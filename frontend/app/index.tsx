@@ -68,8 +68,8 @@ export default function Index() {
         let randTx = { ...defaultTransaction };
         randTx.from = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         randTx.to = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        randTx.amount = Math.random() * 10;
-        randTx.fee = Math.random() * 0.1;
+        randTx.amount = (Math.random() + 1) * 10;
+        randTx.fee = (Math.random() + 1)  * 0.1;
         newTransactions.push(randTx);
       }
       setTransactions(newTransactions);

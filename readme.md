@@ -41,7 +41,7 @@ Install dependencies:
 npm install
 ```
 
-Start the app:
+Start the frontend:
 
 ```sh
 npx expo start
