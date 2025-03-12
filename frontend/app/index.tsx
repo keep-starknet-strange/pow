@@ -12,7 +12,7 @@ export default function Index() {
   const [difficulty, setDifficulty] = useState(1);
   const [nonce, setNonce] = useState(0);
   const [blockHash, setBlockHash] = useState("");
-  const [miningMode, setMiningMode] = useState(true);
+  const [miningMode, setMiningMode] = useState(false);
 
   const [blockTransactions, setBlockTransactions] = useState<Array<any>>([]);
   const resetBlock = () => {
