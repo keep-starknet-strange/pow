@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { Text, View, ScrollView, TouchableOpacity } from "react-native";
+import BalanceDisplay from "./components/BalanceDisplay";
+import Block from "./components/Block";
+import Mempool from "./components/Mempool";
 import "./global.css";
 
 export default function Index() {
@@ -78,78 +81,11 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-[#171717]">
-      <View className="flex flex-row justify-between w-full p-4">
-        <Text className="text-[#f7f7f7] text-2xl">Balance {balance.toFixed(4)} BTC</Text>
-        <View className="flex flex-row gap-4">
-          <View className="bg-[#f7f7f7] rounded-full w-[2rem] h-[2rem] flex items-center justify-center"/>
-          <View className="bg-[#f7f7f7] rounded-full w-[2rem] h-[2rem] flex items-center justify-center"/>
-          <View className="bg-[#f7f7f7] rounded-full w-[2rem] h-[2rem] flex items-center justify-center"/>
-        </View>
-      </View>
+      <BalanceDisplay balance={balance} />
       {!miningMode && (
       <View className="flex-1">
-      <View className="flex flex-row justify-center relative mt-[0%]">
-        {blockNumber > 0 && (
-          <View className="bg-[#f7f7f740] w-[30%] aspect-square rounded-xl border-2 border-[#f7f7f740]
-                           absolute left-0 transform translate-x-[-50%]">
-            <View className="bg-[#f7f7f780] w-[17.5vw] h-[10px] absolute top-[50%] right-0 transform translate-x-[110%] translate-y-[-50%] rounded-xl"></View>
-            <View className="flex flex-wrap gap-1 w-full">
-              {Array.from({ length: maxBlockTransactions }, (_, index) => (
-                <View
-                  key={index}
-                  className="bg-[#f7f7f7] rounded-xl w-[10%] aspect-square"
-                ></View>
-              ))}
-            </View>
-          </View>
-        )}
-        <View className="bg-[#f7f7f740] w-[30%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
-          <View className="flex flex-wrap gap-1 w-full">
-            {blockTransactions.map((_, index) => (
-              <View
-                key={index}
-                className="bg-[#f7f7f7] rounded-xl w-[10%] aspect-square"
-              ></View>
-            ))}
-          </View>
-          <View className="absolute top-0 right-0 transform translate-x-[calc(110%)] translate-y-[50%]">
-            <Text className="text-[#f7f7f7] text-xl">Reward {blockReward} BTC</Text>
-            <Text className="text-[#f7f7f7] text-xl">Fees&nbsp;&nbsp;&nbsp;{blockFees.toFixed(2)} BTC</Text>
-          </View>
-          <Text className="text-[#f7f7f7] text-2xl absolute bottom-[-2rem] left-0 text-center w-full">
-            Block {blockNumber}
-          </Text>
-        </View>
-      </View>
-      <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
-        <Text className="text-[#f7f7f7] text-2xl text-center m-2">Mempool</Text>
-        <ScrollView className="flex-1">
-        {transactions.map((transaction, index) => (
-          <TouchableOpacity
-            key={index}
-            className="flex flex-row justify-between my-2 p-2 bg-[#f7f7f7] rounded-xl h-[4.2rem] w-[95%] mx-auto"
-            onPress={() => addTxToBlock(transaction, index)}
-          >
-            <View className="flex flex-col">
-              <Text className="text-[#171717] text-xl">{transaction.type} {transaction.amount.toFixed(2)} BTC</Text>
-              <View className="flex flex-row flex-1 gap-2">
-                <Text className="text-[#171717] text-xl w-[30%] truncate">
-                  {transaction.from}
-                </Text>
-                <Text className="text-[#171717] text-xl">→</Text>
-                <Text className="text-[#171717] text-xl w-[30%] truncate">
-                  {transaction.to}
-                </Text>
-              </View>
-            </View>
-            <View className="flex flex-col justify-between">
-              <Text className="text-[#171717] text-2xl text-center">Fee</Text>
-              <Text className="text-[#171717] text-xl">{transaction.fee.toFixed(2)} BTC</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-        </ScrollView>
-      </View>
+      <Block blockNumber={blockNumber} blockReward={blockReward} blockFees={blockFees} blockTransactions={blockTransactions} maxBlockTransactions={maxBlockTransactions} />
+      <Mempool transactions={transactions} addTxToBlock={addTxToBlock} />
       </View>
       )}
       {miningMode && (
