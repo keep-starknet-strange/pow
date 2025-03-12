@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 
-type Props = {
+type MiningProps = {
   difficulty: number;
   nonce: number;
   blockHash: string;
@@ -9,7 +9,7 @@ type Props = {
   tryMineBlock: () => void;
 };
 
-const Mining: React.FC<Props> = ({
+const Mining: React.FC<MiningProps> = ({
   difficulty,
   nonce,
   blockHash,

@@ -1,4 +1,3 @@
-
 export type Transaction = {
   from: string;
   to: string;
