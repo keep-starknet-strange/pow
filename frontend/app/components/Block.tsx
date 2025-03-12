@@ -6,7 +6,6 @@ type BlockProps = {
   blockReward: number;
   blockFees: number;
   blockTransactions: Transaction[];
-  maxBlockTransactions: number;
 };
 
 const Block: React.FC<BlockProps> = ({
@@ -14,7 +13,6 @@ const Block: React.FC<BlockProps> = ({
   blockReward,
   blockFees,
   blockTransactions,
-  maxBlockTransactions,
 }) => {
   return (
     <View className="flex flex-row justify-center relative mt-[0%]">

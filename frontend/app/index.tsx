@@ -94,21 +94,23 @@ export default function Index() {
     }
   }, [transactions]);
 
+  const props = {
+    balance: blockData.blockReward + blockData.blockFees,
+    block: { ...blockData },
+    mempool: { transactions, addTxToBlock },
+    mining: { ...miningData, blockReward: blockData.blockReward, blockFees: blockData.blockFees, tryMineBlock },
+  };
+
   return (
     <View className="flex-1 bg-[#171717]">
-      <BalanceDisplay balance={blockData.blockFees + blockData.blockReward} />
+      <BalanceDisplay {...props} />
       {!miningData.miningMode ? (
         <View className="flex-1">
-          <Block {...blockData} maxBlockTransactions={maxBlockTransactions} />
-          <Mempool transactions={transactions} addTxToBlock={addTxToBlock} />
+          <Block {...props.block} />
+          <Mempool {...props.mempool} />
         </View>
       ) : (
-        <Mining
-        {...miningData} 
-        blockReward={blockData.blockReward} 
-        blockFees={blockData.blockFees} 
-        tryMineBlock={tryMineBlock} 
-        />
+        <Mining {...props.mining} />
       )}
     </View>
   );
