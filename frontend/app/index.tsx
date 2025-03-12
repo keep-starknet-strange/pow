@@ -84,8 +84,8 @@ export default function Index() {
       const newTransactions = [...transactions];
       while (newTransactions.length < minTransactions) {
         let randTx = { ...defaultTransaction };
-        randTx.from = Math.random().toString(36).substring(2, 15);
-        randTx.to = Math.random().toString(36).substring(2, 15);
+        randTx.from = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        randTx.to = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);;
         randTx.amount = (Math.random() + 1) * 10;
         randTx.fee = (Math.random() + 1) * 0.1;
         newTransactions.push(randTx);
