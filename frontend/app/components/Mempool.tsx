@@ -1,12 +1,12 @@
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { Transaction } from "../types";
 
-export default function Mempool({
-  transactions,
-  addTxToBlock
-}: {
-  transactions: any[];
-  addTxToBlock: (tx: any, idx: number) => void;
-}) {
+type MempoolProps = {
+  transactions: Transaction[];
+  addTxToBlock: (tx: Transaction, idx: number) => void;
+};
+
+const Mempool: React.FC<MempoolProps> = ({ transactions, addTxToBlock }) => {
   return (
     <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
       <Text className="text-[#f7f7f7] text-2xl text-center m-2">Mempool</Text>
@@ -34,4 +34,6 @@ export default function Mempool({
       </ScrollView>
     </View>
   );
-}
+};
+
+export default Mempool;

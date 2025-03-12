@@ -1,20 +1,22 @@
 import { View, Text, TouchableOpacity } from "react-native";
 
-export default function Mining({
-  difficulty,
-  nonce,
-  blockHash,
-  blockReward,
-  blockFees,
-  tryMineBlock
-}: {
+type Props = {
   difficulty: number;
   nonce: number;
   blockHash: string;
   blockReward: number;
   blockFees: number;
   tryMineBlock: () => void;
-}) {
+};
+
+const Mining: React.FC<Props> = ({
+  difficulty,
+  nonce,
+  blockHash,
+  blockReward,
+  blockFees,
+  tryMineBlock,
+}) => {
   return (
     <View className="flex-1 flex flex-col items-center mt-[30%]">
       <View className="bg-[#f7f7f740] w-[80%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
@@ -33,4 +35,6 @@ export default function Mining({
       <Text className="text-[#f7f7f7] text-2xl">Fees {blockFees.toFixed(2)} BTC</Text>
     </View>
   );
-}
+};
+
+export default Mining;

@@ -1,6 +1,10 @@
 import { Text, View } from "react-native";
 
-export default function BalanceDisplay({ balance }: { balance: number }) {
+type BalanceProps = {
+  balance: number;
+};
+
+const BalanceDisplay: React.FC<BalanceProps> = ({ balance }) => {
   return (
     <View className="flex flex-row justify-between w-full p-4">
       <Text className="text-[#f7f7f7] text-2xl">Balance {balance.toFixed(4)} BTC</Text>
@@ -11,4 +15,6 @@ export default function BalanceDisplay({ balance }: { balance: number }) {
       </View>
     </View>
   );
-}
+};
+
+export default BalanceDisplay;
