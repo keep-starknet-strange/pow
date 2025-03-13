@@ -28,3 +28,5 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     </View>
   );
 };
+
+export default BlockView;

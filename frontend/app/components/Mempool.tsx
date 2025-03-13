@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 
+import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
 
@@ -27,6 +28,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const maxBlockTransactions = 8 * 8;
   const clickTx = (tx: Transaction, index: number) => {
+    playTxClicked();
     props.setBlock(addTxToBlock(props.block, tx));
 
     const newTransactions = [...transactions];
@@ -66,3 +68,5 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     </View>
   );
 };
+
+export default Mempool;

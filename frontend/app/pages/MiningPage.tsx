@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
+import { playMineClicked } from "../components/utils/sounds";
 import { Block } from "../types/Block";
 
 type MiningPageProps = {
@@ -9,11 +10,13 @@ type MiningPageProps = {
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
+  // TODO: Change mining mechanic to be always the same # of clicks & show mining animation
   const difficulty = 1;
   const [nonce, setNonce] = useState(0);
   const [blockHash, setBlockHash] = useState("");
 
   const tryMineBlock = () => {
+    playMineClicked();
     const newNonce = nonce + 1;
     const newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
     setNonce(newNonce);
@@ -43,3 +46,5 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
     </View>
   );
 };
+
+export default MiningPage;

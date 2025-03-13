@@ -17,3 +17,5 @@ export const AchievementsPage: React.FC<AchievementsPageProps> = (props) => {
    </View>
   );
 }
+
+export default AchievementsPage;

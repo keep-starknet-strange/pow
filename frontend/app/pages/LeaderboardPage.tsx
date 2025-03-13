@@ -17,3 +17,5 @@ export const LeaderboardPage: React.FC<LeaderboardPageProps> = (props) => {
    </View>
   );
 }
+
+export default LeaderboardPage;

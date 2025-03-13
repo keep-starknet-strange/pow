@@ -17,3 +17,5 @@ export const StorePage: React.FC<StorePageProps> = (props) => {
    </View>
   );
 }
+
+export default StorePage;

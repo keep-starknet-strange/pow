@@ -38,3 +38,5 @@ export const SequencingPage: React.FC<SequencingPageProps> = (props) => {
    </View>
   );
 }
+
+export default SequencingPage;
