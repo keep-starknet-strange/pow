@@ -3,16 +3,21 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
+import { Upgrade } from "../types/Upgrade";
 
 export type MempoolProps = {
   block: Block;
   setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
+  upgrades: Upgrade[];
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
-  const minTransactions = 20;
+  const minTransactions = 10;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
+
+  // Upgrades should be a map
+  const isSortingEnabled = props.upgrades.some((upgrade) => upgrade.name === "Tx sorting" && upgrade.purchased);
 
   // Auto-generate Transactions
   useEffect(() => {
@@ -21,9 +26,9 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
       while (newTransactions.length < minTransactions) {
         newTransactions.push(newTransaction());
       }
-      setTransactions(newTransactions);
+      setTransactions(isSortingEnabled ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
     }
-  }, [transactions]);
+  }, [transactions, isSortingEnabled]);
 
   const maxBlockTransactions = 8 * 8;
   const clickTx = (tx: Transaction, index: number) => {
