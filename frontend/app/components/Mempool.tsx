@@ -1,12 +1,43 @@
+import { useState, useEffect } from "react";
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
-import { Transaction } from "../types";
 
-type MempoolProps = {
-  transactions: Transaction[];
-  addTxToBlock: (tx: Transaction, idx: number) => void;
+import { Block, addTxToBlock } from "../types/Block";
+import { Transaction, newTransaction } from "../types/Transaction";
+
+export type MempoolProps = {
+  block: Block;
+  setBlock: (block: Block) => void;
+  switchPage: (page: string) => void;
 };
 
-const Mempool: React.FC<MempoolProps> = ({ transactions, addTxToBlock }) => {
+export const Mempool: React.FC<MempoolProps> = (props) => {
+  const minTransactions = 20;
+  const [transactions, setTransactions] = useState<Array<Transaction>>([]);
+
+  // Auto-generate Transactions
+  useEffect(() => {
+    if (transactions.length < minTransactions) {
+      const newTransactions = [...transactions];
+      while (newTransactions.length < minTransactions) {
+        newTransactions.push(newTransaction());
+      }
+      setTransactions(newTransactions);
+    }
+  }, [transactions]);
+
+  const maxBlockTransactions = 8 * 8;
+  const clickTx = (tx: Transaction, index: number) => {
+    props.setBlock(addTxToBlock(props.block, tx));
+
+    const newTransactions = [...transactions];
+    newTransactions.splice(index, 1);
+    setTransactions(newTransactions);
+
+    if (props.block.transactions.length >= maxBlockTransactions) {
+      props.switchPage("Mining");
+    }
+  }
+
   return (
     <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
       <Text className="text-[#f7f7f7] text-2xl text-center m-2">Mempool</Text>
@@ -15,7 +46,7 @@ const Mempool: React.FC<MempoolProps> = ({ transactions, addTxToBlock }) => {
           <TouchableOpacity
             key={index}
             className="flex flex-row justify-between my-2 p-2 bg-[#f7f7f7] rounded-xl h-[4.2rem] w-[95%] mx-auto"
-            onPress={() => addTxToBlock(transaction, index)}
+            onPress={() => clickTx(transaction, index)}
           >
             <View className="flex flex-col">
               <Text className="text-[#171717] text-xl">{transaction.type} {transaction.amount.toFixed(2)} BTC</Text>
@@ -35,5 +66,3 @@ const Mempool: React.FC<MempoolProps> = ({ transactions, addTxToBlock }) => {
     </View>
   );
 };
-
-export default Mempool;

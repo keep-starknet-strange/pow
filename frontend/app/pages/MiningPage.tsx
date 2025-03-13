@@ -1,22 +1,29 @@
+import { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
-type MiningProps = {
-  difficulty: number;
-  nonce: number;
-  blockHash: string;
-  blockReward: number;
-  blockFees: number;
-  tryMineBlock: () => void;
+import { Block } from "../types/Block";
+
+type MiningPageProps = {
+  block: Block;
+  finalizeBlock: () => void;
 };
 
-const Mining: React.FC<MiningProps> = ({
-  difficulty,
-  nonce,
-  blockHash,
-  blockReward,
-  blockFees,
-  tryMineBlock,
-}) => {
+export const MiningPage: React.FC<MiningPageProps> = (props) => {
+  const difficulty = 1;
+  const [nonce, setNonce] = useState(0);
+  const [blockHash, setBlockHash] = useState("");
+
+  const tryMineBlock = () => {
+    const newNonce = nonce + 1;
+    const newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+    setNonce(newNonce);
+    setBlockHash(newBlockHash);
+
+    if (newBlockHash.startsWith("0".repeat(difficulty))) {
+      props.finalizeBlock();
+    }
+  };
+
   return (
     <View className="flex-1 flex flex-col items-center mt-[30%]">
       <View className="bg-[#f7f7f740] w-[80%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
@@ -31,10 +38,8 @@ const Mining: React.FC<MiningProps> = ({
       <Text className="text-[#f7f7f7] text-2xl mt-4">Difficulty {difficulty}</Text>
       <Text className="text-[#f7f7f7] text-2xl">Nonce {nonce}</Text>
       <Text className="text-[#f7f7f7] text-2xl">Hash {blockHash}</Text>
-      <Text className="text-[#f7f7f7] text-2xl mt-8">Reward {blockReward} BTC</Text>
-      <Text className="text-[#f7f7f7] text-2xl">Fees {blockFees.toFixed(2)} BTC</Text>
+      <Text className="text-[#f7f7f7] text-2xl mt-8">Reward {props.block.reward} BTC</Text>
+      <Text className="text-[#f7f7f7] text-2xl">Fees {props.block.fees.toFixed(2)} BTC</Text>
     </View>
   );
 };
-
-export default Mining;
