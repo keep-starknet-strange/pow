@@ -20,6 +20,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = (props) => {
     setNotifs(!notifs);
   }
 
+  // TODO: Help option?
   return (
     <View className="flex-1 flex flex-col gap-4 px-8">
      <View className="flex flex-row justify-around mt-4 gap-4 w-full">
