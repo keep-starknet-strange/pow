@@ -9,6 +9,7 @@ export type MempoolProps = {
   block: Block;
   setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
+  maxBlockTransactions: number;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
@@ -26,7 +27,6 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     }
   }, [transactions]);
 
-  const maxBlockTransactions = 8 * 8;
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked();
     props.setBlock(addTxToBlock(props.block, tx));
@@ -35,10 +35,23 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     newTransactions.splice(index, 1);
     setTransactions(newTransactions);
 
-    if (props.block.transactions.length >= maxBlockTransactions) {
+    if (props.block.transactions.length + 1 >= props.maxBlockTransactions) {
       props.switchPage("Mining");
     }
   }
+
+  // Click tx every (autoClickerSpeed) milliseconds if the auto-clicker upgrade is active
+  const [hasAutoClickerUpgrade, setHasAutoClickerUpgrade] = useState(true);
+  const [autoClickerSpeed, setAutoClickerSpeed] = useState(500);
+  useEffect(() => {
+    if (!hasAutoClickerUpgrade) return;
+    const interval = setInterval(() => {
+      if (transactions.length > 0) {
+        clickTx(transactions[0], 0);
+      }
+    }, autoClickerSpeed);
+    return () => clearInterval(interval);
+  }, [transactions, autoClickerSpeed, hasAutoClickerUpgrade]);
 
   return (
     <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
