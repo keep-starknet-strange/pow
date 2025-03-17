@@ -7,7 +7,9 @@ export const setSoundEffectVolume = (volume: number) => {
 export const getSoundEffectVolume = () => soundEffectVolume;
 
 const txClickedSource = require("../../../assets/sounds/tx-clicked.wav");
-export const playTxClicked = async () => {
+export const playTxClicked = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
   // TODO: Volume, pitch, loading each time, etc.
   // TODO: Move this to setup func
   await Audio.setAudioModeAsync({
@@ -20,7 +22,8 @@ export const playTxClicked = async () => {
 }
 
 const mineClickedSource = require("../../../assets/sounds/mine-clicked.wav");
-export const playMineClicked = async () => {
+export const playMineClicked = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
   const { sound } = await Audio.Sound.createAsync(mineClickedSource);
   await sound.playAsync();
 }
