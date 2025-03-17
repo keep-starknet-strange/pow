@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
+import { useSound } from "../context/Sound";
 import { playMineClicked } from "../components/utils/sounds";
 import { Block } from "../types/Block";
 
@@ -15,9 +16,10 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
   const [nonce, setNonce] = useState(0);
   const [mineCounter, setMineCounter] = useState(0);
   const [blockHash, setBlockHash] = useState("");
+  const { isSoundOn } = useSound();
 
   const tryMineBlock = () => {
-    playMineClicked();
+    playMineClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
     setNonce(randomNonce);
     let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);

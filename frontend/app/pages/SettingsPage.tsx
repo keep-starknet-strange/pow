@@ -4,21 +4,18 @@ import { View, Text, TouchableOpacity } from "react-native";
 import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
 
+import ToggleButton from "../components/buttons/Toggle";
+
+import { useSound } from "../context/Sound";
+
 export type SettingsPageProps = {
   closeHeaderTab: () => void;
 };
 
 export const SettingsPage: React.FC<SettingsPageProps> = (props) => {
-  const [sound, setSound] = useState(true);
-  const [music, setMusic] = useState(true);
+  const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
   const [notifs, setNotifs] = useState(true);
 
-  const toggleSound = () => {
-    setSound(!sound);
-  }
-  const toggleMusic = () => {
-    setMusic(!music);
-  }
   const toggleNotifs = () => {
     setNotifs(!notifs);
   }
@@ -46,28 +43,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = (props) => {
      {openSection.name === "Main" ? (
        <View className="flex flex-col gap-4 mt-4 w-full">
        <View className="flex flex-row justify-around mt-4 gap-4 w-full">
-         <TouchableOpacity
-           onPress={toggleSound}
-           className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-         >
-           <Text className="text-4xl">Sound </Text>
-           <Text className="text-2xl">{sound ? "🔊" : "🔇"}</Text>
-         </TouchableOpacity>
-         <TouchableOpacity
-           onPress={toggleMusic}
-           className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-          >
-            <Text className="text-4xl">Music </Text>
-            <Text className="text-2xl">{music ? "🔊" : "🔇"}</Text>
-          </TouchableOpacity>
+        <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol={"🔊"} offSymbol={"🔇"}  />
+        <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol={"🔊"} offSymbol={"🔇"}/>
        </View>
-       <TouchableOpacity
-         onPress={toggleNotifs}
-         className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-       >
-         <Text className="text-4xl">Notifications </Text>
-         <Text className="text-2xl">{notifs ? "🔔" : "🔕"}</Text>
-       </TouchableOpacity>
+       <ToggleButton label="Notifications" isOn={notifs} onToggle={toggleNotifs} onSymbol={"🔔"} offSymbol={"🔕"} />
        <TouchableOpacity
          className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
        >
