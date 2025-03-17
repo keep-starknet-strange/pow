@@ -5,7 +5,6 @@ import { View } from "react-native";
 
 import { Header } from "./components/Header";
 
-import { newBlock } from "./types/Block";
 import { Upgrades } from "./types/Upgrade";
 import { Block, newBlock } from "./types/Block";
 

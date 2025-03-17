@@ -30,9 +30,8 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
 
   return (
     <View className="flex-1">
-     <Text className="text-xl text-white">Store Page</Text>
      <TouchableOpacity
-       className=""
+       className="w-full flex items-end p-4"
        onPress={closeHeaderTab}
      >
        <Text className="text-red-600 text-4xl">X</Text>

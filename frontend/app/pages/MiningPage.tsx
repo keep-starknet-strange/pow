@@ -12,10 +12,8 @@ type MiningPageProps = {
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
-  const baseDifficulty = 2;
-  const difficulty = useMemo(() => (props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty), [props.upgrades]);
-  // TODO: Change mining mechanic to be always the same # of clicks & show mining animation
-  const [difficulty, setDifficulty] = useState(8);
+  const baseDifficulty = 8;
+  const [difficulty, setDifficulty] = useState(props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty);
   const [nonce, setNonce] = useState(0);
   const [mineCounter, setMineCounter] = useState(0);
   const [blockHash, setBlockHash] = useState("");
