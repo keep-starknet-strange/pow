@@ -6,6 +6,7 @@ import { View } from "react-native";
 import { Header } from "./components/Header";
 
 import { newBlock } from "./types/Block";
+import { Upgrades } from "./types/Upgrade";
 
 import { SequencingPage } from "./pages/SequencingPage";
 import { MiningPage } from "./pages/MiningPage";
@@ -18,10 +19,10 @@ export default function Index() {
   const blockReward = 5;
   const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward));
   const [userBalance, setUserBalance] = useState(0);
-  const [upgrades, setUpgrades] = useState([
-    { name: "Tx sorting", cost: 10, effect: "sort transactions by fee", purchased: false },
-    { name: "Lower Block Difficulty", cost: 20, effect: "make block easier to mine", purchased: false },
-  ]);
+  const [upgrades, setUpgrades] = useState<Upgrades>({
+    "Tx sorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
+    "Lower Block Difficulty": { cost: 20, effect: "make block easier to mine", purchased: false },
+  });
 
   // Finalize Mined Block
   const finalizeBlock = () => {

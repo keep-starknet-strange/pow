@@ -1,32 +1,31 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
 
-import { Upgrade } from "../types/Upgrade";
+import { Upgrades } from "../types/Upgrade";
 
 export type StorePageProps = {
   closeHeaderTab: () => void,
-  upgrades: Upgrade[],
-  setUpgrades: (upgrades: Upgrade[]) => void;
+  upgrades: Upgrades,
+  setUpgrades: (upgrades: Upgrades) => void;
   balance: number
   setBalance: (balance: number) => void;
 };
 
 export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, setUpgrades, balance, setBalance }) => {
   const [showModal, setShowModal] = useState(false);
+  const upgradeNames = Object.keys(upgrades);
 
-  const purchase = (item: Upgrade) => {
-    if (balance < item.cost) {
+  const purchase = (upgradeName: string) => {
+    if (balance < upgrades[upgradeName].cost) {
       setShowModal(true);
       return;
     }
 
-
-    setBalance(balance - item.cost);
-    setUpgrades(
-      upgrades.map((upgrade) =>
-        upgrade.name === item.name ? { ...upgrade, purchased: true } : upgrade
-      )
-    );
+    setBalance(balance - upgrades[upgradeName].cost);
+    setUpgrades({
+      ...upgrades,
+        [upgradeName]: { ...upgrades[upgradeName], purchased: true },
+    })
   };
 
   return (
@@ -39,20 +38,20 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
        <Text className="text-red-600 text-4xl">X</Text>
      </TouchableOpacity>
 
-     <FlatList data={upgrades} renderItem={({ item }) => (
+     <FlatList data={upgradeNames} renderItem={({ item }) => (
       <View className={`flex flex-row justify-between items-center my-2 p-3 rounded-xl h-[4.2rem] w-[95%] mx-auto ${
-        item.purchased ? "bg-gray-300 opacity-50" : "bg-[#f7f7f7]"
+        upgrades[item].purchased ? "bg-gray-300 opacity-50" : "bg-[#f7f7f7]"
       }`}
       >
         <View className="flex flex-col justify-between">
-        <Text className="text-[#171717] text-xl">{item.name}</Text>
-        <Text className="text-[#171717] text-md">{item.effect}</Text>
+        <Text className="text-[#171717] text-xl">{item}</Text>
+        <Text className="text-[#171717] text-md">{upgrades[item].effect}</Text>
         </View>
-        <TouchableOpacity onPress={() => purchase(item)} disabled={item.purchased} className={`p-2 rounded-lg justify-center items-center ${
-          item.purchased ? "bg-gray-500" : "bg-[#d0d0d0]"
+        <TouchableOpacity onPress={() => purchase(item)} disabled={upgrades[item].purchased} className={`p-2 rounded-lg justify-center items-center ${
+          upgrades[item].purchased ? "bg-gray-500" : "bg-[#d0d0d0]"
           }`}
         >
-          <Text className="text-[#171717] text-md">₿{item.cost}</Text>
+          <Text className="text-[#171717] text-md">₿{upgrades[item].cost}</Text>
         </TouchableOpacity>
       </View>
      )} />

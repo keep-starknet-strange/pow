@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
 import { Block } from "../types/Block";
+import { Upgrades } from "../types/Upgrade";
 
 type MiningPageProps = {
   block: Block;
   finalizeBlock: () => void;
+  upgrades: Upgrades;
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
-  const difficulty = 1;
+  const baseDifficulty = 3;
+  const difficulty = useMemo(() => (props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty), [props.upgrades]);
   const [nonce, setNonce] = useState(0);
   const [blockHash, setBlockHash] = useState("");
 

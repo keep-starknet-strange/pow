@@ -3,21 +3,20 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
-import { Upgrade } from "../types/Upgrade";
+import { Upgrades } from "../types/Upgrade";
 
 export type MempoolProps = {
   block: Block;
   setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
-  upgrades: Upgrade[];
+  upgrades: Upgrades;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
-  const minTransactions = 10;
+  const minTransactions = 5;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
 
-  // Upgrades should be a map
-  const isSortingEnabled = props.upgrades.some((upgrade) => upgrade.name === "Tx sorting" && upgrade.purchased);
+  const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
 
   // Auto-generate Transactions
   useEffect(() => {

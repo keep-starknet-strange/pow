@@ -1,6 +1,7 @@
 export type Upgrade = {
-  name: string;
   cost: number;
   effect: string;
   purchased: boolean;
 };
+
+export type Upgrades = Record<string, Upgrade>;
