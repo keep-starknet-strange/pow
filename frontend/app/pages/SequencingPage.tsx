@@ -12,7 +12,6 @@ export type SequencingPageProps = {
 };
 
 export const SequencingPage: React.FC<SequencingPageProps> = (props) => {
-  console.log("SequencingPage", props.block, props.lastBlock);
   return (
     <View className="flex-1 relative">
       {props.lastBlock !== null && (
