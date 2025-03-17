@@ -11,7 +11,7 @@ type MiningPageProps = {
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
-  const baseDifficulty = 3;
+  const baseDifficulty = 2;
   const difficulty = useMemo(() => (props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty), [props.upgrades]);
   const [nonce, setNonce] = useState(0);
   const [blockHash, setBlockHash] = useState("");
