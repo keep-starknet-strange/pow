@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { View } from "react-native";
 
 import { Header } from "./components/Header";
+
+import { Upgrades } from "./types/Upgrade";
 import { Block, newBlock } from "./types/Block";
 
 import { SequencingPage } from "./pages/SequencingPage";
@@ -19,7 +21,10 @@ export default function game() {
   const [lastBlock, setLastBlock] = useState<Block | null>(null);
   const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward, blockSize));
   const [userBalance, setUserBalance] = useState(0);
-
+  const [upgrades, setUpgrades] = useState<Upgrades>({
+    "Tx sorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
+    "Lower Block Difficulty": { cost: 20, effect: "make block easier to mine", purchased: false },
+  });
 
   // Finalize Mined Block
   const finalizeBlock = () => {
@@ -49,6 +54,7 @@ export default function game() {
     name: "Settings",
     component: SettingsPage
   }];
+
   const [currentPage, setCurrentPage] = useState(pages[0]);
   const [currentBasePage, setCurrentBasePage] = useState(pages[0]);
   const basePages = ["Sequencing", "Mining"];
@@ -83,7 +89,9 @@ export default function game() {
     setBlock: setCurrentBlock,
     finalizeBlock: finalizeBlock,
     switchPage: switchPage,
-    closeHeaderTab: closeHeaderTab
+    closeHeaderTab: closeHeaderTab,
+    upgrades: upgrades,
+    setUpgrades: setUpgrades
   };
 
   return (
