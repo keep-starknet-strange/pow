@@ -7,6 +7,7 @@ import { Header } from "./components/Header";
 
 import { newBlock } from "./types/Block";
 import { Upgrades } from "./types/Upgrade";
+import { Block, newBlock } from "./types/Block";
 
 import { SequencingPage } from "./pages/SequencingPage";
 import { MiningPage } from "./pages/MiningPage";
@@ -16,8 +17,10 @@ import { AchievementsPage } from "./pages/AchievementsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
 export default function Index() {
-  const blockReward = 5;
-  const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward));
+  const [blockReward, setBlockReward] = useState(5);
+  const [blockSize, setBlockSize] = useState(8*8);
+  const [lastBlock, setLastBlock] = useState<Block | null>(null);
+  const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward, blockSize));
   const [userBalance, setUserBalance] = useState(0);
   const [upgrades, setUpgrades] = useState<Upgrades>({
     "Tx sorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
@@ -27,7 +30,8 @@ export default function Index() {
   // Finalize Mined Block
   const finalizeBlock = () => {
     const finalizedBlock = { ...currentBlock };
-    setCurrentBlock(newBlock(finalizedBlock.id + 1, blockReward));
+    setLastBlock(finalizedBlock);
+    setCurrentBlock(newBlock(finalizedBlock.id + 1, blockReward, blockSize));
     setUserBalance(userBalance + finalizedBlock.reward + finalizedBlock.fees);
     switchPage("Sequencing");
   };
@@ -81,6 +85,7 @@ export default function Index() {
   const props = {
     balance: userBalance,
     setBalance: setUserBalance,
+    lastBlock: lastBlock,
     block: { ...currentBlock },
     setBlock: setCurrentBlock,
     finalizeBlock: finalizeBlock,

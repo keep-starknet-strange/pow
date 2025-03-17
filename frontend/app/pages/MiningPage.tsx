@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
+import { playMineClicked } from "../components/utils/sounds";
 import { Block } from "../types/Block";
 import { Upgrades } from "../types/Upgrade";
 
@@ -13,23 +14,51 @@ type MiningPageProps = {
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
   const baseDifficulty = 2;
   const difficulty = useMemo(() => (props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty), [props.upgrades]);
+  // TODO: Change mining mechanic to be always the same # of clicks & show mining animation
+  const [difficulty, setDifficulty] = useState(8);
   const [nonce, setNonce] = useState(0);
+  const [mineCounter, setMineCounter] = useState(0);
   const [blockHash, setBlockHash] = useState("");
 
   const tryMineBlock = () => {
-    const newNonce = nonce + 1;
-    const newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
-    setNonce(newNonce);
+    playMineClicked();
+    const randomNonce = Math.floor(Math.random() * 10000);
+    setNonce(randomNonce);
+    let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+    const newMineCounter = mineCounter + 1;
+    setMineCounter(newMineCounter);
+    if (newMineCounter >= difficulty) {
+      newBlockHash = "0".repeat(difficulty) + newBlockHash.substring(difficulty);
+    }
     setBlockHash(newBlockHash);
 
-    if (newBlockHash.startsWith("0".repeat(difficulty))) {
+    if (newMineCounter >= difficulty) {
       props.finalizeBlock();
     }
   };
 
+  // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
+  const [hasAutoMineUpgrade, setHasAutoMineUpgrade] = useState(true);
+  const [minerSpeed, setMinerSpeed] = useState(500);
+  useEffect(() => {
+    if (!hasAutoMineUpgrade) return;
+    const interval = setInterval(() => {
+      if (mineCounter < difficulty) {
+        tryMineBlock();
+      } else {
+        clearInterval(interval);
+      }
+    }, minerSpeed);
+    return () => clearInterval(interval);
+  }, [hasAutoMineUpgrade, mineCounter, difficulty, minerSpeed]);
+
   return (
     <View className="flex-1 flex flex-col items-center mt-[30%]">
       <View className="bg-[#f7f7f740] w-[80%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
+        <View
+          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
+          style={{ width: `${Math.floor(mineCounter / difficulty * 100)}%`, height: `${Math.floor(mineCounter / difficulty * 100)}%` }}
+        />
         <TouchableOpacity
           className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#f7f7f7] rounded-full flex items-center justify-center
                     border-2 border-[#17f717]"
@@ -46,3 +75,5 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
     </View>
   );
 };
+
+export default MiningPage;

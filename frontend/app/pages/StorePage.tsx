@@ -70,3 +70,5 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
    </View>
   );
 }
+
+export default StorePage;

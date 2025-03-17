@@ -24,3 +24,5 @@ export const Header: React.FC<HeaderProps> = (props) => {
     </View>
   );
 };
+
+export default Header;

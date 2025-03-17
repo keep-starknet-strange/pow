@@ -1,0 +1,29 @@
+[
+  {
+    "name": "ClickChainAlpha1",
+    "network": "sepolia",
+    "address": "0x330c950ded409f9cd102ef9102d1ab833f5a07a28ab258226ce83b1a3be00a8",
+    "events": [
+      {
+        "id": 1,
+        "name": "UserBalanceUpdated"
+      },
+      {
+        "id": 2,
+        "name": "UserChainCreated"
+      },
+      {
+        "id": 3,
+        "name": "UserBlockMined"
+      },
+      {
+        "id": 4,
+        "name": "UserBlockFeeUpdated"
+      },
+      {
+        "id": 5,
+        "name": "UserBlockHpUpdated"
+      }
+    ]
+  }
+]
