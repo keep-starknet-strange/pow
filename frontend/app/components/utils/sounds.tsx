@@ -24,6 +24,7 @@ export const playTxClicked = async (isSoundOn: boolean) => {
 const mineClickedSource = require("../../../assets/sounds/mine-clicked.wav");
 export const playMineClicked = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
+  
   const { sound } = await Audio.Sound.createAsync(mineClickedSource);
   await sound.playAsync();
 }
