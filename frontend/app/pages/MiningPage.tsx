@@ -13,8 +13,6 @@ type MiningPageProps = {
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
-  const baseDifficulty = 8;
-  const [difficulty, setDifficulty] = useState(props.upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty);
   const [nonce, setNonce] = useState(0);
   const [mineCounter, setMineCounter] = useState(0);
   const [blockHash, setBlockHash] = useState("");
@@ -27,12 +25,12 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
     let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    if (newMineCounter >= difficulty) {
-      newBlockHash = "0".repeat(difficulty) + newBlockHash.substring(difficulty);
+    if (newMineCounter >= props.block.hp) {
+      newBlockHash = "0".repeat(props.block.hp) + newBlockHash.substring(props.block.hp);
     }
     setBlockHash(newBlockHash);
 
-    if (newMineCounter >= difficulty) {
+    if (newMineCounter >= props.block.hp) {
       props.finalizeBlock();
     }
   };
@@ -43,21 +41,21 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
   useEffect(() => {
     if (!hasAutoMineUpgrade) return;
     const interval = setInterval(() => {
-      if (mineCounter < difficulty) {
+      if (mineCounter < props.block.hp) {
         tryMineBlock();
       } else {
         clearInterval(interval);
       }
     }, minerSpeed);
     return () => clearInterval(interval);
-  }, [hasAutoMineUpgrade, mineCounter, difficulty, minerSpeed]);
+  }, [hasAutoMineUpgrade, mineCounter, props.block.hp, minerSpeed]);
 
   return (
     <View className="flex-1 flex flex-col items-center mt-[30%]">
       <View className="bg-[#f7f7f740] w-[80%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
         <View
           className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-          style={{ width: `${Math.floor(mineCounter / difficulty * 100)}%`, height: `${Math.floor(mineCounter / difficulty * 100)}%` }}
+          style={{ width: `${Math.floor(mineCounter / props.block.hp * 100)}%`, height: `${Math.floor(mineCounter / props.block.hp * 100)}%` }}
         />
         <TouchableOpacity
           className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#f7f7f7] rounded-full flex items-center justify-center
@@ -67,7 +65,7 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
           <Text className="text-[#171717] text-6xl m-4 mx-10">Mine!</Text>
         </TouchableOpacity>
       </View>
-      <Text className="text-[#f7f7f7] text-2xl mt-4">Difficulty {difficulty}</Text>
+      <Text className="text-[#f7f7f7] text-2xl mt-4">Difficulty {props.block.hp}</Text>
       <Text className="text-[#f7f7f7] text-2xl">Nonce {nonce}</Text>
       <Text className="text-[#f7f7f7] text-2xl">Hash {blockHash}</Text>
       <Text className="text-[#f7f7f7] text-2xl mt-8">Reward {props.block.reward} BTC</Text>

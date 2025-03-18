@@ -203,13 +203,13 @@ mod ClickChain {
                 };
                 // Reset user block data
                 self.user_blocks_hp.write((user, chain_id), new_difficulty);
-                self.user_blocks_metadata.write((user, chain_id), new_block_metadata.clone());
+                self.user_blocks_metadata.write((user, chain_id), new_block_metadata);
                 self.user_blocks_fees.write((user, chain_id), 0);
                 // Update balance
                 let user_balance = self.user_balances.read(user);
                 self.user_balances.write(user, user_balance + block_metadata.reward + block_fees);
 
-                self.emit(UserBlockMined { user, chain_id, metadata: new_block_metadata });
+                self.emit(UserBlockMined { user, chain_id, metadata: block_metadata.clone() });
                 self
                     .emit(
                         UserBalanceUpdated {

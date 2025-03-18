@@ -6,6 +6,7 @@ export type Block = {
   fees: number;
   transactions: Transaction[];
   maxSize: number;
+  hp: number;
 };
 
 export const addTxToBlock = (block: Block, tx: Transaction): Block => {
@@ -17,12 +18,13 @@ export const addTxToBlock = (block: Block, tx: Transaction): Block => {
   };
 }
 
-export const newBlock = (blockNumber: number, blockReward: number, maxSize: number): Block => {
+export const newBlock = (blockNumber: number, blockReward: number, maxSize: number, difficulty: number): Block => {
   return {
     id: blockNumber,
     reward: blockReward,
     fees: 0,
     transactions: [],
     maxSize: maxSize,
+    hp: difficulty,
   };
 }
