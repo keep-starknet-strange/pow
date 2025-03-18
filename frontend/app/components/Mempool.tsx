@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 
+import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
@@ -17,6 +18,7 @@ export type MempoolProps = {
 export const Mempool: React.FC<MempoolProps> = (props) => {
   const minTransactions = 5;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
+  const { isSoundOn } = useSound();
 
   const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
 
@@ -32,7 +34,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   }, [transactions, isSortingEnabled]);
 
   const clickTx = (tx: Transaction, index: number) => {
-    playTxClicked();
+    playTxClicked(isSoundOn);
     props.setBlock(addTxToBlock(props.block, tx));
 
     const newTransactions = [...transactions];
