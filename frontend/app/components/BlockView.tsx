@@ -1,26 +1,28 @@
 import { View, Text } from "react-native";
 import { Block } from "../types/Block";
 
+import { calculateWidthPercentage } from "../utils/grid";
+
 export type BlockViewProps = {
   block: Block;
   hideStats?: boolean;
+  blockSize: number;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
+
+  const width = calculateWidthPercentage(props.blockSize, 2, 100);
   return (
     <View className="flex flex-row justify-center relative mt-[0%]">
       <View className="bg-[#f7f7f740] w-[30%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
-
-      <View className="flex flex-wrap w-full aspect-square gap-1">
-  {props.block.transactions.map((_, index) => (
-    <View 
-      key={index} 
-      className="bg-[#f7f7f7] rounded-xl w-[9.75%] aspect-square"
-    />
-  ))}
-</View>
-
-
+       <View className="flex flex-wrap w-full aspect-square gap-1">
+        {props.block.transactions.map((_, index) => (
+          <View 
+            key={index} 
+            className="bg-[#f7f7f7] rounded-xl w-[9.75%] aspect-square"
+          />
+        ))}
+      </View>
         {!props.hideStats && (
           <View className="absolute top-0 right-0 transform translate-x-[calc(100%)] translate-y-[50%]">
             <Text className="text-[#f7f7f7] text-xl">Reward {props.block.reward} BTC</Text>
