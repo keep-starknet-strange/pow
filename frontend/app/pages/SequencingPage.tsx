@@ -3,12 +3,14 @@ import { View } from "react-native";
 import { BlockView } from "../components/BlockView";
 import { Mempool } from "../components/Mempool";
 import { Block } from "../types/Block";
+import { Upgrades } from "../types/Upgrade";
 
 export type SequencingPageProps = {
   lastBlock: Block | null;
   block: Block;
   setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
+  upgrades: Upgrades;
 };
 
 export const SequencingPage: React.FC<SequencingPageProps> = (props) => {

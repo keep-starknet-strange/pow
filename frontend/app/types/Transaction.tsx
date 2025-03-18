@@ -15,3 +15,13 @@ export const newTransaction = () => {
     fee: (Math.random() + 1) * 0.1
   };
 }
+
+export const newEmptyTransaction = () => {
+  return {
+    from: "",
+    to: "",
+    type: "",
+    amount: 0,
+    fee: 0
+  };
+}

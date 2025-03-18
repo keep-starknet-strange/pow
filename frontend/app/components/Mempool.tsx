@@ -55,7 +55,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
       }
     }, autoClickerSpeed);
     return () => clearInterval(interval);
-  }, [transactions, autoClickerSpeed, hasAutoClickerUpgrade]);
+  }, [transactions, autoClickerSpeed, hasAutoClickerUpgrade, props.block]);
 
   return (
     <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
