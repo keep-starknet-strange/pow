@@ -17,19 +17,16 @@ import { SettingsPage } from "./pages/SettingsPage";
 
 import { useEventManager } from "./context/EventManager";
 import { useAchievement } from "./context/Achievements";
+import { useUpgrades } from "./context/Upgrades";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
 import { getGameState } from "./api/state";
 import { mockAddress } from "./api/mock";
 
 export default function game() {
-  const [upgrades, setUpgrades] = useState<Upgrades>({
-    "txSorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
-    "lowerBlockDifficulty": { cost: 20, effect: "make block easier to mine", purchased: false },
-    "l2BlobUpgrade" : { cost: 30, effect: "unlock L2 Blob transactions", purchased: false },
-    "l2Upgrade" : { cost: 40, effect: "unlock L2 transactions", purchased: false }
-  });
+    const { upgrades, addUpgrade, isUpgradeActive } = useUpgrades();
+
   const baseDifficulty = 8;
-  const [difficulty, setDifficulty] = useState(upgrades["Lower Block Difficulty"]?.purchased ? baseDifficulty - 1 : baseDifficulty);
+  const [difficulty, setDifficulty] = useState(upgrades[1] ? baseDifficulty - 1 : baseDifficulty);
   const [blockReward, setBlockReward] = useState(5);
   const [blockSize, setBlockSize] = useState(8*8);
   const [lastBlock, setLastBlock] = useState<Block | null>(null);
@@ -121,7 +118,6 @@ export default function game() {
     switchPage: switchPage,
     closeHeaderTab: closeHeaderTab,
     upgrades: upgrades,
-    setUpgrades: setUpgrades
   };
 
   return (

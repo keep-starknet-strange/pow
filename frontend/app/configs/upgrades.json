@@ -1,0 +1,27 @@
+[
+  {
+    "id": 0,
+    "name": "txSorting",
+    "cost": 10,
+    "effect": "sort transactions by fee"
+  },
+  {
+    "id": 1,
+    "name": "lowerBlockDifficulty",
+    "cost": 20,
+    "effect": "make block easier to mine",
+    "maxLevel": 5
+  },
+  {
+    "id": 2,
+    "name": "l2Upgrade",
+    "cost": 40,
+    "effect": "unlock L2 transactions"
+  },
+  {
+    "id": 3,
+    "name": "l2BlobUpgrade",
+    "cost": 30,
+    "effect": "unlock L2 Blob transactions"
+  }
+]

@@ -6,7 +6,8 @@ import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
 import { useEventManager } from "../context/EventManager";
-import { Upgrades, getActiveUpgrades } from "../types/Upgrade";
+import { Upgrades } from "../types/Upgrade";
+import { useUpgrades } from "../context/Upgrades";
 
 export type MempoolProps = {
   block: Block;
@@ -17,10 +18,11 @@ export type MempoolProps = {
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
+  const { upgrades, isUpgradeActive } = useUpgrades();
   const minTransactions = 5;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
   const { isSoundOn } = useSound();
-  const activatedUpgrades = getActiveUpgrades(props.upgrades);
+
 
   const { notify } = useEventManager();
 
@@ -29,12 +31,12 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     if (transactions.length < minTransactions) {
       const newTransactions = [...transactions];
       while (newTransactions.length < minTransactions) {
-        newTransactions.push(newTransaction(activatedUpgrades)); // Uses upgrade-based filtering
+        newTransactions.push(newTransaction(isUpgradeActive)); // Uses upgrade-based filtering
       }
 
-      setTransactions(activatedUpgrades["txSorting"] ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
+      setTransactions(isUpgradeActive(0) ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
     }
-  }, [transactions, activatedUpgrades]);
+  }, [transactions, upgrades]);
 
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
