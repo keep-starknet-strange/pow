@@ -5,6 +5,7 @@ import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
+import { useEventManager } from "../context/EventManager";
 import { Upgrades, getActiveUpgrades } from "../types/Upgrade";
 
 export type MempoolProps = {
@@ -21,6 +22,8 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const { isSoundOn } = useSound();
   const activatedUpgrades = getActiveUpgrades(props.upgrades);
 
+  const { notify } = useEventManager();
+
   // Auto-generate Transactions
   useEffect(() => {
     if (transactions.length < minTransactions) {
@@ -35,6 +38,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
+    notify("TxAdded", { tx, index });
     props.setBlock(addTxToBlock(props.block, tx));
 
     const newTransactions = [...transactions];

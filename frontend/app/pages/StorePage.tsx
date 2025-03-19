@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
 
 import { Upgrades } from "../types/Upgrade";
+import { useEventManager } from "../context/EventManager";
 
 export type StorePageProps = {
   closeHeaderTab: () => void,
@@ -12,6 +13,7 @@ export type StorePageProps = {
 };
 
 export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, setUpgrades, balance, setBalance }) => {
+  const { notify } = useEventManager();
   const [showModal, setShowModal] = useState(false);
   const upgradeNames = Object.keys(upgrades);
 
@@ -20,9 +22,11 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
       setShowModal(true);
       return;
     }
+ 
+    const newBalance = balance - upgrades[upgradeName].cost;
+    setBalance(newBalance);
+    notify("BalanceUpdated", { balance: newBalance });
 
-    setBalance(balance - upgrades[upgradeName].cost);
-    
     setUpgrades({
       ...upgrades,
         [upgradeName]: { ...upgrades[upgradeName], purchased: true },

@@ -6,6 +6,8 @@ import { playMineClicked } from "../components/utils/sounds";
 import { Block } from "../types/Block";
 import { Upgrades } from "../types/Upgrade";
 
+import { useEventManager } from "../context/EventManager";
+
 type MiningPageProps = {
   block: Block;
   finalizeBlock: () => void;
@@ -18,6 +20,8 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
   const [blockHash, setBlockHash] = useState("");
   const { isSoundOn } = useSound();
 
+  const { notify } = useEventManager();
+
   const tryMineBlock = () => {
     playMineClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
@@ -29,6 +33,12 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
       newBlockHash = "0".repeat(props.block.hp) + newBlockHash.substring(props.block.hp);
     }
     setBlockHash(newBlockHash);
+    notify("TryMineBlock", {
+      nonce: randomNonce,
+      blockHash: newBlockHash,
+      mineCounter: newMineCounter,
+      isMined: newMineCounter >= props.block.hp,
+    });
 
     if (newMineCounter >= props.block.hp) {
       props.finalizeBlock();
