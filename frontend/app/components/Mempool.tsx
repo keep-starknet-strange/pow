@@ -35,7 +35,6 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     }
   }, [transactions, activatedUpgrades]);
 
-  console.log("Generated Transactions:", transactions.map(tx => tx.type));
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
     props.setBlock(addTxToBlock(props.block, tx));
