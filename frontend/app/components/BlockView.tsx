@@ -14,7 +14,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           {props.block.transactions.map((_, index) => (
             <View 
               key={index} 
-              className="bg-[#f7f7f7] rounded-xl w-[9.75%] aspect-square"
+              className="rounded-xl w-[9.75%] aspect-square"
+              style={tx.style}
             />
           ))}
         </View>

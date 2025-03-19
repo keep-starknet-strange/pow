@@ -5,7 +5,7 @@ import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
-import { Upgrades } from "../types/Upgrade";
+import { Upgrades, getActiveUpgrades } from "../types/Upgrade";
 
 export type MempoolProps = {
   block: Block;
@@ -19,19 +19,19 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const minTransactions = 5;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
   const { isSoundOn } = useSound();
-
-  const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
+  const activatedUpgrades = getActiveUpgrades(props.upgrades);
 
   // Auto-generate Transactions
   useEffect(() => {
     if (transactions.length < minTransactions) {
       const newTransactions = [...transactions];
       while (newTransactions.length < minTransactions) {
-        newTransactions.push(newTransaction());
+        newTransactions.push(newTransaction(activatedUpgrades)); // Uses upgrade-based filtering
       }
-      setTransactions(isSortingEnabled ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
+
+      setTransactions(activatedUpgrades["txSorting"] ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
     }
-  }, [transactions, isSortingEnabled]);
+  }, [transactions, activatedUpgrades]);
 
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
@@ -49,6 +49,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   // Click tx every (autoClickerSpeed) milliseconds if the auto-clicker upgrade is active
   const [hasAutoClickerUpgrade, setHasAutoClickerUpgrade] = useState(true);
   const [autoClickerSpeed, setAutoClickerSpeed] = useState(500);
+
   useEffect(() => {
     if (!hasAutoClickerUpgrade) return;
     const interval = setInterval(() => {
@@ -66,7 +67,8 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
         {transactions.map((transaction, index) => (
           <TouchableOpacity
             key={index}
-            className="flex flex-row justify-between my-2 p-2 bg-[#f7f7f7] rounded-xl h-[4.2rem] w-[95%] mx-auto"
+            className="flex flex-row justify-between my-2 p-2 rounded-xl h-[4.2rem] w-[95%] mx-auto"
+            style={transaction.style}
             onPress={() => clickTx(transaction, index)}
           >
             <View className="flex flex-col">
