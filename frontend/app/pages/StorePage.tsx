@@ -22,10 +22,11 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
       setShowModal(true);
       return;
     }
-
+ 
     const newBalance = balance - upgrades[upgradeName].cost;
     setBalance(newBalance);
     notify("BalanceUpdated", { balance: newBalance });
+
     setUpgrades({
       ...upgrades,
         [upgradeName]: { ...upgrades[upgradeName], purchased: true },
