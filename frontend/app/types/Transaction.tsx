@@ -46,8 +46,8 @@ export const newTransaction = (activatedUpgrades: ActivatedUpgrades): Transactio
   const type = getRandomTransactionType(activatedUpgrades) as TransactionType;
 
   return {
-    from: Math.random().toString(36).substring(2, 15),
-    to: Math.random().toString(36).substring(2, 15),
+    from: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+    to: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
     type,
     amount: (Math.random() + 1) * 10,
     fee: (Math.random() + 1 + TRANSACTION_TYPES[type as TransactionType].feeBump) * 0.1,
@@ -64,15 +64,3 @@ export const newEmptyTransaction = () => {
     fee: 0
   };
 }
-
-export const getTransactionStyle = (type: string) => {
-  switch (type) {
-    case "L2 Transaction Batch":
-      return { backgroundColor: "#4A90E2" }; // Blue (Example)
-      case "L2 Blob":
-      return { backgroundColor: "#6B46C1" }; // Purple
-    default:
-      return { backgroundColor: "#f7f7f7" }; // Default Grey
-  }
-};
-

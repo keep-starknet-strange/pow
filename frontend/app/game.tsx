@@ -20,8 +20,8 @@ import { mockAddress } from "./api/mock";
 
 export default function game() {
   const [upgrades, setUpgrades] = useState<Upgrades>({
-    "Tx sorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
-    "Lower Block Difficulty": { cost: 20, effect: "make block easier to mine", purchased: false },
+    "txSorting": { cost: 10, effect: "sort transactions by fee", purchased: false },
+    "lowerBlockDifficulty": { cost: 20, effect: "make block easier to mine", purchased: false },
     "l2BlobUpgrade" : { cost: 30, effect: "unlock L2 Blob transactions", purchased: false },
     "l2Upgrade" : { cost: 40, effect: "unlock L2 transactions", purchased: false }
   });

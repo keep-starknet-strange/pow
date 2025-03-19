@@ -4,7 +4,7 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
-import { Transaction, newTransaction, getTransactionStyle } from "../types/Transaction";
+import { Transaction, newTransaction } from "../types/Transaction";
 import { Upgrades, getActiveUpgrades } from "../types/Upgrade";
 
 export type MempoolProps = {
@@ -20,7 +20,6 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
   const { isSoundOn } = useSound();
   const activatedUpgrades = getActiveUpgrades(props.upgrades);
-  const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
 
   // Auto-generate Transactions
   useEffect(() => {
@@ -31,7 +30,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
         newTransactions.push(newTransaction(activatedUpgrades)); // Uses upgrade-based filtering
       }
 
-      setTransactions(activatedUpgrades["Tx sorting"] ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
+      setTransactions(activatedUpgrades["txSorting"] ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
     }
   }, [transactions, activatedUpgrades]);
 
@@ -51,7 +50,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   // Click tx every (autoClickerSpeed) milliseconds if the auto-clicker upgrade is active
   const [hasAutoClickerUpgrade, setHasAutoClickerUpgrade] = useState(true);
   const [autoClickerSpeed, setAutoClickerSpeed] = useState(500);
-  const [l2upgrade, setL2Upgrade] = useState(true);
+
   useEffect(() => {
     if (!hasAutoClickerUpgrade) return;
     const interval = setInterval(() => {
