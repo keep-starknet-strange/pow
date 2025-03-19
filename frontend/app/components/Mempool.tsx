@@ -25,7 +25,6 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   useEffect(() => {
     if (transactions.length < minTransactions) {
       const newTransactions = [...transactions];
-
       while (newTransactions.length < minTransactions) {
         newTransactions.push(newTransaction(activatedUpgrades)); // Uses upgrade-based filtering
       }
