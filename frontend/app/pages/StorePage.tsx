@@ -22,6 +22,7 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab, upgrades, 
     }
 
     setBalance(balance - upgrades[upgradeName].cost);
+    
     setUpgrades({
       ...upgrades,
         [upgradeName]: { ...upgrades[upgradeName], purchased: true },

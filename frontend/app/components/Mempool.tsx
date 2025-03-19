@@ -4,8 +4,8 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
-import { Transaction, newTransaction } from "../types/Transaction";
-import { Upgrades } from "../types/Upgrade";
+import { Transaction, newTransaction, getTransactionStyle } from "../types/Transaction";
+import { Upgrades, getActiveUpgrades } from "../types/Upgrade";
 
 export type MempoolProps = {
   block: Block;
@@ -19,20 +19,23 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const minTransactions = 5;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
   const { isSoundOn } = useSound();
-
+  const activatedUpgrades = getActiveUpgrades(props.upgrades);
   const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
 
   // Auto-generate Transactions
   useEffect(() => {
     if (transactions.length < minTransactions) {
       const newTransactions = [...transactions];
-      while (newTransactions.length < minTransactions) {
-        newTransactions.push(newTransaction());
-      }
-      setTransactions(isSortingEnabled ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
-    }
-  }, [transactions, isSortingEnabled]);
 
+      while (newTransactions.length < minTransactions) {
+        newTransactions.push(newTransaction(activatedUpgrades)); // Uses upgrade-based filtering
+      }
+
+      setTransactions(activatedUpgrades["Tx sorting"] ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
+    }
+  }, [transactions, activatedUpgrades]);
+
+  console.log("Generated Transactions:", transactions.map(tx => tx.type));
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
     props.setBlock(addTxToBlock(props.block, tx));
@@ -49,6 +52,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   // Click tx every (autoClickerSpeed) milliseconds if the auto-clicker upgrade is active
   const [hasAutoClickerUpgrade, setHasAutoClickerUpgrade] = useState(true);
   const [autoClickerSpeed, setAutoClickerSpeed] = useState(500);
+  const [l2upgrade, setL2Upgrade] = useState(true);
   useEffect(() => {
     if (!hasAutoClickerUpgrade) return;
     const interval = setInterval(() => {
@@ -66,7 +70,8 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
         {transactions.map((transaction, index) => (
           <TouchableOpacity
             key={index}
-            className="flex flex-row justify-between my-2 p-2 bg-[#f7f7f7] rounded-xl h-[4.2rem] w-[95%] mx-auto"
+            className="flex flex-row justify-between my-2 p-2 rounded-xl h-[4.2rem] w-[95%] mx-auto"
+            style={transaction.style}
             onPress={() => clickTx(transaction, index)}
           >
             <View className="flex flex-col">

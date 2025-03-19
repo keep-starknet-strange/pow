@@ -11,8 +11,13 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     <View className="flex flex-row justify-center relative mt-[0%]">
       <View className="bg-[#f7f7f740] w-[30%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
         <View className="flex flex-wrap gap-1 w-full">
-          {props.block.transactions.map((_, index) => (
-            <View key={index} className="bg-[#f7f7f7] rounded-xl w-[10%] aspect-square"></View>
+          {props.block.transactions.map((tx, index) => (
+            <View 
+              key={index}
+              className="rounded-xl w-[10%] aspect-square"
+              style={tx.style} 
+              >
+            </View>
           ))}
         </View>
         {!props.hideStats && (
