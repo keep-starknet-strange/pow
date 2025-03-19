@@ -6,6 +6,7 @@ import { playTxClicked } from "./utils/sounds";
 import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
 import { Upgrades } from "../types/Upgrade";
+import { useEventManager } from "../context/EventManager";
 
 export type MempoolProps = {
   block: Block;
@@ -22,6 +23,8 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const isSortingEnabled = props.upgrades["Tx sorting"].purchased;
 
+  const { notify } = useEventManager();
+
   // Auto-generate Transactions
   useEffect(() => {
     if (transactions.length < minTransactions) {
@@ -35,6 +38,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
+    notify("TxAdded", { tx, index });
     props.setBlock(addTxToBlock(props.block, tx));
 
     const newTransactions = [...transactions];

@@ -15,6 +15,9 @@ import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
+import { useEventManager } from "./context/EventManager";
+import { useAchievement } from "./context/Achievements";
+import { AchievementObserver } from "./components/observer/AchievementObserver";
 import { getGameState } from "./api/state";
 import { mockAddress } from "./api/mock";
 
@@ -31,6 +34,8 @@ export default function game() {
   const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward, blockSize, difficulty));
   const [userBalance, setUserBalance] = useState(0);
 
+  const { notify, registerObserver } = useEventManager();
+  const { updateAchievement } = useAchievement();
   useEffect(() => {
     const getNewGameState = async () => {
       const newGameState = await getGameState(mockAddress);
@@ -40,14 +45,21 @@ export default function game() {
       setCurrentBlock(newGameState.chains[0].currentBlock);
     }
     getNewGameState();
+
+    registerObserver(new AchievementObserver(updateAchievement));
   }, []);
 
   // Finalize Mined Block
   const finalizeBlock = () => {
     const finalizedBlock = { ...currentBlock };
     setLastBlock(finalizedBlock);
-    setCurrentBlock(newBlock(finalizedBlock.id + 1, blockReward, blockSize, difficulty));
-    setUserBalance(userBalance + finalizedBlock.reward + finalizedBlock.fees);
+    notify("BlockFinalized", { block: finalizedBlock });
+    const newCurrBlock = newBlock(finalizedBlock.id + 1, blockReward, blockSize, difficulty);
+    setCurrentBlock(newCurrBlock);
+    notify("BlockCreated", { block: newCurrBlock });
+    const newBalance = userBalance + finalizedBlock.reward + finalizedBlock.fees;
+    setUserBalance(newBalance);
+    notify("BalanceUpdated", { balance: newBalance });
     switchPage("Sequencing");
   };
 

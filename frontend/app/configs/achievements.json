@@ -1,0 +1,74 @@
+[
+  {
+    "id": 0,
+    "name": "Reach 500 BTC",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "BalanceUpdated"
+  },
+  {
+    "id": 1,
+    "name": "Reach 10K BTC",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "BalanceUpdated"
+  },
+  {
+    "id": 2,
+    "name": "Reach 10M BTC",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "BalanceUpdated"
+  },
+  {
+    "id": 3,
+    "name": "Get an Antminer Rig",
+    "image": "https://api.art-peace.net/stencils/stencil-004c956171643d0f968c3be3ae8da8b8b406979f06205bccee1f4ec5a8fcf70c.png",
+    "updateOn": "UpgradePurchased"
+  },
+  {
+    "id": 4,
+    "name": "Achieve SNARK Scaling",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "UpgradePurchased"
+  },
+  {
+    "id": 5,
+    "name": "Achieve STARK Scaling",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "UpgradePurchased"
+  },
+  {
+    "id": 6,
+    "name": "Get 100BTC from 1 TX",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "TxAdded"
+  },
+  {
+    "id": 7,
+    "name": "Mine a block first try",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "TryMineBlock"
+  },
+  {
+    "id": 8,
+    "name": "Reach Block 1000",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "BlockMined"
+  },
+  {
+    "id": 9,
+    "name": "Reach Block 1M",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "BlockMined"
+  },
+  {
+    "id": 10,
+    "name": "Reach Block 1B",
+    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "updateOn": "BlockMined"
+  },
+  {
+    "id": 11,
+    "name": "Prestige!",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "UpgradePurchased"
+  }
+]

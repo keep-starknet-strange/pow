@@ -1,0 +1,51 @@
+import React, { createContext, useContext, useState } from "react";
+
+export interface Observer {
+  onNotify(eventName: string, data?: any): void;
+}
+
+type EventManagerContextType = {
+  registerObserver(observer: Observer): number;
+  unregisterObserver(observerId: number): void;
+  notify(eventName: string, data?: any): void;
+};
+
+const EventManagerContext = createContext<EventManagerContextType | undefined>(undefined);
+
+export const useEventManager = () => {
+  const context = useContext(EventManagerContext);
+  if (!context) {
+    throw new Error("useEventManager must be used within an EventManagerProvider");
+  }
+  return context;
+}
+
+export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [observers, setObservers] = useState<Map<number, Observer>>(new Map());
+
+  const registerObserver = (observer: Observer): number => {
+    const id = Date.now(); // Simple unique ID generator
+    setObservers((prev) => new Map(prev).set(id, observer));
+    return id;
+  };
+
+  const unregisterObserver = (observerId: number): void => {
+    setObservers((prev) => {
+      const newObservers = new Map(prev);
+      newObservers.delete(observerId);
+      return newObservers;
+    });
+  };
+
+  const notify = (eventName: string, data?: any) => {
+    observers.forEach((observer) => {
+      observer.onNotify(eventName, data);
+    });
+  };
+
+  return (
+    <EventManagerContext.Provider value={{ notify, registerObserver, unregisterObserver }}>
+      {children}
+    </EventManagerContext.Provider>
+  );
+}
