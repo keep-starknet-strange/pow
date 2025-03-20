@@ -3,35 +3,28 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
-import { Block, addTxToBlock } from "../types/Block";
 import { Transaction, newTransaction } from "../types/Transaction";
-import { useEventManager } from "../context/EventManager";
-import { Upgrades } from "../types/Upgrade";
+import { useGameState } from "../context/GameState";
 import { useUpgrades } from "../context/Upgrades";
 
 export type MempoolProps = {
-  block: Block;
-  setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
-  upgrades: Upgrades;
-  maxBlockTransactions: number;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
   const { upgrades, isUpgradeActive } = useUpgrades();
-  const minTransactions = 5;
+  const { gameState, upgradableGameState, addTxToBlock } = useGameState();
+  const minTransactions = 6;
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
   const { isSoundOn } = useSound();
 
-
-  const { notify } = useEventManager();
 
   // Auto-generate Transactions
   useEffect(() => {
     if (transactions.length < minTransactions) {
       const newTransactions = [...transactions];
       while (newTransactions.length < minTransactions) {
-        newTransactions.push(newTransaction(isUpgradeActive)); // Uses upgrade-based filtering
+        newTransactions.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
       }
 
       setTransactions(isUpgradeActive(0) ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
@@ -40,36 +33,32 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
-    notify("TxAdded", { tx, index });
-    props.setBlock(addTxToBlock(props.block, tx));
+    addTxToBlock(tx);
 
     const newTransactions = [...transactions];
     newTransactions.splice(index, 1);
     setTransactions(newTransactions);
 
-    if (props.block.transactions.length + 1 >= props.maxBlockTransactions) {
+    if (gameState.chains[0].currentBlock.transactions.length + 1 >= gameState.chains[0].currentBlock.maxSize) {
       props.switchPage("Mining");
     }
   }
 
-  // Click tx every (autoClickerSpeed) milliseconds if the auto-clicker upgrade is active
-  const [hasAutoClickerUpgrade, setHasAutoClickerUpgrade] = useState(true);
-  const [autoClickerSpeed, setAutoClickerSpeed] = useState(500);
-
+  // Auto-clicker functionality
   useEffect(() => {
-    if (!hasAutoClickerUpgrade) return;
+    if (!upgradableGameState.sequencerSpeed) return;
     const interval = setInterval(() => {
       if (transactions.length > 0) {
         clickTx(transactions[0], 0);
       }
-    }, autoClickerSpeed);
+    }, 1000 / upgradableGameState.sequencerSpeed);
     return () => clearInterval(interval);
-  }, [transactions, autoClickerSpeed, hasAutoClickerUpgrade, props.block]);
+  }, [transactions, upgradableGameState.sequencerSpeed]);
 
   return (
-    <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-[55vh]">
+    <View className="flex flex-col mt-[10%] w-[80%] mx-auto bg-[#f7f7f740] rounded-xl h-content">
       <Text className="text-[#f7f7f7] text-2xl text-center m-2">Mempool</Text>
-      <ScrollView className="flex-1">
+      <ScrollView className="">
         {transactions.map((transaction, index) => (
           <TouchableOpacity
             key={index}
@@ -78,7 +67,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
             onPress={() => clickTx(transaction, index)}
           >
             <View className="flex flex-col">
-              <Text className="text-[#171717] text-xl">{transaction.type} {transaction.amount.toFixed(2)} BTC</Text>
+              <Text className="text-[#171717] text-xl">{transaction.type} ₿{transaction.amount.toFixed(2)}</Text>
               <View className="flex flex-row flex-1 gap-2">
                 <Text className="text-[#171717] text-xl w-[30%] truncate">{transaction.from}</Text>
                 <Text className="text-[#171717] text-xl">→</Text>
@@ -86,8 +75,8 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
               </View>
             </View>
             <View className="flex flex-col justify-between">
-              <Text className="text-[#171717] text-2xl text-center">Fee</Text>
-              <Text className="text-[#171717] text-xl">{transaction.fee.toFixed(2)} BTC</Text>
+              <Text className="text-[#171717] text-2xl text-center font-bold">Fee</Text>
+              <Text className="text-[#171717] text-xl font-bold">₿ {transaction.fee.toFixed(2)}</Text>
             </View>
           </TouchableOpacity>
         ))}

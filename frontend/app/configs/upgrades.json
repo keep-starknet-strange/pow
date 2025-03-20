@@ -1,27 +1,62 @@
 [
   {
     "id": 0,
-    "name": "txSorting",
+    "name": "Transaction Sorting",
     "cost": 10,
-    "effect": "sort transactions by fee"
+    "effect": "Sort transactions by fee"
   },
   {
     "id": 1,
-    "name": "lowerBlockDifficulty",
+    "name": "Block Difficulty",
     "cost": 20,
-    "effect": "make block easier to mine",
-    "maxLevel": 5
+    "effect": "Lower block difficulty for faster mining",
+    "maxLevel": 7
   },
   {
     "id": 2,
-    "name": "l2Upgrade",
+    "name": "Unlock L2s",
     "cost": 40,
-    "effect": "unlock L2 transactions"
+    "effect": "Unlock the L2 transaction type"
   },
   {
     "id": 3,
-    "name": "l2BlobUpgrade",
+    "name": "Unlock L2 Blobs",
     "cost": 30,
-    "effect": "unlock L2 Blob transactions"
+    "effect": "Unlock the L2 blob transaction type"
+  },
+  {
+    "id": 4,
+    "name": "Sequencer",
+    "cost": 50,
+    "effect": "Auto-sequence transactions into blocks",
+    "maxLevel": 10
+  },
+  {
+    "id": 5,
+    "name": "Miner",
+    "cost": 50,
+    "effect": "Auto-mine blocks",
+    "maxLevel": 8
+  },
+  {
+    "id": 6,
+    "name": "Block Size",
+    "cost": 60,
+    "effect": "Increase the transactions per block",
+    "maxLevel": 12
+  },
+  {
+    "id": 7,
+    "name": "Block Reward",
+    "cost": 80,
+    "effect": "Increase the block reward for miners",
+    "maxLevel": 5
+  },
+  {
+    "id": 8,
+    "name": "MEV Boost",
+    "cost": 90,
+    "effect": "Increase the transaction fee for miners",
+    "maxLevel": 5
   }
 ]

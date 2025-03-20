@@ -1,19 +1,19 @@
 [
   {
     "id": 0,
-    "name": "Reach 500 BTC",
+    "name": "Reach ₿500",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 1,
-    "name": "Reach 10K BTC",
+    "name": "Reach ₿10K",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 2,
-    "name": "Reach 10M BTC",
+    "name": "Reach ₿10M",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "BalanceUpdated"
   },
@@ -37,7 +37,7 @@
   },
   {
     "id": 6,
-    "name": "Get 100BTC from 1 TX",
+    "name": "Get ₿100 from 1 TX",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "TxAdded"
   },

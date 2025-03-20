@@ -1,15 +1,16 @@
 import { Text, View, TouchableOpacity } from 'react-native';
+import { useGameState } from "../context/GameState";
 
 export type HeaderProps = {
-  balance: number;
   tabs: {name: string, icon: string}[];
   switchPage: (page: string) => void;
 };
 
 export const Header: React.FC<HeaderProps> = (props) => {
+  const { gameState } = useGameState();
   return (
     <View className="flex flex-row justify-between w-full p-4">
-      <Text className="text-[#f7f7f7] text-2xl">Balance {props.balance.toFixed(4)} BTC</Text>
+      <Text className="text-[#f7f7f7] text-2xl font-bold">💰₿ {gameState.balance.toFixed(4)}</Text>
       <View className="flex flex-row gap-3">
         {props.tabs.map((tab, index) => (
           <TouchableOpacity

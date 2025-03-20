@@ -43,8 +43,7 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
     
 };
 
-export const newTransaction = (isUpgradeActive: (id: number
-) => boolean): Transaction => {
+export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
   const type = getRandomTransactionType(isUpgradeActive) as TransactionType;
 
   return {
@@ -52,7 +51,7 @@ export const newTransaction = (isUpgradeActive: (id: number
     to: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
     type,
     amount: (Math.random() + 1) * 10,
-    fee: (Math.random() + 1 + TRANSACTION_TYPES[type as TransactionType].feeBump) * 0.1,
+    fee: (Math.random() + 1 + TRANSACTION_TYPES[type as TransactionType].feeBump) * 0.1 * mevScaling,
     style: { backgroundColor: TRANSACTION_TYPES[type as TransactionType].color },
   };
 };

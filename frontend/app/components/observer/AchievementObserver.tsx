@@ -22,7 +22,7 @@ export class AchievementObserver implements Observer {
           );
           achievementsToCheck.forEach(achievement => {
             switch (achievement.name) {
-              case "Get 100BTC from 1 TX":
+              case "Get ₿100 from 1 TX":
                 if (tx.fee >= 100) {
                   this.updateAchievement(achievement.id, 100);
                 }
@@ -43,13 +43,13 @@ export class AchievementObserver implements Observer {
           );
           achievementsToCheck.forEach(achievement => {
             switch (achievement.name) {
-              case "Reach 500 BTC":
+              case "Reach ₿500":
                 this.updateAchievement(achievement.id, balance >= 500 ? 100 : (balance / 500) * 100);
                 break;
-              case "Reach 10K BTC":
+              case "Reach ₿10K":
                 this.updateAchievement(achievement.id, balance >= 10000 ? 100 : (balance / 10000) * 100);
                 break;
-              case "Reach 10M BTC":
+              case "Reach ₿10M":
                 this.updateAchievement(achievement.id, balance >= 10000000 ? 100 : (balance / 10000000) * 100);
                 break;
               default:
@@ -94,11 +94,11 @@ export class AchievementObserver implements Observer {
           });
         }
         break;
-      case "BlockMined":
+      case "BlockFinalized":
         if (data && data.block) {
           const block = data.block as Block;
           const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "BlockMined"
+            achievement.updateOn === "BlockFinalized"
           );
           achievementsToCheck.forEach(achievement => {
             switch (achievement.name) {

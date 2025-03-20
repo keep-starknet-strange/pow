@@ -5,9 +5,6 @@ import { View } from "react-native";
 
 import { Header } from "./components/Header";
 
-import { Upgrades } from "./types/Upgrade";
-import { Block, newBlock } from "./types/Block";
-
 import { SequencingPage } from "./pages/SequencingPage";
 import { MiningPage } from "./pages/MiningPage";
 import { StorePage } from "./pages/StorePage";
@@ -19,48 +16,14 @@ import { useEventManager } from "./context/EventManager";
 import { useAchievement } from "./context/Achievements";
 import { useUpgrades } from "./context/Upgrades";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
-import { getGameState } from "./api/state";
-import { mockAddress } from "./api/mock";
 
 export default function game() {
-    const { upgrades, addUpgrade, isUpgradeActive } = useUpgrades();
-
-  const baseDifficulty = 8;
-  const [difficulty, setDifficulty] = useState(upgrades[1] ? baseDifficulty - 1 : baseDifficulty);
-  const [blockReward, setBlockReward] = useState(5);
-  const [blockSize, setBlockSize] = useState(8*8);
-  const [lastBlock, setLastBlock] = useState<Block | null>(null);
-  const [currentBlock, setCurrentBlock] = useState(newBlock(0, blockReward, blockSize, difficulty));
-  const [userBalance, setUserBalance] = useState(0);
-
-  const { notify, registerObserver } = useEventManager();
+  const { upgrades } = useUpgrades();
+  const { registerObserver } = useEventManager();
   const { updateAchievement } = useAchievement();
   useEffect(() => {
-    const getNewGameState = async () => {
-      const newGameState = await getGameState(mockAddress);
-      if (!newGameState) return;
-      setUserBalance(newGameState.balance);
-      setLastBlock(newGameState.chains[0].lastBlock);
-      setCurrentBlock(newGameState.chains[0].currentBlock);
-    }
-    getNewGameState();
-
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
-
-  // Finalize Mined Block
-  const finalizeBlock = () => {
-    const finalizedBlock = { ...currentBlock };
-    setLastBlock(finalizedBlock);
-    notify("BlockFinalized", { block: finalizedBlock });
-    const newCurrBlock = newBlock(finalizedBlock.id + 1, blockReward, blockSize, difficulty);
-    setCurrentBlock(newCurrBlock);
-    notify("BlockCreated", { block: newCurrBlock });
-    const newBalance = userBalance + finalizedBlock.reward + finalizedBlock.fees;
-    setUserBalance(newBalance);
-    notify("BalanceUpdated", { balance: newBalance });
-    switchPage("Sequencing");
-  };
 
   const pages = [{
     name: "Sequencing",
@@ -109,12 +72,6 @@ export default function game() {
   }
 
   const props = {
-    balance: userBalance,
-    setBalance: setUserBalance,
-    lastBlock: lastBlock,
-    block: { ...currentBlock },
-    setBlock: setCurrentBlock,
-    finalizeBlock: finalizeBlock,
     switchPage: switchPage,
     closeHeaderTab: closeHeaderTab,
     upgrades: upgrades,

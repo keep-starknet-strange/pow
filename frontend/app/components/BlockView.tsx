@@ -20,9 +20,18 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           ))}
         </View>
         {!props.hideStats && (
-          <View className="absolute top-0 right-0 transform translate-x-[calc(100%)] translate-y-[50%]">
-            <Text className="text-[#f7f7f7] text-xl">Reward {props.block.reward} BTC</Text>
-            <Text className="text-[#f7f7f7] text-xl">Fees {props.block.fees.toFixed(2)} BTC</Text>
+          <View className="absolute top-0 right-0 transform translate-x-[calc(100%)] translate-y-[10%] pl-2">
+            <View className="flex flex-row justify-between items-center w-full">
+              <Text className="text-[#f7f7f7] text-xl">Block</Text>
+              <Text className="text-[#f7f7f7] text-xl">₿ {props.block.reward.toFixed(2)}</Text>
+            </View>
+            <View className="flex flex-row justify-between items-center w-full">
+              <Text className="text-[#f7f7f7] text-xl">Fees</Text>
+              <Text className="text-[#f7f7f7] text-xl">₿ {props.block.fees.toFixed(2)}</Text>
+            </View>
+            <View className="h-[1px] bg-[#f7f7f740] w-full my-1" />
+            <Text className="text-[#f7f7f7] text-xl text-center">Reward</Text>
+            <Text className="text-[#f7f7f7] text-2xl font-bold text-center">₿ {(props.block.reward + props.block.fees).toFixed(2)}</Text>
           </View>
         )}
         <Text className="text-[#f7f7f7] text-2xl absolute bottom-[-2rem] left-0 text-center w-full">

@@ -9,15 +9,6 @@ export type Block = {
   hp: number;
 };
 
-export const addTxToBlock = (block: Block, tx: Transaction): Block => {
-  // TODO: check maxSize
-  return {
-    ...block,
-    fees: block.fees + tx.fee,
-    transactions: [...block.transactions, tx],
-  };
-}
-
 export const newBlock = (blockNumber: number, blockReward: number, maxSize: number, difficulty: number): Block => {
   return {
     id: blockNumber,

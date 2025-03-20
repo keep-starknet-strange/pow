@@ -2,28 +2,24 @@ import { View } from "react-native";
 
 import { BlockView } from "../components/BlockView";
 import { Mempool } from "../components/Mempool";
-import { Block } from "../types/Block";
-import { Upgrades } from "../types/Upgrade";
+import { useGameState } from "../context/GameState";
 
 export type SequencingPageProps = {
-  lastBlock: Block | null;
-  block: Block;
-  setBlock: (block: Block) => void;
   switchPage: (page: string) => void;
-  upgrades: Upgrades;
 };
 
 export const SequencingPage: React.FC<SequencingPageProps> = (props) => {
+  const { gameState } = useGameState();
   return (
     <View className="flex-1 relative">
-      {props.lastBlock !== null && (
+      {gameState.chains[0].lastBlock !== null && (
         <View className="absolute top-0 left-[-50%] w-full">
-          <BlockView block={props.lastBlock} hideStats={true} />
+          <BlockView block={gameState.chains[0].lastBlock} hideStats={true} />
           <View className="absolute top-[50%] right-0 transform translate-x-[-88%] translate-y-[-50%] w-[18%] h-[1rem] bg-[#ffffff80] rounded-xl" />
         </View>
       )}
-      <BlockView {...props} />
-      <Mempool {...props} maxBlockTransactions={props.block.maxSize} />
+      <BlockView {...props} block={gameState.chains[0].currentBlock} />
+      <Mempool {...props} />
    </View>
   );
 }
