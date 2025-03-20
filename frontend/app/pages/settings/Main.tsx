@@ -16,7 +16,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
 
   const toggleNotifs = () => setNotifs(!notifs);
 
-  const settingsOptions: { label: string; tab: "About" | "Credits" | "Help" | null }[] = [
+  const settingsComponents: { label: string; tab: "About" | "Credits" | "Help" | null }[] = [
     { label: "About 📖", tab: "About" },
     { label: "Credits 🎉", tab: "Credits" },
     { label: "Help ❓", tab: "Help" },
@@ -36,7 +36,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
 
       <ResetTutorialButton />
 
-      {settingsOptions.map(({ label, tab }) => (
+      {settingsComponents.map(({ label, tab }) => (
         <TouchableOpacity
           key={label}
           className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
