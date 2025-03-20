@@ -31,7 +31,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
         <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol="🔊" offSymbol="🔇" />
         <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol="🔊" offSymbol="🔇" />
       </View>
-      
+
       <ToggleButton label="Notifications" isOn={notifs} onToggle={toggleNotifs} onSymbol="🔔" offSymbol="🔕" />
 
       <ResetTutorialButton />
