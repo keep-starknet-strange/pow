@@ -58,5 +58,11 @@
     "cost": 90,
     "effect": "Increase the transaction fee for miners",
     "maxLevel": 5
+  },
+  {
+    "id": 9,
+    "name": "Inscriptions Metaprotocol",
+    "cost": 80,
+    "effect": "Unlock the Inscriptions metaprotocol"
   }
 ]

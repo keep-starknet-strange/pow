@@ -46,6 +46,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const finalizedBlock = { ...gameState.chains[0].currentBlock };
     newGameState.chains[0].lastBlock = finalizedBlock;
+    newGameState.chains[0].pastBlocks = gameState.chains[0].pastBlocks ? [finalizedBlock, ...gameState.chains[0].pastBlocks] : [finalizedBlock];
     notify("BlockFinalized", { block: finalizedBlock });
 
     const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.blockReward, upgradableGameState.blockSize, upgradableGameState.difficulty);

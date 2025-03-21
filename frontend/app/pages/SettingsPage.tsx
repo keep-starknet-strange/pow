@@ -24,24 +24,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ closeHeaderTab }) =>
   const ActiveComponent = tabs[activeTab];
 
   return (
-    <View className="flex-1 flex flex-col gap-4 px-8">
-
+    <View className="flex-1 flex flex-col gap-2 mt-10 px-8">
       <ActiveComponent setSettingTab={setActiveTab} />
-
-      <TouchableOpacity
-        onPress={() => {
-          if (activeTab === "Main") {
-            closeHeaderTab();
-          } else {
+      {activeTab !== "Main" && (
+        <TouchableOpacity
+          onPress={() => {
             setActiveTab("Main");
-          }
-        }}
-        className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-      >
-        <Text className="text-4xl">
-          {activeTab === "Main" ? "Back to Game 🎮" : "Back to Settings ⚙️"}
-        </Text>
-      </TouchableOpacity>
+          }}
+          className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
+        >
+          <Text className="text-4xl">
+            Back to Settings ⚙️
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

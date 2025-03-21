@@ -30,14 +30,10 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab }) => {
 
   return (
     <View className="flex-1">
-     <TouchableOpacity
-       className="w-full flex items-end p-4"
-       onPress={closeHeaderTab}
-     >
-       <Text className="text-red-600 text-4xl">X</Text>
-     </TouchableOpacity>
-
-     <FlatList data={upgradesJson} renderItem={({ item }) => (
+     <View className="flex flex-row justify-end items-center p-2">
+       <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🛒Shop</Text>
+     </View>
+     <FlatList className="mb-[8rem]" data={upgradesJson} renderItem={({ item }) => (
       <View
         className={`flex flex-row justify-between items-center my-2 p-3 rounded-xl h-[4.2rem] w-[95%] mx-auto`}
         style={{

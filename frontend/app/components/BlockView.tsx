@@ -1,42 +1,47 @@
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { Block } from "../types/Block";
 
 export type BlockViewProps = {
   block: Block;
-  hideStats?: boolean;
+  showOverlay?: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
+  const txWidth: string = 100 / Math.sqrt(props.block.maxSize) + "%";
+  // TODO: Overlay #s to constant size/length/digits
   return (
-    <View className="flex flex-row justify-center relative mt-[0%]">
-      <View className="bg-[#f7f7f740] w-[30%] aspect-square rounded-xl border-2 border-[#f7f7f740] relative">
-        <View className="flex flex-wrap w-full aspect-square gap-1">
+    <View className="w-full h-full flex flex-col items-center justify-center">
+      <View className="flex-1 bg-[#f7f7f740] aspect-square rounded-xl border-2 border-[#f7f7f740] relative overflow-hidden">
+        <View className="flex flex-wrap w-full aspect-square"> 
           {props.block.transactions.map((tx, index) => (
-            <View 
-              key={index} 
-              className="rounded-xl w-[9.75%] aspect-square"
-              style={tx.style}
-            />
+            <View
+              key={index}
+              className="w-[9.75%] aspect-square border-2 border-[#00000020] rounded-lg overflow-hidden"
+              style={{ width: txWidth, ...tx.style }}
+            >
+              {tx.image && (
+                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={{ uri: tx.image }} />
+              )}
+            </View>
           ))}
         </View>
-        {!props.hideStats && (
-          <View className="absolute top-0 right-0 transform translate-x-[calc(100%)] translate-y-[10%] pl-2">
-            <View className="flex flex-row justify-between items-center w-full">
-              <Text className="text-[#f7f7f7] text-xl">Block</Text>
-              <Text className="text-[#f7f7f7] text-xl">₿ {props.block.reward.toFixed(2)}</Text>
+        {props.showOverlay ? (
+          <View className="absolute top-0 left-0 w-full h-full bg-[#00000060] flex flex-col items-center justify-between">
+            <View/>
+            <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">#{props.block.id}</Text>
+            <View className="flex flex-row items-center justify-between w-[95%]">
+              <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲₿{props.block.reward.toFixed(0)}</Text>
+              <Text className="text-[#e9e9e9f0] text-xl font-bold">💰₿{props.block.fees.toFixed(0)}</Text>
             </View>
-            <View className="flex flex-row justify-between items-center w-full">
-              <Text className="text-[#f7f7f7] text-xl">Fees</Text>
-              <Text className="text-[#f7f7f7] text-xl">₿ {props.block.fees.toFixed(2)}</Text>
+          </View>
+        ) : (
+          <View className="absolute bottom-0 w-full flex flex-row justify-end">
+            <View className="bg-[#272727b0] rounded-tl-lg rounded-br-lg p-[4px]">
+            <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲 ₿{props.block.reward.toFixed(2)}</Text>
+            <Text className="text-[#e9e9e9f0] text-xl font-bold">💰 ₿{props.block.fees.toFixed(2)}</Text>
             </View>
-            <View className="h-[1px] bg-[#f7f7f740] w-full my-1" />
-            <Text className="text-[#f7f7f7] text-xl text-center">Reward</Text>
-            <Text className="text-[#f7f7f7] text-2xl font-bold text-center">₿ {(props.block.reward + props.block.fees).toFixed(2)}</Text>
           </View>
         )}
-        <Text className="text-[#f7f7f7] text-2xl absolute bottom-[-2rem] left-0 text-center w-full">
-          Block {props.block.id}
-        </Text>
       </View>
     </View>
   );

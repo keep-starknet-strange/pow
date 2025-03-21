@@ -25,7 +25,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
   ];
 
   return (
-    <View className="flex flex-col gap-4 mt-4 w-full">
+    <View className="flex flex-col gap-2 mt-4 w-full">
 
       <View className="flex flex-row justify-around mt-4 gap-4 w-full">
         <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol="🔊" offSymbol="🔇" />

@@ -51,19 +51,19 @@
     "id": 8,
     "name": "Reach Block 1000",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "BlockMined"
+    "updateOn": "BlockFinalized"
   },
   {
     "id": 9,
     "name": "Reach Block 1M",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "BlockMined"
+    "updateOn": "BlockFinalized"
   },
   {
     "id": 10,
     "name": "Reach Block 1B",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "BlockMined"
+    "updateOn": "BlockFinalized"
   },
   {
     "id": 11,

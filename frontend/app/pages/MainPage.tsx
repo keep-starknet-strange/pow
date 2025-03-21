@@ -1,0 +1,52 @@
+import { Text, View } from "react-native";
+
+import { BlockView } from "../components/BlockView";
+import { Mempool } from "../components/Mempool";
+import { Miner } from "../components/Miner";
+import { useGameState } from "../context/GameState";
+
+export type MainPageProps = {
+  switchPage: (page: string) => void;
+};
+
+export const MainPage: React.FC<MainPageProps> = (props) => {
+  const { gameState } = useGameState();
+  // TODO: Style overflow with shadow of pastBlocks
+  // TODO: Disable mempool if block is full
+  return (
+    <View className="flex-1 relative flex flex-col items-center">
+      {gameState.chains[0].pastBlocks && gameState.chains[0].pastBlocks.length > 0 && (
+        <View className="flex flex-row w-full px-2 flex-row-reverse mt-[0.5rem]">
+          {gameState.chains[0].pastBlocks.map((block, index) => (
+            <View className="flex flex-row items-center" key={index}>
+              <View className="h-[8rem] w-[8rem]">
+                <BlockView {...props} block={block} showOverlay={true} />
+              </View>
+              {index !== 0 && (
+                <View className="flex flex-col items-center">
+                  <View className="w-2 h-[4px] mx-[2px] bg-[#f9f9f980] rounded-lg" />
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+      <Text className="text-2xl font-bold text-[#f9f9f9] mt-[0.5rem]">
+        Block #{gameState.chains[0].currentBlock.id}
+      </Text>
+      <View className="flex flex-row justify-center w-full h-[22rem]">
+        <BlockView {...props} block={gameState.chains[0].currentBlock} />
+        {gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize && (
+          <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
+            <Miner {...props} />
+          </View>
+        )}
+      </View>
+      <View className="mt-[0.5rem]">
+        <Mempool {...props} />
+      </View>
+   </View>
+  );
+}
+
+export default MainPage;
