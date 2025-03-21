@@ -14,7 +14,7 @@ pub trait IClickChain<TContractState> {
     fn get_user_block_size(self: @TContractState, user: ContractAddress, chain_id: u128) -> u128;
 
     fn update_user_block_reward(ref self: TContractState, user: ContractAddress, chain_id: u128, reward: u128);
-    fn update_user_block_size(ref self: TContractState, user: ContractAddress, chain_id: u128, size: u128);
+    fn update_user_block_size(ref self: TContractState, user: ContractAddress, chain_id: u128, squareRootSize: u128);
 
     fn create_chain(ref self: TContractState, new_block_meta_data: NewBlockMetadata);
     fn sequence_tx(ref self: TContractState, chain_id: u128, fee: u128);
@@ -24,7 +24,8 @@ pub trait IClickChain<TContractState> {
 
 #[starknet::contract]
 mod ClickChain {
-    use starknet::storage::{
+    use core::circuit::CircuitInputs;
+use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, StoragePointerWriteAccess,
     };
@@ -191,13 +192,14 @@ mod ClickChain {
                     },
                 );
         }
-        fn update_user_block_size(ref self: ContractState, user: ContractAddress, chain_id: u128, size: u128) {
+        fn update_user_block_size(ref self: ContractState, user: ContractAddress, chain_id: u128, squareRootSize: u128) {
+            let new_size = squareRootSize * squareRootSize;
             let old_size = self.user_blocks_sizes.read((user, chain_id));
-            self.user_blocks_sizes.write((user, chain_id), size);
+            self.user_blocks_sizes.write((user, chain_id), new_size);
             self
                 .emit(
                     UserBlockSizeUpdated {
-                        user, chain_id, old_size, new_size: size,
+                        user, chain_id, old_size, new_size: new_size,
                     },
                 );
         }
