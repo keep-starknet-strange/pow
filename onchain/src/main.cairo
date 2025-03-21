@@ -24,7 +24,7 @@ pub trait IClickChain<TContractState> {
 
 #[starknet::contract]
 mod ClickChain {
-use starknet::storage::{
+    use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, StoragePointerWriteAccess,
     };
