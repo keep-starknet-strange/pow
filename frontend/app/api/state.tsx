@@ -63,10 +63,17 @@ export const getGameState = async (address: string): Promise<GameState | null> =
     if (hpRes && hpRes.data) {
       hp = hexToInt(hpRes.data.data[1]);
     }
+    const rewardRes = await fetchWrapper(
+      `events/get-latest-with?eventId=6&keys=2:${address}`
+    );
+    let reward = 0;
+    if (rewardRes && rewardRes.data) {
+      reward = hexToInt(rewardRes.data.data[1]);
+    };
 
     const currentBlock: Block = {
       id: blockId,
-      reward: 5, // TODO
+      reward: reward,
       fees: fees,
       hp: hp,
       transactions: [], // TODO
