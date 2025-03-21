@@ -70,6 +70,13 @@ export const getGameState = async (address: string): Promise<GameState | null> =
     if (rewardRes && rewardRes.data) {
       reward = hexToInt(rewardRes.data.data[1]);
     };
+    const maxSizeRes = await fetchWrapper(
+      `events/get-latest-with?eventId=7&keys=2:${address}`
+    );
+    let maxSize = 0;
+    if (maxSizeRes && maxSizeRes.data) {
+      maxSize = hexToInt(maxSizeRes.data.data[1]);
+    };
 
     const currentBlock: Block = {
       id: blockId,
@@ -77,7 +84,7 @@ export const getGameState = async (address: string): Promise<GameState | null> =
       fees: fees,
       hp: hp,
       transactions: [], // TODO
-      maxSize: 8*8 // TODO
+      maxSize: maxSize,
     };
 
     gameState.chains.push({
