@@ -221,12 +221,13 @@ mod ClickChain {
                 let user = get_caller_address();
                 let block_fees = self.user_blocks_fees.read((user, chain_id));
                 let block_metadata = self.user_blocks_metadata.read((user, chain_id));
+                let new_block_reward = self.user_blocks_rewards.read((user, chain_id));
                 const new_difficulty: u128 = 8; // TODO: Update difficulty based on some criteria
                 let new_block_metadata = BlockMetadata {
                     number: block_metadata.number + 1,
                     size: block_metadata.size, // TODO: Update size based ...
                     difficulty: new_difficulty,
-                    reward: 5 // TODO: Calculate reward based ...
+                    reward: new_block_reward,
                 };
                 // Reset user block data
                 self.user_blocks_hp.write((user, chain_id), new_difficulty);
