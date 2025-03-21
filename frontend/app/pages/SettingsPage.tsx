@@ -39,9 +39,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = (props) => {
   // TODO: Help option?
   // TODO: Move main section to a separate component for better readability
   return (
-    <View className="flex-1 flex flex-col gap-4 px-8">
+    <View className="flex-1 flex flex-col gap-2 px-8">
+     <View className="h-[2rem]" />
      {openSection.name === "Main" ? (
-       <View className="flex flex-col gap-4 mt-4 w-full">
+       <View className="flex flex-col gap-2 mt-4 w-full">
        <View className="flex flex-row justify-around mt-4 gap-4 w-full">
         <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol={"🔊"} offSymbol={"🔇"}  />
         <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol={"🔊"} offSymbol={"🔇"}/>
@@ -82,14 +83,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = (props) => {
          )}
        </View>
      )}
-     {openSection.name === "Main" ? (
-       <TouchableOpacity
-         onPress={props.closeHeaderTab}
-         className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-       >
-         <Text className="text-4xl">Back to Game 🎮</Text>
-       </TouchableOpacity>
-     ) : (
+     {openSection.name !== "Main" && (
        <TouchableOpacity
          onPress={() => setSettingTab(tabs[0])}
          className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"

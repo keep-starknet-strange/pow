@@ -73,10 +73,14 @@ export const getGameState = async (address: string): Promise<GameState | null> =
       maxSize: 8*8 // TODO
     };
 
+    // TODO: Only get last 10 blocks?
+    const pastBlocks = lastBlock ? [lastBlock, ...Array(lastBlock.id - 1).fill(lastBlock)] : [];
+
     gameState.chains.push({
       id: chainId,
       lastBlock: lastBlock,
-      currentBlock: currentBlock
+      currentBlock: currentBlock,
+      pastBlocks: pastBlocks
     });
   }
   

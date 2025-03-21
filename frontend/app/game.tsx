@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { View } from "react-native";
 
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 
+import { MainPage } from "./pages/MainPage";
 import { SequencingPage } from "./pages/SequencingPage";
 import { MiningPage } from "./pages/MiningPage";
 import { StorePage } from "./pages/StorePage";
@@ -26,6 +28,9 @@ export default function game() {
   }, []);
 
   const pages = [{
+    name: "Main",
+    component: MainPage
+  },{
     name: "Sequencing",
     component: SequencingPage
   }, {
@@ -47,8 +52,11 @@ export default function game() {
 
   const [currentPage, setCurrentPage] = useState(pages[0]);
   const [currentBasePage, setCurrentBasePage] = useState(pages[0]);
-  const basePages = ["Sequencing", "Mining"];
+  const basePages = ["Main", "Sequencing", "Mining"];
   const headerTabs = [{
+    name: "Main",
+    icon: "🎮"
+  }, {
     name: "Store",
     icon: "🛒"
   }, {
@@ -74,13 +82,13 @@ export default function game() {
   const props = {
     switchPage: switchPage,
     closeHeaderTab: closeHeaderTab,
-    upgrades: upgrades,
   };
 
   return (
-    <View className="flex-1 bg-[#171717]">
+    <View className="flex-1 bg-[#171717] relative">
         <Header {...props} tabs={headerTabs} />
         <currentPage.component {...props} />
+        <Footer {...props} tabs={headerTabs} />
     </View>
   );
 }

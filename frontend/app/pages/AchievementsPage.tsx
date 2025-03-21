@@ -10,12 +10,9 @@ export const AchievementsPage: React.FC<AchievementsPageProps> = (props) => {
   const { achievements } = useAchievement();
   return (
     <View className="flex-1">
-     <TouchableOpacity
-       className="w-full flex items-end p-4"
-       onPress={props.closeHeaderTab}
-     >
-       <Text className="text-red-600 text-4xl">X</Text>
-     </TouchableOpacity>
+     <View className="flex flex-row justify-end items-center p-2">
+       <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🎉Achievements</Text>
+     </View>
      <ScrollView className="flex-1">
        <View className="flex flex-row flex-wrap gap-4 justify-center mb-[3rem]">
          {achievements && Object.values(achievements).map((achievement: Achievement, index: number) => (

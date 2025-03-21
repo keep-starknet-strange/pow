@@ -49,12 +49,9 @@ export const LeaderboardPage: React.FC<LeaderboardPageProps> = (props) => {
   ];
   return (
     <View className="flex-1">
-     <TouchableOpacity
-       className="w-full flex items-end p-4"
-       onPress={props.closeHeaderTab}
-     >
-       <Text className="text-red-600 text-4xl">X</Text>
-     </TouchableOpacity>
+     <View className="flex flex-row justify-end items-center p-2">
+       <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🏆Rankings</Text>
+     </View>
      <View className="flex flex-row justify-between items-center p-4 bg-[#ffffff20]">
        <Text className="text-lg font-bold text-white">Leaderboard</Text>
        <View className="flex flex-row items-center justify-between w-[35%]">
