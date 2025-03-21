@@ -79,7 +79,7 @@ export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab }) => {
       </View>
      )} />
 
-      <Modal visible={showModal} transparent animationType="slide">
+      <Modal visible={showModal} transparent animationType="fade">
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
           <View className="bg-white p-4 rounded-lg">
             <Text className="text-lg font-bold text-black">Insufficient Funds</Text>
