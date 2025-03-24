@@ -1,59 +1,43 @@
-import { useState, useEffect } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
-
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
-import { Transaction, newTransaction } from "../types/Transaction";
 import { useGameState } from "../context/GameState";
-import { useUpgrades } from "../context/Upgrades";
+import { useMempoolTransactions } from "../hooks/useMempoolTransactions";
+import { useAutoClicker } from "../hooks/useAutoClicker";
+
+import { Transaction } from "../types/Transaction";
 
 export type MempoolProps = {
   switchPage: (page: string) => void;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
-  const { upgrades, isUpgradeActive } = useUpgrades();
-  const { gameState, upgradableGameState, addTxToBlock } = useGameState();
-  const minTransactions = 6;
-  const [transactions, setTransactions] = useState<Array<Transaction>>([]);
+  const { gameState, upgradableGameState } = useGameState();
   const { isSoundOn } = useSound();
+  const { transactions, addTransactionToBlock } = useMempoolTransactions();
 
+  const blockFull = gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize;
+  const containerStyle = {
+    opacity: blockFull ? 0.5 : 1,
+  };
 
-  // Auto-generate Transactions
-  useEffect(() => {
-    if (transactions.length < minTransactions) {
-      const newTransactions = [...transactions];
-      while (newTransactions.length < minTransactions) {
-        newTransactions.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
-      }
+  useAutoClicker(
+    !!upgradableGameState.sequencerSpeed,
+    1000 / upgradableGameState.sequencerSpeed,
+    () => transactions.length > 0 && addTransactionToBlock(transactions[0], 0)
+  );
 
-      setTransactions(isUpgradeActive(0) ? newTransactions.sort((a, b) => b.fee - a.fee) : newTransactions);
-    }
-  }, [transactions, upgrades]);
-
-  const clickTx = (tx: Transaction, index: number) => {
+  const handleClick = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
-    if (gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize) return;
-    addTxToBlock(tx);
-
-    const newTransactions = [...transactions];
-    newTransactions.splice(index, 1);
-    setTransactions(newTransactions);
-  }
-
-  // Auto-clicker functionality
-  useEffect(() => {
-    if (!upgradableGameState.sequencerSpeed) return;
-    const interval = setInterval(() => {
-      if (transactions.length > 0) {
-        clickTx(transactions[0], 0);
-      }
-    }, 1000 / upgradableGameState.sequencerSpeed);
-    return () => clearInterval(interval);
-  }, [transactions, upgradableGameState.sequencerSpeed]);
+    addTransactionToBlock(tx, index);
+  };
 
   return (
-    <View className="flex flex-col w-full bg-[#f7f7f740] rounded-xl border-2 border-[#f7f7f740]">
+    <View 
+      className="flex flex-col w-full bg-[#f7f7f740] rounded-xl border-2 border-[#f7f7f740]"
+      style={containerStyle}
+      pointerEvents={blockFull ? "none" : "auto"}
+    >
       <View className="flex flex-row justify-between m-1 mx-4">
         <Text className="text-[#f7f7f7] text-2xl font-bold">Mempool</Text>
         <Text className="text-[#f7f7f7] text-2xl">0.4 TPS</Text>
@@ -64,7 +48,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
             key={index}
             className="flex flex-row justify-between my-1 p-2 rounded-xl h-[4.2rem] w-[95%] mx-auto"
             style={transaction.style}
-            onPress={() => clickTx(transaction, index)}
+            onPress={() => handleClick(transaction, index)}
           >
             <View className="flex flex-row">
               <View className="flex flex-col w-[70%]">
