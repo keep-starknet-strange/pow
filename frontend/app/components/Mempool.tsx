@@ -54,9 +54,9 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
               <View className="flex flex-col w-[70%]">
                 <Text className="text-[#171717] text-xl">{transaction.type} ₿{transaction.amount.toFixed(2)}</Text>
                 <View className="flex flex-row flex-1 gap-2">
-                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.from}</Text>
+                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.meta1}</Text>
                   <Text className="text-[#171717] text-xl">→</Text>
-                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.to}</Text>
+                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.meta2}</Text>
                 </View>
               </View>
               <View className="flex flex-col justify-between">
