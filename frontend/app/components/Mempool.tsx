@@ -27,7 +27,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     () => transactions.length > 0 && addTransactionToBlock(transactions[0], 0)
   );
 
-  const handleClick = (tx: Transaction, index: number) => {
+  const clickTx = (tx: Transaction, index: number) => {
     playTxClicked(isSoundOn);
     addTransactionToBlock(tx, index);
   };
@@ -48,7 +48,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
             key={index}
             className="flex flex-row justify-between my-1 p-2 rounded-xl h-[4.2rem] w-[95%] mx-auto"
             style={transaction.style}
-            onPress={() => handleClick(transaction, index)}
+            onPress={() => clickTx(transaction, index)}
           >
             <View className="flex flex-row">
               <View className="flex flex-col w-[70%]">
