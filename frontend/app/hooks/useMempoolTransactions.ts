@@ -4,7 +4,7 @@ import { useUpgrades } from "../context/Upgrades";
 import { useGameState } from "../context/GameState";
 
 export const useMempoolTransactions = () => {
-  const minTransactions = 6;
+  const minTransactions = 10;
   const { upgrades, isUpgradeActive } = useUpgrades();
   const { upgradableGameState, gameState, addTxToBlock } = useGameState();
   const [transactions, setTransactions] = useState<Transaction[]>([]);

@@ -4,7 +4,7 @@ import { GameState } from "../types/GameState";
 export const mockAddress = process.env.EXPO_PUBLIC_MOCK_ADDRESS || "0x04db37570e07ef111103674778c3716ec5b877e0dec0e9ab90bb3d6b299d4589";
 
 export const mockGameState: GameState = {
-  balance: 142,
+  balance: 14200,
   chains: [
     {
       id: 0,
@@ -24,6 +24,14 @@ export const mockGameState: GameState = {
         transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
         maxSize: 64,
       },
+      pastBlocks: Array.from({ length: 3 }, (_, i) => ({
+        id: 3 - i,
+        reward: 5,
+        fees: 0,
+        hp: 0,
+        transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
+        maxSize: 64,
+      })),
     }
   ]
 };
