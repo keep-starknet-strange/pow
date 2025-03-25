@@ -16,7 +16,7 @@
     "id": 2,
     "name": "Unlock L2s",
     "cost": 40,
-    "effect": "Unlock the L2 transaction type"
+    "effect": "Unlock L2 batched transactions"
   },
   {
     "id": 3,
@@ -64,5 +64,11 @@
     "name": "Inscriptions Metaprotocol",
     "cost": 80,
     "effect": "Unlock the Inscriptions metaprotocol"
+  },
+  {
+    "id": 10,
+    "name": "Dapp",
+    "cost": 100,
+    "effect": "Unlock the Dapps"
   }
 ]

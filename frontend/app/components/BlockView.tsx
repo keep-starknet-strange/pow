@@ -7,7 +7,7 @@ export type BlockViewProps = {
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
-  const txWidth: string = 100 / Math.sqrt(props.block.maxSize) + "%";
+  const txWidth: number = 100 / Math.sqrt(props.block.maxSize);
   // TODO: Overlay #s to constant size/length/digits
   return (
     <View className="w-full h-full flex flex-col items-center justify-center">
@@ -17,7 +17,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             <View
               key={index}
               className="w-[9.75%] aspect-square border-2 border-[#00000020] rounded-lg overflow-hidden"
-              style={{ width: txWidth, ...tx.style }}
+              style={{ width: `${txWidth}%`, ...tx.style }}
             >
               {tx.image && (
                 <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={{ uri: tx.image }} />
