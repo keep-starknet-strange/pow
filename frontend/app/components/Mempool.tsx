@@ -61,7 +61,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [last10TransactionsTimes]);
-// console.log(JSON.stringify(transactions, null, 2));
+  
   return (
     <View 
       className="flex flex-col w-full bg-[#f7f7f740] rounded-xl border-2 border-[#f7f7f740]"

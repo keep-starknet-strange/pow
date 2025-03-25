@@ -10,7 +10,8 @@ export type Transaction = {
   type: string;
   amount: number;
   fee: number;
-  style: { backgroundColor: string };
+  style: 
+    { backgroundColor: string };
   image?: string;
 };
 
@@ -44,7 +45,7 @@ const getTransactionImage = (type: TransactionType): string | undefined => {
       return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
     case "Transfer":
       return "https://cdn-icons-png.flaticon.com/512/876/876784.png";
-    case "L2 Batch":
+    case "L2 Transactions":
       return "https://pbs.twimg.com/profile_images/1656626983617323010/xzIYc6hK_400x400.png";
     case "L2 Blob":
       return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
@@ -65,8 +66,8 @@ const metaBuilder: Record<TransactionType, () => { meta1: string; meta2: string 
     meta1: "Inscription",
     meta2: `tx:${getRandomAddress()}`,
   }),
-  "L2 Batch": () => ({
-    meta1: "L2 Batch",
+  "L2 Transactions": () => ({
+    meta1: "Batch",
     meta2: `${Math.floor(Math.random() * 100)} txs`,
   }),
   "L2 Blob": () => ({

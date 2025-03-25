@@ -16,7 +16,7 @@
     "id": 2,
     "name": "Unlock L2s",
     "cost": 40,
-    "effect": "Unlock the L2 transaction type"
+    "effect": "Unlock the L2 batched transactions"
   },
   {
     "id": 3,
