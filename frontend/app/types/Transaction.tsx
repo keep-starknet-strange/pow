@@ -54,50 +54,6 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
     
 };
 
-const getTransactionImage = (type: TransactionType): string | undefined => {
-  switch (type) {
-    case "Inscription":
-      return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
-    case "Transfer":
-      return "https://cdn-icons-png.flaticon.com/512/876/876784.png";
-    case "L2 Transaction Batch":
-      return "https://pbs.twimg.com/profile_images/1656626983617323010/xzIYc6hK_400x400.png";
-    case "L2 Blob":
-      return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
-    case "Dapp":
-      return "https://static.thenounproject.com/png/2644901-200.png";
-  }
-};
-
-const getMeta1 = (type: TransactionType): string => {
-  switch (type) {
-    case "Inscription":
-      return "Inscription";
-    case "Transfer":
-      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    case "L2 Transaction Batch":
-      return "L2 Batch";
-    case "L2 Blob":
-      return `BlobSize:${Math.random() * 100}kb`;
-    case "Dapp":
-      return dappConfigs.names[Math.floor(Math.random() * dappConfigs.names.length)];
-  }
-}
-
-const getMeta2 = (type: TransactionType): string => {
-  switch (type) {
-    case "Transfer":
-      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    case "Inscription":
-      return  `tx:${Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)}`;;
-    case "L2 Transaction Batch":
-      return Math.random() * 100 + " txs";
-    case "L2 Blob":
-      return `origin:${Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)}`;
-    case "Dapp":
-      return dappConfigs.actions[Math.floor(Math.random() * dappConfigs.actions.length)];
-  }
-
 // TODO: Download images and add them to the project
 const getTransactionImage = (type: string) => {
   if (type === "Inscription") {
