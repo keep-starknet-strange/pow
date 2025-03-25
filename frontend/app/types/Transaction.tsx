@@ -46,6 +46,7 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
     
 };
 
+// TODO: Download images and add them to the project
 const getTransactionImage = (type: string) => {
   if (type === "Inscription") {
     return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
@@ -56,7 +57,7 @@ const getTransactionImage = (type: string) => {
   } else if (type === "L2 Blob") {
     return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
   }
-  return undefined;
+  return "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png";
 }
 
 export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
@@ -80,6 +81,7 @@ export const newEmptyTransaction = () => {
     type: "",
     amount: 0,
     fee: 0,
-    style: { backgroundColor: "#f7f7f7" }
+    style: { backgroundColor: "#f7f7f7" },
+    image: "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png"
   };
 }
