@@ -6,11 +6,9 @@ import { useUpgrades } from "../context/Upgrades";
 
 import upgradesJson from "../configs/upgrades.json";
 
-export type StorePageProps = {
-  closeHeaderTab: () => void,
-};
+export type StorePageProps = {};
 
-export const StorePage: React.FC<StorePageProps> = ({ closeHeaderTab }) => {
+export const StorePage: React.FC<StorePageProps> = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { gameState, updateBalance } = useGameState();

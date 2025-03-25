@@ -55,11 +55,6 @@ const getTransactionImage = (type: TransactionType): string | undefined => {
   }
 };
 
-type TransactionMetaBuilder = {
-  meta1: () => string;
-  meta2: () => string;
-};
-
 // TDOO: better name than meta?
 const metaBuilder: Record<TransactionType, () => { meta1: string; meta2: string }> = {
   Transfer: () => ({

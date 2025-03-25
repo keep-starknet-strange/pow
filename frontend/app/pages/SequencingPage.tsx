@@ -14,7 +14,7 @@ export const SequencingPage: React.FC<SequencingPageProps> = (props) => {
     <View className="flex-1 relative">
       {gameState.chains[0].lastBlock !== null && (
         <View className="absolute top-0 left-[-50%] w-full">
-          <BlockView block={gameState.chains[0].lastBlock} hideStats={true} />
+          <BlockView block={gameState.chains[0].lastBlock} showOverlay={true} />
           <View className="absolute top-[50%] right-0 transform translate-x-[-88%] translate-y-[-50%] w-[18%] h-[1rem] bg-[#ffffff80] rounded-xl" />
         </View>
       )}

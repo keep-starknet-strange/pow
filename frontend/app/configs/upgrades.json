@@ -64,5 +64,11 @@
     "name": "Inscriptions Metaprotocol",
     "cost": 80,
     "effect": "Unlock the Inscriptions metaprotocol"
+  },
+  {
+    "id": 10,
+    "name": "Dapp Metaprotocol",
+    "cost": 100,
+    "effect": "Unlock the Dapp metaprotocol"
   }
 ]
