@@ -1,4 +1,5 @@
 use starknet::ContractAddress;
+use click_chain::main::ClickChain::NewBlockMetadata;
 
 #[starknet::interface]
 pub trait IClickChain<TContractState> {
@@ -9,8 +10,13 @@ pub trait IClickChain<TContractState> {
     ) -> (u128, u128, u128);
     fn get_user_block_fee(self: @TContractState, user: ContractAddress, chain_id: u128) -> u128;
     fn get_user_block_hp(self: @TContractState, user: ContractAddress, chain_id: u128) -> u128;
+    fn get_user_block_reward(self: @TContractState, user: ContractAddress, chain_id: u128) -> u128;
+    fn get_user_block_size(self: @TContractState, user: ContractAddress, chain_id: u128) -> u128;
 
-    fn create_chain(ref self: TContractState);
+    fn update_user_block_reward(ref self: TContractState, user: ContractAddress, chain_id: u128, reward: u128);
+    fn update_user_block_size(ref self: TContractState, user: ContractAddress, chain_id: u128, squareRootSize: u128);
+
+    fn create_chain(ref self: TContractState, new_block_meta_data: NewBlockMetadata);
     fn sequence_tx(ref self: TContractState, chain_id: u128, fee: u128);
     fn try_mine_block(ref self: TContractState, chain_id: u128) -> bool;
     fn mine_block(ref self: TContractState, chain_id: u128);
@@ -46,6 +52,10 @@ mod ClickChain {
         user_blocks_fees: Map<(ContractAddress, u128), u128>,
         // Maps: (user address, chain id) -> block hp (# of tries)
         user_blocks_hp: Map<(ContractAddress, u128), u128>,
+        // Maps: (user address, chain id) -> block reward
+        user_blocks_rewards: Map<(ContractAddress, u128), u128>,
+        // Maps: (user address, chain id) -> block size
+        user_blocks_sizes: Map<(ContractAddress, u128), u128>,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -92,6 +102,26 @@ mod ClickChain {
         new_hp: u128,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct UserBlockRewardUpdated {
+        #[key]
+        user: ContractAddress,
+        #[key]
+        chain_id: u128,
+        old_reward: u128,
+        new_reward: u128,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct UserBlockSizeUpdated {
+        #[key]
+        user: ContractAddress,
+        #[key]
+        chain_id: u128,
+        old_size: u128,
+        new_size: u128,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
@@ -100,6 +130,15 @@ mod ClickChain {
         UserBlockMined: UserBlockMined,
         UserBlockFeeUpdated: UserBlockFeeUpdated,
         UserBlockHpUpdated: UserBlockHpUpdated,
+        UserBlockRewardUpdated: UserBlockRewardUpdated,
+        UserBlockSizeUpdated: UserBlockSizeUpdated,
+    }
+
+    #[derive(Drop, Serde)]
+    pub struct NewBlockMetadata {
+        size: u128,
+        difficulty: u128,
+        reward: u128,
     }
 
     #[constructor]
@@ -131,24 +170,60 @@ mod ClickChain {
         fn get_user_block_hp(self: @ContractState, user: ContractAddress, chain_id: u128) -> u128 {
             self.user_blocks_hp.read((user, chain_id))
         }
+        fn get_user_block_reward(
+            self: @ContractState, user: ContractAddress, chain_id: u128,
+        ) -> u128 {
+            self.user_blocks_rewards.read((user, chain_id))
+        }
+        fn get_user_block_size(
+            self: @ContractState, user: ContractAddress, chain_id: u128,
+        ) -> u128 {
+            self.user_blocks_sizes.read((user, chain_id))
+        }
 
-        fn create_chain(ref self: ContractState) {
+        fn update_user_block_reward(ref self: ContractState, user: ContractAddress, chain_id: u128, reward: u128) {
+            let old_reward = self.user_blocks_rewards.read((user, chain_id));
+            self.user_blocks_rewards.write((user, chain_id), reward);
+            self
+                .emit(
+                    UserBlockRewardUpdated {
+                        user, chain_id, old_reward, new_reward: reward,
+                    },
+                );
+        }
+        fn update_user_block_size(ref self: ContractState, user: ContractAddress, chain_id: u128, squareRootSize: u128) {
+            let new_size = squareRootSize * squareRootSize;
+            let old_size = self.user_blocks_sizes.read((user, chain_id));
+            self.user_blocks_sizes.write((user, chain_id), new_size);
+            self
+                .emit(
+                    UserBlockSizeUpdated {
+                        user, chain_id, old_size, new_size: new_size,
+                    },
+                );
+        }
+
+        fn create_chain(ref self: ContractState, new_block_meta_data: NewBlockMetadata) {
             let user = get_caller_address();
             // Increment user chain count
             let chain_count = self.user_chain_count.read(user);
             self.user_chain_count.write(user, chain_count + 1);
             // Initialize user block metadata
             const new_difficulty: u128 = 8; // TODO: Set initial difficulty
+            const new_reward: u128 = 5; // TODO: Set initial reward
+            const new_size: u128 = 64; // TODO: Set initial size
             let new_block_metadata = BlockMetadata {
                 number: 0,
-                size: 64, // TODO: Set initial size
-                difficulty: new_difficulty,
-                reward: 5 // TODO: Set initial reward
+                size: new_block_meta_data.size, // TODO: Set initial size
+                difficulty: new_block_meta_data.difficulty,
+                reward: new_block_meta_data.reward // TODO: Set initial reward
             };
             // Initialize user block data
             self.user_blocks_hp.write((user, chain_count), new_difficulty);
             self.user_blocks_metadata.write((user, chain_count), new_block_metadata);
             self.user_blocks_fees.write((user, chain_count), 0);
+            self.user_blocks_rewards.write((user, chain_count), new_reward);
+            self.user_blocks_sizes.write((user, chain_count), new_size);
 
             self.emit(UserChainCreated { user, chain_id: chain_count });
             self
@@ -158,6 +233,18 @@ mod ClickChain {
                     },
                 );
             self.emit(UserBlockFeeUpdated { user, chain_id: chain_count, old_fee: 0, new_fee: 0 });
+            self
+                .emit(
+                    UserBlockRewardUpdated {
+                        user, chain_id: chain_count, old_reward: 0, new_reward: new_reward,
+                    },
+                );
+            self
+                .emit(
+                    UserBlockSizeUpdated {
+                        user, chain_id: chain_count, old_size: 0, new_size: new_size,
+                    },
+                );
         }
 
         // TODO: Check block size before sequencing transaction
@@ -194,12 +281,14 @@ mod ClickChain {
                 let user = get_caller_address();
                 let block_fees = self.user_blocks_fees.read((user, chain_id));
                 let block_metadata = self.user_blocks_metadata.read((user, chain_id));
+                let new_block_reward = self.user_blocks_rewards.read((user, chain_id));
+                let new_block_size = self.user_blocks_sizes.read((user, chain_id));
                 const new_difficulty: u128 = 8; // TODO: Update difficulty based on some criteria
                 let new_block_metadata = BlockMetadata {
                     number: block_metadata.number + 1,
-                    size: block_metadata.size, // TODO: Update size based ...
+                    size: new_block_size,
                     difficulty: new_difficulty,
-                    reward: 5 // TODO: Calculate reward based ...
+                    reward: new_block_reward,
                 };
                 // Reset user block data
                 self.user_blocks_hp.write((user, chain_id), new_difficulty);
