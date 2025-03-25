@@ -69,6 +69,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const addTxToBlock = (tx: Transaction) => {
+    if (tx === undefined) return;
     const newCurrentBlock = {
       ...gameState.chains[0].currentBlock,
       fees: gameState.chains[0].currentBlock.fees + tx.fee,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
-import { playMineClicked } from "../components/utils/sounds";
+import { playMineClicked, playBlockMined } from "../components/utils/sounds";
 
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
@@ -41,6 +41,7 @@ export const Miner: React.FC<MinerProps> = (props) => {
 
     if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
       finalizeBlock();
+      playBlockMined(isSoundOn);
       props.switchPage("SequencingPage");
     }
   };
