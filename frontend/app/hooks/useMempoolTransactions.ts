@@ -11,7 +11,8 @@ export const useMempoolTransactions = () => {
 
   useEffect(() => {
     if (transactions.length < minTransactions) {
-      const newTxs = [...transactions];
+      // removes last 4 transactions to remove stale transactions in the mempool
+      const newTxs = [...transactions].slice(0, Math.max(0, transactions.length - 4));
       while (newTxs.length < minTransactions) {
         newTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
       }
