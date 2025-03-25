@@ -1,7 +1,8 @@
-import inscriptionImages from "../configs/inscriptions.json";
+import { ImageSourcePropType } from "react-native";
 import dappConfigs from "../configs/dapps.json";
-import { getRandomAddress, getRandomFromArray } from "../utils/transactions";
+import { getRandomAddress, getRandomFromArray, getRandomTransactionType } from "../utils/transactions";
 import transactionTypesConfig from "../configs/transactions.json";
+import { inscriptionImages } from "../configs/inscriptions";
 
 
 export type Transaction = {
@@ -12,58 +13,38 @@ export type Transaction = {
   fee: number;
   style: 
     { backgroundColor: string };
-  image?: string;
+  image?: ImageSourcePropType;
 };
 
 export type TransactionType = keyof typeof transactionTypesConfig;
 
-const getRandomTransactionType = (isUpgradeActive: (id: number
-) => boolean) => {
-  const availableTypes = Object.entries(transactionTypesConfig)
-    .filter(([_, { requiredUpgrade }]) => !requiredUpgrade || isUpgradeActive(requiredUpgrade)) // Only include if upgrade is active
-    .map(([type, { chance }]) => ({ type, chance }));
 
-    // Normalizes probabilities to sum to 100%
-    // TODO rework probabilities here
-    const totalChance = availableTypes.reduce((sum, { chance }) => sum + chance, 0);
-    let cumulativeChance = 0;
-    const rand = Math.random() * totalChance; // Scale to total probability
-
-    for (const { type, chance } of availableTypes) {
-      cumulativeChance += chance;
-      if (rand < cumulativeChance) return type as TransactionType;
-    }
-
-    return "Transfer"; // Default fallback
-    
-};
-
-const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: string }> = {
+const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: ImageSourcePropType }> = {
   Transfer: () => ({
     meta1: getRandomAddress(),
     meta2: getRandomAddress(),
-    image: require("../assets/transactions/transfer.png")
+    image: require("../../assets/images/transaction/transfer.png")
   }),
   "L2 Transactions": () => ({
     meta1: "Batch",
     meta2: `${Math.floor(Math.random() * 100)} txs`,
-    image: require("../assets/transactions/l2Batch.png"),
+    image: require("../../assets/images/transaction/l2Batch.png"),
   }),
   "L2 Blob": () => ({
     meta1: `${(Math.random() * 100).toFixed(2)}kb blob`,
     meta2: `origin:${getRandomAddress()}`,
-    image: require("../assets/transactions/l2Blob.png"),
+    image: require("../../assets/images/transaction/l2Blob.png"),
   }),
   Inscription: () => ({
     meta1: "Inscription",
     meta2: `tx:${getRandomAddress()}`,
     // get random image(0-11) from the inscription folder
-    image: require(`../assets/transactions/inscription/${Math.floor(Math.random() * 12)}.jpeg`),
+    image: getRandomFromArray(inscriptionImages),
   }),
   Dapp: () => ({
     meta1: getRandomFromArray(dappConfigs.names),
     meta2: getRandomFromArray(dappConfigs.actions),
-    image: require("../assets/transactions/dapp.png")
+    image: require("../../assets/images/transaction/dapp.png")
   }),
 };
 
@@ -91,6 +72,6 @@ export const newEmptyTransaction = () => {
     amount: 0,
     fee: 0,
     style: { backgroundColor: "#f7f7f7" },
-    image: require("../assets/images/questionMark.png")
+    image: require("../../assets/images/questionMark.png")
   };
 }
