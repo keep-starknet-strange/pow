@@ -89,9 +89,9 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
                   <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.meta2}</Text>
                 </View>
               </View>
-                <View className="flex flex-col justify-between">
+              <View className="flex flex-col justify-between">
                 {transaction.image && <Image source={transaction.image} style={{ width: 40, height: 40 }} />}
-                </View>
+              </View>
             </View>
             <View className="flex flex-col justify-between">
               <Text className="text-[#171717] text-2xl text-center font-bold">Fee</Text>
