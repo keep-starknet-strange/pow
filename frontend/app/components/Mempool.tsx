@@ -90,7 +90,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
                 </View>
               </View>
               <View className="flex flex-col justify-between">
-                {transaction.image && <Image source={{uri: transaction.image}} style={{ width: 40, height: 40 }} />}
+                {transaction.image && <Image source={transaction.image} style={{ width: 40, height: 40 }} />}
               </View>
             </View>
             <View className="flex flex-col justify-between">
