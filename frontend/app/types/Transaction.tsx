@@ -38,52 +38,39 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
     
 };
 
-// TODO: Download images and add them to the project then move to config file
-const getTransactionImage = (type: TransactionType): string | undefined => {
-  switch (type) {
-    case "Inscription":
-      return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
-    case "Transfer":
-      return "https://cdn-icons-png.flaticon.com/512/876/876784.png";
-    case "L2 Transactions":
-      return "https://pbs.twimg.com/profile_images/1656626983617323010/xzIYc6hK_400x400.png";
-    case "L2 Blob":
-      return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
-    case "Dapp":
-      return "https://static.thenounproject.com/png/2644901-200.png";
-    default:
-      return "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png";
-  }
-};
-
-// TDOO: better name than meta?
-const metaBuilder: Record<TransactionType, () => { meta1: string; meta2: string }> = {
+const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: string }> = {
   Transfer: () => ({
     meta1: getRandomAddress(),
     meta2: getRandomAddress(),
-  }),
-  Inscription: () => ({
-    meta1: "Inscription",
-    meta2: `tx:${getRandomAddress()}`,
+    image: require("../assets/transactions/transfer.png")
   }),
   "L2 Transactions": () => ({
     meta1: "Batch",
     meta2: `${Math.floor(Math.random() * 100)} txs`,
+    image: require("../assets/transactions/l2Batch.png"),
   }),
   "L2 Blob": () => ({
     meta1: `${(Math.random() * 100).toFixed(2)}kb blob`,
     meta2: `origin:${getRandomAddress()}`,
+    image: require("../assets/transactions/l2Blob.png"),
+  }),
+  Inscription: () => ({
+    meta1: "Inscription",
+    meta2: `tx:${getRandomAddress()}`,
+    // get random image(0-11) from the inscription folder
+    image: require(`../assets/transactions/inscription/${Math.floor(Math.random() * 12)}.jpeg`),
   }),
   Dapp: () => ({
     meta1: getRandomFromArray(dappConfigs.names),
     meta2: getRandomFromArray(dappConfigs.actions),
+    image: require("../assets/transactions/dapp.png")
   }),
 };
 
 export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
   const type = getRandomTransactionType(isUpgradeActive) as TransactionType;
   const config = transactionTypesConfig[type];
-  const { meta1, meta2 } = metaBuilder[type]();
+  const { meta1, meta2, image } = transactionBuilder[type]();
 
   return {
     meta1,
@@ -92,7 +79,7 @@ export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScal
     amount: (Math.random() + 1) * 10,
     fee: (Math.random() + 1 + config.feeBump) * 0.1 * mevScaling,
     style: { backgroundColor: config.color },
-    image: getTransactionImage(type)
+    image
   };
 };
 
@@ -104,6 +91,6 @@ export const newEmptyTransaction = () => {
     amount: 0,
     fee: 0,
     style: { backgroundColor: "#f7f7f7" },
-    image: "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png"
+    image: require("../assets/images/questionMark.png")
   };
 }
