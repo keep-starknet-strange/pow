@@ -19,6 +19,27 @@ export type Transaction = {
 export type TransactionType = keyof typeof transactionTypesConfig;
 
 
+
+const getRandomTransactionType = (isUpgradeActive: (id: number
+) => boolean) => {
+  const availableTypes = Object.entries(transactionTypesConfig)
+  .filter(([_, { requiredUpgrade }]) => !requiredUpgrade || isUpgradeActive(requiredUpgrade)) // Only include if upgrade is active
+  .map(([type, { chance }]) => ({ type, chance }));
+  
+  // Normalizes probabilities to sum to 100%
+  // TODO rework probabilities here
+  const totalChance = availableTypes.reduce((sum, { chance }) => sum + chance, 0);
+  let cumulativeChance = 0;
+  const rand = Math.random() * totalChance; // Scale to total probability
+  
+  for (const { type, chance } of availableTypes) {
+    cumulativeChance += chance;
+    if (rand < cumulativeChance) return type as TransactionType;
+  }
+  
+  return "Transfer"; // Default fallback
+};
+
 const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: ImageSourcePropType }> = {
   Transfer: () => ({
     meta1: getRandomAddress(),
@@ -47,27 +68,6 @@ const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: 
     image: require("../../assets/images/transaction/dapp.png")
   }),
 };
-
-const getRandomTransactionType = (isUpgradeActive: (id: number
-) => boolean) => {
-  const availableTypes = Object.entries(transactionTypesConfig)
-    .filter(([_, { requiredUpgrade }]) => !requiredUpgrade || isUpgradeActive(requiredUpgrade)) // Only include if upgrade is active
-    .map(([type, { chance }]) => ({ type, chance }));
-
-    // Normalizes probabilities to sum to 100%
-    // TODO rework probabilities here
-    const totalChance = availableTypes.reduce((sum, { chance }) => sum + chance, 0);
-    let cumulativeChance = 0;
-    const rand = Math.random() * totalChance; // Scale to total probability
-
-    for (const { type, chance } of availableTypes) {
-      cumulativeChance += chance;
-      if (rand < cumulativeChance) return type as TransactionType;
-    }
-
-    return "Transfer"; // Default fallback
-};
-
 
 export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
   const type = getRandomTransactionType(isUpgradeActive) as TransactionType;
