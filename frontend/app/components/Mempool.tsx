@@ -61,7 +61,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [last10TransactionsTimes]);
-
+// console.log(JSON.stringify(transactions, null, 2));
   return (
     <View 
       className="flex flex-col w-full bg-[#f7f7f740] rounded-xl border-2 border-[#f7f7f740]"
@@ -84,9 +84,9 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
               <View className="flex flex-col w-[70%]">
                 <Text className="text-[#171717] text-xl">{transaction.type} ₿{transaction.amount.toFixed(2)}</Text>
                 <View className="flex flex-row flex-1 gap-2">
-                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.meta1}</Text>
+                  <Text className="text-[#171717] text-xl w-[40%]">{transaction.meta1}</Text>
                   <Text className="text-[#171717] text-xl">→</Text>
-                  <Text className="text-[#171717] text-xl w-[40%] truncate">{transaction.meta2}</Text>
+                  <Text className="text-[#171717] text-xl w-[40%]" >{transaction.meta2}</Text>
                 </View>
               </View>
               <View className="flex flex-col justify-between">

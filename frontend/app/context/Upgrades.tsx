@@ -80,6 +80,9 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       case "Unlock L2 Blobs":
         // TODO?
         break;
+      case "Dapps":
+        // TODO?
+        break;
       default:
         console.warn(`Unknown upgrade: ${upgrade.name}`);
         break;

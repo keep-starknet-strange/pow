@@ -67,8 +67,8 @@
   },
   {
     "id": 10,
-    "name": "Dapp Metaprotocol",
+    "name": "Dapp",
     "cost": 100,
-    "effect": "Unlock the Dapp metaprotocol"
+    "effect": "Unlock the Dapps"
   }
 ]

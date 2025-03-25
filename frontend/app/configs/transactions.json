@@ -1,6 +1,6 @@
 {
   "Transfer":             { "color": "#60f760a0", "chance": 0.65, "feeBump": 0, "requiredUpgrade": null, "levelMultiplier": 1 },
-  "L2 Transaction Batch": { "color": "#f7f760a0", "chance": 0.25, "feeBump": 1, "requiredUpgrade": 2,    "levelMultiplier": 1 },
+  "L2 Batch": { "color": "#f7f760a0", "chance": 0.25, "feeBump": 1, "requiredUpgrade": 2,    "levelMultiplier": 1 },
   "L2 Blob":              { "color": "#6060f7a0", "chance": 0.15, "feeBump": 2, "requiredUpgrade": 3,    "levelMultiplier": 1 },
   "Inscription":          { "color": "#f760f7a0", "chance": 0.2,  "feeBump": 3, "requiredUpgrade": 9,    "levelMultiplier": 1 },
   "Dapp":                 { "color": "#f76060a0", "chance": 0.1,  "feeBump": 4, "requiredUpgrade": 10,   "levelMultiplier": 1 }
