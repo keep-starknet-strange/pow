@@ -1,9 +1,12 @@
-import { Upgrades } from "./Upgrade";
 import inscriptionImages from "../configs/inscriptions.json";
+import dappConfigs from "../configs/dapps.json";
+import { getRandomAddress, getRandomFromArray } from "../utils/transactions";
+import transactionTypesConfig from "../configs/transactions.json";
+
 
 export type Transaction = {
-  from: string;
-  to: string;
+  meta1: string;
+  meta2: string;
   type: string;
   amount: number;
   fee: number;
@@ -11,23 +14,11 @@ export type Transaction = {
   image?: string;
 };
 
-export type TransactionType = "Transfer" | "L2 Transaction Batch" | "L2 Blob" | "Inscription";
-
-const TRANSACTION_TYPES: Record<TransactionType, { color: string; chance: number; feeBump: number; requiredUpgrade: number | null }> = {
-  "Transfer": { color: "#60f760a0", chance: 0.65, feeBump: 0, requiredUpgrade: null }, // Always available
-  "L2 Transaction Batch": { color: "#f7f760a0", feeBump: 1, chance: 0.25, requiredUpgrade: 2 },
-  "L2 Blob": { color: "#6060f7a0", chance: 0.15, feeBump: 2, requiredUpgrade: 3 },
-  "Inscription": { color: "#f760f7a0", chance: 0.2, feeBump: 3, requiredUpgrade: 9 },
-};
-
-// Function to determine a valid transaction type based on active upgrades
-type Upgrade = {
-  purchased: boolean;
-};
+export type TransactionType = keyof typeof transactionTypesConfig;
 
 const getRandomTransactionType = (isUpgradeActive: (id: number
 ) => boolean) => {
-  const availableTypes = Object.entries(TRANSACTION_TYPES)
+  const availableTypes = Object.entries(transactionTypesConfig)
     .filter(([_, { requiredUpgrade }]) => !requiredUpgrade || isUpgradeActive(requiredUpgrade)) // Only include if upgrade is active
     .map(([type, { chance }]) => ({ type, chance }));
 
@@ -46,38 +37,73 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
     
 };
 
-// TODO: Download images and add them to the project
-const getTransactionImage = (type: string) => {
-  if (type === "Inscription") {
-    return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
-  } else if (type === "Transfer") {
-    return "https://cdn-icons-png.flaticon.com/512/876/876784.png";
-  } else if (type === "L2 Transaction Batch") {
-    return "https://pbs.twimg.com/profile_images/1656626983617323010/xzIYc6hK_400x400.png";
-  } else if (type === "L2 Blob") {
-    return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
+// TODO: Download images and add them to the project then move to config file
+const getTransactionImage = (type: TransactionType): string | undefined => {
+  switch (type) {
+    case "Inscription":
+      return inscriptionImages[Math.floor(Math.random() * inscriptionImages.length)];
+    case "Transfer":
+      return "https://cdn-icons-png.flaticon.com/512/876/876784.png";
+    case "L2 Transaction Batch":
+      return "https://pbs.twimg.com/profile_images/1656626983617323010/xzIYc6hK_400x400.png";
+    case "L2 Blob":
+      return "https://static.coinpaprika.com/coin/blobs-blobs/logo.png?rev=11132781";
+    case "Dapp":
+      return "https://static.thenounproject.com/png/2644901-200.png";
+    default:
+      return "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png";
   }
-  return "https://www.freeiconspng.com/thumbs/question-mark-icon/black-question-mark-icon-clip-art-10.png";
-}
+};
+
+type TransactionMetaBuilder = {
+  meta1: () => string;
+  meta2: () => string;
+};
+
+// TDOO: better name than meta?
+const metaBuilder: Record<TransactionType, () => { meta1: string; meta2: string }> = {
+  Transfer: () => ({
+    meta1: getRandomAddress(),
+    meta2: getRandomAddress(),
+  }),
+  Inscription: () => ({
+    meta1: "Inscription",
+    meta2: `tx:${getRandomAddress()}`,
+  }),
+  "L2 Transaction Batch": () => ({
+    meta1: "L2 Batch",
+    meta2: `${Math.floor(Math.random() * 100)} txs`,
+  }),
+  "L2 Blob": () => ({
+    meta1: `${(Math.random() * 100).toFixed(2)}kb blob`,
+    meta2: `origin:${getRandomAddress()}`,
+  }),
+  Dapp: () => ({
+    meta1: getRandomFromArray(dappConfigs.names),
+    meta2: getRandomFromArray(dappConfigs.actions),
+  }),
+};
 
 export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
   const type = getRandomTransactionType(isUpgradeActive) as TransactionType;
+  const config = transactionTypesConfig[type];
+  const { meta1, meta2 } = metaBuilder[type]();
 
   return {
-    from: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-    to: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+    meta1,
+    meta2,
     type,
     amount: (Math.random() + 1) * 10,
-    fee: (Math.random() + 1 + TRANSACTION_TYPES[type as TransactionType].feeBump) * 0.1 * mevScaling,
-    style: { backgroundColor: TRANSACTION_TYPES[type as TransactionType].color },
+    fee: (Math.random() + 1 + config.feeBump) * 0.1 * mevScaling,
+    style: { backgroundColor: config.color },
     image: getTransactionImage(type)
   };
 };
 
 export const newEmptyTransaction = () => {
   return {
-    from: "",
-    to: "",
+    meta1: "",
+    meta2: "",
     type: "",
     amount: 0,
     fee: 0,

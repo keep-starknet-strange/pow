@@ -1,0 +1,15 @@
+{
+  "names": [
+    "foo",
+    "bar",
+    "baz",
+    "fart-peace"
+  ],
+
+  "actions": [
+    "move",
+    "attack",
+    "defend",
+    "heal"
+  ]
+}
