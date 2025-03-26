@@ -8,7 +8,6 @@ import { hexToInt } from './utils';
 import contractResponse from './contracts.json';
 
 export const getGameState = async (address: string): Promise<GameState | null> => {
-  
   if (useMock) return mockGameState;
   // TODO: Get all chains ( and/or pagination? )
   const chainIds = [0];
