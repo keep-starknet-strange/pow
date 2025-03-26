@@ -3,19 +3,9 @@ import { mockGameState } from './mock';
 import { Block } from '../types/Block';
 import { newEmptyTransaction } from '../types/Transaction';
 import { GameState } from '../types/GameState';
-import { hexToInt } from './utils';
+import { hexToInt, getEventValue } from './utils';
 // temoporary import
 import contractResponse from './contracts.json';
-
-const getEventValue = (
-  event: any | undefined,
-  fallback = 0,
-  index = 1
-): number => {
-  return event?.data?.data?.[index]
-    ? hexToInt(event.data.data[index])
-    : fallback;
-};
 
 export const getGameState = async (address: string): Promise<GameState | null> => {
   if (useMock) return mockGameState;
