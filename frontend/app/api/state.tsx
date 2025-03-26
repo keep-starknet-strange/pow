@@ -5,12 +5,16 @@ import { newEmptyTransaction } from '../types/Transaction';
 import { GameState } from '../types/GameState';
 import { hexToInt } from './utils';
 
-export const getGameState = async (address: string): Promise<GameState | null> => {
-  if (useMock) return mockGameState;
+import contractResponse from './contracts.json';
 
+
+export const getGameState = async (address: string): Promise<GameState | null> => {
+  
+  if (useMock) return mockGameState;
+  
   // TODO: Get all chains ( and/or pagination? )
   const chainIds = [0];
-
+  
   // TODO: Use contract.json for event ids
   let balance = 0;
   const balanceRes = await fetchWrapper(
@@ -19,13 +23,14 @@ export const getGameState = async (address: string): Promise<GameState | null> =
   if (balanceRes && balanceRes.data) {
     balance = hexToInt(balanceRes.data.data[1]);
   }
-
+  
   let gameState: GameState = {
     balance: balance,
     chains: []
   }
-
+  
   for (const chainId of chainIds) {
+
     // TODO: Filter out events for other chains w/ keys=3:<chainId>
     let lastBlock: Block | null = null;
     const lastBlockRes = await fetchWrapper(
@@ -47,44 +52,26 @@ export const getGameState = async (address: string): Promise<GameState | null> =
     }
 
     const blockId = lastBlock ? lastBlock.id + 1 : 0;
-    let fees = 0;
+
+    // TODO: use actual api response
     // TODO: Filter out events for other chains w/ keys=3:<chainId>
-    const feesRes = await fetchWrapper(
-      `events/get-latest-with?eventId=4&keys=2:${address}`
-    );
-    if (feesRes && feesRes.data) {
-      fees = hexToInt(feesRes.data.data[1]);
-    }
-    let hp = 0;
-    // TODO: Filter out events for other chains w/ keys=3:<chainId>
-    const hpRes = await fetchWrapper(
-      `events/get-latest-with?eventId=5&keys=2:${address}`
-    );
-    if (hpRes && hpRes.data) {
-      hp = hexToInt(hpRes.data.data[1]);
-    }
-    const rewardRes = await fetchWrapper(
-      `events/get-latest-with?eventId=6&keys=2:${address}`
-    );
-    let reward = 0;
-    if (rewardRes && rewardRes.data) {
-      reward = hexToInt(rewardRes.data.data[1]);
-    };
-    const maxSizeRes = await fetchWrapper(
-      `events/get-latest-with?eventId=7&keys=2:${address}`
-    );
-    let maxSize = 0;
-    if (maxSizeRes && maxSizeRes.data) {
-      maxSize = hexToInt(maxSizeRes.data.data[1]);
-    };
+    const contractInfo = await contractResponse
+    const eventList = contractInfo[0]?.events || [];
+    const events = Object.fromEntries(await Promise.all(eventList.map(async (e) => {
+      const response = await fetchWrapper(
+        `events/get-latest-with?eventId=${e.id}&keys=2:${address}`
+      );
+      const value = response && response.data ? hexToInt(response.data.data[1]) : 0;
+      return [e.name, value];
+    })));
 
     const currentBlock: Block = {
       id: blockId,
-      reward: reward,
-      fees: fees,
-      hp: hp,
-      transactions: [], // TODO
-      maxSize: maxSize,
+      transactions: [], // TODO: Get transactions
+      reward: events.UserBlockRewardUpdated,
+      fees: events.UserBlockFeeUpdated,
+      hp: events.UserBlockHpUpdated,
+      maxSize: events.UserBlockSizeUpdated,
     };
 
     // TODO: Only get last 10 blocks?
