@@ -4,17 +4,14 @@ import { Block } from '../types/Block';
 import { newEmptyTransaction } from '../types/Transaction';
 import { GameState } from '../types/GameState';
 import { hexToInt } from './utils';
-
+// temoporary import
 import contractResponse from './contracts.json';
-
 
 export const getGameState = async (address: string): Promise<GameState | null> => {
   
   if (useMock) return mockGameState;
-  
   // TODO: Get all chains ( and/or pagination? )
   const chainIds = [0];
-  
   // TODO: Use contract.json for event ids
   let balance = 0;
   const balanceRes = await fetchWrapper(
@@ -23,14 +20,11 @@ export const getGameState = async (address: string): Promise<GameState | null> =
   if (balanceRes && balanceRes.data) {
     balance = hexToInt(balanceRes.data.data[1]);
   }
-  
   let gameState: GameState = {
     balance: balance,
     chains: []
   }
-  
   for (const chainId of chainIds) {
-
     // TODO: Filter out events for other chains w/ keys=3:<chainId>
     let lastBlock: Block | null = null;
     const lastBlockRes = await fetchWrapper(
