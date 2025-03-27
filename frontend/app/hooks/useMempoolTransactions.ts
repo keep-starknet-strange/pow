@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Transaction, newTransaction } from "../types/Transaction";
+import { Transaction} from "../types/Transaction";
+import { newTransaction } from "../utils/transactions";
 import { useUpgrades } from "../context/Upgrades";
 import { useGameState } from "../context/GameState";
 
