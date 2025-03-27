@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Upgrade } from "../types/Upgrade";
 import { useGameState } from "./GameState";
+import { useEventManager } from "../context/EventManager";
+
 
 type UpgradesContextType = {
   addUpgrade: (upgrade: Upgrade ) => void;
@@ -21,9 +23,9 @@ const UpgradeContext = createContext<UpgradesContextType | undefined>(undefined)
 
 export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [upgrades, setUpgrades] = useState<{ [key: number]: Upgrade }>({});
-
+  const { notify } = useEventManager();
   // TODO: Move upgradableGameState into this context?
-  const { upgradableGameState, setUpgradableGameState } = useGameState();
+  const { setUpgradableGameState } = useGameState();
 
   useEffect(() => {
     // TODO: Fetch upgrades from server
@@ -41,37 +43,37 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       case "Block Difficulty":
         setUpgradableGameState((prev) => ({
           ...prev,
-          difficulty: upgradableGameState.difficulty - 1
+          difficulty: prev.difficulty - 1
         }));
         break;
       case "Block Size":
         setUpgradableGameState((prev) => ({
           ...prev,
-          blockSize: upgradableGameState.blockSize + 1
+          blockSize: prev.blockSize + 1
         }));
         break;
       case "Block Reward":
         setUpgradableGameState((prev) => ({
           ...prev,
-          blockReward: upgradableGameState.blockReward * 2
+          blockReward: prev.blockReward * 2
         }));
         break;
       case "MEV Boost":
         setUpgradableGameState((prev) => ({
           ...prev,
-          mevBoost: upgradableGameState.mevScaling + 1
+          mevBoost: prev.mevScaling + 1
         }));
         break;
       case "Sequencer":
         setUpgradableGameState((prev) => ({
           ...prev,
-          sequencerSpeed: upgradableGameState.sequencerSpeed + 1
+          sequencerSpeed: prev.sequencerSpeed + 1
         }));
         break;
       case "Miner":
         setUpgradableGameState((prev) => ({
           ...prev,
-          minerSpeed: upgradableGameState.minerSpeed + 1
+          minerSpeed: prev.minerSpeed + 1
         }));
         break;
       case "Unlock L2s":
@@ -107,12 +109,12 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       ...upgrade,
       level: upgrade.maxLevel ? Math.min(currentLevel + 1, upgrade.maxLevel) : undefined
     };
-    setUpgrades((prevUpgrades) => ({
-      ...prevUpgrades,
-      [upgrade.id]: newUpgrade
-    }));
-  };
 
+    const updatedUpgrades = { ...upgrades, [upgrade.id]: newUpgrade };
+    setUpgrades(updatedUpgrades);
+    notify("UpgradePurchased", { upgrade: newUpgrade, allUpgrades: updatedUpgrades });
+  };
+  
   const updateUpgrade = (upgrade: Upgrade) => {
     setUpgrades((prevUpgrades) => ({
       ...prevUpgrades,

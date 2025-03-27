@@ -16,11 +16,9 @@ import { SettingsPage } from "./pages/SettingsPage";
 
 import { useEventManager } from "./context/EventManager";
 import { useAchievement } from "./context/Achievements";
-import { useUpgrades } from "./context/Upgrades";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
 
 export default function game() {
-  const { upgrades } = useUpgrades();
   const { registerObserver } = useEventManager();
   const { updateAchievement } = useAchievement();
   useEffect(() => {

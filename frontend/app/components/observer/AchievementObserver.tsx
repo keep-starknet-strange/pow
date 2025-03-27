@@ -1,6 +1,7 @@
 import { Observer } from "../../context/EventManager";
 import achievments from "../../configs/achievements.json";
-
+import upgradesConfig from "../../configs/upgrades.json";
+import { isAllUpgradesMaxed } from "../../utils/isAllupgradeMaxed";
 import { Upgrade } from "../../types/Upgrade";
 import { Transaction } from "../../types/Transaction";
 import { Block } from "../../types/Block";
@@ -79,6 +80,11 @@ export class AchievementObserver implements Observer {
                 break;
               case "Achieve STARK Scaling":
                 if (upgrade.effect === "STARK") {
+                  this.updateAchievement(achievement.id, 100);
+                }
+                break;
+              case "Maxed out upgrades":
+                if (data?.allUpgrades && isAllUpgradesMaxed(upgradesConfig, data.allUpgrades)) {
                   this.updateAchievement(achievement.id, 100);
                 }
                 break;
