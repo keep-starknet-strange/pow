@@ -1,5 +1,4 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import { useGameState } from "../context/GameState";
 
 export type FooterProps = {
   tabs: {name: string, icon: string}[];
@@ -7,7 +6,6 @@ export type FooterProps = {
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
-  const { gameState } = useGameState();
   // TODO: Add small lines between the icons
   return (
     <View className="absolute bottom-0 left-0 bg-[#171717] z-[100] flex flex-row justify-around w-full pb-[1.5rem] rounded-2xl pt-[1rem] px-[0.5rem]

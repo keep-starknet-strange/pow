@@ -1,7 +1,7 @@
 import { fetchWrapper, useMock } from './requests';
 import { mockGameState } from './mock';
 import { Block } from '../types/Block';
-import { newEmptyTransaction } from '../types/Transaction';
+import { newEmptyTransaction } from '../utils/transactions';
 import { GameState } from '../types/GameState';
 import { hexToInt, getEventValue } from './utils';
 // temoporary import

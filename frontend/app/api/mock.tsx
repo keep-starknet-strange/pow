@@ -1,4 +1,4 @@
-import { newEmptyTransaction } from "../types/Transaction";
+import { newEmptyTransaction } from "../utils/transactions";
 import { GameState } from "../types/GameState";
 
 export const mockAddress = process.env.EXPO_PUBLIC_MOCK_ADDRESS || "0x04db37570e07ef111103674778c3716ec5b877e0dec0e9ab90bb3d6b299d4589";

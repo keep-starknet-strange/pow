@@ -75,13 +75,28 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }));
         break;
       case "Unlock L2s":
-        // TODO?
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          l2Transactions: true
+        }));
         break;
       case "Unlock L2 Blobs":
-        // TODO?
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          l2Blobs: true,
+        }));
         break;
-      case "Dapps":
-        // TODO?
+      case "Dapp":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          dapp: true,
+        }));
+        break;
+      case "Inscriptions Metaprotocol":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          inscriptionsMetaprotocol: true,
+        }));
         break;
       default:
         console.warn(`Unknown upgrade: ${upgrade.name}`);
