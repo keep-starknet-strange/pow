@@ -49,7 +49,6 @@ export const MainPage: React.FC<MainPageProps> = (props) => {
           ))}
         </View>
       )}
-
    </View>
   );
 }
