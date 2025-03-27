@@ -61,41 +61,56 @@ export class AchievementObserver implements Observer {
         }
         break;
       case "UpgradePurchased":
-        if (data && data.upgrade) {
+        if (data && data.upgrade && data.allUpgrades) {
           const upgrade = data.upgrade as Upgrade;
-          const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "UpgradePurchased"
+          const currentUpgrades = data.allUpgrades;
+          const achievementsToCheck = achievments.filter(
+            (achievement) => achievement.updateOn === "UpgradePurchased"
           );
-          achievementsToCheck.forEach(achievement => {
-            switch (achievement.name) {
-              case "Get an Antminer Rig":
-                if (upgrade.effect === "Antminer") {
-                  this.updateAchievement(achievement.id, 100);
+      
+          achievementsToCheck.forEach((achievement) => {
+            if ("targetUpgradeId" in achievement && achievement.targetUpgradeId !== undefined) {
+              const targetUpgrade = upgradesConfig.find(
+                (u) => u.id === achievement.targetUpgradeId
+              );
+              const currentUpgrade = targetUpgrade ? currentUpgrades[targetUpgrade.id] : undefined;
+      
+              if (targetUpgrade?.maxLevel && currentUpgrade) {
+                const progress = (currentUpgrade.level / targetUpgrade.maxLevel) * 100;
+                this.updateAchievement(achievement.id, progress);
                 }
-                break;
-              case "Achieve SNARK Scaling":
-                if (upgrade.effect === "SNARK") {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              case "Achieve STARK Scaling":
-                if (upgrade.effect === "STARK") {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              case "Maxed out upgrades":
-                if (data?.allUpgrades && isAllUpgradesMaxed(upgradesConfig, data.allUpgrades)) {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              case "Prestige!":
-                if (upgrade.effect === "Prestige") {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              default:
-                console.log("AchievementObserver: Unknown achievement", achievement.name);
-                break;
+              } else {
+              // Handle achievements without targetUpgradeId separately
+              switch (achievement.name) {
+                case "Get an Antminer Rig":
+                  if (upgrade.effect === "Antminer") {
+                    this.updateAchievement(achievement.id, 100);
+                  }
+                  break;
+                case "Achieve SNARK Scaling":
+                  if (upgrade.effect === "SNARK") {
+                    this.updateAchievement(achievement.id, 100);
+                  }
+                  break;
+                case "Achieve STARK Scaling":
+                  if (upgrade.effect === "STARK") {
+                    this.updateAchievement(achievement.id, 100);
+                  }
+                  break;
+                case "Maxed out upgrades":
+                  if (isAllUpgradesMaxed(upgradesConfig, currentUpgrades)) {
+                    this.updateAchievement(achievement.id, 100);
+                  }
+                  break;
+                case "Prestige!":
+                  if (upgrade.effect === "Prestige") {
+                    this.updateAchievement(achievement.id, 100);
+                  }
+                  break;
+                default:
+                  console.log("AchievementObserver: Unknown achievement", achievement.name);
+                  break;
+              }
             }
           });
         }

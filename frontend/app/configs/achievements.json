@@ -76,5 +76,47 @@
     "name": "Maxed out upgrades",
     "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
     "updateOn": "UpgradePurchased"
+  },
+  {
+    "id": 13,
+    "name": "Maxed out Block Difficulty",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 1
+  },
+  {
+    "id": 14,
+    "name": "Maxed out Block Reward",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 7
+  },
+  {
+    "id": 15,
+    "name": "Maxed out Sequencer",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 4
+  },
+  {
+    "id": 16,
+    "name": "Maxed out Miner",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 5
+  },
+  {
+    "id": 17,
+    "name": "Maxed out Block Size",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 6
+  },
+  {
+    "id": 18,
+    "name": "Maxed out MEV Boost",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased",
+    "targetUpgradeId": 8
   }
 ]
