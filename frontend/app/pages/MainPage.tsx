@@ -14,9 +14,27 @@ export const MainPage: React.FC<MainPageProps> = (props) => {
   // TODO: Style overflow with shadow of pastBlocks
   // TODO: Disable mempool if block is full
   return (
-    <View className="flex-1 relative flex flex-col items-center">
+    <View className="flex-1 relative flex flex-col items-center mt-10">
+
+      <Text className="text-2xl font-bold text-[#f9f9f9] mt-[0.5rem]">
+        Block #{gameState.chains[0].currentBlock.id}
+      </Text>
+
+      <View className="flex flex-row justify-center w-full h-[22rem]">
+        <BlockView {...props} block={gameState.chains[0].currentBlock} />
+        {gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize && (
+          <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
+            <Miner {...props} />
+          </View>
+        )}
+      </View>
+
+      <View className="mt-6">
+        <Mempool {...props} />
+      </View>
+
       {gameState.chains[0].pastBlocks && gameState.chains[0].pastBlocks.length > 0 && (
-        <View className="flex flex-row w-full px-2 flex-row-reverse mt-[0.5rem]">
+        <View className="flex flex-row w-full px-2 flex-row-reverse mt-6">
           {gameState.chains[0].pastBlocks.map((block, index) => (
             <View className="flex flex-row items-center" key={index}>
               <View className="h-[8rem] w-[8rem]">
@@ -31,20 +49,6 @@ export const MainPage: React.FC<MainPageProps> = (props) => {
           ))}
         </View>
       )}
-      <Text className="text-2xl font-bold text-[#f9f9f9] mt-[0.5rem]">
-        Block #{gameState.chains[0].currentBlock.id}
-      </Text>
-      <View className="flex flex-row justify-center w-full h-[22rem]">
-        <BlockView {...props} block={gameState.chains[0].currentBlock} />
-        {gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize && (
-          <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
-            <Miner {...props} />
-          </View>
-        )}
-      </View>
-      <View className="mt-[0.5rem]">
-        <Mempool {...props} />
-      </View>
    </View>
   );
 }
