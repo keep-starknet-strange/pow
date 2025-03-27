@@ -70,5 +70,11 @@
     "name": "Prestige!",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "UpgradePurchased"
+  },
+  {
+    "id": 12,
+    "name": "Maxed out upgrades",
+    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "updateOn": "UpgradePurchased"
   }
 ]
