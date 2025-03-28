@@ -42,49 +42,38 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const finalizeBlock = () => {
-    let newGameState = { ...gameState };
-
-    const finalizedBlock = { ...gameState.chains[0].currentBlock };
-    newGameState.chains[0].lastBlock = finalizedBlock;
-    newGameState.chains[0].pastBlocks = gameState.chains[0].pastBlocks ? [finalizedBlock, ...gameState.chains[0].pastBlocks] : [finalizedBlock];
-    notify("BlockFinalized", { block: finalizedBlock });
-
-    const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.blockReward, upgradableGameState.blockSize, upgradableGameState.difficulty);
-    newGameState.chains[0].currentBlock = newCurrentBlock;
-    notify("BlockCreated", { block: newCurrentBlock });
-
-    const newBalance = gameState.balance + finalizedBlock.reward + finalizedBlock.fees;
-    newGameState.balance = newBalance;
-    notify("BalanceUpdated", { balance: newBalance });
-
-    setGameState(newGameState);
-  }
-
-  const updateBalance = (newBalance: number) => {
-    setGameState((prevState) => ({
-      ...prevState,
-      balance: newBalance
-    }));
-    notify("BalanceUpdated", { balance: newBalance });
-  }
-
-  const addTxToBlock = (tx: Transaction) => {
-    if (tx === undefined) return;
-    const newCurrentBlock = {
-      ...gameState.chains[0].currentBlock,
-      fees: gameState.chains[0].currentBlock.fees + tx.fee,
-      transactions: [...gameState.chains[0].currentBlock.transactions, tx]
-    };
-    setGameState((prevState) => ({
-      ...prevState,
-      chains: [{
-        ...prevState.chains[0],
-        currentBlock: newCurrentBlock
-      }]
-    }));
-    notify("TxAdded", { tx });
-  }
-
+    setGameState((prevGameState) => {
+      const finalizedBlock = { ...prevGameState.chains[0].currentBlock };
+      const pastBlocks = prevGameState.chains[0].pastBlocks
+        ? [finalizedBlock, ...prevGameState.chains[0].pastBlocks].slice(0, 4)
+        : [finalizedBlock];
+  
+      const newCurrentBlock = newBlock(
+        finalizedBlock.id + 1,
+        upgradableGameState.blockReward,
+        upgradableGameState.blockSize,
+        upgradableGameState.difficulty
+      );
+  
+      const newBalance = prevGameState.balance + finalizedBlock.reward + finalizedBlock.fees;
+  
+      notify("BlockFinalized", { block: finalizedBlock });
+      notify("BlockCreated", { block: newCurrentBlock });
+      notify("BalanceUpdated", { balance: newBalance });
+  
+      return {
+        ...prevGameState,
+        balance: newBalance,
+        chains: [{
+          ...prevGameState.chains[0],
+          lastBlock: finalizedBlock,
+          pastBlocks,
+          currentBlock: newCurrentBlock
+        }]
+      };
+    });
+  };
+  
   return (
     <GameStateContext.Provider value={{ gameState, upgradableGameState, setUpgradableGameState, finalizeBlock, updateBalance, addTxToBlock }}>
       {children}
