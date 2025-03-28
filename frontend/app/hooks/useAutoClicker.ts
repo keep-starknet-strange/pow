@@ -6,7 +6,7 @@ export const useAutoClicker = (
   clickFn: () => void
 ) => {
   useEffect(() => {
-    if (!isEnabled) return;
+    if (!isEnabled || intervalMs <= 0) return;
     const interval = setInterval(clickFn, intervalMs);
     return () => clearInterval(interval);
   }, [isEnabled, intervalMs, clickFn]);
