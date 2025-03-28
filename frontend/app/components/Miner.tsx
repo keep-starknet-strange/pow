@@ -34,7 +34,7 @@ export const Miner: React.FC<MinerProps> = (props) => {
     // }
     // setBlockHash(newBlockHash);
     notify("TryMineBlock", {
-      nonce: randomNonce,
+      // nonce: randomNonce,
       // blockHash: newBlockHash,
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
