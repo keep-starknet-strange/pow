@@ -6,16 +6,17 @@ import { playMineClicked, playBlockMined } from "../components/utils/sounds";
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
+import { useAutoClicker } from "../hooks/useAutoClicker";
 
 type MinerProps = {
   switchPage: (page: string) => void;
 };
 
 export const Miner: React.FC<MinerProps> = (props) => {
-  const [nonce, setNonce] = useState(0);
+  // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);
-  const [blockHash, setBlockHash] = useState("");
+  // const [blockHash, setBlockHash] = useState("");
 
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
@@ -24,17 +25,17 @@ export const Miner: React.FC<MinerProps> = (props) => {
   const tryMineBlock = () => {
     playMineClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
-    setNonce(randomNonce);
-    let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+    // setNonce(randomNonce);
+    // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-      newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
-    }
-    setBlockHash(newBlockHash);
+    // if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
+    //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
+    // }
+    // setBlockHash(newBlockHash);
     notify("TryMineBlock", {
       nonce: randomNonce,
-      blockHash: newBlockHash,
+      // blockHash: newBlockHash,
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
     });
@@ -47,17 +48,16 @@ export const Miner: React.FC<MinerProps> = (props) => {
   };
 
   // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
-  useEffect(() => {
-    if (upgradableGameState.minerSpeed === 0) return; // Auto-miner is disabled
-    const interval = setInterval(() => {
-      if (mineCounter < gameState.chains[0].currentBlock.hp) {
-        tryMineBlock();
-      } else {
-        clearInterval(interval);
-      }
-    }, 1000 / upgradableGameState.minerSpeed);
-    return () => clearInterval(interval);
-  }, [upgradableGameState.minerSpeed, mineCounter, gameState.chains[0].currentBlock.hp]);
+  const shouldMine =
+  upgradableGameState.minerSpeed > 0 &&
+  mineCounter < gameState.chains[0].currentBlock.hp;
+
+useAutoClicker(
+  shouldMine,
+  1000 / upgradableGameState.minerSpeed,
+  tryMineBlock
+);
+
 
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
