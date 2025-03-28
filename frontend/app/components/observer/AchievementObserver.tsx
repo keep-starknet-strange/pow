@@ -1,167 +1,149 @@
 import { Observer } from "../../context/EventManager";
-import achievments from "../../configs/achievements.json";
+import achievements from "../../configs/achievements.json";
 import upgradesConfig from "../../configs/upgrades.json";
-import { isAllUpgradesMaxed } from "../../utils/isAllupgradeMaxed";
 import { Upgrade } from "../../types/Upgrade";
 import { Transaction } from "../../types/Transaction";
 import { Block } from "../../types/Block";
 
+type Achievement = typeof achievements[number];
+
 export class AchievementObserver implements Observer {
   updateAchievement: (achievementId: number, progress: number) => void;
+  achievementsByEvent: Map<string, Achievement[]>;
+  completedAchievements: Set<number>;
 
   constructor(updateAchievement: (achievementId: number, progress: number) => void) {
-    this.updateAchievement = updateAchievement;
+    this.updateAchievement = (achievementId, progress) => {
+      updateAchievement(achievementId, progress);
+      if (progress >= 100) {
+        this.completedAchievements.add(achievementId);
+      }
+    };
+    this.achievementsByEvent = this.groupAchievementsByEvent();
+    this.completedAchievements = new Set<number>();
+  }
+
+  private groupAchievementsByEvent(): Map<string, Achievement[]> {
+    const map = new Map<string, Achievement[]>();
+    achievements.forEach((achievement) => {
+      if (!map.has(achievement.updateOn)) {
+        map.set(achievement.updateOn, []);
+      }
+      map.get(achievement.updateOn)!.push(achievement);
+    });
+    return map;
   }
 
   onNotify(eventName: string, data?: any): void {
-    switch (eventName) {
-      case "TxAdded":
-        if (data && data.tx) {
-          const tx = data.tx as Transaction;
-          const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "TxAdded"
-          );
-          achievementsToCheck.forEach(achievement => {
-            switch (achievement.name) {
-              case "Get ₿100 from 1 TX":
-                if (tx.fee >= 100) {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              default:
-                console.log("AchievementObserver: Unknown achievement", achievement.name);
-                break;
-            }
-          });
-        }
-        break;
-      case "BalanceUpdated":
-        if (data && data.balance) {
-          const balance = data.balance as number;
-          // TODO: Filter out completed achievements
-          const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "BalanceUpdated"
-          );
-          achievementsToCheck.forEach(achievement => {
-            switch (achievement.name) {
-              case "Reach ₿500":
-                this.updateAchievement(achievement.id, balance >= 500 ? 100 : (balance / 500) * 100);
-                break;
-              case "Reach ₿10K":
-                this.updateAchievement(achievement.id, balance >= 10000 ? 100 : (balance / 10000) * 100);
-                break;
-              case "Reach ₿10M":
-                this.updateAchievement(achievement.id, balance >= 10000000 ? 100 : (balance / 10000000) * 100);
-                break;
-              default:
-                console.log("AchievementObserver: Unknown achievement", achievement.name);
-                break;
-            }
-          });
-        }
-        break;
-      case "UpgradePurchased":
-        if (data && data.upgrade && data.allUpgrades) {
-          const upgrade = data.upgrade as Upgrade;
-          const currentUpgrades = data.allUpgrades;
-          const achievementsToCheck = achievments.filter(
-            (achievement) => achievement.updateOn === "UpgradePurchased"
-          );
-      
-          achievementsToCheck.forEach((achievement) => {
-            if ("targetUpgradeId" in achievement && achievement.targetUpgradeId !== undefined) {
-              const targetUpgrade = upgradesConfig.find(
-                (u) => u.id === achievement.targetUpgradeId
-              );
-              const currentUpgrade = targetUpgrade ? currentUpgrades[targetUpgrade.id] : undefined;
-      
-              if (targetUpgrade?.maxLevel && currentUpgrade) {
-                const progress = (currentUpgrade.level / targetUpgrade.maxLevel) * 100;
-                this.updateAchievement(achievement.id, progress);
-                }
-              } else {
-              // Handle achievements without targetUpgradeId separately
-              switch (achievement.name) {
-                case "Get an Antminer Rig":
-                  if (upgrade.effect === "Antminer") {
-                    this.updateAchievement(achievement.id, 100);
-                  }
-                  break;
-                case "Achieve SNARK Scaling":
-                  if (upgrade.effect === "SNARK") {
-                    this.updateAchievement(achievement.id, 100);
-                  }
-                  break;
-                case "Achieve STARK Scaling":
-                  if (upgrade.effect === "STARK") {
-                    this.updateAchievement(achievement.id, 100);
-                  }
-                  break;
-                case "Maxed out upgrades":
-                  if (isAllUpgradesMaxed(upgradesConfig, currentUpgrades)) {
-                    this.updateAchievement(achievement.id, 100);
-                  }
-                  break;
-                case "Prestige!":
-                  if (upgrade.effect === "Prestige") {
-                    this.updateAchievement(achievement.id, 100);
-                  }
-                  break;
-                default:
-                  console.log("AchievementObserver: Unknown achievement", achievement.name);
-                  break;
-              }
-            }
-          });
-        }
-        break;
-      case "BlockFinalized":
-        if (data && data.block) {
-          const block = data.block as Block;
-          const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "BlockFinalized"
-          );
-          achievementsToCheck.forEach(achievement => {
-            switch (achievement.name) {
-              case "Reach Block 1000":
-                this.updateAchievement(achievement.id, block.id >= 1000 ? 100 : (block.id / 1000) * 100);
-                break;
-              case "Reach Block 1M":
-                this.updateAchievement(achievement.id, block.id >= 1000000 ? 100 : (block.id / 1000000) * 100);
-                break;
-              case "Reach Block 1B":
-                this.updateAchievement(achievement.id, block.id >= 1000000000 ? 100 : (block.id / 1000000000) * 100);
-                break;
-              default:
-                console.log("AchievementObserver: Unknown achievement", achievement.name);
-                break;
-            }
-          });
-        }
-        break;
-      case "TryMineBlock":
-        if (data) {
-          const isMined = data.isMined as boolean;
-          const mineCounter = data.mineCounter as number;
-          const achievementsToCheck = achievments.filter(achievement =>
-            achievement.updateOn === "TryMineBlock"
-          );
-          achievementsToCheck.forEach(achievement => {
-            switch (achievement.name) {
-              case "Mine a block first try":
-                if (isMined && mineCounter === 1) {
-                  this.updateAchievement(achievement.id, 100);
-                }
-                break;
-              default:
-                console.log("AchievementObserver: Unknown achievement", achievement.name);
-                break;
-            }
-          });
-        }
-        break;
-      default:
-        break;
+    const relevantAchievements = this.achievementsByEvent.get(eventName);
+    if (!relevantAchievements || !data) return;
+
+    relevantAchievements.forEach((achievement) => {
+      if (this.completedAchievements.has(achievement.id)) return; // Skip completed achievements
+
+      switch (eventName) {
+        case "TxAdded":
+          this.handleTxAdded(achievement, data.tx as Transaction);
+          break;
+        case "BalanceUpdated":
+          this.handleBalanceUpdated(achievement, data.balance as number);
+          break;
+        case "UpgradePurchased":
+          this.handleUpgradePurchased(achievement, data.upgrade as Upgrade, data.allUpgrades);
+          break;
+        case "BlockFinalized":
+          this.handleBlockFinalized(achievement, data.block as Block);
+          break;
+        case "TryMineBlock":
+          this.handleTryMineBlock(achievement, data.isMined as boolean, data.mineCounter as number);
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  private handleTxAdded(achievement: Achievement, tx: Transaction) {
+    if (achievement.name === "Get ₿100 from 1 TX" && tx.fee >= 100) {
+      this.updateAchievement(achievement.id, 100);
+    }
+  }
+
+  private handleBalanceUpdated(achievement: Achievement, balance: number) {
+    const balanceTargets: Record<string, number> = {
+      "Reach ₿500": 500,
+      "Reach ₿10K": 10000,
+      "Reach ₿10M": 10000000,
+    };
+    const target = balanceTargets[achievement.name];
+    if (target) {
+      const progress = Math.min((balance / target) * 100, 100);
+      this.updateAchievement(achievement.id, progress);
+    }
+  }
+
+  private handleUpgradePurchased(achievement: Achievement, upgrade: Upgrade, currentUpgrades: Record<number, Upgrade>) {
+    if ("targetUpgradeId" in achievement && achievement.targetUpgradeId !== undefined) {
+      const targetUpgrade = upgradesConfig.find(u => u.id === achievement.targetUpgradeId);
+      const currentUpgrade = currentUpgrades[achievement.targetUpgradeId];
+
+      if (targetUpgrade?.maxLevel && currentUpgrade?.level !== undefined) {
+        const progress = Math.min((currentUpgrade.level / targetUpgrade.maxLevel) * 100, 100);
+        this.updateAchievement(achievement.id, progress);
+      } else if (currentUpgrade) {
+        this.updateAchievement(achievement.id, 100);
+      }
+    } else {
+      switch (achievement.name) {
+        case "Get an Antminer Rig":
+          if (upgrade.effect === "Antminer") {
+            this.updateAchievement(achievement.id, 100);
+          }
+          break;
+        case "Achieve SNARK Scaling":
+          if (upgrade.effect === "SNARK") {
+            this.updateAchievement(achievement.id, 100);
+          }
+          break;
+        case "Achieve STARK Scaling":
+          if (upgrade.effect === "STARK") {
+            this.updateAchievement(achievement.id, 100);
+          }
+          break;
+        case "Maxed out upgrades":
+          const progress = (upgradesConfig.filter(cfg => {
+            const upg = currentUpgrades[cfg.id];
+            return cfg.maxLevel ? upg?.level === cfg.maxLevel : !!upg;
+          }).length / upgradesConfig.length) * 100;
+          this.updateAchievement(achievement.id, progress);
+          break;
+        case "Prestige!":
+          if (upgrade.effect === "Prestige") {
+            this.updateAchievement(achievement.id, 100);
+          }
+          break;
+        default:
+          console.log("Unknown achievement", achievement.name);
+      }
+    }
+  }
+
+  private handleBlockFinalized(achievement: Achievement, block: Block) {
+    const blockTargets: Record<string, number> = {
+      "Reach Block 1000": 1000,
+      "Reach Block 1M": 1_000_000,
+      "Reach Block 1B": 1_000_000_000,
+    };
+    const target = blockTargets[achievement.name];
+    if (target) {
+      const progress = Math.min((block.id / target) * 100, 100);
+      this.updateAchievement(achievement.id, progress);
+    }
+  }
+
+  private handleTryMineBlock(achievement: Achievement, isMined: boolean, mineCounter: number) {
+    if (achievement.name === "Mine a block first try" && isMined && mineCounter === 1) {
+      this.updateAchievement(achievement.id, 100);
     }
   }
 }
