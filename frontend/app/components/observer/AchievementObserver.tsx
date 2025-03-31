@@ -64,7 +64,7 @@ export class AchievementObserver implements Observer {
   }
 
   private handleTxAdded(achievement: Achievement, tx: Transaction) {
-    if (achievement.name === "Get ₿100 from 1 TX" && tx.fee >= 100) {
+    if ( tx.fee >= 100 && achievement.name === "Get ₿100 from 1 TX") {
       this.updateAchievement(achievement.id, 100);
     }
   }

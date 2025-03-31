@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
 import { playMineClicked, playBlockMined } from "../components/utils/sounds";
@@ -22,42 +22,36 @@ export const Miner: React.FC<MinerProps> = (props) => {
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
   const { isSoundOn } = useSound();
 
-  const tryMineBlock = () => {
-    playMineClicked(isSoundOn);
-    const randomNonce = Math.floor(Math.random() * 10000);
-    // setNonce(randomNonce);
-    // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
-    const newMineCounter = mineCounter + 1;
-    setMineCounter(newMineCounter);
-    // if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-    //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
-    // }
-    // setBlockHash(newBlockHash);
-    notify("TryMineBlock", {
-      // nonce: randomNonce,
-      // blockHash: newBlockHash,
-      mineCounter: newMineCounter,
-      isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
-    });
 
-    if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-      finalizeBlock();
-      playBlockMined(isSoundOn);
-      props.switchPage("SequencingPage");
-    }
-  };
 
   // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
   const shouldMine =
   upgradableGameState.minerSpeed > 0 &&
-  mineCounter < gameState.chains[0].currentBlock.hp;
+  mineCounter < gameState.chains[0].currentBlock.hp &&
+  gameState.chains[0].currentBlock.transactions.length === gameState.chains[0].currentBlock.maxSize;
 
-useAutoClicker(
-  shouldMine,
-  1000 / upgradableGameState.minerSpeed,
-  tryMineBlock
-);
+  const tryMineBlock = useCallback(() => {
+    playMineClicked(isSoundOn);
+    setMineCounter(prev => {
+      const newMineCounter = prev + 1;
 
+      if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
+        // This defers the call to the next event loop tick
+        setTimeout(() => {
+          notify("TryMineBlock", {
+            mineCounter: newMineCounter,
+            isMined: true,
+          });
+          finalizeBlock();
+          playBlockMined(isSoundOn);
+          props.switchPage("SequencingPage");
+        }, 0);
+      }
+      return newMineCounter;
+    });
+  }, [gameState.chains, upgradableGameState.difficulty, finalizeBlock, isSoundOn]);
+
+  useAutoClicker(shouldMine, 1000 / upgradableGameState.minerSpeed, tryMineBlock);
 
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">

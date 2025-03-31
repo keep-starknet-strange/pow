@@ -24,22 +24,27 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   };
 
   const clickTx = useCallback((tx: Transaction, index: number) => {
-    if (gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize) return;
-    const playPitch = tx.fee + 1;
-    playTxClicked(isSoundOn, playPitch);
-    addTransactionToBlock(tx, index);
-    recordTransaction();
-  }, [gameState, isSoundOn, addTransactionToBlock]);
+    if (blockFull) return;
+    setTimeout(() => {
+      const playPitch = tx.fee + 1;
+      playTxClicked(isSoundOn, playPitch);
+      addTransactionToBlock(tx, index);
+      recordTransaction();
+    }, 0);
+  }, [blockFull, isSoundOn, addTransactionToBlock]);
   
   const sequencerInterval = upgradableGameState.sequencerSpeed > 0
-  ? 1000 / upgradableGameState.sequencerSpeed
+  ? 1000 / upgradableGameState.sequencerSpeed 
   : null;
 
-  useAutoClicker(
-    sequencerInterval !== null,
-    sequencerInterval || 1000, // safe fallback
-    () => transactions.length > 0 && clickTx(transactions[0], 0)
-  );
+  const autoSequencerCallback = useCallback(() => {
+    if (transactions.length > 0) {
+      clickTx(transactions[0], 0);
+    }
+  }, [transactions, clickTx]);
+
+
+  useAutoClicker(sequencerInterval !== null && !blockFull, sequencerInterval || 1000, autoSequencerCallback);
 
   return (
     <View 

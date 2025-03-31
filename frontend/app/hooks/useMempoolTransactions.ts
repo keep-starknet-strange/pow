@@ -1,29 +1,40 @@
-import { useEffect, useState } from "react";
-import { Transaction} from "../types/Transaction";
+import { useEffect, useState, useCallback } from "react";
+import { Transaction } from "../types/Transaction";
 import { newTransaction } from "../utils/transactions";
 import { useUpgrades } from "../context/Upgrades";
 import { useGameState } from "../context/GameState";
 
 export const useMempoolTransactions = () => {
   const minTransactions = 10;
-  const { upgrades, isUpgradeActive } = useUpgrades();
+  const refillInterval = 2000; // 2 seconds
+
+  const { isUpgradeActive } = useUpgrades();
   const { upgradableGameState, gameState, addTxToBlock } = useGameState();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  useEffect(() => {
-    if (transactions.length < minTransactions) {
-      // removes last 4 transactions to keep stale transactions out of the mempool
-      const newTxs = [...transactions].slice(0, Math.max(0, transactions.length - 4));
-      while (newTxs.length < minTransactions) {
-        newTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
-      }
-      setTransactions(
-        isUpgradeActive(0) ? newTxs.sort((a, b) => b.fee - a.fee) : newTxs
-      );
-    }
-  }, [transactions, upgrades]);
+  const refillTransactions = useCallback(() => {
+    setTransactions((prevTransactions) => {
+      if (prevTransactions.length >= minTransactions) return prevTransactions;
 
-  const addTransactionToBlock = (tx: Transaction, index: number) => {
+      const updatedTxs = [...prevTransactions];
+      while (updatedTxs.length < minTransactions) {
+        updatedTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
+      }
+
+      return isUpgradeActive(0)
+        ? updatedTxs.sort((a, b) => b.fee - a.fee)
+        : updatedTxs;
+    });
+  }, [isUpgradeActive, upgradableGameState.mevScaling]);
+
+  // Initial refill and periodic checks
+  useEffect(() => {
+    refillTransactions(); // immediate initial refill
+    const intervalId = setInterval(refillTransactions, refillInterval); // periodic refill
+    return () => clearInterval(intervalId);
+  }, [refillTransactions, refillInterval]);
+
+  const addTransactionToBlock = useCallback((tx: Transaction, index: number) => {
     if (
       gameState.chains[0].currentBlock.transactions.length >=
       gameState.chains[0].currentBlock.maxSize
@@ -31,10 +42,11 @@ export const useMempoolTransactions = () => {
       return;
 
     addTxToBlock(tx);
-    const updatedTxs = [...transactions];
-    updatedTxs.splice(index, 1);
-    setTransactions(updatedTxs);
-  };
+    setTransactions((prev) => prev.filter((_, idx) => idx !== index));
+
+    // Immediately refill if dropped below minTransactions
+    setTimeout(refillTransactions, 0);
+  }, [gameState.chains, addTxToBlock, refillTransactions]);
 
   return {
     transactions,

@@ -44,8 +44,10 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const finalizeBlock = () => {
     setGameState((prevGameState) => {
       const finalizedBlock = { ...prevGameState.chains[0].currentBlock };
+      console.log("Finalizing block", finalizedBlock.id);
       const pastBlocks = prevGameState.chains[0].pastBlocks
-        ? [finalizedBlock, ...prevGameState.chains[0].pastBlocks].slice(0, 4)
+      // keep only the last 4 blocks in the past blocks to prevent state from getting too large
+        ? [finalizedBlock, ...prevGameState.chains[0].pastBlocks.slice(0, 4)]
         : [finalizedBlock];
   
       const newCurrentBlock = newBlock(
@@ -71,9 +73,37 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           currentBlock: newCurrentBlock
         }]
       };
+      
     });
+
   };
   
+  const updateBalance = (newBalance: number) => {
+    setGameState((prevState) => ({
+      ...prevState,
+      balance: newBalance
+    }));
+    notify("BalanceUpdated", { balance: newBalance });
+  }
+
+  const addTxToBlock = (tx: Transaction) => {
+    if (tx === undefined) return;
+    const newCurrentBlock = {
+      ...gameState.chains[0].currentBlock,
+      fees: gameState.chains[0].currentBlock.fees + tx.fee,
+      transactions: [...gameState.chains[0].currentBlock.transactions, tx]
+    };
+    setGameState((prevState) => ({
+      ...prevState,
+      chains: [{
+        ...prevState.chains[0],
+        currentBlock: newCurrentBlock
+      }]
+    }));
+    notify("TxAdded", { tx });
+    console.log("Adding TX", tx.meta1, "to block", gameState.chains[0].currentBlock.id);
+
+  }
   return (
     <GameStateContext.Provider value={{ gameState, upgradableGameState, setUpgradableGameState, finalizeBlock, updateBalance, addTxToBlock }}>
       {children}

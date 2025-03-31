@@ -12,10 +12,10 @@ type MiningPageProps = {
 };
 
 export const MiningPage: React.FC<MiningPageProps> = (props) => {
-  const [nonce, setNonce] = useState(0);
+  // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);
-  const [blockHash, setBlockHash] = useState("");
+  // const [blockHash, setBlockHash] = useState("");
 
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
@@ -23,18 +23,18 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
 
   const tryMineBlock = () => {
     playMineClicked(isSoundOn);
-    const randomNonce = Math.floor(Math.random() * 10000);
-    setNonce(randomNonce);
-    let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
+    // const randomNonce = Math.floor(Math.random() * 10000);
+    // setNonce(randomNonce);
+    // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-      newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
-    }
-    setBlockHash(newBlockHash);
+    // if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
+    //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
+    // }
+    // setBlockHash(newBlockHash);
     notify("TryMineBlock", {
-      nonce: randomNonce,
-      blockHash: newBlockHash,
+      // nonce: randomNonce,
+      // blockHash: newBlockHash,
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
     });
@@ -74,8 +74,8 @@ export const MiningPage: React.FC<MiningPageProps> = (props) => {
         </TouchableOpacity>
       </View>
       <Text className="text-[#f7f7f7] text-2xl mt-4">Difficulty {gameState.chains[0].currentBlock.hp}</Text>
-      <Text className="text-[#f7f7f7] text-2xl">Nonce {nonce}</Text>
-      <Text className="text-[#f7f7f7] text-2xl">Hash {blockHash}</Text>
+      {/* <Text className="text-[#f7f7f7] text-2xl">Nonce {nonce}</Text>
+      <Text className="text-[#f7f7f7] text-2xl">Hash {blockHash}</Text> */}
       <Text className="text-[#f7f7f7] text-2xl mt-8">Reward ₿ {gameState.chains[0].currentBlock.reward}</Text>
       <Text className="text-[#f7f7f7] text-2xl">Fees ₿ {gameState.chains[0].currentBlock.fees.toFixed(2)}</Text>
     </View>
