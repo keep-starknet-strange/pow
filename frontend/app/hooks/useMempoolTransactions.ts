@@ -1,16 +1,17 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { Transaction } from "../types/Transaction";
 import { newTransaction } from "../utils/transactions";
 import { useUpgrades } from "../context/Upgrades";
 import { useGameState } from "../context/GameState";
 
 export const useMempoolTransactions = () => {
-  const minTransactions = 10;
+  const minTransactions = 1;
   const refillInterval = 2000; // 2 seconds
 
   const { isUpgradeActive } = useUpgrades();
   const { upgradableGameState, gameState, addTxToBlock } = useGameState();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const currentBlock = useMemo(() => gameState.chains[0].currentBlock, [gameState.chains[0].currentBlock]);
 
   const refillTransactions = useCallback(() => {
     setTransactions((prevTransactions) => {
@@ -36,8 +37,8 @@ export const useMempoolTransactions = () => {
 
   const addTransactionToBlock = useCallback((tx: Transaction, index: number) => {
     if (
-      gameState.chains[0].currentBlock.transactions.length >=
-      gameState.chains[0].currentBlock.maxSize
+      currentBlock.transactions.length >=
+      currentBlock.maxSize
     )
       return;
 
@@ -46,7 +47,7 @@ export const useMempoolTransactions = () => {
 
     // Immediately refill if dropped below minTransactions
     setTimeout(refillTransactions, 0);
-  }, [gameState.chains, addTxToBlock, refillTransactions]);
+  }, [currentBlock, addTxToBlock, refillTransactions]);
 
   return {
     transactions,

@@ -52,7 +52,7 @@ export class AchievementObserver implements Observer {
           this.handleUpgradePurchased(achievement, data.upgrade as Upgrade, data.allUpgrades);
           break;
         case "BlockFinalized":
-          this.handleBlockFinalized(achievement, data.block as Block);
+          this.handleBlockFinalized(achievement, data.blockId as number);
           break;
         case "TryMineBlock":
           this.handleTryMineBlock(achievement, data.isMined as boolean, data.mineCounter as number);
@@ -128,7 +128,7 @@ export class AchievementObserver implements Observer {
     }
   }
 
-  private handleBlockFinalized(achievement: Achievement, block: Block) {
+  private handleBlockFinalized(achievement: Achievement, blockId: number) {
     const blockTargets: Record<string, number> = {
       "Reach Block 1000": 1000,
       "Reach Block 1M": 1_000_000,
@@ -136,7 +136,7 @@ export class AchievementObserver implements Observer {
     };
     const target = blockTargets[achievement.name];
     if (target) {
-      const progress = Math.min((block.id / target) * 100, 100);
+      const progress = Math.min((blockId / target) * 100, 100);
       this.updateAchievement(achievement.id, progress);
     }
   }

@@ -59,7 +59,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
       const newBalance = prevGameState.balance + finalizedBlock.reward + finalizedBlock.fees;
   
-      notify("BlockFinalized", { block: finalizedBlock });
+      notify("BlockFinalized", { blockId: finalizedBlock.id });
       notify("BlockCreated", { block: newCurrentBlock });
       notify("BalanceUpdated", { balance: newBalance });
   
