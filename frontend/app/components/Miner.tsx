@@ -1,69 +1,62 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-
 import { playMineClicked, playBlockMined } from "../components/utils/sounds";
-
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
+import { useCurrentBlock } from "../context/CurrentBlock";
+import { useBlockActions } from "../hooks/useBlockActions";
 
 type MinerProps = {
   switchPage: (page: string) => void;
 };
 
-export const Miner: React.FC<MinerProps> = (props) => {
-  // const [nonce, setNonce] = useState(0);
-  // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
-  const [mineCounter, setMineCounter] = useState(0);
-  // const [blockHash, setBlockHash] = useState("");
+export const Miner: React.FC<MinerProps> = ({ switchPage }) => {
+    const [mineCounter, setMineCounter] = useState(0);
+    const { notify } = useEventManager();
+    const { upgradableGameState } = useGameState();
+    const { currentBlock } = useCurrentBlock();
+    const { isSoundOn } = useSound();
+    const { finalizeBlock } = useBlockActions();
+    
+    const shouldMine =
+    upgradableGameState.minerSpeed > 0 &&
+    mineCounter < currentBlock.hp &&
+    currentBlock.transactions.length === currentBlock.maxSize;
 
-  const { notify } = useEventManager();
-  const { gameState, upgradableGameState, finalizeBlock } = useGameState();
-  const { isSoundOn } = useSound();
+    const tryMineBlock = useCallback(() => {
+      playMineClicked(isSoundOn);
+      setMineCounter(prev => {
+        const newMineCounter = prev + 1;
 
-  const tryMineBlock = () => {
-    playMineClicked(isSoundOn);
-    const randomNonce = Math.floor(Math.random() * 10000);
-    // setNonce(randomNonce);
-    // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
-    const newMineCounter = mineCounter + 1;
-    setMineCounter(newMineCounter);
-    // if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-    //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
-    // }
-    // setBlockHash(newBlockHash);
-    notify("TryMineBlock", {
-      // nonce: randomNonce,
-      // blockHash: newBlockHash,
-      mineCounter: newMineCounter,
-      isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
-    });
+        if (newMineCounter >= currentBlock.hp) {
+          setTimeout(() => {
+            notify("TryMineBlock", {
+              mineCounter: newMineCounter,
+              isMined: true,
+            });
+            finalizeBlock();
+            playBlockMined(isSoundOn);
+            switchPage("SequencingPage");
+          }, 0);
+        }
+        return newMineCounter;
+      });
+    }, [currentBlock.hp, finalizeBlock, isSoundOn, notify, switchPage]);
 
-    if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-      finalizeBlock();
-      playBlockMined(isSoundOn);
-      props.switchPage("SequencingPage");
-    }
-  };
+  useAutoClicker(
+    shouldMine,
+    1000 / upgradableGameState.minerSpeed,
+    tryMineBlock
+  );
 
-  // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
-  const shouldMine =
-  upgradableGameState.minerSpeed > 0 &&
-  mineCounter < gameState.chains[0].currentBlock.hp;
-
-useAutoClicker(
-  shouldMine,
-  1000 / upgradableGameState.minerSpeed,
-  tryMineBlock
-);
-
-
+  const progressPercent = Math.floor((mineCounter / currentBlock.hp) * 100);
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
       <View
         className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-        style={{ width: `${Math.floor(mineCounter / gameState.chains[0].currentBlock.hp * 100)}%`, height: `${Math.floor(mineCounter / gameState.chains[0].currentBlock.hp * 100)}%` }}
+        style={{ width: `${Math.floor(mineCounter / currentBlock.hp * 100)}%`, height: `${Math.floor(mineCounter / currentBlock.hp * 100)}%` }}
       />
       <TouchableOpacity
         className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#a7a7a7c0] rounded-full flex items-center justify-center

@@ -5,19 +5,23 @@ import { GameStateProvider } from "./context/GameState";
 import { AchievementProvider } from "./context/Achievements";
 import { UpgradesProvider } from "./context/Upgrades";
 import Game from "./game";
+import { CurrentBlockProvider } from "./context/CurrentBlock";
 
 export default function App() {
   return (
     <EventManagerProvider>
       <SoundProvider>
-        <GameStateProvider>
-          <AchievementProvider>
-            <UpgradesProvider>
-              <Game />
-            </UpgradesProvider>
-          </AchievementProvider>
+        <GameStateProvider> 
+          <CurrentBlockProvider>
+            <AchievementProvider>
+              <UpgradesProvider>
+                <Game />
+              </UpgradesProvider>
+            </AchievementProvider>
+          </CurrentBlockProvider>
         </GameStateProvider>
       </SoundProvider>
     </EventManagerProvider>
+
   );
 }

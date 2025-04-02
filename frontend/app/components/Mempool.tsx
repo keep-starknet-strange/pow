@@ -1,66 +1,53 @@
-import { useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { useGameState } from "../context/GameState";
 import { useMempoolTransactions } from "../hooks/useMempoolTransactions";
 import { useAutoClicker } from "../hooks/useAutoClicker";
-
+import { useCurrentBlock } from "../context/CurrentBlock";
+import { useCalculateTps } from "../hooks/useCalculateTps";
 import { Transaction } from "../types/Transaction";
+import { useBlockActions } from "../hooks/useBlockActions";
+import { newTransaction } from "../utils/transactions";
+import { useUpgrades } from "../context/Upgrades";
 
 export type MempoolProps = {
   switchPage: (page: string) => void;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
-  const { gameState, upgradableGameState } = useGameState();
+  const { upgradableGameState } = useGameState();
   const { isSoundOn } = useSound();
   const { transactions, addTransactionToBlock } = useMempoolTransactions();
+  const { currentBlock } = useCurrentBlock()
+  const { tps, recordTransaction } = useCalculateTps();
+  const { addTxToBlock } = useBlockActions()
+  const { isUpgradeActive } = useUpgrades()
 
-  const blockFull = gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize;
+  const blockFull = currentBlock.transactions.length >= currentBlock.maxSize;
   const containerStyle = {
     opacity: blockFull ? 0.5 : 1,
   };
 
-  useAutoClicker(
-    !!upgradableGameState.sequencerSpeed,
-    1000 / upgradableGameState.sequencerSpeed,
-    () => transactions.length > 0 && clickTx(transactions[0], 0)
-  );
+  const clickTx = useCallback((tx: Transaction, index: number) => {
+    if (blockFull) return;
+    setTimeout(() => {
+      playTxClicked(isSoundOn, tx.fee + 1);
+      addTransactionToBlock(tx, index);
+      recordTransaction();
+    }, 0);
+  }, [blockFull, isSoundOn, addTransactionToBlock, recordTransaction]);
 
-  const [last10TransactionsTimes, setLast10TransactionsTimes] = useState<Array<number>>([]);
-  const [tps, setTps] = useState<number>(0);
-  const clickTx = (tx: Transaction, index: number) => {
-    if (gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize) return;
-    const playPitch = tx.fee + 1;
-    playTxClicked(isSoundOn, playPitch);
-    addTransactionToBlock(tx, index);
+  const sequencerInterval = upgradableGameState.sequencerSpeed > 0
+    ? 1000 / upgradableGameState.sequencerSpeed
+    : null;
 
-    const newTimes = [...last10TransactionsTimes];
-    newTimes.push(Date.now());
-    if (newTimes.length > 10) newTimes.shift();
-    setLast10TransactionsTimes(newTimes);
+  const autoSequencerCallback = useCallback(() => {
+    addTxToBlock(newTransaction(isUpgradeActive, upgradableGameState.mevScaling))
+  }, [isUpgradeActive, upgradableGameState.mevScaling]);
 
-    const timeDiff = newTimes[newTimes.length - 1] - newTimes[0];
-    const newTps = (newTimes.length - 1) / (timeDiff / 1000);
-    if (isNaN(newTps)) setTps(0);
-    else setTps(newTps);
-  }
-
-  // Recalculate TPS every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-       // Remove txs older than 5 seconds
-      const newTimes = last10TransactionsTimes.filter(time => Date.now() - time < 5000);
-      setLast10TransactionsTimes(newTimes);
-      const timeDiff = newTimes[newTimes.length - 1] - newTimes[0];
-      const newTps = (newTimes.length - 1) / (timeDiff / 1000);
-
-      if (isNaN(newTps)) setTps(0);
-      else setTps(newTps);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [last10TransactionsTimes]);
+  useAutoClicker(sequencerInterval !== null && !blockFull, sequencerInterval || 1000, autoSequencerCallback);
 
   return (
     <View 

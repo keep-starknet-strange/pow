@@ -2,14 +2,10 @@ import { Block, newBlock } from './Block';
 
 export type Chain = {
   id: number;
-  currentBlock: Block;
-  lastBlock: Block | null;
-  pastBlocks?: Block[];
+  blocks: Block[];
 }
 
 export const newEmptyChain = (id: number): Chain => ({
   id,
-  currentBlock: newBlock(0, 0, 0, 0),
-  lastBlock: null,
-  pastBlocks: [],
+  blocks: [],
 });
