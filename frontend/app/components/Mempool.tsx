@@ -4,8 +4,6 @@ import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { useGameState } from "../context/GameState";
 import { useMempoolTransactions } from "../hooks/useMempoolTransactions";
-import { useAutoClicker } from "../hooks/useAutoClicker";
-
 import { Transaction } from "../types/Transaction";
 
 export type MempoolProps = {
@@ -13,7 +11,7 @@ export type MempoolProps = {
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
-  const { gameState, upgradableGameState } = useGameState();
+  const { gameState } = useGameState();
   const { isSoundOn } = useSound();
   const { transactions, addTransactionToBlock } = useMempoolTransactions();
 
@@ -21,12 +19,6 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const containerStyle = {
     opacity: blockFull ? 0.5 : 1,
   };
-
-  useAutoClicker(
-    !!upgradableGameState.sequencerSpeed,
-    1000 / upgradableGameState.sequencerSpeed,
-    () => transactions.length > 0 && clickTx(transactions[0], 0)
-  );
 
   const [last10TransactionsTimes, setLast10TransactionsTimes] = useState<Array<number>>([]);
   const [tps, setTps] = useState<number>(0);

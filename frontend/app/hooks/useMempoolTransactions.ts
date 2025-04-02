@@ -13,13 +13,21 @@ export const useMempoolTransactions = () => {
   useEffect(() => {
     if (transactions.length < minTransactions) {
       // removes last 4 transactions to keep stale transactions out of the mempool
-      const newTxs = [...transactions].slice(0, Math.max(0, transactions.length - 4));
-      while (newTxs.length < minTransactions) {
-        newTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
-      }
-      setTransactions(
-        isUpgradeActive(0) ? newTxs.sort((a, b) => b.fee - a.fee) : newTxs
-      );
+      setTransactions(prev => {
+        let stableTxs = prev.slice(0, Math.max(0, transactions.length - 4)); // start with existing transactions
+        const numToAdd = minTransactions - stableTxs.length;
+
+        for (let i = 0; i < numToAdd; i++) {
+          stableTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
+        }
+
+        // only sort if necessary
+        const sortedTxs = isUpgradeActive(0)
+          ? [...stableTxs].sort((a, b) => b.fee - a.fee)
+          : stableTxs;
+
+        return sortedTxs;
+      });
     }
   }, [transactions, upgrades]);
 

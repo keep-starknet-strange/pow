@@ -1,5 +1,11 @@
 import { View, Text, Image } from "react-native";
 import { Block } from "../types/Block";
+import { useCallback, useMemo } from "react";
+import { useGameState } from "../context/GameState";
+import {useUpgrades} from "../context/Upgrades"
+import { useAutoCaller } from "../hooks/useAutoCaller"
+import { newTransaction } from "../utils/transactions";
+
 
 export type BlockViewProps = {
   block: Block;
@@ -7,6 +13,28 @@ export type BlockViewProps = {
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
+    const { gameState, upgradableGameState, addTxToBlock } = useGameState();
+    const { isUpgradeActive } = useUpgrades()
+
+    const blockFull = useMemo(() => (
+      gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize
+    ), [gameState.chains]);
+    const isCurrentBlock = useMemo(() => !props.showOverlay, [props.showOverlay]);
+    
+    const autoSequencerCallback = useCallback(() => {
+      addTxToBlock(newTransaction(isUpgradeActive, upgradableGameState.mevScaling))
+    }, [isUpgradeActive, upgradableGameState.mevScaling]);
+  
+    const sequencerActive = useMemo(() => (
+      !!upgradableGameState.sequencerSpeed && !blockFull && isCurrentBlock
+    ), [upgradableGameState.sequencerSpeed, blockFull, isCurrentBlock]);
+
+    useAutoCaller(
+      sequencerActive,
+      1000 / upgradableGameState.sequencerSpeed,
+      autoSequencerCallback
+    );
+  
   const txWidth: number = 100 / Math.sqrt(props.block.maxSize);
   // TODO: Overlay #s to constant size/length/digits
   return (
