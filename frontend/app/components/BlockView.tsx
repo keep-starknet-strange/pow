@@ -15,25 +15,26 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
     const { gameState, upgradableGameState, addTxToBlock } = useGameState();
     const { isUpgradeActive } = useUpgrades()
-
-    const blockFull = useMemo(() => (
-      gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize
-    ), [gameState.chains[0].currentBlock]);
     const isCurrentBlock = useMemo(() => !props.showOverlay, [props.showOverlay]);
-    
-    const autoSequencerCallback = useCallback(() => {
-      addTxToBlock(newTransaction(isUpgradeActive, upgradableGameState.mevScaling))
-    }, [isUpgradeActive, upgradableGameState.mevScaling]);
-  
-    const sequencerActive = useMemo(() => (
-      !!upgradableGameState.sequencerSpeed && !blockFull && isCurrentBlock
-    ), [upgradableGameState.sequencerSpeed, blockFull, isCurrentBlock]);
 
-    useAutoCaller(
-      sequencerActive,
-      1000 / upgradableGameState.sequencerSpeed,
-      autoSequencerCallback
-    );
+    if (isCurrentBlock) {
+      const blockFull =
+      gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize;
+      
+      const autoSequencerCallback = useCallback(() => {
+        addTxToBlock(newTransaction(isUpgradeActive, upgradableGameState.mevScaling))
+      }, [isUpgradeActive, upgradableGameState.mevScaling]);
+      
+      const sequencerActive = useMemo(() => (
+        !!upgradableGameState.sequencerSpeed && !blockFull && isCurrentBlock
+      ), [upgradableGameState.sequencerSpeed, blockFull, isCurrentBlock]);
+      
+      useAutoCaller(
+        sequencerActive,
+        1000 / upgradableGameState.sequencerSpeed,
+        autoSequencerCallback
+      );
+    }
   
   const txWidth: number = 100 / Math.sqrt(props.block.maxSize);
   // TODO: Overlay #s to constant size/length/digits
