@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { GameState, newEmptyGameState, UpgradableGameState, newBaseUpgradableGameState } from "../types/GameState";
-import { newBlock } from "../types/Block";
+import { newBlock, Block } from "../types/Block";
 import { Transaction } from "../types/Transaction";
 import { useEventManager } from "./EventManager";
 import { getGameState } from "../api/state";

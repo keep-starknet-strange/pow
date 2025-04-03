@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
 import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
@@ -14,29 +14,30 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const { gameState } = useGameState();
   const { isSoundOn } = useSound();
   const { transactions, addTransactionToBlock } = useMempoolTransactions();
+  const [last10TransactionsTimes, setLast10TransactionsTimes] = useState<Array<number>>([]);
+  const [tps, setTps] = useState<number>(0);
+  const last10TimesRef = useRef<number[]>([]);
 
   const blockFull = gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize;
   const containerStyle = {
     opacity: blockFull ? 0.5 : 1,
   };
 
-  const [last10TransactionsTimes, setLast10TransactionsTimes] = useState<Array<number>>([]);
-  const [tps, setTps] = useState<number>(0);
   const clickTx = (tx: Transaction, index: number) => {
-    if (gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize) return;
+    if (blockFull) return;
     const playPitch = tx.fee + 1;
     playTxClicked(isSoundOn, playPitch);
     addTransactionToBlock(tx, index);
 
-    const newTimes = [...last10TransactionsTimes];
-    newTimes.push(Date.now());
-    if (newTimes.length > 10) newTimes.shift();
-    setLast10TransactionsTimes(newTimes);
-
-    const timeDiff = newTimes[newTimes.length - 1] - newTimes[0];
-    const newTps = (newTimes.length - 1) / (timeDiff / 1000);
-    if (isNaN(newTps)) setTps(0);
-    else setTps(newTps);
+    const now = Date.now();
+    last10TimesRef.current.push(now);
+    if (last10TimesRef.current.length > 10) {
+      last10TimesRef.current.shift();
+    }
+    const times = last10TimesRef.current;
+    const timeDiff = times[times.length - 1] - times[0];
+    const newTps = (times.length - 1) / (timeDiff / 1000);
+    setTps(isNaN(newTps) ? 0 : newTps);
   }
 
   // Recalculate TPS every second

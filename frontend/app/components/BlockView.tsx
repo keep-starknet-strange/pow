@@ -18,7 +18,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
     const blockFull = useMemo(() => (
       gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize
-    ), [gameState.chains]);
+    ), [gameState.chains[0].currentBlock]);
     const isCurrentBlock = useMemo(() => !props.showOverlay, [props.showOverlay]);
     
     const autoSequencerCallback = useCallback(() => {

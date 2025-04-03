@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { Upgrade } from "../types/Upgrade";
 import { useGameState } from "./GameState";
 import { useEventManager } from "../context/EventManager";
