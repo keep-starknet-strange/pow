@@ -39,9 +39,9 @@ export const useMempoolTransactions = () => {
       return;
 
     addTxToBlock(tx);
-    const updatedTxs = [...transactions];
-    updatedTxs.splice(index, 1);
-    setTransactions(updatedTxs);
+    setTransactions(prev => {
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   return {
