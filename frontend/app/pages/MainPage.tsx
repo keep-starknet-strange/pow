@@ -1,5 +1,5 @@
+import { useEffect } from "react";
 import { Text, View } from "react-native";
-
 import { BlockView } from "../components/BlockView";
 import { Mempool } from "../components/Mempool";
 import { Miner } from "../components/Miner";

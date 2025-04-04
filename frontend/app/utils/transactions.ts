@@ -29,33 +29,36 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
   
   return "Transfer"; // Default fallback
 };
+const transferImage = require("../../assets/images/transaction/transfer.png");
+const l2BatchImage = require("../../assets/images/transaction/l2Batch.png");
+const l2BlobImage = require("../../assets/images/transaction/l2Blob.png");
+const dappImage = require("../../assets/images/transaction/dapp.png");
 
 const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: ImageSourcePropType }> = {
   Transfer: () => ({
     meta1: getRandomAddress(),
     meta2: getRandomAddress(),
-    image: require("../../assets/images/transaction/transfer.png")
+    image: transferImage 
   }),
   "L2 Transactions": () => ({
     meta1: "Batch",
     meta2: `${Math.floor(Math.random() * 100)} txs`,
-    image: require("../../assets/images/transaction/l2Batch.png"),
+    image: l2BatchImage,
   }),
   "L2 Blob": () => ({
     meta1: `${(Math.random() * 100).toFixed(2)}kb blob`,
     meta2: `origin:${getRandomAddress()}`,
-    image: require("../../assets/images/transaction/l2Blob.png"),
+    image: l2BlobImage,
   }),
   Inscription: () => ({
     meta1: "Inscription",
     meta2: `tx:${getRandomAddress()}`,
-    // get random image(0-11) from the inscription folder
     image: getRandomFromArray(inscriptionImages),
   }),
   Dapp: () => ({
     meta1: getRandomFromArray(dappConfigs.names),
     meta2: getRandomFromArray(dappConfigs.actions),
-    image: require("../../assets/images/transaction/dapp.png")
+    image: dappImage
   }),
 };
 

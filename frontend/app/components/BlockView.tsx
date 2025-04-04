@@ -20,7 +20,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
               style={{ width: `${txWidth}%`, ...tx.style }}
             >
               {tx.image && (
-                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={ tx.image } />
+                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" />
               )}
             </View>
           ))}

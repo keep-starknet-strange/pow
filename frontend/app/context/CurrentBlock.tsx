@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { Block } from "../types/Block";
 import { newBlock } from "../types/Block";
 import { Transaction } from "../types/Transaction";

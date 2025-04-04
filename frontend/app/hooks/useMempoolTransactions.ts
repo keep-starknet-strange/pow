@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Transaction} from "../types/Transaction";
 import { newTransaction } from "../utils/transactions";
 import { useUpgrades } from "../context/Upgrades";
@@ -17,16 +17,12 @@ export const useMempoolTransactions = () => {
   useEffect(() => {
     if (transactions.length < minTransactions) {
       // removes last 4 transactions to keep stale transactions out of the mempool
-      const newTxs = [...transactions].slice(0, Math.max(0, transactions.length - 4));
-      while (newTxs.length < minTransactions) {
-        newTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
-      }
       setTransactions(prev => {
         let stableTxs = prev.slice(0, Math.max(0, transactions.length - 4)); // start with existing transactions
         const numToAdd = minTransactions - stableTxs.length;
       
         for (let i = 0; i < numToAdd; i++) {
-          stableTxs.push(newTransaction(isUpgradeActive, upgradableGameState.mevScaling));
+          stableTxs.push(createTransaction());
         }
       
         // only sort if necessary
@@ -51,6 +47,15 @@ export const useMempoolTransactions = () => {
     updatedTxs.splice(index, 1);
     setTransactions(updatedTxs);
   };
+
+  const createTransaction = useCallback((): Transaction => {
+    return newTransaction(isUpgradeActive, upgradableGameState.mevScaling);
+  }, [isUpgradeActive, upgradableGameState.mevScaling]);
+
+  const addNewTransaction = useCallback(() => {
+    setTransactions((prevTxs) => [...prevTxs, createTransaction()]);
+  }, [createTransaction]);
+
 
   return {
     transactions,

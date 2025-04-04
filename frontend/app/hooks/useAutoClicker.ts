@@ -5,8 +5,14 @@ export const useAutoClicker = (
   intervalMs: number,
   clickFn: () => void
 ) => {
+  const savedClickFn = useRef(clickFn);
+  
   useEffect(() => {
-    const savedClickFn = clickFn;
+    savedClickFn.current = clickFn;
+  }, [clickFn]);
+
+  useEffect(() => {
+
     if (!isEnabled || intervalMs <= 0) return;
     console.log("SET!!!!!!!!!!")
     const interval = setInterval(clickFn, intervalMs);
@@ -14,5 +20,5 @@ export const useAutoClicker = (
       console.log("clear!!!!!!!")
       clearInterval(interval);
     }
-  }, [isEnabled, intervalMs, clickFn]);
+  }, [isEnabled, intervalMs]);
 };
