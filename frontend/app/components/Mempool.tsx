@@ -37,7 +37,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
       addTransactionToBlock(tx, index);
       recordTransaction();
     }, 0);
-  }, [blockFull, isSoundOn, addTransactionToBlock, recordTransaction]);
+  }, [blockFull, isSoundOn, addTransactionToBlock]);
 
   const sequencerInterval = upgradableGameState.sequencerSpeed > 0
     ? 1000 / upgradableGameState.sequencerSpeed
@@ -45,6 +45,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
 
   const autoSequencerCallback = useCallback(() => {
     addTxToBlock(newTransaction(isUpgradeActive, upgradableGameState.mevScaling))
+    recordTransaction();
   }, [isUpgradeActive, upgradableGameState.mevScaling]);
 
   useAutoClicker(sequencerInterval !== null && !blockFull, sequencerInterval || 1000, autoSequencerCallback);
@@ -62,7 +63,7 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
       <ScrollView className="mb-1 h-[12rem]">
         {transactions.map((transaction, index) => (
           <TouchableOpacity
-            key={index}
+            key={transaction.meta1 + transaction.meta2 + transaction.amount + transaction.fee}
             className="flex flex-row justify-between my-1 p-2 rounded-xl h-[4.2rem] w-[95%] mx-auto"
             style={transaction.style}
             onPress={() => clickTx(transaction, index)}
