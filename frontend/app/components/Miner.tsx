@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { playMineClicked, playBlockMined } from "../components/utils/sounds";
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
-import { useSound } from "../context/Sound";
+// import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { useCurrentBlock } from "../context/CurrentBlock";
 import { useBlockActions } from "../hooks/useBlockActions";
@@ -17,7 +17,7 @@ export const Miner: React.FC<MinerProps> = ({ switchPage }) => {
     const { notify } = useEventManager();
     const { upgradableGameState } = useGameState();
     const { currentBlock } = useCurrentBlock();
-    const { isSoundOn } = useSound();
+    // const { isSoundOn } = useSound();
     const { finalizeBlock } = useBlockActions();
     
     const shouldMine =
@@ -26,7 +26,7 @@ export const Miner: React.FC<MinerProps> = ({ switchPage }) => {
     currentBlock.transactions.length === currentBlock.maxSize;
 
     const tryMineBlock = useCallback(() => {
-      playMineClicked(isSoundOn);
+      // playMineClicked(isSoundOn);
       setMineCounter(prev => {
         const newMineCounter = prev + 1;
 
@@ -37,13 +37,13 @@ export const Miner: React.FC<MinerProps> = ({ switchPage }) => {
               isMined: true,
             });
             finalizeBlock();
-            playBlockMined(isSoundOn);
+            // playBlockMined(isSoundOn);
             switchPage("SequencingPage");
           }, 0);
         }
         return newMineCounter;
       });
-    }, [currentBlock.hp, finalizeBlock, isSoundOn, notify, switchPage]);
+    }, [currentBlock.hp, finalizeBlock, notify, switchPage]);
 
   useAutoClicker(
     shouldMine,

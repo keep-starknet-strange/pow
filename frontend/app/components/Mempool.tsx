@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
-import { useSound } from "../context/Sound";
+// import { useSound } from "../context/Sound";
 import { playTxClicked } from "./utils/sounds";
 import { useGameState } from "../context/GameState";
 import { useMempoolTransactions } from "../hooks/useMempoolTransactions";
@@ -18,7 +18,7 @@ export type MempoolProps = {
 
 export const Mempool: React.FC<MempoolProps> = (props) => {
   const { upgradableGameState } = useGameState();
-  const { isSoundOn } = useSound();
+  // const { isSoundOn } = useSound();
   const { transactions, addTransactionToBlock } = useMempoolTransactions();
   const { currentBlock } = useCurrentBlock()
   const { tps, recordTransaction } = useCalculateTps();
@@ -33,11 +33,11 @@ export const Mempool: React.FC<MempoolProps> = (props) => {
   const clickTx = useCallback((tx: Transaction, index: number) => {
     if (blockFull) return;
     setTimeout(() => {
-      playTxClicked(isSoundOn, tx.fee + 1);
+      // playTxClicked(isSoundOn, tx.fee + 1);
       addTransactionToBlock(tx, index);
       recordTransaction();
     }, 0);
-  }, [blockFull, isSoundOn, addTransactionToBlock]);
+  }, [blockFull, addTransactionToBlock]);
 
   const sequencerInterval = upgradableGameState.sequencerSpeed > 0
     ? 1000 / upgradableGameState.sequencerSpeed

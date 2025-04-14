@@ -4,14 +4,14 @@ import { View, Text, TouchableOpacity } from "react-native";
 import ToggleButton from "../../components/buttons/Toggle";
 import ResetTutorialButton from "./ResetTutorial";
 
-import { useSound } from "../../context/Sound";
+// import { useSound } from "../../context/Sound";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (tab: "About" | "Credits" | "Help") => void;
 };
 
 const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab }) => {
-  const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
+  // const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
   const [notifs, setNotifs] = useState(true);
 
   const toggleNotifs = () => setNotifs(!notifs);
@@ -28,8 +28,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
     <View className="flex flex-col gap-2 mt-4 w-full">
 
       <View className="flex flex-row justify-around mt-4 gap-4 w-full">
-        <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol="🔊" offSymbol="🔇" />
-        <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol="🔊" offSymbol="🔇" />
+        {/* <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol="🔊" offSymbol="🔇" />
+        <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol="🔊" offSymbol="🔇" /> */}
       </View>
 
       <ToggleButton label="Notifications" isOn={notifs} onToggle={toggleNotifs} onSymbol="🔔" offSymbol="🔕" />

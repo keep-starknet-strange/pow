@@ -1,6 +1,6 @@
 import React from "react";
 import { EventManagerProvider } from "./context/EventManager";
-import { SoundProvider } from "./context/Sound";
+// import { SoundProvider } from "./context/Sound";
 import { GameStateProvider } from "./context/GameState";
 import { AchievementProvider } from "./context/Achievements";
 import { UpgradesProvider } from "./context/Upgrades";
@@ -10,7 +10,7 @@ import { CurrentBlockProvider } from "./context/CurrentBlock";
 export default function App() {
   return (
     <EventManagerProvider>
-      <SoundProvider>
+      {/* <SoundProvider> */}
         <GameStateProvider> 
           <CurrentBlockProvider>
             <AchievementProvider>
@@ -20,7 +20,7 @@ export default function App() {
             </AchievementProvider>
           </CurrentBlockProvider>
         </GameStateProvider>
-      </SoundProvider>
+      {/* </SoundProvider> */}
     </EventManagerProvider>
 
   );
