@@ -7,10 +7,10 @@ declare module ".wav" {
   export default src;
 }
 declare module "*.png" {
-  const src: string;
+  const src: ImageSourcePropType;
   export default src;
 }
 declare module "*.jpeg" {
-  const src: string;
+  const src: ImageSourcePropType;
   export default src;
 }
