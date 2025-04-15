@@ -42,7 +42,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const finalizeBlock = () => {
-    let newGameState = { ...gameState };
+    const newGameState = { ...gameState };
 
     const finalizedBlock = { ...gameState.chains[0].currentBlock };
     newGameState.chains[0].lastBlock = finalizedBlock;
