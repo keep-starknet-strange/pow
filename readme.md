@@ -38,14 +38,24 @@ cd click-chain
 Install dependencies:
 
 ```sh
+cd frontend
 npm install
 ```
 
 Start the frontend:
 
 ```sh
+cd frontend
 npx expo start
 ```
+
+Linter
+
+```sh
+cd frontend
+npx eslint
+```
+
 
 ### Setting up Scarb
  - [Install Scarb](https://docs.swmansion.com/scarb/download)

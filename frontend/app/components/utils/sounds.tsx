@@ -6,6 +6,7 @@ export const setSoundEffectVolume = (volume: number) => {
 }
 export const getSoundEffectVolume = () => soundEffectVolume;
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const txClickedSource = require("../../../assets/sounds/tx-clicked.mp3");
 export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
   if (!isSoundOn) return;
@@ -24,6 +25,7 @@ export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
   await sound.playAsync();
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const mineClickedSource = require("../../../assets/sounds/mine-clicked.mp3");
 export const playMineClicked = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
@@ -35,6 +37,7 @@ export const playMineClicked = async (isSoundOn: boolean) => {
   await sound.playAsync();
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const blockMinedSource = require("../../../assets/sounds/block-mined.mp3");
 export const playBlockMined = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;

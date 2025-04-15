@@ -24,7 +24,7 @@ export const getGameState = async (address: string): Promise<GameState | null> =
     return [e.name, response];
   })));
 
-  let gameState: GameState = {
+  const gameState: GameState = {
     balance: getEventValue(events.UserBalanceUpdated, 0, 1),
     chains: []
   }

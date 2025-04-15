@@ -6,9 +6,7 @@ import { useUpgrades } from "../context/Upgrades";
 
 import upgradesJson from "../configs/upgrades.json";
 
-export type StorePageProps = {};
-
-export const StorePage: React.FC<StorePageProps> = () => {
+export const StorePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { gameState, updateBalance } = useGameState();
