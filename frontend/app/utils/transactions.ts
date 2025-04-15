@@ -32,7 +32,7 @@ const getRandomTransactionType = (isUpgradeActive: (id: number)
     if (rand < cumulativeChance) return type as TransactionType;
   }
 
-  return "Transfer";
+  return "Transfer"; // Default fallback
 };
 
 const inscriptionImageArray = Object.values(inscriptionImages);
