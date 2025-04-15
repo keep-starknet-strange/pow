@@ -36,7 +36,6 @@ export const playMineClicked = async (isSoundOn: boolean) => {
   await sound.playAsync();
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const blockMinedSource = require("../../../assets/sounds/block-mined.mp3");
 export const playBlockMined = async (isSoundOn: boolean) => {
