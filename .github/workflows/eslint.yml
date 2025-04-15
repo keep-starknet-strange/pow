@@ -22,11 +22,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json 
 
       - name: Install Dependencies
-        run: 
-          cd frontend/
-          npm install
+        run: cd frontend && npm install
 
       - name: Run ESLint
-        run: 
-          cd frontend/
-          npx eslint .
+        run: cd frontend && npx eslint .
