@@ -41,6 +41,7 @@ export const playMineClicked = async (isSoundOn: boolean) => {
 const blockMinedSource = require("../../../assets/sounds/block-mined.mp3");
 export const playBlockMined = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
+
   const { sound } = await Audio.Sound.createAsync(blockMinedSource, {
     volume: 0.7,
     rate: 1.2
