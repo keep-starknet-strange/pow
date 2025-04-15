@@ -23,10 +23,10 @@ jobs:
 
       - name: Install Dependencies
         run: 
-          cd frontend
+          cd frontend/
           npm install
 
       - name: Run ESLint
         run: 
-          cd frontend
+          cd frontend/
           npx eslint .
