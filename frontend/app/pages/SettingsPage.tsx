@@ -6,9 +6,6 @@ import CreditsSection from "./settings/Credits";
 import HelpSection from "./settings/Help";
 import SettingsMainSection from "./settings/Main"; 
 
-export type SettingsPageProps = {};
-
-
 const tabs = {
   Main: SettingsMainSection,
   About: AboutSection,
@@ -16,7 +13,7 @@ const tabs = {
   Help: HelpSection,
 };
 
-export const SettingsPage: React.FC<SettingsPageProps> = () => {
+export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<keyof typeof tabs>("Main");
 
   const ActiveComponent = tabs[activeTab];
