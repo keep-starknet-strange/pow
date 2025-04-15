@@ -29,6 +29,7 @@ export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
 const mineClickedSource = require("../../../assets/sounds/mine-clicked.mp3");
 export const playMineClicked = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
+
   const { sound } = await Audio.Sound.createAsync(mineClickedSource, {
     volume: 0.4,
     rate: 1.2
