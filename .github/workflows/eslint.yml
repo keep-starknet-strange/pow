@@ -1,0 +1,31 @@
+name: ESLint
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.8.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: 
+          cd frontend
+          npm install
+
+      - name: Run ESLint
+        run: 
+          cd frontend
+          npx eslint .
