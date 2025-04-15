@@ -1,7 +1,7 @@
 import { ImageSourcePropType } from "react-native";
 import dappConfigs from "../configs/dapps.json";
 import transactionTypesConfig from "../configs/transactions.json";
-import { inscriptionImages } from "../configs/inscriptions";
+import * as inscriptionImages from "../configs/inscriptions";
 import { Transaction, TransactionType } from "../types/Transaction";
 
 export const getRandomAddress = () =>
@@ -29,6 +29,8 @@ const getRandomTransactionType = (isUpgradeActive: (id: number
   
   return "Transfer"; // Default fallback
 };
+ 
+const inscriptionImageArray = Object.values(inscriptionImages)
 
 const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: string; image: ImageSourcePropType }> = {
   Transfer: () => ({
@@ -50,7 +52,7 @@ const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: 
     meta1: "Inscription",
     meta2: `tx:${getRandomAddress()}`,
     // get random image(0-11) from the inscription folder
-    image: getRandomFromArray(inscriptionImages),
+    image: getRandomFromArray(inscriptionImageArray),
   }),
   Dapp: () => ({
     meta1: getRandomFromArray(dappConfigs.names),
