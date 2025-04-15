@@ -1,4 +1,7 @@
 import { Audio } from "expo-av";
+import txClickedSource from "../../../assets/sounds/tx-clicked.mp3";
+import mineClickedSource from "../../../assets/sounds/mine-clicked.mp3";
+import blockMinedSource from "../../../assets/sounds/block-mined.mp3";
 
 export let soundEffectVolume = 1;
 export const setSoundEffectVolume = (volume: number) => {
@@ -6,7 +9,6 @@ export const setSoundEffectVolume = (volume: number) => {
 }
 export const getSoundEffectVolume = () => soundEffectVolume;
 
-const txClickedSource = require("../../../assets/sounds/tx-clicked.mp3");
 export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
   if (!isSoundOn) return;
 
@@ -18,30 +20,28 @@ export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
     staysActiveInBackground: false,
     shouldDuckAndroid: false,
   });
-  const { sound } = await Audio.Sound.createAsync(txClickedSource, {
-    rate: pitch + Math.random() *  0.1,
-  });
+  const { sound } = await Audio.Sound.createAsync({ uri: txClickedSource }, {
+      rate: pitch + Math.random() *  0.1,
+    });
   await sound.playAsync();
 }
 
-const mineClickedSource = require("../../../assets/sounds/mine-clicked.mp3");
 export const playMineClicked = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
   
-  const { sound } = await Audio.Sound.createAsync(mineClickedSource, {
-    volume: 0.4,
-    rate: 1.2
-  });
+  const { sound } = await Audio.Sound.createAsync({ uri: mineClickedSource }, {
+      volume: 0.4,
+      rate: 1.2
+    });
   await sound.playAsync();
 }
 
-const blockMinedSource = require("../../../assets/sounds/block-mined.mp3");
 export const playBlockMined = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
 
-  const { sound } = await Audio.Sound.createAsync(blockMinedSource, {
-    volume: 0.7,
-    rate: 1.2
-  });
+  const { sound } = await Audio.Sound.createAsync({ uri: blockMinedSource }, {
+      volume: 0.7,
+      rate: 1.2
+    });
   await sound.playAsync();
 }

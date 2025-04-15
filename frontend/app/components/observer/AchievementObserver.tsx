@@ -110,13 +110,14 @@ export class AchievementObserver implements Observer {
             this.updateAchievement(achievement.id, 100);
           }
           break;
-        case "Maxed out upgrades":
+        case "Maxed out upgrades": {
           const progress = (upgradesConfig.filter(cfg => {
             const upg = currentUpgrades[cfg.id];
             return cfg.maxLevel ? upg?.level === cfg.maxLevel : !!upg;
           }).length / upgradesConfig.length) * 100;
           this.updateAchievement(achievement.id, progress);
           break;
+        }
         case "Prestige!":
           if (upgrade.effect === "Prestige") {
             this.updateAchievement(achievement.id, 100);
