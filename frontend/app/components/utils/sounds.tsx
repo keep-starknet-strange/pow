@@ -1,7 +1,4 @@
 import { Audio } from "expo-av";
-import txClickedSource from "../../../assets/sounds/tx-clicked.mp3";
-import mineClickedSource from "../../../assets/sounds/mine-clicked.mp3";
-import blockMinedSource from "../../../assets/sounds/block-mined.mp3";
 
 export let soundEffectVolume = 1;
 export const setSoundEffectVolume = (volume: number) => {
@@ -20,6 +17,8 @@ export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
     staysActiveInBackground: false,
     shouldDuckAndroid: false,
   });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const txClickedSource = require("../../../assets/sounds/tx-clicked.mp3");
   const { sound } = await Audio.Sound.createAsync({ uri: txClickedSource }, {
       rate: pitch + Math.random() *  0.1,
     });
@@ -28,7 +27,8 @@ export const playTxClicked = async (isSoundOn: boolean, pitch: number) => {
 
 export const playMineClicked = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
-  
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mineClickedSource = require("../../../assets/sounds/mine-clicked.mp3");
   const { sound } = await Audio.Sound.createAsync({ uri: mineClickedSource }, {
       volume: 0.4,
       rate: 1.2
@@ -39,6 +39,8 @@ export const playMineClicked = async (isSoundOn: boolean) => {
 export const playBlockMined = async (isSoundOn: boolean) => {
   if (!isSoundOn) return;
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const blockMinedSource = require("../../../assets/sounds/block-mined.mp3");
   const { sound } = await Audio.Sound.createAsync({ uri: blockMinedSource }, {
       volume: 0.7,
       rate: 1.2
