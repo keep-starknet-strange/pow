@@ -1,14 +1,12 @@
-export const inscriptionImages = [
-  require("../../assets/images/transaction/inscription/0.jpeg"),
-  require("../../assets/images/transaction/inscription/1.jpeg"),
-  require("../../assets/images/transaction/inscription/2.jpeg"),
-  require("../../assets/images/transaction/inscription/3.png"),
-  require("../../assets/images/transaction/inscription/4.png"),
-  require("../../assets/images/transaction/inscription/5.png"),
-  require("../../assets/images/transaction/inscription/6.png"),
-  require("../../assets/images/transaction/inscription/7.png"),
-  require("../../assets/images/transaction/inscription/8.png"),
-  require("../../assets/images/transaction/inscription/9.png"),
-  require("../../assets/images/transaction/inscription/10.png"),
-  require("../../assets/images/transaction/inscription/11.png"),
-];
+export { default as img0 } from "../../assets/images/transaction/inscription/0.jpeg";
+export { default as img1 } from "../../assets/images/transaction/inscription/1.jpeg";
+export { default as img2 } from "../../assets/images/transaction/inscription/2.jpeg";
+export { default as img3 } from "../../assets/images/transaction/inscription/3.png";
+export { default as img4 } from "../../assets/images/transaction/inscription/4.png";
+export { default as img5 } from "../../assets/images/transaction/inscription/5.png";
+export { default as img6 } from "../../assets/images/transaction/inscription/6.png";
+export { default as img7 } from "../../assets/images/transaction/inscription/7.png";
+export { default as img8 } from "../../assets/images/transaction/inscription/8.png";
+export { default as img9 } from "../../assets/images/transaction/inscription/9.png";
+export { default as img10 } from "../../assets/images/transaction/inscription/10.png";
+export { default as img11 } from "../../assets/images/transaction/inscription/11.png";

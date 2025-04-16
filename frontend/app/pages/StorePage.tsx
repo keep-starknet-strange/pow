@@ -7,9 +7,7 @@ import { useUpgrades } from "../context/Upgrades";
 import upgradesJson from "../configs/upgrades.json";
 import transactionsJson from "../configs/transactions.json";
 
-export type StorePageProps = {};
-
-export const StorePage: React.FC<StorePageProps> = () => {
+export const StorePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { gameState, updateBalance } = useGameState();
@@ -82,7 +80,7 @@ export const StorePage: React.FC<StorePageProps> = () => {
       </View>
      <View className="flex flex-col mb-4">
        {storeTransactions.map((item, index) => (
-         <View className="flex flex-row w-full px-4 py-3 items-center">
+         <View className="flex flex-row w-full px-4 py-3 items-center" key={index}>
            <View className="flex flex-col justify-center items-center p-1
                             rounded-full border-2 border-[#e7e7e740] relative"
                  style={{

@@ -7,12 +7,14 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 1. Install dependencies
 
    ```bash
+   cd frontend
    npm install
    ```
 
 2. Start the app
 
    ```bash
+    cd frontend
     npx expo start
    ```
 
