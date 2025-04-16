@@ -86,3 +86,16 @@ export const newEmptyTransaction = () => {
     image: require("../../assets/images/questionMark.png")
   };
 }
+
+export const createTx = (txType: any, txFee: number, txIcon: ImageSourcePropType) => {
+  return {
+    meta1: "",
+    meta2: "",
+    type: txType.name,
+    amount: 0,
+    fee: txFee,
+    style: { backgroundColor: txType.color },
+    image: txIcon
+  };
+}
+

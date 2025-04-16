@@ -26,10 +26,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           ))}
         </View>
         {props.showOverlay ? (
-          <View className="absolute top-0 left-0 w-full h-full bg-[#00000060] flex flex-col items-center justify-between">
+          <View className="absolute top-0 left-0 w-full h-full bg-[#00000080] flex flex-col items-center justify-between">
             <View/>
             <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">#{props.block.id}</Text>
-            <View className="flex flex-row items-center justify-between w-[95%]">
+            <View className="flex flex-col items-end justify-between w-[95%]">
               <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲₿{props.block.reward.toFixed(0)}</Text>
               <Text className="text-[#e9e9e9f0] text-xl font-bold">💰₿{props.block.fees.toFixed(0)}</Text>
             </View>
@@ -37,8 +37,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         ) : (
           <View className="absolute bottom-0 w-full flex flex-row justify-end">
             <View className="bg-[#272727b0] rounded-tl-lg rounded-br-lg p-[4px]">
-            <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲 ₿{props.block.reward.toFixed(2)}</Text>
-            <Text className="text-[#e9e9e9f0] text-xl font-bold">💰 ₿{props.block.fees.toFixed(2)}</Text>
+            <Text className="text-[#e9e9e9f0] text-2xl font-bold">🔲 ₿{props.block.reward.toFixed(2)}</Text>
+            <Text className="text-[#e9e9e9f0] text-2xl font-bold">💰 ₿{props.block.fees.toFixed(2)}</Text>
             </View>
           </View>
         )}

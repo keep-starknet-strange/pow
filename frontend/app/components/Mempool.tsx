@@ -9,7 +9,6 @@ import { useAutoClicker } from "../hooks/useAutoClicker";
 import { Transaction } from "../types/Transaction";
 
 export type MempoolProps = {
-  switchPage: (page: string) => void;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {

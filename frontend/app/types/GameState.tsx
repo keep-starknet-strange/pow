@@ -1,13 +1,16 @@
 import { Chain, newEmptyChain } from "./Chain";
+import { L2 } from "./L2";
 
 export type GameState = {
   balance: number;
   chains: Chain[];
+  l2?: L2;
 }
 
 export const newEmptyGameState = (): GameState => ({
   balance: 0,
-  chains: [newEmptyChain(0)]
+  chains: [newEmptyChain(0)],
+  l2: undefined,
 });
 
 export type UpgradableGameState = {
@@ -43,3 +46,9 @@ export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   dapp: false,
   inscriptionMetaprotocol: false,
 });
+
+export type TransactionTypeState = {
+  id: number;
+  speedLevel: number;
+  feeLevel: number;
+}
