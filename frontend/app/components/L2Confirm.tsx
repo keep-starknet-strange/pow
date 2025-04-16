@@ -9,6 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 
 type L2ConfirmProps = {
+  _id: number;
 };
 
 export const L2Confirm: React.FC<L2ConfirmProps> = (props) => {

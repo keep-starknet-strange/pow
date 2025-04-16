@@ -4,6 +4,7 @@ import { L1Phase } from "./main/L1Phase";
 import { L2Phase } from "./main/L2Phase";
 
 export type MainPageProps = {
+  _id: number;
 };
 
 export const MainPage: React.FC<MainPageProps> = (props) => {

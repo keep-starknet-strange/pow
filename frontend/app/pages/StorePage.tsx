@@ -7,6 +7,16 @@ import { useUpgrades } from "../context/Upgrades";
 import upgradesJson from "../configs/upgrades.json";
 import transactionsJson from "../configs/transactions.json";
 
+import * as transfer from "../../assets/images/transaction/transfer.png";
+import * as l2Blob from "../../assets/images/transaction/l2Blob.png";
+import * as inscription from "../../assets/images/transaction/inscription/0.jpeg";
+import * as dapp from "../../assets/images/transaction/dapp.png";
+import * as l2Batch from "../../assets/images/transaction/l2Batch.png";
+import * as duck from "../../assets/images/transaction/duck.png";
+import * as dojo from "../../assets/images/transaction/dojo.png";
+import * as money from "../../assets/images/money.png";
+import * as overclock from "../../assets/images/overclock.png";
+
 export const StorePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
@@ -26,19 +36,19 @@ export const StorePage: React.FC = () => {
   };
 
   const txIcons = [
-    require("../../assets/images/transaction/transfer.png"),
-    require("../../assets/images/transaction/l2Blob.png"),
-    require("../../assets/images/transaction/inscription/0.jpeg"),
-    require("../../assets/images/transaction/dapp.png"),
-    require("../../assets/images/transaction/l2Batch.png"),
+    transfer,
+    l2Blob,
+    inscription,
+    dapp,
+    l2Batch,
   ];
 
   const txL2Icons = [
-    require("../../assets/images/transaction/transfer.png"),
-    require("../../assets/images/transaction/transfer.png"),
-    require("../../assets/images/transaction/duck.png"),
-    require("../../assets/images/transaction/dapp.png"),
-    require("../../assets/images/transaction/dojo.png"),
+    transfer,
+    transfer,
+    duck,
+    dapp,
+    dojo,
   ];
 
 
@@ -87,7 +97,7 @@ export const StorePage: React.FC = () => {
                    backgroundColor: item.color
                  }}
            >
-             <Image source={activeIcons[item.id]} className="w-[3.6rem] h-[3.6rem] rounded-full" />
+             <Image source={activeIcons[item.id] as any} className="w-[3.6rem] h-[3.6rem] rounded-full" />
            </View>
            <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
              <Text className="text-[#e7e7e7] text-xl font-bold">{item.name}</Text>
@@ -115,7 +125,7 @@ export const StorePage: React.FC = () => {
                }
              }}
            >
-             <Image source={require("../../assets/images/money.png")} className="w-[3rem] h-[3rem]" />
+             <Image source={money as any} className="w-[3rem] h-[3rem]" />
              {storeType === "L1" ? (
              <Text
                className="absolute bottom-[-1rem] w-full text-center px-1 w-[4rem]
@@ -179,7 +189,7 @@ export const StorePage: React.FC = () => {
                }
              }}
            >
-             <Image source={require("../../assets/images/overclock.png")} className="w-[3rem] h-[3rem]" />
+             <Image source={overclock as any} className="w-[3rem] h-[3rem]" />
              {storeType === "L1" ? (
              <Text
                className="absolute bottom-[-1rem]  w-full text-center px-1 w-[4rem]

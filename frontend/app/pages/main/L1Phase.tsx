@@ -10,7 +10,15 @@ import { createTx } from "../../utils/transactions";
 import { playTxClicked } from "../../components/utils/sounds";
 import transactions from "../../configs/transactions.json";
 
+import * as transfer from "../../../assets/images/transaction/transfer.png";
+import * as l2Blob from "../../../assets/images/transaction/l2Blob.png";
+import * as inscription from "../../../assets/images/transaction/inscription/0.jpeg";
+import * as dapp from "../../../assets/images/transaction/dapp.png";
+import * as l2Batch from "../../../assets/images/transaction/l2Batch.png";
+import * as lock from "../../../assets/images/lock.png";
+
 export type L1PhaseProps = {
+  _id: number;
 };
 
 export const L1Phase: React.FC<L1PhaseProps> = (props) => {
@@ -68,11 +76,11 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
 
   const [txTypes, setTxTypes] = useState(transactions.L1);
   const txIcons = [
-    require("../../../assets/images/transaction/transfer.png"),
-    require("../../../assets/images/transaction/l2Blob.png"),
-    require("../../../assets/images/transaction/inscription/0.jpeg"),
-    require("../../../assets/images/transaction/dapp.png"),
-    require("../../../assets/images/transaction/l2Batch.png"),
+    transfer,
+    l2Blob,
+    inscription,
+    dapp,
+    l2Batch,
   ];
 
   const tryBuyTx = (txTypeId: number) => {
@@ -183,7 +191,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lock as any}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>

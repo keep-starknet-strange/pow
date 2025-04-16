@@ -9,6 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 
 type MinerProps = {
+  _id: number;
 };
 
 export const Miner: React.FC<MinerProps> = (props) => {

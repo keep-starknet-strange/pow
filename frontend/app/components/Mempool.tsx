@@ -9,6 +9,7 @@ import { useAutoClicker } from "../hooks/useAutoClicker";
 import { Transaction } from "../types/Transaction";
 
 export type MempoolProps = {
+  _id: number;
 };
 
 export const Mempool: React.FC<MempoolProps> = (props) => {

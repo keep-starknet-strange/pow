@@ -71,7 +71,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const finalizeL2Block = () => {
     if (!gameState.l2) return;
-    let newGameState = { ...gameState };
+    const newGameState = { ...gameState };
     if (!newGameState.l2) return;
 
     const finalizedBlock = { ...gameState.chains[1].currentBlock };
@@ -147,7 +147,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const unlockL2 = () => {
     if (gameState.l2) return;
-    let newGameState = { ...gameState };
+    const newGameState = { ...gameState };
     newGameState.l2 = newEmptyL2();
     setGameState(newGameState);
     notify("L2Unlocked", {});
@@ -155,7 +155,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const finalizeL2Proof = () => {
     if (!gameState.l2) return;
-    let newGameState = { ...gameState };
+    const newGameState = { ...gameState };
     if (!newGameState.l2) return;
 
     const finalizedProof = { ...gameState.l2.prover };
@@ -171,7 +171,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const finalizeL2DA = () => {
     if (!gameState.l2) return;
-    let newGameState = { ...gameState };
+    const newGameState = { ...gameState };
     if (!newGameState.l2) return;
 
     const finalizedDA = { ...gameState.l2.da };

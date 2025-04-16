@@ -13,7 +13,17 @@ import { playTxClicked } from "../../components/utils/sounds";
 import transactions from "../../configs/transactions.json";
 import { useUpgrades } from "../../context/Upgrades";
 
+import * as transfer from "../../../assets/images/transaction/transfer.png";
+import * as l2Blob from "../../../assets/images/transaction/l2Blob.png";
+import * as inscription from "../../../assets/images/transaction/inscription/0.jpeg";
+import * as dapp from "../../../assets/images/transaction/dapp.png";
+import * as l2Batch from "../../../assets/images/transaction/l2Batch.png";
+import * as duck from "../../../assets/images/transaction/duck.png";
+import * as dojo from "../../../assets/images/transaction/dojo.png";
+import * as lock from "../../../assets/images/lock.png";
+
 export type L2PhaseProps = {
+  _id: string;
 };
 
 export const L2Phase: React.FC<L2PhaseProps> = (props) => {
@@ -56,20 +66,20 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
 
   const [txTypes, setTxTypes] = useState(transactions.L1);
   const txIcons = [
-    require("../../../assets/images/transaction/transfer.png"),
-    require("../../../assets/images/transaction/l2Blob.png"),
-    require("../../../assets/images/transaction/inscription/0.jpeg"),
-    require("../../../assets/images/transaction/dapp.png"),
-    require("../../../assets/images/transaction/l2Batch.png"),
+    transfer,
+    l2Blob,
+    inscription,
+    dapp,
+    l2Batch,
   ];
 
   const [l2TxTypes, setL2TxTypes] = useState(transactions.L2);
   const txL2Icons = [
-    require("../../../assets/images/transaction/transfer.png"),
-    require("../../../assets/images/transaction/transfer.png"),
-    require("../../../assets/images/transaction/duck.png"),
-    require("../../../assets/images/transaction/dapp.png"),
-    require("../../../assets/images/transaction/dojo.png"),
+    transfer,
+    transfer,
+    duck,
+    dapp,
+    dojo,
   ];
 
   const addL2TransactionToBlock = (txType: any, feelLevel: number = 0) => {
@@ -244,7 +254,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lock as any}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -378,7 +388,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lock as any}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
