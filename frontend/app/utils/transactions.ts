@@ -65,22 +65,6 @@ const transactionBuilder: Record<TransactionType, () => { meta1: string; meta2: 
   }),
 };
 
-export const newTransaction = (isUpgradeActive: (id: number) => boolean, mevScaling: number): Transaction => {
-  const type = getRandomTransactionType(isUpgradeActive) as TransactionType;
-  const config = transactionTypesConfig[type];
-  const { meta1, meta2, image } = transactionBuilder[type]();
-
-  return {
-    meta1,
-    meta2,
-    type,
-    amount: (Math.random() + 1) * 10,
-    fee: (Math.random() + 1 + config.feeBump) * 0.1 * mevScaling,
-    style: { backgroundColor: config.color },
-    image,
-  };
-};
-
 export const newEmptyTransaction = () => {
   return {
     meta1: "",
@@ -91,4 +75,16 @@ export const newEmptyTransaction = () => {
     style: { backgroundColor: "#f7f7f7" },
     image: questionMarkImage,
   };
-};
+}
+
+export const createTx = (txType: any, txFee: number, txIcon: ImageSourcePropType) => {
+  return {
+    meta1: "",
+    meta2: "",
+    type: txType.name,
+    amount: 0,
+    fee: txFee,
+    style: { backgroundColor: txType.color },
+    image: txIcon
+  };
+}

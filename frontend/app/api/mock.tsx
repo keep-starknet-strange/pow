@@ -32,6 +32,33 @@ export const mockGameState: GameState = {
         transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
         maxSize: 64,
       })),
-    }
-  ]
+    },
+    {
+      id: 1,
+      currentBlock: {
+        id: 2,
+        reward: 10,
+        fees: 2,
+        hp: 1,
+        transactions: Array.from({ length: 12 }, (_) => (newEmptyTransaction())),
+        maxSize: 64,
+      },
+      lastBlock: {
+        id: 1,
+        reward: 10,
+        fees: 0,
+        hp: 0,
+        transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
+        maxSize: 64,
+      },
+      pastBlocks: Array.from({ length: 1 }, (_, i) => ({
+        id: 1 - i,
+        reward: 10,
+        fees: 0,
+        hp: 0,
+        transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
+        maxSize: 64,
+      })),
+    },
+  ],
 };

@@ -55,6 +55,9 @@ export default function game() {
     name: "Main",
     icon: "🎮"
   }, {
+    name: "Staking",
+    icon: "💎"
+  }, {
     name: "Store",
     icon: "🛒"
   }, {
