@@ -9,7 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { createTx } from "../utils/transactions";
 
-import * as L2Blob from "../assets/images/transaction/l2Blob.png";
+import * as L2Blob from "../../assets/images/transaction/l2Blob.png";
 
 type DAConfirmProps = {
   _id: string;
