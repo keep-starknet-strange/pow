@@ -1,0 +1,10 @@
+export { default as img0 } from "../../assets/images/transaction/nfts/0.png";
+export { default as img1 } from "../../assets/images/transaction/nfts/1.png";
+export { default as img2 } from "../../assets/images/transaction/nfts/2.png";
+export { default as img3 } from "../../assets/images/transaction/nfts/3.png";
+export { default as img4 } from "../../assets/images/transaction/nfts/4.png";
+export { default as img5 } from "../../assets/images/transaction/nfts/5.png";
+export { default as img6 } from "../../assets/images/transaction/nfts/6.png";
+export { default as img7 } from "../../assets/images/transaction/nfts/7.png";
+export { default as img8 } from "../../assets/images/transaction/nfts/8.png";
+export { default as img9 } from "../../assets/images/transaction/nfts/9.png";

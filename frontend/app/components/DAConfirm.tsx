@@ -9,7 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { createTx } from "../utils/transactions";
 
-import * as L2Blob from "../../assets/images/transaction/l2Blob.png";
+import L2Blob from "../../assets/images/transaction/l2Blob.png";
 
 type DAConfirmProps = {
   _id: string;
@@ -50,10 +50,7 @@ export const DAConfirm: React.FC<DAConfirmProps> = (props) => {
     if (newMineCounter >= gameState.l2.da.hp) {
       const txFee = gameState.l2.da.blockFees;
       const txIcon = L2Blob;
-      const newTx = createTx({
-        name: "L2",
-        color: "#f760f7a0"
-      }, txFee, txIcon);
+      const newTx = createTx(1, 1, txFee, txIcon);
       finalizeL2DA();
       addTxToBlock(newTx);
       playBlockMined(isSoundOn);
