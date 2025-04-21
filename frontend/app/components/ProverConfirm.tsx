@@ -57,6 +57,18 @@ export const ProverConfirm: React.FC<L2ConfirmProps> = (props) => {
     }
   };
 
+  const [shouldAutoProve, setShouldAutoProve] = useState(false);
+  useEffect(() => {
+    const newShouldAutoProve = upgradableGameState.proverSpeed > 0 && mineCounter < (gameState.l2?.prover.hp || 0);
+    setShouldAutoProve(newShouldAutoProve);
+  }, [upgradableGameState.proverSpeed, mineCounter, gameState.l2?.prover.hp]);
+
+  useAutoClicker(
+    shouldAutoProve,
+    1000 / upgradableGameState.proverSpeed,
+    tryProve
+  );
+
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
       {gameState.l2 && (

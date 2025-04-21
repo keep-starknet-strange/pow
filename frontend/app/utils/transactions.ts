@@ -1,4 +1,5 @@
 import transactionsJson from "../configs/transactions.json";
+import dappsJson from "../configs/dapps.json";
 import questionMarkImage from "../../assets/images/questionMark.png";
 export const newEmptyTransaction = () => {
   return {
@@ -30,20 +31,33 @@ export const getChainIcons = (chain: number) => {
       "Blobs": blobIcon,
       "Inscription": getRandomInscriptionImage(),
       "Dapp": dappIcon,
-      "L2": l2BatchIcon
+      "L2": l2BatchIcon,
+      "PowSwap": powSwapIcon,
+      "ClosedOcean": closedOceanIcon,
+      "Pave": paveIcon,
+      "CryptoDragons": cryptoDragonsIcon,
     },
     2: {
       "Transfer": transferIcon,
       "Bridge": transferIcon,
       "NFTs": getRandomNFTImage(),
       "Dapp": dappIcon,
-      "AppChain": dojoIcon
+      "AppChain": dojoIcon,
+      "AVNU": avnuIcon,
+      "art/peace": artPeaceIcon,
+      "Vesu": vesuIcon,
+      "Eternum": eternumIcon,
     },
   };
   return layerIcons[chain];
 }
 
-export const getTxIcon = (chain: number, txTypeId: number) => {
+export const getTxIcon = (chain: number, txTypeId: number, isDapp?: boolean) => {
+  if (isDapp) {
+    const dappMeta = chain === 1 ? dappsJson.L1[txTypeId] : dappsJson.L2[txTypeId];
+    const icons = getChainIcons(chain);
+    return icons?.[dappMeta.name] || questionMarkImage;
+  }
   const txMeta = chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
   const icons = getChainIcons(chain);
   return icons?.[txMeta.name] || questionMarkImage;
@@ -55,6 +69,14 @@ import blobIcon from "../../assets/images/transaction/l2Blob.png";
 import dappIcon from "../../assets/images/transaction/dapp.png";
 import l2BatchIcon from "../../assets/images/transaction/l2Batch.png";
 import dojoIcon from "../../assets/images/transaction/dojo.png";
+import powSwapIcon from "../../assets/images/dapps/powswap.png";
+import closedOceanIcon from "../../assets/images/dapps/closedocean.png";
+import paveIcon from "../../assets/images/dapps/pave.png";
+import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.png";
+import avnuIcon from "../../assets/images/dapps/avnu.png";
+import artPeaceIcon from "../../assets/images/dapps/artpeace.jpeg";
+import vesuIcon from "../../assets/images/dapps/vesu.jpeg";
+import eternumIcon from "../../assets/images/dapps/eternum.jpeg";
 export const createTx = (chain: number, txTypeId: number, txFee: number, txIcon?: string) => {
   const txMeta = chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
   const image = txIcon || getTxIcon(chain, txTypeId);

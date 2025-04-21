@@ -6,31 +6,47 @@ import { useSound } from "../../context/Sound";
 import { getTxIcon, createTx, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
 import { playTxClicked } from "../../components/utils/sounds";
 import transactions from "../../configs/transactions.json";
+import upgradesJson from "../../configs/upgrades.json";
+import dapps from "../../configs/dapps.json";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 
 export type TxButtonProps = {
   chain: string;
   txType: any; // TODO: Define a proper type for txType
   addTransaction: (chainId: number, tx: any) => void;
+  isDapp?: boolean;
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { gameState, updateBalance, unlockL2 } = useGameState();
-  const { l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade } = useUpgrades();
+  const { upgrades, l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade,
+          l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade } = useUpgrades();
   const { isSoundOn } = useSound();
 
   const [chainId, setChainId] = useState(0);
   const [txTypes, setTxTypes] = useState(l1TransactionTypes);
   useEffect(() => {
+    if (props.isDapp) {
+      if (props.chain === "L1") {
+        setTxTypes(l1DappTypes);
+      } else {
+        setTxTypes(l2DappTypes);
+      }
+      return;
+    }
     if (props.chain === "L1") {
       setTxTypes(l1TransactionTypes);
     } else {
       setTxTypes(l2TransactionTypes);
     }
-  }, [props.chain, l1TransactionTypes, l2TransactionTypes]);
+  }, [props.chain, l1TransactionTypes, l2TransactionTypes, l1DappTypes, l2DappTypes]);
   const [icon, setIcon] = useState<any>(questionMarkIcon);
   useEffect(() => {
     setChainId(props.chain === "L1" ? 0 : 1);
+    if (props.isDapp) {
+      props.chain === "L1" ? setTxTypes(l1DappTypes) : setTxTypes(l2DappTypes);
+      return;
+    }
     props.chain === "L1" ? setTxTypes(l1TransactionTypes) : setTxTypes(l2TransactionTypes);
   }, [props.chain]);
   useEffect(() => {
@@ -39,7 +55,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     } else if (props.txType.name === "NFTs") {
       setIcon(getRandomNFTImage());
     } else {
-      setIcon(getTxIcon(chainId + 1, props.txType.id));
+      setIcon(getTxIcon(chainId + 1, props.txType.id, props.isDapp));
     }
   }, [props.txType, chainId]);
 
@@ -50,7 +66,14 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     )
       return;
 
-    const txFee = txType.value[feeLevel];
+    // TODO: Hardcoded for now
+    let mevBoost = 1;
+    if (chainId === 0) {
+      mevBoost = upgradesJson.L1[3].value[upgrades[chainId][3].level - 1];
+    } else {
+      mevBoost = upgradesJson.L2[3].value[upgrades[chainId][3].level - 1];
+    }
+    const txFee = txType.value[feeLevel] * mevBoost;
     const tx = createTx(chainId + 1, txType.id, txFee, icon);
     const playPitch = (tx.fee / 8) + 1;
     playTxClicked(isSoundOn, playPitch);
@@ -81,13 +104,26 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
 
   const tryBuyTx = (txTypeId: number) => {
     if (txTypes[txTypeId].feeLevel !== 0) return;
-    const txType = chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
+    let txType = null;
+    if (props.isDapp) {
+      txType = chainId === 0 ? dapps.L1[txTypeId] : dapps.L2[txTypeId];
+    } else {
+      txType = chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
+    }
     
     if (gameState.balance < txType.feeCosts[0]) return;
-    if (chainId === 0) {
-      l1TxFeeUpgrade(txTypeId);
+    if (props.isDapp) {
+      if (chainId === 0) {
+        l1DappFeeUpgrade(txTypeId);
+      } else {
+        l2DappFeeUpgrade(txTypeId);
+      }
     } else {
-      l2TxFeeUpgrade(txTypeId);
+      if (chainId === 0) {
+        l1TxFeeUpgrade(txTypeId);
+      } else {
+        l2TxFeeUpgrade(txTypeId);
+      }
     }
 
     const newBalance = gameState.balance - txType.feeCosts[0];
@@ -112,7 +148,12 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     }).start(() => {
       sequenceAnim.setValue(0);
       // TODO: Seperate callback for this to avoid slowing down the animation
-      const txType = chainId === 0 ? transactions.L1[props.txType.id] : transactions.L2[props.txType.id];
+      let txType = null;
+      if (props.isDapp) {
+        txType = chainId === 0 ? dapps.L1[props.txType.id] : dapps.L2[props.txType.id];
+      } else {
+        txType = chainId === 0 ? transactions.L1[props.txType.id] : transactions.L2[props.txType.id];
+      }
       addTransactionToBlock(chainId, txType, txTypes[props.txType.id]?.feeLevel - 1);
       setSequencedDone(sequencedDone + 1);
     });

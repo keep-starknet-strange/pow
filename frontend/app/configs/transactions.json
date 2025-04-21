@@ -32,9 +32,9 @@
       "name": "Dapp",
       "description": "Decentralized applications.",
       "color": "#f76060a0",
-      "speedCosts": [7, 28, 112, 224, 448, 896, 1792, 3584, 7168, 14336],
-      "feeCosts": [7, 28, 112, 224, 448, 896, 1792, 3584, 7168, 14336],
-      "value": [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]
+      "speedCosts": [],
+      "feeCosts": [20],
+      "value": [0]
     },
     {
       "id": 4,
@@ -76,9 +76,9 @@
       "name": "Dapp",
       "description": "Decentralized applications.",
       "color": "#f76060a0",
-      "speedCosts": [400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200],
-      "feeCosts": [400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200],
-      "value": [8, 16, 24, 32, 40, 48, 56, 64, 72, 80]
+      "speedCosts": [],
+      "feeCosts": [1000],
+      "value": [0]
     }, {
       "id": 4,
       "name": "AppChain",

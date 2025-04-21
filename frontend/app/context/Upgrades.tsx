@@ -1,21 +1,31 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Upgrade } from "../types/Upgrade";
+import upgradesJson from "../configs/upgrades.json";
+import automationsJson from "../configs/automation.json";
 import { useGameState } from "./GameState";
 import { useEventManager } from "../context/EventManager";
 import { TransactionTypeState } from "../types/GameState";
 
 type UpgradesContextType = {
-  addUpgrade: (upgrade: Upgrade ) => void;
+  addUpgrade: (chainId: number, upgradeId: number) => void;
   updateUpgrade: (upgrade: Upgrade ) => void;
   removeUpgrade: (upgrade: Upgrade ) => void;
   isUpgradeActive: (id: number) => boolean;
-  upgrades: { [key: number]: Upgrade };
+  upgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } };
+  automation: { [chainId: number]: { [upgradeId: number]: Upgrade } };
+  upgradeAutomation: (chainId: number, upgradeId: number) => void;
   l1TransactionTypes: TransactionTypeState[];
   l1TxSpeedUpgrade: (id: number) => void;
   l1TxFeeUpgrade: (id: number) => void;
   l2TransactionTypes: TransactionTypeState[];
   l2TxSpeedUpgrade: (id: number) => void;
   l2TxFeeUpgrade: (id: number) => void;
+  l1DappTypes: TransactionTypeState[];
+  l2DappTypes: TransactionTypeState[];
+  l1DappFeeUpgrade: (id: number) => void;
+  l2DappFeeUpgrade: (id: number) => void;
+  l1DappSpeedUpgrade: (id: number) => void;
+  l2DappSpeedUpgrade: (id: number) => void;
 };
 
 export const useUpgrades = () => {
@@ -28,15 +38,46 @@ export const useUpgrades = () => {
 const UpgradeContext = createContext<UpgradesContextType | undefined>(undefined);
 
 export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [upgrades, setUpgrades] = useState<{ [key: number]: Upgrade }>({});
+  const [upgrades, setUpgrades] = useState<{ [chainId: number]: { [upgradeId: number]: Upgrade } }>({});
+  const [automation, setAutomation] = useState<{ [chainId: number]: { [upgradeId: number]: Upgrade } }>({});
   const [l1TransactionTypes, setL1TransactionTypes] = useState<TransactionTypeState[]>([]);
   const [l2TransactionTypes, setL2TransactionTypes] = useState<TransactionTypeState[]>([]);
+  const [l1DappTypes, setL1DappTypes] = useState<TransactionTypeState[]>([]);
+  const [l2DappTypes, setL2DappTypes] = useState<TransactionTypeState[]>([]);
   const { notify } = useEventManager();
   // TODO: Move upgradableGameState into this context?
   const { setUpgradableGameState } = useGameState();
 
   useEffect(() => {
-    // TODO: Fetch upgrades from server
+    // Initialize upgrades
+    let initUpgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
+    for (const chainId in upgradesJson) {
+      let chainIdInt = chainId === "L1" ? 0 : 1;
+      let upgradeJsonChain = chainId === "L1" ? upgradesJson.L1 : upgradesJson.L2;
+      initUpgrades[chainIdInt] = {};
+      for (const upgradeId in upgradeJsonChain) {
+        const upgrade = upgradeJsonChain[upgradeId];
+        initUpgrades[chainIdInt][upgradeId] = {
+          ...upgrade,
+          level: 0,
+        };
+      }
+    }
+    setUpgrades(initUpgrades);
+    let initAutomation: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
+    for (const chainId in automationsJson) {
+      let chainIdInt = chainId === "L1" ? 0 : 1;
+      let automationJsonChain = chainId === "L1" ? automationsJson.L1 : automationsJson.L2;
+      initAutomation[chainIdInt] = {};
+      for (const upgradeId in automationJsonChain) {
+        const upgrade = automationJsonChain[upgradeId];
+        initAutomation[chainIdInt][upgradeId] = {
+          ...upgrade,
+          level: 0,
+        };
+      }
+    }
+    setAutomation(initAutomation);
     const initL1TransactionTypes = [
       {
         "id": 0,
@@ -93,10 +134,63 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     ];
     setL1TransactionTypes(initL1TransactionTypes);
     setL2TransactionTypes(initL2TransactionTypes);
+
+    const initL1DappTypes = [
+      {
+        "id": 0,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 1,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 2,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 3,
+        "feeLevel": 0,
+        "speedLevel": 0
+      }
+    ];
+    const initL2DappTypes = [
+      {
+        "id": 0,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 1,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 2,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
+      {
+        "id": 3,
+        "feeLevel": 0,
+        "speedLevel": 0
+      }
+    ];
+    setL1DappTypes(initL1DappTypes);
+    setL2DappTypes(initL2DappTypes);
   }, []);
 
 
-  const addUpgrade = (upgrade: Upgrade) => {
+  const addUpgrade = (chainId: number, upgradeId: number) => {
+    let upgrade = null;
+    if (chainId === 0) {
+      upgrade = upgradesJson.L1[upgradeId];
+    } else {
+      upgrade = upgradesJson.L2[upgradeId];
+    }
     switch (upgrade.name) {
       case "Transaction Sorting":
         setUpgradableGameState((prev) => ({
@@ -168,13 +262,13 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.warn(`Unknown upgrade: ${upgrade.name}`);
         break;
     }
-    const currentLevel = upgrades[upgrade.id]?.level || 0;
+    const currentLevel = upgrades[chainId][upgrade.id]?.level || 0;
     const newUpgrade = {
       ...upgrade,
-      level: upgrade.maxLevel ? Math.min(currentLevel + 1, upgrade.maxLevel) : undefined
+      level: Math.min(currentLevel + 1, upgrade.costs.length),
     };
 
-    const updatedUpgrades = { ...upgrades, [upgrade.id]: newUpgrade };
+    const updatedUpgrades = { ...upgrades, [chainId]: { ...upgrades[chainId], [upgrade.id]: newUpgrade } };
     setUpgrades(updatedUpgrades);
     notify("UpgradePurchased", { upgrade: newUpgrade, allUpgrades: updatedUpgrades });
   };
@@ -237,9 +331,98 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setL2TransactionTypes(newTransactionTypes);
   }
 
+  const l1DappFeeUpgrade = (id: number) => {
+    const currentLevel = l1DappTypes[id].feeLevel || 0;
+    const newTransactionTypes = { ...l1DappTypes };
+    newTransactionTypes[id] = {
+      ...l1DappTypes[id],
+      feeLevel: currentLevel + 1
+    };
+    setL1DappTypes(newTransactionTypes);
+  }
+
+  const l2DappFeeUpgrade = (id: number) => {
+    const currentLevel = l2DappTypes[id].feeLevel || 0;
+    const newTransactionTypes = { ...l2DappTypes };
+    newTransactionTypes[id] = {
+      ...l2DappTypes[id],
+      feeLevel: currentLevel + 1
+    };
+    setL2DappTypes(newTransactionTypes);
+  }
+
+  const l1DappSpeedUpgrade = (id: number) => {
+    const currentLevel = l1DappTypes[id].speedLevel || 0;
+    const newTransactionTypes = { ...l1DappTypes };
+    newTransactionTypes[id] = {
+      ...l1DappTypes[id],
+      speedLevel: currentLevel + 1
+    };
+    setL1DappTypes(newTransactionTypes);
+  }
+
+  const l2DappSpeedUpgrade = (id: number) => {
+    const currentLevel = l2DappTypes[id].speedLevel || 0;
+    const newTransactionTypes = { ...l2DappTypes };
+    newTransactionTypes[id] = {
+      ...l2DappTypes[id],
+      speedLevel: currentLevel + 1
+    };
+    setL2DappTypes(newTransactionTypes);
+  }
+
+  const upgradeAutomation = (chainId: number, upgradeId: number) => {
+    let upgrade = null;
+    if (chainId === 0) {
+      upgrade = automationsJson.L1[upgradeId];
+    } else {
+      upgrade = automationsJson.L2[upgradeId];
+    }
+    const currentLevel = automation[chainId][upgrade.id]?.level || 0;
+    const newUpgrade = {
+      ...upgrade,
+      level: Math.min(currentLevel + 1, upgrade.levels.length)
+    };
+    switch (upgrade.name) {
+      case "Miner":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          minerSpeed: prev.minerSpeed + 1
+        }));
+        break;
+      case "Sequencer":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          sequencerSpeed: prev.sequencerSpeed + 1
+        }));
+        break;
+      case "Prover":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          proverSpeed: prev.proverSpeed + 1
+        }));
+        break;
+      case "DA":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          daSpeed: prev.daSpeed + 1
+        }));
+        break;
+      default:
+        console.warn(`Unknown upgrade: ${upgrade.name}`);
+        break;
+    }
+
+    const updatedAutomation = { ...automation, [chainId]: { ...automation[chainId], [upgrade.id]: newUpgrade } };
+    setAutomation(updatedAutomation);
+    notify("AutomationPurchased", { upgrade: newUpgrade, allAutomation: updatedAutomation });
+  };
+
   return (
     <UpgradeContext.Provider value={{ addUpgrade, updateUpgrade, upgrades, removeUpgrade, isUpgradeActive,
-      l1TransactionTypes, l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TransactionTypes, l2TxSpeedUpgrade, l2TxFeeUpgrade }}>
+      automation, upgradeAutomation,
+      l1TransactionTypes, l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TransactionTypes, l2TxSpeedUpgrade, l2TxFeeUpgrade,
+      l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade }}>
       {children}
     </UpgradeContext.Provider>
   );

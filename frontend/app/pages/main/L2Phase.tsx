@@ -8,8 +8,11 @@ import { L2Confirm } from "../../components/L2Confirm";
 import { ProverConfirm } from "../../components/ProverConfirm";
 import { DAConfirm } from "../../components/DAConfirm";
 import { TxButton } from "../../components/buttons/TxButton";
+import { DappsButton } from "../../components/buttons/DappsButton";
 import { useGameState } from "../../context/GameState";
 import transactions from "../../configs/transactions.json";
+import upgradesJson from "../../configs/upgrades.json";
+import dapps from "../../configs/dapps.json";
 import { useUpgrades } from "../../context/Upgrades";
 import { createTx, getTxIcon, getRandomNFTImage, getRandomInscriptionImage } from "../../utils/transactions";
 
@@ -20,7 +23,7 @@ export type L2PhaseProps = {
 
 export const L2Phase: React.FC<L2PhaseProps> = (props) => {
   const { gameState, updateBalance, addTxToBlock, addL2TxToBlock } = useGameState();
-  const { l1TransactionTypes, l1TxFeeUpgrade, l2TransactionTypes, l2TxFeeUpgrade } = useUpgrades();
+  const { upgrades, l1TransactionTypes, l1TxFeeUpgrade, l2TransactionTypes, l2TxFeeUpgrade, l1DappTypes, l2DappTypes } = useUpgrades();
   const [mutex] = useState(new Mutex());
   const addTransaction = async (chainId: number, tx: any) => {
     const release = await mutex.acquire();
@@ -34,6 +37,31 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
       release();
     }
   }
+
+  const [l1MevBoost, setL1MevBoost] = useState(1);
+  const [l2MevBoost, setL2MevBoost] = useState(1);
+  useEffect(() => {
+    // TODO: Hardcoded for now
+    if (upgrades && upgrades[0] && upgrades[0][3] && upgrades[0][3].level !== 0) {
+      let newL1MevBoost = upgradesJson.L1[3].value[upgrades[0][3].level - 1];
+      setL1MevBoost(newL1MevBoost);
+    } else {
+      setL1MevBoost(1);
+    }
+
+    if (upgrades && upgrades[1] && upgrades[1][3] && upgrades[1][3].level !== 0) {
+      let newL2MevBoost = upgradesJson.L2[3].value[upgrades[1][3]?.level - 1];
+      setL2MevBoost(newL2MevBoost);
+    } else {
+      setL2MevBoost(1);
+    }
+  }, [upgrades]);
+
+  const [l1TransactionsBase, setL1TransactionsBase] = useState(transactions.L1.slice(0, 3));
+  const [l1DappsOpen, setL1DappsOpen] = useState(false);
+  const [l2TransactionsBase, setL2TransactionsBase] = useState(transactions.L2.slice(0, 3));
+  const [l2DappsOpen, setL2DappsOpen] = useState(false);
+
   return (
     <View className="flex-1 relative flex flex-col items-center mt-10">
       <View className="flex flex-row px-2 mt-6 w-full justify-end">
@@ -63,10 +91,13 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
       </View>
 
       <View className="flex flex-row justify-center w-full gap-2 mt-[1rem]">
-        {transactions.L1.map((txType, index) => (
+        {l1TransactionsBase.map((txType, index) => (
           <View
             className="flex flex-col items-center justify-center relative"
             key={index}
+            style={{
+              display: l1DappsOpen ? "none" : "flex",
+            }}
           >
             <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} />
             {l1TransactionTypes[txType.id].feeLevel === 0 && (
@@ -92,7 +123,110 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
             >
               {l1TransactionTypes[txType.id].feeLevel === 0 ? "" : "+"}
               ₿
-              {l1TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id].feeLevel - 1]}
+              {l1TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id].feeLevel - 1] * l1MevBoost}
+            </Text>
+            )}
+          </View>
+        ))}
+        <View className="flex flex-col items-center justify-center relative">
+          <DappsButton chain={"L1"} txType={transactions.L1[3]} toggleOpen={() => setL1DappsOpen(!l1DappsOpen)} />
+          {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 && (
+            <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+              pointer-events-none
+              top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+              <Image
+                source={require("../../../assets/images/lock.png")}
+                className="h-[3rem] aspect-square rounded-lg mb-4"
+              />
+            </View>
+          )}
+          {(transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] !== 0 || l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0) && (
+          <Text
+            className="text-[#60f760a0] text-center font-bold text-[1rem]
+                       bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                       absolute bottom-[-1rem]
+                       "
+            style={{
+              color: l1TransactionTypes[transactions.L1[3].id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+              borderColor: transactions.L1[3].color
+            }}
+          >
+            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? "" : "+"}
+            ₿
+            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? transactions.L1[3].feeCosts[0] : transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] * l1MevBoost}
+          </Text>
+          )}
+        </View>
+        {dapps.L1.map((txType, index) => (
+          <View
+            className="flex flex-col items-center justify-center relative"
+            key={index}
+            style={{
+              display: l1DappsOpen ? "flex" : "none"
+            }}
+          >
+            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} isDapp={true} />
+            {l1DappTypes[txType.id]?.feeLevel === 0 && (
+              <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+                pointer-events-none
+                top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+                <Image
+                  source={require("../../../assets/images/lock.png")}
+                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                />
+              </View>
+            )}
+            {(txType.value[l1DappTypes[txType.id]?.feeLevel - 1] !== 0 || l1DappTypes[txType.id]?.feeLevel === 0) && (
+            <Text
+              className="text-[#60f760a0] text-center font-bold text-[1rem]
+                         bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                         absolute bottom-[-1rem]
+                         "
+              style={{
+                color: l1DappTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+                borderColor: txType.color
+              }}
+            >
+              {l1DappTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
+              ₿
+              {l1DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1DappTypes[txType.id]?.feeLevel - 1] * l1MevBoost}
+            </Text>
+            )}
+          </View>
+        ))}
+        {transactions.L1.slice(4).map((txType, index) => (
+          <View
+            className="flex flex-col items-center justify-center relative"
+            key={index}
+            style={{
+              display: l1DappsOpen ? "none" : "flex"
+            }}
+          >
+            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} />
+            {l1TransactionTypes[txType.id]?.feeLevel === 0 && (
+              <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+                pointer-events-none
+                top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+                <Image
+                  source={require("../../../assets/images/lock.png")}
+                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                />
+              </View>
+            )}
+            {(txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] !== 0 || l1TransactionTypes[txType.id]?.feeLevel === 0) && (
+            <Text
+              className="text-[#60f760a0] text-center font-bold text-[1rem]
+                         bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                         absolute bottom-[-1rem]
+                         "
+              style={{
+                color: l1TransactionTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+                borderColor: txType.color
+              }}
+            >
+              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
+              ₿
+              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * l1MevBoost}
             </Text>
             )}
           </View>
@@ -173,10 +307,13 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
       </View>
 
       <View className="flex flex-row justify-center w-full gap-2 mt-[1rem]">
-        {transactions.L2.map((txType, index) => (
+        {l2TransactionsBase.map((txType, index) => (
           <View
             className="flex flex-col items-center justify-center relative"
             key={index}
+            style={{
+              display: l2DappsOpen ? "none" : "flex"
+            }}
           >
             <TxButton chain={"L2"} txType={txType} addTransaction={addTransaction} />
             {l2TransactionTypes[txType.id].feeLevel === 0 && (
@@ -201,9 +338,108 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
             >
               {l2TransactionTypes[txType.id].feeLevel === 0 ? "" : "+"}
               ₿
-              {l2TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l2TransactionTypes[txType.id].feeLevel - 1]}
+              {l2TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l2TransactionTypes[txType.id].feeLevel - 1] * l2MevBoost}
             </Text>
           </View>
+        ))}
+        <View className="flex flex-col items-center justify-center relative">
+          <DappsButton chain={"L2"} txType={transactions.L2[3]} toggleOpen={() => setL2DappsOpen(!l2DappsOpen)} />
+          {l2TransactionTypes[transactions.L2[3].id]?.feeLevel === 0 && (
+            <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+              pointer-events-none
+              top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+              <Image
+                source={require("../../../assets/images/lock.png")}
+                className="h-[3rem] aspect-square rounded-lg mb-4"
+              />
+            </View>
+          )}
+          {(transactions.L2[3].value[l2TransactionTypes[transactions.L2[3].id]?.feeLevel - 1] !== 0 || l2TransactionTypes[transactions.L2[3].id]?.feeLevel === 0) && (
+          <Text
+            className="text-[#60f760a0] text-center font-bold text-[1rem]
+                       bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                       absolute bottom-[-1rem]
+                       "
+            style={{
+              color: l2TransactionTypes[transactions.L2[3].id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+              borderColor: transactions.L2[3].color
+            }}
+          >
+            {l2TransactionTypes[transactions.L2[3].id]?.feeLevel === 0 ? "" : "+"}
+            ₿
+            {l2TransactionTypes[transactions.L2[3].id]?.feeLevel === 0 ? transactions.L2[3].feeCosts[0] : transactions.L2[3].value[l2TransactionTypes[transactions.L2[3].id]?.feeLevel - 1] * l2MevBoost}
+          </Text>
+          )}
+        </View>
+        {dapps.L2.map((txType, index) => (
+          <View
+            className="flex flex-col items-center justify-center relative"
+            key={index}
+            style={{
+              display: l2DappsOpen ? "flex" : "none"
+            }}
+          >
+            <TxButton chain={"L2"} txType={txType} addTransaction={addTransaction} isDapp={true} />
+            {l2DappTypes[txType.id]?.feeLevel === 0 && (
+              <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+                pointer-events-none
+                top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+                <Image
+                  source={require("../../../assets/images/lock.png")}
+                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                />
+              </View>
+            )}
+            <Text
+              className="text-[#60f760a0] text-center font-bold text-[1rem]
+                         bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                         absolute bottom-[-1rem]
+                         "
+              style={{
+                color: l2DappTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+                borderColor: txType.color
+              }}
+            >
+              {l2DappTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
+              ₿
+              {l2DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l2DappTypes[txType.id]?.feeLevel - 1] * l2MevBoost}
+            </Text>
+          </View>
+        ))}
+        {transactions.L2.slice(4).map((txType, index) => (
+          <View
+            className="flex flex-col items-center justify-center relative"
+            key={index}
+            style={{
+              display: l2DappsOpen ? "none" : "flex"
+            }}
+          >
+            <TxButton chain={"L2"} txType={txType} addTransaction={addTransaction} />
+            {l2TransactionTypes[txType.id]?.feeLevel === 0 && (
+              <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
+                pointer-events-none
+                top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
+                <Image
+                  source={require("../../../assets/images/lock.png")}
+                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                />
+              </View>
+            )}
+            <Text
+              className="text-[#60f760a0] text-center font-bold text-[1rem]
+                         bg-[#292929d0] rounded-lg px-2 py-1 border-2
+                         absolute bottom-[-1rem]
+                         "
+              style={{
+                color: l2TransactionTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
+                borderColor: txType.color
+              }}
+            >
+              {l2TransactionTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
+              ₿
+              {l2TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l2TransactionTypes[txType.id]?.feeLevel - 1] * l2MevBoost}
+            </Text>
+         </View>
         ))}
       </View>
       </>

@@ -57,6 +57,18 @@ export const DAConfirm: React.FC<DAConfirmProps> = (props) => {
     }
   };
 
+  const [shouldAutoConfirm, setShouldAutoConfirm] = useState(false);
+  useEffect(() => {
+    const newShouldAutoConfirm = upgradableGameState.daSpeed > 0 && mineCounter < (gameState.l2?.da.hp || 0);
+    setShouldAutoConfirm(newShouldAutoConfirm);
+  }, [upgradableGameState.daSpeed, mineCounter, gameState.l2?.da.hp]);
+
+  useAutoClicker(
+    shouldAutoConfirm,
+    1000 / upgradableGameState.daSpeed,
+    tryConfirmBlock
+  );
+
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
       {gameState.l2 && (
