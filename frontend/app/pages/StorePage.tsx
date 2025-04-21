@@ -12,6 +12,8 @@ import upgradesJson from "../configs/upgrades.json";
 import automationJson from "../configs/automation.json";
 import moneyImg from "../../assets/images/money.png";
 import overclockImg from "../../assets/images/overclock.png";
+import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
+import prestigeImg from "../../assets/images/transaction/nfts/7.png";
 
 export const StorePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -488,7 +490,7 @@ export const StorePage: React.FC = () => {
           <View className="flex flex-row justify-between items-center p-2 mx-2
                            bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
           >
-            <Image source={require("../../assets/images/transaction/l2Batch.png")} className="w-[3.6rem] h-[3.6rem] rounded-full" />
+            <Image source={l2BatchImg} className="w-[3.6rem] h-[3.6rem] rounded-full" />
             <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
               <Text className="text-[#e7e7e7] text-xl font-bold">Layer 2 Scaling</Text>
               <Text className="text-[#e7e7e7] text-md">Scale your blockchain with Layer 2 Starknet.</Text>
@@ -536,7 +538,7 @@ export const StorePage: React.FC = () => {
             <View className="flex flex-row justify-between items-center p-2 mx-2
                              bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
             >
-              <Image source={require("../../assets/images/transaction/nfts/7.png")} className="w-[3.6rem] h-[3.6rem] rounded-full" />
+              <Image source={prestigeImg} className="w-[3.6rem] h-[3.6rem] rounded-full" />
               <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
                 <Text className="text-[#e7e7e7] text-xl font-bold">Prestige!</Text>
                 <Text className="text-[#e7e7e7] text-md">Complete the game and reset with Prestige upgrades!</Text>
