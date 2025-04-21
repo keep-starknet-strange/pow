@@ -9,7 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { createTx } from "../utils/transactions";
 
-import * as l2Batch from "../../assets/images/transaction/l2Batch.png";
+import l2Batch from "../../assets/images/transaction/l2Batch.png";
 
 type L2ConfirmProps = {
   _id: number;
@@ -50,15 +50,24 @@ export const ProverConfirm: React.FC<L2ConfirmProps> = (props) => {
     if (newMineCounter >= gameState.l2.prover.hp) {
       const txFee = gameState.l2.prover.blockFees;
       const txIcon = l2Batch;
-      const newTx = createTx({
-        name: "L2",
-        color: "#f760f7a0"
-      }, txFee, txIcon);
+      const newTx = createTx(1, 4, txFee, txIcon);
       finalizeL2Proof();
       addTxToBlock(newTx);
       playBlockMined(isSoundOn);
     }
   };
+
+  const [shouldAutoProve, setShouldAutoProve] = useState(false);
+  useEffect(() => {
+    const newShouldAutoProve = upgradableGameState.proverSpeed > 0 && mineCounter < (gameState.l2?.prover.hp || 0);
+    setShouldAutoProve(newShouldAutoProve);
+  }, [upgradableGameState.proverSpeed, mineCounter, gameState.l2?.prover.hp]);
+
+  useAutoClicker(
+    shouldAutoProve,
+    1000 / upgradableGameState.proverSpeed,
+    tryProve
+  );
 
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">

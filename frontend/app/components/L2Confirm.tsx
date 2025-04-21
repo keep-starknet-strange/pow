@@ -47,13 +47,17 @@ export const L2Confirm: React.FC<L2ConfirmProps> = (props) => {
   };
 
   // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
-  const shouldMine =
-  upgradableGameState.minerSpeed > 0 &&
-  mineCounter < gameState.chains[1].currentBlock.hp;
+  const [shouldAutoConfirm, setShouldAutoConfirm] = useState(false);
+  useEffect(() => {
+    const newShouldAutoConfirm =
+      upgradableGameState.sequencerSpeed > 0 &&
+      mineCounter < gameState.chains[1].currentBlock.hp;
+    setShouldAutoConfirm(newShouldAutoConfirm);
+  }, [upgradableGameState.sequencerSpeed, mineCounter, gameState.chains[1].currentBlock.hp]);
 
   useAutoClicker(
-    shouldMine,
-    1000 / upgradableGameState.minerSpeed,
+    shouldAutoConfirm,
+    1000 / upgradableGameState.sequencerSpeed,
     tryConfirmBlock
   );
 

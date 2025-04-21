@@ -84,11 +84,11 @@ export class AchievementObserver implements Observer {
 
   private handleUpgradePurchased(achievement: Achievement, upgrade: Upgrade, currentUpgrades: Record<number, Upgrade>) {
     if ("targetUpgradeId" in achievement && achievement.targetUpgradeId !== undefined) {
-      const targetUpgrade = upgradesConfig.find(u => u.id === achievement.targetUpgradeId);
+      const targetUpgrade = upgradesConfig.L1.find(u => u.id === achievement.targetUpgradeId);
       const currentUpgrade = currentUpgrades[achievement.targetUpgradeId];
 
-      if (targetUpgrade?.maxLevel && currentUpgrade?.level !== undefined) {
-        const progress = Math.min((currentUpgrade.level / targetUpgrade.maxLevel) * 100, 100);
+      if (targetUpgrade?.costs.length && currentUpgrade?.level !== undefined) {
+        const progress = Math.min((currentUpgrade.level / targetUpgrade.costs.length) * 100, 100);
         this.updateAchievement(achievement.id, progress);
       } else if (currentUpgrade) {
         this.updateAchievement(achievement.id, 100);
@@ -96,30 +96,30 @@ export class AchievementObserver implements Observer {
     } else {
       switch (achievement.name) {
         case "Get an Antminer Rig":
-          if (upgrade.effect === "Antminer") {
+          if (upgrade.name === "Antminer") {
             this.updateAchievement(achievement.id, 100);
           }
           break;
         case "Achieve SNARK Scaling":
-          if (upgrade.effect === "SNARK") {
+          if (upgrade.name === "SNARK") {
             this.updateAchievement(achievement.id, 100);
           }
           break;
         case "Achieve STARK Scaling":
-          if (upgrade.effect === "STARK") {
+          if (upgrade.name === "STARK") {
             this.updateAchievement(achievement.id, 100);
           }
           break;
         case "Maxed out upgrades": {
-          const progress = (upgradesConfig.filter(cfg => {
+          const progress = (upgradesConfig.L1.filter(cfg => {
             const upg = currentUpgrades[cfg.id];
-            return cfg.maxLevel ? upg?.level === cfg.maxLevel : !!upg;
-          }).length / upgradesConfig.length) * 100;
+            return cfg.costs.length ? upg?.level === cfg.costs.length : !!upg;
+          }).length / upgradesConfig.L1.length) * 100;
           this.updateAchievement(achievement.id, progress);
           break;
         }
         case "Prestige!":
-          if (upgrade.effect === "Prestige") {
+          if (upgrade.name === "Prestige") {
             this.updateAchievement(achievement.id, 100);
           }
           break;

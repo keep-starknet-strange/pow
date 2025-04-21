@@ -1,15 +1,78 @@
 {
-  "names": [
-    "foo",
-    "bar",
-    "baz",
-    "fart-peace"
+  "L1": [
+    {
+      "id": 0,
+      "name": "PowSwap",
+      "description": "Decentralized exchange (DEX) for token swaps!",
+      "color": "#f7f7f7a0",
+      "speedCosts": [7, 28, 112, 224, 448, 896, 1792, 3584, 7168, 14336],
+      "feeCosts": [7, 28, 112, 224, 448, 896, 1792, 3584, 7168, 14336],
+      "value": [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]
+    },
+    {
+      "id": 1,
+      "name": "ClosedOcean",
+      "description": "NFT Marketplace",
+      "color": "#f7f7f7a0",
+      "speedCosts": [10, 40, 160, 320, 640, 1280, 2560, 5120, 10240, 20480],
+      "feeCosts": [10, 40, 160, 320, 640, 1280, 2560, 5120, 10240, 20480],
+      "value": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    },
+    {
+      "id": 2,
+      "name": "Pave",
+      "description": "Liquidity & flashloans protocol",
+      "color": "#f7f7f7a0",
+      "speedCosts": [13, 52, 208, 416, 832, 1664, 3328, 6656, 13312, 26624],
+      "feeCosts": [13, 52, 208, 416, 832, 1664, 3328, 6656, 13312, 26624],
+      "value": [13, 26, 39, 52, 65, 78, 91, 104, 117, 130]
+    },
+    {
+      "id": 3,
+      "name": "CryptoDragons",
+      "description": "Collect, breed and battle dragons",
+      "color": "#f7f7f7a0",
+      "speedCosts": [16, 64, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
+      "feeCosts": [16, 64, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
+      "value": [16, 32, 48, 64, 80, 96, 112, 128, 144, 160]
+    }
   ],
-
-  "actions": [
-    "move",
-    "attack",
-    "defend",
-    "heal"
+  "L2": [
+    {
+      "id": 0,
+      "name": "AVNU",
+      "description": "Onchain trading platform",
+      "color": "#f7f7f7a0",
+      "speedCosts": [350, 1400, 5600, 11200, 22400, 44800, 89600, 179200, 358400, 716800],
+      "feeCosts": [350, 1400, 5600, 11200, 22400, 44800, 89600, 179200, 358400, 716800],
+      "value": [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]
+    },
+    {
+      "id": 1,
+      "name": "art/peace",
+      "description": "Competitive, Shared Art Canvas",
+      "color": "#f7f7f7a0",
+      "speedCosts": [400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200],
+      "feeCosts": [400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200],
+      "value": [8, 16, 24, 32, 40, 48, 56, 64, 72, 80]
+    },
+    {
+      "id": 2,
+      "name": "Vesu",
+      "description": "Permissionless lending protocol",
+      "color": "#f7f7f7a0",
+      "speedCosts": [450, 1800, 7200, 14400, 28800, 57600, 115200, 230400, 460800, 921600],
+      "feeCosts": [450, 1800, 7200, 14400, 28800, 57600, 115200, 230400, 460800, 921600],
+      "value": [9, 18, 27, 36, 45, 54, 63, 72, 81, 90]
+    },
+    {
+      "id": 3,
+      "name": "Eternum",
+      "description": "Fully-onchain strategy game",
+      "color": "#f7f7f7a0",
+      "speedCosts": [500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000],
+      "feeCosts": [500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000],
+      "value": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    }
   ]
 }

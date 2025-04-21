@@ -20,6 +20,8 @@ export type UpgradableGameState = {
   mevScaling: number;
   sequencerSpeed: number;
   minerSpeed: number;
+  proverSpeed: number;
+  daSpeed: number;
   sortTransactions: boolean;
   l2Transactions: boolean;
   l2Blobs: boolean;
@@ -33,6 +35,8 @@ const baseReward = 5;
 const baseMevScaling = 1;
 const baseSequencerSpeed = 0;
 const baseMinerSpeed = 0;
+const baseProverSpeed = 0;
+const baseDASpeed = 0;
 export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   difficulty: baseDifficulty,
   blockSize: baseBlockWidth * baseBlockWidth,
@@ -40,6 +44,8 @@ export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   mevScaling: baseMevScaling,
   sequencerSpeed: baseSequencerSpeed,
   minerSpeed: baseMinerSpeed,
+  proverSpeed: baseProverSpeed,
+  daSpeed: baseDASpeed,
   sortTransactions: false,
   l2Transactions: false,
   l2Blobs: false,

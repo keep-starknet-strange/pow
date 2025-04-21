@@ -1,0 +1,192 @@
+{
+  "L1": [
+    {
+      "id": 0,
+      "name": "Miner",
+      "color": "#f7f760",
+      "description": "Auto-mine completed L1 blocks",
+      "levels": [
+        {
+          "id": 0,
+          "name": "CPU",
+          "color": "#f7f760",
+          "cost": 10,
+          "speed": 1
+        },
+        {
+          "id": 1,
+          "name": "GPU",
+          "color": "#f7f760",
+          "cost": 20,
+          "speed": 2
+        },
+        {
+          "id": 2,
+          "name": "ASIC",
+          "color": "#f7f760",
+          "cost": 40,
+          "speed": 3
+        },
+        {
+          "id": 3,
+          "name": "Antminer",
+          "color": "#f7f760",
+          "cost": 80,
+          "speed": 4
+        },
+        {
+          "id": 4,
+          "name": "Bitmain",
+          "color": "#f7f760",
+          "cost": 160,
+          "speed": 5
+        },
+        {
+          "id": 5,
+          "name": "Quantum",
+          "color": "#f7f760",
+          "cost": 320,
+          "speed": 10
+        }
+      ]
+    }
+  ],
+  "L2": [
+    {
+      "id": 0,
+      "name": "Sequencer",
+      "color": "#f7f760",
+      "description": "Auto-sequence L2 blocks",
+      "levels": [
+        {
+          "id": 0,
+          "name": "Base",
+          "color": "#f7f760",
+          "cost": 20,
+          "speed": 1
+        },
+        {
+          "id": 1,
+          "name": "Improved",
+          "color": "#f7f760",
+          "cost": 40,
+          "speed": 2
+        },
+        {
+          "id": 2,
+          "name": "Cloud",
+          "color": "#f7f760",
+          "cost": 80,
+          "speed": 3
+        },
+        {
+          "id": 3,
+          "name": "Cairo-native",
+          "color": "#f7f760",
+          "cost": 160,
+          "speed": 4
+        },
+        {
+          "id": 4,
+          "name": "Parallelized",
+          "color": "#f7f760",
+          "cost": 320,
+          "speed": 5
+        },
+        {
+          "id": 5,
+          "name": "Decentralized",
+          "color": "#f7f760",
+          "cost": 640,
+          "speed": 10
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Prover",
+      "color": "#f7f760",
+      "description": "Prove completed L2 batches",
+      "levels": [
+        {
+          "id": 0,
+          "name": "Optimistic",
+          "color": "#f7f760",
+          "cost": 30,
+          "speed": 1
+        },
+        {
+          "id": 1,
+          "name": "ZK SNARK",
+          "color": "#f7f760",
+          "cost": 60,
+          "speed": 2
+        },
+        {
+          "id": 2,
+          "name": "ZK STARK",
+          "color": "#f7f760",
+          "cost": 120,
+          "speed": 4
+        },
+        {
+          "id": 3,
+          "name": "STARK Stone",
+          "color": "#f7f760",
+          "cost": 240,
+          "speed": 6
+        },
+        {
+          "id": 4,
+          "name": "STARK STWO",
+          "color": "#f7f760",
+          "cost": 480,
+          "speed": 10
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "DA",
+      "color": "#f7f760",
+      "description": "Store L2 data",
+      "levels": [
+        {
+          "id": 0,
+          "name": "Calldata",
+          "color": "#f7f760",
+          "cost": 40,
+          "speed": 1
+        },
+        {
+          "id": 1,
+          "name": "Blobs",
+          "color": "#f7f760",
+          "cost": 80,
+          "speed": 2
+        },
+        {
+          "id": 2,
+          "name": "Compression",
+          "color": "#f7f760",
+          "cost": 160,
+          "speed": 4
+        },
+        {
+          "id": 3,
+          "name": "DAS",
+          "color": "#f7f760",
+          "cost": 320,
+          "speed": 6
+        },
+        {
+          "id": 4,
+          "name": "Volition",
+          "color": "#f7f760",
+          "cost": 640,
+          "speed": 10
+        }
+      ]
+    }
+  ]
+}

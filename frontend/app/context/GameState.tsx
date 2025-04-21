@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { Mutex } from "async-mutex";
 import { GameState, newEmptyGameState, UpgradableGameState, newBaseUpgradableGameState } from "../types/GameState";
 import { newBlock } from "../types/Block";
 import { Transaction } from "../types/Transaction";
@@ -66,6 +67,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     newGameState.balance = newBalance;
     notify("BalanceUpdated", { balance: newBalance });
 
+    // TODO: Use prevState
     setGameState(newGameState);
   }
 
@@ -94,6 +96,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     newL2Prover.blockFees = newL2Prover.blockFees + (finalizedBlock.fees * 0.4) + finalizedBlock.reward; // 40% of fees go to L2 Prover + block reward
     newGameState.l2.prover = newL2Prover;
 
+    // TODO: Use prevState
     setGameState(newGameState);
   }
 
@@ -105,40 +108,39 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     notify("BalanceUpdated", { balance: newBalance });
   }
 
-  const addTxToBlock = (tx: Transaction) => {
+  const addTxToBlock = async (tx: Transaction) => {
     if (tx === undefined) return;
-    const newCurrentBlock = {
-      ...gameState.chains[0].currentBlock,
-      fees: gameState.chains[0].currentBlock.fees + tx.fee,
-      transactions: [...gameState.chains[0].currentBlock.transactions, tx]
-    };
-    setGameState((prevState) => ({
+    setGameState((prevState) => 
+    ({
       ...prevState,
       chains: [
         {
           ...prevState.chains[0],
-          currentBlock: newCurrentBlock
+          currentBlock: {
+            ...prevState.chains[0].currentBlock,
+            fees: prevState.chains[0].currentBlock.fees + tx.fee,
+            transactions: prevState.chains[0].currentBlock.transactions.concat(tx)
+          }
         },
         prevState.chains[1]
       ]
     }));
     notify("TxAdded", { tx });
-  }
+  };
 
   const addL2TxToBlock = (tx: Transaction) => {
     if (tx === undefined) return;
-    const newCurrentBlock = {
-      ...gameState.chains[1].currentBlock,
-      fees: gameState.chains[1].currentBlock.fees + tx.fee,
-      transactions: [...gameState.chains[1].currentBlock.transactions, tx]
-    };
     setGameState((prevState) => ({
       ...prevState,
       chains: [
         prevState.chains[0],
         {
           ...prevState.chains[1],
-          currentBlock: newCurrentBlock
+          currentBlock: {
+            ...prevState.chains[1].currentBlock,
+            fees: prevState.chains[1].currentBlock.fees + tx.fee,
+            transactions: prevState.chains[1].currentBlock.transactions.concat(tx)
+          }
         }
       ]
     }));
@@ -147,26 +149,26 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const unlockL2 = () => {
     if (gameState.l2) return;
-    const newGameState = { ...gameState };
-    newGameState.l2 = newEmptyL2();
-    setGameState(newGameState);
+    setGameState((prevState) => ({
+      ...prevState,
+      l2: newEmptyL2()
+    }));
     notify("L2Unlocked", {});
   }
 
   const finalizeL2Proof = () => {
     if (!gameState.l2) return;
-    const newGameState = { ...gameState };
-    if (!newGameState.l2) return;
 
     const finalizedProof = { ...gameState.l2.prover };
     notify("L2ProofFinalized", { proof: finalizedProof });
 
-    const newL2Prover = { ...gameState.l2.prover };
-    newL2Prover.blockFees = 0;
-    newL2Prover.blocks = [];
-    newGameState.l2.prover = newL2Prover;
-
-    setGameState(newGameState);
+    setGameState((prevState) => ({
+      ...prevState,
+      l2: {
+        ...prevState.l2,
+        prover: { ...prevState.l2.prover, blockFees: 0, blocks: [] }
+      }
+    }));
   }
 
   const finalizeL2DA = () => {
@@ -177,15 +179,13 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const finalizedDA = { ...gameState.l2.da };
     notify("L2DAFinalized", { da: finalizedDA });
 
-    const newBalance = gameState.balance + finalizedDA.blockFees;
-    newGameState.balance = newBalance;
-
-    const newL2DA = { ...gameState.l2.da };
-    newL2DA.blockFees = 0;
-    newL2DA.blocks = [];
-    newGameState.l2.da = newL2DA;
-
-    setGameState(newGameState);
+    setGameState((prevState) => ({
+      ...prevState,
+      l2: {
+        ...prevState.l2,
+        da: { ...prevState.l2.da, blockFees: 0, blocks: [] }
+      }
+    }));
   }
 
   return (
