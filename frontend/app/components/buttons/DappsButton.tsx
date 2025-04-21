@@ -28,7 +28,11 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
   const [icon, setIcon] = useState<any>(questionMarkIcon);
   useEffect(() => {
     setChainId(props.chain === "L1" ? 0 : 1);
-    props.chain === "L1" ? setTxTypes(l1TransactionTypes) : setTxTypes(l2TransactionTypes);
+    if (props.chain === "L1") {
+      setTxTypes(l1TransactionTypes);
+    } else {
+      setTxTypes(l2TransactionTypes);
+    }
   }, [props.chain]);
   useEffect(() => {
     setIcon(getTxIcon(chainId + 1, props.txType.id));

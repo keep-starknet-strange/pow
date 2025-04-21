@@ -15,6 +15,7 @@ import upgradesJson from "../../configs/upgrades.json";
 import dapps from "../../configs/dapps.json";
 import { useUpgrades } from "../../context/Upgrades";
 import { createTx, getTxIcon, getRandomNFTImage, getRandomInscriptionImage } from "../../utils/transactions";
+import lockImg from "../../../assets/images/lock.png";
 
 
 export type L2PhaseProps = {
@@ -43,14 +44,14 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
   useEffect(() => {
     // TODO: Hardcoded for now
     if (upgrades && upgrades[0] && upgrades[0][3] && upgrades[0][3].level !== 0) {
-      let newL1MevBoost = upgradesJson.L1[3].value[upgrades[0][3].level - 1];
+      const newL1MevBoost = upgradesJson.L1[3].value[upgrades[0][3].level - 1];
       setL1MevBoost(newL1MevBoost);
     } else {
       setL1MevBoost(1);
     }
 
     if (upgrades && upgrades[1] && upgrades[1][3] && upgrades[1][3].level !== 0) {
-      let newL2MevBoost = upgradesJson.L2[3].value[upgrades[1][3]?.level - 1];
+      const newL2MevBoost = upgradesJson.L2[3].value[upgrades[1][3]?.level - 1];
       setL2MevBoost(newL2MevBoost);
     } else {
       setL2MevBoost(1);
@@ -105,7 +106,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -135,7 +136,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
               pointer-events-none
               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
               <Image
-                source={require("../../../assets/images/lock.png")}
+                source={lockImg}
                 className="h-[3rem] aspect-square rounded-lg mb-4"
               />
             </View>
@@ -171,7 +172,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -208,7 +209,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -321,7 +322,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -349,7 +350,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
               pointer-events-none
               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
               <Image
-                source={require("../../../assets/images/lock.png")}
+                source={lockImg}
                 className="h-[3rem] aspect-square rounded-lg mb-4"
               />
             </View>
@@ -385,7 +386,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -420,7 +421,7 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>

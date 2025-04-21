@@ -11,6 +11,7 @@ import transactions from "../../configs/transactions.json";
 import upgradesJson from "../../configs/upgrades.json";
 import dapps from "../../configs/dapps.json";
 import { Mutex } from 'async-mutex';
+import lockImg from "../../../assets/images/lock.png";
 
 export type L1PhaseProps = {
   _id: number;
@@ -45,7 +46,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
       setMevBoost(1);
       return;
     }
-    let newMevBoost = upgradesJson.L1[3].value[upgrades[0][3]?.level - 1];
+    const newMevBoost = upgradesJson.L1[3].value[upgrades[0][3]?.level - 1];
     setMevBoost(newMevBoost);
   }, [upgrades]);
 
@@ -99,7 +100,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -129,7 +130,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
               pointer-events-none
               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
               <Image
-                source={require("../../../assets/images/lock.png")}
+                source={lockImg}
                 className="h-[3rem] aspect-square rounded-lg mb-4"
               />
             </View>
@@ -165,7 +166,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>
@@ -202,7 +203,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
-                  source={require("../../../assets/images/lock.png")}
+                  source={lockImg}
                   className="h-[3rem] aspect-square rounded-lg mb-4"
                 />
               </View>

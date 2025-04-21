@@ -50,10 +50,10 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     // Initialize upgrades
-    let initUpgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
+    const initUpgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
     for (const chainId in upgradesJson) {
-      let chainIdInt = chainId === "L1" ? 0 : 1;
-      let upgradeJsonChain = chainId === "L1" ? upgradesJson.L1 : upgradesJson.L2;
+      const chainIdInt = chainId === "L1" ? 0 : 1;
+      const upgradeJsonChain = chainId === "L1" ? upgradesJson.L1 : upgradesJson.L2;
       initUpgrades[chainIdInt] = {};
       for (const upgradeId in upgradeJsonChain) {
         const upgrade = upgradeJsonChain[upgradeId];
@@ -64,10 +64,10 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
     setUpgrades(initUpgrades);
-    let initAutomation: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
+    const initAutomation: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
     for (const chainId in automationsJson) {
-      let chainIdInt = chainId === "L1" ? 0 : 1;
-      let automationJsonChain = chainId === "L1" ? automationsJson.L1 : automationsJson.L2;
+      const chainIdInt = chainId === "L1" ? 0 : 1;
+      const automationJsonChain = chainId === "L1" ? automationsJson.L1 : automationsJson.L2;
       initAutomation[chainIdInt] = {};
       for (const upgradeId in automationJsonChain) {
         const upgrade = automationJsonChain[upgradeId];

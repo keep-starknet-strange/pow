@@ -10,6 +10,8 @@ import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 import upgradesJson from "../configs/upgrades.json";
 import automationJson from "../configs/automation.json";
+import moneyImg from "../../assets/images/money.png";
+import overclockImg from "../../assets/images/overclock.png";
 
 export const StorePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -117,7 +119,7 @@ export const StorePage: React.FC = () => {
                  }
                }}
              >
-               <Image source={require("../../assets/images/money.png")} className="w-[3rem] h-[3rem]" />
+               <Image source={moneyImg} className="w-[3rem] h-[3rem]" />
                {storeType === "L1" ? (
                <Text
                  className="absolute bottom-[-1rem] w-full text-center px-1 w-[4rem]
@@ -181,7 +183,7 @@ export const StorePage: React.FC = () => {
                  }
                }}
              >
-               <Image source={require("../../assets/images/overclock.png")} className="w-[3rem] h-[3rem]" />
+               <Image source={overclockImg} className="w-[3rem] h-[3rem]" />
                {storeType === "L1" ? (
                <Text
                  className="absolute bottom-[-1rem]  w-full text-center px-1 w-[4rem]
@@ -266,7 +268,7 @@ export const StorePage: React.FC = () => {
                  }
                }}
              >
-               <Image source={require("../../assets/images/money.png")} className="w-[3rem] h-[3rem]" />
+               <Image source={moneyImg} className="w-[3rem] h-[3rem]" />
                {storeType === "L1" ? (
                <Text
                  className="absolute bottom-[-1rem] w-full text-center px-1 w-[4rem]
@@ -330,7 +332,7 @@ export const StorePage: React.FC = () => {
                  }
                }}
              >
-               <Image source={require("../../assets/images/overclock.png")} className="w-[3rem] h-[3rem]" />
+               <Image source={overclockImg} className="w-[3rem] h-[3rem]" />
                {storeType === "L1" ? (
                <Text
                  className="absolute bottom-[-1rem]  w-full text-center px-1 w-[4rem]
@@ -412,7 +414,7 @@ export const StorePage: React.FC = () => {
                  addUpgrade(chainId, item.id);
                }}
              >
-               <Image source={require("../../assets/images/money.png")} className="w-[3rem] h-[3rem]" />
+               <Image source={moneyImg} className="w-[3rem] h-[3rem]" />
                <Text
                  className="absolute top-[-0.5rem] w-full text-center px-1 w-[4rem]
                             border-2 border-[#e7e7e740] rounded-xl

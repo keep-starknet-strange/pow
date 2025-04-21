@@ -44,10 +44,18 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   useEffect(() => {
     setChainId(props.chain === "L1" ? 0 : 1);
     if (props.isDapp) {
-      props.chain === "L1" ? setTxTypes(l1DappTypes) : setTxTypes(l2DappTypes);
+      if (props.chain === "L1") {
+        setTxTypes(l1DappTypes);
+      } else {
+        setTxTypes(l2DappTypes);
+      }
       return;
     }
-    props.chain === "L1" ? setTxTypes(l1TransactionTypes) : setTxTypes(l2TransactionTypes);
+    if (props.chain === "L1") {
+      setTxTypes(l1TransactionTypes);
+    } else {
+      setTxTypes(l2TransactionTypes);
+    }
   }, [props.chain]);
   useEffect(() => {
     if (props.txType.name === "Inscription") {
