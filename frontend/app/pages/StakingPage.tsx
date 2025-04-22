@@ -21,7 +21,6 @@ export const StakingPage: React.FC = (props) => {
       accrueAll();         
     }, [accrueAll])
   );
-  
 
   const [inputs, setInputs] = useState<string[]>(
     Array(gameState.chains.length).fill("")
