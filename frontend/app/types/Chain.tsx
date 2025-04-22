@@ -15,6 +15,6 @@ export const newEmptyChain = (id: number): Chain => ({
   currentBlock: newBlock(0, 0, 0, 0),
   lastBlock: null,
   pastBlocks: [],
-  apy: 0,
+  apy: 6,
   stakingPool: newStakingPool(0, 0, 0),
 });

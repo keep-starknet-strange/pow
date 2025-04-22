@@ -3,18 +3,19 @@ import { View, Text, TouchableOpacity, FlatList, Modal } from "react-native";
 
 import { useGameState } from "../context/GameState";
 import { useUpgrades } from "../context/Upgrades";
+import { AlertModal } from "../components/AlertModal";
 
 import upgradesJson from "../configs/upgrades.json";
 
 export const StorePage: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [insufficientFunds, setInsufficientFunds] = useState(false);
 
   const { gameState, updateBalance } = useGameState();
   const { upgrades, addUpgrade, isUpgradeActive } = useUpgrades();
 
   const purchase = (upgradeId: number) => {
     if (gameState.balance < upgradesJson[upgradeId].cost) {
-      setShowModal(true);
+      setInsufficientFunds(true);
       return;
     }
  
@@ -75,17 +76,11 @@ export const StorePage: React.FC = () => {
       </View>
      )} />
 
-      <Modal visible={showModal} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white p-4 rounded-lg">
-            <Text className="text-lg font-bold text-black">Insufficient Funds</Text>
-            <TouchableOpacity className="mt-2 bg-red-500 p-2 rounded-lg" onPress={() => setShowModal(false)}>
-              <Text className="text-white">Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
+    <AlertModal
+      visible={insufficientFunds}
+      title="Insufficient Funds"
+      onClose={() => setInsufficientFunds(false)}
+    />
    </View>
   );
 }

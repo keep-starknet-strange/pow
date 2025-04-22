@@ -1,11 +1,11 @@
 export type StakingPool = {
   stakedAmount: number;
-  startBlock:  number;
+  lastBlockUpdated:  number;
   rewardAccrued: number;
 };
 
-export const newStakingPool = (stakedAmount: number, startBlock: number, rewardAccrued: number): StakingPool => ({
+export const newStakingPool = (stakedAmount: number, lastBlockUpdated: number, rewardAccrued: number): StakingPool => ({
   stakedAmount,
-  startBlock,
+  lastBlockUpdated,
   rewardAccrued, 
 });

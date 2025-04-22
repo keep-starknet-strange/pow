@@ -1,12 +1,11 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useGameState } from "../context/GameState";
-import { useEventManager, Observer } from "../context/EventManager";
 
-const BLOCKS_PER_YEAR = 10512000; // 60 * 60 * 24 * 365 / 2.5s block time
+const BLOCKS_PER_GAME_YEAR = 100; // 60 * 60 * 24 * 365 / 2.5s block time
+const YIELD_BOOST     = 100000000000000;              
 
 export function useStaking() {
   const { gameState, setGameState, updateBalance } = useGameState();
-  const { registerObserver, unregisterObserver } = useEventManager();
 
   const poolFor = (chainIdx: number) =>
     gameState.chains[chainIdx].stakingPool;
@@ -33,7 +32,7 @@ export function useStaking() {
         rewardAccrued: pool.rewardAccrued
       }));
     },
-    [gameState]
+    [setGameState]
   );
 
   const claimRewards = useCallback(
@@ -45,50 +44,40 @@ export function useStaking() {
       updatePool(chainIdx, pool => ({
         ...pool,
         rewardAccrued: 0,
-        startBlock: gameState.chains[0].currentBlock.id
+        startBlock: gameState.chains[chainIdx].currentBlock.id
       }));
     },
     [gameState]
   );
 
-  useEffect(() => {
-    const obs: Observer = {
-      onNotify(eventName: string, data?: any) {
-        if (eventName !== "BlockFinalized") return;
+  const accrueAll = useCallback(() => {
+    setGameState(prev => {
+      const chains = prev.chains.map(chain => {
+        const { stakingPool, apy, currentBlock } = chain as any; // adjust typing
+        if (!stakingPool.stakedAmount) return chain;
 
-        const { block } = data;
-        setGameState(prev => {
-          const chains = prev.chains.map(chain => {
-            const { stakingPool, apy } = chain;
-            if (!stakingPool.stakedAmount) return chain;
+        const blocks = currentBlock.id - stakingPool.lastBlockUpdated;
+        if (blocks <= 0) return chain;
 
-            const blocks = block.id - stakingPool.startBlock;
-            if (blocks <= 0) return chain;
-
-            const yieldPerBlock =
-              (stakingPool.stakedAmount * (apy / 100)) / BLOCKS_PER_YEAR;
-
-            return {
-              ...chain,
-              stakingPool: {
-                ...stakingPool,
-                rewardAccrued: stakingPool.rewardAccrued + yieldPerBlock * blocks,
-                lastUpdateBlock: block.id
-              }
-            };
-          });
-          return { ...prev, chains };
-        });
-      }
-    };
-
-    const id = registerObserver(obs);
-    return () => unregisterObserver(id);
-  }, [registerObserver, unregisterObserver, setGameState]);
+        const yieldPerBlock =
+          (stakingPool.stakedAmount + stakingPool.rewardAccrued * (apy / 100) * YIELD_BOOST) / BLOCKS_PER_GAME_YEAR;
+        return {
+          ...chain,
+          stakingPool: {
+            ...stakingPool,
+            rewardAccrued: stakingPool.rewardAccrued + yieldPerBlock * blocks,
+            lastBlockUpdated: currentBlock.id
+          }
+        };
+      });
+      return { ...prev, chains };
+    });
+  }, [setGameState]);
 
   return {
     stakeTokens,
     claimRewards,
+    accrueAll,
     stakingInfo: gameState.chains.map(c => c.stakingPool)
   };
 }
