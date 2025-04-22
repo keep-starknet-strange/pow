@@ -427,7 +427,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const doPrestige = () => {
     const newPrestige = upgradableGameState.prestige + 1;
     setGameState(newEmptyGameState());
-    let newUpgradableGameState = newBaseUpgradableGameState();
+    const newUpgradableGameState = newBaseUpgradableGameState();
     newUpgradableGameState.prestige = newPrestige;
     setUpgradableGameState(newUpgradableGameState);
     resetUpgrades();
