@@ -11,6 +11,7 @@ import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 import upgradesJson from "../configs/upgrades.json";
 import automationJson from "../configs/automation.json";
+import prestigeJson from "../configs/prestige.json";
 import moneyImg from "../../assets/images/money.png";
 import overclockImg from "../../assets/images/overclock.png";
 import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
@@ -19,13 +20,11 @@ import prestigeImg from "../../assets/images/transaction/nfts/7.png";
 export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
-  const { gameState, updateBalance } = useGameState();
-  const { upgrades, addUpgrade, automation, upgradeAutomation,
+  const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
+  const { upgrades, addUpgrade, automation, upgradeAutomation, doPrestige,
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
           } = useUpgrades();
-  const [prestigeLevel, setPrestigeLevel] = useState(0);
-  const [prestigeCosts, setPrestigeCosts] = useState([1000, 2000, 3000]);
 
   const storeTypes = [
     "L1",
@@ -508,6 +507,8 @@ export const StorePage: React.FC = () => {
                 l1TxFeeUpgrade(item.id);
                 const newBalance = gameState.balance - cost;
                 updateBalance(newBalance);
+
+                unlockL2();
               }}
             >
               <Text
@@ -534,7 +535,7 @@ export const StorePage: React.FC = () => {
           </View>
         ) : (
           <>
-          {prestigeLevel < prestigeCosts.length && (
+          {upgradableGameState.prestige < prestigeJson.length - 1 && (
             <View className="flex flex-row justify-between items-center p-2 mx-2
                              bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
             >
@@ -548,19 +549,17 @@ export const StorePage: React.FC = () => {
                            border-2 border-[#e7e7e740] mr-1
                 "
                 onPress={() => {
-                  if (gameState.balance < prestigeCosts[prestigeLevel]) {
+                  if (gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost) {
                     setInsufficientFunds(true);
                     return;
                   }
-                  const newBalance = gameState.balance - prestigeCosts[prestigeLevel];
-                  updateBalance(newBalance);
-                  setPrestigeLevel(prestigeLevel + 1);
+                  doPrestige();
                 }}
               >
                 <Text
                   className="text-[#171717] text-md font-bold"
                 >
-                  Unlock - ₿{prestigeCosts[prestigeLevel]}
+                  Unlock - ₿{prestigeJson[upgradableGameState.prestige + 1].cost}
                 </Text>
               </TouchableOpacity>
             </View>

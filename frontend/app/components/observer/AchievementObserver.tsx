@@ -51,8 +51,11 @@ export class AchievementObserver implements Observer {
         case "UpgradePurchased":
           this.handleUpgradePurchased(achievement, data.upgrade as Upgrade, data.allUpgrades);
           break;
-        case "BlockFinalized":
-          this.handleBlockFinalized(achievement, data.block as Block);
+        case "L1BlockFinalized":
+          this.handleL1BlockFinalized(achievement, data.block as Block);
+          break;
+        case "L2BlockFinalized":
+          this.handleL2BlockFinalized(achievement, data.block as Block);
           break;
         case "TryMineBlock":
           this.handleTryMineBlock(achievement, data.isMined as boolean, data.mineCounter as number);
@@ -71,9 +74,10 @@ export class AchievementObserver implements Observer {
 
   private handleBalanceUpdated(achievement: Achievement, balance: number) {
     const balanceTargets: Record<string, number> = {
-      "Reach ₿500": 500,
-      "Reach ₿10K": 10000,
-      "Reach ₿10M": 10000000,
+      "Reach ₿100": 100,
+      "Reach ₿10K": 10_000,
+      "Reach ₿1M": 1_000_000,
+      "Reach ₿100M": 100_000_000,
     };
     const target = balanceTargets[achievement.name];
     if (target) {
@@ -129,12 +133,27 @@ export class AchievementObserver implements Observer {
     }
   }
 
-  private handleBlockFinalized(achievement: Achievement, block: Block) {
+  private handleL1BlockFinalized(achievement: Achievement, block: Block) {
     const blockTargets: Record<string, number> = {
-      "Reach Block 1000": 1000,
-      "Reach Block 1M": 1_000_000,
-      "Reach Block 1B": 1_000_000_000,
+      "Reach L1 Block 10": 10,
+      "Reach L1 Block 100": 100,
+      "Reach L1 Block 1000": 1_000,
+      "Reach L1 Block 10K": 10_000,
     };
+    const target = blockTargets[achievement.name];
+    if (target) {
+      const progress = Math.min((block.id / target) * 100, 100);
+      this.updateAchievement(achievement.id, progress);
+    }
+  }
+
+  private handleL2BlockFinalized(achievement: Achievement, block: Block) {
+    const blockTargets: Record<string, number> = {
+      "Reach L2 Block 100": 100,
+      "Reach L2 Block 1000": 1000,
+      "Reach L2 Block 10K": 10000,
+      "Reach L2 Block 100K": 100000,
+    }
     const target = blockTargets[achievement.name];
     if (target) {
       const progress = Math.min((block.id / target) * 100, 100);

@@ -7,6 +7,7 @@ import { getTxIcon, createTx, getRandomInscriptionImage, getRandomNFTImage } fro
 import { playTxClicked } from "../../components/utils/sounds";
 import transactions from "../../configs/transactions.json";
 import upgradesJson from "../../configs/upgrades.json";
+import prestigeJson from "../../configs/prestige.json";
 import dapps from "../../configs/dapps.json";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 
@@ -18,7 +19,7 @@ export type TxButtonProps = {
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
-  const { gameState, updateBalance, unlockL2 } = useGameState();
+  const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
   const { upgrades, l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade } = useUpgrades();
   const { isSoundOn } = useSound();
@@ -76,12 +77,14 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
 
     // TODO: Hardcoded for now
     let mevBoost = 1;
-    if (chainId === 0) {
+    if (upgrades[chainId][3].level === 0) {
+      mevBoost = 1;
+    } else if (chainId === 0) {
       mevBoost = upgradesJson.L1[3].value[upgrades[chainId][3].level - 1];
     } else {
       mevBoost = upgradesJson.L2[3].value[upgrades[chainId][3].level - 1];
     }
-    const txFee = txType.value[feeLevel] * mevBoost;
+    const txFee = txType.value[feeLevel] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler;
     const tx = createTx(chainId + 1, txType.id, txFee, icon);
     const playPitch = (tx.fee / 8) + 1;
     playTxClicked(isSoundOn, playPitch);

@@ -1,0 +1,68 @@
+[
+  {
+    "id": 0,
+    "scaler": 1,
+    "cost": 0,
+    "color": "#FF0000"
+  },
+  {
+    "id": 1,
+    "scaler": 2,
+    "cost": 1000,
+    "color": "#00FF00"
+  },
+  {
+    "id": 2,
+    "scaler": 4,
+    "cost": 2000,
+    "color": "#0000FF"
+  },
+  {
+    "id": 3,
+    "scaler": 8,
+    "cost": 3000,
+    "color": "#FFFF00"
+  },
+  {
+    "id": 4,
+    "scaler": 16,
+    "cost": 4000,
+    "color": "#FF00FF"
+  },
+  {
+    "id": 5,
+    "scaler": 32,
+    "cost": 5000,
+    "color": "#00FFFF"
+  },
+  {
+    "id": 6,
+    "scaler": 64,
+    "cost": 6000,
+    "color": "#FFFFFF"
+  },
+  {
+    "id": 7,
+    "scaler": 128,
+    "cost": 7000,
+    "color": "#000000"
+  },
+  {
+    "id": 8,
+    "scaler": 256,
+    "cost": 8000,
+    "color": "#FF8080"
+  },
+  {
+    "id": 9,
+    "scaler": 512,
+    "cost": 9000,
+    "color": "#80FF80"
+  },
+  {
+    "id": 10,
+    "scaler": 1024,
+    "cost": 10000,
+    "color": "#8080FF"
+  }
+]

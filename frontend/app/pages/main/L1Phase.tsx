@@ -9,6 +9,7 @@ import { useGameState } from "../../context/GameState";
 import { useUpgrades } from "../../context/Upgrades";
 import transactions from "../../configs/transactions.json";
 import upgradesJson from "../../configs/upgrades.json";
+import prestigeJson from "../../configs/prestige.json";
 import dapps from "../../configs/dapps.json";
 import { Mutex } from 'async-mutex';
 import lockImg from "../../../assets/images/lock.png";
@@ -18,7 +19,7 @@ export type L1PhaseProps = {
 };
 
 export const L1Phase: React.FC<L1PhaseProps> = (props) => {
-  const { gameState, addTxToBlock, addL2TxToBlock } = useGameState();
+  const { gameState, addTxToBlock, addL2TxToBlock, upgradableGameState } = useGameState();
   const { l1TransactionTypes, l1TxFeeUpgrade, l1DappTypes, upgrades } = useUpgrades();
 
   const [mutex] = useState(new Mutex());
@@ -118,7 +119,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
             >
               {l1TransactionTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
               ₿
-              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * mevBoost}
+              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler}
             </Text>
             )}
           </View>
@@ -148,7 +149,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
           >
             {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? "" : "+"}
             ₿
-            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? transactions.L1[3].feeCosts[0] : transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] * mevBoost}
+            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? transactions.L1[3].feeCosts[0] : transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler}
           </Text>
           )}
         </View>
@@ -184,7 +185,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
             >
               {l1DappTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
               ₿
-              {l1DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1DappTypes[txType.id]?.feeLevel - 1] * mevBoost}
+              {l1DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1DappTypes[txType.id]?.feeLevel - 1] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler}
             </Text>
             )}
           </View>
@@ -221,7 +222,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
             >
               {l1TransactionTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
               ₿
-              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * mevBoost}
+              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler}
             </Text>
             )}
           </View>

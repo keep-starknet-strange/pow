@@ -4,7 +4,7 @@ import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automation.json";
 import { useGameState } from "./GameState";
 import { useEventManager } from "../context/EventManager";
-import { TransactionTypeState } from "../types/GameState";
+import { newBaseUpgradableGameState, TransactionTypeState, newEmptyGameState } from "../types/GameState";
 
 type UpgradesContextType = {
   addUpgrade: (chainId: number, upgradeId: number) => void;
@@ -26,6 +26,7 @@ type UpgradesContextType = {
   l2DappFeeUpgrade: (id: number) => void;
   l1DappSpeedUpgrade: (id: number) => void;
   l2DappSpeedUpgrade: (id: number) => void;
+  doPrestige: () => void;
 };
 
 export const useUpgrades = () => {
@@ -46,9 +47,9 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [l2DappTypes, setL2DappTypes] = useState<TransactionTypeState[]>([]);
   const { notify } = useEventManager();
   // TODO: Move upgradableGameState into this context?
-  const { setUpgradableGameState } = useGameState();
+  const { setGameState, upgradableGameState, setUpgradableGameState } = useGameState();
 
-  useEffect(() => {
+  const resetUpgrades = () => {
     // Initialize upgrades
     const initUpgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
     for (const chainId in upgradesJson) {
@@ -181,7 +182,12 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     ];
     setL1DappTypes(initL1DappTypes);
     setL2DappTypes(initL2DappTypes);
+  };
+
+  useEffect(() => {
+    resetUpgrades();
   }, []);
+    
 
 
   const addUpgrade = (chainId: number, upgradeId: number) => {
@@ -418,11 +424,20 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     notify("AutomationPurchased", { upgrade: newUpgrade, allAutomation: updatedAutomation });
   };
 
+  const doPrestige = () => {
+    const newPrestige = upgradableGameState.prestige + 1;
+    setGameState(newEmptyGameState());
+    let newUpgradableGameState = newBaseUpgradableGameState();
+    newUpgradableGameState.prestige = newPrestige;
+    setUpgradableGameState(newUpgradableGameState);
+    resetUpgrades();
+  }
+
   return (
     <UpgradeContext.Provider value={{ addUpgrade, updateUpgrade, upgrades, removeUpgrade, isUpgradeActive,
       automation, upgradeAutomation,
       l1TransactionTypes, l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TransactionTypes, l2TxSpeedUpgrade, l2TxFeeUpgrade,
-      l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade }}>
+      l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade, doPrestige }}>
       {children}
     </UpgradeContext.Provider>
   );

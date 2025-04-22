@@ -1,0 +1,11 @@
+export { default as img00 } from "../../assets/images/prestige/0.png";
+export { default as img01 } from "../../assets/images/prestige/1.png";
+export { default as img02 } from "../../assets/images/prestige/2.png";
+export { default as img03 } from "../../assets/images/prestige/3.png";
+export { default as img04 } from "../../assets/images/prestige/4.png";
+export { default as img05 } from "../../assets/images/prestige/5.png";
+export { default as img06 } from "../../assets/images/prestige/6.png";
+export { default as img07 } from "../../assets/images/prestige/7.png";
+export { default as img08 } from "../../assets/images/prestige/8.png";
+export { default as img09 } from "../../assets/images/prestige/9.png";
+export { default as img10 } from "../../assets/images/prestige/10.png";
