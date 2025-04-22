@@ -29,6 +29,7 @@ export const StorePage: React.FC = () => {
     if (gameState.balance < upgradesJson[upgradeId].cost) {
       setInsufficientFunds(true);
       return;
+    }
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeCosts, setPrestigeCosts] = useState([1000, 2000, 3000]);
 
