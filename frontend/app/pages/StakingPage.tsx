@@ -5,6 +5,7 @@ import { useGameState } from "../context/GameState";
 import { useStaking } from "../hooks/useStaking";
 import { BlockView } from "../components/BlockView";
 import { AlertModal } from "../components/AlertModal";
+import stakingConfig from "../configs/staking.json";
 
 export type StakingPageProps = {
   switchPage: (page: string) => void;
@@ -53,13 +54,13 @@ export const StakingPage: React.FC = (props) => {
 
       {gameState.chains.map((chain, idx) => {
         const pool = chain.stakingPool;
-
+        const meta = stakingConfig.find(c => c.chainId === chain.id)!;
         const pastBlocks = chain.pastBlocks ?? [];
         return (
           <View key={chain.id ?? idx} className="bg-gray-800 rounded-2xl p-5 mt-6">
 
             <Text className="text-white text-lg font-semibold mb-2">
-              {`🚀 Chain ${idx + 1}`}
+            {meta.icon} {meta.name}
             </Text>
 
             {pastBlocks.length > 0 && (

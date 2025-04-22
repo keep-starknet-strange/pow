@@ -9,7 +9,6 @@ export const mockGameState: GameState = {
   chains: [
     {
       id: 0,
-      apy: 0.05,
       stakingPool: newStakingPool(0, 0, 0),
       currentBlock: {
         id: 4,

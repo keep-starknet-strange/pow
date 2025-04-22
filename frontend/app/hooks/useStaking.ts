@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useGameState } from "../context/GameState";
+import stakingConfig from "../configs/staking.json";
 
-const BLOCKS_PER_GAME_YEAR = 100; // 60 * 60 * 24 * 365 / 2.5s block time
-const YIELD_BOOST     = 100000000000000;              
+const BLOCKS_PER_GAME_YEAR = 100;      
 
 export function useStaking() {
   const { gameState, setGameState, updateBalance } = useGameState();
@@ -53,14 +53,16 @@ export function useStaking() {
   const accrueAll = useCallback(() => {
     setGameState(prev => {
       const chains = prev.chains.map(chain => {
-        const { stakingPool, apy, currentBlock } = chain as any; // adjust typing
+        const meta   = stakingConfig.find(c => c.chainId === chain.id)!;
+        const { stakingPool, currentBlock } = chain as any; // adjust typing
         if (!stakingPool.stakedAmount) return chain;
 
         const blocks = currentBlock.id - stakingPool.lastBlockUpdated;
         if (blocks <= 0) return chain;
 
+        const apy = meta.baseApy * meta.yieldMultiplier;
         const yieldPerBlock =
-          (stakingPool.stakedAmount + stakingPool.rewardAccrued * (apy / 100) * YIELD_BOOST) / BLOCKS_PER_GAME_YEAR;
+          (stakingPool.stakedAmount + stakingPool.rewardAccrued * (apy / 100) ) / BLOCKS_PER_GAME_YEAR;
         return {
           ...chain,
           stakingPool: {
