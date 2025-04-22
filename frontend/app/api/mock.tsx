@@ -37,6 +37,7 @@ export const mockGameState: GameState = {
     },
     {
       id: 1,
+      stakingPool: newStakingPool(0, 0, 0),
       currentBlock: {
         id: 2,
         reward: 10,

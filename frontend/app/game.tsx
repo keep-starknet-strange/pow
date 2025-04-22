@@ -74,10 +74,6 @@ export default function game() {
   }, {
     name: "Settings",
     icon: "⚙️"
-  },
-    {
-    name: "Staking",
-    icon: "🥩"
   }];
   const switchPage = (name: string) => {
     if (!basePages.includes(name) && basePages.includes(currentPage.name)) {
