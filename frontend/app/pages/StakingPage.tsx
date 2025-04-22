@@ -59,7 +59,7 @@ export const StakingPage: React.FC = (props) => {
           <View key={chain.id ?? idx} className="bg-gray-800 rounded-2xl p-5 mt-6">
 
             <Text className="text-white text-lg font-semibold mb-2">
-              🚀 {`Chain ${idx + 1}`}
+              {`🚀 Chain ${idx + 1}`}
             </Text>
 
             {pastBlocks.length > 0 && (
@@ -80,12 +80,12 @@ export const StakingPage: React.FC = (props) => {
             {/* staked + claim row */}
             <View className="flex-row items-center justify-center gap-x-8 mt-4 mb-3">
               <Text className="text-white">
-                {pool.stakedAmount.toFixed(2)} staked
+                {pool.stakedAmount.toFixed(2) + " staked"}
               </Text>
 
               <TouchableOpacity onPress={() => claimRewards(idx)}>
                 <Text className="text-green-400">
-                  Claim {pool.rewardAccrued.toFixed(2)}
+                  {"Claim " + pool.rewardAccrued.toFixed(2)}
                 </Text>
               </TouchableOpacity>
             </View>
