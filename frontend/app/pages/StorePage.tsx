@@ -24,12 +24,6 @@ export const StorePage: React.FC = () => {
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
           } = useUpgrades();
-
-  const purchase = (upgradeId: number) => {
-    if (gameState.balance < upgradesJson[upgradeId].cost) {
-      setInsufficientFunds(true);
-      return;
-    }
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeCosts, setPrestigeCosts] = useState([1000, 2000, 3000]);
 
@@ -555,7 +549,7 @@ export const StorePage: React.FC = () => {
                 "
                 onPress={() => {
                   if (gameState.balance < prestigeCosts[prestigeLevel]) {
-                    setShowModal(true);
+                    setInsufficientFunds(true);
                     return;
                   }
                   const newBalance = gameState.balance - prestigeCosts[prestigeLevel];
