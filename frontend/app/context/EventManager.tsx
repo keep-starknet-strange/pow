@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 export interface Observer {
   onNotify(eventName: string, data?: any): void;
@@ -23,20 +23,20 @@ export const useEventManager = () => {
 export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [observers, setObservers] = useState<Map<number, Observer>>(new Map());
 
-  const registerObserver = useCallback((observer: Observer) => {
-    const id = Date.now();
-    setObservers(prev => new Map(prev).set(id, observer));
+  const registerObserver = (observer: Observer): number => {
+    const id = Date.now(); // Simple unique ID generator
+    setObservers((prev) => new Map(prev).set(id, observer));
     return id;
-  }, []);
-  
-  const unregisterObserver = useCallback((id: number) => {
-    setObservers(prev => {
-      const m = new Map(prev);
-      m.delete(id);
-      return m;
+  };
+
+  const unregisterObserver = (observerId: number): void => {
+    setObservers((prev) => {
+      const newObservers = new Map(prev);
+      newObservers.delete(observerId);
+      return newObservers;
     });
-  }, []);
-  
+  };
+
   const notify = (eventName: string, data?: any) => {
     observers.forEach((observer) => {
       observer.onNotify(eventName, data);
