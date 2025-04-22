@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, Image } from "react-na
 
 import { useGameState } from "../context/GameState";
 import { useUpgrades } from "../context/Upgrades";
+import { AlertModal } from "../components/AlertModal";
 import { getChainIcons } from "../utils/transactions";
 import { getUpgradeIcons, getAutomationIcons } from "../utils/upgrades";
 
@@ -16,14 +17,13 @@ import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
 import prestigeImg from "../../assets/images/transaction/nfts/7.png";
 
 export const StorePage: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [insufficientFunds, setInsufficientFunds] = useState(false);
 
   const { gameState, updateBalance } = useGameState();
   const { upgrades, addUpgrade, automation, upgradeAutomation,
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
           } = useUpgrades();
-
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeCosts, setPrestigeCosts] = useState([1000, 2000, 3000]);
 
@@ -549,7 +549,7 @@ export const StorePage: React.FC = () => {
                 "
                 onPress={() => {
                   if (gameState.balance < prestigeCosts[prestigeLevel]) {
-                    setShowModal(true);
+                    setInsufficientFunds(true);
                     return;
                   }
                   const newBalance = gameState.balance - prestigeCosts[prestigeLevel];
@@ -570,17 +570,11 @@ export const StorePage: React.FC = () => {
         <View className="h-32" />
      </ScrollView>
 
-      <Modal visible={showModal} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white p-4 rounded-lg">
-            <Text className="text-lg font-bold text-black">Insufficient Funds</Text>
-            <TouchableOpacity className="mt-2 bg-red-500 p-2 rounded-lg" onPress={() => setShowModal(false)}>
-              <Text className="text-white">Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
+    <AlertModal
+      visible={insufficientFunds}
+      title="Insufficient Funds"
+      onClose={() => setInsufficientFunds(false)}
+    />
    </View>
   );
 }

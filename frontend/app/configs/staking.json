@@ -1,0 +1,23 @@
+[
+  {
+    "chainId": 0,
+    "name": "Main Chain",
+    "baseApy": 6,          
+    "yieldMultiplier": 25,  
+    "icon": "🥇"
+  },
+  {
+    "chainId": 1,
+    "name": "Fox Chain",
+    "baseApy": 9,
+    "yieldMultiplier": 30,
+    "icon": "🦊"
+  },
+  {
+    "chainId": 2,
+    "name": "Phoenix Chain",
+    "baseApy": 12,
+    "yieldMultiplier": 40,
+    "icon": "🔥"
+  }
+]

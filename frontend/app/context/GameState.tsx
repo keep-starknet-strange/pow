@@ -10,9 +10,9 @@ import { mockAddress } from "../api/mock";
 
 type GameStateContextType = {
   gameState: GameState;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   upgradableGameState: UpgradableGameState;
   setUpgradableGameState: React.Dispatch<React.SetStateAction<UpgradableGameState>>;
-
   updateBalance: (newBalance: number) => void;
 
   finalizeBlock: () => void;
@@ -189,7 +189,7 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   return (
-    <GameStateContext.Provider value={{ gameState, upgradableGameState, setUpgradableGameState, finalizeBlock, updateBalance, addTxToBlock, finalizeL2Block, addL2TxToBlock, unlockL2,
+    <GameStateContext.Provider value={{ gameState, setGameState, upgradableGameState, setUpgradableGameState, finalizeBlock, updateBalance, addTxToBlock, finalizeL2Block, addL2TxToBlock, unlockL2,
     finalizeL2Proof, finalizeL2DA }}>
       {children}
     </GameStateContext.Provider>

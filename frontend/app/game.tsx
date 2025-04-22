@@ -13,6 +13,7 @@ import { StorePage } from "./pages/StorePage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { StakingPage } from "./pages/StakingPage";
 
 import { useEventManager } from "./context/EventManager";
 import { useAchievement } from "./context/Achievements";
@@ -46,6 +47,10 @@ export default function game() {
   }, {
     name: "Settings",
     component: SettingsPage
+  }
+  , {
+    name: "Staking",
+    component: StakingPage
   }];
 
   const [currentPage, setCurrentPage] = useState(pages[0]);
