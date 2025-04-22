@@ -1,0 +1,78 @@
+import React, { useEffect, useState } from "react";
+import { Image, TouchableOpacity, Animated, useAnimatedValue } from "react-native";
+import { useGameState } from "../../context/GameState";
+import { useUpgrades } from "../../context/Upgrades";
+import { getTxIcon, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
+import transactions from "../../configs/transactions.json";
+import questionMarkIcon from "../../../assets/images/questionMark.png";
+
+export type DappsButtonProps = {
+  chain: string;
+  txType: any; // TODO: Define a proper type for txType
+  toggleOpen: () => void;
+};
+
+export const DappsButton: React.FC<DappsButtonProps> = (props) => {
+  const { gameState, updateBalance, unlockL2 } = useGameState();
+  const { l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade } = useUpgrades();
+
+  const [chainId, setChainId] = useState(0);
+  const [txTypes, setTxTypes] = useState(l1TransactionTypes);
+  useEffect(() => {
+    if (props.chain === "L1") {
+      setTxTypes(l1TransactionTypes);
+    } else {
+      setTxTypes(l2TransactionTypes);
+    }
+  }, [props.chain, l1TransactionTypes, l2TransactionTypes]);
+  const [icon, setIcon] = useState<any>(questionMarkIcon);
+  useEffect(() => {
+    setChainId(props.chain === "L1" ? 0 : 1);
+    if (props.chain === "L1") {
+      setTxTypes(l1TransactionTypes);
+    } else {
+      setTxTypes(l2TransactionTypes);
+    }
+  }, [props.chain]);
+  useEffect(() => {
+    setIcon(getTxIcon(chainId + 1, props.txType.id));
+  }, [props.txType, chainId]);
+
+  const tryBuyTx = (txTypeId: number) => {
+    if (txTypes[txTypeId].feeLevel !== 0) return;
+    const txType = chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
+    
+    if (gameState.balance < txType.feeCosts[0]) return;
+    if (chainId === 0) {
+      l1TxFeeUpgrade(txTypeId);
+    } else {
+      l2TxFeeUpgrade(txTypeId);
+    }
+
+    const newBalance = gameState.balance - txType.feeCosts[0];
+    updateBalance(newBalance);
+
+    if (txType.name === "L2") {
+      unlockL2();
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: props.txType.color,
+        borderColor: props.txType.color,
+      }}
+      className="flex flex-col items-center justify-center w-[4.5rem] aspect-square rounded-lg border-2 overflow-hidden relative"
+      onPress={() => {
+        if (txTypes[props.txType.id].feeLevel === 0) tryBuyTx(props.txType.id);
+        else props.toggleOpen();
+      }}
+    >
+      <Image
+        source={icon}
+        className="w-[3.8rem] h-[3.8rem]"
+      />
+    </TouchableOpacity>
+  );
+}

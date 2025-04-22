@@ -9,7 +9,7 @@ import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 
 type MinerProps = {
-  switchPage: (page: string) => void;
+  _id: number;
 };
 
 export const Miner: React.FC<MinerProps> = (props) => {
@@ -43,21 +43,20 @@ export const Miner: React.FC<MinerProps> = (props) => {
     if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
       finalizeBlock();
       playBlockMined(isSoundOn);
-      props.switchPage("SequencingPage");
     }
   };
 
   // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
-  const shouldMine =
-  upgradableGameState.minerSpeed > 0 &&
-  mineCounter < gameState.chains[0].currentBlock.hp;
-
-useAutoClicker(
-  shouldMine,
-  1000 / upgradableGameState.minerSpeed,
-  tryMineBlock
-);
-
+  const [shouldAutoMine, setShouldAutoMine] = useState(false);
+  useEffect(() => {
+    const newShouldAutoMine = upgradableGameState.minerSpeed > 0 && mineCounter < gameState.chains[0].currentBlock.hp;
+    setShouldAutoMine(newShouldAutoMine);
+  }, [upgradableGameState.minerSpeed, mineCounter, gameState.chains[0].currentBlock.hp]);
+  useAutoClicker(
+    shouldAutoMine,
+    1000 / upgradableGameState.minerSpeed,
+    tryMineBlock
+  );
 
   return (
     <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">

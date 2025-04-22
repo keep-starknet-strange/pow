@@ -1,7 +1,92 @@
 {
-  "Transfer":             { "color": "#60f760a0", "chance": 0.65, "feeBump": 0, "requiredUpgrade": null, "levelMultiplier": 1 },
-  "L2 Transactions":      { "color": "#f7f760a0", "chance": 0.25, "feeBump": 1, "requiredUpgrade": 2,    "levelMultiplier": 1 },
-  "L2 Blob":              { "color": "#6060f7a0", "chance": 0.15, "feeBump": 2, "requiredUpgrade": 3,    "levelMultiplier": 1 },
-  "Inscription":          { "color": "#f760f7a0", "chance": 0.2,  "feeBump": 3, "requiredUpgrade": 9,    "levelMultiplier": 1 },
-  "Dapp":                 { "color": "#f76060a0", "chance": 0.1,  "feeBump": 4, "requiredUpgrade": 10,   "levelMultiplier": 1 }
+  "L1": [
+    {
+      "id": 0,
+      "name": "Transfer",
+      "description": "Send funds between wallets.",
+      "color": "#60f760a0",
+      "speedCosts": [1, 4, 16, 32, 64, 128, 256, 512, 1024, 2048],
+      "feeCosts": [1, 4, 16, 32, 64, 128, 256, 512, 1024, 2048],
+      "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    },
+    {
+      "id": 1,
+      "name": "Blobs",
+      "description": "Stores data on the chain.",
+      "color": "#6060f7a0",
+      "speedCosts": [3, 12, 48, 96, 192, 384, 768, 1536, 3072, 6144],
+      "feeCosts": [3, 12, 48, 96, 192, 384, 768, 1536, 3072, 6144],
+      "value": [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]
+    },
+    {
+      "id": 2,
+      "name": "Inscription",
+      "description": "Etches images to the chain.",
+      "color": "#f760f7a0",
+      "speedCosts": [5, 20, 80, 160, 320, 640, 1280, 2560, 5120, 10240],
+      "feeCosts": [5, 20, 80, 160, 320, 640, 1280, 2560, 5120, 10240],
+      "value": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    },
+    {
+      "id": 3,
+      "name": "Dapp",
+      "description": "Decentralized applications.",
+      "color": "#f76060a0",
+      "speedCosts": [],
+      "feeCosts": [20],
+      "value": [0]
+    },
+    {
+      "id": 4,
+      "name": "L2",
+      "description": "Unlock Layer 2 scaling!",
+      "color": "#f760f7a0",
+      "speedCosts": [0],
+      "feeCosts": [100],
+      "value": [0]
+    }
+  ],
+  "L2": [
+    {
+      "id": 0,
+      "name": "Transfer",
+      "description": "Send funds between wallets.",
+      "color": "#60f760a0",
+      "speedCosts": [100, 400, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800],
+      "feeCosts": [100, 400, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800],
+      "value": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+    }, {
+      "id": 1,
+      "name": "Bridge",
+      "description": "Transfer assets between chains.",
+      "color": "#60f7f7a0",
+      "speedCosts": [200, 800, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600],
+      "feeCosts": [200, 800, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600],
+      "value": [4, 8, 12, 16, 20, 24, 28, 32, 36, 40]
+    }, {
+      "id": 2,
+      "name": "NFTs",
+      "description": "Mint images to the chain.",
+      "color": "#f760f7a0",
+      "speedCosts": [300, 1200, 4800, 9600, 19200, 38400, 76800, 153600, 307200, 614400],
+      "feeCosts": [300, 1200, 4800, 9600, 19200, 38400, 76800, 153600, 307200, 614400],
+      "value": [6, 12, 18, 24, 30, 36, 42, 48, 54, 60]
+    }, {
+      "id": 3,
+      "name": "Dapp",
+      "description": "Decentralized applications.",
+      "color": "#f76060a0",
+      "speedCosts": [],
+      "feeCosts": [1000],
+      "value": [0]
+    }, {
+      "id": 4,
+      "name": "AppChain",
+      "description": "Fractal scale!",
+      "color": "#f76060a0",
+      "speedCosts": [500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000],
+      "feeCosts": [500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000],
+      "value": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    }
+  ]
 }
