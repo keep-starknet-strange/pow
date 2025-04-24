@@ -12,6 +12,7 @@ import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 import upgradesJson from "../configs/upgrades.json";
 import automationJson from "../configs/automation.json";
+import prestigeJson from "../configs/prestige.json";
 import moneyImg from "../../assets/images/money.png";
 import overclockImg from "../../assets/images/overclock.png";
 import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
@@ -21,13 +22,11 @@ import stakingImg from "../../assets/images/upgrades/staking.png";
 export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
-  const { gameState, updateBalance, upgradableGameState } = useGameState();
-  const { upgrades, addUpgrade, automation, upgradeAutomation,
+  const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
+  const { upgrades, addUpgrade, automation, upgradeAutomation, doPrestige,
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
           } = useUpgrades();
-  const [prestigeLevel, setPrestigeLevel]= useState(0);
-  const prestigeCosts = [1000, 2000, 3000];
 
   const storeTypes = [
     "L1",
@@ -499,7 +498,6 @@ export const StorePage: React.FC = () => {
         <View className="w-full h-[2px] bg-[#e7e7e740] my-2" />
         {storeType === "L1" ? (
           <>
-            {/* Layer 2 Scaling */}
             <UpgradeCard
               imageSrc={l2BatchImg}
               title="Layer 2 Scaling"
@@ -508,16 +506,18 @@ export const StorePage: React.FC = () => {
               cost={transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
               disabled={gameState.balance < transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
               onPress={() => {
-                const cost = transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]
-                const item = transactionsJson.L1[4]
-                const lvl = l1TransactionTypes[item.id].feeLevel
-                if (lvl === item.feeCosts.length || gameState.balance < item.feeCosts[lvl]) return
-                l1TxFeeUpgrade(item.id)
-                updateBalance(gameState.balance - item.feeCosts[lvl])
+                const item = transactionsJson.L1[4];
+                if (l1TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
+                const cost = item.feeCosts[l1TransactionTypes[item.id].feeLevel];
+                if (gameState.balance < cost) return;
+                l1TxFeeUpgrade(item.id);
+                const newBalance = gameState.balance - cost;
+                updateBalance(newBalance);
+
+                unlockL2();
               }}
             />
 
-            {/* Staking */}
             <UpgradeCard
               imageSrc={stakingImg}
               title="Staking"
@@ -531,8 +531,7 @@ export const StorePage: React.FC = () => {
           </>
         ) : (
           <>
-            {/* Prestige */}
-            {prestigeLevel < prestigeCosts.length && (
+            {upgradableGameState.prestige < prestigeJson.length - 1 && (
               <UpgradeCard
                 imageSrc={prestigeImg}
                 title="Prestige!"
@@ -541,12 +540,11 @@ export const StorePage: React.FC = () => {
                 cost={prestigeCosts[prestigeLevel]}
                 disabled={gameState.balance < prestigeCosts[prestigeLevel]}
                 onPress={() => {
-                  if (gameState.balance < prestigeCosts[prestigeLevel]) {
-                    setInsufficientFunds(true)
-                    return
+                   if (gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost) {
+                    setInsufficientFunds(true);
+                    return;
                   }
-                  updateBalance(gameState.balance - prestigeCosts[prestigeLevel])
-                  setPrestigeLevel(prestigeLevel + 1)
+                  doPrestige();
                 }}
               />
             )}

@@ -1,12 +1,16 @@
 import { View, Text, Image } from "react-native";
 import { Block } from "../types/Block";
+import messagesJson from "../configs/messages.json";
+import { useGameState } from "../context/GameState";
 
 export type BlockViewProps = {
   block: Block;
   showOverlay?: boolean;
+  incompleted?: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
+  const { upgradableGameState } = useGameState();
   const txWidth: number = 100 / Math.sqrt(props.block.maxSize);
   // TODO: Overlay #s to constant size/length/digits
   return (
@@ -25,10 +29,24 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             </View>
           ))}
         </View>
+        {props.block.id === 0 && (
+        <Text className="absolute top-0 left-0 w-full h-full text-center
+          text-xl text-[#ffffff] font-bold items-center justify-center py-4
+        ">
+          {messagesJson.genesis[upgradableGameState.prestige]}
+        </Text>
+        )}
         {props.showOverlay ? (
-          <View className="absolute top-0 left-0 w-full h-full bg-[#00000080] flex flex-col items-center justify-between">
+          <View
+            className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between"
+            style={{
+              backgroundColor: !props.incompleted ? "#00000080" : "#00000000",
+            }}
+          >
             <View/>
-            <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">#{props.block.id}</Text>
+            <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">
+              {!props.incompleted ? `#${props.block.id}` : ``}
+            </Text>
             <View className="flex flex-col items-end justify-between w-[95%]">
               <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲₿{props.block.reward.toFixed(0)}</Text>
               <Text className="text-[#e9e9e9f0] text-xl font-bold">💰₿{props.block.fees.toFixed(0)}</Text>

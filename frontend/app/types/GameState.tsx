@@ -28,6 +28,7 @@ export type UpgradableGameState = {
   dapp: boolean;
   inscriptionMetaprotocol: boolean;
   staking: boolean;
+  prestige: number;
 }
 
 const baseDifficulty = 8;
@@ -38,6 +39,7 @@ const baseSequencerSpeed = 0;
 const baseMinerSpeed = 0;
 const baseProverSpeed = 0;
 const baseDASpeed = 0;
+const basePrestige = 0;
 export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   difficulty: baseDifficulty,
   blockSize: baseBlockWidth * baseBlockWidth,
@@ -53,6 +55,7 @@ export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   dapp: false,
   inscriptionMetaprotocol: false,
   staking: false,
+  prestige: basePrestige,
 });
 
 export type TransactionTypeState = {

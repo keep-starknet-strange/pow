@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import { SvgXml } from "react-native-svg";
+import prestigeJson from "../configs/prestige.json";
+
+import * as prestigeImages from "../configs/prestige";
+export const getPrestigeIcon = (prestige: number) => {
+  const images = Object.values(prestigeImages);
+  return images[prestige] || images[0];
+}
 
 export type LeaderboardPageProps = {
   closeTab: () => void;
@@ -10,63 +18,96 @@ export const LeaderboardPage: React.FC<LeaderboardPageProps> = (props) => {
     {
       id: 1,
       name: "Satoshi",
-      prestige: 4,
-      score: 1000,
+      prestige: 10,
+      balance: 1_245_000_000,
     },
     {
       id: 2,
       name: "Mr Moneybags",
-      prestige: 3,
-      score: 800,
+      prestige: 6,
+      balance: 4_290_000,
     },
     {
       id: 3,
       name: "Builder",
-      prestige: 2,
-      score: 600,
+      prestige: 3,
+      balance: 62_000,
     },
     {
       id: 4,
       name: "Hello World",
       prestige: 1,
-      score: 400,
+      balance: 1_000,
     },
     {
       id: 5,
       name: "Test User",
       prestige: 0,
-      score: 200,
+      balance: 200,
     }
   ];
   const [leaderboard, setLeaderboard] = useState(leaderboardMock);
 
-  const prestigeIcons = [
-    "😢",  // 0
-    "🙂",  // 1
-    "😎",  // 2
-    "🤩",  // 3
-    "🥳"   // 4
-  ];
+  const shortenBalance = (balance: number) => {
+    if (balance < 1000) return `₿${balance.toString()}`;
+    const suffixes = ["K", "M", "B", "T"];
+    let suffixIndex = 0;
+    let shortenedScore = balance;
+    while (shortenedScore >= 1000 && suffixIndex < suffixes.length) {
+      shortenedScore /= 1000;
+      suffixIndex++;
+    }
+    return `₿${shortenedScore.toFixed(1)}${suffixes[suffixIndex - 1]}`;
+  }
+
+  const [userIconsSvgMap, setUserIconsSvgMap] = useState<{ [key: string]: string }>({});
+  useEffect(() => {
+    const fetchUserIcons = async () => {
+      const icons: { [key: string]: any } = {};
+      for (const user of leaderboard) {
+        const iconUri = `https://noun-api.com/beta/pfp?name=${user.name}`;
+        const response = await fetch(iconUri);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          icons[user.name] = atob(base64data.split(',')[1]);
+        };
+      }
+      setUserIconsSvgMap(icons);
+    };
+    fetchUserIcons();
+  }, []);
+
   return (
     <View className="flex-1">
      <View className="flex flex-row justify-end items-center p-2">
        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🏆Rankings</Text>
      </View>
      <View className="flex flex-row justify-between items-center p-4 bg-[#ffffff20]">
-       <Text className="text-lg font-bold text-white">Leaderboard</Text>
-       <View className="flex flex-row items-center justify-between w-[35%]">
-         <Text className="text-lg font-bold text-white">Prestige</Text>
-         <Text className="text-lg font-bold text-white">Score</Text>
-       </View>
+       <Text className="text-lg font-bold text-white flex-1">Leaderboard</Text>
+       <Text className="text-lg font-bold text-white w-[6rem] text-center">Prestige</Text>
+       <Text className="text-lg font-bold text-white w-[6rem] text-right">Score</Text>
      </View>
      <ScrollView className="flex-1">
        {leaderboard.map((user, index) => (
          <View key={user.id} className={`flex flex-row justify-between items-center p-4 ${index % 2 === 0 ? 'bg-[#ffffff20]' : 'bg-[#ffffff10]'}`}>
-           <Text className="text-lg font-bold text-white">{user.name}</Text>
-           <View className="flex flex-row items-center justify-between w-[35%]">
-             <Text className="text-white">{prestigeIcons[user.prestige]} {user.prestige}</Text>
-             <Text className="text-white">{user.score}</Text>
+           <View className="flex flex-row items-center flex-1">
+             {userIconsSvgMap[user.name] && (
+               <View className="w-[3rem] aspect-square mr-2 rounded-full overflow-hidden">
+                 <SvgXml xml={userIconsSvgMap[user.name]} width="100%" height="100%" />
+               </View>
+             )}
+             <Text className="text-xl font-bold text-white">{user.name}</Text>
            </View>
+           <View className="flex flex-row items-center justify-center w-[6rem]">
+             <Image
+               source={getPrestigeIcon(user.prestige)}
+               className="w-[3rem] aspect-square rounded-full"
+              />
+            </View>
+           <Text className="text-lg text-white w-[6rem] text-right font-bold">{shortenBalance(user.balance)}</Text>
          </View>
        ))}
      </ScrollView>
