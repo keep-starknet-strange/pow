@@ -537,8 +537,8 @@ export const StorePage: React.FC = () => {
                 title="Prestige!"
                 description="Complete the game and reset with Prestige upgrades!"
                 unlocked={false}
-                cost={prestigeCosts[prestigeLevel]}
-                disabled={gameState.balance < prestigeCosts[prestigeLevel]}
+                cost={prestigeJson[upgradableGameState.prestige + 1].cost}
+                disabled={gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost}
                 onPress={() => {
                    if (gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost) {
                     setInsufficientFunds(true);
