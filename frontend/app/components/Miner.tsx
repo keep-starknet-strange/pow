@@ -8,11 +8,7 @@ import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 
-type MinerProps = {
-  _id: number;
-};
-
-export const Miner: React.FC<MinerProps> = (props) => {
+export const Miner: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);

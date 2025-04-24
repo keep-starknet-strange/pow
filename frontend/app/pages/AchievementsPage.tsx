@@ -3,7 +3,7 @@ import { useAchievement } from "../context/Achievements";
 import { Achievement } from "../types/Achievement";
 
 export type AchievementsPageProps = {
-  closeHeaderTab: () => void;
+  closeTab: () => void;
 };
 
 export const AchievementsPage: React.FC<AchievementsPageProps> = (props) => {

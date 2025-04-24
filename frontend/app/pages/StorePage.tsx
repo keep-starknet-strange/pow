@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Modal, Image } from "react-native";
 
 import { useGameState } from "../context/GameState";
@@ -15,17 +15,20 @@ import moneyImg from "../../assets/images/money.png";
 import overclockImg from "../../assets/images/overclock.png";
 import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
 import prestigeImg from "../../assets/images/transaction/nfts/7.png";
+import stakingImg from "../../assets/images/upgrades/staking.png";
+
+const STAKING_UNLOCK_COST = 750;
 
 export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
-  const { gameState, updateBalance } = useGameState();
+  const { gameState, updateBalance, upgradableGameState } = useGameState();
   const { upgrades, addUpgrade, automation, upgradeAutomation,
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
           } = useUpgrades();
-  const [prestigeLevel, setPrestigeLevel] = useState(0);
-  const [prestigeCosts, setPrestigeCosts] = useState([1000, 2000, 3000]);
+  const [prestigeLevel, setPrestigeLevel]= useState(0);
+  const prestigeCosts = [1000, 2000, 3000];
 
   const storeTypes = [
     "L1",
@@ -61,7 +64,16 @@ export const StorePage: React.FC = () => {
       setActiveAutomationIcons(getAutomationIcons(2));
     }
   }, [storeType]);
-
+  
+  const unlockStaking = () => {
+      if (upgradableGameState.staking) return;
+      if (gameState.balance < STAKING_UNLOCK_COST) {
+        setInsufficientFunds(true);
+        return;
+      }
+      updateBalance(gameState.balance - STAKING_UNLOCK_COST);
+      addUpgrade(2, 0);
+    };
   return (
     <View className="flex-1">
      <View className="flex flex-row justify-end items-center p-2">
@@ -487,6 +499,7 @@ export const StorePage: React.FC = () => {
         </View>
         <View className="w-full h-[2px] bg-[#e7e7e740] my-2" />
         {storeType === "L1" ? (
+          <>
           <View className="flex flex-row justify-between items-center p-2 mx-2
                            bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
           >
@@ -532,6 +545,38 @@ export const StorePage: React.FC = () => {
               </View>
             )}
           </View>
+                   
+          <View className="flex flex-row justify-between items-center p-2 mx-2
+                          bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] mt-2 relative">
+            <Image source={stakingImg} className="w-[3.6rem] h-[3.6rem] rounded-full" />
+          
+            <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
+              <Text className="text-[#e7e7e7] text-xl font-bold">Staking</Text>
+              <Text className="text-[#e7e7e7] text-md">Lock coins to earn yield on Chain 2.</Text>
+            </View>
+          
+            {upgradableGameState.staking ? (
+              <View
+                className="flex flex-1 justify-center items-center bg-[#e7e760e0] rounded-lg
+                          p-2 border-2 border-[#e7e7e740] mr-1"
+                style={{ backgroundColor: "#9ef7a0d0" }}
+              >
+                <Text className="text-[#171717] text-md font-bold">Unlocked!</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={unlockStaking}
+                className="flex flex-1 justify-center items-center bg-[#e7e760e0] rounded-lg
+                          p-2 border-2 border-[#e7e7e740] mr-1"
+                style={{ opacity: gameState.balance < STAKING_UNLOCK_COST ? 0.5 : 1 }}
+              >
+                <Text className="text-[#171717] text-md font-bold">
+                  Unlock – ₿{STAKING_UNLOCK_COST}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </>
         ) : (
           <>
           {prestigeLevel < prestigeCosts.length && (

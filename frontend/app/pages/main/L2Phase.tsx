@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Image, TouchableOpacity, Animated, useAnimatedValue } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, View, Image } from "react-native";
 import { Mutex } from "async-mutex";
 
 import { BlockView } from "../../components/BlockView";
@@ -14,18 +14,15 @@ import transactions from "../../configs/transactions.json";
 import upgradesJson from "../../configs/upgrades.json";
 import dapps from "../../configs/dapps.json";
 import { useUpgrades } from "../../context/Upgrades";
-import { createTx, getTxIcon, getRandomNFTImage, getRandomInscriptionImage } from "../../utils/transactions";
 import lockImg from "../../../assets/images/lock.png";
 
+const L1_BASE = transactions.L1.slice(0, 3);
+const L2_BASE = transactions.L2.slice(0, 3);
 
-export type L2PhaseProps = {
-  _id: string;
-};
-
-export const L2Phase: React.FC<L2PhaseProps> = (props) => {
-  const { gameState, updateBalance, addTxToBlock, addL2TxToBlock } = useGameState();
-  const { upgrades, l1TransactionTypes, l1TxFeeUpgrade, l2TransactionTypes, l2TxFeeUpgrade, l1DappTypes, l2DappTypes } = useUpgrades();
-  const [mutex] = useState(new Mutex());
+export const L2Phase: React.FC = (props) => {
+  const { gameState, addTxToBlock, addL2TxToBlock } = useGameState();
+  const { upgrades, l1TransactionTypes, l2TransactionTypes, l1DappTypes, l2DappTypes } = useUpgrades();
+  const mutex = useRef(new Mutex()).current;
   const addTransaction = async (chainId: number, tx: any) => {
     const release = await mutex.acquire();
     try {
@@ -57,10 +54,10 @@ export const L2Phase: React.FC<L2PhaseProps> = (props) => {
       setL2MevBoost(1);
     }
   }, [upgrades]);
-
-  const [l1TransactionsBase, setL1TransactionsBase] = useState(transactions.L1.slice(0, 3));
+  
+  const l1TransactionsBase = L1_BASE;
+  const l2TransactionsBase = L2_BASE;
   const [l1DappsOpen, setL1DappsOpen] = useState(false);
-  const [l2TransactionsBase, setL2TransactionsBase] = useState(transactions.L2.slice(0, 3));
   const [l2DappsOpen, setL2DappsOpen] = useState(false);
 
   return (
