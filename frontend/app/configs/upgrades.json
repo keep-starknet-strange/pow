@@ -91,14 +91,6 @@
       "description": "Unlock staking for validators",
       "costs": [10],
       "value": [1]
-    },
-    {
-      "id": 1,
-      "name": "Slashing Protection",
-      "color": "#f760f7a0",
-      "description": "Increase the slashing protection for validators",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80],
-      "value": [1.1, 1.2, 1.4, 1.8, 2.5, 3.5, 5]
     }
   ]
 }
