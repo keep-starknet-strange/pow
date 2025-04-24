@@ -18,8 +18,6 @@ import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
 import prestigeImg from "../../assets/images/transaction/nfts/7.png";
 import stakingImg from "../../assets/images/upgrades/staking.png";
 
-const STAKING_UNLOCK_COST = 750;
-
 export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
@@ -44,6 +42,7 @@ export const StorePage: React.FC = () => {
   const [activeUpgradeIcons, setActiveUpgradeIcons] = useState(getUpgradeIcons(1));
   const [storeAutomation, setStoreAutomation] = useState(automationJson.L1);
   const [activeAutomationIcons, setActiveAutomationIcons] = useState(getAutomationIcons(1));
+  const staking = upgradesJson.staking;
   useEffect(() => {
     if (storeType === "L1") {
       setChainId(0);
@@ -66,16 +65,6 @@ export const StorePage: React.FC = () => {
     }
   }, [storeType]);
 
-  const unlockStaking = () => {
-      if (upgradableGameState.staking) return;
-      if (gameState.balance < STAKING_UNLOCK_COST) {
-        setInsufficientFunds(true);
-        return;
-      }
-      updateBalance(gameState.balance - STAKING_UNLOCK_COST);
-      addUpgrade(2, 0);
-    };
-
   const purchase = (cost: number, onSuccess: () => void) => {
     if (gameState.balance < cost) {
       setInsufficientFunds(true);
@@ -84,7 +73,7 @@ export const StorePage: React.FC = () => {
     updateBalance(gameState.balance - cost);
     onSuccess();
   };
-  
+
   return (
     <View className="flex-1">
      <View className="flex flex-row justify-end items-center p-2">
@@ -124,8 +113,7 @@ export const StorePage: React.FC = () => {
              </View>
              <TouchableOpacity
                className="flex justify-center items-center bg-[#e7e7e730] rounded-lg p-2 relative
-                          border-2 border-[#e7e7e740] mr-1
-               "
+                          border-2 border-[#e7e7e740] mr-1"
                onPress={() => {
                  if (storeType === "L2") {
                    if (l2TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
@@ -520,6 +508,7 @@ export const StorePage: React.FC = () => {
               cost={transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
               disabled={gameState.balance < transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
               onPress={() => {
+                const cost = transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]
                 const item = transactionsJson.L1[4]
                 const lvl = l1TransactionTypes[item.id].feeLevel
                 if (lvl === item.feeCosts.length || gameState.balance < item.feeCosts[lvl]) return
@@ -534,10 +523,10 @@ export const StorePage: React.FC = () => {
               title="Staking"
               description="Lock coins to earn yield on Chain 2."
               unlocked={upgradableGameState.staking}
-              cost={STAKING_UNLOCK_COST}
-              disabled={gameState.balance < STAKING_UNLOCK_COST}
+              cost={staking[0].costs[0]}
+              disabled={gameState.balance < staking[0].costs[0]}
               unlockedBgColor="#9ef7a0d0"
-              onPress={() => purchase(STAKING_UNLOCK_COST,  () => addUpgrade(2, 0))}
+              onPress={() => purchase(staking[0].costs[0],  () => addUpgrade(2, 0))}
             />
           </>
         ) : (

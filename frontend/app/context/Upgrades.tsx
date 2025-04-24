@@ -54,10 +54,19 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     for (const chainId in upgradesJson) {
       let chainIdInt: number;
       let upgradeJsonChain;
-      if (chainId === "L1")           { chainIdInt = 0;   upgradeJsonChain = upgradesJson.L1; }
-      else if (chainId === "L2")      { chainIdInt = 1;   upgradeJsonChain = upgradesJson.L2; }
-      else if (chainId === "staking") { chainIdInt = 2;   upgradeJsonChain = upgradesJson.staking; }
-      else continue;
+      if (chainId === "L1") {
+        chainIdInt = 0;
+        upgradeJsonChain = upgradesJson.L1;
+      } else if (chainId === "L2") {
+        chainIdInt = 1;
+        upgradeJsonChain = upgradesJson.L2;
+      } else if (chainId === "staking") {
+        chainIdInt = 2;
+        upgradeJsonChain = upgradesJson.staking;
+      } else {
+        console.warn(`Unknown chainId: ${chainId}`);
+        continue;
+      }
       initUpgrades[chainIdInt] = {};
       for (const upgradeId in upgradeJsonChain) {
         const upgrade = upgradeJsonChain[upgradeId];
