@@ -10,7 +10,7 @@ export const getPrestigeIcon = (prestige: number) => {
 }
 
 export type LeaderboardPageProps = {
-  closeHeaderTab: () => void;
+  closeTab: () => void;
 };
 
 export const LeaderboardPage: React.FC<LeaderboardPageProps> = (props) => {

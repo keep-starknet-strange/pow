@@ -1,23 +1,26 @@
 [
   {
     "chainId": 0,
-    "name": "Main Chain",
+    "name": "Main Chain",
     "baseApy": 6,          
     "yieldMultiplier": 25,  
-    "icon": "🥇"
+    "icon": "🥩",
+    "unlockCosts": [700]
   },
   {
     "chainId": 1,
-    "name": "Fox Chain",
+    "name": "Fox Chain",
     "baseApy": 9,
     "yieldMultiplier": 30,
-    "icon": "🦊"
+    "icon": "🦊",
+    "unlockCosts": [10]
   },
   {
     "chainId": 2,
-    "name": "Phoenix Chain",
+    "name": "Phoenix Chain",
     "baseApy": 12,
     "yieldMultiplier": 40,
-    "icon": "🔥"
+    "icon": "🔥",
+    "unlockCosts": [100]
   }
 ]

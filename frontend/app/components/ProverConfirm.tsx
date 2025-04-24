@@ -11,11 +11,7 @@ import { createTx } from "../utils/transactions";
 
 import l2Batch from "../../assets/images/transaction/l2Batch.png";
 
-type L2ConfirmProps = {
-  _id: number;
-};
-
-export const ProverConfirm: React.FC<L2ConfirmProps> = (props) => {
+export const ProverConfirm: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Animated, useAnimatedValue, Text, View, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, View, Image } from "react-native";
 
 import { BlockView } from "../../components/BlockView";
 import { Miner } from "../../components/Miner";
@@ -14,15 +14,13 @@ import dapps from "../../configs/dapps.json";
 import { Mutex } from 'async-mutex';
 import lockImg from "../../../assets/images/lock.png";
 
-export type L1PhaseProps = {
-  _id: number;
-};
+const L1_BASE = transactions.L1.slice(0, 3);
 
-export const L1Phase: React.FC<L1PhaseProps> = (props) => {
-  const { gameState, addTxToBlock, addL2TxToBlock, upgradableGameState } = useGameState();
+export const L1Phase: React.FC = (props) => {
+  const { gameState, addTxToBlock, addL2TxToBlock, upgradableGameState  } = useGameState();
   const { l1TransactionTypes, l1TxFeeUpgrade, l1DappTypes, upgrades } = useUpgrades();
 
-  const [mutex] = useState(new Mutex());
+  const mutex = useRef(new Mutex()).current;
   const addTransaction = async (chainId: number, tx: any) => {
     const release = await mutex.acquire();
     try {
@@ -51,8 +49,7 @@ export const L1Phase: React.FC<L1PhaseProps> = (props) => {
     setMevBoost(newMevBoost);
   }, [upgrades]);
 
-  const [l1TransactionsBase, setL1TransactionsBase] = useState(transactions.L1.slice(0, 3));
-
+  const l1TransactionsBase = L1_BASE;
   const [dappsOpen, setDappsOpen] = useState(false);
   return (
     <View className="flex-1 relative flex flex-col items-center mt-10">

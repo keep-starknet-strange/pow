@@ -11,11 +11,7 @@ import { createTx } from "../utils/transactions";
 
 import L2Blob from "../../assets/images/transaction/l2Blob.png";
 
-type DAConfirmProps = {
-  _id: string;
-};
-
-export const DAConfirm: React.FC<DAConfirmProps> = (props) => {
+export const DAConfirm: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);

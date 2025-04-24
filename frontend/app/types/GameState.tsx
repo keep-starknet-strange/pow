@@ -27,6 +27,7 @@ export type UpgradableGameState = {
   l2Blobs: boolean;
   dapp: boolean;
   inscriptionMetaprotocol: boolean;
+  staking: boolean;
   prestige: number;
 }
 
@@ -53,6 +54,7 @@ export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   l2Blobs: false,
   dapp: false,
   inscriptionMetaprotocol: false,
+  staking: false,
   prestige: basePrestige,
 });
 
