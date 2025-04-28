@@ -48,3 +48,75 @@ export const playBlockMined = async (isSoundOn: boolean) => {
   });
   await sound.playAsync();
 }
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const sequenceClickedSource = require("../../../assets/sounds/sequence-clicked.wav");
+export const playSequenceClicked = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(sequenceClickedSource, {
+    volume: 0.7,
+    rate: 1.2
+  });
+  await sound.playAsync();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const sequenceDoneSource = require("../../../assets/sounds/sequence-done.wav");
+export const playSequenceDone = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(sequenceDoneSource, {
+    volume: 0.7,
+    rate: 1.2
+  });
+  await sound.playAsync();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const proveClickedSource = require("../../../assets/sounds/prove-clicked.wav");
+export const playProveClicked = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(proveClickedSource, {
+    volume: 0.4,
+    rate: 0.8
+  });
+  await sound.playAsync();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const proveDoneSource = require("../../../assets/sounds/prove-done.wav");
+export const playProveDone = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(proveDoneSource, {
+    volume: 0.5,
+    rate: 1
+  });
+  await sound.playAsync();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const daClickedSource = require("../../../assets/sounds/da-clicked.wav");
+export const playDaClicked = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(daClickedSource, {
+    volume: 0.5,
+    rate: 1.2
+  });
+  await sound.playAsync();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const daDoneSource = require("../../../assets/sounds/da-done.wav");
+export const playDaDone = async (isSoundOn: boolean) => {
+  if (!isSoundOn) return;
+
+  const { sound } = await Audio.Sound.createAsync(daDoneSource, {
+    volume: 0.5,
+    rate: 1.2
+  });
+  await sound.playAsync();
+}

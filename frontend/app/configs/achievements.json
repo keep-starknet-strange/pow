@@ -109,90 +109,66 @@
   },
   {
     "id": 18,
-    "name": "Get an ASIC Miner",
-    "image": "https://api.art-peace.net/stencils/stencil-004c956171643d0f968c3be3ae8da8b8b406979f06205bccee1f4ec5a8fcf70c.png",
-    "updateOn": "UpgradePurchased"
-  },
-  {
-    "id": 19,
     "name": "Get a Quantum Miner",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 20,
-    "name": "Unlock Cairo-native Sequencer",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
-  },
-  {
-    "id": 21,
+    "id": 19,
     "name": "Decentralize the Sequencer",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 22,
-    "name": "Achieve STARK Scaling",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
-  },
-  {
-    "id": 23,
+    "id": 20,
     "name": "Achieve STWO Scaling",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 24,
-    "name": "Save with DA Blobs",
+    "id": 21,
+    "name": "Scale with DA Volition",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 25,
-    "name": "Save with DA Volition",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
-  },
-  {
-    "id": 26,
+    "id": 22,
     "name": "Proof of Stake!",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 27,
+    "id": 23,
     "name": "Scale with Layer 2!",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 28,
+    "id": 24,
     "name": "Prestige!",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 29,
+    "id": 25,
     "name": "Reach Max Prestige",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "UpgradePurchased"
   },
   {
-    "id": 30,
+    "id": 26,
     "name": "Get ₿100 in 1 Transaction",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "TxAdded"
   },
   {
-    "id": 31,
+    "id": 27,
     "name": "Get ₿1K in 1 Transaction",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "TxAdded"
   },
   {
-    "id": 32,
+    "id": 28,
     "name": "Mine a block 1st try",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "BlockFinalized"

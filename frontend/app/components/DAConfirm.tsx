@@ -1,15 +1,29 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Image, View, Text, TouchableOpacity } from "react-native";
 
-import { playMineClicked, playBlockMined } from "../components/utils/sounds";
+import { playDaClicked, playDaDone } from "../components/utils/sounds";
 
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { createTx } from "../utils/transactions";
+import automationJson from "../configs/automation.json";
 
 import L2Blob from "../../assets/images/transaction/l2Blob.png";
+
+import * as daImages from "../configs/da";
+export const getDaIcon = (daId: number) => {
+  const images = Object.values(daImages);
+  return images[daId] || images[0];
+}
+
+import * as daAnimation from "../configs/storing";
+export const getDaAnimation = (progress: number) => {
+  const animations = Object.values(daAnimation);
+  const animationIndex = Math.floor(progress * animations.length);
+  return animations[animationIndex] || animations[0];
+}
 
 export const DAConfirm: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
@@ -26,7 +40,7 @@ export const DAConfirm: React.FC = (props) => {
     if (!gameState.l2) {
       return;
     }
-    playMineClicked(isSoundOn);
+    playDaClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
     // setNonce(randomNonce);
     // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
@@ -49,38 +63,38 @@ export const DAConfirm: React.FC = (props) => {
       const newTx = createTx(1, 1, txFee, txIcon);
       finalizeL2DA();
       addTxToBlock(newTx);
-      playBlockMined(isSoundOn);
+      playDaDone(isSoundOn);
     }
   };
 
   const [shouldAutoConfirm, setShouldAutoConfirm] = useState(false);
   useEffect(() => {
-    const newShouldAutoConfirm = upgradableGameState.daSpeed > 0 && mineCounter < (gameState.l2?.da.hp || 0);
+    const newShouldAutoConfirm = upgradableGameState.daLevel > 0 && mineCounter < (gameState.l2?.da.hp || 0);
     setShouldAutoConfirm(newShouldAutoConfirm);
-  }, [upgradableGameState.daSpeed, mineCounter, gameState.l2?.da.hp]);
+  }, [upgradableGameState.daLevel, mineCounter, gameState.l2?.da.hp]);
 
   useAutoClicker(
     shouldAutoConfirm,
-    1000 / upgradableGameState.daSpeed,
+    1000 / (automationJson.L2[2].levels[upgradableGameState.daLevel]?.speed || 1),
     tryConfirmBlock
   );
 
   return (
-    <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
-      {gameState.l2 && (
-        <>
-        <View
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-          style={{ width: `${Math.floor(mineCounter / gameState.l2.da.hp * 100)}%`, height: `${Math.floor(mineCounter / gameState.l2.da.hp * 100)}%` }}
+    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
+      <TouchableOpacity
+        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
+        onPress={tryConfirmBlock}
+      >
+        <Image
+          source={getDaIcon(upgradableGameState.daLevel)}
+          className="w-28 h-28"
         />
-        <TouchableOpacity
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#a7a7a7c0] rounded-full flex items-center justify-center
-                    border-2 border-[#c7c7f780]"
-          onPress={tryConfirmBlock}
-        >
-          <Text className="text-[#171717] text-6xl m-4 mx-10">🆗</Text>
-        </TouchableOpacity>
-        </>
+      </TouchableOpacity>
+      {mineCounter !== 0 && (
+        <Image
+          source={getDaAnimation(mineCounter / (gameState.l2?.da.hp || 1))}
+          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full pointer-events-none"
+        />
       )}
     </View>
   );

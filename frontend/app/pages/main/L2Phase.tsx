@@ -64,13 +64,14 @@ export const L2Phase: React.FC = (props) => {
 
   return (
     <View className="flex-1 relative flex flex-col items-center mt-10">
+      <View className="pb-[1.5rem]">
       <View className="flex flex-row px-2 mt-6 w-full justify-end">
         {gameState.chains[0].pastBlocks && gameState.chains[0].pastBlocks.length > 0 && (
           <View className="flex flex-row w-full flex-row-reverse">
             {gameState.chains[0].pastBlocks.map((block, index) => (
               <View className="flex flex-row items-center" key={index}>
                 <View className="h-[8rem] w-[8rem]">
-                  <BlockView {...props} block={block} showOverlay={true} />
+                  <BlockView {...props} block={block} showOverlay={true} completed={true} />
                 </View>
                 <View className="flex flex-col items-center">
                   <View className="w-2 h-[4px] mx-[2px] bg-[#f9f9f980] rounded-lg" />
@@ -81,7 +82,7 @@ export const L2Phase: React.FC = (props) => {
         )}
 
         <View className="h-[8rem]">
-          <BlockView {...props} block={gameState.chains[0].currentBlock} showOverlay={true} incompleted={true} />
+          <BlockView {...props} block={gameState.chains[0].currentBlock} showOverlay={true} completed={false} />
           {gameState.chains[0].currentBlock.transactions.length >= gameState.chains[0].currentBlock.maxSize && (
             <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
               <Miner />
@@ -90,31 +91,28 @@ export const L2Phase: React.FC = (props) => {
         </View>
       </View>
 
-      <View className="flex flex-row justify-center w-full gap-2 mt-[1rem]">
+      <View className="flex flex-row justify-center w-full gap-1 mt-[1rem]">
         {l1TransactionsBase.map((txType, index) => (
           <View
             className="flex flex-col items-center justify-center relative"
             key={index}
-            style={{
-              display: l1DappsOpen ? "none" : "flex",
-            }}
           >
-            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} />
+            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} size={0.11} />
             {l1TransactionTypes[txType.id].feeLevel === 0 && (
               <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
                   source={lockImg}
-                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                  className="h-[1.6rem] aspect-square rounded-lg mb-4"
                 />
               </View>
             )}
             {(txType.value[l1TransactionTypes[txType.id].feeLevel - 1] !== 0 || l1TransactionTypes[txType.id].feeLevel === 0) && (
             <Text
-              className="text-[#60f760a0] text-center font-bold text-[1rem]
+              className="text-[#60f760a0] text-center font-bold text-[0.6rem]
                          bg-[#292929d0] rounded-lg px-2 py-1 border-2
-                         absolute bottom-[-1rem]
+                         absolute bottom-[-1rem] w-[3rem]
                          "
               style={{
                 color: l1TransactionTypes[txType.id].feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
@@ -123,64 +121,33 @@ export const L2Phase: React.FC = (props) => {
             >
               {l1TransactionTypes[txType.id].feeLevel === 0 ? "" : "+"}
               ₿
-              {l1TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id].feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler}
+              {(l1TransactionTypes[txType.id].feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id].feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler).toFixed(0)}
             </Text>
             )}
           </View>
         ))}
-        <View className="flex flex-col items-center justify-center relative">
-          <DappsButton chain={"L1"} txType={transactions.L1[3]} toggleOpen={() => setL1DappsOpen(!l1DappsOpen)} />
-          {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 && (
-            <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
-              pointer-events-none
-              top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
-              <Image
-                source={lockImg}
-                className="h-[3rem] aspect-square rounded-lg mb-4"
-              />
-            </View>
-          )}
-          {(transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] !== 0 || l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0) && (
-          <Text
-            className="text-[#60f760a0] text-center font-bold text-[1rem]
-                       bg-[#292929d0] rounded-lg px-2 py-1 border-2
-                       absolute bottom-[-1rem]
-                       "
-            style={{
-              color: l1TransactionTypes[transactions.L1[3].id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
-              borderColor: transactions.L1[3].color
-            }}
-          >
-            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? "" : "+"}
-            ₿
-            {l1TransactionTypes[transactions.L1[3].id]?.feeLevel === 0 ? transactions.L1[3].feeCosts[0] : transactions.L1[3].value[l1TransactionTypes[transactions.L1[3].id]?.feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler}
-          </Text>
-          )}
-        </View>
         {dapps.L1.map((txType, index) => (
           <View
             className="flex flex-col items-center justify-center relative"
             key={index}
-            style={{
-              display: l1DappsOpen ? "flex" : "none"
-            }}
           >
-            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} isDapp={true} />
+            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} isDapp={true} size={0.11} />
             {l1DappTypes[txType.id]?.feeLevel === 0 && (
               <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
                 pointer-events-none
                 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
                 <Image
                   source={lockImg}
-                  className="h-[3rem] aspect-square rounded-lg mb-4"
+                  className="h-[1.6rem] aspect-square rounded-lg mb-4"
                 />
               </View>
             )}
             {(txType.value[l1DappTypes[txType.id]?.feeLevel - 1] !== 0 || l1DappTypes[txType.id]?.feeLevel === 0) && (
             <Text
-              className="text-[#60f760a0] text-center font-bold text-[1rem]
+              className="text-[#60f760a0] text-center font-bold text-[0.6rem]
                          bg-[#292929d0] rounded-lg px-2 py-1 border-2
-                         absolute bottom-[-1rem]
+                         absolute bottom-[-1rem] w-[3rem]
+                         overflow-hidden white-space-nowrap text-ellipsis
                          "
               style={{
                 color: l1DappTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
@@ -189,52 +156,17 @@ export const L2Phase: React.FC = (props) => {
             >
               {l1DappTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
               ₿
-              {l1DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1DappTypes[txType.id]?.feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler}
-            </Text>
-            )}
-          </View>
-        ))}
-        {transactions.L1.slice(4).map((txType, index) => (
-          <View
-            className="flex flex-col items-center justify-center relative"
-            key={index}
-            style={{
-              display: l1DappsOpen ? "none" : "flex"
-            }}
-          >
-            <TxButton chain={"L1"} txType={txType} addTransaction={addTransaction} />
-            {l1TransactionTypes[txType.id]?.feeLevel === 0 && (
-              <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
-                pointer-events-none
-                top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex items-center justify-center">
-                <Image
-                  source={lockImg}
-                  className="h-[3rem] aspect-square rounded-lg mb-4"
-                />
-              </View>
-            )}
-            {(txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] !== 0 || l1TransactionTypes[txType.id]?.feeLevel === 0) && (
-            <Text
-              className="text-[#60f760a0] text-center font-bold text-[1rem]
-                         bg-[#292929d0] rounded-lg px-2 py-1 border-2
-                         absolute bottom-[-1rem]
-                         "
-              style={{
-                color: l1TransactionTypes[txType.id]?.feeLevel !== 0 ? "#60f760a0" : "#f76060a0",
-                borderColor: txType.color
-              }}
-            >
-              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? "" : "+"}
-              ₿
-              {l1TransactionTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1TransactionTypes[txType.id]?.feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler}
+              {(l1DappTypes[txType.id]?.feeLevel === 0 ? txType.feeCosts[0] : txType.value[l1DappTypes[txType.id]?.feeLevel - 1] * l1MevBoost * prestigeJson[upgradableGameState.prestige].scaler).toFixed(0)}
             </Text>
             )}
           </View>
         ))}
       </View>
+      </View>
 
+      <View className="bg-[#49494930] flex-1 pt-[0.5rem]">
       {gameState.l2 && (
-        <View className="flex flex-row justify-center w-full gap-2 mt-[2rem]">
+        <View className="flex flex-row justify-center w-full gap-2">
           <View className="w-[30%] h-[12rem] bg-[#6060f7a0] rounded-lg border-2 border-[#6060f7c0] flex items-center justify-end relative">
             {gameState.l2.da.blocks.map((block, index) => (
               <View className="flex flex-row w-full h-[5%]
@@ -286,7 +218,7 @@ export const L2Phase: React.FC = (props) => {
             {gameState.chains[1].pastBlocks.map((block, index) => (
               <View className="flex flex-row items-center" key={index}>
                 <View className="h-[8rem] w-[8rem]">
-                  <BlockView {...props} block={block} showOverlay={true} />
+                  <BlockView {...props} block={block} showOverlay={true} completed={true} />
                 </View>
                 <View className="flex flex-col items-center">
                   <View className="w-2 h-[4px] mx-[2px] bg-[#f9f9f980] rounded-lg" />
@@ -297,7 +229,7 @@ export const L2Phase: React.FC = (props) => {
         )}
 
         <View className="h-[8rem]">
-          <BlockView {...props} block={gameState.chains[1].currentBlock} showOverlay={true} incompleted={true} />
+          <BlockView {...props} block={gameState.chains[1].currentBlock} showOverlay={true} completed={false} />
           {gameState.chains[1].currentBlock.transactions.length >= gameState.chains[1].currentBlock.maxSize && (
             <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
               <L2Confirm />
@@ -343,7 +275,7 @@ export const L2Phase: React.FC = (props) => {
           </View>
         ))}
         <View className="flex flex-col items-center justify-center relative">
-          <DappsButton chain={"L2"} txType={transactions.L2[3]} toggleOpen={() => setL2DappsOpen(!l2DappsOpen)} />
+          <DappsButton chain={"L2"} txType={transactions.L2[3]} toggleOpen={() => setL2DappsOpen(!l2DappsOpen)} isOpen={l1DappsOpen} />
           {l2TransactionTypes[transactions.L2[3].id]?.feeLevel === 0 && (
             <View className="absolute w-full h-full bg-[#292929d0] rounded-lg border-2 border-[#f9f9f920]
               pointer-events-none
@@ -444,6 +376,7 @@ export const L2Phase: React.FC = (props) => {
       </View>
       </>
       )}
+      </View>
    </View>
   );
 }

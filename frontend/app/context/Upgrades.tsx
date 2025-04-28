@@ -95,7 +95,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const initL1TransactionTypes = [
       {
         "id": 0,
-        "feeLevel": 1,
+        "feeLevel": 0,
         "speedLevel": 0
       },
       {
@@ -117,7 +117,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         "id": 4,
         "feeLevel": 0,
         "speedLevel": 0
-      }
+      },
     ];
     const initL2TransactionTypes = [
       {
@@ -169,7 +169,12 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         "id": 3,
         "feeLevel": 0,
         "speedLevel": 0
-      }
+      },
+      {
+        "id": 4,
+        "feeLevel": 0,
+        "speedLevel": 0
+      },
     ];
     const initL2DappTypes = [
       {
@@ -215,70 +220,95 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return;
     }
     switch (upgrade.name) {
-      case "Transaction Sorting":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          sortTransactions: true
-        }));
-        break;
       case "Block Difficulty":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          difficulty: prev.difficulty - 1
+        setUpgradableGameState((prev) => (
+          chainId === 0 ? {
+            ...prev,
+            l1: {
+              ...prev.l1,
+              difficulty: prev.l1.difficulty + 1
+            }
+          } : {
+            ...prev,
+            l2: {
+              ...prev.l2,
+              difficulty: prev.l2.difficulty + 1
+          }
         }));
         break;
       case "Block Size":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          blockSize: prev.blockSize + 1
-        }));
+        setUpgradableGameState((prev) => (
+          chainId === 0 ? {
+            ...prev,
+            l1: {
+              ...prev.l1,
+              blockWidth: prev.l1.blockWidth + 1
+            }
+          } : {
+            ...prev,
+            l2: {
+              ...prev.l2,
+              blockWidth: prev.l2.blockWidth + 1
+            }
+          }
+        ));
         break;
       case "Block Reward":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          blockReward: prev.blockReward * 2
-        }));
+        setUpgradableGameState((prev) => (
+          chainId === 0 ? {
+            ...prev,
+            l1: {
+              ...prev.l1,
+              blockReward: prev.l1.blockReward + 1
+            }
+          } : {
+            ...prev,
+            l2: {
+              ...prev.l2,
+              blockReward: prev.l2.blockReward + 1
+            }
+          }
+        ));
         break;
       case "MEV Boost":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          mevBoost: prev.mevScaling + 1
-        }));
+        setUpgradableGameState((prev) => (
+          chainId === 0 ? {
+            ...prev,
+            l1: {
+              ...prev.l1,
+              mevScaling: prev.l1.mevScaling + 1
+            }
+          } : {
+            ...prev,
+            l2: {
+              ...prev.l2,
+              mevScaling: prev.l2.mevScaling + 1
+            }
+          }
+        ));
         break;
       case "Sequencer":
         setUpgradableGameState((prev) => ({
           ...prev,
-          sequencerSpeed: prev.sequencerSpeed + 1
+          sequencerSpeed: prev.sequencerLevel + 1
         }));
         break;
       case "Miner":
         setUpgradableGameState((prev) => ({
           ...prev,
-          minerSpeed: prev.minerSpeed + 1
+          minerLevel: prev.minerLevel + 1
         }));
         break;
-      case "Unlock L2s":
+      case "Recursive Proving":
         setUpgradableGameState((prev) => ({
           ...prev,
-          l2Transactions: true
+          proverMaxSize: prev.proverMaxSize + 1
         }));
         break;
-      case "Unlock L2 Blobs":
+      case "DA compression":
         setUpgradableGameState((prev) => ({
           ...prev,
-          l2Blobs: true,
-        }));
-        break;
-      case "Dapp":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          dapp: true,
-        }));
-        break;
-      case "Inscriptions Metaprotocol":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          inscriptionsMetaprotocol: true,
+          daMaxSize: prev.daMaxSize + 1
         }));
         break;
       case "Unlock Staking":
@@ -417,25 +447,25 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       case "Miner":
         setUpgradableGameState((prev) => ({
           ...prev,
-          minerSpeed: prev.minerSpeed + 1
+          minerLevel: prev.minerLevel + 1
         }));
         break;
       case "Sequencer":
         setUpgradableGameState((prev) => ({
           ...prev,
-          sequencerSpeed: prev.sequencerSpeed + 1
+          sequencerSpeed: prev.sequencerLevel + 1
         }));
         break;
       case "Prover":
         setUpgradableGameState((prev) => ({
           ...prev,
-          proverSpeed: prev.proverSpeed + 1
+          proverSpeed: prev.proverLevel + 1
         }));
         break;
       case "DA":
         setUpgradableGameState((prev) => ({
           ...prev,
-          daSpeed: prev.daSpeed + 1
+          daSpeed: prev.daLevel + 1
         }));
         break;
       default:

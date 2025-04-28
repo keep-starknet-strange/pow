@@ -9,7 +9,7 @@ export const newEmptyL2DA = (): L2DA => ({
   blocks: [],
   blockFees: 0,
   maxSize: 3,
-  hp: 3,
+  hp: 4,
 });
 
 export type L2Prover = {
@@ -25,7 +25,7 @@ export const newEmptyL2Prover = (): L2Prover => ({
   blocks: [],
   blockFees: 0,
   maxSize: 2,
-  hp: 4,
+  hp: 8,
 });
 
 export type L2 = {

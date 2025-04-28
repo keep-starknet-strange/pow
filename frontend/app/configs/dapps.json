@@ -29,12 +29,21 @@
     },
     {
       "id": 3,
-      "name": "CryptoDragons",
-      "description": "Collect, breed and battle dragons",
+      "name": "Libra",
+      "description": "Liquid staking protocol",
       "color": "#f7f7f7a0",
       "speedCosts": [16, 64, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
       "feeCosts": [16, 64, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
       "value": [16, 32, 48, 64, 80, 96, 112, 128, 144, 160]
+    },
+    {
+      "id": 4,
+      "name": "CryptoDragons",
+      "description": "Collect, breed and battle dragons",
+      "color": "#f7f7f7a0",
+      "speedCosts": [19, 76, 304, 608, 1216, 2432, 4864, 9728, 19456, 38912],
+      "feeCosts": [19, 76, 304, 608, 1216, 2432, 4864, 9728, 19456, 38912],
+      "value": [19, 38, 57, 76, 95, 114, 133, 152, 171, 190]
     }
   ],
   "L2": [

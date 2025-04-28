@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Mutex } from "async-mutex";
 import { GameState, newEmptyGameState, UpgradableGameState, newBaseUpgradableGameState } from "../types/GameState";
+import { newEmptyChain } from "../types/Chain";
 import { newBlock } from "../types/Block";
 import { Transaction } from "../types/Transaction";
 import { newEmptyL2 } from "../types/L2";
@@ -55,11 +55,10 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const newGameState = { ...gameState };
 
     const finalizedBlock = { ...gameState.chains[0].currentBlock };
-    newGameState.chains[0].lastBlock = finalizedBlock;
     newGameState.chains[0].pastBlocks = gameState.chains[0].pastBlocks ? [finalizedBlock, ...gameState.chains[0].pastBlocks] : [finalizedBlock];
     notify("L1BlockFinalized", { block: finalizedBlock });
 
-    const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.blockReward, upgradableGameState.blockSize, upgradableGameState.difficulty);
+    const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.l1.blockReward, upgradableGameState.l1.blockWidth * upgradableGameState.l1.blockWidth, upgradableGameState.l1.difficulty);
     newGameState.chains[0].currentBlock = newCurrentBlock;
     notify("BlockCreated", { block: newCurrentBlock });
 
@@ -77,11 +76,10 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!newGameState.l2) return;
 
     const finalizedBlock = { ...gameState.chains[1].currentBlock };
-    newGameState.chains[1].lastBlock = finalizedBlock;
     newGameState.chains[1].pastBlocks = gameState.chains[1].pastBlocks ? [finalizedBlock, ...gameState.chains[1].pastBlocks] : [finalizedBlock];
     notify("L2BlockFinalized", { block: finalizedBlock });
 
-    const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.blockReward, upgradableGameState.blockSize, upgradableGameState.difficulty);
+    const newCurrentBlock = newBlock(finalizedBlock.id + 1, upgradableGameState.l2.blockReward, upgradableGameState.l2.blockWidth * upgradableGameState.l2.blockWidth, upgradableGameState.l2.difficulty);
     newGameState.chains[1].currentBlock = newCurrentBlock;
     notify("L2BlockCreated", { block: newCurrentBlock });
 
@@ -151,6 +149,10 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (gameState.l2) return;
     setGameState((prevState) => ({
       ...prevState,
+      chains: [
+        prevState.chains[0],
+        newEmptyChain(1)
+      ],
       l2: newEmptyL2()
     }));
     notify("L2Unlocked", {});
@@ -166,7 +168,12 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       ...prevState,
       l2: {
         ...prevState.l2,
-        prover: { ...prevState.l2.prover, blockFees: 0, blocks: [] }
+        prover: {
+          ...prevState.l2.prover,
+          maxSize: upgradableGameState.proverMaxSize,
+          blockFees: 0,
+          blocks: []
+        }
       }
     }));
   }
@@ -183,7 +190,12 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       ...prevState,
       l2: {
         ...prevState.l2,
-        da: { ...prevState.l2.da, blockFees: 0, blocks: [] }
+        da: {
+          ...prevState.l2.da,
+          maxSize: upgradableGameState.daMaxSize,
+          blockFees: 0,
+          blocks: []
+        }
       }
     }));
   }

@@ -1,12 +1,26 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 
-import { playMineClicked, playBlockMined } from "../components/utils/sounds";
+import { playSequenceClicked, playSequenceDone } from "../components/utils/sounds";
 
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
+import automationJson from "../configs/automation.json";
+
+import * as sequencerImages from "../configs/sequencers";
+export const getSequencerImage = (sequencerId: number) => {
+  const images = Object.values(sequencerImages);
+  return images[sequencerId] || images[0];
+}
+
+import * as SequencingAnimation from "../configs/sequencing";
+export const getSequencingAnimation = (progress: number) => {
+  const animations = Object.values(SequencingAnimation);
+  const animationIndex = Math.floor(progress * animations.length);
+  return animations[animationIndex] || animations[0];
+}
 
 
 export const L2Confirm: React.FC = (props) => {
@@ -16,7 +30,7 @@ export const L2Confirm: React.FC = (props) => {
   const { isSoundOn } = useSound();
 
   const tryConfirmBlock = () => {
-    playMineClicked(isSoundOn);
+    playSequenceClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
@@ -27,7 +41,7 @@ export const L2Confirm: React.FC = (props) => {
 
     if (newMineCounter >= gameState.chains[1].currentBlock.hp) {
       finalizeL2Block();
-      playBlockMined(isSoundOn);
+      playSequenceDone(isSoundOn);
     }
   };
 
@@ -35,30 +49,34 @@ export const L2Confirm: React.FC = (props) => {
   const [shouldAutoConfirm, setShouldAutoConfirm] = useState(false);
   useEffect(() => {
     const newShouldAutoConfirm =
-      upgradableGameState.sequencerSpeed > 0 &&
+      upgradableGameState.sequencerLevel > 0 &&
       mineCounter < gameState.chains[1].currentBlock.hp;
     setShouldAutoConfirm(newShouldAutoConfirm);
-  }, [upgradableGameState.sequencerSpeed, mineCounter, gameState.chains[1].currentBlock.hp]);
+  }, [upgradableGameState.sequencerLevel, mineCounter, gameState.chains[1].currentBlock.hp]);
 
   useAutoClicker(
     shouldAutoConfirm,
-    1000 / upgradableGameState.sequencerSpeed,
+    1000 / (automationJson.L2[0].levels[upgradableGameState.sequencerLevel]?.speed || 1),
     tryConfirmBlock
   );
 
   return (
-    <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
-      <View
-        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-        style={{ width: `${Math.floor(mineCounter / gameState.chains[1].currentBlock.hp * 100)}%`, height: `${Math.floor(mineCounter / gameState.chains[1].currentBlock.hp * 100)}%` }}
-      />
+    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
       <TouchableOpacity
-        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#a7a7a7c0] rounded-full flex items-center justify-center
-                  border-2 border-[#c7c7f780]"
+        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
         onPress={tryConfirmBlock}
       >
-        <Text className="text-[#171717] text-6xl m-4 mx-10">🆗</Text>
+        <Image
+          source={getSequencerImage(upgradableGameState.sequencerLevel)}
+          className="w-28 h-28"
+        />
       </TouchableOpacity>
+      {mineCounter !== 0 && (
+        <Image
+          source={getSequencingAnimation(mineCounter / gameState.chains[1].currentBlock.hp )}
+          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full pointer-events-none"
+        />
+      )}
     </View>
   );
 };

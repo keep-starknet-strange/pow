@@ -1,15 +1,29 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Image, View, Text, TouchableOpacity } from "react-native";
 
-import { playMineClicked, playBlockMined } from "../components/utils/sounds";
+import { playProveClicked, playProveDone } from "../components/utils/sounds";
 
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
 import { createTx } from "../utils/transactions";
+import automationsJson from "../configs/automation.json";
 
 import l2Batch from "../../assets/images/transaction/l2Batch.png";
+
+import * as proverImages from "../configs/provers";
+export const getProverImage = (proverId: number) => {
+  const images = Object.values(proverImages);
+  return images[proverId] || images[0];
+}
+
+import * as ProvingAnimation from "../configs/proving";
+export const getProvingAnimation = (progress: number) => {
+  const animations = Object.values(ProvingAnimation);
+  const animationIndex = Math.floor(progress * animations.length);
+  return animations[animationIndex] || animations[0];
+}
 
 export const ProverConfirm: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
@@ -26,7 +40,7 @@ export const ProverConfirm: React.FC = (props) => {
     if (!gameState.l2) {
       return;
     }
-    playMineClicked(isSoundOn);
+    playProveClicked(isSoundOn);
     const randomNonce = Math.floor(Math.random() * 10000);
     // setNonce(randomNonce);
     // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
@@ -49,39 +63,39 @@ export const ProverConfirm: React.FC = (props) => {
       const newTx = createTx(1, 4, txFee, txIcon);
       finalizeL2Proof();
       addTxToBlock(newTx);
-      playBlockMined(isSoundOn);
+      playProveDone(isSoundOn);
     }
   };
 
   const [shouldAutoProve, setShouldAutoProve] = useState(false);
   useEffect(() => {
-    const newShouldAutoProve = upgradableGameState.proverSpeed > 0 && mineCounter < (gameState.l2?.prover.hp || 0);
+    const newShouldAutoProve = upgradableGameState.proverLevel > 0 && mineCounter < (gameState.l2?.prover.hp || 0);
     setShouldAutoProve(newShouldAutoProve);
-  }, [upgradableGameState.proverSpeed, mineCounter, gameState.l2?.prover.hp]);
+  }, [upgradableGameState.proverLevel, mineCounter, gameState.l2?.prover.hp]);
 
   useAutoClicker(
     shouldAutoProve,
-    1000 / upgradableGameState.proverSpeed,
+    1000 / (automationsJson.L2[1].levels[upgradableGameState.proverLevel]?.speed || 1),
     tryProve
   );
 
   return (
-    <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
-      {gameState.l2 && (
-        <>
-        <View
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-          style={{ width: `${Math.floor(mineCounter / gameState.l2.prover.hp * 100)}%`, height: `${Math.floor(mineCounter / gameState.l2.prover.hp * 100)}%` }}
+    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
+      {mineCounter !== 0 && (
+        <Image
+          source={getProvingAnimation(mineCounter / (gameState.l2?.prover.hp || 1))}
+          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full pointer-events-none"
         />
-        <TouchableOpacity
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#a7a7a7c0] rounded-full flex items-center justify-center
-                    border-2 border-[#c7c7f780]"
-          onPress={tryProve}
-        >
-          <Text className="text-[#171717] text-6xl m-4 mx-10">🆗</Text>
-        </TouchableOpacity>
-        </>
       )}
+      <TouchableOpacity
+        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
+        onPress={tryProve}
+      >
+        <Image
+          source={getProverImage(upgradableGameState.proverLevel)}
+          className="w-28 h-28"
+        />
+      </TouchableOpacity>
     </View>
   );
 };
