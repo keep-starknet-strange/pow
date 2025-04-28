@@ -29,6 +29,7 @@ export type UpgradableGameState = {
   daLevel: number;
   proverMaxSize: number;
   daMaxSize: number;
+  staking: boolean;
   prestige: number;
 }
 
@@ -62,6 +63,7 @@ export const newBaseUpgradableGameState = (): UpgradableGameState => ({
   daLevel: baseDALevel,
   proverMaxSize: baseProverSize,
   daMaxSize: baseDASize,
+  staking: false,
   prestige: basePrestige,
 });
 

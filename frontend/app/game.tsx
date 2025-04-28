@@ -16,11 +16,13 @@ import { StakingPage } from "./pages/StakingPage";
 
 import { useEventManager } from "./context/EventManager";
 import { useAchievement } from "./context/Achievements";
+import { useGameState } from "./context/GameState";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
 
 export default function game() {
   const { registerObserver } = useEventManager();
   const { updateAchievement } = useAchievement();
+  const { upgradableGameState } = useGameState();
   useEffect(() => {
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
@@ -43,22 +45,22 @@ export default function game() {
   }, {
     name: "Settings",
     component: SettingsPage
-  }
-  , {
-    name: "Staking",
-    component: StakingPage
-  }];
+  }, 
+  ...(upgradableGameState.staking ? [{ name: "Staking", component: StakingPage }] : [])
+];
 
   const [currentPage, setCurrentPage] = useState(pages[0]);
   const [currentBasePage, setCurrentBasePage] = useState(pages[0]);
   const basePages = ["Main", "Sequencing", "Mining"];
-  const headerTabs = [{
+  const tabs = [{
     name: "Main",
     icon: "🎮"
-  }, {
+  }, 
+  ...(upgradableGameState.staking ?
+   [{ 
     name: "Staking",
-    icon: "💎"
-  }, {
+    icon: "🥩" }
+    ] : []), {
     name: "Store",
     icon: "🛒"
   }, {
@@ -77,20 +79,20 @@ export default function game() {
     }
     setCurrentPage(pages.find(page => page.name === name) || pages[0]);
   }
-  const closeHeaderTab = () => {
+  const closeTab = () => {
     setCurrentPage(currentBasePage);
   }
 
   const props = {
     switchPage: switchPage,
-    closeHeaderTab: closeHeaderTab,
+    closeTab: closeTab
   };
 
   return (
     <View className="flex-1 bg-[#171717] relative">
-        <Header {...props} tabs={headerTabs} />
+        <Header />
         <currentPage.component {...props} />
-        <Footer {...props} tabs={headerTabs} />
+        <Footer {...props} tabs={tabs} />
     </View>
   );
 }

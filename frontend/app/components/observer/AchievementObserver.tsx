@@ -87,49 +87,37 @@ export class AchievementObserver implements Observer {
   }
 
   private handleUpgradePurchased(achievement: Achievement, upgrade: Upgrade, currentUpgrades: Record<number, Upgrade>) {
-    if ("targetUpgradeId" in achievement && achievement.targetUpgradeId !== undefined) {
-      const targetUpgrade = upgradesConfig.L1.find(u => u.id === achievement.targetUpgradeId);
-      const currentUpgrade = currentUpgrades[achievement.targetUpgradeId];
-
-      if (targetUpgrade?.costs.length && currentUpgrade?.level !== undefined) {
-        const progress = Math.min((currentUpgrade.level / targetUpgrade.costs.length) * 100, 100);
-        this.updateAchievement(achievement.id, progress);
-      } else if (currentUpgrade) {
-        this.updateAchievement(achievement.id, 100);
-      }
-    } else {
-      switch (achievement.name) {
-        case "Get an Antminer Rig":
-          if (upgrade.name === "Antminer") {
-            this.updateAchievement(achievement.id, 100);
-          }
-          break;
-        case "Achieve SNARK Scaling":
-          if (upgrade.name === "SNARK") {
-            this.updateAchievement(achievement.id, 100);
-          }
-          break;
-        case "Achieve STARK Scaling":
-          if (upgrade.name === "STARK") {
-            this.updateAchievement(achievement.id, 100);
-          }
-          break;
-        case "Maxed out upgrades": {
-          const progress = (upgradesConfig.L1.filter(cfg => {
-            const upg = currentUpgrades[cfg.id];
-            return cfg.costs.length ? upg?.level === cfg.costs.length : !!upg;
-          }).length / upgradesConfig.L1.length) * 100;
-          this.updateAchievement(achievement.id, progress);
-          break;
+    switch (achievement.name) {
+      case "Get an Antminer Rig":
+        if (upgrade.name === "Antminer") {
+          this.updateAchievement(achievement.id, 100);
         }
-        case "Prestige!":
-          if (upgrade.name === "Prestige") {
-            this.updateAchievement(achievement.id, 100);
-          }
-          break;
-        default:
-          console.log("Unknown achievement", achievement.name);
+        break;
+      case "Achieve SNARK Scaling":
+        if (upgrade.name === "SNARK") {
+          this.updateAchievement(achievement.id, 100);
+        }
+        break;
+      case "Achieve STARK Scaling":
+        if (upgrade.name === "STARK") {
+          this.updateAchievement(achievement.id, 100);
+        }
+        break;
+      case "Maxed out upgrades": {
+        const progress = (upgradesConfig.L1.filter(cfg => {
+          const upg = currentUpgrades[cfg.id];
+          return cfg.costs.length ? upg?.level === cfg.costs.length : !!upg;
+        }).length / upgradesConfig.L1.length) * 100;
+        this.updateAchievement(achievement.id, progress);
+        break;
       }
+      case "Prestige!":
+        if (upgrade.name === "Prestige") {
+          this.updateAchievement(achievement.id, 100);
+        }
+        break;
+      default:
+        console.log("Unknown achievement", achievement.name);
     }
   }
 

@@ -25,11 +25,7 @@ export const getProvingAnimation = (progress: number) => {
   return animations[animationIndex] || animations[0];
 }
 
-type ProverConfirmProps = {
-  _id: number;
-};
-
-export const ProverConfirm: React.FC<ProverConfirmProps> = (props) => {
+export const ProverConfirm: React.FC = (props) => {
   // const [nonce, setNonce] = useState(0);
   // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
   const [mineCounter, setMineCounter] = useState(0);

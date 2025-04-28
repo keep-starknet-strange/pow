@@ -23,34 +23,17 @@ export const getMiningAnimation = (mineProgress: number) => {
   return animations[animationIndex] || animations[0];
 }
 
-type MinerProps = {
-  _id: number;
-};
-
-export const Miner: React.FC<MinerProps> = (props) => {
-  // const [nonce, setNonce] = useState(0);
-  // TODO: mineCounter = upgradableGameState.difficulty - gameState.chains[0].currentBlock.hp
+export const Miner: React.FC = () => {
   const [mineCounter, setMineCounter] = useState(0);
-  // const [blockHash, setBlockHash] = useState("");
-
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
   const { isSoundOn } = useSound();
 
   const tryMineBlock = () => {
     playMineClicked(isSoundOn);
-    const randomNonce = Math.floor(Math.random() * 10000);
-    // setNonce(randomNonce);
-    // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    // if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
-    //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
-    // }
-    // setBlockHash(newBlockHash);
     notify("TryMineBlock", {
-      // nonce: randomNonce,
-      // blockHash: newBlockHash,
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
     });

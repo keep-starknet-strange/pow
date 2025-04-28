@@ -53,8 +53,21 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Initialize upgrades
     const initUpgrades: { [chainId: number]: { [upgradeId: number]: Upgrade } } = {};
     for (const chainId in upgradesJson) {
-      const chainIdInt = chainId === "L1" ? 0 : 1;
-      const upgradeJsonChain = chainId === "L1" ? upgradesJson.L1 : upgradesJson.L2;
+      let chainIdInt: number;
+      let upgradeJsonChain;
+      if (chainId === "L1") {
+        chainIdInt = 0;
+        upgradeJsonChain = upgradesJson.L1;
+      } else if (chainId === "L2") {
+        chainIdInt = 1;
+        upgradeJsonChain = upgradesJson.L2;
+      } else if (chainId === "staking") {
+        chainIdInt = 2;
+        upgradeJsonChain = upgradesJson.staking;
+      } else {
+        console.warn(`Unknown chainId: ${chainId}`);
+        continue;
+      }
       initUpgrades[chainIdInt] = {};
       for (const upgradeId in upgradeJsonChain) {
         const upgrade = upgradeJsonChain[upgradeId];
@@ -194,13 +207,17 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
     
 
-
   const addUpgrade = (chainId: number, upgradeId: number) => {
     let upgrade = null;
     if (chainId === 0) {
       upgrade = upgradesJson.L1[upgradeId];
-    } else {
+    } else if (chainId === 1) {
       upgrade = upgradesJson.L2[upgradeId];
+    } else if (chainId === 2) {
+      upgrade = upgradesJson.staking[upgradeId];
+    } else {
+      console.warn(`Unknown chainId: ${chainId}`);
+      return;
     }
     switch (upgrade.name) {
       case "Block Difficulty":
@@ -294,10 +311,17 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           daMaxSize: prev.daMaxSize + 1
         }));
         break;
+      case "Unlock Staking":
+        setUpgradableGameState((prev) => ({
+          ...prev,
+          staking: true,
+        }));
+        break;
       default:
         console.warn(`Unknown upgrade: ${upgrade.name}`);
         break;
     }
+
     const currentLevel = upgrades[chainId][upgrade.id]?.level || 0;
     const newUpgrade = {
       ...upgrade,

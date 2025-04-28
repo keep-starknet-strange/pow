@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Modal, Image } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 
 import { useGameState } from "../context/GameState";
 import { useUpgrades } from "../context/Upgrades";
 import { AlertModal } from "../components/AlertModal";
+import { UpgradeCard } from "./storePage/UpgradeCard";
 import { getChainIcons } from "../utils/transactions";
 import { getUpgradeIcons, getAutomationIcons } from "../utils/upgrades";
 
@@ -17,6 +18,7 @@ import lockImg from "../../assets/images/lock.png";
 import overclockImg from "../../assets/images/overclock.png";
 import l2BatchImg from "../../assets/images/transaction/l2Batch.png";
 import prestigeImg from "../../assets/images/transaction/nfts/7.png";
+import stakingImg from "../../assets/images/upgrades/staking.png";
 
 export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
@@ -40,6 +42,7 @@ export const StorePage: React.FC = () => {
   const [activeUpgradeIcons, setActiveUpgradeIcons] = useState(getUpgradeIcons(1));
   const [storeAutomation, setStoreAutomation] = useState(automationJson.L1);
   const [activeAutomationIcons, setActiveAutomationIcons] = useState(getAutomationIcons(1));
+  const staking = upgradesJson.staking;
   useEffect(() => {
     if (storeType === "L1") {
       setChainId(0);
@@ -61,6 +64,15 @@ export const StorePage: React.FC = () => {
       setActiveAutomationIcons(getAutomationIcons(2));
     }
   }, [storeType]);
+
+  const purchase = (cost: number, onSuccess: () => void) => {
+    if (gameState.balance < cost) {
+      setInsufficientFunds(true);
+      return;
+    }
+    updateBalance(gameState.balance - cost);
+    onSuccess();
+  };
 
   return (
     <View className="flex-1">
@@ -103,8 +115,7 @@ export const StorePage: React.FC = () => {
              </View>
              <TouchableOpacity
                className="flex justify-center items-center bg-[#e7e7e730] rounded-lg p-2 relative
-                          border-2 border-[#e7e7e740] mr-1
-               "
+                          border-2 border-[#e7e7e740] mr-1"
                onPress={() => {
                  if (storeType === "L2") {
                    if (l2TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
@@ -559,19 +570,14 @@ export const StorePage: React.FC = () => {
         </View>
         <View className="w-full h-[2px] bg-[#e7e7e740] my-2" />
         {storeType === "L1" ? (
-          <View className="flex flex-row justify-between items-center p-2 mx-2
-                           bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
-          >
-            <Image source={l2BatchImg} className="w-[3.6rem] h-[3.6rem] rounded-full" />
-            <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
-              <Text className="text-[#e7e7e7] text-xl font-bold">Layer 2 Scaling</Text>
-              <Text className="text-[#e7e7e7] text-md">Scale your blockchain with Layer 2 Starknet.</Text>
-            </View>
-            {l1TransactionTypes[transactionsJson.L1[4].id].feeLevel === 0 ? (
-            <TouchableOpacity
-              className="flex flex-1 justify-center items-center bg-[#e7e760e0] rounded-lg p-2 relative
-                         border-2 border-[#e7e7e740] mr-1
-              "
+          <>
+            <UpgradeCard
+              imageSrc={l2BatchImg}
+              title="Layer 2 Scaling"
+              description="Scale your blockchain with Layer 2 Starknet."
+              unlocked={l1TransactionTypes[transactionsJson.L1[4].id].feeLevel > 0}
+              cost={transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
+              disabled={gameState.balance < transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
               onPress={() => {
                 const item = transactionsJson.L1[4];
                 if (l1TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
@@ -583,60 +589,38 @@ export const StorePage: React.FC = () => {
 
                 unlockL2();
               }}
-            >
-              <Text
-                className="text-[#171717] text-md font-bold"
-              >
-                Unlock - ₿{transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
-              </Text>
-            </TouchableOpacity>
-            ) : (
-              <View
-                className="flex flex-1 justify-center items-center bg-[#e7e760e0] rounded-lg p-2 relative
-                           border-2 border-[#e7e7e740] mr-1"
-                style={{
-                  backgroundColor: transactionsJson.L1[4].color.substring(0, 7) + "d0",
-                }}
-              >
-                <Text
-                  className="text-[#171717] text-md font-bold"
-                >
-                  Unlocked!
-                </Text>
-              </View>
-            )}
-          </View>
+            />
+
+            <UpgradeCard
+              imageSrc={stakingImg}
+              title="Staking"
+              description="Lock coins to earn yield on Chain 2."
+              unlocked={upgradableGameState.staking}
+              cost={staking[0].costs[0]}
+              disabled={gameState.balance < staking[0].costs[0]}
+              unlockedBgColor="#9ef7a0d0"
+              onPress={() => purchase(staking[0].costs[0],  () => addUpgrade(2, 0))}
+            />
+          </>
         ) : (
           <>
-          {upgradableGameState.prestige < prestigeJson.length - 1 && (
-            <View className="flex flex-row justify-between items-center p-2 mx-2
-                             bg-[#e760e740] rounded-lg border-2 border-[#e7e7e740] relative"
-            >
-              <Image source={prestigeImg} className="w-[3.6rem] h-[3.6rem] rounded-full" />
-              <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
-                <Text className="text-[#e7e7e7] text-xl font-bold">Prestige!</Text>
-                <Text className="text-[#e7e7e7] text-md">Complete the game and reset with Prestige upgrades!</Text>
-              </View>
-              <TouchableOpacity
-                className="flex flex justify-center items-center bg-[#e7e760e0] rounded-lg p-2 relative
-                           border-2 border-[#e7e7e740] mr-1
-                "
+            {upgradableGameState.prestige < prestigeJson.length - 1 && (
+              <UpgradeCard
+                imageSrc={prestigeImg}
+                title="Prestige!"
+                description="Complete the game and reset with Prestige upgrades!"
+                unlocked={false}
+                cost={prestigeJson[upgradableGameState.prestige + 1].cost}
+                disabled={gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost}
                 onPress={() => {
-                  if (gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost) {
+                   if (gameState.balance < prestigeJson[upgradableGameState.prestige + 1].cost) {
                     setInsufficientFunds(true);
                     return;
                   }
                   doPrestige();
                 }}
-              >
-                <Text
-                  className="text-[#171717] text-md font-bold"
-                >
-                  Unlock - ₿{prestigeJson[upgradableGameState.prestige + 1].cost}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+              />
+            )}
           </>
         )}
         <View className="h-32" />
