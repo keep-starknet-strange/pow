@@ -13,46 +13,55 @@ export const newEmptyGameState = (): GameState => ({
   l2: undefined,
 });
 
-export type UpgradableGameState = {
+export type ChainUpgradableState = {
   difficulty: number;
-  blockSize: number;
+  blockWidth: number;
   blockReward: number;
   mevScaling: number;
-  sequencerSpeed: number;
-  minerSpeed: number;
-  proverSpeed: number;
-  daSpeed: number;
-  sortTransactions: boolean;
-  l2Transactions: boolean;
-  l2Blobs: boolean;
-  dapp: boolean;
-  inscriptionMetaprotocol: boolean;
+}
+
+export type UpgradableGameState = {
+  l1: ChainUpgradableState;
+  l2: ChainUpgradableState;
+  sequencerLevel: number;
+  minerLevel: number;
+  proverLevel: number;
+  daLevel: number;
+  proverMaxSize: number;
+  daMaxSize: number;
   prestige: number;
 }
 
 const baseDifficulty = 8;
-const baseBlockWidth = 8;
+const baseBlockWidth = 5;
 const baseReward = 5;
 const baseMevScaling = 1;
-const baseSequencerSpeed = 0;
-const baseMinerSpeed = 0;
-const baseProverSpeed = 0;
-const baseDASpeed = 0;
+const baseSequencerLevel = 0;
+const baseMinerLevel = -1;
+const baseProverLevel = 0;
+const baseDALevel = 0;
 const basePrestige = 0;
+const baseProverSize = 2;
+const baseDASize = 3;
 export const newBaseUpgradableGameState = (): UpgradableGameState => ({
-  difficulty: baseDifficulty,
-  blockSize: baseBlockWidth * baseBlockWidth,
-  blockReward: baseReward,
-  mevScaling: baseMevScaling,
-  sequencerSpeed: baseSequencerSpeed,
-  minerSpeed: baseMinerSpeed,
-  proverSpeed: baseProverSpeed,
-  daSpeed: baseDASpeed,
-  sortTransactions: false,
-  l2Transactions: false,
-  l2Blobs: false,
-  dapp: false,
-  inscriptionMetaprotocol: false,
+  l1: {
+    difficulty: baseDifficulty,
+    blockWidth: baseBlockWidth,
+    blockReward: baseReward,
+    mevScaling: baseMevScaling,
+  },
+  l2: {
+    difficulty: baseDifficulty,
+    blockWidth: baseBlockWidth,
+    blockReward: baseReward,
+    mevScaling: baseMevScaling,
+  },
+  sequencerLevel: baseSequencerLevel,
+  minerLevel: baseMinerLevel,
+  proverLevel: baseProverLevel,
+  daLevel: baseDALevel,
+  proverMaxSize: baseProverSize,
+  daMaxSize: baseDASize,
   prestige: basePrestige,
 });
 

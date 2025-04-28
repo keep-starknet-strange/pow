@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Image, TouchableOpacity, Animated, useAnimatedValue } from "react-native";
+import { Image, Text, TouchableOpacity, Dimensions, Animated, useAnimatedValue } from "react-native";
 import { useGameState } from "../../context/GameState";
 import { useUpgrades } from "../../context/Upgrades";
 import { getTxIcon, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
 import transactions from "../../configs/transactions.json";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 
+const window = Dimensions.get("window");
+
 export type DappsButtonProps = {
   chain: string;
   txType: any; // TODO: Define a proper type for txType
   toggleOpen: () => void;
+  isOpen: boolean;
 };
 
 export const DappsButton: React.FC<DappsButtonProps> = (props) => {
@@ -62,8 +65,10 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
       style={{
         backgroundColor: props.txType.color,
         borderColor: props.txType.color,
+        width: window.width * 0.16,
+        height: window.width * 0.16,
       }}
-      className="flex flex-col items-center justify-center w-[4.5rem] aspect-square rounded-lg border-2 overflow-hidden relative"
+      className="flex flex-col items-center justify-center rounded-lg border-2 overflow-hidden relative"
       onPress={() => {
         if (txTypes[props.txType.id].feeLevel === 0) tryBuyTx(props.txType.id);
         else props.toggleOpen();
@@ -71,8 +76,17 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
     >
       <Image
         source={icon}
-        className="w-[3.8rem] h-[3.8rem]"
+        className="w-full h-full object-contain"
       />
+      {props.isOpen && (
+        <Text
+          className="text-white text-center text-[2rem] font-bold
+            absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]
+            "
+        >
+          X
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }

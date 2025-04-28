@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, TouchableOpacity, Animated, useAnimatedValue } from "react-native";
+import { Dimensions } from 'react-native';
 import { useGameState } from "../../context/GameState";
 import { useUpgrades } from "../../context/Upgrades";
 import { useSound } from "../../context/Sound";
@@ -11,11 +12,14 @@ import prestigeJson from "../../configs/prestige.json";
 import dapps from "../../configs/dapps.json";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 
+const window = Dimensions.get('window');
+
 export type TxButtonProps = {
   chain: string;
   txType: any; // TODO: Define a proper type for txType
   addTransaction: (chainId: number, tx: any) => void;
   isDapp?: boolean;
+  size?: number;
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
@@ -175,8 +179,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       style={{
         backgroundColor: props.txType.color,
         borderColor: props.txType.color,
+        width: window.width * (props.size || 0.16),
+        height: window.width * (props.size || 0.16),
       }}
-      className="flex flex-col items-center justify-center w-[4.5rem] aspect-square rounded-lg border-2 overflow-hidden relative"
+      className="flex flex-col items-center justify-center rounded-lg border-2 overflow-hidden relative"
       onPress={() => {
         if (props.txType.value[txTypes[props.txType.id].feeLevel - 1] === 0) return;
         if (txTypes[props.txType.id].feeLevel === 0) tryBuyTx(props.txType.id);
@@ -185,7 +191,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     >
       <Image
         source={icon}
-        className="w-[3.8rem] h-[3.8rem]"
+        className="w-full h-full object-contain"
       />
       {txTypes[props.txType.id]?.feeLevel !== 0 && txTypes[props.txType.id]?.speedLevel !== 0 && (
         <Animated.View

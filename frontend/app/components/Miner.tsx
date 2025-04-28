@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Image } from "react-native";
 
 import { playMineClicked, playBlockMined } from "../components/utils/sounds";
 
@@ -7,6 +7,21 @@ import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
 import { useAutoClicker } from "../hooks/useAutoClicker";
+import automationJson from "../configs/automation.json";
+
+// TODO: Default ( non-CPU ) miner image
+import * as minerImages from "../configs/miners";
+export const getMinerImage = (minerId: number) => {
+  const images = Object.values(minerImages);
+  return images[minerId] || images[0];
+}
+
+import * as miningAnimation from "../configs/mining";
+export const getMiningAnimation = (mineProgress: number) => {
+  const animations = Object.values(miningAnimation);
+  const animationIndex = Math.floor(animations.length * mineProgress);
+  return animations[animationIndex] || animations[0];
+}
 
 type MinerProps = {
   _id: number;
@@ -49,27 +64,37 @@ export const Miner: React.FC<MinerProps> = (props) => {
   // Try mine every (minerSpeed) milliseconds if the auto-miner is enabled
   const [shouldAutoMine, setShouldAutoMine] = useState(false);
   useEffect(() => {
-    const newShouldAutoMine = upgradableGameState.minerSpeed > 0 && mineCounter < gameState.chains[0].currentBlock.hp;
+    // TODO: Hardcoded miner automation index
+    const minerSpeed = automationJson.L1[0].levels[upgradableGameState.minerLevel]?.speed;
+    if (!minerSpeed) {
+      setShouldAutoMine(false);
+      return;
+    }
+    const newShouldAutoMine = minerSpeed > 0 && mineCounter < gameState.chains[0].currentBlock.hp;
     setShouldAutoMine(newShouldAutoMine);
-  }, [upgradableGameState.minerSpeed, mineCounter, gameState.chains[0].currentBlock.hp]);
+  }, [upgradableGameState.minerLevel, mineCounter, gameState.chains[0].currentBlock.hp]);
   useAutoClicker(
     shouldAutoMine,
-    1000 / upgradableGameState.minerSpeed,
+    1000 / (automationJson.L1[0].levels[upgradableGameState.minerLevel]?.speed || 1),
     tryMineBlock
   );
 
   return (
-    <View className="flex flex-col bg-[#272727b0] h-full aspect-square rounded-xl relative">
-      <View
-        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#ff6727] opacity-50 aspect-square rounded-full"
-        style={{ width: `${Math.floor(mineCounter / gameState.chains[0].currentBlock.hp * 100)}%`, height: `${Math.floor(mineCounter / gameState.chains[0].currentBlock.hp * 100)}%` }}
-      />
+    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
+      {mineCounter !== 0 && (
+        <Image
+          source={getMiningAnimation(mineCounter / gameState.chains[0].currentBlock.hp)}
+          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full"
+        />
+      )}
       <TouchableOpacity
-        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-[#a7a7a7c0] rounded-full flex items-center justify-center
-                  border-2 border-[#c7c7f780]"
+        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
         onPress={tryMineBlock}
       >
-        <Text className="text-[#171717] text-6xl m-4 mx-10">⛏️</Text>
+        <Image
+          source={getMinerImage(upgradableGameState.minerLevel)}
+          className="w-28 h-28"
+        />
       </TouchableOpacity>
     </View>
   );

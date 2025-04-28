@@ -35,6 +35,7 @@ export const getChainIcons = (chain: number) => {
       "PowSwap": powSwapIcon,
       "ClosedOcean": closedOceanIcon,
       "Pave": paveIcon,
+      "Libra": libraIcon,
       "CryptoDragons": cryptoDragonsIcon,
     },
     2: {
@@ -72,6 +73,7 @@ import dojoIcon from "../../assets/images/transaction/dojo.png";
 import powSwapIcon from "../../assets/images/dapps/powswap.png";
 import closedOceanIcon from "../../assets/images/dapps/closedocean.png";
 import paveIcon from "../../assets/images/dapps/pave.png";
+import libraIcon from "../../assets/images/dapps/libra.png";
 import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.png";
 import avnuIcon from "../../assets/images/dapps/avnu.png";
 import artPeaceIcon from "../../assets/images/dapps/artpeace.jpeg";

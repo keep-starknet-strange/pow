@@ -4,15 +4,15 @@ import { StakingPool, newStakingPool } from './StakingPool';
 export type Chain = {
   id: number;
   currentBlock: Block;
-  lastBlock: Block | null;
-  pastBlocks?: Block[];
+  pastBlocks: Block[];
   stakingPool: StakingPool;
 }
 
+const genesisBlockReward = 1;
+const genesisBlockDifficulty = 4;
 export const newEmptyChain = (id: number): Chain => ({
   id,
-  currentBlock: newBlock(0, 0, 0, 0),
-  lastBlock: null,
+  currentBlock: newBlock(0, genesisBlockReward, 0, genesisBlockDifficulty),
   pastBlocks: [],
   stakingPool: newStakingPool(0, 0, 0),
 });

@@ -6,7 +6,7 @@ import { useGameState } from "../context/GameState";
 export type BlockViewProps = {
   block: Block;
   showOverlay?: boolean;
-  incompleted?: boolean;
+  completed: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
@@ -20,8 +20,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           {props.block.transactions.map((tx, index) => (
             <View
               key={index}
-              className="w-[9.75%] aspect-square border-2 border-[#00000020] rounded-lg overflow-hidden"
-              style={{ width: `${txWidth}%`, ...tx.style }}
+              className="border-2 border-[#00000020] rounded-lg overflow-hidden"
+              style={{ width: `${txWidth}%`, height: `${txWidth}%`, ...tx.style }}
             >
               {tx.image && (
                 <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={ tx.image } />
@@ -30,22 +30,29 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           ))}
         </View>
         {props.block.id === 0 && (
-        <Text className="absolute top-0 left-0 w-full h-full text-center
-          text-xl text-[#ffffff] font-bold items-center justify-center py-4
-        ">
-          {messagesJson.genesis[upgradableGameState.prestige]}
-        </Text>
+          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
+            {!props.completed && (
+              <Text className="text-[#ffffff] text-2xl font-bold underline text-center py-4">
+                Genesis Block
+              </Text>
+            )}
+            <Text
+              className={`text-[#ffffff] font-bold text-center ${props.completed ? "text-sm" : "text-2xl"}`}
+            >
+              {messagesJson.genesis[upgradableGameState.prestige]}
+            </Text>
+          </View>
         )}
         {props.showOverlay ? (
           <View
             className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between"
             style={{
-              backgroundColor: !props.incompleted ? "#00000080" : "#00000000",
+              backgroundColor: props.completed ? "#00000080" : "#00000000",
             }}
           >
             <View/>
             <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">
-              {!props.incompleted ? `#${props.block.id}` : ``}
+              {props.completed ? `#${props.block.id}` : ``}
             </Text>
             <View className="flex flex-col items-end justify-between w-[95%]">
               <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲₿{props.block.reward.toFixed(0)}</Text>

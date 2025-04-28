@@ -8,7 +8,6 @@ import { Footer } from "./components/Footer";
 
 import { MainPage } from "./pages/MainPage";
 import { SequencingPage } from "./pages/SequencingPage";
-import { MiningPage } from "./pages/MiningPage";
 import { StorePage } from "./pages/StorePage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
@@ -32,9 +31,6 @@ export default function game() {
   },{
     name: "Sequencing",
     component: SequencingPage
-  }, {
-    name: "Mining",
-    component: MiningPage
   }, {
     name: "Store",
     component: StorePage
