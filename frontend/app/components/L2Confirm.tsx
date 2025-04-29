@@ -25,21 +25,18 @@ export const L2Confirm: React.FC = (props) => {
   const [mineCounter, setMineCounter] = useState(0);
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeL2Block } = useGameState();
-  const { playSoundEffect } = useSound();
 
   const tryConfirmBlock = () => {
-    playSoundEffect("SequenceClicked");
     const randomNonce = Math.floor(Math.random() * 10000);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    notify("TryConfirmBlock", {
+    notify("SequenceClicked", {
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[1].currentBlock.hp,
     });
 
     if (newMineCounter >= gameState.chains[1].currentBlock.hp) {
       finalizeL2Block();
-      playSoundEffect("SequenceDone");
     }
   };
 

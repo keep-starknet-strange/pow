@@ -1,4 +1,4 @@
-import { Observer } from "../../context/EventManager";
+import { Observer, EventType } from "../../context/EventManager";
 import achievements from "../../configs/achievements.json";
 import upgradesConfig from "../../configs/upgrades.json";
 import { Upgrade } from "../../types/Upgrade";
@@ -34,7 +34,7 @@ export class AchievementObserver implements Observer {
     return map;
   }
 
-  onNotify(eventName: string, data?: any): void {
+  onNotify(eventName: EventType, data?: any): void {
     const relevantAchievements = this.achievementsByEvent.get(eventName);
     if (!relevantAchievements || !data) return;
 
@@ -50,15 +50,6 @@ export class AchievementObserver implements Observer {
           break;
         case "UpgradePurchased":
           this.handleUpgradePurchased(achievement, data.upgrade as Upgrade, data.allUpgrades);
-          break;
-        case "L1BlockFinalized":
-          this.handleL1BlockFinalized(achievement, data.block as Block);
-          break;
-        case "L2BlockFinalized":
-          this.handleL2BlockFinalized(achievement, data.block as Block);
-          break;
-        case "TryMineBlock":
-          this.handleTryMineBlock(achievement, data.isMined as boolean, data.mineCounter as number);
           break;
         default:
           break;

@@ -25,20 +25,17 @@ export const Miner: React.FC = () => {
   const [mineCounter, setMineCounter] = useState(0);
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
-  const { playSoundEffect } = useSound();
 
   const tryMineBlock = () => {
-    playSoundEffect("MineClicked");
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
-    notify("TryMineBlock", {
+    notify("MineClicked", {
       mineCounter: newMineCounter,
       isMined: newMineCounter >= gameState.chains[0].currentBlock.hp,
     });
 
     if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
       finalizeBlock();
-      playSoundEffect("BlockMined");
     }
   };
 

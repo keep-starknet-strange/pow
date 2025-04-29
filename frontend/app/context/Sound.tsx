@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import soundsJson from "../configs/sounds.json";
@@ -51,20 +51,24 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const achievementUnlockedSource = require("../../assets/sounds/achievement.mp3");
   const basicClickSource = require("../../assets/sounds/basic-click.mp3");
   const soundEffects: { [key: string]: any } = {
-    TxClicked: txClickedSource,
     MineClicked: mineClickedSource,
-    BlockMined: blockMinedSource,
+    MineDone: blockMinedSource,
     SequenceClicked: sequenceClickedSource,
     SequenceDone: sequenceDoneSource,
     ProveClicked: proveClickedSource,
     ProveDone: proveDoneSource,
     DaClicked: daClickedSource,
     DaDone: daDoneSource,
-    ItemPurchased: itemPurchasedSource,
+    TxUpgradePurchased: itemPurchasedSource,
+    UpgradePurchased: itemPurchasedSource,
+    StakingPurchased: itemPurchasedSource,
+    L2Purchased: itemPurchasedSource,
+    PrestigePurchased: itemPurchasedSource,
+    TxAdded: txClickedSource,
     AchievementUnlocked: achievementUnlockedSource,
     BasicClick: basicClickSource,
   };
-  const playSoundEffect = async (type: string, pitchShift: number = 1.0) => {
+  const playSoundEffect = useCallback(async (type: string, pitchShift: number = 1.0) => {
     if (!isSoundOn || !soundEffects[type] || !soundsJson.hasOwnProperty(type)) return;
 
     const soundConfig = soundsJson[type as keyof typeof soundsJson];
@@ -73,7 +77,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       rate: (soundConfig.rate || 1.0) * pitchShift,
     });
     await sound.playAsync();
-  }
+  }, [isSoundOn, soundEffectVolume]);
 
   // TODO: Choose random music from a list of songs
   // Music

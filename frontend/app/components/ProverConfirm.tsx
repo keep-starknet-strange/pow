@@ -31,14 +31,12 @@ export const ProverConfirm: React.FC = (props) => {
 
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeL2Proof, addTxToBlock } = useGameState();
-  const { playSoundEffect } = useSound();
 
   // TODO: Show load animation
   const tryProve = () => {
     if (!gameState.l2) {
       return;
     }
-    playSoundEffect("ProveClicked");
     const randomNonce = Math.floor(Math.random() * 10000);
     // setNonce(randomNonce);
     // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
@@ -48,7 +46,7 @@ export const ProverConfirm: React.FC = (props) => {
     //   newBlockHash = "0".repeat(upgradableGameState.difficulty) + newBlockHash.substring(upgradableGameState.difficulty);
     // }
     // setBlockHash(newBlockHash);
-    notify("TryProve", {
+    notify("ProveClicked", {
       // nonce: randomNonce,
       // blockHash: newBlockHash,
       mineCounter: newMineCounter,
@@ -61,7 +59,6 @@ export const ProverConfirm: React.FC = (props) => {
       const newTx = createTx(1, 4, txFee, txIcon);
       finalizeL2Proof();
       addTxToBlock(newTx);
-      playSoundEffect("ProveDone");
     }
   };
 

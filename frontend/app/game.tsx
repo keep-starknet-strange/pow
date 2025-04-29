@@ -14,17 +14,29 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { StakingPage } from "./pages/StakingPage";
 
 import { useEventManager } from "./context/EventManager";
+import { useSound } from "./context/Sound";
 import { useAchievement } from "./context/Achievements";
 import { useGameState } from "./context/GameState";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
+import { SoundObserver } from "./observers/SoundObserver";
 
 export default function game() {
-  const { registerObserver } = useEventManager();
+  const { registerObserver, unregisterObserver } = useEventManager();
   const { updateAchievement } = useAchievement();
   const { upgradableGameState } = useGameState();
   useEffect(() => {
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
+
+  const { playSoundEffect } = useSound();
+  const [soundObserver, setSoundObserver] = useState<null | number>(null);
+  useEffect(() => {
+    if (soundObserver !== null) {
+      // Unregister the previous observer if it exists
+      unregisterObserver(soundObserver);
+    }
+    setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
+  }, [playSoundEffect]);
 
   const pages = [{
     name: "Main",

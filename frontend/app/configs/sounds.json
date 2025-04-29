@@ -1,13 +1,9 @@
 {
-  "TxClicked": {
-    "volume": 1,
-    "rate": 1
-  },
   "MineClicked": {
     "volume": 0.4,
     "rate": 1.2
   },
-  "BlockMined": {
+  "MineDone": {
     "volume": 0.7,
     "rate": 1.2
   },
@@ -35,8 +31,28 @@
     "volume": 0.3,
     "rate": 1.2
   },
-  "ItemPurchased": {
+  "TxUpgradePurchased": {
     "volume": 0.5,
+    "rate": 1
+  },
+  "UpgradePurchased": {
+    "volume": 0.5,
+    "rate": 1
+  },
+  "StakingPurchased": {
+    "volume": 0.5,
+    "rate": 1
+  },
+  "L2Purchased": {
+    "volume": 0.5,
+    "rate": 1
+  },
+  "PrestigePurchased": {
+    "volume": 0.5,
+    "rate": 1
+  },
+  "TxAdded": {
+    "volume": 1,
     "rate": 1
   },
   "AchievementUnlocked": {
