@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 
-import { playSequenceClicked, playSequenceDone } from "../components/utils/sounds";
-
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
@@ -27,10 +25,10 @@ export const L2Confirm: React.FC = (props) => {
   const [mineCounter, setMineCounter] = useState(0);
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeL2Block } = useGameState();
-  const { isSoundOn } = useSound();
+  const { playSoundEffect } = useSound();
 
   const tryConfirmBlock = () => {
-    playSequenceClicked(isSoundOn);
+    playSoundEffect("SequenceClicked");
     const randomNonce = Math.floor(Math.random() * 10000);
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
@@ -41,7 +39,7 @@ export const L2Confirm: React.FC = (props) => {
 
     if (newMineCounter >= gameState.chains[1].currentBlock.hp) {
       finalizeL2Block();
-      playSequenceDone(isSoundOn);
+      playSoundEffect("SequenceDone");
     }
   };
 

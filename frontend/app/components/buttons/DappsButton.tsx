@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, Dimensions, Animated, useAnimatedValue } from "react-native";
 import { useGameState } from "../../context/GameState";
+import { useSound } from "../../context/Sound";
 import { useUpgrades } from "../../context/Upgrades";
 import { getTxIcon, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
 import transactions from "../../configs/transactions.json";
@@ -17,6 +18,7 @@ export type DappsButtonProps = {
 
 export const DappsButton: React.FC<DappsButtonProps> = (props) => {
   const { gameState, updateBalance, unlockL2 } = useGameState();
+  const { playSoundEffect } = useSound();
   const { l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade } = useUpgrades();
 
   const [chainId, setChainId] = useState(0);
@@ -53,6 +55,7 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
     }
 
     const newBalance = gameState.balance - txType.feeCosts[0];
+    playSoundEffect("ItemPurchased");
     updateBalance(newBalance);
 
     if (txType.name === "L2") {

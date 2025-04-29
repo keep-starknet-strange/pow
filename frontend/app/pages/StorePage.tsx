@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 
 import { useGameState } from "../context/GameState";
+import { useSound } from "../context/Sound";
 import { useUpgrades } from "../context/Upgrades";
 import { AlertModal } from "../components/AlertModal";
 import { UpgradeCard } from "./storePage/UpgradeCard";
@@ -24,6 +25,7 @@ export const StorePage: React.FC = () => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
   const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
+  const { playSoundEffect } = useSound();
   const { upgrades, addUpgrade, automation, upgradeAutomation, doPrestige,
           l1TxSpeedUpgrade, l1TxFeeUpgrade, l2TxSpeedUpgrade, l2TxFeeUpgrade, l1TransactionTypes, l2TransactionTypes,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade, l1DappSpeedUpgrade, l2DappSpeedUpgrade
@@ -70,6 +72,7 @@ export const StorePage: React.FC = () => {
       setInsufficientFunds(true);
       return;
     }
+    playSoundEffect("ItemPurchased");
     updateBalance(gameState.balance - cost);
     onSuccess();
   };
@@ -123,6 +126,7 @@ export const StorePage: React.FC = () => {
                    if (gameState.balance < cost) return;
                    l2TxFeeUpgrade(item.id);
                    const newBalance = gameState.balance - cost;
+                   playSoundEffect("ItemPurchased");
                    updateBalance(newBalance);
                  } else {
                    if (l1TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
@@ -130,6 +134,7 @@ export const StorePage: React.FC = () => {
                    if (gameState.balance < cost) return;
                    l1TxFeeUpgrade(item.id);
                    const newBalance = gameState.balance - cost;
+                   playSoundEffect("ItemPurchased");
                    updateBalance(newBalance);
                  }
                }}
@@ -187,6 +192,7 @@ export const StorePage: React.FC = () => {
                    if (gameState.balance < cost) return;
                    l2TxSpeedUpgrade(item.id);
                    const newBalance = gameState.balance - cost;
+                   playSoundEffect("ItemPurchased");
                    updateBalance(newBalance);
                  } else {
                    if (l1TransactionTypes[item.id].speedLevel === item.speedCosts.length) return;
@@ -194,6 +200,7 @@ export const StorePage: React.FC = () => {
                    if (gameState.balance < cost) return;
                    l1TxSpeedUpgrade(item.id);
                    const newBalance = gameState.balance - cost;
+                   playSoundEffect("ItemPurchased");
                    updateBalance(newBalance);
                  }
                }}
@@ -268,6 +275,7 @@ export const StorePage: React.FC = () => {
                   if (gameState.balance < cost) return;
                   l2TxFeeUpgrade(item.id);
                   const newBalance = gameState.balance - cost;
+                  playSoundEffect("ItemPurchased");
                   updateBalance(newBalance);
                 } else {
                   const item = transactionsJson.L1[3];
@@ -276,6 +284,7 @@ export const StorePage: React.FC = () => {
                   if (gameState.balance < cost) return;
                   l1TxFeeUpgrade(item.id);
                   const newBalance = gameState.balance - cost;
+                  playSoundEffect("ItemPurchased");
                   updateBalance(newBalance);
                 }
               }}
@@ -322,6 +331,7 @@ export const StorePage: React.FC = () => {
                      if (gameState.balance < cost) return;
                      l2DappFeeUpgrade(item.id);
                      const newBalance = gameState.balance - cost;
+                     playSoundEffect("ItemPurchased");
                      updateBalance(newBalance);
                    } else {
                      if (l1DappTypes[item.id].feeLevel === item.feeCosts.length) return;
@@ -329,6 +339,7 @@ export const StorePage: React.FC = () => {
                      if (gameState.balance < cost) return;
                      l1DappFeeUpgrade(item.id);
                      const newBalance = gameState.balance - cost;
+                     playSoundEffect("ItemPurchased");
                      updateBalance(newBalance);
                    }
                  }}
@@ -387,6 +398,7 @@ export const StorePage: React.FC = () => {
                      if (gameState.balance < cost) return;
                      l2DappSpeedUpgrade(item.id);
                      const newBalance = gameState.balance - cost;
+                     playSoundEffect("ItemPurchased");
                      updateBalance(newBalance);
                    } else {
                      if (l1DappTypes[item.id].speedLevel === item.speedCosts.length) return;
@@ -394,6 +406,7 @@ export const StorePage: React.FC = () => {
                      if (gameState.balance < cost) return;
                      l1DappSpeedUpgrade(item.id);
                      const newBalance = gameState.balance - cost;
+                     playSoundEffect("ItemPurchased");
                      updateBalance(newBalance);
                    }
                  }}
@@ -478,6 +491,7 @@ export const StorePage: React.FC = () => {
                "
                onPress={() => {
                  // TODO: Check if max?
+                 playSoundEffect("ItemPurchased");
                  addUpgrade(chainId, item.id);
                }}
              >
@@ -531,6 +545,7 @@ export const StorePage: React.FC = () => {
                          setInsufficientFunds(true);
                          return;
                        }
+                       playSoundEffect("ItemPurchased");
                        updateBalance(gameState.balance - level.cost);
                        upgradeAutomation(chainId, item.id);
                      }}
@@ -585,6 +600,7 @@ export const StorePage: React.FC = () => {
                 if (gameState.balance < cost) return;
                 l1TxFeeUpgrade(item.id);
                 const newBalance = gameState.balance - cost;
+                playSoundEffect("ItemPurchased");
                 updateBalance(newBalance);
 
                 unlockL2();
@@ -617,6 +633,7 @@ export const StorePage: React.FC = () => {
                     setInsufficientFunds(true);
                     return;
                   }
+                  playSoundEffect("ItemPurchased");
                   doPrestige();
                 }}
               />

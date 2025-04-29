@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Image, View, Text, TouchableOpacity } from "react-native";
 
-import { playProveClicked, playProveDone } from "../components/utils/sounds";
-
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
@@ -33,14 +31,14 @@ export const ProverConfirm: React.FC = (props) => {
 
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeL2Proof, addTxToBlock } = useGameState();
-  const { isSoundOn } = useSound();
+  const { playSoundEffect } = useSound();
 
   // TODO: Show load animation
   const tryProve = () => {
     if (!gameState.l2) {
       return;
     }
-    playProveClicked(isSoundOn);
+    playSoundEffect("ProveClicked");
     const randomNonce = Math.floor(Math.random() * 10000);
     // setNonce(randomNonce);
     // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
@@ -63,7 +61,7 @@ export const ProverConfirm: React.FC = (props) => {
       const newTx = createTx(1, 4, txFee, txIcon);
       finalizeL2Proof();
       addTxToBlock(newTx);
-      playProveDone(isSoundOn);
+      playSoundEffect("ProveDone");
     }
   };
 

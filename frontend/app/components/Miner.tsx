@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, TouchableOpacity, Image } from "react-native";
 
-import { playMineClicked, playBlockMined } from "../components/utils/sounds";
-
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
@@ -27,10 +25,10 @@ export const Miner: React.FC = () => {
   const [mineCounter, setMineCounter] = useState(0);
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeBlock } = useGameState();
-  const { isSoundOn } = useSound();
+  const { playSoundEffect } = useSound();
 
   const tryMineBlock = () => {
-    playMineClicked(isSoundOn);
+    playSoundEffect("MineClicked");
     const newMineCounter = mineCounter + 1;
     setMineCounter(newMineCounter);
     notify("TryMineBlock", {
@@ -40,7 +38,7 @@ export const Miner: React.FC = () => {
 
     if (newMineCounter >= gameState.chains[0].currentBlock.hp) {
       finalizeBlock();
-      playBlockMined(isSoundOn);
+      playSoundEffect("BlockMined");
     }
   };
 

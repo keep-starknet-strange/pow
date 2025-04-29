@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Image, View, Text, TouchableOpacity } from "react-native";
 
-import { playDaClicked, playDaDone } from "../components/utils/sounds";
-
 import { useEventManager } from "../context/EventManager";
 import { useGameState } from "../context/GameState";
 import { useSound } from "../context/Sound";
@@ -33,14 +31,14 @@ export const DAConfirm: React.FC = (props) => {
 
   const { notify } = useEventManager();
   const { gameState, upgradableGameState, finalizeL2DA, addTxToBlock } = useGameState();
-  const { isSoundOn } = useSound();
+  const { playSoundEffect } = useSound();
 
   // TODO: Show load animation
   const tryConfirmBlock = () => {
     if (!gameState.l2) {
       return;
     }
-    playDaClicked(isSoundOn);
+    playSoundEffect("DaClicked");
     const randomNonce = Math.floor(Math.random() * 10000);
     // setNonce(randomNonce);
     // let newBlockHash = Math.random().toString(16).substring(2, 15) + Math.random().toString(16).substring(2, 15);
@@ -63,7 +61,7 @@ export const DAConfirm: React.FC = (props) => {
       const newTx = createTx(1, 1, txFee, txIcon);
       finalizeL2DA();
       addTxToBlock(newTx);
-      playDaDone(isSoundOn);
+      playSoundEffect("DaDone");
     }
   };
 

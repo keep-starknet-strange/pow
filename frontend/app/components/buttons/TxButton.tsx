@@ -5,7 +5,6 @@ import { useGameState } from "../../context/GameState";
 import { useUpgrades } from "../../context/Upgrades";
 import { useSound } from "../../context/Sound";
 import { getTxIcon, createTx, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
-import { playTxClicked } from "../../components/utils/sounds";
 import transactions from "../../configs/transactions.json";
 import upgradesJson from "../../configs/upgrades.json";
 import prestigeJson from "../../configs/prestige.json";
@@ -26,7 +25,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
   const { upgrades, l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade,
           l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade } = useUpgrades();
-  const { isSoundOn } = useSound();
+  const { playSoundEffect } = useSound();
 
   const [chainId, setChainId] = useState(0);
   const [txTypes, setTxTypes] = useState(l1TransactionTypes);
@@ -91,7 +90,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     const txFee = txType.value[feeLevel] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler;
     const tx = createTx(chainId + 1, txType.id, txFee, icon);
     const playPitch = (tx.fee / 8) + 1;
-    playTxClicked(isSoundOn, playPitch);
+    playSoundEffect("TxClicked", playPitch);
     props.addTransaction(chainId, tx);
     if (txType.name === "Inscription") {
       setIcon(getRandomInscriptionImage());
@@ -141,6 +140,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       }
     }
 
+    playSoundEffect("ItemPurchased");
     const newBalance = gameState.balance - txType.feeCosts[0];
     updateBalance(newBalance);
 
