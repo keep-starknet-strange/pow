@@ -5,6 +5,7 @@ import { useBalance } from "../context/Balance";
 import { useStaking } from "../context/Staking";
 import { useTicker } from "../hooks/useTicker";
 import { useVisibleBlocks } from "../hooks/useVisibleBlocks";
+import StakingChain from "./stakingPage/StakingChain";
 import { AlertModal } from "../components/AlertModal";
 import { BlockView } from "../components/BlockView";
 import stakingConfig from "../configs/staking.json";
@@ -22,6 +23,10 @@ export const StakingPage: React.FC = (props) => {
       accrueAll();         
     }, [accrueAll])
   );
+
+  useEffect(() => {
+    accrueAll();
+  }, [tick, accrueAll]);
 
   interface StakeParams {
     id: number;
@@ -45,53 +50,17 @@ export const StakingPage: React.FC = (props) => {
         const meta = stakingConfig[idx];
         const [visibleBlocks, blocksShown] = useVisibleBlocks(stakingPool.createdAt, tick, 4);
         return (
-          <View key={`stakingPoolKey${idx}`} className="bg-gray-800 rounded-2xl p-5 mt-6">
-
-            <Text className="text-white text-lg font-semibold mb-2">
-              {meta?.icon} {meta.name}
-            </Text>
-
-            {blocksShown > 0 && (
-                <View className="flex-row-reverse w-full px-2 mt-4">
-                {visibleBlocks.map((block: Block, bi: number) => (
-                  <View key={block.id ?? bi} className="flex-row items-center">
-                  <View className="h-28 w-28">
-                    <BlockView block={block} />
-                  </View>
-                  {bi !== 0 && (
-                    <View className="w-2 h-1 mx-[2px] bg-[#f9f9f980] rounded-lg" />
-                  )}
-                  </View>
-                ))}
-                </View>
-            )}
-
-            {/* staked + claim row */}
-            <View className="flex-row items-center justify-center gap-x-8 mt-4 mb-3">
-              <Text className="text-white">
-                {stakingPool.stakedAmount.toFixed(2) + " staked"}
-              </Text>
-
-              <TouchableOpacity onPress={() => claimRewards(idx)}>
-                <Text className="text-green-400">
-                  {"Claim " + stakingPool?.rewardAccrued.toFixed(2)}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-           {/* single-stake button */}
-           <View className="flex-row justify-center mt-2">
-              <TouchableOpacity
-                onPress={() => onPressStake(meta.chainId, meta.stakingAmount)}
-                className="bg-blue-600 px-6 py-2 rounded-xl"
-              >
-                <Text className="text-white font-semibold">
-                  Stake {meta.stakingAmount.toFixed(2)}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
+          <StakingChain
+          key={idx}
+          idx={idx}
+          meta={meta}
+          visibleBlocks={visibleBlocks}
+          blocksShown={blocksShown}
+          stakingPool={stakingPool}
+          claimRewards={claimRewards}
+          onPressStake={onPressStake}
+        /> 
+        )
       })}
 
     <AlertModal
