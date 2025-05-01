@@ -1,14 +1,14 @@
 export type StakingPool = {
-  chainId: number;
+  createdAt: number;
   stakedAmount: number;
   lastBlockUpdated:  number;
   rewardAccrued: number;
   icon?: string;
 };
 
-export const newStakingPool = (chainId: number, stakedAmount: number, lastBlockUpdated: number, rewardAccrued: number): StakingPool => ({
-  chainId,
+export const newStakingPool = (stakedAmount: number, rewardAccrued: number): StakingPool => ({
+  createdAt: Math.floor(Date.now() / 1000), // current second 
   stakedAmount,
-  lastBlockUpdated,
+  lastBlockUpdated: Math.floor(Date.now() / 1000),
   rewardAccrued, 
 });

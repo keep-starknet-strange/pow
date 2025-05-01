@@ -1,44 +1,36 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from "@react-navigation/native";
 import { useBalance } from "../context/Balance";
 import { useStaking } from "../context/Staking";
+import { useTicker } from "../hooks/useTicker";
+import { useVisibleBlocks } from "../hooks/useVisibleBlocks";
+import StakingChain from "./stakingPage/StakingChain";
 import { AlertModal } from "../components/AlertModal";
-import { StakingChainView } from "../components/StakingChainView";
 import stakingConfig from "../configs/staking.json";
+
+const SECOND = 1000;
 
 export const StakingPage: React.FC = (props) => {
   const { balance } = useBalance();
-  const { stakingChains, getStakingPool, stakeTokens, claimRewards, accrueAll } = useStaking();
+  const { stakingPools, stakeTokens, claimRewards, accrueAll } = useStaking();
   const [insufficientFunds, setInsufficientFunds] = useState(false);
+  const tick = useTicker(SECOND);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      accrueAll();         
-    }, [accrueAll])
-  );
+  useEffect(() => {
+    accrueAll();
+  }, [tick, accrueAll]);
 
-  const [inputs, setInputs] = useState<string[]>(
-    Array(stakingChains.length).fill("")
-  );
-
-  const handleInput = (idx: number, text: string) =>
-    setInputs(arr => {
-      const next = [...arr];
-      next[idx] = text;
-      return next;
-    });
-
-  const handleStake = (idx: number) => {
-    const amount = parseFloat(inputs[idx]);
-    if (!isNaN(amount) && amount > 0) {
-      if (amount > balance) {
-        setInsufficientFunds(true);
-        handleInput(idx, ""); 
-        return;
-      }
-      stakeTokens(idx, amount);
-      handleInput(idx, "");           // clear the field
+  interface StakeParams {
+    id: number;
+    stakingAmount: number;
+  }
+  const onPressStake = (id: StakeParams['id'], stakingAmount: StakeParams['stakingAmount']): void => {
+    const amt: number = stakingAmount;
+    if (amt > balance) {
+      setInsufficientFunds(true);
+    } else {
+      stakeTokens(id, amt);
     }
   };
   return (
@@ -46,50 +38,21 @@ export const StakingPage: React.FC = (props) => {
       <View className="flex flex-row justify-end items-center p-2">
         <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🥩Staking</Text>
       </View>
-
-      {stakingChains.map((chain, idx) => {
-        const pool = getStakingPool(chain.chainId);
-        const meta = stakingConfig.find(c => c.chainId === chain.chainId)!;
+      {stakingPools?.map((stakingPool, idx) => {
+        const meta = stakingConfig[idx];
+        const [visibleBlocks, blocksShown] = useVisibleBlocks(stakingPool.createdAt, tick, 4);
         return (
-          <View key={idx} className="bg-gray-800 rounded-2xl p-5 mt-6">
-
-            <Text className="text-white text-lg font-semibold mb-2">
-              {meta?.icon} {meta.name}
-            </Text>
-            <StakingChainView chainId={chain.chainId} />
-
-            {/* staked + claim row */}
-            <View className="flex-row items-center justify-center gap-x-8 mt-4 mb-3">
-              <Text className="text-white">
-                {pool?.stakedAmount.toFixed(2) + " staked"}
-              </Text>
-
-              <TouchableOpacity onPress={() => claimRewards(idx)}>
-                <Text className="text-green-400">
-                  {"Claim " + pool?.rewardAccrued.toFixed(2)}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* stake input */}
-            <View className="flex-row items-center">
-              <TextInput
-                value={inputs[idx]}
-                onChangeText={txt => handleInput(idx, txt)}
-                keyboardType="number-pad"
-                placeholder="Amount"
-                placeholderTextColor="#888"
-                className="flex-1 bg-gray-700 text-white px-3 py-2 rounded-l-xl"
-              />
-              <TouchableOpacity
-                onPress={() => handleStake(idx)}
-                className="bg-blue-600 px-4 py-2 rounded-r-xl ml-[1px]"
-              >
-                <Text className="text-white font-semibold">Stake</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
+          <StakingChain
+          key={idx}
+          idx={idx}
+          meta={meta}
+          visibleBlocks={visibleBlocks}
+          blocksShown={blocksShown}
+          stakingPool={stakingPool}
+          claimRewards={claimRewards}
+          onPressStake={onPressStake}
+        /> 
+        )
       })}
 
     <AlertModal
