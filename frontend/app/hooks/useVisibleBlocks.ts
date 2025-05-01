@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { newBlock, Block } from '../types/Block';
+import { newBlock, Block } from '../types/Chains';
 
 export function useVisibleBlocks(
   createdAtSec: number,
@@ -11,7 +11,7 @@ export function useVisibleBlocks(
     const blocksShown = Math.min(windowSize, elapsed);
     const visibleBlocks: Block[] = Array.from(
       { length: blocksShown },
-      (_, i) => newBlock((elapsed - i), 0, 16, 0)
+      (_, i) => newBlock((elapsed - i), 0)
     );
     return [visibleBlocks, blocksShown];
   }, [createdAtSec, tick, windowSize]);
