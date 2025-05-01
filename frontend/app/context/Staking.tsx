@@ -43,7 +43,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const initChain = newChain(0);
     initChain.blocks = [newBlock(0, 1)];
     setStakingChains([initChain]);
-    setStakingPools([newStakingPool(0, 0, 0, 0)]);
+    setStakingPools([newStakingPool(0, 0)]);
     setStakingUnlocked(false);
   }
   useEffect(() => {
