@@ -1,13 +1,34 @@
 import React, { createContext, useContext, useState } from "react";
 
+export type EventType =
+  'MineClicked' |
+  'MineDone' |
+  'SequenceClicked' |
+  'SequenceDone' |
+  'ProveClicked' |
+  'ProveDone' |
+  'DaClicked' |
+  'DaDone' |
+  'BalanceUpdated' |
+  'ItemPurchased' |
+  'BuyFailed' |
+  'TxUpgradePurchased' |
+  'UpgradePurchased' |
+  'AutomationPurchased' |
+  'DappsPurchased' |
+  'StakingPurchased' |
+  'L2Purchased' |
+  'PrestigePurchased' |
+  'TxAdded';
+
 export interface Observer {
-  onNotify(eventName: string, data?: any): void;
+  onNotify(eventName: EventType, data?: any): void;
 }
 
 type EventManagerContextType = {
   registerObserver(observer: Observer): number;
   unregisterObserver(observerId: number): void;
-  notify(eventName: string, data?: any): void;
+  notify(eventName: EventType, data?: any): void;
 };
 
 const EventManagerContext = createContext<EventManagerContextType | undefined>(undefined);
@@ -37,7 +58,7 @@ export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   };
 
-  const notify = (eventName: string, data?: any) => {
+  const notify = (eventName: EventType, data?: any) => {
     observers.forEach((observer) => {
       observer.onNotify(eventName, data);
     });

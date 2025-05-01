@@ -7,7 +7,6 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 
 import { MainPage } from "./pages/MainPage";
-import { SequencingPage } from "./pages/SequencingPage";
 import { StorePage } from "./pages/StorePage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
@@ -15,84 +14,71 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { StakingPage } from "./pages/StakingPage";
 
 import { useEventManager } from "./context/EventManager";
+import { useSound } from "./context/Sound";
 import { useAchievement } from "./context/Achievements";
-import { useGameState } from "./context/GameState";
+import { useStaking } from "./context/Staking";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
+import { SoundObserver } from "./observers/SoundObserver";
 
 export default function game() {
-  const { registerObserver } = useEventManager();
+  const { registerObserver, unregisterObserver } = useEventManager();
+  const { stakingUnlocked } = useStaking();
   const { updateAchievement } = useAchievement();
-  const { upgradableGameState } = useGameState();
   useEffect(() => {
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
 
-  const pages = [{
+  const { playSoundEffect } = useSound();
+  const [soundObserver, setSoundObserver] = useState<null | number>(null);
+  useEffect(() => {
+    if (soundObserver !== null) {
+      // Unregister the previous observer if it exists
+      unregisterObserver(soundObserver);
+    }
+    setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
+  }, [playSoundEffect]);
+
+  const tabs = [{
     name: "Main",
+    icon: "🎮",
     component: MainPage
-  },{
-    name: "Sequencing",
-    component: SequencingPage
-  }, {
+  },
+  ...(stakingUnlocked ? [{
+    name: "Staking",
+    icon: "🥩",
+    component: StakingPage
+  }] : []),
+  {
     name: "Store",
+    icon: "🛒",
     component: StorePage
   }, {
     name: "Leaderboard",
+    icon: "🏆",
     component: LeaderboardPage
   }, {
     name: "Achievements",
+    icon: "🎉",
     component: AchievementsPage
   }, {
     name: "Settings",
+    icon: "⚙️",
     component: SettingsPage
-  }, 
-  ...(upgradableGameState.staking ? [{ name: "Staking", component: StakingPage }] : [])
-];
-
-  const [currentPage, setCurrentPage] = useState(pages[0]);
-  const [currentBasePage, setCurrentBasePage] = useState(pages[0]);
-  const basePages = ["Main", "Sequencing", "Mining"];
-  const tabs = [{
-    name: "Main",
-    icon: "🎮"
-  }, 
-  ...(upgradableGameState.staking ?
-   [{ 
-    name: "Staking",
-    icon: "🥩" }
-    ] : []), {
-    name: "Store",
-    icon: "🛒"
-  }, {
-    name: "Leaderboard",
-    icon: "🏆"
-  }, {
-    name: "Achievements",
-    icon: "🎉"
-  }, {
-    name: "Settings",
-    icon: "⚙️"
   }];
+  const [currentPage, setCurrentPage] = useState(tabs[0]);
   const switchPage = (name: string) => {
-    if (!basePages.includes(name) && basePages.includes(currentPage.name)) {
-      setCurrentBasePage(currentPage);
+    if (!tabs.some(tab => tab.name === name)) {
+      console.warn(`Tab with name "${name}" does not exist.`);
+      return;
     }
-    setCurrentPage(pages.find(page => page.name === name) || pages[0]);
+    setCurrentPage(tabs.find(tab => tab.name === name) || currentPage);
   }
-  const closeTab = () => {
-    setCurrentPage(currentBasePage);
-  }
-
-  const props = {
-    switchPage: switchPage,
-    closeTab: closeTab
-  };
 
   return (
     <View className="flex-1 bg-[#171717] relative">
         <Header />
-        <currentPage.component {...props} />
-        <Footer {...props} tabs={tabs} />
+        <currentPage.component/>
+        <Footer tabs={tabs} switchPage={switchPage} />
     </View>
   );
 }

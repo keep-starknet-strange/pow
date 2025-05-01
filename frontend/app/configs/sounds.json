@@ -1,0 +1,54 @@
+{
+  "MineClicked": {
+    "volume": 0.4,
+    "rate": 1.2
+  },
+  "MineDone": {
+    "volume": 0.7,
+    "rate": 1.2
+  },
+  "SequenceClicked": {
+    "volume": 0.5,
+    "rate": 1.2
+  },
+  "SequenceDone": {
+    "volume": 0.4,
+    "rate": 1.2
+  },
+  "ProveClicked": {
+    "volume": 0.1,
+    "rate": 0.8
+  },
+  "ProveDone": {
+    "volume": 0.4,
+    "rate": 1
+  },
+  "DaClicked": {
+    "volume": 0.3,
+    "rate": 1.2
+  },
+  "DaDone": {
+    "volume": 0.3,
+    "rate": 1.2
+  },
+  "ItemPurchased": {
+    "volume": 0.5,
+    "rate": 1
+  },
+  "BuyFailed": {
+    "volume": 1,
+    "rate": 1
+  },
+  "TxAdded": {
+    "volume": 1,
+    "rate": 1
+  },
+  "AchievementUnlocked": {
+    "volume": 0.6,
+    "rate": 1
+  },
+  "BasicClick": {
+    "volume": 0.5,
+    "rate": 1
+  }
+}

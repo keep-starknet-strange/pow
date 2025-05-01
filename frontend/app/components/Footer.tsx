@@ -1,4 +1,5 @@
 import { Text, View, TouchableOpacity } from 'react-native';
+import { useSound } from "../context/Sound";
 
 export type FooterProps = {
   tabs: {name: string, icon: string}[];
@@ -6,6 +7,12 @@ export type FooterProps = {
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
+  const { playSoundEffect } = useSound();
+  const switchPage = (page: string) => {
+    playSoundEffect("BasicClick");
+    props.switchPage(page);
+  }
+
   // TODO: Add small lines between the icons
   return (
     <View className="absolute bottom-0 left-0 bg-[#171717] z-[100] flex flex-row justify-around w-full pb-[1.5rem] rounded-2xl pt-[1rem] px-[0.5rem]
@@ -14,7 +21,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
         <TouchableOpacity
           key={index}
           className="flex flex-row"
-          onPress={() => props.switchPage(tab.name)}
+          onPress={() => switchPage(tab.name)}
         >
           <Text className="text-[#f7f7f7] text-[2.8rem]">{tab.icon}</Text>
         </TouchableOpacity>

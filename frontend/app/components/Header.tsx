@@ -1,12 +1,12 @@
-import { Text, View, TouchableOpacity } from 'react-native';
-import { useGameState } from "../context/GameState";
+import { Text, View } from 'react-native';
+import { useBalance } from "../context/Balance";
 
 export const Header: React.FC = () => {
-  const { gameState } = useGameState();
+  const { balance } = useBalance();
   return (
-    <View className="absolute top-0 left-0 my-2 py-1 pr-2 bg-[#777777c0] z-[100]
+    <View className="absolute top-0 left-0 my-2 py-1 pr-2 bg-[#272727f0] z-[100]
       border-2 border-l-0 border-[#e7e7e780] rounded-r-lg">
-      <Text className="text-[#f7f7f7] text-2xl font-bold">💰₿{gameState.balance.toFixed(2)}</Text>
+      <Text className="text-[#f7f7f7] text-2xl font-bold">💰₿{balance.toFixed(2)}</Text>
     </View>
   );
 };
