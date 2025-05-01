@@ -8,16 +8,13 @@ export function useStaking() {
   const { gameState, setGameState, updateBalance } = useGameState();
 
   const poolFor = (chainIdx: number) =>
-    gameState.chains[chainIdx].stakingPool;
+    gameState.stakingPools?.[chainIdx]
 
   const updatePool = (chainIdx: number, fn: (p: any) => any) =>
     setGameState(prev => {
-      const chains = [...prev.chains];
-      chains[chainIdx] = {
-        ...chains[chainIdx],
-        stakingPool: fn({ ...chains[chainIdx].stakingPool })
-      };
-      return { ...prev, chains };
+      const stakingPools = [...(prev.stakingPools || [])];
+      stakingPools[chainIdx] = fn({ ...stakingPools[chainIdx] });
+      return { ...prev, stakingPools };
     });
 
   const stakeTokens = useCallback(
@@ -27,21 +24,22 @@ export function useStaking() {
       updateBalance(gameState.balance - amount);
 
       updatePool(chainIdx, pool => ({
+        ...pool,
         stakedAmount: pool.stakedAmount + amount,
-        startBlock:   gameState.chains[0].currentBlock.id,
-        rewardAccrued: pool.rewardAccrued
+        lastBlockUpdated: Math.floor(Date.now() / 1000)
       }));
     },
-    [setGameState]
+    [gameState, updateBalance, updatePool]
   );
 
   const claimRewards = useCallback(
     (chainIdx: number) => {
       const pool = poolFor(chainIdx);
+      if (!pool) return;
       if (pool.rewardAccrued <= 0) return;
       updateBalance(gameState.balance + pool.rewardAccrued);
 
-      updatePool(chainIdx, pool => ({
+      updatePool(chainIdx, pool => ({   
         ...pool,
         rewardAccrued: 0,
         startBlock: gameState.chains[chainIdx].currentBlock.id
@@ -51,28 +49,31 @@ export function useStaking() {
   );
 
   const accrueAll = useCallback(() => {
+    const now = Math.floor(Date.now() / 1000);
     setGameState(prev => {
-      const chains = prev.chains.map(chain => {
-        const meta   = stakingConfig.find(c => c.chainId === chain.id)!;
-        const { stakingPool, currentBlock } = chain as any; // adjust typing
-        if (!stakingPool.stakedAmount) return chain;
+      if (!prev.stakingPools) return prev;
+      const newStakingPools = prev.stakingPools.map((pool, idx) => {
+        if (pool.stakedAmount <= 0) return pool;
 
-        const blocks = currentBlock.id - stakingPool.lastBlockUpdated;
-        if (blocks <= 0) return chain;
+        const blocksElapsed = (Date.now() / 1000) - pool.lastBlockUpdated;
+        if (blocksElapsed <= 0) return pool;
 
-        const apy = meta.baseApy * meta.yieldMultiplier;
-        const yieldPerBlock =
-          (stakingPool.stakedAmount + stakingPool.rewardAccrued * (apy / 100) ) / BLOCKS_PER_GAME_YEAR;
+        const meta = stakingConfig[idx]
+        const annualRate = (meta.baseApy * meta.yieldMultiplier) / 100;
+        const yieldPerBlock = ((pool.stakedAmount + pool.rewardAccrued) * annualRate) / BLOCKS_PER_GAME_YEAR;
+        const rewardEarned = Math.floor(yieldPerBlock * blocksElapsed);
+
         return {
-          ...chain,
-          stakingPool: {
-            ...stakingPool,
-            rewardAccrued: stakingPool.rewardAccrued + yieldPerBlock * blocks,
-            lastBlockUpdated: currentBlock.id
-          }
+          ...pool,
+          rewardAccrued: pool.rewardAccrued + rewardEarned,
+          lastBlockUpdated: now,
         };
       });
-      return { ...prev, chains };
+
+      return {
+        ...prev,
+        stakingPools: newStakingPools,
+      };
     });
   }, [setGameState]);
 
@@ -80,6 +81,6 @@ export function useStaking() {
     stakeTokens,
     claimRewards,
     accrueAll,
-    stakingInfo: gameState.chains.map(c => c.stakingPool)
+    stakingInfo: gameState.stakingPools?.map(pools => pools)
   };
 }

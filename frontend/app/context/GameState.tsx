@@ -4,6 +4,7 @@ import { GameState, newEmptyGameState, UpgradableGameState, newBaseUpgradableGam
 import { newBlock } from "../types/Block";
 import { Transaction } from "../types/Transaction";
 import { newEmptyL2 } from "../types/L2";
+import { StakingPool } from "../types/StakingPool";
 import { useEventManager } from "./EventManager";
 import { getGameState } from "../api/state";
 import { mockAddress } from "../api/mock";
@@ -24,6 +25,8 @@ type GameStateContextType = {
 
   finalizeL2Proof: () => void;
   finalizeL2DA: () => void;
+
+  addStakingPoolToGameState: (pool: StakingPool) => void;
 };
 
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
@@ -157,40 +160,46 @@ export const GameStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const finalizeL2Proof = () => {
-    if (!gameState.l2) return;
-
-    const finalizedProof = { ...gameState.l2.prover };
-    notify("L2ProofFinalized", { proof: finalizedProof });
-
-    setGameState((prevState) => ({
-      ...prevState,
-      l2: {
-        ...prevState.l2,
-        prover: { ...prevState.l2.prover, blockFees: 0, blocks: [] }
-      }
-    }));
+    setGameState((prevState) => {
+      if (!prevState.l2) return prevState; 
+      const finalizedProof = { ...prevState.l2.prover };
+      notify("L2ProofFinalized", { proof: finalizedProof });
+      return {
+        ...prevState,
+        l2: {
+          ...prevState.l2,
+          prover: { ...finalizedProof, blockFees: 0, blocks: [] }
+        }
+      };
+    });
   }
 
   const finalizeL2DA = () => {
-    if (!gameState.l2) return;
-    const newGameState = { ...gameState };
-    if (!newGameState.l2) return;
+    setGameState((prevState) => {
+      if (!prevState.l2) return prevState;0
+      const finalizedDA = { ...prevState.l2.da };
+      notify("L2DAFinalized", { da: finalizedDA });
+      return {
+        ...prevState,
+        l2: {
+          ...prevState.l2,
+          da: { ...finalizedDA, blockFees: 0, blocks: [] }
+        }
+      };
+    });
+  }
 
-    const finalizedDA = { ...gameState.l2.da };
-    notify("L2DAFinalized", { da: finalizedDA });
-
+  const addStakingPoolToGameState = (pool: StakingPool) => {
     setGameState((prevState) => ({
       ...prevState,
-      l2: {
-        ...prevState.l2,
-        da: { ...prevState.l2.da, blockFees: 0, blocks: [] }
-      }
+      stakingPools: prevState.stakingPools ? [...prevState.stakingPools, pool] : [pool]
     }));
+    notify("StakingPoolAdded", { pool });
   }
 
   return (
     <GameStateContext.Provider value={{ gameState, setGameState, upgradableGameState, setUpgradableGameState, finalizeBlock, updateBalance, addTxToBlock, finalizeL2Block, addL2TxToBlock, unlockL2,
-    finalizeL2Proof, finalizeL2DA }}>
+    finalizeL2Proof, finalizeL2DA, addStakingPoolToGameState }}>
       {children}
     </GameStateContext.Provider>
   );

@@ -519,6 +519,7 @@ export const StorePage: React.FC = () => {
             />
 
             <UpgradeCard
+              containerClass="mt-4"
               imageSrc={stakingImg}
               title="Staking"
               description="Lock coins to earn yield on Chain 2."

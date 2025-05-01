@@ -1,10 +1,12 @@
 import { Chain, newEmptyChain } from "./Chain";
 import { L2 } from "./L2";
+import { StakingPool } from "./StakingPool";
 
 export type GameState = {
   balance: number;
   chains: Chain[];
   l2?: L2;
+  stakingPools?: StakingPool[];
 }
 
 export const newEmptyGameState = (): GameState => ({

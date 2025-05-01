@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Upgrade } from "../types/Upgrade";
+import { newStakingPool } from "../types/StakingPool";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automation.json";
 import { useGameState } from "./GameState";
@@ -47,7 +48,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [l2DappTypes, setL2DappTypes] = useState<TransactionTypeState[]>([]);
   const { notify } = useEventManager();
   // TODO: Move upgradableGameState into this context?
-  const { setGameState, upgradableGameState, setUpgradableGameState } = useGameState();
+  const { setGameState, upgradableGameState, setUpgradableGameState, addStakingPoolToGameState } = useGameState();
 
   const resetUpgrades = () => {
     // Initialize upgrades
@@ -286,6 +287,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           ...prev,
           staking: true,
         }));
+        addStakingPoolToGameState(newStakingPool(0, 0));
         break;
       default:
         console.warn(`Unknown upgrade: ${upgrade.name}`);

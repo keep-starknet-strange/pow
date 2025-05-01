@@ -2,7 +2,8 @@
   {
     "chainId": 0,
     "name": "Main Chain",
-    "baseApy": 6,          
+    "baseApy": 6,
+    "stakingAmount": 100,        
     "yieldMultiplier": 25,  
     "icon": "🥩",
     "unlockCosts": [700]
@@ -11,6 +12,7 @@
     "chainId": 1,
     "name": "Fox Chain",
     "baseApy": 9,
+    "stakingAmount": 100,
     "yieldMultiplier": 30,
     "icon": "🦊",
     "unlockCosts": [10]
@@ -19,6 +21,7 @@
     "chainId": 2,
     "name": "Phoenix Chain",
     "baseApy": 12,
+    "stakingAmount": 100,
     "yieldMultiplier": 40,
     "icon": "🔥",
     "unlockCosts": [100]
