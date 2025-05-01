@@ -2,11 +2,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import { useAchievement } from "../context/Achievements";
 import { Achievement } from "../types/Achievement";
 
-export type AchievementsPageProps = {
-  closeTab: () => void;
-};
-
-export const AchievementsPage: React.FC<AchievementsPageProps> = (props) => {
+export const AchievementsPage: React.FC = () => {
   const { achievements } = useAchievement();
   return (
     <View className="flex-1">

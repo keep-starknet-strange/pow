@@ -31,24 +31,12 @@
     "volume": 0.3,
     "rate": 1.2
   },
-  "TxUpgradePurchased": {
+  "ItemPurchased": {
     "volume": 0.5,
     "rate": 1
   },
-  "UpgradePurchased": {
-    "volume": 0.5,
-    "rate": 1
-  },
-  "StakingPurchased": {
-    "volume": 0.5,
-    "rate": 1
-  },
-  "L2Purchased": {
-    "volume": 0.5,
-    "rate": 1
-  },
-  "PrestigePurchased": {
-    "volume": 0.5,
+  "BuyFailed": {
+    "volume": 1,
     "rate": 1
   },
   "TxAdded": {

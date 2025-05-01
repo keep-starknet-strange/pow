@@ -10,8 +10,12 @@ export type EventType =
   'DaClicked' |
   'DaDone' |
   'BalanceUpdated' |
+  'ItemPurchased' |
+  'BuyFailed' |
   'TxUpgradePurchased' |
   'UpgradePurchased' |
+  'AutomationPurchased' |
+  'DappsPurchased' |
   'StakingPurchased' |
   'L2Purchased' |
   'PrestigePurchased' |

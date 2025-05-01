@@ -11,42 +11,42 @@
           "name": "CPU",
           "color": "#f7f760",
           "cost": 10,
-          "speed": 1
+          "speed": 2
         },
         {
           "id": 1,
           "name": "GPU",
           "color": "#f7f760",
           "cost": 20,
-          "speed": 2
+          "speed": 4
         },
         {
           "id": 2,
           "name": "ASIC",
           "color": "#f7f760",
           "cost": 40,
-          "speed": 3
+          "speed": 7
         },
         {
           "id": 3,
           "name": "Antminer",
           "color": "#f7f760",
           "cost": 80,
-          "speed": 4
+          "speed": 10
         },
         {
           "id": 4,
           "name": "Bitmain",
           "color": "#f7f760",
           "cost": 160,
-          "speed": 5
+          "speed": 14
         },
         {
           "id": 5,
           "name": "Quantum",
           "color": "#f7f760",
           "cost": 320,
-          "speed": 10
+          "speed": 18
         }
       ]
     }
@@ -67,7 +67,7 @@
         },
         {
           "id": 1,
-          "name": "Improved",
+          "name": "Rust",
           "color": "#f7f760",
           "cost": 40,
           "speed": 2
@@ -81,14 +81,14 @@
         },
         {
           "id": 3,
-          "name": "Cairo-native",
+          "name": "Cairo",
           "color": "#f7f760",
           "cost": 160,
           "speed": 4
         },
         {
           "id": 4,
-          "name": "Parallelized",
+          "name": "Parallel",
           "color": "#f7f760",
           "cost": 320,
           "speed": 5
@@ -117,28 +117,28 @@
         },
         {
           "id": 1,
-          "name": "ZK SNARK",
+          "name": "SNARK",
           "color": "#f7f760",
           "cost": 60,
           "speed": 2
         },
         {
           "id": 2,
-          "name": "ZK STARK",
+          "name": "STARK",
           "color": "#f7f760",
           "cost": 120,
           "speed": 4
         },
         {
           "id": 3,
-          "name": "STARK Stone",
+          "name": "Stone",
           "color": "#f7f760",
           "cost": 240,
           "speed": 6
         },
         {
           "id": 4,
-          "name": "STARK STWO",
+          "name": "STWO",
           "color": "#f7f760",
           "cost": 480,
           "speed": 10
@@ -167,7 +167,7 @@
         },
         {
           "id": 2,
-          "name": "Compression",
+          "name": "Zip",
           "color": "#f7f760",
           "cost": 160,
           "speed": 4

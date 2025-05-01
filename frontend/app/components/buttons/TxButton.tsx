@@ -1,205 +1,159 @@
 import React, { useEffect, useState } from "react";
-import { Image, TouchableOpacity, Animated, useAnimatedValue } from "react-native";
+import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue } from "react-native";
 import { Dimensions } from 'react-native';
-import { useEventManager } from "../../context/EventManager";
-import { useGameState } from "../../context/GameState";
-import { useUpgrades } from "../../context/Upgrades";
-import { useSound } from "../../context/Sound";
-import { getTxIcon, createTx, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
-import transactions from "../../configs/transactions.json";
-import upgradesJson from "../../configs/upgrades.json";
-import prestigeJson from "../../configs/prestige.json";
-import dapps from "../../configs/dapps.json";
+import { useGame } from "../../context/Game";
+import { useTransactions } from "../../context/Transactions";
+import { newTransaction } from "../../types/Chains";
+import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
+import lockImg from "../../../assets/images/lock.png";
 
 const window = Dimensions.get('window');
 
 export type TxButtonProps = {
-  chain: string;
+  chainId: number;
   txType: any; // TODO: Define a proper type for txType
-  addTransaction: (chainId: number, tx: any) => void;
   isDapp?: boolean;
-  size?: number;
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
-  const { notify } = useEventManager();
-  const { gameState, updateBalance, unlockL2, upgradableGameState } = useGameState();
-  const { upgrades, l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade,
-          l1DappTypes, l2DappTypes, l1DappFeeUpgrade, l2DappFeeUpgrade } = useUpgrades();
+  const { addTransaction } = useGame();
+  const { transactionFees, dappFees, getNextTxFeeCost, getNextDappFeeCost,
+          getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
+          txFeeUpgrade, dappFeeUpgrade
+        } = useTransactions();
 
-  const [chainId, setChainId] = useState(0);
-  const [txTypes, setTxTypes] = useState(l1TransactionTypes);
+  const [feeLevel, setFeeLevel] = useState<number>(-1);
   useEffect(() => {
+    const chainId = props.chainId;
     if (props.isDapp) {
-      if (props.chain === "L1") {
-        setTxTypes(l1DappTypes);
-      } else {
-        setTxTypes(l2DappTypes);
-      }
-      return;
-    }
-    if (props.chain === "L1") {
-      setTxTypes(l1TransactionTypes);
+      setFeeLevel(dappFees[chainId]?.[props.txType.id]);
     } else {
-      setTxTypes(l2TransactionTypes);
+      setFeeLevel(transactionFees[chainId]?.[props.txType.id]);
     }
-  }, [props.chain, l1TransactionTypes, l2TransactionTypes, l1DappTypes, l2DappTypes]);
+  }, [props.chainId, props.txType.id, props.isDapp, transactionFees, dappFees]);
+  const [feeCost, setFeeCost] = useState<number>(0);
+  useEffect(() => {
+    const chainId = props.chainId;
+    if (props.isDapp) {
+      setFeeCost(getNextDappFeeCost(chainId, props.txType.id));
+    } else {
+      setFeeCost(getNextTxFeeCost(chainId, props.txType.id));
+    }
+  }, [props.chainId, props.txType.id, props.isDapp, getNextTxFeeCost, getNextDappFeeCost]);
+
+  const [fee, setFee] = useState<number>(0);
+  const [speed, setSpeed] = useState<number>(0);
+  useEffect(() => {
+    const chainId = props.chainId;
+
+    if (props.isDapp) {
+      setFee(getDappFee(chainId, props.txType.id));
+      setSpeed(getDappSpeed(chainId, props.txType.id));
+    } else {
+      setFee(getTransactionFee(chainId, props.txType.id));
+      setSpeed(getTransactionSpeed(chainId, props.txType.id));
+    }
+  }, [props.chainId, props.txType.id, props.isDapp, getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed]);
+
+  const addNewTransaction = async () => {
+    const newTx = newTransaction(props.txType.id, fee, icon);
+    setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
+    addTransaction(props.chainId, newTx);
+  }
+
   const [icon, setIcon] = useState<any>(questionMarkIcon);
   useEffect(() => {
-    setChainId(props.chain === "L1" ? 0 : 1);
-    if (props.isDapp) {
-      if (props.chain === "L1") {
-        setTxTypes(l1DappTypes);
-      } else {
-        setTxTypes(l2DappTypes);
-      }
-      return;
-    }
-    if (props.chain === "L1") {
-      setTxTypes(l1TransactionTypes);
-    } else {
-      setTxTypes(l2TransactionTypes);
-    }
-  }, [props.chain]);
-  useEffect(() => {
-    if (props.txType.name === "Inscription") {
-      setIcon(getRandomInscriptionImage());
-    } else if (props.txType.name === "NFTs") {
-      setIcon(getRandomNFTImage());
-    } else {
-      setIcon(getTxIcon(chainId + 1, props.txType.id, props.isDapp));
-    }
-  }, [props.txType, chainId]);
-
-  const addTransactionToBlock = (chainId: number, txType: any, feeLevel: number = 0) => {
-    if (
-      gameState.chains[chainId].currentBlock.transactions.length >=
-      gameState.chains[chainId].currentBlock.maxSize
-    )
-      return;
-
-    // TODO: Hardcoded for now
-    let mevBoost = 1;
-    if (upgrades[chainId][3].level === 0) {
-      mevBoost = 1;
-    } else if (chainId === 0) {
-      mevBoost = upgradesJson.L1[3].value[upgrades[chainId][3].level - 1];
-    } else {
-      mevBoost = upgradesJson.L2[3].value[upgrades[chainId][3].level - 1];
-    }
-    const txFee = txType.value[feeLevel] * mevBoost * prestigeJson[upgradableGameState.prestige].scaler;
-    const tx = createTx(chainId + 1, txType.id, txFee, icon);
-    props.addTransaction(chainId, tx);
-    if (txType.name === "Inscription") {
-      setIcon(getRandomInscriptionImage());
-    } else if (txType.name === "NFTs") {
-      setIcon(getRandomNFTImage());
-    }
-
-    /*
-    TODO
-    const newTimes = [...last10TransactionsTimes, Date.now()];
-    while (newTimes.length > 10) {
-      newTimes.shift();
-    }
-    setLast10TransactionsTimes(newTimes);
-
-    const timeDiff = newTimes[newTimes.length - 1] - newTimes[0];
-    const newTps = (newTimes.length - 1) / (timeDiff / 1000);
-    if (isNaN(newTps)) {
-      setTps(0);
-    } else {
-      setTps(newTps);
-    }
-    */
-  };
-
-  const tryBuyTx = (txTypeId: number) => {
-    if (txTypes[txTypeId].feeLevel !== 0) return;
-    let txType = null;
-    if (props.isDapp) {
-      txType = chainId === 0 ? dapps.L1[txTypeId] : dapps.L2[txTypeId];
-    } else {
-      txType = chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
-    }
-    
-    if (gameState.balance < txType.feeCosts[0]) return;
-    if (props.isDapp) {
-      if (chainId === 0) {
-        l1DappFeeUpgrade(txTypeId);
-      } else {
-        l2DappFeeUpgrade(txTypeId);
-      }
-    } else {
-      if (chainId === 0) {
-        l1TxFeeUpgrade(txTypeId);
-      } else {
-        l2TxFeeUpgrade(txTypeId);
-      }
-    }
-
-    notify("TxUpgradePurchased");
-    const newBalance = gameState.balance - txType.feeCosts[0];
-    updateBalance(newBalance);
-
-    if (txType.name === "L2") {
-      unlockL2();
-    }
-  };
+    setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
+  }, [props.chainId, props.txType.id, props.isDapp, getTxIcon]);
 
   const sequenceAnim = useAnimatedValue(0);
   const [sequencedDone, setSequencedDone] = useState(0);
   useEffect(() => {
-    if (!txTypes[props.txType.id] ||
-        txTypes[props.txType.id].feeLevel === 0 ||
-        txTypes[props.txType.id].speedLevel === 0)
-      return;
+    if (speed <= 0) return;
+    const randomValue = Math.floor(Math.random() * 300) - 150;
     Animated.timing(sequenceAnim, {
       toValue: 100,
-      duration: 1000 / txTypes[props.txType.id].speedLevel,
+      easing: Easing.linear,
+      duration: (5000 / speed) + randomValue,
       useNativeDriver: false,
     }).start(() => {
       sequenceAnim.setValue(0);
-      // TODO: Seperate callback for this to avoid slowing down the animation
-      let txType = null;
-      if (props.isDapp) {
-        txType = chainId === 0 ? dapps.L1[props.txType.id] : dapps.L2[props.txType.id];
-      } else {
-        txType = chainId === 0 ? transactions.L1[props.txType.id] : transactions.L2[props.txType.id];
-      }
-      addTransactionToBlock(chainId, txType, txTypes[props.txType.id]?.feeLevel - 1);
+      addNewTransaction();
       setSequencedDone(sequencedDone + 1);
     });
-  }, [sequenceAnim, sequencedDone, txTypes, props.txType, chainId]);
+  }, [sequencedDone, speed]);
 
   return (
     <TouchableOpacity
       style={{
         backgroundColor: props.txType.color,
         borderColor: props.txType.color,
-        width: window.width * (props.size || 0.16),
-        height: window.width * (props.size || 0.16),
+        width: window.width * 0.16,
+        height: window.width * 0.16,
       }}
-      className="flex flex-col items-center justify-center rounded-lg border-2 overflow-hidden relative"
+      className="flex flex-col items-center justify-center rounded-lg border-2 relative"
       onPress={() => {
-        if (props.txType.value[txTypes[props.txType.id].feeLevel - 1] === 0) return;
-        if (txTypes[props.txType.id].feeLevel === 0) tryBuyTx(props.txType.id);
-        else addTransactionToBlock(chainId, props.txType, txTypes[props.txType.id].feeLevel - 1);
+        if (feeLevel === -1) {
+          if (props.isDapp) {
+            dappFeeUpgrade(props.chainId, props.txType.id);
+          } else {
+            txFeeUpgrade(props.chainId, props.txType.id);
+          }
+          return;
+        }
+        addNewTransaction();
       }}
     >
-      <Image
-        source={icon}
-        className="w-full h-full object-contain"
-      />
-      {txTypes[props.txType.id]?.feeLevel !== 0 && txTypes[props.txType.id]?.speedLevel !== 0 && (
-        <Animated.View
-          className="absolute h-full bg-[#f9f9f980] left-0 rounded-sm"
-          style={{
-            width: sequenceAnim
-          }}
+      <View className="w-full h-full relative overflow-hidden">
+        <Image
+          source={icon}
+          className="w-full h-full object-contain p-1"
         />
+        {speed > 0 && (
+          <Animated.View
+            className="absolute bg-[#f9f9f980] rounded-full
+                       top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]"
+            style={{
+              height: sequenceAnim,
+              width: sequenceAnim
+            }}
+          />
+        )}
+      </View>
+      {feeLevel === -1 && (
+        <View
+          className="absolute w-full h-full bg-[#292929d9] rounded-lg
+                     flex items-center justify-center
+                     border-2 border-[#f9f9f920] pointer-events-none
+                     top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+        >
+          <Image
+            source={lockImg}
+            className="w-full h-full object-contain p-2 mb-3"
+          />
+        </View>
       )}
+      <Text
+        className="absolute top-0 w-full text-center text-[0.6rem] font-bold"
+        style={{
+          color: feeLevel === -1 ? props.txType.color : "#292929d0",
+        }}
+      >
+        {props.txType.name}
+      </Text>
+      <Text
+        className="absolute w-[4.2rem] border-2 bg-[#292929] rounded-lg
+                   bottom-[-1rem] text-center text-[1rem] font-bold"
+        style={{
+          color: feeLevel === -1 ? "#f76060a0" : "#60f760a0",
+          borderColor: props.txType.color,
+        }}
+      >
+        {feeLevel === -1 ? "" : "+"}
+        ₿
+        {feeLevel === -1 ? feeCost : fee.toFixed(0)}
+      </Text>
     </TouchableOpacity>
   );
 }

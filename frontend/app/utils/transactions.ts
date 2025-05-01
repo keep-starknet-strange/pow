@@ -26,22 +26,26 @@ export const getRandomNFTImage = () => {
 
 export const getChainIcons = (chain: number) => {
   const layerIcons: any = {
-    1: {
+    0: {
       "Transfer": transferIcon,
+      "Segwit": segwitIcon,
       "Blobs": blobIcon,
-      "Inscription": getRandomInscriptionImage(),
+      "Inscriptions": getRandomInscriptionImage(),
+      "Runes": runesIcon,
       "Dapp": dappIcon,
       "L2": l2BatchIcon,
       "PowSwap": powSwapIcon,
       "ClosedOcean": closedOceanIcon,
       "Pave": paveIcon,
       "Libra": libraIcon,
-      "CryptoDragons": cryptoDragonsIcon,
+      "Crypto Dragons": cryptoDragonsIcon,
     },
-    2: {
+    1: {
       "Transfer": transferIcon,
       "Bridge": transferIcon,
       "NFTs": getRandomNFTImage(),
+      "Oracles": oracleIcon,
+      "Attestations": attestationIcon,
       "Dapp": dappIcon,
       "AppChain": dojoIcon,
       "AVNU": avnuIcon,
@@ -53,20 +57,51 @@ export const getChainIcons = (chain: number) => {
   return layerIcons[chain];
 }
 
-export const getTxIcon = (chain: number, txTypeId: number, isDapp?: boolean) => {
+export const getTxIcon = (chainId: number, txTypeId: number, isDapp?: boolean) => {
+  // TODO: Hardcoded for now, need to be dynamic
+  if (txTypeId === 101) {
+    return blobIcon;
+  } else if (txTypeId === 102) {
+    return l2BatchIcon;
+  }
   if (isDapp) {
-    const dappMeta = chain === 1 ? dappsJson.L1[txTypeId] : dappsJson.L2[txTypeId];
-    const icons = getChainIcons(chain);
+    const dappMeta = chainId === 0 ? dappsJson.L1.transactions[txTypeId] : dappsJson.L2.transactions[txTypeId];
+    const icons = getChainIcons(chainId);
     return icons?.[dappMeta.name] || questionMarkImage;
   }
-  const txMeta = chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
-  const icons = getChainIcons(chain);
+  const txMeta = chainId === 0 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
+  const icons = getChainIcons(chainId);
   return icons?.[txMeta.name] || questionMarkImage;
+}
+
+export const getTxStyle = (chainId: number, txTypeId: number, isDapp?: boolean) => {
+  // TODO: Hardcoded for now, need to be dynamic
+  if (txTypeId === 101) {
+    return {
+      backgroundColor: "#f7f7f7f0",
+    };
+  } else if (txTypeId === 102) {
+    return {
+      backgroundColor: "#f7f7f7f0",
+    };
+  }
+  if (isDapp) {
+    const dappMeta = chainId === 0 ? dappsJson.L1.transactions[txTypeId] : dappsJson.L2.transactions[txTypeId];
+    return {
+      backgroundColor: dappMeta.color || "#f7f7f7",
+    };
+  }
+  const txMeta = chainId === 0 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
+  return {
+    backgroundColor: txMeta.color || "#f7f7f7",
+  };
 }
 
 // Above as import
 import transferIcon from "../../assets/images/transaction/transfer.png";
 import blobIcon from "../../assets/images/transaction/l2Blob.png";
+import segwitIcon from "../../assets/images/transaction/segwit.png";
+import runesIcon from "../../assets/images/transaction/runes.png";
 import dappIcon from "../../assets/images/transaction/dapp.png";
 import l2BatchIcon from "../../assets/images/transaction/l2Batch.png";
 import dojoIcon from "../../assets/images/transaction/dojo.png";
@@ -79,6 +114,8 @@ import avnuIcon from "../../assets/images/dapps/avnu.png";
 import artPeaceIcon from "../../assets/images/dapps/artpeace.jpeg";
 import vesuIcon from "../../assets/images/dapps/vesu.jpeg";
 import eternumIcon from "../../assets/images/dapps/eternum.jpeg";
+import oracleIcon from "../../assets/images/transaction/oracle.png";
+import attestationIcon from "../../assets/images/transaction/attestation.png";
 export const createTx = (chain: number, txTypeId: number, txFee: number, txIcon?: string) => {
   const txMeta = chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
   const image = txIcon || getTxIcon(chain, txTypeId);

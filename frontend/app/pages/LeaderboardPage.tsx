@@ -9,11 +9,7 @@ export const getPrestigeIcon = (prestige: number) => {
   return images[prestige] || images[0];
 }
 
-export type LeaderboardPageProps = {
-  closeTab: () => void;
-};
-
-export const LeaderboardPage: React.FC<LeaderboardPageProps> = (props) => {
+export const LeaderboardPage: React.FC = () => {
   const leaderboardMock = [
     {
       id: 1,

@@ -48,6 +48,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const daClickedSource = require("../../assets/sounds/da-clicked.wav");
   const daDoneSource = require("../../assets/sounds/da-done.wav");
   const itemPurchasedSource = require("../../assets/sounds/purchase.mp3");
+  const buyFailedSource = require("../../assets/sounds/buy-failed.mp3");
   const achievementUnlockedSource = require("../../assets/sounds/achievement.mp3");
   const basicClickSource = require("../../assets/sounds/basic-click.mp3");
   const soundEffects: { [key: string]: any } = {
@@ -59,18 +60,22 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     ProveDone: proveDoneSource,
     DaClicked: daClickedSource,
     DaDone: daDoneSource,
-    TxUpgradePurchased: itemPurchasedSource,
-    UpgradePurchased: itemPurchasedSource,
-    StakingPurchased: itemPurchasedSource,
-    L2Purchased: itemPurchasedSource,
-    PrestigePurchased: itemPurchasedSource,
+    ItemPurchased: itemPurchasedSource,
+    BuyFailed: buyFailedSource,
     TxAdded: txClickedSource,
     AchievementUnlocked: achievementUnlockedSource,
     BasicClick: basicClickSource,
   };
+  const minPitchShift = 0.5;
+  const maxPitchShift = 2.0;
   const playSoundEffect = useCallback(async (type: string, pitchShift: number = 1.0) => {
     if (!isSoundOn || !soundEffects[type] || !soundsJson.hasOwnProperty(type)) return;
 
+    if (pitchShift < minPitchShift) {
+      pitchShift = minPitchShift;
+    } else if (pitchShift > maxPitchShift) {
+      pitchShift = maxPitchShift;
+    }
     const soundConfig = soundsJson[type as keyof typeof soundsJson];
     const { sound } = await Audio.Sound.createAsync(soundEffects[type], {
       volume: soundEffectVolume * (soundConfig.volume || 1.0),

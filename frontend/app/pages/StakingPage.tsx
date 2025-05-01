@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from "@react-navigation/native";
-import { useGameState } from "../context/GameState";
-import { useStaking } from "../hooks/useStaking";
-import { BlockView } from "../components/BlockView";
+import { useBalance } from "../context/Balance";
+import { useStaking } from "../context/Staking";
 import { AlertModal } from "../components/AlertModal";
+import { StakingChainView } from "../components/StakingChainView";
 import stakingConfig from "../configs/staking.json";
 
-export type StakingPageProps = {
-  switchPage: (page: string) => void;
-};
-
 export const StakingPage: React.FC = (props) => {
-  const { gameState } = useGameState();
-  const { stakeTokens, claimRewards, accrueAll } = useStaking();
+  const { balance } = useBalance();
+  const { stakingChains, getStakingPool, stakeTokens, claimRewards, accrueAll } = useStaking();
   const [insufficientFunds, setInsufficientFunds] = useState(false);
 
   useFocusEffect(
@@ -23,7 +19,7 @@ export const StakingPage: React.FC = (props) => {
   );
 
   const [inputs, setInputs] = useState<string[]>(
-    Array(gameState.chains.length).fill("")
+    Array(stakingChains.length).fill("")
   );
 
   const handleInput = (idx: number, text: string) =>
@@ -36,7 +32,7 @@ export const StakingPage: React.FC = (props) => {
   const handleStake = (idx: number) => {
     const amount = parseFloat(inputs[idx]);
     if (!isNaN(amount) && amount > 0) {
-      if (amount > gameState.balance) {
+      if (amount > balance) {
         setInsufficientFunds(true);
         handleInput(idx, ""); 
         return;
@@ -51,41 +47,26 @@ export const StakingPage: React.FC = (props) => {
         <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🥩Staking</Text>
       </View>
 
-      {gameState.chains.map((chain, idx) => {
-        const pool = chain.stakingPool;
-        const meta = stakingConfig.find(c => c.chainId === chain.id)!;
-        const pastBlocks = chain.pastBlocks ?? [];
+      {stakingChains.map((chain, idx) => {
+        const pool = getStakingPool(chain.chainId);
+        const meta = stakingConfig.find(c => c.chainId === chain.chainId)!;
         return (
-          <View key={chain.id ?? idx} className="bg-gray-800 rounded-2xl p-5 mt-6">
+          <View key={idx} className="bg-gray-800 rounded-2xl p-5 mt-6">
 
             <Text className="text-white text-lg font-semibold mb-2">
-            {meta.icon} {meta.name}
+              {meta?.icon} {meta.name}
             </Text>
-
-            {pastBlocks.length > 0 && (
-              <View className="flex-row-reverse w-full px-2 mt-4">
-                {pastBlocks.map((block, bi) => (
-                  <View key={block.id ?? bi} className="flex-row items-center">
-                    <View className="h-28 w-28">
-                      <BlockView block={block} showOverlay />
-                    </View>
-                    {bi !== 0 && (
-                      <View className="w-2 h-1 mx-[2px] bg-[#f9f9f980] rounded-lg" />
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
+            <StakingChainView chainId={chain.chainId} />
 
             {/* staked + claim row */}
             <View className="flex-row items-center justify-center gap-x-8 mt-4 mb-3">
               <Text className="text-white">
-                {pool.stakedAmount.toFixed(2) + " staked"}
+                {pool?.stakedAmount.toFixed(2) + " staked"}
               </Text>
 
               <TouchableOpacity onPress={() => claimRewards(idx)}>
                 <Text className="text-green-400">
-                  {"Claim " + pool.rewardAccrued.toFixed(2)}
+                  {"Claim " + pool?.rewardAccrued.toFixed(2)}
                 </Text>
               </TouchableOpacity>
             </View>

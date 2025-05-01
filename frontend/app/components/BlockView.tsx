@@ -1,69 +1,69 @@
+import { useEffect, useState } from "react";
 import { View, Text, Image } from "react-native";
-import { Block } from "../types/Block";
 import messagesJson from "../configs/messages.json";
-import { useGameState } from "../context/GameState";
+import { useUpgrades } from "../context/Upgrades";
+import { Block } from "../types/Chains";
+import { getTxStyle } from "../utils/transactions";
+import feeImg from "../../assets/images/bitcoin.png";
 
 export type BlockViewProps = {
-  block: Block;
-  showOverlay?: boolean;
+  chainId: number;
+  block: Block | null;
   completed: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
-  const { upgradableGameState } = useGameState();
-  const txWidth: number = 100 / Math.sqrt(props.block.maxSize);
-  // TODO: Overlay #s to constant size/length/digits
+  const { currentPrestige } = useUpgrades();
+  const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
+  useEffect(() => {
+    setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
+  }, [props.block?.transactions.length]);
+
   return (
     <View className="w-full h-full flex flex-col items-center justify-center">
       <View className="flex-1 bg-[#f7f7f740] aspect-square rounded-xl border-2 border-[#f7f7f740] relative overflow-hidden">
-        <View className="flex flex-wrap w-full aspect-square"> 
-          {props.block.transactions.map((tx, index) => (
+        <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
+          {props.block?.transactions.map((tx, index) => (
             <View
               key={index}
               className="border-2 border-[#00000020] rounded-lg overflow-hidden"
-              style={{ width: `${txWidth}%`, height: `${txWidth}%`, ...tx.style }}
+              style={{ width: `${txWidth}%`, height: `${txWidth}%`, ...getTxStyle(props.chainId, tx.typeId) }}
             >
-              {tx.image && (
-                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={ tx.image } />
-              )}
+              <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={tx.icon} />
             </View>
           ))}
         </View>
-        {props.block.id === 0 && (
+        {props.block?.blockId === 0 && (
           <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
             {!props.completed && (
-              <Text className="text-[#ffffff] text-2xl font-bold underline text-center py-4">
+              <Text className="text-[#ffffff] text-xl font-bold underline text-center pt-2">
                 Genesis Block
               </Text>
             )}
             <Text
-              className={`text-[#ffffff] font-bold text-center ${props.completed ? "text-sm" : "text-2xl"}`}
+              className={`text-[#ffffff] font-bold text-center ${props.completed ? "text-sm" : "text-xl"}`}
             >
-              {messagesJson.genesis[upgradableGameState.prestige]}
+              {props.chainId === 0 ? messagesJson.genesis.L1[currentPrestige] : messagesJson.genesis.L2[currentPrestige]}
             </Text>
           </View>
         )}
-        {props.showOverlay ? (
+        {props.completed && (
           <View
-            className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between"
-            style={{
-              backgroundColor: props.completed ? "#00000080" : "#00000000",
-            }}
+            className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between bg-[#171717c0] rounded-xl"
           >
-            <View/>
-            <Text className="text-[#e9e9e9f0] text-4xl font-bold m-1">
-              {props.completed ? `#${props.block.id}` : ``}
+            <Text className="text-[#e9e9e9f0] text-3xl font-bold m-1">
+              #{props.block?.blockId}
             </Text>
-            <View className="flex flex-col items-end justify-between w-[95%]">
-              <Text className="text-[#e9e9e9f0] text-xl font-bold">🔲₿{props.block.reward.toFixed(0)}</Text>
-              <Text className="text-[#e9e9e9f0] text-xl font-bold">💰₿{props.block.fees.toFixed(0)}</Text>
-            </View>
-          </View>
-        ) : (
-          <View className="absolute bottom-0 w-full flex flex-row justify-end">
-            <View className="bg-[#272727b0] rounded-tl-lg rounded-br-lg p-[4px]">
-            <Text className="text-[#e9e9e9f0] text-2xl font-bold">🔲 ₿{props.block.reward.toFixed(2)}</Text>
-            <Text className="text-[#e9e9e9f0] text-2xl font-bold">💰 ₿{props.block.fees.toFixed(2)}</Text>
+            <View className="flex flex-col items-end justify-center w-full px-2">
+              <View className="flex flex-row items-center gap-1">
+                <Image
+                  source={feeImg}
+                  className="w-4 h-4"
+                />
+                <Text className="text-[#e9e9e9f0] text-lg font-bold">
+                  ₿{((props.block?.fees || 0) + (props.block?.reward || 0)).toFixed(0)}
+                </Text>
+              </View>
             </View>
           </View>
         )}

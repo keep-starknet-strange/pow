@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, Dimensions, Animated, useAnimatedValue } from "react-native";
 import { useEventManager } from "../../context/EventManager";
-import { useGameState } from "../../context/GameState";
 import { useSound } from "../../context/Sound";
 import { useUpgrades } from "../../context/Upgrades";
 import { getTxIcon, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
