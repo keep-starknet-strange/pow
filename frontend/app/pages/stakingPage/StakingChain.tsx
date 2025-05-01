@@ -64,7 +64,7 @@ const StakingChain: React.FC<StakingChainProps> = ({
 
     <View className="flex-row justify-center mt-2">
       <TouchableOpacity
-        onPress={() => onPressStake(meta.chainId, meta.stakingAmount)}
+        onPress={() => onPressStake(idx, meta.stakingAmount)}
         className="bg-blue-600 px-6 py-2 rounded-xl"
       >
         <Text className="text-white font-semibold">

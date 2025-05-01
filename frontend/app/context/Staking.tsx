@@ -37,6 +37,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setStakingPools([]);
     setStakingUnlocked(false);
   }
+  
   useEffect(() => {
     resetStaking();
   }, []);
@@ -96,7 +97,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         lastBlockUpdated: Math.floor(Date.now() / 1000)
       }));
     },
-    [updateBalance]
+    [updateBalance, stakingPools]
   );
 
   const accrueAll = useCallback(() => {

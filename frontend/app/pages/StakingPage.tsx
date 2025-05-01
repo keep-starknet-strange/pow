@@ -17,12 +17,6 @@ export const StakingPage: React.FC = (props) => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
   const tick = useTicker(SECOND);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      accrueAll();         
-    }, [accrueAll])
-  );
-
   useEffect(() => {
     accrueAll();
   }, [tick, accrueAll]);
