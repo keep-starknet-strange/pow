@@ -103,7 +103,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const onBlockMined = () => {
-    let completedBlock = workingBlocks[0];
+    const completedBlock = workingBlocks[0];
     const blockReward = completedBlock.reward || getUpgradeValue(0, "Block Reward");
     completedBlock.reward = blockReward;
     setWorkingBlocks((prevState) => {
@@ -147,7 +147,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const onBlockSequenced = () => {
-    let completedBlock = workingBlocks[1];
+    const completedBlock = workingBlocks[1];
     const blockReward = completedBlock.reward || getUpgradeValue(1, "Block Reward");
     completedBlock.reward = blockReward;
     setWorkingBlocks((prevState) => {

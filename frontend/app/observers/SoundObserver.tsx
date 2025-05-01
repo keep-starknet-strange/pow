@@ -9,13 +9,15 @@ export class SoundObserver implements Observer {
 
   onNotify(eventType: EventType, data?: any): void {
     switch (eventType) {
-      case 'TxAdded':
+      case "TxAdded": {
         const pitchShift = data?.tx.fee ? (data.tx.fee / 8) + 1 : 0;
         this.playSound(eventType, pitchShift);
         break;
-      default:
+      }
+      default: {
         this.playSound(eventType, data?.pitchShift);
         break;
+      }
     }
   }
 }

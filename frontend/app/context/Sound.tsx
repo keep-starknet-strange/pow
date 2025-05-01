@@ -38,6 +38,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [musicVolume, setMusicVolumeInner] = useState(0.5);
 
   // Sound Effects
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const txClickedSource = require("../../assets/sounds/tx-clicked.mp3");
   const mineClickedSource = require("../../assets/sounds/mine-clicked.mp3");
   const blockMinedSource = require("../../assets/sounds/block-mined.mp3");
