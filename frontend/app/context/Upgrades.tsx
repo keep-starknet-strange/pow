@@ -1,13 +1,4 @@
-<<<<<<< HEAD
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-=======
-import { createContext, useContext, useEffect, useState } from "react";
-import { Upgrade } from "../types/Upgrade";
-import { newStakingPool } from "../types/StakingPool";
-import upgradesJson from "../configs/upgrades.json";
-import automationsJson from "../configs/automation.json";
-import { useGameState } from "./GameState";
->>>>>>> aa34c31fd97abb118ff5c6ee013847c4f8f44b11
 import { useEventManager } from "../context/EventManager";
 import { useBalance } from "../context/Balance";
 import upgradesJson from "../configs/upgrades.json";
@@ -47,12 +38,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [automations, setAutomation] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
   const [currentPrestige, setCurrentPrestige] = useState<number>(0);
   const { notify } = useEventManager();
-<<<<<<< HEAD
   const { tryBuy } = useBalance();
-=======
-  // TODO: Move upgradableGameState into this context?
-  const { setGameState, upgradableGameState, setUpgradableGameState, addStakingPoolToGameState } = useGameState();
->>>>>>> aa34c31fd97abb118ff5c6ee013847c4f8f44b11
 
   const resetUpgrades = () => {
     // Initialize upgrades
@@ -104,120 +90,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     resetUpgrades();
   }, []);
 
-<<<<<<< HEAD
   const upgrade = (chainId: number, upgradeId: number) => {
-=======
-  const addUpgrade = (chainId: number, upgradeId: number) => {
-    let upgrade = null;
-    if (chainId === 0) {
-      upgrade = upgradesJson.L1[upgradeId];
-    } else if (chainId === 1) {
-      upgrade = upgradesJson.L2[upgradeId];
-    } else if (chainId === 2) {
-      upgrade = upgradesJson.staking[upgradeId];
-    } else {
-      console.warn(`Unknown chainId: ${chainId}`);
-      return;
-    }
-    switch (upgrade.name) {
-      case "Transaction Sorting":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          sortTransactions: true
-        }));
-        break;
-      case "Block Difficulty":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          difficulty: prev.difficulty - 1
-        }));
-        break;
-      case "Block Size":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          blockSize: prev.blockSize + 1
-        }));
-        break;
-      case "Block Reward":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          blockReward: prev.blockReward * 2
-        }));
-        break;
-      case "MEV Boost":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          mevBoost: prev.mevScaling + 1
-        }));
-        break;
-      case "Sequencer":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          sequencerSpeed: prev.sequencerSpeed + 1
-        }));
-        break;
-      case "Miner":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          minerSpeed: prev.minerSpeed + 1
-        }));
-        break;
-      case "Unlock L2s":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          l2Transactions: true
-        }));
-        break;
-      case "Unlock L2 Blobs":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          l2Blobs: true,
-        }));
-        break;
-      case "Dapp":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          dapp: true,
-        }));
-        break;
-      case "Inscriptions Metaprotocol":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          inscriptionsMetaprotocol: true,
-        }));
-        break;
-      case "Unlock Staking":
-        setUpgradableGameState((prev) => ({
-          ...prev,
-          staking: true,
-        }));
-        addStakingPoolToGameState(newStakingPool(0, 0));
-        break;
-      default:
-        console.warn(`Unknown upgrade: ${upgrade.name}`);
-        break;
-    }
-
-    const currentLevel = upgrades[chainId][upgrade.id]?.level || 0;
-    const newUpgrade = {
-      ...upgrade,
-      level: Math.min(currentLevel + 1, upgrade.costs.length),
-    };
-
-    const updatedUpgrades = { ...upgrades, [chainId]: { ...upgrades[chainId], [upgrade.id]: newUpgrade } };
-    setUpgrades(updatedUpgrades);
-    notify("UpgradePurchased", { upgrade: newUpgrade, allUpgrades: updatedUpgrades });
-  };
-  
-  const updateUpgrade = (upgrade: Upgrade) => {
-    setUpgrades((prevUpgrades) => ({
-      ...prevUpgrades,
-      [upgrade.id]: upgrade
-    }));
-  };
-
-  const removeUpgrade = (upgrade: Upgrade) => {
->>>>>>> aa34c31fd97abb118ff5c6ee013847c4f8f44b11
     setUpgrades((prevUpgrades) => {
       const newUpgrades = { ...prevUpgrades };
       if (!newUpgrades[chainId]) {
