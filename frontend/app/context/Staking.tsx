@@ -6,9 +6,7 @@ import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
 
 type StakingContextType = {
-  stakingChains: Chain[];
   stakingPools: StakingPool[];
-  getStakingChain: (chainId: number) => Chain | undefined;
   getStakingPool: (chainId: number) => StakingPool | undefined;
 
   stakeTokens: (chainIdx: number, amount: number) => void;
@@ -113,31 +111,36 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   const accrueAll = useCallback(() => {
+    const now = Math.floor(Date.now() / 1000);
     setStakingPools(prev => {
-      const pools = prev.map(pool => {
-        const meta = stakingConfig.find(c => c.chainId === pool.chainId)!;
-        const currentBlock = stakingChains[pool.chainId].blocks[-1];
-        if (!pool.stakedAmount) return pool;
+      if (!prev) return prev;
+      const newStakingPools = prev.map((pool, idx) => {
+        if (pool.stakedAmount <= 0) return pool;
 
-        const blocks = currentBlock.blockId - pool.lastBlockUpdated;
-        if (blocks <= 0) return pool;
+        const blocksElapsed = (Date.now() / 1000) - pool.lastBlockUpdated;
+        if (blocksElapsed <= 0) return pool;
 
-        const apy = meta.baseApy * meta.yieldMultiplier;
-        const yieldPerBlock =
-          (pool.stakedAmount + pool.rewardAccrued * (apy / 100)) / BLOCKS_PER_GAME_YEAR;
+        const meta = stakingConfig[idx]
+        const annualRate = (meta.baseApy * meta.yieldMultiplier) / 100;
+        const yieldPerBlock = ((pool.stakedAmount + pool.rewardAccrued) * annualRate) / BLOCKS_PER_GAME_YEAR;
+        const rewardEarned = Math.floor(yieldPerBlock * blocksElapsed);
+
         return {
           ...pool,
-          rewardAccrued: pool.rewardAccrued + yieldPerBlock * blocks,
-          lastBlockUpdated: currentBlock.blockId
+          rewardAccrued: pool.rewardAccrued + rewardEarned,
+          lastBlockUpdated: now,
         };
       });
-      return pools;
+
+      return {
+        ...prev,
+        stakingPools: newStakingPools,
+      };
     });
-  }, [stakingChains]);
+  }, [stakingPools]);
 
   return (
     <StakingContext.Provider value={{
-      stakingChains, getStakingChain,
       stakingPools, getStakingPool, accrueAll, stakeTokens, claimRewards,
       stakingUnlocked, unlockStaking, getStakingUnlockCost
     }}>
