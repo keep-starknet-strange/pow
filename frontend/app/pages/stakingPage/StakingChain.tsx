@@ -40,7 +40,7 @@ const StakingChain: React.FC<StakingChainProps> = ({
         {visibleBlocks.map((block, bi) => (
           <View key={block.id ?? bi} className="flex-row items-center">
             <View className="h-28 w-28">
-              <BlockView block={block} showOverlay />
+              <BlockView chainId={3} block={block} completed={true}/>
             </View>
             {bi !== 0 && (
               <View className="w-2 h-1 mx-[2px] bg-[#f9f9f980] rounded-lg" />

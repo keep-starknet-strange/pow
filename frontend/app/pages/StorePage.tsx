@@ -107,39 +107,10 @@ export const StorePage: React.FC = () => {
           <Text className="text-[#e7e7e7] text-2xl font-bold">Scaling</Text>
         </View>
         {storeType === "L1" ? (
-          <>
-            <UpgradeCard
-              imageSrc={l2BatchImg}
-              title="Layer 2 Scaling"
-              description="Scale your blockchain with Layer 2 Starknet."
-              unlocked={l1TransactionTypes[transactionsJson.L1[4].id].feeLevel > 0}
-              cost={transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
-              disabled={gameState.balance < transactionsJson.L1[4].feeCosts[l1TransactionTypes[transactionsJson.L1[4].id].feeLevel]}
-              onPress={() => {
-                const item = transactionsJson.L1[4];
-                if (l1TransactionTypes[item.id].feeLevel === item.feeCosts.length) return;
-                const cost = item.feeCosts[l1TransactionTypes[item.id].feeLevel];
-                if (gameState.balance < cost) return;
-                l1TxFeeUpgrade(item.id);
-                const newBalance = gameState.balance - cost;
-                updateBalance(newBalance);
-
-                unlockL2();
-              }}
-            />
-
-            <UpgradeCard
-              containerClass="mt-4"
-              imageSrc={stakingImg}
-              title="Staking"
-              description="Lock coins to earn yield on Chain 2."
-              unlocked={upgradableGameState.staking}
-              cost={staking[0].costs[0]}
-              disabled={gameState.balance < staking[0].costs[0]}
-              unlockedBgColor="#9ef7a0d0"
-              onPress={() => purchase(staking[0].costs[0],  () => addUpgrade(2, 0))}
-            />
-          </>
+          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
+            <StakingUnlock />
+            <L2Unlock alwaysShow={true} />
+          </View>
         ) : (
           <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
           </View>

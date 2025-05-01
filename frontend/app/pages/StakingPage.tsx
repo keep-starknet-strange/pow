@@ -44,7 +44,6 @@ export const StakingPage: React.FC = (props) => {
       <View className="flex flex-row justify-end items-center p-2">
         <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🥩Staking</Text>
       </View>
-
       {stakingPools?.map((stakingPool, idx) => {
         const meta = stakingConfig[idx];
         const [visibleBlocks, blocksShown] = useVisibleBlocks(stakingPool.createdAt, tick, 4);

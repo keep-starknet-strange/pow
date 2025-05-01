@@ -1,13 +1,11 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useBalance } from "../context/Balance";
-import { Chain, newChain, newBlock } from "../types/Chains";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
 
 type StakingContextType = {
   stakingPools: StakingPool[];
-  getStakingPool: (chainId: number) => StakingPool | undefined;
 
   stakeTokens: (chainIdx: number, amount: number) => void;
   claimRewards: (chainIdx: number) => void;
@@ -32,32 +30,16 @@ const BLOCKS_PER_GAME_YEAR = 100;
 export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notify } = useEventManager();
   const { tryBuy, updateBalance } = useBalance();
-
-  const [stakingChains, setStakingChains] = useState<Chain[]>([]);
   const [stakingPools, setStakingPools] = useState<StakingPool[]>([]);
   const [stakingUnlocked, setStakingUnlocked] = useState(false);
 
   const resetStaking = () => {
-    const initChain = newChain(0);
-    initChain.blocks = [newBlock(0, 1)];
-    setStakingChains([initChain]);
-    setStakingPools([newStakingPool(0, 0)]);
+    setStakingPools([]);
     setStakingUnlocked(false);
   }
   useEffect(() => {
     resetStaking();
   }, []);
-
-  const getStakingChain = useCallback((chainId: number) => {
-    if (!stakingChains) return undefined;
-    return stakingChains[chainId] || undefined;
-  }, [stakingChains]);
-
-  // TODO: Use find w/ chainId
-  const getStakingPool = useCallback((chainId: number) => {
-    if (!stakingPools) return undefined
-    return stakingPools[chainId] || undefined;
-  }, [stakingPools]);
 
   const getStakingUnlockCost = useCallback(() => {
     return 500; // TODO: Replace with actual logic to get the cost
@@ -67,6 +49,12 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setStakingUnlocked((prevUnlocked) => {
       const cost = getStakingUnlockCost();
       if(!tryBuy(cost)) return prevUnlocked;
+      setStakingPools(prev => {
+        const pools = [...prev];
+        pools[0] = newStakingPool(0, 0);
+        return pools;
+      }
+      )
       notify("StakingPurchased");
       return true;
     });
@@ -86,45 +74,48 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if(!tryBuy(amount)) return;
 
       updatePool(chainIdx, pool => ({
+        ...pool,
         stakedAmount: pool.stakedAmount + amount,
-        startBlock: stakingChains[chainIdx].blocks[0],
+        lastBlockUpdated:  Math.floor(Date.now() / 1000),
         rewardAccrued: pool.rewardAccrued
       }));
     },
-    [stakingChains]
+    [tryBuy]
   );
 
   const claimRewards = useCallback(
     (chainIdx: number) => {
-      const pool = getStakingPool(chainIdx);
+      const pool = stakingPools[chainIdx];
       if (!pool) return;
       if (pool.rewardAccrued <= 0) return;
-      updateBalance(pool.rewardAccrued);
-
-      updatePool(chainIdx, pool => ({
+      updateBalance(pool.rewardAccrued),
+      updatePool(chainIdx, pool => (
+        {
         ...pool,
         rewardAccrued: 0,
-        startBlock: stakingChains[chainIdx].blocks.length,
+        lastBlockUpdated: Math.floor(Date.now() / 1000)
       }));
     },
-    [stakingChains, getStakingPool, updateBalance]
+    [updateBalance]
   );
 
   const accrueAll = useCallback(() => {
     const now = Math.floor(Date.now() / 1000);
+  
     setStakingPools(prev => {
       if (!prev) return prev;
+  
       const newStakingPools = prev.map((pool, idx) => {
         if (pool.stakedAmount <= 0) return pool;
-
-        const blocksElapsed = (Date.now() / 1000) - pool.lastBlockUpdated;
+  
+        const blocksElapsed = now - pool.lastBlockUpdated;
         if (blocksElapsed <= 0) return pool;
-
-        const meta = stakingConfig[idx]
-        const annualRate = (meta.baseApy * meta.yieldMultiplier) / 100;
+  
+        const { baseApy, yieldMultiplier } = stakingConfig[idx];
+        const annualRate   = (baseApy * yieldMultiplier) / 100;
         const yieldPerBlock = ((pool.stakedAmount + pool.rewardAccrued) * annualRate) / BLOCKS_PER_GAME_YEAR;
-        const rewardEarned = Math.floor(yieldPerBlock * blocksElapsed);
-
+        const rewardEarned  = Math.floor(yieldPerBlock * blocksElapsed);
+  
         return {
           ...pool,
           rewardAccrued: pool.rewardAccrued + rewardEarned,
@@ -132,16 +123,13 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
       });
 
-      return {
-        ...prev,
-        stakingPools: newStakingPools,
-      };
+      return newStakingPools;
     });
-  }, [stakingPools]);
+  }, []);
 
   return (
     <StakingContext.Provider value={{
-      stakingPools, getStakingPool, accrueAll, stakeTokens, claimRewards,
+      stakingPools, accrueAll, stakeTokens, claimRewards,
       stakingUnlocked, unlockStaking, getStakingUnlockCost
     }}>
       {children}
