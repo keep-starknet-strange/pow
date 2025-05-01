@@ -37,7 +37,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setStakingPools([]);
     setStakingUnlocked(false);
   }
-  
+
   useEffect(() => {
     resetStaking();
   }, []);
@@ -89,7 +89,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const pool = stakingPools[chainIdx];
       if (!pool) return;
       if (pool.rewardAccrued <= 0) return;
-      updateBalance(pool.rewardAccrued),
+      updateBalance(pool.rewardAccrued);
       updatePool(chainIdx, pool => (
         {
         ...pool,
