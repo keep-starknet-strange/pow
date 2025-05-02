@@ -4,13 +4,24 @@ import { useBalance } from "../context/Balance";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
 // TODO: use configuable function for time/block.id/block.time
+
+function calculateRewards(
+  stakedAmount: number,
+  yieldMultiplier: number,
+  elapsedSeconds: number
+): number {
+  // (staked * multiplier% * time) / (seconds in a year)
+  return (stakedAmount * yieldMultiplier * elapsedSeconds)
+       / (365 * 24 * 3600 * 100);
+}
+
 type StakingContextType = {
   stakingPools: StakingPool[];
 
   stakeTokens: (poolIdx: number, amount: number) => void;
   claimRewards: (poolIdx: number) => void;
   accrueAll: () => void;
-
+  accrueAndCheckSlashingAll: () => void;
   stakingUnlocked: boolean;
   getStakingUnlockCost: (poolIdx: number) => number;
   unlockStaking: (poolIdx: number) => void;
@@ -105,17 +116,17 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const newStakingPools = prev.map((pool, idx) => {
         if (pool.stakedAmount <= 0) return pool;
   
-        const blocksElapsed = now - pool.lastBlockUpdated;
-        if (blocksElapsed <= 0) return pool;
-  
-        const { baseApy, yieldMultiplier } = stakingConfig[idx];
-        const annualRate   = (baseApy * yieldMultiplier) / 100;
-        const yieldPerBlock = ((pool.stakedAmount + pool.rewardAccrued) * annualRate) / BLOCKS_PER_GAME_YEAR;
-        const rewardEarned  = Math.floor(yieldPerBlock * blocksElapsed);
+      const cfg = stakingConfig[idx];
+      const elapsed = now - pool.lastBlockUpdated;
+      const reward  = calculateRewards(
+        pool.stakedAmount,
+        cfg.yieldMultiplier,
+        elapsed
+      );
   
         return {
           ...pool,
-          rewardAccrued: pool.rewardAccrued + rewardEarned,
+          rewardAccrued: pool.rewardAccrued + reward,
           lastBlockUpdated: now,
         };
       });
@@ -124,10 +135,58 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
+  const accrueAndCheckSlashingAll = useCallback(() => {
+    const now = Math.floor(Date.now() / 1000);
+
+    setStakingPools(prevPools =>
+      prevPools.map((pool, idx) => {
+        if (pool.stakedAmount <= 0) return pool;
+
+        const oldTs   = pool.lastBlockUpdated;
+        const elapsed = now - oldTs;
+        const cfg     = stakingConfig[idx];
+
+        // 1) accrue rewards
+        const reward = calculateRewards(
+          pool.stakedAmount,
+          cfg.yieldMultiplier,
+          elapsed
+        );
+
+        // 2) maybe slash
+        let updatedStake = pool.stakedAmount;
+        if (elapsed > cfg.slashing.dueTime) {
+          // scale probability by how far overdue
+          const over = elapsed - cfg.slashing.dueTime;
+          const prob = Math.min(cfg.slashing.chance * (over / cfg.slashing.dueTime), 1);
+
+          if (Math.random() < prob) {
+            const slashAmt = Math.floor(pool.stakedAmount * cfg.slashing.fraction);
+            updatedStake -= slashAmt;
+          }
+        }
+
+        // 3) reset timer for next cycle
+        return {
+          ...pool,
+          rewardsEarned: updatedRewards,
+          stakedAmount: updatedStake,
+          lastBlockUpdated: now,
+        };
+      })
+    );
+  }, []);
+
   return (
     <StakingContext.Provider value={{
-      stakingPools, accrueAll, stakeTokens, claimRewards,
-      stakingUnlocked, unlockStaking, getStakingUnlockCost
+      stakingPools,
+      accrueAll,
+      stakeTokens, 
+      claimRewards,
+      stakingUnlocked, 
+      unlockStaking, 
+      getStakingUnlockCost,
+      accrueAndCheckSlashingAll
     }}>
       {children}
     </StakingContext.Provider>
