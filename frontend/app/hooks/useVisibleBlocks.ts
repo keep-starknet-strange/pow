@@ -11,6 +11,7 @@ export function useVisibleBlocks(
     const blocksShown = Math.min(windowSize, elapsed);
     const visibleBlocks: Block[] = Array.from(
       { length: blocksShown },
+      // TODO: fill block with transaction data
       (_, i) => newBlock((elapsed - i), 0)
     );
     return [visibleBlocks, blocksShown];
