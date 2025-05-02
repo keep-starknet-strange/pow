@@ -52,7 +52,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setStakingPools(prev => {
       const pools = [...prev];
-      pools[0] = newStakingPool(0, 0);
+      pools[poolIdx] = newStakingPool(0, 0);
       return pools;
     })
   }, [tryBuy, notify]);
