@@ -12,8 +12,8 @@ type StakingContextType = {
   accrueAll: () => void;
 
   stakingUnlocked: boolean;
-  getStakingUnlockCost: () => number;
-  unlockStaking: () => void;
+  getStakingUnlockCost: (poolIdx: number) => number;
+  unlockStaking: (poolIdx: number) => void;
 }
 
 export const useStaking = () => {
@@ -42,24 +42,20 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     resetStaking();
   }, []);
 
-  const getStakingUnlockCost = useCallback(() => {
-    return 500; // TODO: Replace with actual logic to get the cost
-  }, []);
+  const getStakingUnlockCost = useCallback((poolIdx: number) => {
+    return stakingConfig[poolIdx].unlockCosts[0];
+    }, []);
 
-  const unlockStaking = () => {
-    setStakingUnlocked((prevUnlocked) => {
-      const cost = getStakingUnlockCost();
-      if(!tryBuy(cost)) return prevUnlocked;
-      setStakingPools(prev => {
-        const pools = [...prev];
-        pools[0] = newStakingPool(0, 0);
-        return pools;
-      }
-      )
-      notify("StakingPurchased");
-      return true;
-    });
-  }
+  const unlockStaking = useCallback((poolIdx: number) => {
+    const cost = getStakingUnlockCost(poolIdx);
+    if(!tryBuy(cost)) return;
+
+    setStakingPools(prev => {
+      const pools = [...prev];
+      pools[0] = newStakingPool(0, 0);
+      return pools;
+    })
+  }, [tryBuy, notify]);
 
   const updatePool = (poolIdx: number, fn: (p: any) => any) =>
     setStakingPools((prev) => {
