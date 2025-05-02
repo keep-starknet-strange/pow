@@ -3,7 +3,7 @@ import { useEventManager } from "../context/EventManager";
 import { useBalance } from "../context/Balance";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
-
+// TODO: use configuable function for time/block.id/block.time
 type StakingContextType = {
   stakingPools: StakingPool[];
 

@@ -37,8 +37,9 @@ const StakingChain: React.FC<StakingChainProps> = ({
   );
   return (
     <View className="bg-gray-800 rounded-2xl p-5 mt-6">
-      
+
       <Text className="text-white text-lg font-semibold mb-2">
+        {/* TODO: change icon to imag */}
         {meta.icon} {meta.name}
       </Text>
 
