@@ -49,7 +49,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const unlockStaking = useCallback((poolIdx: number) => {
     const cost = getStakingUnlockCost(poolIdx);
     if(!tryBuy(cost)) return;
-
+    setStakingUnlocked(true);
     setStakingPools(prev => {
       const pools = [...prev];
       pools[poolIdx] = newStakingPool(0, 0);

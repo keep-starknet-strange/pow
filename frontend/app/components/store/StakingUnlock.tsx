@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useStaking } from "../../context/Staking";
 import { UnlockView } from "./UnlockView";
@@ -11,7 +10,7 @@ export const StakingUnlock = () => {
   const nextCfg = stakingConfig[nextIdx];
 
   if (!nextCfg) return null;
-  
+
   const { name, icon, unlockCosts } = nextCfg;
 
   return (
