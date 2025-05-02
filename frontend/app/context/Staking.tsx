@@ -7,8 +7,8 @@ import stakingConfig from "../configs/staking.json";
 type StakingContextType = {
   stakingPools: StakingPool[];
 
-  stakeTokens: (chainIdx: number, amount: number) => void;
-  claimRewards: (chainIdx: number) => void;
+  stakeTokens: (poolIdx: number, amount: number) => void;
+  claimRewards: (poolIdx: number) => void;
   accrueAll: () => void;
 
   stakingUnlocked: boolean;
@@ -61,20 +61,20 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }
 
-  const updatePool = (chainIdx: number, fn: (p: any) => any) =>
+  const updatePool = (poolIdx: number, fn: (p: any) => any) =>
     setStakingPools((prev) => {
       const pools = [...prev];
-      const pool = pools[chainIdx];
+      const pool = pools[poolIdx];
       if (!pool) return pools;
-      pools[chainIdx] = fn(pool);
+      pools[poolIdx] = fn(pool);
       return pools;
     });
 
   const stakeTokens = useCallback(
-    (chainIdx: number, amount: number) => {
+    (poolIdx: number, amount: number) => {
       if(!tryBuy(amount)) return;
 
-      updatePool(chainIdx, pool => ({
+      updatePool(poolIdx, pool => ({
         ...pool,
         stakedAmount: pool.stakedAmount + amount,
         lastBlockUpdated:  Math.floor(Date.now() / 1000),
@@ -85,12 +85,12 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   const claimRewards = useCallback(
-    (chainIdx: number) => {
-      const pool = stakingPools[chainIdx];
+    (poolIdx: number) => {
+      const pool = stakingPools[poolIdx];
       if (!pool) return;
       if (pool.rewardAccrued <= 0) return;
       updateBalance(pool.rewardAccrued);
-      updatePool(chainIdx, pool => (
+      updatePool(poolIdx, pool => (
         {
         ...pool,
         rewardAccrued: 0,

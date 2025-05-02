@@ -14,20 +14,6 @@ export const StakingUnlock = () => {
       setShowUnlock(false);
       return;
     }
-    /*
-    TODO
-    const txLevels = transactionFees[0];
-    if (!txLevels) {
-      setShowUnlock(false);
-      return;
-    }
-    for (const level of Object.values(txLevels)) {
-      if (level === -1) {
-        setShowUnlock(false);
-        return;
-      }
-    }
-    */
     setShowUnlock(true);
   }, [stakingUnlocked, transactionFees]);
 
