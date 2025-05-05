@@ -5,14 +5,16 @@ import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
 // TODO: use configuable function for time/block.id/block.time
 
+const BLOCKS_PER_GAME_YEAR = 10;
+
 function calculateRewards(
-  stakedAmount: number,
-  yieldMultiplier: number,
+  totalAmount: number,
+  baseApy: number,
   elapsedSeconds: number
 ): number {
-  // (staked * multiplier% * time) / (seconds in a year)
-  return (stakedAmount * yieldMultiplier * elapsedSeconds)
-       / (365 * 24 * 3600 * 100);
+  return (totalAmount
+    * Math.pow(1 + (baseApy / BLOCKS_PER_GAME_YEAR), BLOCKS_PER_GAME_YEAR * elapsedSeconds))
+  - totalAmount
 }
 
 type StakingContextType = {
@@ -37,7 +39,6 @@ export const useStaking = () => {
 
 const StakingContext = createContext<StakingContextType | undefined>(undefined);
 
-const BLOCKS_PER_GAME_YEAR = 100;
 export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notify } = useEventManager();
   const { tryBuy, updateBalance } = useBalance();
@@ -119,8 +120,8 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const cfg = stakingConfig[idx];
       const elapsed = now - pool.lastBlockUpdated;
       const reward  = calculateRewards(
-        pool.stakedAmount,
-        cfg.yieldMultiplier,
+        pool.stakedAmount + pool.rewardAccrued,
+        cfg.baseApy,
         elapsed
       );
   
@@ -147,9 +148,9 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const cfg     = stakingConfig[idx];
 
         // 1) accrue rewards
-        const reward = calculateRewards(
-          pool.stakedAmount,
-          cfg.yieldMultiplier,
+        const updatedRewards = calculateRewards(
+          pool.stakedAmount + pool.rewardAccrued,
+          cfg.baseApy,
           elapsed
         );
 
