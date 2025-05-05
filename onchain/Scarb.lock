@@ -2,7 +2,7 @@
 version = 1
 
 [[package]]
-name = "click_chain"
+name = "pow_game"
 version = "0.1.0"
 dependencies = [
  "snforge_std",

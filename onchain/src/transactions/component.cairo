@@ -1,0 +1,167 @@
+#[starknet::component]
+pub mod PowTransactionsComponent {
+  use starknet::{ContractAddress, get_caller_address};
+  use starknet::storage::{
+      Map, StorageMapReadAccess, StorageMapWriteAccess,
+  };
+  use pow_game::transactions::interface::{
+    IPowTransactions, TransactionFeeConfig, TransactionSpeedConfig,
+    TransactionSetupParams
+  };
+
+  #[storage]
+  pub struct Storage {
+      // Maps: (chain_id, tx_type_id, level) -> transaction fee config
+      transaction_fee_config: Map<(u32, u32, u32), TransactionFeeConfig>,
+      // Maps: (chain_id, tx_type_id, level) -> transaction speed config
+      transaction_speed_config: Map<(u32, u32, u32), TransactionSpeedConfig>,
+      // Maps: (user address, chain id, tx type id) -> transaction fee level
+      transaction_fee_levels: Map<(ContractAddress, u32, u32), u32>,
+      // Maps: (user address, chain id, tx type id) -> transaction speed level
+      transaction_speed_levels: Map<(ContractAddress, u32, u32), u32>,
+  }
+
+  #[derive(Drop, starknet::Event)]
+  struct TransactionConfigUpdated {
+      #[key]
+      chain_id: u32,
+      #[key]
+      tx_type_id: u32,
+      new_config: TransactionSetupParams,
+  }
+
+  #[derive(Drop, starknet::Event)]
+  struct TransactionFeeLevelUpdated {
+      #[key]
+      user: ContractAddress,
+      #[key]
+      chain_id: u32,
+      #[key]
+      tx_type_id: u32,
+      old_level: u32,
+      new_level: u32,
+  }
+
+  #[derive(Drop, starknet::Event)]
+  struct TransactionSpeedLevelUpdated {
+      #[key]
+      user: ContractAddress,
+      #[key]
+      chain_id: u32,
+      #[key]
+      tx_type_id: u32,
+      old_level: u32,
+      new_level: u32,
+  }
+
+  #[event]
+  #[derive(Drop, starknet::Event)]
+  pub enum Event {
+      TransactionConfigUpdated: TransactionConfigUpdated,
+      TransactionFeeLevelUpdated: TransactionFeeLevelUpdated,
+      TransactionSpeedLevelUpdated: TransactionSpeedLevelUpdated,
+  }
+
+  #[embeddable_as(PowTransactionsImpl)]
+  impl PowTransactions<
+    TContractState, +HasComponent<TContractState>
+  > of IPowTransactions<ComponentState<TContractState>> {
+      fn get_transaction_fee_config(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32, level: u32) -> TransactionFeeConfig {
+          self.transaction_fee_config.read((chain_id, tx_type_id, level))
+      }
+
+      fn get_transaction_speed_config(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32, level: u32) -> TransactionSpeedConfig {
+          self.transaction_speed_config.read((chain_id, tx_type_id, level))
+      }
+
+      // TODO: Clear TransactionFeeConfig & TransactionSpeedConfig for higher than len()
+      fn setup_transaction_config(ref self: ComponentState<TContractState>, params: TransactionSetupParams) {
+          let chain_id = params.chain_id;
+          let tx_type_id = params.tx_type_id;
+          let mut idx = 0;
+          let maxFeeLevel = params.fee_levels.len();
+          while idx != maxFeeLevel {
+              self.transaction_fee_config.write((chain_id, tx_type_id, idx), params.fee_levels[idx].clone());
+              idx += 1;
+          }
+          idx = 0;
+          let maxSpeedLevel = params.speed_levels.len();
+          while idx != maxSpeedLevel {
+              self.transaction_speed_config.write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
+              idx += 1;
+          }
+          self.emit(
+            TransactionConfigUpdated {
+              chain_id,
+              tx_type_id,
+              new_config: params,
+            }
+          );
+      }
+
+      fn get_user_transaction_fee_level(self: @ComponentState<TContractState>, user: ContractAddress, chain_id: u32, tx_type_id: u32) -> u32 {
+          self.transaction_fee_levels.read((user, chain_id, tx_type_id))
+      }
+
+      fn get_user_transaction_speed_level(self: @ComponentState<TContractState>, user: ContractAddress, chain_id: u32, tx_type_id: u32) -> u32 {
+          self.transaction_speed_levels.read((user, chain_id, tx_type_id))
+      }
+      
+      fn level_transaction_fee(ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
+          let caller = get_caller_address();
+          let current_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
+          let new_level = current_level + 1;
+          self.transaction_fee_levels.write((caller, chain_id, tx_type_id), new_level);
+          self.emit(
+            TransactionFeeLevelUpdated {
+              user: caller,
+              chain_id,
+              tx_type_id,
+              old_level: current_level,
+              new_level,
+            }
+          );
+      }
+
+      fn level_transaction_speed(ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
+          let caller = get_caller_address();
+          let current_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
+          let new_level = current_level + 1;
+          self.transaction_speed_levels.write((caller, chain_id, tx_type_id), new_level);
+          self.emit(
+            TransactionSpeedLevelUpdated {
+              user: caller,
+              chain_id,
+              tx_type_id,
+              old_level: current_level,
+              new_level,
+            }
+          );
+      }
+
+      // TODO: If maxlevel
+      fn get_next_tx_fee_cost(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> u128 {
+          let caller = get_caller_address();
+          let next_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id)) + 1;
+          self.transaction_fee_config.read((chain_id, tx_type_id, next_level)).cost
+      }
+
+      fn get_next_tx_speed_cost(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> u128 {
+          let caller = get_caller_address();
+          let next_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id)) + 1;
+          self.transaction_speed_config.read((chain_id, tx_type_id, next_level)).cost
+      }
+
+      fn get_my_tx_fee_value(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> u128 {
+          let caller = get_caller_address();
+          let level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
+          self.transaction_fee_config.read((chain_id, tx_type_id, level)).value
+      }
+
+      fn get_my_tx_speed_value(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> u128 {
+          let caller = get_caller_address();
+          let level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
+          self.transaction_speed_config.read((chain_id, tx_type_id, level)).value
+      }
+  }
+}
