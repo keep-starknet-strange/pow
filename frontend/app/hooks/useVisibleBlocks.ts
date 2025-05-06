@@ -33,7 +33,6 @@ export function useVisibleBlocks(
 ): [Block[], number] {
   const blocksRef = useRef<Block[]>([]);
 
-  // Transaction configs
   const initialTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 9 };
   const updateTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 16, minFee: 1, maxFee: 10 };
 
