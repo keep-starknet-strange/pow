@@ -28,7 +28,7 @@
     }
   },
   {
-    "chainId": 2,
+    "chainId": 1,
     "name": "Phoenix Chain",
     "baseApy": 0.12,
     "stakingAmount": 100,

@@ -31,6 +31,7 @@ const StakingChain: React.FC<StakingChainProps> = ({
   onPressStake,
 }) => {
   const [visibleBlocks, blocksShown] = useVisibleBlocks(
+    meta.chainId,
     stakingPool.createdAt,
     tick,
     windowSize
@@ -46,7 +47,7 @@ const StakingChain: React.FC<StakingChainProps> = ({
       {blocksShown > 0 && (
         <View className="flex-row-reverse w-full px-2 mt-4">
           {visibleBlocks.map((block, bi) => (
-            <View key={block.blockId ?? bi} className="flex-row items-center">
+            <View key={block.blockId + meta.name} className="flex-row items-center">
               <View className="h-28 w-28">
                 <BlockView chainId={3} block={block} completed={true}/>
               </View>
