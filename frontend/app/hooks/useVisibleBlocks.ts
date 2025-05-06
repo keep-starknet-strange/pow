@@ -1,7 +1,29 @@
-// src/hooks/useVisibleBlocks.ts
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { newBlock, Block } from "../types/Chains";
 import { randomTransactions } from "../utils/transactionGenerator";
+
+interface TxConfig {
+  chainId: number;
+  minTxPerBlock: number;
+  maxTxPerBlock: number;
+  minFee?: number;
+  maxFee?: number;
+}
+
+const getNowSec = (): number => Math.floor(Date.now() / 1000);
+
+const buildBlock = (blockId: number, txConfig: TxConfig): Block => {
+  const blk = newBlock(blockId, 0);
+  const transactions = randomTransactions(txConfig);
+  const fees = transactions.reduce((sum, tx) => sum + tx.fee, 0);
+
+  return {
+    ...blk,
+    transactions,
+    fees,
+    isBuilt: true,
+  };
+};
 
 export function useVisibleBlocks(
   chainId: number,
@@ -11,49 +33,30 @@ export function useVisibleBlocks(
 ): [Block[], number] {
   const blocksRef = useRef<Block[]>([]);
 
+  // Transaction configs
+  const initialTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 9 };
+  const updateTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 16, minFee: 1, maxFee: 10 };
+
   useEffect(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const elapsed = Math.max(1, now - createdAtSec);
+    const elapsed = Math.max(1, getNowSec() - createdAtSec);
     const count = Math.min(elapsed, windowSize);
 
-    blocksRef.current = Array.from({ length: count }, (_, i) => {
-      const blockId = elapsed - i;
-      const blk = newBlock(blockId, 0);
-      const txs = randomTransactions({ chainId, minTxPerBlock: 4, maxTxPerBlock: 9 });
-      blk.transactions = txs;
-      blk.fees = txs.reduce((sum, tx) => sum + tx.fee, 0);
-      blk.isBuilt = true;
-      return blk;
-    });
-
+    blocksRef.current = Array.from({ length: count }, (_, i) =>
+      buildBlock(elapsed - i, initialTxConfig)
+    );
   }, [chainId, createdAtSec, windowSize]);
 
-
   useEffect(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const elapsed = Math.max(0, now - createdAtSec);
-    const blockId = elapsed;
-    if (blocksRef.current[0]?.blockId >= blockId) {
-      return;
-    }
+    const elapsed = Math.max(0, getNowSec() - createdAtSec);
+    const nextBlockId = elapsed;
 
-    const block = newBlock(blockId, 0);
-    const txs = randomTransactions({
-      chainId,
-      minTxPerBlock: 4,
-      maxTxPerBlock: 16,
-      minFee: 1,
-      maxFee: 10,
-    });
-    block.transactions = txs;
-    block.fees = txs.reduce((sum, tx) => sum + tx.fee, 0);
-    block.isBuilt = true;
+    if (blocksRef.current[0]?.blockId >= nextBlockId) return;
 
-    blocksRef.current.unshift(block);
+    blocksRef.current.unshift(buildBlock(nextBlockId, updateTxConfig));
+
     if (blocksRef.current.length > windowSize) {
       blocksRef.current.pop();
     }
-
   }, [tick]);
 
   return [blocksRef.current, blocksRef.current.length];
