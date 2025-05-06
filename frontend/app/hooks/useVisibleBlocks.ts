@@ -13,10 +13,11 @@ export function useVisibleBlocks(
 
   useEffect(() => {
     const now = Math.floor(Date.now() / 1000);
-    const elapsed = Math.max(0, now - createdAtSec);
+    const elapsed = Math.max(1, now - createdAtSec);
     const count = Math.min(elapsed, windowSize);
-
-
+    // if (chainId == 1) {
+    //   debugger
+    // }
     blocksRef.current = Array.from({ length: count }, (_, i) => {
       const blockId = elapsed - i;
       const blk = newBlock(blockId, 0);
@@ -31,10 +32,16 @@ export function useVisibleBlocks(
 
 
   useEffect(() => {
-    const blockId = blocksRef.current[0]?.blockId + 1 || 1;
+    const now = Math.floor(Date.now() / 1000);
+    const elapsed = Math.max(0, now - createdAtSec);
+    const blockId = elapsed;
     if (blocksRef.current[0]?.blockId >= blockId) {
       return;
     }
+    // if (chainId == 1) {
+    //   debugger
+    // }
+
     const block = newBlock(blockId, 0);
     const txs = randomTransactions({
       chainId,
