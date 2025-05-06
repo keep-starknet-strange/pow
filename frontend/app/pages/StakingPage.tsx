@@ -46,7 +46,7 @@ export const StakingPage: React.FC = (props) => {
       {pools?.map((props, idx) => {
         return (
           <StakingChain
-            key={props.meta.chainId}
+            key={props.meta.name}
             idx={idx}
             tick={tick}
             meta={props.meta}
