@@ -10,6 +10,7 @@ pub struct UpgradeConfig {
 pub struct UpgradeSetupParams {
     pub chain_id: u32,
     pub upgrade_id: u32,
+    pub name: felt252,
     pub levels: Span<UpgradeConfig>,
 }
 
@@ -23,6 +24,7 @@ pub struct AutomationConfig {
 pub struct AutomationSetupParams {
     pub chain_id: u32,
     pub automation_id: u32,
+    pub name: felt252,
     pub levels: Span<AutomationConfig>,
 }
 
@@ -39,10 +41,13 @@ pub trait IPowUpgrades<TContractState> {
   fn get_user_automation_level(self: @TContractState, user: ContractAddress, chain_id: u32, automation_id: u32) -> u32;
   fn level_upgrade(ref self: TContractState, chain_id: u32, upgrade_id: u32);
   fn level_automation(ref self: TContractState, chain_id: u32, automation_id: u32);
+  fn reset_upgrade_levels(ref self: TContractState, chain_id: u32);
 
   // Use upgrades
   fn get_next_upgrade_cost(self: @TContractState, chain_id: u32, upgrade_id: u32) -> u128;
   fn get_next_automation_cost(self: @TContractState, chain_id: u32, automation_id: u32) -> u128;
   fn get_my_upgrade_value(self: @TContractState, chain_id: u32, upgrade_id: u32) -> u128;
+  fn get_my_upgrade(self:  @TContractState, chain_id: u32, upgrade_name: felt252) -> u128;
   fn get_my_automation_value(self: @TContractState, chain_id: u32, automation_id: u32) -> u128;
+  fn get_my_automation(self:  @TContractState, chain_id: u32, automation_name: felt252) -> u128;
 }

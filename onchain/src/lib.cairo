@@ -17,3 +17,12 @@ pub mod transactions {
     TransactionFeeConfig, TransactionSpeedConfig, IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait
   };
 }
+
+pub mod prestige {
+  pub mod interface;
+  pub mod component;
+
+  pub use interface::{
+    PrestigeConfig, IPrestigeDispatcher, IPrestigeDispatcherTrait
+  };
+}

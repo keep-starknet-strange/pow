@@ -11,6 +11,10 @@ pub mod PowTransactionsComponent {
 
   #[storage]
   pub struct Storage {
+      // Maps: (user address, chain id) -> is dapp unlocked
+      dapps_unlocked: Map<(ContractAddress, u32), bool>,
+      // Maps: (chain id, tx type id) -> is dapp
+      dapps: Map<(u32, u32), bool>,
       // Maps: (chain_id, tx_type_id, level) -> transaction fee config
       transaction_fee_config: Map<(u32, u32, u32), TransactionFeeConfig>,
       // Maps: (chain_id, tx_type_id, level) -> transaction speed config
@@ -90,6 +94,9 @@ pub mod PowTransactionsComponent {
               self.transaction_speed_config.write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
               idx += 1;
           }
+          if params.is_dapp {
+              self.dapps.write((chain_id, tx_type_id), true);
+          }
           self.emit(
             TransactionConfigUpdated {
               chain_id,
@@ -109,6 +116,16 @@ pub mod PowTransactionsComponent {
       
       fn level_transaction_fee(ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
           let caller = get_caller_address();
+          // Ensure previous tx unlocked
+          if (tx_type_id != 0) {
+              let previous_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id - 1));
+              assert!(previous_level != 0, "Tx Type Locked");
+          }
+          // Ensure dapp unlocked
+          if (self.is_dapp(chain_id, tx_type_id)) {
+              let dapps_unlocked = self.dapps_unlocked.read((caller, chain_id));
+              assert!(dapps_unlocked, "Dapps Locked");
+          }
           let current_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
           let new_level = current_level + 1;
           self.transaction_fee_levels.write((caller, chain_id, tx_type_id), new_level);
@@ -125,6 +142,8 @@ pub mod PowTransactionsComponent {
 
       fn level_transaction_speed(ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
           let caller = get_caller_address();
+          let tx_fee_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
+          assert!(tx_fee_level != 0, "Tx Type Locked");
           let current_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
           let new_level = current_level + 1;
           self.transaction_speed_levels.write((caller, chain_id, tx_type_id), new_level);
@@ -137,6 +156,18 @@ pub mod PowTransactionsComponent {
               new_level,
             }
           );
+      }
+
+      fn reset_tx_levels(ref self: ComponentState<TContractState>, chain_id: u32) {
+          let caller = get_caller_address();
+          let mut idx = 0;
+          let transactions_count = 20; // TODO
+          while idx != transactions_count {
+              self.transaction_fee_levels.write((caller, chain_id, idx), 0);
+              self.transaction_speed_levels.write((caller, chain_id, idx), 0);
+              idx += 1;
+          }
+          self.dapps_unlocked.write((caller, chain_id), false);
       }
 
       // TODO: If maxlevel
@@ -162,6 +193,20 @@ pub mod PowTransactionsComponent {
           let caller = get_caller_address();
           let level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
           self.transaction_speed_config.read((chain_id, tx_type_id, level)).value
+      }
+
+      fn check_has_tx(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
+          let level = self.transaction_fee_levels.read((get_caller_address(), chain_id, tx_type_id));
+          assert!(level != 0, "Tx Type Locked");
+      }
+
+      fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
+          let caller = get_caller_address();
+          self.dapps_unlocked.write((caller, chain_id), true);
+      }
+
+      fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
+          self.dapps.read((chain_id, tx_type_id))
       }
   }
 }
