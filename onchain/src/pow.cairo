@@ -1,65 +1,60 @@
-use starknet::ContractAddress;
-
-#[starknet::interface]
-pub trait IPowGame<TContractState> {
-  fn get_user_prestige(self: @TContractState, user: ContractAddress) -> u128;
-  fn prestige(ref self: TContractState);
-  fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
-
-  fn get_working_block_fees(self: @TContractState, user: ContractAddress, chain_id: u32) -> u128;
-  fn add_transaction(ref self: TContractState, chain_id: u32, tx_type_id: u32);
-  fn get_block_clicks(self: @TContractState, user: ContractAddress, chain_id: u32) -> u128;
-  fn mine_block(ref self: TContractState, chain_id: u32);
-}
-
 #[starknet::contract]
 mod PowGame {
+    use pow_game::actions::*;
+    use pow_game::interface::{IPowGame, IPowGameValidation};
+    use pow_game::store::*;
+    use pow_game::transactions::{DA_TX_TYPE_ID, PROOF_TX_TYPE_ID};
+
+    // Import the components
+    use pow_game::upgrades::component::PowUpgradesComponent;
     use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_caller_address};
-
-    use pow_game::upgrades::component::PowUpgradesComponent;
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
     impl PowUpgradesComponentImpl =
         PowUpgradesComponent::PowUpgradesImpl<ContractState>;
-
     use pow_game::transactions::component::PowTransactionsComponent;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
     impl PowTransactionsComponentImpl =
         PowTransactionsComponent::PowTransactionsImpl<ContractState>;
-
-    #[derive(Drop)]
-    struct PrestigeConfig {
-        id: u32,
-        costs: Span<u128>,
-        scalers: Span<u128>,
-    }
+    use pow_game::prestige::component::PrestigeComponent;
+    component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
+    #[abi(embed_v0)]
+    impl PrestigeComponentImpl = PrestigeComponent::PrestigeImpl<ContractState>;
+    use pow_game::builder::component::BuilderComponent;
+    component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
+    #[abi(embed_v0)]
+    impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
 
     #[storage]
     struct Storage {
-        // Maps: user address -> prestige
-        user_prestige: Map<ContractAddress, u128>,
+        game_masters: Map<ContractAddress, bool>,
+        genesis_block_reward: u128,
+        max_chain_id: u32,
+        // Maps: user address -> user max chain unlocked
+        user_max_chains: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
         user_balances: Map<ContractAddress, u128>,
-        // Maps: (user address, chain id) -> new block fees
-        working_blocks: Map<(ContractAddress, u32), u128>,
-        // Maps: (user address, chain id) -> click counter
-        block_clicks: Map<(ContractAddress, u32), u128>,
-
         #[substorage(v0)]
         upgrades: PowUpgradesComponent::Storage,
         #[substorage(v0)]
         transactions: PowTransactionsComponent::Storage,
+        #[substorage(v0)]
+        prestige: PrestigeComponent::Storage,
+        #[substorage(v0)]
+        builder: BuilderComponent::Storage,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct PrestigeUpdated {
+    struct ChainUnlocked {
         #[key]
         user: ContractAddress,
-        prestige: u128,
+        #[key]
+        chain_id: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -70,165 +65,318 @@ mod PowGame {
         new_balance: u128,
     }
 
-    #[derive(Drop, starknet::Event)]
-    struct TransactionAdded {
-        #[key]
-        user: ContractAddress,
-        #[key]
-        chain_id: u32,
-        #[key]
-        tx_type_id: u32,
-        fees: u128,
-        total_fees: u128,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct BlockClicked {
-        #[key]
-        user: ContractAddress,
-        #[key]
-        chain_id: u32,
-        click_count: u128,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct BlockMined {
-        #[key]
-        user: ContractAddress,
-        #[key]
-        chain_id: u32,
-        fees: u128,
-    }
-
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        PrestigeUpdated: PrestigeUpdated,
+        ChainUnlocked: ChainUnlocked,
         BalanceUpdated: BalanceUpdated,
         TransactionAdded: TransactionAdded,
-        BlockClicked: BlockClicked,
         BlockMined: BlockMined,
+        DAStored: DAStored,
+        ProofStored: ProofStored,
         #[flat]
         UpgradeEvent: PowUpgradesComponent::Event,
         #[flat]
         TransactionEvent: PowTransactionsComponent::Event,
+        #[flat]
+        PrestigeEvent: PrestigeComponent::Event,
+        #[flat]
+        BuilderEvent: BuilderComponent::Event,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState) {
-
+    fn constructor(ref self: ContractState, host: ContractAddress) {
+        self.genesis_block_reward.write(1);
+        self.max_chain_id.write(2);
+        self.game_masters.write(host, true);
     }
 
     #[abi(embed_v0)]
-    impl PowGameImpl of super::IPowGame<ContractState> {
-        fn get_user_prestige(self: @ContractState, user: ContractAddress) -> u128 {
-            self.user_prestige.read(user)
+    impl PowGameImpl of IPowGame<ContractState> {
+        fn get_genesis_block_reward(self: @ContractState) -> u128 {
+            self.genesis_block_reward.read()
+        }
+
+        fn set_genesis_block_reward(ref self: ContractState, reward: u128) {
+            self.check_valid_game_master(get_caller_address());
+            self.genesis_block_reward.write(reward);
+        }
+
+        fn get_max_chain_id(self: @ContractState) -> u32 {
+            self.max_chain_id.read()
+        }
+
+        fn set_max_chain_id(ref self: ContractState, chain_id: u32) {
+            self.check_valid_game_master(get_caller_address());
+            self.max_chain_id.write(chain_id);
+        }
+
+        fn add_game_master(ref self: ContractState, user: ContractAddress) {
+            self.check_valid_game_master(get_caller_address());
+            self.game_masters.write(user, true);
+        }
+
+        fn remove_game_master(ref self: ContractState, user: ContractAddress) {
+            // TODO: Add host that cannot be removed?
+            self.check_valid_game_master(get_caller_address());
+            self.game_masters.write(user, false);
         }
 
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
             self.user_balances.read(user)
         }
+    }
 
-        fn prestige(ref self: ContractState) {
-            let caller = get_caller_address();
-            let current_prestige = self.user_prestige.read(caller);
-            let new_prestige = current_prestige + 1;
-            self.user_prestige.write(caller, new_prestige);
-            self.emit(
-              PrestigeUpdated {
-                user: caller,
-                prestige: new_prestige,
-              }
-            );
-
-            // TODO: Reset user game state
+    #[abi(embed_v0)]
+    impl PowGameValidationImpl of IPowGameValidation<ContractState> {
+        fn check_valid_chain_id(self: @ContractState, chain_id: u32) {
+            let max_chain_id = self.max_chain_id.read();
+            assert!(chain_id < max_chain_id, "Invalid chain id");
         }
 
-        fn get_working_block_fees(self: @ContractState, user: ContractAddress, chain_id: u32) -> u128 {
-            self.working_blocks.read((user, chain_id))
+        fn check_user_valid_chain(self: @ContractState, chain_id: u32) {
+            let caller = get_caller_address();
+            let max_chain_id = self.user_max_chains.read(caller);
+            assert!(chain_id < max_chain_id, "Chain not unlocked");
+        }
+
+        fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
+            assert!(self.game_masters.read(user), "Invalid game master");
+        }
+
+        fn check_block_not_full(self: @ContractState, chain_id: u32) {
+            let caller = get_caller_address();
+            let working_block = self.get_block_building_state(caller, chain_id);
+            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
+            let block_size = block_width * block_width;
+            assert!(working_block.size.into() < block_size, "Block is full");
+        }
+    }
+
+    #[abi(embed_v0)]
+    impl PowGameActionsImpl of IPowGameActions<ContractState> {
+        fn init_my_game(ref self: ContractState) {
+            let caller = get_caller_address();
+            assert!(self.user_max_chains.read(caller) == 0, "Account already initialized");
+            unlock_next_chain(ref self);
         }
 
         fn add_transaction(ref self: ContractState, chain_id: u32, tx_type_id: u32) {
-            let caller = get_caller_address();
-            let fees = self.transactions.get_my_tx_fee_value(chain_id, tx_type_id);
-            let current_fees = self.working_blocks.read((caller, chain_id));
-            let new_fees = current_fees + fees;
-            self.working_blocks.write((caller, chain_id), new_fees);
-            self.emit(
-              TransactionAdded {
-                user: caller,
-                chain_id,
-                tx_type_id,
-                fees,
-                total_fees: new_fees,
-              }
-            );
-        }
+            // Validation
+            self.check_has_tx(chain_id, tx_type_id);
 
-        fn get_block_clicks(self: @ContractState, user: ContractAddress, chain_id: u32) -> u128 {
-            self.block_clicks.read((user, chain_id))
+            // Update working block
+            let tx_fees = self.transactions.get_my_tx_fee_value(chain_id, tx_type_id);
+            let mev_boost = self.get_my_upgrade(chain_id, 'MEV Boost');
+            let prestige_scaler = self.get_my_prestige_scaler();
+            let total_fees = tx_fees * mev_boost * prestige_scaler;
+            do_add_transaction(ref self, chain_id, tx_type_id, total_fees);
         }
 
         fn mine_block(ref self: ContractState, chain_id: u32) {
-            let block_hp = 8; // TODO: get from storage
-            click_block(ref self, get_caller_address(), chain_id);
-            let current_clicks = self.block_clicks.read((get_caller_address(), chain_id));
+            // Validation
+            let caller = get_caller_address();
+            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
+            let block_size = block_width * block_width;
+            let working_block = self.get_block_building_state(caller, chain_id);
+            assert!(working_block.size.into() >= block_size, "Block is not full");
+
+            // Try Mining
+            do_click_block(ref self, chain_id);
+            let current_clicks = self.get_block_clicks(caller, chain_id);
+            let block_hp = self.get_my_upgrade(chain_id, 'Block Difficulty');
             if current_clicks < block_hp {
                 return;
             }
 
+            // Finalize block
+            let fees = working_block.fees;
+            let reward = self.get_my_upgrade(chain_id, 'Block Reward');
+            pay_user(ref self, caller, fees + reward);
+            self.emit(BlockMined { user: caller, chain_id, fees, reward });
+
+            self.reset_block(chain_id);
+        }
+
+        fn store_da(ref self: ContractState, chain_id: u32) {
+            // Validation
+            assert!(chain_id > 0, "DA compression not available on genesis chain");
             let caller = get_caller_address();
-            let fees = self.working_blocks.read((caller, chain_id));
-            update_balance(ref self, caller, fees);
-            // Reset the working block state
-            self.working_blocks.write((caller, chain_id), 0);
-            self.block_clicks.write((caller, chain_id), 0);
-            self.emit(
-              BlockMined {
-                user: caller,
-                chain_id,
-                fees,
-              }
-            );
+            let da_size = self.get_my_upgrade(chain_id, 'DA compression');
+            let working_da = self.get_da_building_state(caller, chain_id);
+            assert!(working_da.size.into() >= da_size, "DA is not full");
+
+            // Try Storing
+            do_click_da(ref self, chain_id);
+            let current_clicks = self.get_da_clicks(caller, chain_id);
+            let da_hp = self.get_my_upgrade(chain_id, 'DA compression');
+            if current_clicks < da_hp {
+                return;
+            }
+
+            // Add DA to lower chain
+            let total_fees = working_da.fees;
+            do_add_transaction(ref self, chain_id - 1, DA_TX_TYPE_ID, total_fees);
+            self.emit(DAStored { user: caller, chain_id, fees: total_fees });
+
+            self.reset_da(chain_id);
+        }
+
+        fn prove(ref self: ContractState, chain_id: u32) {
+            // Validation
+            assert!(chain_id > 0, "Proof compression not available on genesis chain");
+            let caller = get_caller_address();
+            let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
+            let working_proof = self.get_proof_building_state(caller, chain_id);
+            assert!(working_proof.size.into() >= proof_size, "Proof is not full");
+
+            // Try Proving
+            do_click_proof(ref self, chain_id);
+            let current_clicks = self.get_proof_clicks(caller, chain_id);
+            let proof_hp = self.get_my_upgrade(chain_id, 'Recursive Proving');
+            if current_clicks < proof_hp {
+                return;
+            }
+
+            // Add Proof to lower chain
+            let total_fees = working_proof.fees;
+            do_add_transaction(ref self, chain_id - 1, PROOF_TX_TYPE_ID, total_fees);
+            self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
+
+            self.reset_proof(chain_id);
+        }
+    }
+
+    #[abi(embed_v0)]
+    impl PowStoreImpl of IPowStore<ContractState> {
+        fn buy_tx_fee(ref self: ContractState, chain_id: u32, tx_type_id: u32) {
+            let cost = self.get_next_tx_fee_cost(chain_id, tx_type_id);
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            self.level_transaction_fee(chain_id, tx_type_id);
+        }
+
+        fn buy_tx_speed(ref self: ContractState, chain_id: u32, tx_type_id: u32) {
+            let cost = self.get_next_tx_speed_cost(chain_id, tx_type_id);
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            self.level_transaction_speed(chain_id, tx_type_id);
+        }
+
+        fn buy_upgrade(ref self: ContractState, chain_id: u32, upgrade_id: u32) {
+            let cost = self.get_next_upgrade_cost(chain_id, upgrade_id);
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            self.level_upgrade(chain_id, upgrade_id);
+        }
+
+        fn buy_automation(ref self: ContractState, chain_id: u32, automation_id: u32) {
+            let cost = self.get_next_automation_cost(chain_id, automation_id);
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            self.level_automation(chain_id, automation_id);
+        }
+
+        fn buy_dapps(ref self: ContractState, chain_id: u32) {
+            let cost = 100; // TODO: get from config
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            self.unlock_dapps(chain_id);
+        }
+
+        fn buy_next_chain(ref self: ContractState) {
+            let cost = 1000; // TODO: get from config
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            unlock_next_chain(ref self);
+        }
+
+        fn buy_prestige(ref self: ContractState) {
+            let cost = self.get_next_prestige_cost();
+            let caller = get_caller_address();
+            debit_user(ref self, caller, cost);
+            do_prestige(ref self);
         }
     }
 
     // Private functions
-    fn set_user_balance(ref self: ContractState, user: ContractAddress, balance: u128) {
-        let old_balance = self.user_balances.read(user);
-        self.user_balances.write(user, balance);
-        self.emit(
-          BalanceUpdated {
-            user,
-            old_balance,
-            new_balance: balance,
-          }
-        );
-    }
-
-    fn update_balance(ref self: ContractState, user: ContractAddress, delta: u128) {
+    fn pay_user(ref self: ContractState, user: ContractAddress, delta: u128) {
         let old_balance = self.user_balances.read(user);
         let new_balance = old_balance + delta;
         self.user_balances.write(user, new_balance);
-        self.emit(
-          BalanceUpdated {
-            user,
-            old_balance,
-            new_balance,
-          }
-        );
+        self.emit(BalanceUpdated { user, old_balance, new_balance });
     }
 
-    fn click_block(ref self: ContractState, user: ContractAddress, chain_id: u32) {
-        let current_clicks = self.block_clicks.read((user, chain_id));
-        let new_clicks = current_clicks + 1;
-        self.block_clicks.write((user, chain_id), new_clicks);
-        self.emit(
-          BlockClicked {
-            user,
-            chain_id,
-            click_count: new_clicks,
-          }
-        ); 
+    fn debit_user(ref self: ContractState, user: ContractAddress, cost: u128) {
+        let balance = self.user_balances.read(user);
+        assert!(balance >= cost, "Not enough balance");
+        let new_balance = balance - cost;
+        self.user_balances.write(user, new_balance);
+        self.emit(BalanceUpdated { user, old_balance: balance, new_balance });
+    }
+
+    fn do_add_transaction(
+        ref self: ContractState, chain_id: u32, tx_type_id: u32, total_fees: u128,
+    ) {
+        let caller = get_caller_address();
+        self.check_valid_chain_id(chain_id);
+        self.check_user_valid_chain(chain_id);
+        self.check_block_not_full(chain_id);
+        self.build_block(chain_id, total_fees);
+        self.emit(TransactionAdded { user: caller, chain_id, tx_type_id, fees: total_fees });
+    }
+
+    fn do_click_block(ref self: ContractState, chain_id: u32) {
+        self.check_valid_chain_id(chain_id);
+        self.check_user_valid_chain(chain_id);
+
+        self.click_block(chain_id);
+    }
+
+    fn do_click_da(ref self: ContractState, chain_id: u32) {
+        self.check_valid_chain_id(chain_id);
+        self.check_user_valid_chain(chain_id);
+
+        self.click_da(chain_id);
+    }
+
+    fn do_click_proof(ref self: ContractState, chain_id: u32) {
+        self.check_valid_chain_id(chain_id);
+        self.check_user_valid_chain(chain_id);
+
+        self.click_proof(chain_id);
+    }
+
+    fn unlock_next_chain(ref self: ContractState) {
+        let caller = get_caller_address();
+        let new_chain_id = self.user_max_chains.read(caller);
+        self.check_valid_chain_id(new_chain_id);
+        self.user_max_chains.write(caller, new_chain_id + 1);
+        pay_user(ref self, caller, self.genesis_block_reward.read());
+        self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
+    }
+
+    fn do_prestige(ref self: ContractState) {
+        // Validation
+        let caller = get_caller_address();
+        let my_max_chain_id = self.user_max_chains.read(caller);
+        assert!(my_max_chain_id >= self.max_chain_id.read(), "Not enough chains unlocked");
+        // TODO: Check upgrades, txs, etc. levels
+
+        self.prestige();
+
+        // Reset user state
+        self.user_max_chains.write(caller, 0);
+        self.user_balances.write(caller, 0);
+        let mut chain_id = 0;
+        let max_chain_id = self.max_chain_id.read();
+        while chain_id != max_chain_id {
+            self.reset_block(chain_id);
+            self.reset_da(chain_id);
+            self.reset_proof(chain_id);
+            self.transactions.reset_tx_levels(chain_id);
+            self.upgrades.reset_upgrade_levels(chain_id);
+            chain_id += 1;
+        }
     }
 }
