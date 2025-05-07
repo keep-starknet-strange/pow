@@ -12,7 +12,7 @@ export const L2Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactions();
 
   return (
-    <View className="flex-1 relative flex flex-col items-center bg-[#f7f7f710] pb-[4rem]">
+    <View className=" relative flex flex-col items-center bg-[#f7f7f710] pb-[4rem]">
       <View className="flex flex-row justify-center w-full gap-2">
         <DaView />
         <ProverView />

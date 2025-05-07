@@ -12,7 +12,7 @@ export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactions();
   const { l2 } = useGame();
   return (
-    <View className="flex-1 relative flex flex-col items-center mt-10">
+    <View className="flex flex-col items-center mt-10">
       <View className="px-2 mt-[1.5rem] w-full">
         <ChainView chainId={0} />
       </View>
