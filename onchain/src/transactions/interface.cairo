@@ -1,5 +1,8 @@
 use starknet::ContractAddress;
 
+pub const DA_TX_TYPE_ID: u32 = 100;
+pub const PROOF_TX_TYPE_ID: u32 = 101;
+
 #[derive(Drop, Serde, Clone, starknet::Store)]
 pub struct TransactionFeeConfig {
     pub cost: u128,

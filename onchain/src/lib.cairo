@@ -1,4 +1,7 @@
+pub mod actions;
+pub mod interface;
 pub mod pow;
+pub mod store;
 
 pub mod upgrades {
     pub mod component;
@@ -12,8 +15,8 @@ pub mod transactions {
     pub mod interface;
 
     pub use interface::{
-        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait, TransactionFeeConfig,
-        TransactionSpeedConfig,
+        DA_TX_TYPE_ID, IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
+        PROOF_TX_TYPE_ID, TransactionFeeConfig, TransactionSpeedConfig,
     };
 }
 
