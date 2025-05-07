@@ -7,12 +7,14 @@ export const MainPage: React.FC = () => {
   const { l2 } = useGame();
 
   return (
-    <ScrollView className="flex-1 pb-[10rem]">
-      <View className="flex-1">
+    <ScrollView 
+          className="flex-1"
+          contentContainerClassName="flex-grow pb-[10rem]">
+      <View className="flex">
         <L1Phase />
       </View>
       {l2 && (
-        <View className="flex-1 pb-[8rem]">
+        <View className="flex pb-[8rem]">
           <L2Phase />
         </View>
       )}
