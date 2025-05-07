@@ -17,7 +17,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { getUpgradeValue } = useUpgrades();
 
   return (
-    <View className="flex-1 flex flex-col items-center justify-center">
+    <View className="flex flex-col items-center justify-center">
       <View className={`flex flex-row justify-center aspect-square ${props.chainId === 0 ? "w-[22rem]" : "w-[16rem]"}`}>
         <BlockView chainId={props.chainId} block={getWorkingBlock(props.chainId)} completed={false} />
         {workingBlocks[props.chainId]?.isBuilt && (
