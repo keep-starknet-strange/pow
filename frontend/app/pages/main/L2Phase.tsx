@@ -25,9 +25,7 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
       >
         <TouchableOpacity
           className="flex flex-col items-center justify-center"
-          onPress={() => {
-+           setCurrentView("L1");
-          }}
+          onPress={() => setCurrentView("L1")}
         >
           <View className="w-3 h-3 ml-1 rotate-45 border-[#f7f760c0] border-l-2 border-t-2" />
           <Text className="text-xs text-[#f7f760c0] text-center font-bold">
