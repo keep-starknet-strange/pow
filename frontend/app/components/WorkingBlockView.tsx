@@ -33,21 +33,21 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
 
       <View
         className="flex flex-row justify-between items-center w-[22rem] mt-[0.5rem] px-2
-                   bg-[#f7f7f740] rounded-lg shadow-lg border-2 border-[#f7f7f740]"
+                   bg-[#ffff8008] rounded-lg shadow-lg border-2 border-[#ffff80b0]"
       >
-        <Text className="text-2xl font-bold text-[#f9f9f9d0]">
+        <Text className="text-2xl font-bold text-[#f9f980d0]">
           Block {workingBlocks[props.chainId]?.blockId}
         </Text>
         <View className="flex flex-row items-center gap-4">
           <View className="flex flex-row items-center gap-1">
             <Image source={feeImg} className="w-6 h-6" />
-            <Text className="text-xl font-bold text-[#f9f9f9d0]">
+            <Text className="text-xl font-bold text-[#f9f980d0]">
               ₿{workingBlocks[props.chainId]?.fees.toFixed(2)}
             </Text>
           </View>
           <View className="flex flex-row items-center gap-1">
             <Image source={rewardImg} className="w-6 h-6" />
-            <Text className="text-xl font-bold text-[#f9f9f9d0]">
+            <Text className="text-xl font-bold text-[#f9f980d0]">
               ₿{(workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward")).toFixed(2)}
             </Text>
           </View>

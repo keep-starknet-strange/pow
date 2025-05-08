@@ -17,12 +17,12 @@ export const ProverView = () => {
   return (
     <View
       className="flex flex-row items-center w-[14rem] h-[7rem]
-                 bg-[#f760f7a0] rounded-lg shadow-lg relative
+                 bg-[#f760f710] rounded-lg shadow-lg relative
                  border-2 border-[#f760f7c0] overflow-hidden"
     >
       {getProver()?.blocks.map((block, index) => (
         <View
-          className="flex flex-row rounded-sm border-2 border-[#f760f7c0] bg-[#606060a0] shadow-sm"
+          className="flex flex-row rounded-sm border-2 border-[#f760f7c0] bg-[#60606010] shadow-sm"
           key={index}
           style={{ width: `${blockWidth}%`, height: `${blockWidth}%` }}
         >
