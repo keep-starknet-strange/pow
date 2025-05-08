@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue, LayoutRectangle, LayoutChangeEvent } from "react-native";
 import { Dimensions } from 'react-native';
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
@@ -7,6 +7,7 @@ import { newTransaction } from "../../types/Chains";
 import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
+import { useTutorial } from "../../context/Tutorial";
 
 const window = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ export type TxButtonProps = {
   chainId: number;
   txType: any; // TODO: Define a proper type for txType
   isDapp?: boolean;
+  tutorialTarget?: boolean
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
@@ -22,8 +24,19 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-
+  const { step, registerTargetLayout, advanceStep } = useTutorial();
   const [feeLevel, setFeeLevel] = useState<number>(-1);
+  const containerRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (props.tutorialTarget && step === "transactions" && containerRef.current) {
+      // measureInWindow gives absolute x,y on screen
+      containerRef.current.measureInWindow((x, y, width, height) => {
+        registerTargetLayout({ x, y, width, height });
+      });
+    }
+  }, [step, props.tutorialTarget]);
+
   useEffect(() => {
     const chainId = props.chainId;
     if (props.isDapp) {
@@ -85,26 +98,37 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [sequencedDone, speed]);
 
   return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: props.txType.color,
-        borderColor: props.txType.color,
-        width: window.width * 0.16,
-        height: window.width * 0.16,
-      }}
-      className="flex flex-col items-center justify-center rounded-lg border-2 relative"
-      onPress={() => {
-        if (feeLevel === -1) {
-          if (props.isDapp) {
-            dappFeeUpgrade(props.chainId, props.txType.id);
-          } else {
-            txFeeUpgrade(props.chainId, props.txType.id);
+    <View ref={containerRef}>
+      <TouchableOpacity
+        style={{
+          backgroundColor: props.txType.color,
+          borderColor: props.txType.color,
+          width: window.width * 0.16,
+          height: window.width * 0.16,
+        }}
+        className="flex flex-col items-center justify-center rounded-lg border-2 relative"
+        onPress={() => {
+          if (feeLevel === -1) {
+            if (props.isDapp) {
+              dappFeeUpgrade(props.chainId, props.txType.id);
+            } else {
+              txFeeUpgrade(props.chainId, props.txType.id);
+            }
+            return;
+            }
+            addNewTransaction();
+            if (props.tutorialTarget && step === "transactions") {
+              advanceStep();
+            }
           }
-          return;
         }
-        addNewTransaction();
+      onLayout={(e: LayoutChangeEvent) => {
+        if (props.tutorialTarget && step === "transactions") {
+          const { x, y, width, height } = e.nativeEvent.layout;
+          registerTargetLayout({ x, y, width, height });
+        }
       }}
-    >
+      >
       <View className="w-full h-full relative overflow-hidden">
         <Image
           source={icon}
@@ -155,5 +179,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         {feeLevel === -1 ? feeCost : fee.toFixed(0)}
       </Text>
     </TouchableOpacity>
+  </View>
   );
 }

@@ -8,28 +8,31 @@ import { ChainsProvider } from "./context/Chains";
 import { StakingProvider } from "./context/Staking";
 import { GameProvider } from "./context/Game";
 import { AchievementProvider } from "./context/Achievements";
+import { TutorialProvider } from "./context/Tutorial";
 import Game from "./game";
 
 export default function App() {
   return (
     <EventManagerProvider>
-      <SoundProvider>
-        <BalanceProvider>
-          <UpgradesProvider>
-            <ChainsProvider>
-              <StakingProvider>
-                <GameProvider>
-                  <TransactionsProvider>
-                    <AchievementProvider>
-                      <Game />
-                    </AchievementProvider>
-                  </TransactionsProvider>
-                </GameProvider>
-              </StakingProvider>
-            </ChainsProvider>
-          </UpgradesProvider>
-        </BalanceProvider>
-      </SoundProvider>
+      <TutorialProvider>
+        <SoundProvider>
+          <BalanceProvider>
+            <UpgradesProvider>
+              <ChainsProvider>
+                <StakingProvider>
+                  <GameProvider>
+                    <TransactionsProvider>
+                      <AchievementProvider>
+                        <Game />
+                      </AchievementProvider>
+                    </TransactionsProvider>
+                  </GameProvider>
+                </StakingProvider>
+              </ChainsProvider>
+            </UpgradesProvider>
+          </BalanceProvider>
+        </SoundProvider>
+      </TutorialProvider>
     </EventManagerProvider>
   );
 }
