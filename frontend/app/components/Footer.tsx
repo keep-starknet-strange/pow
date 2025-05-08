@@ -15,8 +15,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
 
   // TODO: Add small lines between the icons
   return (
-    <View className="absolute bottom-0 left-0 bg-[#171717] z-[100] flex flex-row justify-around w-full pb-[1.5rem] rounded-2xl pt-[1rem] px-[0.5rem]
-      border-2 border-[#f7f7f720] border-b-0">
+    <View className="absolute bottom-0 left-0 bg-[#010a12ff] z-[100] flex flex-row justify-around w-full pb-[1.5rem] rounded-2xl pt-[1rem] px-[0.5rem]
+      border-2 border-[#f7f780b0] border-b-0">
       {props.tabs.map((tab, index) => (
         <TouchableOpacity
           key={index}

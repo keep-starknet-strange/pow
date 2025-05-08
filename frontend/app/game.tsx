@@ -12,9 +12,11 @@ import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { StakingPage } from "./pages/StakingPage";
+import { LoginPage } from "./pages/LoginPage";
 
 import { useEventManager } from "./context/EventManager";
 import { useSound } from "./context/Sound";
+import { useStarknetConnector } from "./context/StarknetConnector";
 import { useAchievement } from "./context/Achievements";
 import { useStaking } from "./context/Staking";
 import { AchievementObserver } from "./components/observer/AchievementObserver";
@@ -22,6 +24,7 @@ import { SoundObserver } from "./observers/SoundObserver";
 
 export default function game() {
   const { registerObserver, unregisterObserver } = useEventManager();
+  const { account } = useStarknetConnector();
   const { stakingUnlocked } = useStaking();
   const { updateAchievement } = useAchievement();
   useEffect(() => {
@@ -75,10 +78,18 @@ export default function game() {
   }
 
   return (
-    <View className="flex-1 bg-[#171717] relative">
-        <Header />
-        <currentPage.component/>
-        <Footer tabs={tabs} switchPage={switchPage} />
+    <View className="flex-1 bg-[#010a12ff] relative">
+        {account ? (
+          <View className="flex-1">
+            <Header />
+            <currentPage.component/>
+            <Footer tabs={tabs} switchPage={switchPage} />
+          </View>
+        ) : (
+          <View className="flex-1">
+            <LoginPage />
+          </View>
+        )}
     </View>
   );
 }

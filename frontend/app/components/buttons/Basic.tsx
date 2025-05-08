@@ -1,19 +1,17 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
 
-type ToggleButtonProps = {
+type BasicButtonProps = {
   label: string;
-  isOn: boolean;
-  onSymbol: string;
-  offSymbol: string;
-  onToggle: () => void;
+  onPress?: () => void;
   style?: object;
+  icon?: string;
 };
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ style, label, isOn, onSymbol, offSymbol, onToggle }) => {
+const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon }) => {
   return (
     <TouchableOpacity
-      onPress={onToggle}
+      onPress={onPress}
       className="rounded-full items-center justify-around flex-row p-2
                  border-2 border-[#ffff80] shadow-lg shadow-[#ffff80]"
       style={{
@@ -21,9 +19,11 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ style, label, isOn, onSymbo
       }}
     >
       <Text className="text-[#ffff80] font-bold text-2xl">{label}</Text>
-      <Text className="font-bold text-4xl">{isOn ? onSymbol : offSymbol}</Text>
+      {icon && (
+        <Text className="text-[#ffff80] font-bold text-4xl">{icon}</Text>
+      )}
     </TouchableOpacity>
   );
 };
 
-export default ToggleButton;
+export default BasicButton;

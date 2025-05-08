@@ -1,6 +1,7 @@
 import React from "react";
 import { EventManagerProvider } from "./context/EventManager";
 import { SoundProvider } from "./context/Sound";
+import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { BalanceProvider } from "./context/Balance";
 import { UpgradesProvider } from "./context/Upgrades";
 import { TransactionsProvider } from "./context/Transactions";
@@ -14,21 +15,23 @@ export default function App() {
   return (
     <EventManagerProvider>
       <SoundProvider>
-        <BalanceProvider>
-          <UpgradesProvider>
-            <ChainsProvider>
-              <StakingProvider>
-                <GameProvider>
-                  <TransactionsProvider>
-                    <AchievementProvider>
-                      <Game />
-                    </AchievementProvider>
-                  </TransactionsProvider>
-                </GameProvider>
-              </StakingProvider>
-            </ChainsProvider>
-          </UpgradesProvider>
-        </BalanceProvider>
+        <StarknetConnectorProvider>
+          <BalanceProvider>
+            <UpgradesProvider>
+              <ChainsProvider>
+                <StakingProvider>
+                  <GameProvider>
+                    <TransactionsProvider>
+                      <AchievementProvider>
+                        <Game />
+                      </AchievementProvider>
+                    </TransactionsProvider>
+                  </GameProvider>
+                </StakingProvider>
+              </ChainsProvider>
+            </UpgradesProvider>
+          </BalanceProvider>
+        </StarknetConnectorProvider>
       </SoundProvider>
     </EventManagerProvider>
   );

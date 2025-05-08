@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, ImageBackground, Image, TouchableOpacity, ScrollView } from "react-native";
 import { SvgXml } from "react-native-svg";
 import prestigeJson from "../configs/prestige.json";
+import background from "../../assets/background.png";
 
 import * as prestigeImages from "../configs/prestige";
 export const getPrestigeIcon = (prestige: number) => {
@@ -77,18 +78,22 @@ export const LeaderboardPage: React.FC = () => {
   }, []);
 
   return (
-    <View className="flex-1">
+    <ImageBackground
+      className="flex-1"
+      source={background}
+      resizeMode="cover"
+    >
      <View className="flex flex-row justify-end items-center p-2">
        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🏆Rankings</Text>
      </View>
-     <View className="flex flex-row justify-between items-center p-4 bg-[#ffffff20]">
+     <View className="flex flex-row justify-between items-center p-4 transparent">
        <Text className="text-lg font-bold text-white flex-1">Leaderboard</Text>
        <Text className="text-lg font-bold text-white w-[6rem] text-center">Prestige</Text>
        <Text className="text-lg font-bold text-white w-[6rem] text-right">Score</Text>
      </View>
      <ScrollView className="flex-1">
        {leaderboard.map((user, index) => (
-         <View key={user.id} className={`flex flex-row justify-between items-center p-4 ${index % 2 === 0 ? 'bg-[#ffffff20]' : 'bg-[#ffffff10]'}`}>
+         <View key={user.id} className={`flex flex-row justify-between items-center p-4 ${index % 2 === 0 ? 'bg-[#ffff8010]' : 'bg-[#ffff8020]'}`}>
            <View className="flex flex-row items-center flex-1">
              {userIconsSvgMap[user.name] && (
                <View className="w-[3rem] aspect-square mr-2 rounded-full overflow-hidden">
@@ -107,7 +112,7 @@ export const LeaderboardPage: React.FC = () => {
          </View>
        ))}
      </ScrollView>
-   </View>
+   </ImageBackground>
   );
 }
 
