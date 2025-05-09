@@ -33,7 +33,7 @@
       "color": "#f760f7a0",
       "description": "Increase the transaction fee for miners",
       "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      "values": [1.1, 1.2, 1.4, 1.8, 2.5, 3.5, 5, 7, 10, 15],
+      "values": [11, 12, 14, 18, 25, 35, 50, 70, 100, 150],
       "baseValue": 1
     }
   ],
@@ -43,7 +43,7 @@
       "name": "L2 Finality",
       "color": "#f760f7a0",
       "description": "Decrease finality time for L2 blocks",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      "costs": [10, 20, 30, 40, 50, 60, 70, 80],
       "values": [7, 6, 5, 4, 3, 2, 1, 0],
       "baseValue": 8
     },
@@ -71,7 +71,7 @@
       "color": "#f760f7a0",
       "description": "Increase the transaction fee for L2 sequencers",
       "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      "values": [1.1, 1.2, 1.4, 1.8, 2.5, 3.5, 5, 7, 10, 15],
+      "values": [11, 12, 14, 18, 25, 35, 50, 70, 100, 150],
       "baseValue": 1
     },
     {
