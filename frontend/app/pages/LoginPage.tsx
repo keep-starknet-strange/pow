@@ -48,7 +48,7 @@ export const LoginPage: React.FC = () => {
           </Text>
           <Image
             source={starknetLogo}
-            style={{ width: 24, height: 24 }}
+            style={{ width: 40, height: 40 }}
             resizeMode="contain"
           />
         </View>
