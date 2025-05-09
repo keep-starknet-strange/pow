@@ -9,7 +9,7 @@ import starknetLogo from '../../assets/logo/starknet.png';
 
 export const LoginPage: React.FC = () => {
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
-  const { account, deployAccount, connectAccount, getMyAddress } = useStarknetConnector();
+  const { account, deployAccount, connectAccount, getMyAddress, invokeInitMyGame } = useStarknetConnector();
   return (
     <ImageBackground
       className="flex-1 items-center justify-between"
@@ -32,7 +32,9 @@ export const LoginPage: React.FC = () => {
         <BasicButton
           label="PLAY!"
           onPress={async () => {
+            await deployAccount();
             await connectAccount();
+            await invokeInitMyGame();
           }}
           style={{ width: 250 }}
         />
@@ -48,7 +50,7 @@ export const LoginPage: React.FC = () => {
           </Text>
           <Image
             source={starknetLogo}
-            style={{ width: 24, height: 24 }}
+            style={{ width: 40, height: 40 }}
             resizeMode="contain"
           />
         </View>
