@@ -1,27 +1,43 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
+import { useEventManager } from "../context/EventManager";
+import { TutorialObserver } from "../observers/TutorialObserver";
 
-type TutorialStep = "mine-block" | "transactions" | "completed";
+type TutorialStep = "mineBlock" | "transactions" | "completed";
 interface Layout { x: number; y: number; width: number; height: number; }
 interface TutorialContextType {
   step: TutorialStep;
   advanceStep: () => void;
-  registerTargetLayout: (layout: Layout) => void;
-  targetLayout?: Layout;
+  registerLayout: (stepKey: TutorialStep, layout: Layout) => void;
+  layouts?: Partial<Record<TutorialStep, Layout>>;
 }
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
 export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [step, setStep] = useState<TutorialStep>("mine-block");
-  const [targetLayout, setTargetLayout] = useState<Layout>();
-  const advanceStep = () => {
-    setStep((prev) => {
-      if (prev === "mine-block") return "transactions";
-      return "completed";
-    });
-  };
-  const registerTargetLayout = (layout: Layout) => setTargetLayout(layout);
+  const [step, setStep] = useState<TutorialStep>("mineBlock");
+  const [layouts, setLayouts] = useState<Partial<Record<TutorialStep, Layout>>>();
+  const { registerObserver, unregisterObserver } = useEventManager();
+  const advanceStep = useCallback(() => {
+    setStep(prev => (prev === "mineBlock" ? "transactions" : "completed"));
+  }, []);
+
+  const registerLayout = useCallback(
+    (stepKey: TutorialStep, layout: Layout) => {
+      setLayouts(prev => ({ ...prev, [stepKey]: layout }));
+    },
+    []
+  );
+
+
+  useEffect(() => {
+    const observer = new TutorialObserver(advanceStep);
+    const id = registerObserver(observer);
+    return () => {
+      unregisterObserver(id);
+    };
+  }, []);
+    
   return (
-    <TutorialContext.Provider value={{ step, advanceStep, registerTargetLayout, targetLayout }}>
+    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts }}>
       {children}
     </TutorialContext.Provider>
   );

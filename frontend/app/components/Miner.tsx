@@ -22,14 +22,14 @@ export const Miner: React.FC = () => {
   const { automations } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
   const viewRef = useRef<View>(null);
-  const { registerTargetLayout } = useTutorial();
+  const { registerLayout } = useTutorial();
 
   return (
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative"
     ref={viewRef}
       onLayout={() => {
         viewRef.current?.measureInWindow((x, y, width, height) => {
-          registerTargetLayout({ x, y, width, height });
+          registerLayout("mineBlock", { x, y, width, height });
         });
       }}
     >

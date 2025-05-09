@@ -24,7 +24,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-  const { step, registerTargetLayout, advanceStep } = useTutorial();
+  const { step, registerLayout, advanceStep } = useTutorial();
   const [feeLevel, setFeeLevel] = useState<number>(-1);
   const containerRef = useRef<View>(null);
 
@@ -32,7 +32,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     if (props.tutorialTarget && step === "transactions" && containerRef.current) {
       // measureInWindow gives absolute x,y on screen
       containerRef.current.measureInWindow((x, y, width, height) => {
-        registerTargetLayout({ x, y, width, height });
+        registerLayout("transactions", { x, y, width, height });
       });
     }
   }, [step, props.tutorialTarget]);
@@ -125,7 +125,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       onLayout={(e: LayoutChangeEvent) => {
         if (props.tutorialTarget && step === "transactions") {
           const { x, y, width, height } = e.nativeEvent.layout;
-          registerTargetLayout({ x, y, width, height });
+          registerLayout("transactions", { x, y, width, height });
         }
       }}
       >
