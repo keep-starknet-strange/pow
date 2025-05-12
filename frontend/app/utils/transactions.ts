@@ -111,9 +111,9 @@ import paveIcon from "../../assets/images/dapps/pave.png";
 import libraIcon from "../../assets/images/dapps/libra.png";
 import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.png";
 import avnuIcon from "../../assets/images/dapps/avnu.png";
-import artPeaceIcon from "../../assets/images/dapps/artpeace.jpeg";
-import vesuIcon from "../../assets/images/dapps/vesu.jpeg";
-import eternumIcon from "../../assets/images/dapps/eternum.jpeg";
+import artPeaceIcon from "../../assets/images/dapps/artpeace.png";
+import vesuIcon from "../../assets/images/dapps/vesu.png";
+import eternumIcon from "../../assets/images/dapps/eternum.png";
 import oracleIcon from "../../assets/images/transaction/oracle.png";
 import attestationIcon from "../../assets/images/transaction/attestation.png";
 export const createTx = (chain: number, txTypeId: number, txFee: number, txIcon?: string) => {

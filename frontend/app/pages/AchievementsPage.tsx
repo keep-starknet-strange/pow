@@ -1,11 +1,16 @@
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Image, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
 import { useAchievement } from "../context/Achievements";
 import { Achievement } from "../types/Achievement";
+import background from "../../assets/background.png";
 
 export const AchievementsPage: React.FC = () => {
   const { achievements } = useAchievement();
   return (
-    <View className="flex-1">
+    <ImageBackground
+      className="flex-1"
+      source={background}
+      resizeMode="cover"
+    >
      <View className="flex flex-row justify-end items-center p-2">
        <Text className="text-[#e7e7e7] text-2xl font-bold mr-2">🎉Achievements</Text>
      </View>
@@ -31,7 +36,7 @@ export const AchievementsPage: React.FC = () => {
          ))}
        </View>
      </ScrollView>
-   </View>
+   </ImageBackground>
   );
 }
 

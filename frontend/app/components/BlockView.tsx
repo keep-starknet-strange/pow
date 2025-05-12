@@ -21,12 +21,12 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   return (
     <View className="w-full h-full flex flex-col items-center justify-center">
-      <View className="flex-1 bg-[#f7f7f740] aspect-square rounded-xl border-2 border-[#f7f7f740] relative overflow-hidden">
+      <View className="flex-1 bg-[#ffff8008] aspect-square rounded-xl border-2 border-[#ffff80b0] relative overflow-hidden">
         <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
           {props.block?.transactions.map((tx, index) => (
             <View
               key={index}
-              className="border-2 border-[#00000020] rounded-lg overflow-hidden"
+              className="border-2 border-[#ffffff20] rounded-lg overflow-hidden"
               style={{ width: `${txWidth}%`, height: `${txWidth}%`, ...getTxStyle(props.chainId, tx.typeId) }}
             >
               <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={tx.icon} />
@@ -36,12 +36,12 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         {props.block?.blockId === 0 && (
           <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
             {!props.completed && (
-              <Text className="text-[#ffffff] text-xl font-bold underline text-center pt-2">
+              <Text className="text-[#ffff80ff] text-xl font-bold underline text-center pt-2">
                 Genesis Block
               </Text>
             )}
             <Text
-              className={`text-[#ffffff] font-bold text-center ${props.completed ? "text-sm" : "text-xl"}`}
+              className={`text-[#ffff80ff] font-bold text-center ${props.completed ? "text-sm" : "text-xl"}`}
             >
               {props.chainId === 0 ? messagesJson.genesis.L1[currentPrestige] : messagesJson.genesis.L2[currentPrestige]}
             </Text>
@@ -51,7 +51,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           <View
             className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between bg-[#171717c0] rounded-xl"
           >
-            <Text className="text-[#e9e9e9f0] text-3xl font-bold m-1">
+            <Text className="text-[#e9e980f0] text-3xl font-bold m-1">
               #{props.block?.blockId}
             </Text>
             <View className="flex flex-col items-end justify-center w-full px-2">
@@ -60,7 +60,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                   source={feeImg}
                   className="w-4 h-4"
                 />
-                <Text className="text-[#e9e9e9f0] text-lg font-bold">
+                <Text className="text-[#e9e980f0] text-lg font-bold">
                   ₿{((props.block?.fees || 0) + (props.block?.reward || 0)).toFixed(0)}
                 </Text>
               </View>

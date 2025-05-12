@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { ImageBackground, View, Text, ScrollView } from "react-native";
 
 import { useTransactions } from "../context/Transactions";
 import { useGame } from "../context/Game";
@@ -15,6 +15,8 @@ import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 import upgradesJson from "../configs/upgrades.json";
 import automationJson from "../configs/automations.json";
+
+import background from '../../assets/background.png';
 
 export const StorePage: React.FC = () => {
   const { dappsUnlocked } = useTransactions();
@@ -49,7 +51,11 @@ export const StorePage: React.FC = () => {
   }, [storeType]);
 
   return (
-    <View className="flex-1">
+    <ImageBackground
+      className="flex-1"
+      source={background}
+      resizeMode="cover"
+    >
      <View className="flex flex-row justify-end items-center p-2">
        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🛒Shop</Text>
        {l2 && storeTypes.map((type) => (
@@ -123,7 +129,7 @@ export const StorePage: React.FC = () => {
       title="Insufficient Funds"
       onClose={() => setInsufficientFunds(false)}
     />
-   </View>
+   </ImageBackground>
   );
 }
 

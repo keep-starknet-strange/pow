@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
+import background from "../../assets/background.png";
 
 import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
@@ -19,7 +20,11 @@ export const SettingsPage: React.FC = () => {
   const ActiveComponent = tabs[activeTab];
 
   return (
-    <View className="flex-1 flex flex-col gap-2 mt-10 px-8">
+    <ImageBackground
+      className="flex-1 flex flex-col gap-2 pt-10 px-8"
+      source={background}
+      resizeMode="cover"
+    >
       <ActiveComponent setSettingTab={setActiveTab} />
       {activeTab !== "Main" && (
         <TouchableOpacity
@@ -33,7 +38,7 @@ export const SettingsPage: React.FC = () => {
           </Text>
         </TouchableOpacity>
       )}
-    </View>
+    </ImageBackground>
   );
 };
 

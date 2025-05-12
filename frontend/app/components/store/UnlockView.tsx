@@ -16,29 +16,29 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
-      className="bg-[#606060d0] rounded-xl border-2 border-[#272727a0]
-                 flex flex-row items-center justify-between p-1 mx-10"
+      className="mx-10 rounded-full items-center justify-around flex-row p-2
+                 border-2 border-[#ffff80] shadow-lg shadow-[#ffff80] bg-[#ffff8008]"
       style={props.style}
     >
       <Image source={props.icon} className="w-[3rem] h-[3rem]" />
       <View className="flex flex-col items-start justify-center flex-1 pl-2">
-        <Text className="text-xl font-bold text-[#f7f7f7a0]">
+        <Text className="text-xl font-bold text-[#ffff80]">
           Unlock {props.name}
         </Text>
-        <Text className="text-sm text-center text-[#f7f7f7a0]">
+        <Text className="text-sm text-center text-[#ffff80]">
           {props.description}
         </Text>
       </View>
       {props.owned ? (
         <View className="flex flex-row items-center justify-center pr-1">
-          <Text className="text-lg font-bold pl-1 text-[#60f770c0]">
+          <Text className="text-lg font-bold pl-1 text-[#ffff80]">
             Owned
           </Text>
         </View>
       ) : (
         <View className="flex flex-row items-center justify-center pr-1">
           <Image source={coinImg} className="w-[2rem] h-[2rem]" />
-          <Text className="text-lg font-bold pl-1">
+          <Text className="text-lg font-bold pl-1 text-[#ffff80]">
             ₿{props.cost}
           </Text>
         </View>

@@ -8,7 +8,11 @@ import { TransactionButtonsView } from "../../components/TransactionButtonsView"
 import { DappsUnlock } from "../../components/store/DappsUnlock";
 import { L2Unlock } from "../../components/store/L2Unlock";
 
-export const L1Phase: React.FC = () => {
+export interface L1PhaseProps {
+  setCurrentView: (view: string) => void;
+}
+
+export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
   const { dappsUnlocked } = useTransactions();
   const { l2 } = useGame();
   return (
@@ -40,6 +44,7 @@ export const L1Phase: React.FC = () => {
           <TouchableOpacity
             className="flex flex-col items-center justify-center"
             onPress={() => {
+              setCurrentView("L2");
             }}
           >
             <Text className="text-xs text-[#f7f760c0] text-center font-bold">

@@ -7,16 +7,21 @@ type ToggleButtonProps = {
   onSymbol: string;
   offSymbol: string;
   onToggle: () => void;
+  style?: object;
 };
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ label, isOn, onSymbol, offSymbol, onToggle }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({ style, label, isOn, onSymbol, offSymbol, onToggle }) => {
   return (
     <TouchableOpacity
       onPress={onToggle}
-      className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
+      className="rounded-full items-center justify-around flex-row p-2
+                 border-2 border-[#ffff80] shadow-lg shadow-[#ffff80]"
+      style={{
+        ...style,
+      }}
     >
-      <Text className="text-4xl">{label} </Text>
-      <Text className="text-2xl">{isOn ? onSymbol : offSymbol}</Text>
+      <Text className="text-[#ffff80] font-bold text-2xl">{label}</Text>
+      <Text className="font-bold text-4xl">{isOn ? onSymbol : offSymbol}</Text>
     </TouchableOpacity>
   );
 };
