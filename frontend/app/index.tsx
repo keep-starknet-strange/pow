@@ -33,9 +33,9 @@ export default function App() {
                 </ChainsProvider>
               </UpgradesProvider>
             </BalanceProvider>
-            </TutorialProvider>
           </StarknetConnectorProvider>
-      </SoundProvider>
+       </SoundProvider>
+      </TutorialProvider>
     </EventManagerProvider>
   );
 }
