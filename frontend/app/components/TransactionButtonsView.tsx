@@ -11,6 +11,7 @@ export type TransactionButtonsViewProps = {
 
 export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (props) => {
   const [transactionTypes, setTransactionTypes] = useState<any[]>([]);
+
   useEffect(() => {
     if (props.isDapps) {
       const dappTransactions = props.chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;

@@ -5,6 +5,7 @@ import { View } from "react-native";
 
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { TutorialOverlay } from "./components/TutorialOverlay";
 
 import { MainPage } from "./pages/MainPage";
 import { StorePage } from "./pages/StorePage";
@@ -81,6 +82,7 @@ export default function game() {
     <View className="flex-1 bg-[#010a12ff] relative">
         {account ? (
           <View className="flex-1">
+            <TutorialOverlay />
             <Header />
             <currentPage.component/>
             <Footer tabs={tabs} switchPage={switchPage} />
