@@ -9,12 +9,15 @@ interface TutorialContextType {
   advanceStep: () => void;
   registerLayout: (stepKey: TutorialStep, layout: Layout) => void;
   layouts?: Partial<Record<TutorialStep, Layout>>;
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
 }
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
 export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [step, setStep] = useState<TutorialStep>("mineBlock");
   const [layouts, setLayouts] = useState<Partial<Record<TutorialStep, Layout>>>();
+  const [visible, setVisible] = useState(false);
   const { registerObserver, unregisterObserver } = useEventManager();
   const advanceStep = useCallback(() => {
     setStep(prev => (prev === "mineBlock" ? "transactions" : "completed"));
@@ -22,14 +25,24 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const registerLayout = useCallback(
     (stepKey: TutorialStep, layout: Layout) => {
-      setLayouts(prev => ({ ...prev, [stepKey]: layout }));
-    },
-    []
-  );
+    setLayouts(prev => {
+      const old = prev?.[stepKey];
+      if (
+        old &&
+        old.x === layout.x &&
+        old.y === layout.y &&
+        old.width === layout.width &&
+        old.height === layout.height
+      ) {
+        return prev; 
+      }
+      return { ...prev, [stepKey]: layout };
+    });
+  }, []);
 
 
   useEffect(() => {
-    const observer = new TutorialObserver(advanceStep);
+    const observer = new TutorialObserver(advanceStep, setVisible);
     const id = registerObserver(observer);
     return () => {
       unregisterObserver(id);
@@ -37,7 +50,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
     
   return (
-    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts }}>
+    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts, visible, setVisible }}>
       {children}
     </TutorialContext.Provider>
   );

@@ -7,8 +7,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUBBLE_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 260);
 
 export const TutorialOverlay: React.FC = () => {
-  const { step, advanceStep, layouts } = useTutorial();
-  const [visible, setVisible] = useState(false);
+  const { step, layouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
 
   useEffect(() => {
@@ -20,12 +19,13 @@ export const TutorialOverlay: React.FC = () => {
   if ((step !== 'mineBlock' && step !== 'transactions') || !layouts) return null;
   const config: { title: string; description: string; topOffset?: number } = tutorialConfig[step];
   if (layouts[step] === undefined) return null;
-  const { x = 0, y = 0, width = 0, height = 0 } = layouts[step]
+  const { x, y, width, height } = layouts[step]
   const left = x + width / 2 - BUBBLE_WIDTH / 2;
   let top = y + height / 2 - bubbleHeight / 2;
   const arrowLeft = left + BUBBLE_WIDTH / 2 - 8;
   const arrowTop = top + bubbleHeight;
   top += config.topOffset ?? 0;
+  console.log(step)
   return (
     <View className="absolute inset-0">
       <View

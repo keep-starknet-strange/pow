@@ -15,7 +15,6 @@ export type TxButtonProps = {
   chainId: number;
   txType: any; // TODO: Define a proper type for txType
   isDapp?: boolean;
-  tutorialTarget?: boolean
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
@@ -27,16 +26,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { step, registerLayout, advanceStep } = useTutorial();
   const [feeLevel, setFeeLevel] = useState<number>(-1);
   const containerRef = useRef<View>(null);
-
-  useEffect(() => {
-    if (props.tutorialTarget && step === "transactions" && containerRef.current) {
-      // measureInWindow gives absolute x,y on screen
-      containerRef.current.measureInWindow((x, y, width, height) => {
-        registerLayout("transactions", { x, y, width, height });
-      });
-    }
-  }, [step, props.tutorialTarget]);
-
+  const tutorialTarget = step == "transactions" && props.txType.name == "Transfer" && props.chainId == 0 && !props.isDapp
   useEffect(() => {
     const chainId = props.chainId;
     if (props.isDapp) {
@@ -117,13 +107,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             return;
             }
             addNewTransaction();
-            if (props.tutorialTarget && step === "transactions") {
-              advanceStep();
-            }
           }
         }
       onLayout={(e: LayoutChangeEvent) => {
-        if (props.tutorialTarget && step === "transactions") {
+        if (tutorialTarget && step === "transactions") {
           const { x, y, width, height } = e.nativeEvent.layout;
           registerLayout("transactions", { x, y, width, height });
         }

@@ -3,7 +3,6 @@ import { View } from "react-native";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 import { TxButton } from "./buttons/TxButton";
-import { useTutorial } from "../context/Tutorial";
 
 export type TransactionButtonsViewProps = {
   chainId: number;
@@ -12,7 +11,6 @@ export type TransactionButtonsViewProps = {
 
 export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (props) => {
   const [transactionTypes, setTransactionTypes] = useState<any[]>([]);
-  const { step } = useTutorial();
 
   useEffect(() => {
     if (props.isDapps) {
@@ -31,7 +29,7 @@ export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (pr
           className="flex flex-col items-center justify-center relative"
           key={index}
         >
-          <TxButton chainId={props.chainId} txType={txType} isDapp={props.isDapps} tutorialTarget={step === "transactions" && index === 0 && props.chainId == 0 && !props.isDapps} />
+          <TxButton chainId={props.chainId} txType={txType} isDapp={props.isDapps} />
         </View>
       ))}
     </View>
