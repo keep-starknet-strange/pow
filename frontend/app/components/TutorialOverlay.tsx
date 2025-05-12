@@ -25,7 +25,6 @@ export const TutorialOverlay: React.FC = () => {
   const arrowLeft = left + BUBBLE_WIDTH / 2 - 8;
   const arrowTop = top + bubbleHeight;
   top += config.topOffset ?? 0;
-  console.log(step)
   return (
     <View className="absolute inset-0">
       <View
