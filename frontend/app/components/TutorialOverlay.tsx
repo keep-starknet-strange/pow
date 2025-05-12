@@ -49,7 +49,13 @@ export const TutorialOverlay: React.FC = () => {
       >
         <View
           className="bg-[#272727] p-3 rounded-md border border-yellow-400 shadow-lg"
-          onLayout={(e: LayoutChangeEvent) => setBubbleHeight(e.nativeEvent.layout.height)}
+          onLayout={(e: LayoutChangeEvent) => {
+            const measured = Math.round(e.nativeEvent.layout.height);
+            setBubbleHeight(prev => {
+              if (prev === measured) return prev;
+              return measured;
+            });
+          }}
         >
           <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
             {config.title}

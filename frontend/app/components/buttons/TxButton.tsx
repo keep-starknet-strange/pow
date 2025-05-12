@@ -23,7 +23,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-  const { step, registerLayout, advanceStep } = useTutorial();
+  const { step, registerLayout } = useTutorial();
   const [feeLevel, setFeeLevel] = useState<number>(-1);
   const containerRef = useRef<View>(null);
   const tutorialTarget = step == "transactions" && props.txType.name == "Transfer" && props.chainId == 0 && !props.isDapp
@@ -109,10 +109,12 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             addNewTransaction();
           }
         }
-      onLayout={(e: LayoutChangeEvent) => {
-        if (tutorialTarget && step === "transactions") {
-          const { x, y, width, height } = e.nativeEvent.layout;
-          registerLayout("transactions", { x, y, width, height });
+      onLayout={() => {
+        console.log("layout")
+        if (tutorialTarget) {
+          containerRef.current?.measureInWindow((x, y, width, height) => {
+            registerLayout("transactions", { x, y, width, height });
+          });
         }
       }}
       >

@@ -8,7 +8,7 @@
   "transactions": {
     "title": "Transactions Explained",
     "description": "Now click on transactions in the mempool to add them to your block.",
-    "topOffset": 0,
+    "topOffset": 1,
     "leftOffset": 0
   }
 }

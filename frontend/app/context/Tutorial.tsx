@@ -34,7 +34,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
         old.width === layout.width &&
         old.height === layout.height
       ) {
-        return prev; 
+        return prev;
       }
       return { ...prev, [stepKey]: layout };
     });
