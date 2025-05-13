@@ -79,7 +79,7 @@ export const TutorialOverlay: React.FC = () => {
   const insets = useSafeAreaInsets();
   const headerH = useHeaderHeight();
 
-  const config = (Object.prototype.hasOwnProperty.call(tutorialConfig, step) ? tutorialConfig[step] : { title: '', description: '', topOffset: 0 }) as {
+  const config = (step in tutorialConfig ? tutorialConfig[step as keyof typeof tutorialConfig] : { title: '', description: '', topOffset: 0 }) as {
     title: string;
     description: string;
     topOffset: number;
