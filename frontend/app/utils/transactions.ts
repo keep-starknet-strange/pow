@@ -10,6 +10,9 @@ export const newEmptyTransaction = () => {
   };
 }
 
+export const daTxTypeId = 101;
+export const proofTxTypeId = 102;
+
 import * as inscriptionImages from "../configs/inscriptions";
 export const getRandomInscriptionImage = () => {
   const images = Object.values(inscriptionImages);
@@ -59,9 +62,9 @@ export const getChainIcons = (chain: number) => {
 
 export const getTxIcon = (chainId: number, txTypeId: number, isDapp?: boolean) => {
   // TODO: Hardcoded for now, need to be dynamic
-  if (txTypeId === 101) {
+  if (txTypeId === daTxTypeId) {
     return blobIcon;
-  } else if (txTypeId === 102) {
+  } else if (txTypeId === proofTxTypeId) {
     return l2BatchIcon;
   }
   if (isDapp) {

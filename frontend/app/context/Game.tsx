@@ -9,6 +9,7 @@ import { useDAConfirmer } from "../hooks/useDAConfirmer";
 import { useProver } from "../hooks/useProver";
 import { Transaction, newTransaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
+import { daTxTypeId, proofTxTypeId } from "../utils/transactions";
 
 import l2Blob from "../../assets/images/transaction/l2Blob.png";
 import l2Batch from "../../assets/images/transaction/l2Batch.png";
@@ -48,7 +49,7 @@ export const useGame = () => {
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notify } = useEventManager();
-  const { updateBalance } = useBalance();
+  const { updateBalance, tryBuy } = useBalance();
   const { getUpgradeValue } = useUpgrades();
   const { addBlock, addChain } = useChains();
 
@@ -118,7 +119,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
   const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);
 
-  const daSplit = 0.5; // TODO: Config
+  // TODO: DA / Prover fee split? const daSplit = 0.5; // TODO: Config
   const addBlockToDa = (block: Block) => {
     if (!l2) return;
     setL2((prevState) => {
@@ -126,7 +127,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newL2Instance = { ...prevState };
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward = block.reward || getUpgradeValue(1, "Block Reward");
-      newL2Instance.da.blockFees += (block.fees + blockReward) * daSplit;
+      // TODO: DA / Prover fee split? newL2Instance.da.blockFees += (block.fees + blockReward) * daSplit;
+      newL2Instance.da.blockFees += (block.fees + blockReward);
       const daMaxSize = getUpgradeValue(1, "DA compression");
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return newL2Instance;
@@ -140,7 +142,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newL2Instance = { ...prevState };
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward = block.reward || getUpgradeValue(1, "Block Reward");
-      newL2Instance.prover.blockFees += (block.fees + blockReward) * (1 - daSplit);
+      // TODO: newL2Instance.prover.blockFees += (block.fees + blockReward) * (1 - daSplit);
+      newL2Instance.prover.blockFees += (block.fees + blockReward);
       const proverMaxSize = getUpgradeValue(1, "Recursive Proving");
       newL2Instance.prover.isBuilt = newL2Instance.prover.blocks.length >= proverMaxSize;
       return newL2Instance;
@@ -172,8 +175,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return l2.da;
   }, [l2]);
 
-  const daTxTypeId = 101;
-  const proofTxTypeId = 102;
   const onDAConfirmed = () => {
     setL2((prevState) => {
       if (!prevState) return prevState;
@@ -212,7 +213,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const initL2 = () => {
     setWorkingBlocks((prevState) => {
+      const cost = getL2Cost();
       if (l2) return prevState;
+      if(!tryBuy(cost)) return prevState;
       const newWorkingBlock = newBlock(0, genesisBlockReward);
       newWorkingBlock.isBuilt = true; // Mark the genesis block as built
       return [...prevState, newWorkingBlock];

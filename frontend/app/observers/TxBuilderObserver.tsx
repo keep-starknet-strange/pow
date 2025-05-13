@@ -3,6 +3,7 @@ import { Call } from "starknet";
 import { Block } from "../types/Chains";
 import transactionsJson from "../configs/transactions.json";
 import { POW_CONTRACT_ADDRESS } from "../context/StarknetConnector";
+import { daTxTypeId, proofTxTypeId } from "../utils/transactions";
 
 export const createAddTransactionCall = (chainId: number, txTypeId: number): Call => {
   return {
@@ -104,6 +105,11 @@ export class TxBuilderObserver implements Observer {
   onNotify(eventType: EventType, data?: any): void {
     switch (eventType) {
       case 'TxAdded':
+        // TODO: Temporary work around
+        if (data.tx.typeId === proofTxTypeId || data.tx.typeId === daTxTypeId) {
+          // Don't add the tx to the multi call if it's a proof or DA tx
+          return;
+        }
         if (data.tx.isDapp) {
           // Offset the txId by the number of tx types to get the correct txId for the dapp
           const txTypes = data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
@@ -118,6 +124,7 @@ export class TxBuilderObserver implements Observer {
         this.addToMultiCall(createMineBlockCall(0));
         break;
       case 'SequenceClicked':
+        if (this.getWorkingBlock(1)?.blockId === 0) return;
         this.addToMultiCall(createMineBlockCall(1));
         break;
       case 'DaClicked':

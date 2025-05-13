@@ -110,7 +110,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           }
         }
       onLayout={() => {
-        console.log("layout")
         if (tutorialTarget) {
           containerRef.current?.measureInWindow((x, y, width, height) => {
             registerLayout("transactions", { x, y, width, height });
