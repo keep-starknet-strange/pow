@@ -27,7 +27,6 @@ export const useMiner = (
     setMiningProgress(mineCounter / blockDifficulty);
     if (mineCounter >= blockDifficulty) {
       onBlockMined();
-      notify("MineDone", { counter: mineCounter });
       setMineCounter(0);
       setMiningProgress(0);
     }

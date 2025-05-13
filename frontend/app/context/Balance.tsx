@@ -20,7 +20,7 @@ export const BalanceContext = createContext<BalanceContextType | undefined>(unde
 
 export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notify } = useEventManager();
-  const [balance, setBalance] = useState<number>(100000);
+  const [balance, setBalance] = useState<number>(0);
 
   const updateBalance = (change: number) => {
     setBalance(prevBalance => {

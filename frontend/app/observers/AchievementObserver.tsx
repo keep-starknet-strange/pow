@@ -1,9 +1,7 @@
-import { Observer, EventType } from "../../context/EventManager";
-import achievements from "../../configs/achievements.json";
-import upgradesConfig from "../../configs/upgrades.json";
-import { Upgrade } from "../../types/Upgrade";
-import { Transaction } from "../../types/Transaction";
-import { Block } from "../../types/Block";
+import { Observer, EventType } from "../context/EventManager";
+import achievements from "../configs/achievements.json";
+import upgradesConfig from "../configs/upgrades.json";
+import { Transaction } from "../types/Chains";
 
 type Achievement = typeof achievements[number];
 

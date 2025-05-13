@@ -130,6 +130,7 @@ pub mod BuilderComponent {
             let user = get_caller_address();
             let mut block = self.building_blocks.read((user, chain_id));
             block.fees += fees;
+            block.size += 1;
             self.building_blocks.write((user, chain_id), block.clone());
             self.emit(BuildingBlockUpdate { user, chain_id, new_block: block });
         }
