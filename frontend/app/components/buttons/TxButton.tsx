@@ -26,7 +26,8 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { step, registerLayout } = useTutorial();
   const [feeLevel, setFeeLevel] = useState<number>(-1);
   const containerRef = useRef<View>(null);
-  const tutorialTarget = step == "transactions" && props.txType.name == "Transfer" && props.chainId == 0 && !props.isDapp
+  const tutorialTarget = (step as string) === "purchaseTransactions" || (step as string) === "addTransactionsToBlock" && props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp;
+  
   useEffect(() => {
     const chainId = props.chainId;
     if (props.isDapp) {
@@ -88,8 +89,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [sequencedDone, speed]);
 
   return (
-    <View ref={containerRef}>
+    <View>
       <TouchableOpacity
+        ref={containerRef}
         style={{
           backgroundColor: props.txType.color,
           borderColor: props.txType.color,
@@ -110,7 +112,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           }
         }
       onLayout={() => {
-        console.log("layout")
         if (tutorialTarget) {
           containerRef.current?.measureInWindow((x, y, width, height) => {
             registerLayout("transactions", { x, y, width, height });

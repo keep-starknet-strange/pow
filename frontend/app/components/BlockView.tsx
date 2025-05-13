@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { View, Text, Image } from "react-native";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
+import { useTutorial } from "../context/Tutorial";
 import { Block } from "../types/Chains";
 import { getTxStyle } from "../utils/transactions";
 import feeImg from "../../assets/images/bitcoin.png";
@@ -15,12 +16,22 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { currentPrestige } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
+  const { registerLayout, step } = useTutorial();
+  const viewRef = useRef<View>(null);
   useEffect(() => {
     setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
   }, [props.block?.transactions.length]);
 
+  useLayoutEffect(() => {
+    if (viewRef.current && step === "mineBlock") {
+      viewRef.current.measureInWindow((x, y, width, height) => {
+        registerLayout("mineBlock", { x, y, width, height });
+      });
+    }
+  }, [props.block]);
   return (
-    <View className="w-full h-full flex flex-col items-center justify-center">
+    <View className="w-full h-full flex flex-col items-center justify-center"
+    >
       <View className="flex-1 bg-[#ffff8008] aspect-square rounded-xl border-2 border-[#ffff80b0] relative overflow-hidden">
         <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
           {props.block?.transactions.map((tx, index) => (
@@ -34,7 +45,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           ))}
         </View>
         {props.block?.blockId === 0 && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
+          <View 
+            className="absolute top-0 left-0 w-full h-full flex flex-col items-center"
+            ref={viewRef}
+            >
             {!props.completed && (
               <Text className="text-[#ffff80ff] text-xl font-bold underline text-center pt-2">
                 Genesis Block
