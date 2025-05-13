@@ -5,7 +5,8 @@ export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'h
 export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://api.cartridge.gg/x/starknet/sepolia'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://api.cartridge.gg/x/starknet/mainnet'
 
-export const POW_CONTRACT_ADDRESS = "0x039704b9762d4beb532dad3b0f8b0b9b5bfed8612a1bcd739f7229200a99e542";
+export const POW_CONTRACT_ADDRESS = "0x074d1b015178cbdbd883f5a8d26de6fe97338b1ffb7976822924d62b889d4c97";
+export const MAX_MULTICALL = 50;
 
 type StarknetConnectorContextType = {
   chain: string;
@@ -86,7 +87,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const deployAccount = async () => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     if (!provider) {
@@ -132,7 +132,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const invokeContract = async (contractAddress: string, functionName: string, args: any[]) => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     /*
@@ -157,7 +156,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const invokeContractCalls = useCallback(async (calls: Call[]) => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
 
@@ -173,12 +171,11 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const addToMultiCall = useCallback(async (call: Call) => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     setMultiCalls((prev) => {
       const newMultiCalls = [...prev, call];
-      if (newMultiCalls.length >= 10) {
+      if (newMultiCalls.length >= MAX_MULTICALL) {
         invokeContractCalls(newMultiCalls);
         return [];
       }
@@ -188,7 +185,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const invokeInitMyGame = async () => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     /*

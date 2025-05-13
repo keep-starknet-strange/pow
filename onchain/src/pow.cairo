@@ -205,7 +205,13 @@ mod PowGame {
             // Finalize block
             let fees = working_block.fees;
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
-            pay_user(ref self, caller, fees + reward);
+            if (chain_id != 0) {
+              // Add block to da & proof
+              self.build_proof(chain_id, fees + reward);
+              self.build_da(chain_id, fees + reward);
+            } else {
+              pay_user(ref self, caller, fees + reward);
+            }
             println!("Adding block: {} -> {}: new fees: {} reward: {}", chain_id, block_width, fees, reward);
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
@@ -381,7 +387,14 @@ mod PowGame {
         let new_chain_id = self.user_max_chains.read(caller);
         self.check_valid_chain_id(new_chain_id);
         self.user_max_chains.write(caller, new_chain_id + 1);
-        pay_user(ref self, caller, self.genesis_block_reward.read());
+        // Finalize genesis block
+        if (new_chain_id != 0) {
+          // Add genesis block to da & proof
+          self.build_proof(new_chain_id, self.genesis_block_reward.read());
+          self.build_da(new_chain_id, self.genesis_block_reward.read());
+        } else {
+          pay_user(ref self, caller, self.genesis_block_reward.read());
+        }
         println!("Unlocking chain: {}", new_chain_id);
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
