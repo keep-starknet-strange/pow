@@ -131,17 +131,23 @@ mod PowGame {
     impl PowGameValidationImpl of IPowGameValidation<ContractState> {
         fn check_valid_chain_id(self: @ContractState, chain_id: u32) {
             let max_chain_id = self.max_chain_id.read();
+            println!("asserting chain id: {} < {}", chain_id, max_chain_id);
             assert!(chain_id < max_chain_id, "Invalid chain id");
+            println!("Done!");
         }
 
         fn check_user_valid_chain(self: @ContractState, chain_id: u32) {
             let caller = get_caller_address();
             let max_chain_id = self.user_max_chains.read(caller);
+            println!("asserting user chain id: {} < {}", chain_id, max_chain_id);
             assert!(chain_id < max_chain_id, "Chain not unlocked");
+            println!("Done!");
         }
 
         fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
+            println!("asserting game master");
             assert!(self.game_masters.read(user), "Invalid game master");
+            println!("Done!");
         }
 
         fn check_block_not_full(self: @ContractState, chain_id: u32) {
@@ -149,7 +155,9 @@ mod PowGame {
             let working_block = self.get_block_building_state(caller, chain_id);
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let block_size = block_width * block_width;
+            println!("asserting block not full: {} < {}", working_block.size, block_size);
             assert!(working_block.size.into() < block_size, "Block is full");
+            println!("Done!");
         }
     }
 
@@ -157,7 +165,9 @@ mod PowGame {
     impl PowGameActionsImpl of IPowGameActions<ContractState> {
         fn init_my_game(ref self: ContractState) {
             let caller = get_caller_address();
+            println!("asserting user not initialized");
             assert!(self.user_max_chains.read(caller) == 0, "Account already initialized");
+            println!("Done!");
             unlock_next_chain(ref self);
         }
 
@@ -169,6 +179,7 @@ mod PowGame {
             let tx_fees = self.transactions.get_my_tx_fee_value(chain_id, tx_type_id);
             let mev_boost = self.get_my_upgrade(chain_id, 'MEV Boost');
             let prestige_scaler = self.get_my_prestige_scaler();
+            println!("adding tx fees: {} * {} * {}", tx_fees, mev_boost, prestige_scaler);
             let total_fees = tx_fees * mev_boost * prestige_scaler;
             do_add_transaction(ref self, chain_id, tx_type_id, total_fees);
         }
@@ -179,7 +190,9 @@ mod PowGame {
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let block_size = block_width * block_width;
             let working_block = self.get_block_building_state(caller, chain_id);
+            println!("asserting block not full: {} < {}", working_block.size, block_size);
             assert!(working_block.size.into() >= block_size, "Block is not full");
+            println!("Done!");
 
             // Try Mining
             do_click_block(ref self, chain_id);
@@ -193,6 +206,7 @@ mod PowGame {
             let fees = working_block.fees;
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
             pay_user(ref self, caller, fees + reward);
+            println!("Adding block: {} -> {}: new fees: {} reward: {}", chain_id, block_width, fees, reward);
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
             self.reset_block(chain_id);
@@ -200,11 +214,15 @@ mod PowGame {
 
         fn store_da(ref self: ContractState, chain_id: u32) {
             // Validation
+            println!("asserting DA compression");
             assert!(chain_id > 0, "DA compression not available on genesis chain");
+            println!("Done!");
             let caller = get_caller_address();
             let da_size = self.get_my_upgrade(chain_id, 'DA compression');
             let working_da = self.get_da_building_state(caller, chain_id);
+            println!("asserting DA not full: {} < {}", working_da.size, da_size);
             assert!(working_da.size.into() >= da_size, "DA is not full");
+            println!("Done!");
 
             // Try Storing
             do_click_da(ref self, chain_id);
@@ -217,6 +235,7 @@ mod PowGame {
             // Add DA to lower chain
             let total_fees = working_da.fees;
             do_add_transaction(ref self, chain_id - 1, DA_TX_TYPE_ID, total_fees);
+            println!("Adding DA: {} -> {}: new fees: {}", chain_id, chain_id - 1, total_fees);
             self.emit(DAStored { user: caller, chain_id, fees: total_fees });
 
             self.reset_da(chain_id);
@@ -224,11 +243,15 @@ mod PowGame {
 
         fn prove(ref self: ContractState, chain_id: u32) {
             // Validation
+            println!("asserting proof compression");
             assert!(chain_id > 0, "Proof compression not available on genesis chain");
+            println!("Done!");
             let caller = get_caller_address();
             let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
             let working_proof = self.get_proof_building_state(caller, chain_id);
+            println!("asserting proof not full: {} < {}", working_proof.size, proof_size);
             assert!(working_proof.size.into() >= proof_size, "Proof is not full");
+            println!("Done!");
 
             // Try Proving
             do_click_proof(ref self, chain_id);
@@ -241,6 +264,7 @@ mod PowGame {
             // Add Proof to lower chain
             let total_fees = working_proof.fees;
             do_add_transaction(ref self, chain_id - 1, PROOF_TX_TYPE_ID, total_fees);
+            println!("Adding proof: {} -> {}: new fees: {}", chain_id, chain_id - 1, total_fees);
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
 
             self.reset_proof(chain_id);
@@ -304,14 +328,18 @@ mod PowGame {
         let old_balance = self.user_balances.read(user);
         let new_balance = old_balance + delta;
         self.user_balances.write(user, new_balance);
+        println!("Updating user balance: {} -> {}", old_balance, new_balance);
         self.emit(BalanceUpdated { user, old_balance, new_balance });
     }
 
     fn debit_user(ref self: ContractState, user: ContractAddress, cost: u128) {
         let balance = self.user_balances.read(user);
+        println!("asserting user balance: {} >= {}", balance, cost);
         assert!(balance >= cost, "Not enough balance");
+        println!("Done!");
         let new_balance = balance - cost;
         self.user_balances.write(user, new_balance);
+        println!("Updating user balance: {} -> {}", balance, new_balance);
         self.emit(BalanceUpdated { user, old_balance: balance, new_balance });
     }
 
@@ -323,6 +351,7 @@ mod PowGame {
         self.check_user_valid_chain(chain_id);
         self.check_block_not_full(chain_id);
         self.build_block(chain_id, total_fees);
+        println!("Adding transaction: {} -> {}: new fees: {}", chain_id, tx_type_id, total_fees);
         self.emit(TransactionAdded { user: caller, chain_id, tx_type_id, fees: total_fees });
     }
 
@@ -353,6 +382,7 @@ mod PowGame {
         self.check_valid_chain_id(new_chain_id);
         self.user_max_chains.write(caller, new_chain_id + 1);
         pay_user(ref self, caller, self.genesis_block_reward.read());
+        println!("Unlocking chain: {}", new_chain_id);
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
 
@@ -360,7 +390,9 @@ mod PowGame {
         // Validation
         let caller = get_caller_address();
         let my_max_chain_id = self.user_max_chains.read(caller);
+        println!("asserting prestige: {} >= {}", my_max_chain_id, self.max_chain_id.read());
         assert!(my_max_chain_id >= self.max_chain_id.read(), "Not enough chains unlocked");
+        println!("Done!");
         // TODO: Check upgrades, txs, etc. levels
 
         self.prestige();

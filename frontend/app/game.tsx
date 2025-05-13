@@ -18,10 +18,12 @@ import { LoginPage } from "./pages/LoginPage";
 import { useEventManager } from "./context/EventManager";
 import { useSound } from "./context/Sound";
 import { useStarknetConnector } from "./context/StarknetConnector";
+import { useGame } from "./context/Game";
 import { useAchievement } from "./context/Achievements";
 import { useStaking } from "./context/Staking";
-import { AchievementObserver } from "./components/observer/AchievementObserver";
+import { AchievementObserver } from "./observers/AchievementObserver";
 import { SoundObserver } from "./observers/SoundObserver";
+import { TxBuilderObserver } from "./observers/TxBuilderObserver";
 
 export default function game() {
   const { registerObserver, unregisterObserver } = useEventManager();
@@ -32,6 +34,16 @@ export default function game() {
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
 
+  const { getWorkingBlock } = useGame();
+  const { addToMultiCall } = useStarknetConnector();
+  const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(null);
+  useEffect(() => {
+    if (txBuilderObserver !== null) {
+      // Unregister the previous observer if it exists
+      unregisterObserver(txBuilderObserver);
+    }
+    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addToMultiCall, getWorkingBlock)));
+  }, [addToMultiCall, getWorkingBlock]);
   const { playSoundEffect } = useSound();
   const [soundObserver, setSoundObserver] = useState<null | number>(null);
   useEffect(() => {

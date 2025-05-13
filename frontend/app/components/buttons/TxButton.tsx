@@ -60,7 +60,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [props.chainId, props.txType.id, props.isDapp, getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed]);
 
   const addNewTransaction = async () => {
-    const newTx = newTransaction(props.txType.id, fee, icon);
+    const newTx = newTransaction(props.txType.id, fee, icon, props.isDapp);
     setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
     addTransaction(props.chainId, newTx);
   }

@@ -55,7 +55,7 @@ for entry in $(echo $L1_UPGRADES | jq -r '. | @base64'); do
     ID=$(_jq '.id')
     NAME=$(_jq '.name')
     NAME_NO_SPACES=$(echo $NAME | tr -d ' ')
-    NAME_HEX=$(echo -n $NAME_NO_SPACES | xxd -p | tr -d '\n')
+    NAME_HEX=$(echo -n $NAME | xxd -p | tr -d '\n')
     COSTS=$(_jq '.costs')
     VALUES=$(_jq '.values')
     BASE_VALUE=$(_jq '.baseValue')
@@ -79,7 +79,7 @@ for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     ID=$(_jq '.id')
     NAME=$(_jq '.name')
     NAME_NO_SPACES=$(echo $NAME | tr -d ' ')
-    NAME_HEX=$(echo -n $NAME_NO_SPACES | xxd -p | tr -d '\n')
+    NAME_HEX=$(echo -n $NAME | xxd -p | tr -d '\n')
     COSTS=$(_jq '.costs')
     VALUES=$(_jq '.values')
     BASE_VALUE=$(_jq '.baseValue')
@@ -113,7 +113,7 @@ for entry in $(echo $L1_AUTOMATIONS | jq -r '. | @base64'); do
     ID=$(_jq '.id')
     NAME=$(_jq '.name')
     NAME_NO_SPACES=$(echo $NAME | tr -d ' ')
-    NAME_HEX=$(echo -n $NAME_NO_SPACES | xxd -p | tr -d '\n')
+    NAME_HEX=$(echo -n $NAME | xxd -p | tr -d '\n')
     LEVELS=$(_jq '.levels[]')
     LEVEL_INFO="0 0"
     for level in $(echo $LEVELS | jq -r '. | @base64'); do
@@ -139,7 +139,7 @@ for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     ID=$(_jq '.id')
     NAME=$(_jq '.name')
     NAME_NO_SPACES=$(echo $NAME | tr -d ' ')
-    NAME_HEX=$(echo -n $NAME_NO_SPACES | xxd -p | tr -d '\n')
+    NAME_HEX=$(echo -n $NAME | xxd -p | tr -d '\n')
     LEVELS=$(_jq '.levels[]')
     LEVEL_INFO="0 0"
     for level in $(echo $LEVELS | jq -r '. | @base64'); do
@@ -166,7 +166,9 @@ echo
 
 TRANSACTIONS_CONFIG_CONTENT=$(cat $TRANSACTIONS_CONFIG)
 L1_TRANSACTIONS=$(echo $TRANSACTIONS_CONFIG_CONTENT | jq -r '.L1[]')
+L1_TX_COUNT=$(echo $TRANSACTIONS_CONFIG_CONTENT | jq -r '.L1 | length')
 L2_TRANSACTIONS=$(echo $TRANSACTIONS_CONFIG_CONTENT | jq -r '.L2[]')
+L2_TX_COUNT=$(echo $TRANSACTIONS_CONFIG_CONTENT | jq -r '.L2 | length')
 for entry in $(echo $L1_TRANSACTIONS | jq -r '. | @base64'); do
     _jq() {
         echo ${entry} | base64 --decode | jq -r ${1}
@@ -257,7 +259,7 @@ for entry in $(echo $L1_DAPPS | jq -r '. | @base64'); do
     done
     FEE_LEVELS=$(echo $FEE_COSTS | jq -r '. | length')
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
-    SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $ID $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
+    SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $((ID + L1_TX_COUNT)) $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
@@ -285,7 +287,7 @@ for entry in $(echo $L2_DAPPS | jq -r '. | @base64'); do
     done
     FEE_LEVELS=$(echo $FEE_COSTS | jq -r '. | length')
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
-    SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $ID $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
+    SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $((ID + L2_TX_COUNT)) $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
 done
@@ -298,8 +300,8 @@ echo
 
 PRESTIGE_CONFIG_CONTENT=$(cat $PRESTIGE_CONFIG)
 PRESTIGE_LEVELS=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r '. | length')
-PRESTIGE_COSTS_INFO="0"
-PRESTIGE_SCALERS_INFO="0"
+PRESTIGE_COSTS_INFO=""
+PRESTIGE_SCALERS_INFO=""
 for i in $(seq 0 $((PRESTIGE_LEVELS - 1))); do
     COST=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r ".[$i].cost")
     SCALER=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r ".[$i].scaler")
@@ -307,7 +309,7 @@ for i in $(seq 0 $((PRESTIGE_LEVELS - 1))); do
     PRESTIGE_SCALERS_INFO="$PRESTIGE_SCALERS_INFO $SCALER"
 done
 PRESTIGE_LEVELS=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r '. | length')
-SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS + 1)) $PRESTIGE_COSTS_INFO $((PRESTIGE_LEVELS + 1)) $PRESTIGE_SCALERS_INFO)
+SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS)) $PRESTIGE_COSTS_INFO $((PRESTIGE_LEVELS)) $PRESTIGE_SCALERS_INFO)
 
 # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
 sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA

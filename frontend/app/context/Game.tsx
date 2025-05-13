@@ -112,6 +112,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newWorkingBlocks[0] = newBlockInstance;
       return newWorkingBlocks;
     });
+    notify("MineDone", { block: completedBlock });
     updateBalance(blockReward + completedBlock.fees);
     addBlock(0, completedBlock);
   }
