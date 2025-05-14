@@ -42,7 +42,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   }, [props.block?.transactions.length]);
 
   return (
-    <View className="w-full h-full flex flex-col items-center justify-center"
+    <View 
+      className="w-full h-full flex flex-col items-center justify-center"
       ref={ref}
       onLayout={onLayout}
      >
@@ -90,9 +91,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           )}
         </View>
         {props.block?.blockId === 0 && (
-          <View 
-            className="absolute top-0 left-0 w-full h-full flex flex-col items-center"
-            >
+          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
             {!props.completed && (
               <Text className="text-[#ffff80ff] text-xl font-bold underline text-center pt-2">
                 Genesis Block

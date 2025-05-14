@@ -10,7 +10,8 @@ export type ConfirmerProps = {
 };
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
-  const { ref, onLayout } = useTutorialLayout("mineBlock", "bubble", props.renderedBy === "miner");
+  const enabled = props.renderedBy === "miner";
+  const { ref, onLayout } = useTutorialLayout("mineBlock", "bubble", enabled);
   return (
     <View className="w-full h-full relative">
       {props.progress > 0 && (

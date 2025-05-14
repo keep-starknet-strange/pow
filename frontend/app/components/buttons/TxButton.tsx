@@ -24,9 +24,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-  const { step } = useTutorial();
-  const { ref: refBubble, onLayout: onLayoutBubble } = useTutorialLayout("transactions", "bubble", props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp);
-  const { ref: refHighlight, onLayout: onLayoutHighlight } = useTutorialLayout("transactions", "bubble", props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp);
+  const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
+  const { ref: refBubble, onLayout: onLayoutBubble } = useTutorialLayout("transactions", "bubble", enabled);
+  const { ref: refHighlight, onLayout: onLayoutHighlight } = useTutorialLayout("transactions", "bubble", enabled);
   const [feeLevel, setFeeLevel] = useState<number>(-1);
 
   useEffect(() => {
