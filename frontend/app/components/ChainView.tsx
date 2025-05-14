@@ -11,7 +11,7 @@ export const ChainView: React.FC<ChainViewProps> = (props) => {
   const { chains } = useChains();
 
   return (
-    <View className="flex flex-row w-full justify-end pr-[0.5rem]">
+    <View className="flex flex-row w-full justify-end pr-[0.5rem] min-h-[6rem]">
       {chains[props.chainId] && chains[props.chainId].blocks.map((block, index) => (
         <View className="flex flex-row items-center" key={index}>
           <View className="h-[6rem] w-[6rem]">

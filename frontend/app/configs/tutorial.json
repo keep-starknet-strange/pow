@@ -2,7 +2,7 @@
   "mineBlock": {
     "title": "Welcome to Click Chain!",
     "description": "Click the block above to mine it and start building your chain.",
-    "topOffset": 140,
+    "topOffset": 0,
     "leftOffset": 0
   },
   "purchaseTransactions": {

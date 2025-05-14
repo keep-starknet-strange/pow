@@ -25,6 +25,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   useLayoutEffect(() => {
     if (viewRef.current && step === "mineBlock") {
       viewRef.current.measureInWindow((x, y, width, height) => {
+        console.log("BlockView layout", x, y, width, height);
         registerLayout("mineBlock", { x, y, width, height });
       });
     }
