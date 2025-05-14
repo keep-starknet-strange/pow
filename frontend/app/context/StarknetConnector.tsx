@@ -1,9 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { Account, constants, Contract, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import { Call, Account, constants, Contract, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 
 export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'http://localhost:5050/rpc';
 export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://api.cartridge.gg/x/starknet/sepolia'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://api.cartridge.gg/x/starknet/mainnet'
+
+export const POW_CONTRACT_ADDRESS = "0x074d1b015178cbdbd883f5a8d26de6fe97338b1ffb7976822924d62b889d4c97";
+export const MAX_MULTICALL = 50;
 
 type StarknetConnectorContextType = {
   chain: string;
@@ -15,6 +18,9 @@ type StarknetConnectorContextType = {
   connectAccount: () => Promise<void>;
   disconnectAccount: () => Promise<void>;
   invokeContract: (contractAddress: string, functionName: string, args: any[]) => Promise<void>;
+  invokeContractCalls: (calls: Call[]) => Promise<void>;
+
+  addToMultiCall: (call: Call) => Promise<void>;
 
   invokeInitMyGame: () => Promise<void>;
 };
@@ -46,6 +52,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
   const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
+  const [multiCall, setMultiCalls] = useState<Call[]>([]);
 
   const ENABLE_STARKNET = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
 
@@ -80,7 +87,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const deployAccount = async () => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     if (!provider) {
@@ -126,7 +132,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
 
   const invokeContract = async (contractAddress: string, functionName: string, args: any[]) => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     /*
@@ -149,10 +154,37 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     console.log(`✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`);
   }
 
-  const powContractAddress = "0x0719c15db8859dbc4d812bb1dceefc753e5549f39e7ab2d42db737a5067f881d";
+  const invokeContractCalls = useCallback(async (calls: Call[]) => {
+    if (!ENABLE_STARKNET) {
+      return;
+    }
+
+    console.log('Invoking calls:', calls);
+    const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
+    const res = await newAccount.execute(calls, {
+      maxFee: 100_000_000_000_000,
+    });
+    console.log(`Transaction hash: ${res.transaction_hash}`);
+    await provider!.waitForTransaction(res.transaction_hash);
+    console.log(`✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`);
+  }, [provider, myPrivateKey]);
+
+  const addToMultiCall = useCallback(async (call: Call) => {
+    if (!ENABLE_STARKNET) {
+      return;
+    }
+    setMultiCalls((prev) => {
+      const newMultiCalls = [...prev, call];
+      if (newMultiCalls.length >= MAX_MULTICALL) {
+        invokeContractCalls(newMultiCalls);
+        return [];
+      }
+      return newMultiCalls;
+    });
+  }, [invokeContractCalls]);
+
   const invokeInitMyGame = async () => {
     if (!ENABLE_STARKNET) {
-      console.log('Starknet is disabled.');
       return;
     }
     /*
@@ -163,12 +195,12 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     }
     */
     // TODO: Check if the game is already initialized
-    console.log("Invoking init_my_game on contract at address:", powContractAddress);
-    const { abi: contractAbi } = await provider!.getClassAt(powContractAddress);
+    console.log("Invoking init_my_game on contract at address:", POW_CONTRACT_ADDRESS);
+    const { abi: contractAbi } = await provider!.getClassAt(POW_CONTRACT_ADDRESS);
     if (contractAbi === undefined) {
-      throw new Error(`Contract at address ${powContractAddress} does not have an ABI.`);
+      throw new Error(`Contract at address ${POW_CONTRACT_ADDRESS} does not have an ABI.`);
     }
-    const contract = new Contract(contractAbi, powContractAddress, provider!);
+    const contract = new Contract(contractAbi, POW_CONTRACT_ADDRESS, provider!);
     const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
     contract.connect(newAccount!);
 
@@ -176,7 +208,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     /*
     const rest = newAccount.execute([
       {
-        contractAddress: powContractAddress,
+        contractAddress: POW_CONTRACT_ADDRESS,
         entrypoint: "init_my_game",
         calldata: []
       },
@@ -199,6 +231,8 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     connectAccount,
     disconnectAccount,
     invokeContract,
+    invokeContractCalls,
+    addToMultiCall,
     invokeInitMyGame,
   };
   return (

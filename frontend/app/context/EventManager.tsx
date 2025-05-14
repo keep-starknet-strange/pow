@@ -45,7 +45,8 @@ export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [observers, setObservers] = useState<Map<number, Observer>>(new Map());
 
   const registerObserver = (observer: Observer): number => {
-    const id = Date.now(); // Simple unique ID generator
+    // Generate a unique ID for the observer
+    const id = Math.floor(Math.random() * 10000000);
     setObservers((prev) => new Map(prev).set(id, observer));
     return id;
   };

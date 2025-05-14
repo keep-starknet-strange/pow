@@ -4,13 +4,16 @@ export type Transaction = {
   typeId: number;
   fee: number;
   icon: ImageSourcePropType;
+  isDapp?: boolean;
 };
 
-export const newTransaction = (typeId: number, fee: number, icon: ImageSourcePropType): Transaction => {
+export const newTransaction = (typeId: number, fee: number, icon: ImageSourcePropType,
+  isDapp?: boolean): Transaction => {
   return {
     typeId,
     fee,
-    icon
+    icon,
+    isDapp
   }
 }
 

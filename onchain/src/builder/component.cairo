@@ -130,6 +130,7 @@ pub mod BuilderComponent {
             let user = get_caller_address();
             let mut block = self.building_blocks.read((user, chain_id));
             block.fees += fees;
+            block.size += 1;
             self.building_blocks.write((user, chain_id), block.clone());
             self.emit(BuildingBlockUpdate { user, chain_id, new_block: block });
         }
@@ -155,7 +156,9 @@ pub mod BuilderComponent {
             let user = get_caller_address();
             let mut da = self.building_da.read((user, chain_id));
             da.fees += fees;
+            da.size += 1;
             self.building_da.write((user, chain_id), da.clone());
+            println!("Building DA: adding fees {}", fees);
             self.emit(BuildingDaUpdate { user, chain_id, new_da: da });
         }
 
@@ -180,7 +183,9 @@ pub mod BuilderComponent {
             let user = get_caller_address();
             let mut proof = self.building_proof.read((user, chain_id));
             proof.fees += fees;
+            proof.size += 1;
             self.building_proof.write((user, chain_id), proof.clone());
+            println!("Building proof: adding fees {}", fees);
             self.emit(BuildingProofUpdate { user, chain_id, new_proof: proof });
         }
 

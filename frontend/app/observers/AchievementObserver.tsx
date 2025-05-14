@@ -1,9 +1,7 @@
-import { Observer, EventType } from "../../context/EventManager";
-import achievements from "../../configs/achievements.json";
-import upgradesConfig from "../../configs/upgrades.json";
-import { Upgrade } from "../../types/Upgrade";
-import { Transaction } from "../../types/Chains";
-import { Block } from "../../types/Chains";
+import { Observer, EventType } from "../context/EventManager";
+import achievements from "../configs/achievements.json";
+import upgradesConfig from "../configs/upgrades.json";
+import { Transaction, Block } from "../types/Chains";
 
 type Achievement = typeof achievements[number];
 
@@ -48,9 +46,6 @@ export class AchievementObserver implements Observer {
         case "BalanceUpdated":
           this.handleBalanceUpdated(achievement, data.balance as number);
           break;
-        case "UpgradePurchased":
-          this.handleUpgradePurchased(achievement, data.upgrade as Upgrade, data.allUpgrades);
-          break;
         default:
           break;
       }
@@ -77,41 +72,6 @@ export class AchievementObserver implements Observer {
     }
   }
 
-  private handleUpgradePurchased(achievement: Achievement, upgrade: Upgrade, currentUpgrades: Record<number, Upgrade>) {
-    switch (achievement.name) {
-      case "Get an Antminer Rig":
-        if (upgrade.name === "Antminer") {
-          this.updateAchievement(achievement.id, 100);
-        }
-        break;
-      case "Achieve SNARK Scaling":
-        if (upgrade.name === "SNARK") {
-          this.updateAchievement(achievement.id, 100);
-        }
-        break;
-      case "Achieve STARK Scaling":
-        if (upgrade.name === "STARK") {
-          this.updateAchievement(achievement.id, 100);
-        }
-        break;
-      case "Maxed out upgrades": {
-        const progress = (upgradesConfig.L1.filter(cfg => {
-          const upg = currentUpgrades[cfg.id];
-          return cfg.costs.length ? upg?.level === cfg.costs.length : !!upg;
-        }).length / upgradesConfig.L1.length) * 100;
-        this.updateAchievement(achievement.id, progress);
-        break;
-      }
-      case "Prestige!":
-        if (upgrade.name === "Prestige") {
-          this.updateAchievement(achievement.id, 100);
-        }
-        break;
-      default:
-        console.log("Unknown achievement", achievement.name);
-    }
-  }
-
   private handleL1BlockFinalized(achievement: Achievement, block: Block) {
     const blockTargets: Record<string, number> = {
       "Reach L1 Block 10": 10,
@@ -121,7 +81,7 @@ export class AchievementObserver implements Observer {
     };
     const target = blockTargets[achievement.name];
     if (target) {
-      const progress = Math.min((block.id / target) * 100, 100);
+      const progress = Math.min((block.blockId / target) * 100, 100);
       this.updateAchievement(achievement.id, progress);
     }
   }
@@ -135,7 +95,7 @@ export class AchievementObserver implements Observer {
     }
     const target = blockTargets[achievement.name];
     if (target) {
-      const progress = Math.min((block.id / target) * 100, 100);
+      const progress = Math.min((block.blockId / target) * 100, 100);
       this.updateAchievement(achievement.id, progress);
     }
   }

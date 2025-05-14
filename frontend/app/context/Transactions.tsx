@@ -175,7 +175,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevFees;
       // Upgrade the fee level by 1
       newFees[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, dappId, type: "dappFee", level: newFees[chainId][dappId] });
+      notify("TxUpgradePurchased", { chainId, txId: dappId, type: "dappFee", level: newFees[chainId][dappId] });
       return newFees;
     });
   };
@@ -202,7 +202,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevSpeeds;
       // Upgrade the speed level by 1
       newSpeeds[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, dappId, type: "dappSpeed", level: newSpeeds[chainId][dappId] });
+      notify("TxUpgradePurchased", { chainId, txId: dappId, type: "dappSpeed", level: newSpeeds[chainId][dappId] });
       return newSpeeds;
     });
   };
