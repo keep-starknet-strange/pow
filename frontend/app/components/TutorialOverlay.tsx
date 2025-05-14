@@ -26,15 +26,13 @@ interface Position {
 function useBubblePosition(
   target: { x: number; y: number; width: number; height: number },
   bubbleHeight: number,
-  offset: number,
   insetTop: number,
   headerHeight: number
 ): Position {
   const { x, y, width, height } = target;
-  const pageYOffset = y - headerHeight;
 
   // Preferred below target
-  let top = y + height + ARROW_SIZE + ARROW_SPACING - pageYOffset - offset;
+  let top = y + height + ARROW_SIZE + ARROW_SPACING - headerHeight;
   const roomBelow = SCREEN_HEIGHT - (y + height) - insetTop;
   const below = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING;
 
@@ -74,7 +72,7 @@ function useBubblePosition(
 }
 
 export const TutorialOverlay: React.FC = () => {
-  const { step, layouts, visible, setVisible } = useTutorial();
+  const { step, bubbleLayouts, highlightLayouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const insets = useSafeAreaInsets();
   const headerH = useHeaderHeight();
@@ -82,21 +80,20 @@ export const TutorialOverlay: React.FC = () => {
   const config = (step in tutorialConfig ? tutorialConfig[step as keyof typeof tutorialConfig] : { title: '', description: '', topOffset: 0 }) as {
     title: string;
     description: string;
-    topOffset: number;
   };
-  const target = layouts?.[step] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const bubbleTarget = bubbleLayouts?.[step] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const highlightTarget = highlightLayouts?.[step] ?? { x: 0, y: 0, width: 0, height: 0 };
 
   // Compute positions unconditionally
   const { left: bubbleLeft, top: bubbleTop, style: arrowStyle, arrowLeft } = useBubblePosition(
-    target,
+    bubbleTarget,
     bubbleHeight,
-    config.topOffset || 0,
     insets.top + headerH,
     headerH
   );
 
   const masks = useMemo(() => {
-    const { x, y, width, height } = target;
+    const { x, y, width, height } = highlightTarget;
     const topOffset = y - headerH;
     return [
       { top: 0, left: 0, right: 0, height: topOffset },
@@ -104,7 +101,7 @@ export const TutorialOverlay: React.FC = () => {
       { top: topOffset, left: 0, width: x, height },
       { top: topOffset, left: x + width, right: 0, height },
     ];
-  }, [target, headerH]);
+  }, [highlightTarget, headerH]);
 
   // Show overlay on step change
   useEffect(() => {
@@ -114,8 +111,8 @@ export const TutorialOverlay: React.FC = () => {
   }, [step, setVisible]);
 
   // Guard render
-  if (!visible || !layouts || !['mineBlock', 'transactions'].includes(step)) return null;
-  if (!layouts[step]) return null;
+  if (!visible || !bubbleLayouts || !['mineBlock', 'transactions'].includes(step)) return null;
+  if (!bubbleLayouts[step]) return null;
 
   return (
     <View className="absolute inset-0 z-10" pointerEvents="box-none">
@@ -129,10 +126,10 @@ export const TutorialOverlay: React.FC = () => {
         pointerEvents="none"
         style={{
           position: 'absolute',
-          top: target.y - headerH - 4,
-          left: target.x - 4,
-          width: target.width + 8,
-          height: target.height + 8,
+          top: highlightTarget.y - headerH - 4,
+          left: highlightTarget.x - 4,
+          width: highlightTarget.width + 8,
+          height: highlightTarget.height + 8,
         }}
         className="border-2 border-yellow-400 rounded-2xl shadow-lg"
       />

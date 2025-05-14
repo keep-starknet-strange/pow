@@ -1,26 +1,18 @@
 {
   "mineBlock": {
     "title": "Welcome to Click Chain!",
-    "description": "Click the block above to mine it and start building your chain.",
-    "topOffset": 140,
-    "leftOffset": 0
+    "description": "Click the block above to mine it and start building your chain."
   },
   "purchaseTransactions": {
     "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool.",
-    "topOffset": -180,
-    "leftOffset": 0
+    "description": "Now click on transaction to add them to your mempool."
   },
   "addTransactionsToBlock": {
     "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool.",
-    "topOffset": -180,
-    "leftOffset": 0
+    "description": "Now click on transaction to add them to your mempool."
   },
   "completed": {
     "title": "Transactions Explained",
-    "description": "Now click on transactions in the mempool to add them to your block.",
-    "topOffset": -180,
-    "leftOffset": 0
+    "description": "Now click on transactions in the mempool to add them to your block."
   }
 }

@@ -20,7 +20,6 @@ export const getMiningAnimation = (mineProgress: number) => {
 export const Miner: React.FC = () => {
   const { automations } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
-  const viewRef = useRef<View>(null);
 
   return (
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative"
@@ -30,6 +29,7 @@ export const Miner: React.FC = () => {
         image={getMinerImage(automations[0][0] + 1)}
         getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
+        renderedBy="miner"
       />
     </View>
   );

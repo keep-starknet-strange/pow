@@ -8,6 +8,7 @@ import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorial } from "../../context/Tutorial";
+import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 
 const window = Dimensions.get('window');
 
@@ -23,11 +24,11 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-  const { step, registerLayout } = useTutorial();
+  const { step } = useTutorial();
+  const { ref: refBubble, onLayout: onLayoutBubble } = useTutorialLayout("transactions", "bubble", props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp);
+  const { ref: refHighlight, onLayout: onLayoutHighlight } = useTutorialLayout("transactions", "bubble", props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp);
   const [feeLevel, setFeeLevel] = useState<number>(-1);
-  const containerRef = useRef<View>(null);
-  const tutorialTarget = (step as string) === "purchaseTransactions" || (step as string) === "addTransactionsToBlock" && props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp;
-  
+
   useEffect(() => {
     const chainId = props.chainId;
     if (props.isDapp) {
@@ -91,7 +92,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   return (
     <View>
       <TouchableOpacity
-        ref={containerRef}
         style={{
           backgroundColor: props.txType.color,
           borderColor: props.txType.color,
@@ -108,16 +108,13 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             }
             return;
             }
-            addNewTransaction();
-          }
-        }
-      onLayout={() => {
-        if (tutorialTarget) {
-          containerRef.current?.measureInWindow((x, y, width, height) => {
-            registerLayout("transactions", { x, y, width, height });
-          });
-        }
-      }}
+          addNewTransaction();
+          }}
+        ref={refBubble && refHighlight}
+        onLayout={() => {
+          onLayoutBubble();
+          onLayoutHighlight();
+        }}
       >
       <View className="w-full h-full relative overflow-hidden">
         <Image
