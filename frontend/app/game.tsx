@@ -21,6 +21,7 @@ import { useStarknetConnector } from "./context/StarknetConnector";
 import { useGame } from "./context/Game";
 import { useAchievement } from "./context/Achievements";
 import { useStaking } from "./context/Staking";
+import { useTutorial } from "./context/Tutorial";
 import { AchievementObserver } from "./observers/AchievementObserver";
 import { SoundObserver } from "./observers/SoundObserver";
 import { TxBuilderObserver } from "./observers/TxBuilderObserver";
@@ -30,6 +31,7 @@ export default function game() {
   const { account } = useStarknetConnector();
   const { stakingUnlocked } = useStaking();
   const { updateAchievement } = useAchievement();
+  const { isTutorialActive } = useTutorial();
   useEffect(() => {
     registerObserver(new AchievementObserver(updateAchievement));
   }, []);
@@ -94,7 +96,7 @@ export default function game() {
     <View className="flex-1 bg-[#010a12ff] relative">
         {account ? (
           <View className="flex-1">
-            <TutorialOverlay />
+            { isTutorialActive && <TutorialOverlay /> }
             <Header />
             <currentPage.component/>
             <Footer tabs={tabs} switchPage={switchPage} />
