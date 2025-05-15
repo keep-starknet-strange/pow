@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useEventManager } from "../context/EventManager";
 import { TutorialObserver } from "../observers/TutorialObserver";
+import tutorialConfig from "../configs/tutorial.json";
 
-export type TutorialStep = "mineBlock" | "transactions" | "completed";
+export type TutorialStep = keyof typeof tutorialConfig;
+export type TargetId = keyof typeof tutorialConfig[TutorialStep]["bubbleTargetId"] | keyof typeof tutorialConfig[TutorialStep]["highlightTargetId"];
+
 interface Layout { 
   x: number; 
   y: number; 
@@ -14,10 +17,12 @@ interface TutorialContextType {
   isTutorialActive: boolean;
   step: TutorialStep;
   advanceStep: () => void;
-  registerHighlightLayout: (stepKey: TutorialStep, layout: Layout) => void;
-  registerBubbleLayout: (stepKey: TutorialStep, layout: Layout) => void;
-  bubbleLayouts?: Partial<Record<TutorialStep, Layout>>;
-  highlightLayouts?: Partial<Record<TutorialStep, Layout>>;
+  // registerHighlightLayout: (targetId: TargetId, layout: Layout) => void;
+  // registerBubbleLayout: (targetId: TargetId, layout: Layout) => void;
+  registerLayout: (targetId: TargetId, layout: Layout) => void;
+  layouts?: Partial<Record<TargetId, Layout>>;
+  bubbleLayouts?: Partial<Record<TargetId, Layout>>;
+  highlightLayouts?: Partial<Record<TargetId, Layout>>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }
@@ -27,18 +32,55 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   // TODO: add setTutorialActive to the tutorial observer and settings
   const [isTutorialActive, setIsTutorialActive] = useState(true);
   const [step, setStep] = useState<TutorialStep>("mineBlock");
-  const [bubbleLayouts, setBubbleLayouts] = useState<Partial<Record<TutorialStep, Layout>>>();
-  const [highlightLayouts, setHighlightLayouts] = useState<Partial<Record<TutorialStep, Layout>>>();
+  const [stepIndex, setStepIndex] = useState<number>(0);
+  // const [bubbleLayouts, setBubbleLayouts] = useState<Partial<Record<TargetId, Layout>>>();
+  // const [highlightLayouts, setHighlightLayouts] = useState<Partial<Record<TargetId, Layout>>>();
+  const [ layouts, setLayouts] = useState<Partial<Record<TargetId, Layout>>>();
   const [visible, setVisible] = useState(false);
   const { registerObserver, unregisterObserver } = useEventManager();
   const advanceStep = useCallback(() => {
-    setStep(prev => (prev === "mineBlock" ? "transactions" : "completed"));
+    setStepIndex((prev: number) => (prev + 1));
+    setStep(Object.keys(tutorialConfig)[stepIndex] as TutorialStep);
   }, []);
 
-  const registerHighlightLayout = useCallback(
-    (stepKey: TutorialStep, layout: Layout) => {
-    setHighlightLayouts(prev => {
-      const old = prev?.[stepKey];
+  // const registerHighlightLayout = useCallback(
+  //   (targetId: TargetId, layout: Layout) => {
+  //   setHighlightLayouts(prev => { 
+  //     const old = prev?.[targetId];
+  //     if (
+  //       old &&
+  //       old.x === layout.x &&
+  //       old.y === layout.y &&
+  //       old.width === layout.width &&
+  //       old.height === layout.height
+  //     ) {
+  //       return prev;
+  //     }
+  //     return { ...prev, [targetId]: layout };
+  //   });
+  // }, []);
+
+  // const registerBubbleLayout = useCallback(
+  //   (targetId: TargetId, layout: Layout) => {
+  //   setBubbleLayouts(prev => {
+  //     const old = prev?.[targetId];
+  //     if (
+  //       old &&
+  //       old.x === layout.x &&
+  //       old.y === layout.y &&
+  //       old.width === layout.width &&
+  //       old.height === layout.height
+  //     ) {
+  //       return prev;
+  //     }
+  //     return { ...prev, [targetId]: layout };
+  //   });
+  // }, []);
+
+    const registerLayout = useCallback(
+    (targetId: TargetId, layout: Layout) => {
+    setLayouts(prev => {
+      const old = prev?.[targetId];
       if (
         old &&
         old.x === layout.x &&
@@ -48,24 +90,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
       ) {
         return prev;
       }
-      return { ...prev, [stepKey]: layout };
-    });
-  }, []);
-
-  const registerBubbleLayout = useCallback(
-    (stepKey: TutorialStep, layout: Layout) => {
-    setBubbleLayouts(prev => {
-      const old = prev?.[stepKey];
-      if (
-        old &&
-        old.x === layout.x &&
-        old.y === layout.y &&
-        old.width === layout.width &&
-        old.height === layout.height
-      ) {
-        return prev;
-      }
-      return { ...prev, [stepKey]: layout };
+      return { ...prev, [targetId]: layout };
     });
   }, []);
 
@@ -79,7 +104,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
     
   return (
-    <TutorialContext.Provider value={{ step, advanceStep, registerHighlightLayout, registerBubbleLayout, bubbleLayouts, highlightLayouts, visible, setVisible, isTutorialActive }}>
+    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts, visible, setVisible, isTutorialActive }}>
       {children}
     </TutorialContext.Provider>
   );

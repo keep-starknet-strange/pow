@@ -1,31 +1,23 @@
 import { useRef, useCallback } from "react";
 import { View } from "react-native";
-import { useTutorial, TutorialStep } from "../context/Tutorial";
-
-type TutorialLayoutType = "highlight" | "bubble";
+import { useTutorial, TargetId } from "../context/Tutorial";
+import tutorialConfig from "../configs/tutorial.json";
 
 export function useTutorialLayout(
-  stepKey: TutorialStep,
-  types: TutorialLayoutType | TutorialLayoutType[],
+  id: TargetId,
   enabled: boolean = true
 ) {
   const ref = useRef<View>(null);
-  const { step, registerHighlightLayout, registerBubbleLayout, isTutorialActive } = useTutorial();
-
-  const typeList = Array.isArray(types) ? types : [types];
+  const { step, registerLayout, isTutorialActive } = useTutorial();
+  const stepTargets = [tutorialConfig[step]["bubbleTargetId"], tutorialConfig[step]["highlightTargetId"]];
 
   const onLayout = useCallback(() => {
-    if (!enabled || !isTutorialActive || step !== stepKey) return;
+    if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) return;
 
     ref.current?.measureInWindow((x, y, width, height) => {
-      if (typeList.includes("highlight")) {
-        registerHighlightLayout(stepKey, { x, y, width, height });
-      }
-      if (typeList.includes("bubble")) {
-        registerBubbleLayout(stepKey, { x, y, width, height });
-      }
+      registerLayout(id, { x, y, width, height });
     });
-  }, [stepKey,  typeList.join(","), isTutorialActive, registerHighlightLayout, registerBubbleLayout]);
+  }, [id, isTutorialActive, registerLayout]);
 
   return { ref, onLayout };
 }

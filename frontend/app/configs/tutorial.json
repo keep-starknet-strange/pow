@@ -1,18 +1,26 @@
 {
   "mineBlock": {
     "title": "Welcome to Click Chain!",
-    "description": "Click the block above to mine it and start building your chain."
+    "description": "Click the block above to mine it and start building your chain.",
+    "bubbleTargetId": "block",
+    "highlightTargetId": "minerConfirmer"
   },
   "purchaseTransactions": {
     "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool."
+    "description": "Now click on transaction to add them to your mempool.",
+    "bubbleTargetId": "firstTransactionButton",
+    "highlightTargetId": "firstTransactionButton"
   },
   "addTransactionsToBlock": {
     "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool."
-  },
+    "description": "Now click on transaction to add them to your mempool.",
+    "bubbleTargetId": "firstTransactionButton",
+    "highlightTargetId": "firstTransactionButton"
+  }, 
   "completed": {
     "title": "Transactions Explained",
-    "description": "Now click on transactions in the mempool to add them to your block."
+    "description": "Now click on transactions in the mempool to add them to your block.",
+    "bubbleTargetId": "transaction",
+    "highlightTargetId": "confirmer"
   }
 }

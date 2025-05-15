@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, LayoutChangeEvent, Dimensions, ViewStyle, StyleProp } from 'react-native';
-import { useTutorial } from '../context/Tutorial';
+import { useTutorial, TargetId } from '../context/Tutorial';
 import tutorialConfig from '../configs/tutorial.json';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -77,12 +77,14 @@ export const TutorialOverlay: React.FC = () => {
   const insets = useSafeAreaInsets();
   const headerH = useHeaderHeight();
 
-  const config = (step in tutorialConfig ? tutorialConfig[step as keyof typeof tutorialConfig] : { title: '', description: '', topOffset: 0 }) as {
+  const config = (step in tutorialConfig ? tutorialConfig[step as keyof typeof tutorialConfig] : { title: '', description: '', topOffset: 0, bubbleTargetId: '', highlightTargetId: '' }) as {
     title: string;
     description: string;
+    bubbleTargetId: TargetId;
+    highlightTargetId: TargetId;
   };
-  const bubbleTarget = bubbleLayouts?.[step] ?? { x: 0, y: 0, width: 0, height: 0 };
-  const highlightTarget = highlightLayouts?.[step] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const bubbleTarget = bubbleLayouts?.[config.bubbleTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const highlightTarget = highlightLayouts?.[config.highlightTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
 
   // Compute positions unconditionally
   const { left: bubbleLeft, top: bubbleTop, style: arrowStyle, arrowLeft } = useBubblePosition(
@@ -112,7 +114,7 @@ export const TutorialOverlay: React.FC = () => {
 
   // Guard render
   if (!visible || !bubbleLayouts || !['mineBlock', 'transactions'].includes(step)) return null;
-  if (!bubbleLayouts[step]) return null;
+  if (!bubbleLayouts[config.bubbleTargetId]) return null;
 
   return (
     <View className="absolute inset-0 z-10" pointerEvents="box-none">

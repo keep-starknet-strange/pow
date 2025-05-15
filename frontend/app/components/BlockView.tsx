@@ -4,6 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import { TargetId } from "../context/Tutorial";
 import { Block } from "../types/Chains";
 import { getTxStyle } from "../utils/transactions";
 import feeImg from "../../assets/images/bitcoin.png";
@@ -17,7 +18,7 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { currentPrestige, getUpgradeValue } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
-  const { ref, onLayout } = useTutorialLayout("mineBlock", "highlight");
+  const { ref, onLayout } = useTutorialLayout("mineBlock" as TargetId);
   useEffect(() => {
     const maxBlockSize = getUpgradeValue(props.chainId, "Block Size")**2;
     // setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));

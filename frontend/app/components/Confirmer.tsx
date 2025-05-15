@@ -1,5 +1,6 @@
 import { View, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
 import { useTutorialLayout } from '../hooks/useTutorialLayout';
+import { TargetId } from '../context/Tutorial';
 
 export type ConfirmerProps = {
   progress: number;
@@ -11,7 +12,7 @@ export type ConfirmerProps = {
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const enabled = props.renderedBy === "miner";
-  const { ref, onLayout } = useTutorialLayout("mineBlock", "bubble", enabled);
+  const { ref, onLayout } = useTutorialLayout("mineBlock" as TargetId, enabled);
   return (
     <View className="w-full h-full relative">
       {props.progress > 0 && (

@@ -8,6 +8,7 @@ import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
+import { TargetId } from "../../context/Tutorial";
 
 const window = Dimensions.get('window');
 
@@ -24,7 +25,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
   const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
-  const { ref, onLayout } = useTutorialLayout("transactions", ["highlight", "bubble"], enabled);
+  const { ref, onLayout } = useTutorialLayout("firstTransactionButton" as TargetId, ["highlight", "bubble"], enabled);
   
   const [feeLevel, setFeeLevel] = useState<number>(-1);
 
