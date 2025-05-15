@@ -17,8 +17,6 @@ interface TutorialContextType {
   isTutorialActive: boolean;
   step: TutorialStep;
   advanceStep: () => void;
-  // registerHighlightLayout: (targetId: TargetId, layout: Layout) => void;
-  // registerBubbleLayout: (targetId: TargetId, layout: Layout) => void;
   registerLayout: (targetId: TargetId, layout: Layout) => void;
   layouts?: Partial<Record<TargetId, Layout>>;
   bubbleLayouts?: Partial<Record<TargetId, Layout>>;
@@ -33,8 +31,6 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isTutorialActive, setIsTutorialActive] = useState(true);
   const [step, setStep] = useState<TutorialStep>("mineBlock");
   const [stepIndex, setStepIndex] = useState<number>(0);
-  // const [bubbleLayouts, setBubbleLayouts] = useState<Partial<Record<TargetId, Layout>>>();
-  // const [highlightLayouts, setHighlightLayouts] = useState<Partial<Record<TargetId, Layout>>>();
   const [ layouts, setLayouts] = useState<Partial<Record<TargetId, Layout>>>();
   const [visible, setVisible] = useState(false);
   const { registerObserver, unregisterObserver } = useEventManager();
