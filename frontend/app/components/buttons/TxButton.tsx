@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue, LayoutRectangle, LayoutChangeEvent } from "react-native";
 import { Dimensions } from 'react-native';
 import { useGame } from "../../context/Game";
@@ -7,7 +7,6 @@ import { newTransaction } from "../../types/Chains";
 import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
-import { useTutorial } from "../../context/Tutorial";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 
 const window = Dimensions.get('window');
@@ -25,8 +24,8 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
   const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
-  const { ref: refBubble, onLayout: onLayoutBubble } = useTutorialLayout("transactions", "bubble", enabled);
-  const { ref: refHighlight, onLayout: onLayoutHighlight } = useTutorialLayout("transactions", "bubble", enabled);
+  const { ref, onLayout } = useTutorialLayout("transactions", ["highlight", "bubble"], enabled);
+  
   const [feeLevel, setFeeLevel] = useState<number>(-1);
 
   useEffect(() => {
@@ -110,11 +109,8 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             }
           addNewTransaction();
           }}
-        ref={refBubble && refHighlight}
-        onLayout={() => {
-          onLayoutBubble();
-          onLayoutHighlight();
-        }}
+        ref={ref}
+        onLayout={onLayout}
       >
       <View className="w-full h-full relative overflow-hidden">
         <Image
