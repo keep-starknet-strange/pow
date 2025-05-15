@@ -43,40 +43,6 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
     setStep(Object.keys(tutorialConfig)[stepIndex] as TutorialStep);
   }, []);
 
-  // const registerHighlightLayout = useCallback(
-  //   (targetId: TargetId, layout: Layout) => {
-  //   setHighlightLayouts(prev => { 
-  //     const old = prev?.[targetId];
-  //     if (
-  //       old &&
-  //       old.x === layout.x &&
-  //       old.y === layout.y &&
-  //       old.width === layout.width &&
-  //       old.height === layout.height
-  //     ) {
-  //       return prev;
-  //     }
-  //     return { ...prev, [targetId]: layout };
-  //   });
-  // }, []);
-
-  // const registerBubbleLayout = useCallback(
-  //   (targetId: TargetId, layout: Layout) => {
-  //   setBubbleLayouts(prev => {
-  //     const old = prev?.[targetId];
-  //     if (
-  //       old &&
-  //       old.x === layout.x &&
-  //       old.y === layout.y &&
-  //       old.width === layout.width &&
-  //       old.height === layout.height
-  //     ) {
-  //       return prev;
-  //     }
-  //     return { ...prev, [targetId]: layout };
-  //   });
-  // }, []);
-
     const registerLayout = useCallback(
     (targetId: TargetId, layout: Layout) => {
     setLayouts(prev => {
