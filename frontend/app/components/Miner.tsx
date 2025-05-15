@@ -2,7 +2,6 @@ import { useRef } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
-import { useTutorial } from "../context/Tutorial";
 import { Confirmer } from "./Confirmer";
 
 import * as minerImages from "../configs/miners";
@@ -21,23 +20,16 @@ export const getMiningAnimation = (mineProgress: number) => {
 export const Miner: React.FC = () => {
   const { automations } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
-  const viewRef = useRef<View>(null);
-  const { registerLayout } = useTutorial();
 
   return (
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative"
-    ref={viewRef}
-      onLayout={() => {
-        viewRef.current?.measureInWindow((x, y, width, height) => {
-          registerLayout("mineBlock", { x, y, width, height });
-        });
-      }}
     >
       <Confirmer
         progress={miningProgress}
         image={getMinerImage(automations[0][0] + 1)}
         getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
+        renderedBy="miner"
       />
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue, LayoutRectangle, LayoutChangeEvent } from "react-native";
 import { Dimensions } from 'react-native';
 import { useGame } from "../../context/Game";
@@ -7,7 +7,8 @@ import { newTransaction } from "../../types/Chains";
 import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
-import { useTutorial } from "../../context/Tutorial";
+import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
+import { TargetId } from "../../context/Tutorial";
 
 const window = Dimensions.get('window');
 
@@ -23,10 +24,11 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
-  const { step, registerLayout } = useTutorial();
+  const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
+  const { ref, onLayout } = useTutorialLayout("firstTransactionButton" as TargetId, ["highlight", "bubble"], enabled);
+  
   const [feeLevel, setFeeLevel] = useState<number>(-1);
-  const containerRef = useRef<View>(null);
-  const tutorialTarget = step == "transactions" && props.txType.name == "Transfer" && props.chainId == 0 && !props.isDapp
+
   useEffect(() => {
     const chainId = props.chainId;
     if (props.isDapp) {
@@ -88,7 +90,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [sequencedDone, speed]);
 
   return (
-    <View ref={containerRef}>
+    <View>
       <TouchableOpacity
         style={{
           backgroundColor: props.txType.color,
@@ -106,16 +108,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             }
             return;
             }
-            addNewTransaction();
-          }
-        }
-      onLayout={() => {
-        if (tutorialTarget) {
-          containerRef.current?.measureInWindow((x, y, width, height) => {
-            registerLayout("transactions", { x, y, width, height });
-          });
-        }
-      }}
+          addNewTransaction();
+          }}
+        ref={ref}
+        onLayout={onLayout}
       >
       <View className="w-full h-full relative overflow-hidden">
         <Image

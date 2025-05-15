@@ -3,6 +3,8 @@ import { View, Text, Image } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import { TargetId } from "../context/Tutorial";
 import { Block } from "../types/Chains";
 import { getTxStyle } from "../utils/transactions";
 import feeImg from "../../assets/images/bitcoin.png";
@@ -16,6 +18,7 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { currentPrestige, getUpgradeValue } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
+  const { ref, onLayout } = useTutorialLayout("mineBlock" as TargetId);
   useEffect(() => {
     const maxBlockSize = getUpgradeValue(props.chainId, "Block Size")**2;
     // setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
@@ -40,7 +43,11 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   }, [props.block?.transactions.length]);
 
   return (
-    <View className="w-full h-full flex flex-col items-center justify-center">
+    <View 
+      className="w-full h-full flex flex-col items-center justify-center"
+      ref={ref}
+      onLayout={onLayout}
+     >
       <View className="flex-1 bg-[#ffff8008] aspect-square rounded-xl border-2 border-[#ffff80b0] relative overflow-hidden">
         <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
           {props.block?.transactions.map((tx, index) => (

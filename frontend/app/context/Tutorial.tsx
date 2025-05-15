@@ -1,32 +1,48 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useEventManager } from "../context/EventManager";
 import { TutorialObserver } from "../observers/TutorialObserver";
+import tutorialConfig from "../configs/tutorial.json";
 
-type TutorialStep = "mineBlock" | "transactions" | "completed";
-interface Layout { x: number; y: number; width: number; height: number; }
+export type TutorialStep = keyof typeof tutorialConfig;
+export type TargetId = keyof typeof tutorialConfig[TutorialStep]["bubbleTargetId"] | keyof typeof tutorialConfig[TutorialStep]["highlightTargetId"];
+
+interface Layout { 
+  x: number; 
+  y: number; 
+  width: number; 
+  height: number;  
+  }
+
 interface TutorialContextType {
+  isTutorialActive: boolean;
   step: TutorialStep;
   advanceStep: () => void;
-  registerLayout: (stepKey: TutorialStep, layout: Layout) => void;
-  layouts?: Partial<Record<TutorialStep, Layout>>;
+  registerLayout: (targetId: TargetId, layout: Layout) => void;
+  layouts?: Partial<Record<TargetId, Layout>>;
+  bubbleLayouts?: Partial<Record<TargetId, Layout>>;
+  highlightLayouts?: Partial<Record<TargetId, Layout>>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
 export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // TODO: add setTutorialActive to the tutorial observer and settings
+  const [isTutorialActive, setIsTutorialActive] = useState(true);
   const [step, setStep] = useState<TutorialStep>("mineBlock");
-  const [layouts, setLayouts] = useState<Partial<Record<TutorialStep, Layout>>>();
+  const [stepIndex, setStepIndex] = useState<number>(0);
+  const [ layouts, setLayouts] = useState<Partial<Record<TargetId, Layout>>>();
   const [visible, setVisible] = useState(false);
   const { registerObserver, unregisterObserver } = useEventManager();
   const advanceStep = useCallback(() => {
-    setStep(prev => (prev === "mineBlock" ? "transactions" : "completed"));
+    setStepIndex((prev: number) => (prev + 1));
+    setStep(Object.keys(tutorialConfig)[stepIndex] as TutorialStep);
   }, []);
 
-  const registerLayout = useCallback(
-    (stepKey: TutorialStep, layout: Layout) => {
+    const registerLayout = useCallback(
+    (targetId: TargetId, layout: Layout) => {
     setLayouts(prev => {
-      const old = prev?.[stepKey];
+      const old = prev?.[targetId];
       if (
         old &&
         old.x === layout.x &&
@@ -36,7 +52,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
       ) {
         return prev;
       }
-      return { ...prev, [stepKey]: layout };
+      return { ...prev, [targetId]: layout };
     });
   }, []);
 
@@ -50,7 +66,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
     
   return (
-    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts, visible, setVisible }}>
+    <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts, visible, setVisible, isTutorialActive }}>
       {children}
     </TutorialContext.Provider>
   );

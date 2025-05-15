@@ -12,7 +12,7 @@ export class TutorialObserver implements Observer {
     }
     // once a transaction is added to the block, mark tutorial complete
     if (eventName === 'TxAdded') {
-      // this.advanceStep();
+      this.advanceStep();
     }
     // do extra stuff here
   }
