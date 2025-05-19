@@ -2,10 +2,11 @@ import React, { createContext, useCallback, useContext, useState, useEffect } fr
 import { Call, Account, constants, Contract, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 
 export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'http://localhost:5050/rpc';
-export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://api.cartridge.gg/x/starknet/sepolia'
-export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://api.cartridge.gg/x/starknet/mainnet'
+export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
+export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
 
-export const POW_CONTRACT_ADDRESS = "0x074d1b015178cbdbd883f5a8d26de6fe97338b1ffb7976822924d62b889d4c97";
+// sepolia: export const POW_CONTRACT_ADDRESS = "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4";
+export const POW_CONTRACT_ADDRESS = "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781";
 export const MAX_MULTICALL = 50;
 
 type StarknetConnectorContextType = {
@@ -38,7 +39,7 @@ export const useStarknetConnector = () => {
 export const getStarknetProvider = (chain: string): RpcProvider => {
   switch (chain) {
     case "SN_MAINNET":
-      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL });
+      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL, specVersion: "0.7" });
     case "SN_SEPOLIA":
       return new RpcProvider({ nodeUrl: SEPOLIA_RPC_URL });
     case "SN_DEVNET":
@@ -51,7 +52,7 @@ export const getStarknetProvider = (chain: string): RpcProvider => {
 export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
-  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
+  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_MAINNET");
   const [multiCall, setMultiCalls] = useState<Call[]>([]);
 
   const ENABLE_STARKNET = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
@@ -62,10 +63,11 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   }, [chain]);
 
   const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9";
-  const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
+  const ozAccountClassHash = "0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f";
+  //const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
   const getDeployCalldata = (privateKey: string) => {
     const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
-    const constructorCalldata = CallData.compile({ publick_key: starkKeyPub });
+    const constructorCalldata = CallData.compile({ public_key: starkKeyPub });
     return constructorCalldata;
   }
 
@@ -111,6 +113,9 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
       constructorCalldata: constructorCalldata,
       addressSalt: starkKeyPub,
       contractAddress: contractAddress,
+    }, { maxFee: 100_000_000_000_000 }).catch((error) => {
+      console.error('Error deploying account:', error);
+      throw error;
     });
     console.log('Transaction hash:', transaction_hash);
     await provider!.waitForTransaction(transaction_hash);
@@ -216,7 +221,10 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
       maxFee: 100_000_000_000_000,
     });
     */
-    const res = await contract.init_my_game(myCall.calldata);
+    const res = await contract.init_my_game(myCall.calldata).catch((error) => {
+      console.error('Error invoking init_my_game:', error);
+      throw error;
+    });
     console.log(`Transaction hash: ${res.transaction_hash}`);
     await provider!.waitForTransaction(res.transaction_hash);
     console.log(`✅ initMyGame executed successfully. ${res.transaction_hash}`);

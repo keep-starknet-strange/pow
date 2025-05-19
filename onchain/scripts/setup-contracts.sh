@@ -2,10 +2,19 @@
 #
 # This script sets up the POW! contracts from configs
 
-POW_CONTRACT_ADDRESS=$1
+if [ "$FOC_ENV_FILE" ]; then
+    source $FOC_ENV_FILE
+fi
+if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
+    POW_GAME_CONTRACT_ADDRESS=$1
+    if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
+        echo "POW_GAME_CONTRACT_ADDRESS not set. Please set it in the environment or pass it as an argument."
+        exit 1
+    fi
+fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-PROJECT_DIR=$SCRIPT_DIR/..
+PROJECT_DIR=$SCRIPT_DIR/../..
 CONTRACT_DIR=$PROJECT_DIR/onchain
 CONFIGS_DIR=$PROJECT_DIR/frontend/app/configs
 
@@ -36,7 +45,7 @@ mkdir -p $LOG_DIR
 mkdir -p $TMP_DIR
 
 echo "Setting up POW! contracts..."
-echo "POW_CONTRACT_ADDRESS: $POW_CONTRACT_ADDRESS"
+echo "POW_GAME_CONTRACT_ADDRESS: $POW_GAME_CONTRACT_ADDRESS"
 echo
 echo "======================================================================"
 echo
@@ -68,8 +77,8 @@ for entry in $(echo $L1_UPGRADES | jq -r '. | @base64'); do
     done
     SETUP_UPGRADE_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
 done
 for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     _jq() {
@@ -92,8 +101,8 @@ for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     done
     SETUP_UPGRADE_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
 done
 
 echo
@@ -128,8 +137,8 @@ for entry in $(echo $L1_AUTOMATIONS | jq -r '. | @base64'); do
     LEVELS=$(echo $LEVELS | jq -r '. | length')
     SETUP_AUTOMATION_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
 done
 for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     _jq() {
@@ -154,8 +163,8 @@ for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     LEVELS=$(echo $LEVELS | jq -r '. | length')
     SETUP_AUTOMATION_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
 done
 
 echo
@@ -195,8 +204,8 @@ for entry in $(echo $L1_TRANSACTIONS | jq -r '. | @base64'); do
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
     SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $ID $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
 done
 for entry in $(echo $L2_TRANSACTIONS | jq -r '. | @base64'); do
     _jq() {
@@ -223,8 +232,8 @@ for entry in $(echo $L2_TRANSACTIONS | jq -r '. | @base64'); do
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
     SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $ID $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
 done
 
 echo
@@ -261,8 +270,8 @@ for entry in $(echo $L1_DAPPS | jq -r '. | @base64'); do
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
     SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $((ID + L1_TX_COUNT)) $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
 
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
 done
 for entry in $(echo $L2_DAPPS | jq -r '. | @base64'); do
     _jq() {
@@ -288,8 +297,8 @@ for entry in $(echo $L2_DAPPS | jq -r '. | @base64'); do
     FEE_LEVELS=$(echo $FEE_COSTS | jq -r '. | length')
     SPEED_LEVELS=$(echo $SPEED_COSTS | jq -r '. | length')
     SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $((ID + L2_TX_COUNT)) $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
-    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
+    # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
 done
 
 echo
@@ -311,8 +320,8 @@ done
 PRESTIGE_LEVELS=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r '. | length')
 SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS)) $PRESTIGE_COSTS_INFO $((PRESTIGE_LEVELS)) $PRESTIGE_SCALERS_INFO)
 
-# echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
-sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA
+# echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA
 echo
 echo "Done setting up prestige!"
 echo
