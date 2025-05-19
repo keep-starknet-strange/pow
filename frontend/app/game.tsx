@@ -96,7 +96,7 @@ export default function game() {
     <View className="flex-1 bg-[#010a12ff] relative">
         {account ? (
           <View className="flex-1">
-            { isTutorialActive && <TutorialOverlay /> }
+            { isTutorialActive && <TutorialOverlay/> }
             <Header />
             <currentPage.component/>
             <Footer tabs={tabs} switchPage={switchPage} />

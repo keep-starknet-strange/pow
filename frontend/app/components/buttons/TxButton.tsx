@@ -25,7 +25,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           txFeeUpgrade, dappFeeUpgrade
         } = useTransactions();
   const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
-  const { ref, onLayout } = useTutorialLayout("firstTransactionButton" as TargetId, ["highlight", "bubble"], enabled);
+  const { ref, onLayout } = useTutorialLayout("firstTransactionButton" as TargetId, enabled);
   
   const [feeLevel, setFeeLevel] = useState<number>(-1);
 
@@ -92,6 +92,8 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   return (
     <View>
       <TouchableOpacity
+        ref={ref}
+        onLayout={onLayout}
         style={{
           backgroundColor: props.txType.color,
           borderColor: props.txType.color,
@@ -107,11 +109,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
               txFeeUpgrade(props.chainId, props.txType.id);
             }
             return;
-            }
+          }
           addNewTransaction();
-          }}
-        ref={ref}
-        onLayout={onLayout}
+        }}
       >
       <View className="w-full h-full relative overflow-hidden">
         <Image
