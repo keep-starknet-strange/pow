@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue, LayoutRectangle, LayoutChangeEvent } from "react-native";
+import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue } from "react-native";
 import { Dimensions } from 'react-native';
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";

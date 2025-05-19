@@ -23,6 +23,18 @@
       "bubbleTargetId": "storeTab",
       "highlightTargetId": "storeTab"
     },
+  "purchaseFeeUpgrade": {
+    "title": "Purchase Fee Upgrade",
+    "description": "Now click on the fee upgrade to increase your fee per transaction.",
+    "bubbleTargetId": "feeUpgradeButton",
+    "highlightTargetId": "feeUpgradeButton"
+  },
+  "purchaseSpeedUpgrade": {
+    "title": "Transactions automatically added to block",
+    "description": "Now click on the speed upgrade to add transactions to the block fasterr.",
+    "bubbleTargetId": "speedUpgradeButton",
+    "highlightTargetId": "speedUpgradeButton"
+  },
   "completed": {
     "title": "Congratulations!",
     "description": "You're done!",

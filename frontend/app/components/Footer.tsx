@@ -14,7 +14,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
   const {ref, onLayout} = useTutorialLayout("storeTab" as TargetId)
   const { notify } = useEventManager()
   const switchPage = (page: string) => {
-    notify((page + 'TabClicked') as EventType)
+    notify(('TabClicked') as EventType, { tab: page });
     playSoundEffect("BasicClick");
     props.switchPage(page);
   }
