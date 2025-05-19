@@ -52,7 +52,7 @@ export const getStarknetProvider = (chain: string): RpcProvider => {
 export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
-  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_MAINNET");
+  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
   const [multiCall, setMultiCalls] = useState<Call[]>([]);
 
   const ENABLE_STARKNET = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
