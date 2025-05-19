@@ -32,7 +32,7 @@ export const LoginPage: React.FC = () => {
         <BasicButton
           label="PLAY!"
           onPress={async () => {
-            // await deployAccount();
+            await deployAccount();
             await connectAccount();
             await invokeInitMyGame();
           }}
