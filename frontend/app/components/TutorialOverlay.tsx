@@ -68,11 +68,11 @@ function useBubblePosition(
       };
 
   const arrowLeft = clamp(x + width / 2 - ARROW_SIZE, HORIZONTAL_MARGIN, SCREEN_WIDTH - ARROW_SIZE - HORIZONTAL_MARGIN);
-  return useMemo(() => ({ left, top, style: arrowStyle, arrowLeft }), [left, top, arrowStyle, arrowLeft]);
+  return useMemo(() => ({ left, top, style: arrowStyle, arrowLeft }), [left, top, arrowStyle, arrowLeft, target]);
 }
 
 export const TutorialOverlay: React.FC = () => {
-  const { step, bubbleLayouts, highlightLayouts, visible, setVisible } = useTutorial();
+  const { step, layouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const insets = useSafeAreaInsets();
   const headerH = useHeaderHeight();
@@ -83,8 +83,8 @@ export const TutorialOverlay: React.FC = () => {
     bubbleTargetId: TargetId;
     highlightTargetId: TargetId;
   };
-  const bubbleTarget = bubbleLayouts?.[config.bubbleTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
-  const highlightTarget = highlightLayouts?.[config.highlightTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const bubbleTarget = layouts?.[config.bubbleTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const highlightTarget = layouts?.[config.highlightTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
 
   // Compute positions unconditionally
   const { left: bubbleLeft, top: bubbleTop, style: arrowStyle, arrowLeft } = useBubblePosition(
@@ -112,10 +112,7 @@ export const TutorialOverlay: React.FC = () => {
     }
   }, [step, setVisible]);
 
-  // Guard render
-  if (!visible || !bubbleLayouts || !['mineBlock', 'transactions'].includes(step)) return null;
-  if (!bubbleLayouts[config.bubbleTargetId]) return null;
-
+  if (!visible) return null;
   return (
     <View className="absolute inset-0 z-10" pointerEvents="box-none">
       {/* Masks */}

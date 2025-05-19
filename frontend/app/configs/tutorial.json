@@ -1,26 +1,32 @@
 {
   "mineBlock": {
     "title": "Welcome to Click Chain!",
-    "description": "Click the block above to mine it and start building your chain.",
-    "bubbleTargetId": "block",
-    "highlightTargetId": "minerConfirmer"
+    "description": "A harrowing omen seared into the very bedrock of the blockchain, proclaiming the imminent collapse of the old financial world. Click the block above to mine it and start building your chain!",
+    "bubbleTargetId": "minerConfirmer",
+    "highlightTargetId": "blockView"
   },
   "purchaseTransactions": {
     "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool.",
+    "description": "Now click on transaction to unlock them.",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "addTransactionsToBlock": {
-    "title": "Purchase Transaction",
-    "description": "Now click on transaction to add them to your mempool.",
+    "title": "Add Transaction to Block",
+    "description": "Now click on transaction to add them to your mempool until the block is full.",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
-  }, 
+  },
+  "checkStore": {
+      "title": "Checkout the store to buy stuff",
+      "description": "Checkout out the store to buy stuff.",
+      "bubbleTargetId": "storeTab",
+      "highlightTargetId": "storeTab"
+    },
   "completed": {
-    "title": "Transactions Explained",
-    "description": "Now click on transactions in the mempool to add them to your block.",
-    "bubbleTargetId": "transaction",
-    "highlightTargetId": "confirmer"
+    "title": "Congratulations!",
+    "description": "You're done!",
+    "bubbleTargetId": "???",
+    "highlightTargetId": "??"
   }
 }

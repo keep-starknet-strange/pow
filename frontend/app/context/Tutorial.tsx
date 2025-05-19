@@ -19,8 +19,6 @@ interface TutorialContextType {
   advanceStep: () => void;
   registerLayout: (targetId: TargetId, layout: Layout) => void;
   layouts?: Partial<Record<TargetId, Layout>>;
-  bubbleLayouts?: Partial<Record<TargetId, Layout>>;
-  highlightLayouts?: Partial<Record<TargetId, Layout>>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }
@@ -35,11 +33,15 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [visible, setVisible] = useState(false);
   const { registerObserver, unregisterObserver } = useEventManager();
   const advanceStep = useCallback(() => {
-    setStepIndex((prev: number) => (prev + 1));
-    setStep(Object.keys(tutorialConfig)[stepIndex] as TutorialStep);
+    setStepIndex(prev => {
+      const keys = Object.keys(tutorialConfig) as TutorialStep[];
+      const next = Math.min(prev + 1, keys.length - 1);
+      setStep(keys[next]);
+      return next;
+    });
   }, []);
 
-    const registerLayout = useCallback(
+  const registerLayout = useCallback(
     (targetId: TargetId, layout: Layout) => {
     setLayouts(prev => {
       const old = prev?.[targetId];
@@ -58,12 +60,12 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 
   useEffect(() => {
-    const observer = new TutorialObserver(advanceStep, setVisible);
+    const observer = new TutorialObserver(advanceStep, setVisible, step);
     const id = registerObserver(observer);
     return () => {
       unregisterObserver(id);
     };
-  }, []);
+  }, [step]);
     
   return (
     <TutorialContext.Provider value={{ step, advanceStep, registerLayout, layouts, visible, setVisible, isTutorialActive }}>

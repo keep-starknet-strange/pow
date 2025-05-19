@@ -1,5 +1,5 @@
-import { useRef, useCallback } from "react";
-import { View } from "react-native";
+import { useRef, useCallback, useEffect } from "react";
+import { View, InteractionManager } from "react-native";
 import { useTutorial, TargetId } from "../context/Tutorial";
 import tutorialConfig from "../configs/tutorial.json";
 
@@ -9,15 +9,32 @@ export function useTutorialLayout(
 ) {
   const ref = useRef<View>(null);
   const { step, registerLayout, isTutorialActive } = useTutorial();
-  const stepTargets = [tutorialConfig[step]["bubbleTargetId"], tutorialConfig[step]["highlightTargetId"]];
 
-  const onLayout = useCallback(() => {
-    if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) return;
+  const { bubbleTargetId, highlightTargetId } = tutorialConfig[step];
+  const stepTargets = [bubbleTargetId, highlightTargetId];
 
+  const measure = useCallback(() => {
+    if (
+      !enabled ||
+      !isTutorialActive ||
+      !stepTargets.includes(id.toString())
+    ) {
+      return;
+    }
     ref.current?.measureInWindow((x, y, width, height) => {
       registerLayout(id, { x, y, width, height });
     });
-  }, [id, isTutorialActive, registerLayout]);
+  }, [enabled, isTutorialActive, registerLayout, step, id, stepTargets]);
+
+  const onLayout = useCallback(() => {
+    measure();
+  }, [measure]);
+
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      measure();
+    });
+  }, [measure, step]);
 
   return { ref, onLayout };
 }

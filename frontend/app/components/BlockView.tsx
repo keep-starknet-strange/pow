@@ -18,7 +18,7 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { currentPrestige, getUpgradeValue } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
-  const { ref, onLayout } = useTutorialLayout("mineBlock" as TargetId);
+  const { ref, onLayout } = useTutorialLayout("blockView" as TargetId);
   useEffect(() => {
     const maxBlockSize = getUpgradeValue(props.chainId, "Block Size")**2;
     // setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
