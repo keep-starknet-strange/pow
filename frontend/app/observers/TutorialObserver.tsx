@@ -23,9 +23,10 @@ export class TutorialObserver implements Observer {
   }
   
   onNotify(eventName: EventType, data?: any): void {
-    console.log("handler", eventName, this.step);
+    if (data.tab == "Store") {
+      eventName = "Store" + eventName;
+    } 
     const handler = this.handlers.get(`${eventName}-${this.step}`);
-    console.log("handler", handler);
     if (handler) {
       handler();
       return;
