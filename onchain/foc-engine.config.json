@@ -1,0 +1,18 @@
+{
+  "contracts": [
+    {
+      "name": "Pow Game",
+      "class_name": "PowGame",
+      "constructor_args": [
+        "$ACCOUNT"
+      ],
+      "init_commands": [
+        "setup-accounts.sh",
+        "setup-contracts.sh"
+      ],
+      "sepolia_address": "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4",
+      "mainnet_address": "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781"
+    }
+  ]
+}
+

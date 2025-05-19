@@ -158,7 +158,6 @@ pub mod BuilderComponent {
             da.fees += fees;
             da.size += 1;
             self.building_da.write((user, chain_id), da.clone());
-            println!("Building DA: adding fees {}", fees);
             self.emit(BuildingDaUpdate { user, chain_id, new_da: da });
         }
 
@@ -185,7 +184,6 @@ pub mod BuilderComponent {
             proof.fees += fees;
             proof.size += 1;
             self.building_proof.write((user, chain_id), proof.clone());
-            println!("Building proof: adding fees {}", fees);
             self.emit(BuildingProofUpdate { user, chain_id, new_proof: proof });
         }
 
