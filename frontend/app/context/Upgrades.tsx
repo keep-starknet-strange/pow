@@ -112,7 +112,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if(!tryBuy(cost)) return newUpgrades;
       // Increment upgrade level
       newUpgrades[chainId][upgradeId] = currentLevel + 1;
-      notify("UpgradePurchased", { chainId, upgradeId, level: newUpgrades[chainId][upgradeId] });
+      notify("UpgradePurchased", { chainId, upgradeId, level: newUpgrades[chainId][upgradeId], newUpgrades: newUpgrades });
       return newUpgrades;
     });
   }

@@ -27,7 +27,6 @@ export const useSequencer = (
     setSequencingProgress(sequenceCounter / blockDifficulty);
     if (sequenceCounter >= blockDifficulty) {
       onBlockSequenced();
-      notify("SequenceDone", { counter: sequenceCounter });
       setSequenceCounter(0);
       setSequencingProgress(0);
     }

@@ -67,7 +67,8 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       pools[poolIdx] = newStakingPool(0, 0);
       return pools;
     })
-  }, [tryBuy, notify]);
+    notify('StakingPurchased');
+  }, [tryBuy]);
 
   const updatePool = (poolIdx: number, fn: (p: any) => any) =>
     setStakingPools((prev) => {

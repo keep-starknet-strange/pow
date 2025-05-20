@@ -19,7 +19,8 @@ export type EventType =
   'StakingPurchased' |
   'L2Purchased' |
   'PrestigePurchased' |
-  'TxAdded';
+  'TxAdded' |
+  'AchievementCompleted';
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): void;

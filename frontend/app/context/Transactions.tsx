@@ -121,7 +121,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevFees;
       // Upgrade the fee level by 1
       newFees[chainId][txId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId, type: "txFee", level: newFees[chainId][txId] });
+      notify("TxUpgradePurchased", { chainId, txId, isDapp: false, type: "txFee", level: currentLevel + 1 });
       return newFees;
     });
   };
@@ -148,7 +148,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevSpeeds;
       // Upgrade the speed level by 1
       newSpeeds[chainId][txId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId, type: "txSpeed", level: newSpeeds[chainId][txId] });
+      notify("TxUpgradePurchased", { chainId, txId, isDapp: false, type: "txSpeed", level: currentLevel + 1 });
       return newSpeeds;
     });
   };
@@ -175,7 +175,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevFees;
       // Upgrade the fee level by 1
       newFees[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId: dappId, type: "dappFee", level: newFees[chainId][dappId] });
+      notify("TxUpgradePurchased", { chainId, txId: dappId, isDapp: true, type: "dappFee", level: currentLevel + 1 });
       return newFees;
     });
   };
@@ -202,7 +202,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if(!tryBuy(cost)) return prevSpeeds;
       // Upgrade the speed level by 1
       newSpeeds[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId: dappId, type: "dappSpeed", level: newSpeeds[chainId][dappId] });
+      notify("TxUpgradePurchased", { chainId, txId: dappId, isDapp: true, type: "dappSpeed", level: currentLevel + 1});
       return newSpeeds;
     });
   };

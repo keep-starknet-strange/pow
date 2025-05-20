@@ -16,7 +16,8 @@ export const useMiner = (
   const mineBlock = () => {
     setMineCounter(prevCounter => {
       const newCounter = prevCounter + 1;
-      notify("MineClicked", { counter: newCounter });
+      const blockDifficulty = getUpgradeValue(0, "Block Difficulty");
+      notify("MineClicked", { counter: newCounter, difficulty: blockDifficulty });
       return newCounter;
     });
   }

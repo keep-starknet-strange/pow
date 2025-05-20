@@ -1,0 +1,15 @@
+[
+  {
+    "id": 0,
+    "eventType": "BuyFailed",
+    "message": "Insufficient funds. Keep building!",
+    "type": "error",
+    "color": "#f76060"
+  },
+  {
+    "id": 1,
+    "eventType": "AchievementCompleted",
+    "type": "success",
+    "color": "#f7f760"
+  }
+]

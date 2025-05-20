@@ -160,6 +160,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newWorkingBlocks[1] = newBlockInstance;
       return newWorkingBlocks;
     });
+    notify("SequenceDone", { block: completedBlock });
     addBlockToDa(completedBlock);
     addBlockToProver(completedBlock);
     addBlock(1, completedBlock);
@@ -212,10 +213,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [defaultL2Cost]);
 
   const initL2 = () => {
+    const cost = getL2Cost();
+    if(!tryBuy(cost)) return;
+
     setWorkingBlocks((prevState) => {
-      const cost = getL2Cost();
       if (l2) return prevState;
-      if(!tryBuy(cost)) return prevState;
       const newWorkingBlock = newBlock(0, genesisBlockReward);
       newWorkingBlock.isBuilt = true; // Mark the genesis block as built
       return [...prevState, newWorkingBlock];
