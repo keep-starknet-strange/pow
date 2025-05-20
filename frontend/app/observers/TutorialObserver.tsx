@@ -23,7 +23,7 @@ export class TutorialObserver implements Observer {
   }
   
   onNotify(eventName: EventType, data?: any): void {
-    if (data.tab == "Store") {
+    if (data?.name == "Store") {
       eventName = "Store" + eventName;
     } 
     const handler = this.handlers.get(`${eventName}-${this.step}`);

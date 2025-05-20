@@ -16,7 +16,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { StakingPage } from "./pages/StakingPage";
 import { LoginPage } from "./pages/LoginPage";
 
-import { useEventManager } from "./context/EventManager";
+import { useEventManager, EventType } from "./context/EventManager";
 import { useSound } from "./context/Sound";
 import { useStarknetConnector } from "./context/StarknetConnector";
 import { useGame } from "./context/Game";
@@ -66,6 +66,7 @@ export default function game() {
     setTxBuilderObserver(registerObserver(new TxBuilderObserver(addToMultiCall, getWorkingBlock)));
   }, [addToMultiCall, getWorkingBlock]);
   const { playSoundEffect } = useSound();
+  const { notify } = useEventManager()
   const [soundObserver, setSoundObserver] = useState<null | number>(null);
   useEffect(() => {
     if (soundObserver !== null) {
@@ -108,6 +109,8 @@ export default function game() {
       console.warn(`Tab with name "${name}" does not exist.`);
       return;
     }
+    notify(('switchPage') as EventType, { name });
+    playSoundEffect("BasicClick");
     setCurrentPage(tabs.find(tab => tab.name === name) || currentPage);
   }
 
