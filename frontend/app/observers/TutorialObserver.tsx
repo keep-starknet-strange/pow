@@ -16,7 +16,7 @@ export class TutorialObserver implements Observer {
     this.handlers.set(`TxUpgradePurchased-purchaseTransactions`,  ()=> this.advanceStep());
     this.handlers.set(`TxAdded-addTransactionsToBlock`,           ()=> this.setVisible(false));
     this.handlers.set('MineDone-addTransactionsToBlock',          ()=> this.advanceStep());
-    this.handlers.set('StoreTabClicked-checkStore',               ()=> this.advanceStep());
+    this.handlers.set('switchPage-Store-checkStore',               ()=> this.advanceStep());
     this.handlers.set('TxUpgradePurchased-purchaseFeeUpgrade',    ()=> this.advanceStep());
     this.handlers.set('TxUpgradePurchased-purchaseSpeedUpgrade',  ()=> this.advanceStep());
     // …and you can add more here without changing onNotify
@@ -24,7 +24,7 @@ export class TutorialObserver implements Observer {
   
   onNotify(eventName: EventType, data?: any): void {
     if (data?.name == "Store") {
-      eventName = "Store" + eventName;
+      eventName = eventName + "-" + data.name;
     } 
     const handler = this.handlers.get(`${eventName}-${this.step}`);
     if (handler) {
