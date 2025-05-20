@@ -1,23 +1,13 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import { useSound } from "../context/Sound";
-import { useTutorial, TargetId } from '../context/Tutorial';
+import { TargetId } from '../context/Tutorial';
 import { useTutorialLayout } from '../hooks/useTutorialLayout';
-import {  useEventManager, EventType  } from '../context/EventManager'
-
 export type FooterProps = {
   tabs: {name: string, icon: string}[];
   switchPage: (page: string) => void;
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
-  const { playSoundEffect } = useSound();
   const {ref, onLayout} = useTutorialLayout("storeTab" as TargetId)
-  const { notify } = useEventManager()
-  const switchPage = (page: string) => {
-    notify(('TabClicked') as EventType, { tab: page });
-    playSoundEffect("BasicClick");
-    props.switchPage(page);
-  }
 
   // TODO: Add small lines between the icons
   return (
@@ -32,7 +22,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
           <TouchableOpacity
             key={index}
             className="flex flex-row"
-            onPress={() => switchPage(tab.name)}
+            onPress={() => props.switchPage(tab.name)}
             {...tutorialProps}
           >
               <Text className="text-[#f7f7f7] text-[2.8rem]">{tab.icon}</Text>
