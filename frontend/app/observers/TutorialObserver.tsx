@@ -17,10 +17,15 @@ export class TutorialObserver implements Observer {
     this.handlers.set(`TxAdded-addTransactionsToBlock`,           ()=> this.setVisible(false));
     this.handlers.set('MineDone-addTransactionsToBlock',          ()=> this.advanceStep());
     this.handlers.set('StoreTabClicked-checkStore',               ()=> this.advanceStep());
+    this.handlers.set('TxUpgradePurchased-purchaseFeeUpgrade',    ()=> this.advanceStep());
+    this.handlers.set('TxUpgradePurchased-purchaseSpeedUpgrade',  ()=> this.advanceStep());
     // …and you can add more here without changing onNotify
   }
   
   onNotify(eventName: EventType, data?: any): void {
+    if (data.tab == "Store") {
+      eventName = "Store" + eventName;
+    } 
     const handler = this.handlers.get(`${eventName}-${this.step}`);
     if (handler) {
       handler();
