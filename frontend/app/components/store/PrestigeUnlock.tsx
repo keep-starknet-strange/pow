@@ -4,10 +4,7 @@ import { useUpgrades } from "../../context/Upgrades";
 import { UnlockView } from "./UnlockView";
 import prestigeIcon from "../../../assets/images/prestige/0.png";
 
-export type PrestigeUnlockProps = {
-};
-
-export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = (props) => {
+export const PrestigeUnlock: React.FC = () => {
   const { prestige, getNextPrestigeCost } = useUpgrades();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {

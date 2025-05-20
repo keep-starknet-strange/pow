@@ -10,12 +10,13 @@ export class InAppNotificationsObserver implements Observer {
 
   onNotify(eventName: EventType, data?: any): void {
     switch (eventName) {
-      case "BuyFailed":
+      case "BuyFailed": {
         const typeId = inAppNotificationsJson.find(
           (notification) => notification.eventType === "BuyFailed"
         )?.id || 0;
         this.sendNotification(typeId);
         break;
+      }
       default:
         break;
     }
