@@ -43,9 +43,9 @@
     "volume": 1,
     "rate": 1
   },
-  "AchievementUnlocked": {
-    "volume": 0.6,
-    "rate": 1
+  "AchievementCompleted": {
+    "volume": 1,
+    "rate": 1.1
   },
   "BasicClick": {
     "volume": 0.5,

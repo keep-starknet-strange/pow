@@ -1,10 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useInAppNotifications } from "../context/InAppNotifications";
+import { useSound } from "../context/Sound";
 import achievementsJson from "../configs/achievements.json";
-import { Achievement } from "../types/Achievement";
+import inAppNotificationsJson from "../configs/inAppNotifications.json";
 
 type AchievementContextType = {
   updateAchievement: (achievementId: number, progress: number) => void;
-  achievements: { [key: number]: Achievement };
+  achievementsProgress: { [key: number]: number };
 };
 
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
@@ -18,35 +21,47 @@ export const useAchievement = () => {
 }
 
 export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [achievements, setAchievements] = useState<{ [key: number]: Achievement }>({});
+  const { sendInAppNotification } = useInAppNotifications();
+  const { playSoundEffect } = useSound();
+  const [achievementsProgress, setAchievementsProgress] = useState<{ [key: number]: number }>({});
   useEffect(() => {
-    const initialAchievements: { [key: number]: Achievement } = {};
+    const initialAchievementsProgress: { [key: number]: number } = {};
     achievementsJson.forEach((achievement: any) => {
-      initialAchievements[achievement.id] = {
-        id: achievement.id,
-        name: achievement.name,
-        image: achievement.image,
-        progress: 0, // Start with 0 progress
-        status: 'locked' // Default status
-      };
+      initialAchievementsProgress[achievement.id] = 0; // Initialize progress to 0
     });
-    setAchievements(initialAchievements);
-    // TODO: Fetch status & progress from server ( or update progress thru game events )
+    // Load saved progress from local storage
+    achievementsJson.forEach((achievement: any) => {
+      AsyncStorage.getItem(`achievement_${achievement.id}`)
+        .then((value) => {
+          if (value !== null) {
+            initialAchievementsProgress[achievement.id] = parseInt(value, 10);
+          }
+        })
+        .catch((error) => console.error("Error fetching achievement progress:", error));
+    });
+    setAchievementsProgress(initialAchievementsProgress);
   }, []);
 
-  const updateAchievement = (achievementId: number, progress: number) => {
-    setAchievements((prevAchievements) => ({
+  const updateAchievement = useCallback((achievementId: number, progress: number) => {
+    setAchievementsProgress((prevAchievements) => ({
       ...prevAchievements,
-      [achievementId]: {
-        ...prevAchievements[achievementId],
-        progress,
-        status: progress >= 100 ? 'claimable' : 'locked'
-      },
+      [achievementId]: Math.min(progress, 100), // Ensure progress does not exceed 100
     }));
-  };
+    if (progress >= 100) {
+      playSoundEffect("AchievementCompleted");
+      const typeId = inAppNotificationsJson.find(
+        (notification) => notification.eventType === "AchievementCompleted"
+      )?.id || 0;
+      const achievement = achievementsJson.find((ach) => ach.id === achievementId);
+      const message = "Achieved! " + (achievement?.name || "Unknown");
+      sendInAppNotification(typeId, message);
+    }
+    AsyncStorage.setItem(`achievement_${achievementId}`, progress.toString())
+      .catch((error) => console.error("Error saving achievement progress:", error));
+  }, [playSoundEffect]);
 
   return (
-    <AchievementContext.Provider value={{ updateAchievement, achievements }}>
+    <AchievementContext.Provider value={{ updateAchievement, achievementsProgress }}>
       {children}
     </AchievementContext.Provider>
   );

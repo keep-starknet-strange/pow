@@ -3,49 +3,49 @@
     "id": 0,
     "name": "Reach L1 Block 10",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L1BlockFinalized"
+    "updateOn": "MineDone"
   },
   {
     "id": 1,
     "name": "Reach L1 Block 100",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L1BlockFinalized"
+    "updateOn": "MineDone"
   },
   {
     "id": 2,
     "name": "Reach L1 Block 1000",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L1BlockFinalized"
+    "updateOn": "MineDone"
   },
   {
     "id": 3,
     "name": "Reach L1 Block 10K",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L1BlockFinalized"
+    "updateOn": "MineDone"
   },
   {
     "id": 4,
     "name": "Reach L2 Block 100",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L2BlockFinalized"
+    "updateOn": "SequenceDone"
   },
   {
     "id": 5,
     "name": "Reach L2 Block 1000",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L2BlockFinalized"
+    "updateOn": "SequenceDone"
   },
   {
     "id": 6,
     "name": "Reach L2 Block 10K",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L2BlockFinalized"
+    "updateOn": "SequenceDone"
   },
   {
     "id": 7,
     "name": "Reach L2 Block 100K",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "L2BlockFinalized"
+    "updateOn": "SequenceDone"
   },
   {
     "id": 8,
@@ -75,25 +75,25 @@
     "id": 12,
     "name": "Unlock all L1 Transactions",
     "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 13,
     "name": "Unlock all L1 Dapps",
     "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 14,
     "name": "Unlock all L2 Transactions",
     "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 15,
     "name": "Unlock all L2 Dapps",
     "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 16,
@@ -111,49 +111,49 @@
     "id": 18,
     "name": "Get a Quantum Miner",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "AutomationPurchased"
   },
   {
     "id": 19,
     "name": "Decentralize the Sequencer",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "AutomationPurchased"
   },
   {
     "id": 20,
     "name": "Achieve STWO Scaling",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "AutomationPurchased"
   },
   {
     "id": 21,
     "name": "Scale with DA Volition",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "AutomationPurchased"
   },
   {
     "id": 22,
     "name": "Proof of Stake!",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "StakingPurchased"
   },
   {
     "id": 23,
     "name": "Scale with Layer 2!",
     "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "L2Purchased"
   },
   {
     "id": 24,
     "name": "Prestige!",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "PrestigePurchased"
   },
   {
     "id": 25,
     "name": "Reach Max Prestige",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
-    "updateOn": "UpgradePurchased"
+    "updateOn": "PrestigePurchased"
   },
   {
     "id": 26,
@@ -171,7 +171,7 @@
     "id": 28,
     "name": "Mine a block 1st try",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
-    "updateOn": "BlockFinalized"
+    "updateOn": "MineClicked"
   }
 ]
 

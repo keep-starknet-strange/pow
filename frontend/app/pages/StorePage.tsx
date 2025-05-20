@@ -9,6 +9,7 @@ import { AutomationView } from "../components/store/AutomationView";
 import { DappsUnlock } from "../components/store/DappsUnlock";
 import { L2Unlock } from "../components/store/L2Unlock";
 import { StakingUnlock } from "../components/store/StakingUnlock";
+import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { AlertModal } from "../components/AlertModal";
 
 import transactionsJson from "../configs/transactions.json";
@@ -119,6 +120,7 @@ export const StorePage: React.FC = () => {
           </View>
         ) : (
           <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
+            <PrestigeUnlock />
           </View>
         )}
        <View className="h-32" />

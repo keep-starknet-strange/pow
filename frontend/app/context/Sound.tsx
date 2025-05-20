@@ -63,7 +63,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     ItemPurchased: itemPurchasedSource,
     BuyFailed: buyFailedSource,
     TxAdded: txClickedSource,
-    AchievementUnlocked: achievementUnlockedSource,
+    AchievementCompleted: achievementUnlockedSource,
     BasicClick: basicClickSource,
   };
   const minPitchShift = 0.5;

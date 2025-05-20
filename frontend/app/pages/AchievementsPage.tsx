@@ -1,10 +1,10 @@
 import { View, Text, Image, ImageBackground, TouchableOpacity, ScrollView } from "react-native";
 import { useAchievement } from "../context/Achievements";
-import { Achievement } from "../types/Achievement";
+import achievementJson from "../configs/achievements.json";
 import background from "../../assets/background.png";
 
 export const AchievementsPage: React.FC = () => {
-  const { achievements } = useAchievement();
+  const { achievementsProgress } = useAchievement();
   return (
     <ImageBackground
       className="flex-1"
@@ -16,20 +16,20 @@ export const AchievementsPage: React.FC = () => {
      </View>
      <ScrollView className="flex-1">
        <View className="flex flex-row flex-wrap gap-2 justify-center mb-[3rem] mr-[1rem]">
-         {achievements && Object.values(achievements).map((achievement: Achievement, index: number) => (
+         {achievementJson.map((achievement, index) => (
            <View className={`p-2 rounded-lg w-[23%]
              border-2 border-[#ffffff40] border-opacity-20
              flex flex-col items-center justify-center gap-1
-             ${achievement.progress === 100 ? "bg-[#20ff2080]" : "bg-[#ffffff20]"}`}
+             ${achievementsProgress[achievement.id] === 100 ? "bg-[#20ff2080]" : "bg-[#ffffff20]"}`}
              key={index}
            >
              <Text className="text-lg text-white h-[4rem]">{achievement.name}</Text>
              <Image className="w-16 h-16" source={{ uri: achievement.image }} />
-             {achievement.progress === 100 ? (
+             {achievementsProgress[achievement.id] === 100 ? (
                <Text className="text-white">Achieved!</Text>
               ) : (
                <View className="bg-[#ffffff40] w-full h-2 rounded-xl relative">
-                 <View className="bg-[#20ff2080] h-full rounded-xl" style={{ width: `${achievement.progress}%` }} />
+                 <View className="bg-[#20ff2080] h-full rounded-xl" style={{ width: `${achievementsProgress[achievement.id]}%` }} />
                </View>
              )}
            </View>
