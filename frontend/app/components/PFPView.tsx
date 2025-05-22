@@ -6,7 +6,7 @@ import {
 } from '../configs/nouns';
 
 type PFPViewProps = {
-  user?: String | undefined;
+  user?: string | undefined;
   attributes?: NounsAttributes;
 }
 
