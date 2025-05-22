@@ -2,6 +2,7 @@ import { View } from 'react-native'
 import { UpgradeButton } from './UpgradeButton'
 import { useTutorialLayout } from '@/app/hooks/useTutorialLayout'
 import { TargetId } from '@/app/context/Tutorial'
+import { shortMoneyString } from '../../../utils/helpers'
 
 type ActionsProps = {
   locked: boolean
@@ -37,7 +38,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
   return (
     locked ? (
       <UpgradeButton
-        label={`Buy ₿${nextCost}`}
+        label={`Buy ${shortMoneyString(nextCost)}`}
         level={0}
         maxLevel={0}
         nextCost={nextCost}

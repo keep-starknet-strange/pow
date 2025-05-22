@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, ImageSourcePropType, Text, TouchableOpacity, View } from "react-native";
 import coinImg from "../../../assets/images/bitcoin.png";
+import { shortMoneyString } from "../../utils/helpers";
 
 export type UnlockViewProps = {
   icon: ImageSourcePropType;
@@ -39,7 +40,7 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
         <View className="flex flex-row items-center justify-center pr-1">
           <Image source={coinImg} className="w-[2rem] h-[2rem]" />
           <Text className="text-lg font-bold pl-1 text-[#ffff80]">
-            ₿{props.cost}
+            {shortMoneyString(props.cost)}
           </Text>
         </View>
       )}

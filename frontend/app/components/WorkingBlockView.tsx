@@ -7,6 +7,7 @@ import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
 import rewardImg from "../../assets/images/coin.png";
 import feeImg from "../../assets/images/bitcoin.png";
+import { shortMoneyString } from "../utils/helpers";
 
 export type WorkingBlockViewProps = {
   chainId: number;
@@ -42,13 +43,13 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           <View className="flex flex-row items-center gap-1">
             <Image source={feeImg} className="w-6 h-6" />
             <Text className="text-xl font-bold text-[#f9f980d0]">
-              ₿{workingBlocks[props.chainId]?.fees.toFixed(2)}
+              {shortMoneyString(workingBlocks[props.chainId]?.fees)}
             </Text>
           </View>
           <View className="flex flex-row items-center gap-1">
             <Image source={rewardImg} className="w-6 h-6" />
             <Text className="text-xl font-bold text-[#f9f980d0]">
-              ₿{(workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward")).toFixed(2)}
+              {shortMoneyString(workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward"))}
             </Text>
           </View>
         </View>

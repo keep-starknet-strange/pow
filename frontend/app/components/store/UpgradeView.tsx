@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import moneyImg from "../../../assets/images/money.png";
 import { useUpgrades } from "../../context/Upgrades";
 import { getUpgradeIcons } from "../../utils/upgrades";
+import { shortMoneyString } from "../../utils/helpers";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -52,7 +53,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
                      border-2 border-[#e7e7e740] rounded-xl
                      text-[#171717] text-sm font-bold bg-[#e7e760f0]"
         >
-          {level === props.upgrade.costs.length ? "MAX" : `₿${getNextUpgradeCost(props.chainId, props.upgrade.id)}`}
+          {level === props.upgrade.costs.length ? "MAX" : `${shortMoneyString(getNextUpgradeCost(props.chainId, props.upgrade.id))}`}
         </Text>
       </TouchableOpacity>
     </View>

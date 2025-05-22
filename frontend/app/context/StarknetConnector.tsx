@@ -5,8 +5,9 @@ export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'h
 export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
 
+export const POW_CONTRACT_ADDRESS = "0x06278f64edb9a1b2f55c6861462783ffd086333301b92c76da7a91bb03122b78";
 // sepolia: export const POW_CONTRACT_ADDRESS = "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4";
-export const POW_CONTRACT_ADDRESS = "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781";
+// mainnet: export const POW_CONTRACT_ADDRESS = "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781";
 export const MAX_MULTICALL = 50;
 
 type StarknetConnectorContextType = {
@@ -63,8 +64,8 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   }, [chain]);
 
   const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9";
-  const ozAccountClassHash = "0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f";
-  //const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
+  // const ozAccountClassHash = "0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f";
+  const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
   const getDeployCalldata = (privateKey: string) => {
     const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
     const constructorCalldata = CallData.compile({ public_key: starkKeyPub });

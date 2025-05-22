@@ -8,6 +8,7 @@ import { TargetId } from "../context/Tutorial";
 import { Block } from "../types/Chains";
 import { getTxStyle } from "../utils/transactions";
 import feeImg from "../../assets/images/bitcoin.png";
+import { shortMoneyString } from "../utils/helpers";
 
 export type BlockViewProps = {
   chainId: number;
@@ -119,7 +120,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                   className="w-4 h-4"
                 />
                 <Text className="text-[#e9e980f0] text-lg font-bold">
-                  ₿{((props.block?.fees || 0) + (props.block?.reward || 0)).toFixed(0)}
+                  {shortMoneyString((props.block?.fees || 0) + (props.block?.reward || 0))}
                 </Text>
               </View>
             </View>
