@@ -17,7 +17,6 @@ export default function App() {
   return (
     <EventManagerProvider>
       <InAppNotificationsProvider>
-        <TutorialProvider>
           <SoundProvider>
             <StarknetConnectorProvider>
               <BalanceProvider>
@@ -25,11 +24,13 @@ export default function App() {
                   <ChainsProvider>
                     <StakingProvider>
                       <GameProvider>
+        <TutorialProvider>
                         <TransactionsProvider>
                           <AchievementProvider>
                             <Game />
                           </AchievementProvider>
                         </TransactionsProvider>
+        </TutorialProvider>
                       </GameProvider>
                     </StakingProvider>
                   </ChainsProvider>
@@ -37,7 +38,6 @@ export default function App() {
               </BalanceProvider>
             </StarknetConnectorProvider>
          </SoundProvider>
-        </TutorialProvider>
       </InAppNotificationsProvider>
     </EventManagerProvider>
   );

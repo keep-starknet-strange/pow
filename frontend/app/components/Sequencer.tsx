@@ -27,6 +27,7 @@ export const Sequencer: React.FC = () => {
         image={getSequencerImage(automations[1][0] + 1)}
         getAnimation={getSequencingAnimation}
         onConfirm={sequenceBlock}
+        renderedBy="sequencer"
       />
     </View>
   );

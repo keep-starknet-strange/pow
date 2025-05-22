@@ -28,7 +28,7 @@ export function useTutorialLayout(
 
   const onLayout = useCallback(() => {
     measure();
-  }, [measure]);
+  }, [measure, step]);
 
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {

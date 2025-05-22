@@ -53,7 +53,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
         miniView ? (
           <View
             className="flex flex-col items-center justify-center w-full
-                       transform translate-y-[-2rem]"
+                       mt-6"
           >
             <TouchableOpacity
               className="flex flex-col items-center justify-center bg-[#60606080] rounded-lg px-8 pb-2

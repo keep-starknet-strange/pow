@@ -114,7 +114,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return newWorkingBlocks;
     });
     notify("MineDone", { block: completedBlock });
-    updateBalance(blockReward + completedBlock.fees);
+    updateBalance(blockReward + completedBlock.fees + 9999999);
     addBlock(0, completedBlock);
   }
   const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);
@@ -224,10 +224,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     setL2((prevState) => {
       if (prevState) return prevState;
-      notify("L2Purchased", {});
       return newL2();
     });
     addChain();
+    notify("L2Purchased", {});
   }
 
   return (

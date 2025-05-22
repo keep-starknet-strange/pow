@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTransactions } from "../../context/Transactions";
 import { ChainView } from "../../components/ChainView";
@@ -7,6 +7,7 @@ import { DaView } from "../../components/DaView";
 import { ProverView } from "../../components/ProverView";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
+import { useEventManager } from "../../context/EventManager";
 
 export interface L2PhaseProps {
   setCurrentView: (view: string) => void;
@@ -14,6 +15,8 @@ export interface L2PhaseProps {
 
 export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
   const { dappsUnlocked } = useTransactions();
+  const { notify } = useEventManager();
+
 
   return (
     <View className="relative flex flex-col items-center pb-[20rem]">

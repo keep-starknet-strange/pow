@@ -18,7 +18,8 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { currentPrestige, getUpgradeValue } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
-  const { ref, onLayout } = useTutorialLayout("blockView" as TargetId);
+  const enabled = props.block?.blockId === 0
+  const { ref, onLayout } = useTutorialLayout("blockView" as TargetId, enabled);
   useEffect(() => {
     const maxBlockSize = getUpgradeValue(props.chainId, "Block Size")**2;
     // setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
@@ -43,11 +44,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   }, [props.block?.transactions.length]);
 
   return (
-    <View 
-      className="w-full h-full flex flex-col items-center justify-center"
-      ref={ref}
-      onLayout={onLayout}
-     >
+    <View className="w-full h-full flex flex-col items-center justify-center">
       <View className="flex-1 bg-[#ffff8008] aspect-square rounded-xl border-2 border-[#ffff80b0] relative overflow-hidden">
         <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
           {props.block?.transactions.map((tx, index) => (
@@ -92,7 +89,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           )}
         </View>
         {props.block?.blockId === 0 && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
+          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center"
+                ref={ref}
+                onLayout={onLayout}
+                >
             {!props.completed && (
               <Text className="text-[#ffff80ff] text-xl font-bold underline text-center pt-2">
                 Genesis Block
