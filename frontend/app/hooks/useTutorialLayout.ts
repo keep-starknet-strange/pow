@@ -34,7 +34,7 @@ export function useTutorialLayout(
     InteractionManager.runAfterInteractions(() => {
       measure();
     });
-  }, [measure, step]);
+  }, [measure]);
 
   return { ref, onLayout };
 }
