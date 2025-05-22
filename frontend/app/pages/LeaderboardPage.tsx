@@ -3,6 +3,7 @@ import { View, Text, ImageBackground, Image, TouchableOpacity, ScrollView } from
 import { SvgXml } from "react-native-svg";
 import prestigeJson from "../configs/prestige.json";
 import background from "../../assets/background.png";
+import { shortMoneyString } from "../utils/helpers";
 
 import * as prestigeImages from "../configs/prestige";
 export const getPrestigeIcon = (prestige: number) => {
@@ -44,18 +45,6 @@ export const LeaderboardPage: React.FC = () => {
     }
   ];
   const [leaderboard, setLeaderboard] = useState(leaderboardMock);
-
-  const shortenBalance = (balance: number) => {
-    if (balance < 1000) return `₿${balance.toString()}`;
-    const suffixes = ["K", "M", "B", "T"];
-    let suffixIndex = 0;
-    let shortenedScore = balance;
-    while (shortenedScore >= 1000 && suffixIndex < suffixes.length) {
-      shortenedScore /= 1000;
-      suffixIndex++;
-    }
-    return `₿${shortenedScore.toFixed(1)}${suffixes[suffixIndex - 1]}`;
-  }
 
   const [userIconsSvgMap, setUserIconsSvgMap] = useState<{ [key: string]: string }>({});
   useEffect(() => {
@@ -108,7 +97,7 @@ export const LeaderboardPage: React.FC = () => {
                className="w-[3rem] aspect-square rounded-full"
               />
             </View>
-           <Text className="text-lg text-white w-[6rem] text-right font-bold">{shortenBalance(user.balance)}</Text>
+           <Text className="text-lg text-white w-[6rem] text-right font-bold">{shortMoneyString(user.balance)}</Text>
          </View>
        ))}
      </ScrollView>

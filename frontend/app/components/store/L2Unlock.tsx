@@ -4,6 +4,7 @@ import { useTransactions } from "../../context/Transactions";
 import { useGame } from "../../context/Game";
 import { UnlockView } from "./UnlockView";
 import l2Icon from "../../../assets/images/transaction/l2Batch.png";
+import { shortMoneyString } from "../../utils/helpers";
 
 export type L2UnlockProps = {
   alwaysShow?: boolean;
@@ -66,7 +67,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
                 Scale with L2
               </Text>
               <Text className="text-sm text-[#f7f760c0] text-center">
-                ₿{getL2Cost()}
+                {shortMoneyString(getL2Cost())}
               </Text>
               <View className="w-3 h-3 ml-1 rotate-45 border-[#f7f760c0] border-r-2 border-b-2" />
             </TouchableOpacity>

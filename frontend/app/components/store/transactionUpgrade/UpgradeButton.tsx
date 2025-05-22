@@ -1,4 +1,5 @@
 import { TouchableOpacity, Image, Text } from 'react-native'
+import { shortMoneyString } from '../../../utils/helpers'
 
 type UpgradeButtonProps = {
   icon?: any
@@ -42,7 +43,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
             {level + 1}/{maxLevel}
           </Text>
           <Text className="absolute top-[-0.7rem] text-center px-1 w-[3.6rem] border-2 border-[#e7e7e770] rounded-xl text-[#171717] text-sm font-bold bg-[#e7e760f0]">
-            {level === maxLevel ? 'Max' : `₿${nextCost}`}
+            {level === maxLevel ? 'Max' : `${shortMoneyString(nextCost)}`}
           </Text>
         </>
       )}

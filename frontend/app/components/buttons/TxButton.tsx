@@ -9,6 +9,7 @@ import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
+import { shortMoneyString } from "../../utils/helpers";
 
 const window = Dimensions.get('window');
 
@@ -159,8 +160,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         }}
       >
         {feeLevel === -1 ? "" : "+"}
-        ₿
-        {feeLevel === -1 ? feeCost : fee.toFixed(0)}
+        {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
       </Text>
     </TouchableOpacity>
   </View>

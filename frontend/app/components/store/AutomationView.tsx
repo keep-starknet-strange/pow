@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { useUpgrades } from "../../context/Upgrades";
 import { getAutomationIcons } from "../../utils/upgrades";
 import lockImg from "../../../assets/images/lock.png";
+import { shortMoneyString } from "../../utils/helpers";
 
 export type AutomationViewProps = {
   chainId: number;
@@ -69,7 +70,7 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
                            border-2 border-[#e7e7e740] rounded-xl w-[2.8rem]
                            text-[#171717] text-xs font-bold bg-[#e7e760f0]"
                >
-                 {`₿${automation.cost}`}
+                 {shortMoneyString(automation.cost)}
                </Text>
                )}
                <Text
