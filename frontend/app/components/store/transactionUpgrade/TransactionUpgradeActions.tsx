@@ -33,8 +33,10 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
   feeProps,
   speedProps,
 }) => {
-  const { ref: feeRef, onLayout: onLayoutFee } = useTutorialLayout("feeUpgradeButton" as TargetId)
-  const { ref: speedRef, onLayout: onLayoutSpeed } = useTutorialLayout("speedUpgradeButton" as TargetId)
+  // First transfer color
+  const enabled = feeProps?.color == '#60f760f0' && speedProps?.color == '#60f760f0'
+  const { ref: feeRef, onLayout: onLayoutFee } = useTutorialLayout("feeUpgradeButton" as TargetId, enabled)
+  const { ref: speedRef, onLayout: onLayoutSpeed } = useTutorialLayout("speedUpgradeButton" as TargetId, enabled)
   return (
     locked ? (
       <UpgradeButton

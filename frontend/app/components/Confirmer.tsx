@@ -11,8 +11,15 @@ export type ConfirmerProps = {
 };
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
-  const enabled = props.renderedBy === "miner";
-  const { ref, onLayout } = useTutorialLayout("minerConfirmer" as TargetId, enabled);
+  const enabled = props.renderedBy !== undefined && ["miner", "sequencer", "da", 'prover'].includes(props.renderedBy);
+  let tutorialProps = {}
+  let ref, onLayout;
+  if (enabled) {
+    const targetId = `${props.renderedBy}Confirmer` as TargetId;
+    ({ ref, onLayout } = useTutorialLayout(targetId, enabled));
+    tutorialProps = { ref, onLayout };
+  }
+
   return (
     <View className="w-full h-full relative">
       {props.progress > 0 && (
@@ -24,8 +31,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       <TouchableOpacity
         className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
         onPress={props.onConfirm}
-        ref={ref}
-        onLayout={onLayout}
+        {...tutorialProps}
       >
         <Image source={props.image} className="w-28 h-28" />
       </TouchableOpacity>

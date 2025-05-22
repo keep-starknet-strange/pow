@@ -85,6 +85,7 @@ export const TutorialOverlay: React.FC = () => {
   };
   const bubbleTarget = layouts?.[config.bubbleTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
   const highlightTarget = layouts?.[config.highlightTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const isLayoutReady = bubbleTarget.width > 0 && bubbleTarget.height > 0;
 
   // Compute positions unconditionally
   const { left: bubbleLeft, top: bubbleTop, style: arrowStyle, arrowLeft } = useBubblePosition(
@@ -112,7 +113,7 @@ export const TutorialOverlay: React.FC = () => {
     }
   }, [step, setVisible]);
 
-  if (!visible) return null;
+  if (!visible || !isLayoutReady) return null;
   return (
     <View className="absolute inset-0 z-10" pointerEvents="box-none">
       {/* Masks */}

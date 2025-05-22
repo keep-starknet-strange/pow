@@ -7,6 +7,8 @@ import { WorkingBlockView } from "../../components/WorkingBlockView";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
 import { L2Unlock } from "../../components/store/L2Unlock";
+import { useTutorialLayout } from "../../hooks/useTutorialLayout";
+import { TargetId } from "../../context/Tutorial";
 
 export interface L1PhaseProps {
   setCurrentView: (view: string) => void;
@@ -14,6 +16,7 @@ export interface L1PhaseProps {
 
 export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
   const { dappsUnlocked } = useTransactions();
+  const {ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
   const { l2 } = useGame();
   return (
     <View className="flex flex-col items-center mt-10">
@@ -34,7 +37,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
         )}
       </View>
       <View
-        className="w-full pb-[1.2rem] rounded-t-lg"
+        className="w-full pb-[1.2rem] rounded-t-lg items-center"
         style={{
           backgroundColor: l2 ? "#f7f7f710" : "transparent",
           marginTop: l2 ? 16 : 0,
@@ -42,7 +45,9 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
       >
         {l2 ? (
           <TouchableOpacity
-            className="flex flex-col items-center justify-center"
+            ref={ref}
+            onLayout={onLayout}
+            className="flex flex-col items-center justify-center pt-2 w-24"
             onPress={() => {
               setCurrentView("L2");
             }}

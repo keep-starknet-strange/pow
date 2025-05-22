@@ -35,6 +35,24 @@
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton"
   },
+  "L2Upgrade": {
+    "title": "Congrats! You now have an L2",
+    "description": "Click here to manage the L2.",
+    "bubbleTargetId": "manageL2",
+    "highlightTargetId": "manageL2"
+  },
+  "dataAvailability": {
+    "title": "Congrats! You now have a data availability layer",
+    "description": "Click here to manage the data availability layer.",
+    "bubbleTargetId": "daConfirmer",
+    "highlightTargetId": "daConfirmer"
+  },
+  "prover": {
+    "title": "Congrats! You now have a prover",
+    "description": "Click here to manage the prover.",
+    "bubbleTargetId": "proverConfirmer",
+    "highlightTargetId": "proverConfirmer"
+  },
   "completed": {
     "title": "Congratulations!",
     "description": "You're done!",

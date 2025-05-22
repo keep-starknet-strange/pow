@@ -27,6 +27,7 @@ export const DAConfirm: React.FC = () => {
         image={getDaIcon(automations[1][2] + 1)}
         getAnimation={getDaAnimation}
         onConfirm={daConfirm}
+        renderedBy="da"
       />
     </View>
   );

@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTransactions } from "../../context/Transactions";
 import { ChainView } from "../../components/ChainView";
@@ -7,6 +6,7 @@ import { DaView } from "../../components/DaView";
 import { ProverView } from "../../components/ProverView";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
+import { useEventManager } from "../../context/EventManager";
 
 export interface L2PhaseProps {
   setCurrentView: (view: string) => void;

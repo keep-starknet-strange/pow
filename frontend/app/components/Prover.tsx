@@ -27,6 +27,7 @@ export const Prover: React.FC = () => {
         image={getProverImage(automations[1][1] + 1)}
         getAnimation={getProvingAnimation}
         onConfirm={prove}
+        renderedBy="prover"
       />
     </View>
   );
