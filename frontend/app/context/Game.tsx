@@ -114,7 +114,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return newWorkingBlocks;
     });
     notify("MineDone", { block: completedBlock });
-    updateBalance(blockReward + completedBlock.fees + 9999999);
+    updateBalance(blockReward + completedBlock.fees);
     addBlock(0, completedBlock);
   }
   const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);

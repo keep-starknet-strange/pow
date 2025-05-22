@@ -23,13 +23,10 @@ export class TutorialObserver implements Observer {
     this.handlers.set('L2Purchased-purchaseSpeedUpgrade',         ()=> this.advanceStep());
     this.handlers.set('SequenceDone-L2Upgrade',                   ()=> this.advanceStep());
     this.handlers.set('DaDone-dataAvailability',                  ()=> this.advanceStep());
-    // TODO: need to set up event for L2 page
     // …and you can add more here without changing onNotify
   }
   
   onNotify(eventName: EventType, data?: any): void {
-    
-    console.log("eventname-step", eventName, this.step);
     if (data?.name == "Store") {
       eventName = eventName + "-" + data.name;
     } 
