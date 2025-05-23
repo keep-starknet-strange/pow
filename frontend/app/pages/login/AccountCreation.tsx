@@ -53,6 +53,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
         <Text className="text-[#ffff80] text-md">
           Set up a username
         </Text>
+        {/* // TODO: fix/keyboard-covers-input-fields */}
         <TextInput
           className="bg-[#ffff8010] w-full rounded-lg mt-2 px-2 py-1 text-xl text-[#ffff80] border-2 border-[#ffff80] shadow-lg shadow-black/50"
           placeholder="Satoshi"
