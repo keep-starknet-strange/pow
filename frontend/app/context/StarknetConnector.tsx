@@ -5,11 +5,6 @@ export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'h
 export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
 
-export const POW_CONTRACT_ADDRESS = "0x06278f64edb9a1b2f55c6861462783ffd086333301b92c76da7a91bb03122b78";
-// sepolia: export const POW_CONTRACT_ADDRESS = "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4";
-// mainnet: export const POW_CONTRACT_ADDRESS = "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781";
-export const MAX_MULTICALL = 50;
-
 type StarknetConnectorContextType = {
   chain: string;
   account: Account | null;
@@ -21,10 +16,6 @@ type StarknetConnectorContextType = {
   disconnectAccount: () => Promise<void>;
   invokeContract: (contractAddress: string, functionName: string, args: any[]) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
-
-  addToMultiCall: (call: Call) => Promise<void>;
-
-  invokeInitMyGame: () => Promise<void>;
 };
 
 const StarknetConnector = createContext<StarknetConnectorContextType | undefined>(undefined);
@@ -54,9 +45,8 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
   const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
-  const [multiCall, setMultiCalls] = useState<Call[]>([]);
 
-  const ENABLE_STARKNET = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
+  const STARKNET_ENABLED = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
 
   useEffect(() => {
     const providerInstance = getStarknetProvider(chain);
@@ -89,7 +79,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   }
 
   const deployAccount = async () => {
-    if (!ENABLE_STARKNET) {
+    if (!STARKNET_ENABLED) {
       return;
     }
     if (!provider) {
@@ -115,9 +105,16 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
       addressSalt: starkKeyPub,
       contractAddress: contractAddress,
     }, { maxFee: 100_000_000_000_000 }).catch((error) => {
-      console.error('Error deploying account:', error);
-      throw error;
+      // TODO: Handle error ( for now assume it is already deployed )
+      // console.error('Error deploying account:', error);
+      // throw error;
+      return { transaction_hash: 'Account already exists', contract_address: contractAddress };
     });
+    if (transaction_hash === 'Account already exists') {
+      console.log('Account already exists:', contractAddress);
+      connectAccount();
+      return;
+    }
     console.log('Transaction hash:', transaction_hash);
     await provider!.waitForTransaction(transaction_hash);
     console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
@@ -137,7 +134,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
   }
 
   const invokeContract = async (contractAddress: string, functionName: string, args: any[]) => {
-    if (!ENABLE_STARKNET) {
+    if (!STARKNET_ENABLED) {
       return;
     }
     /*
@@ -145,7 +142,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
       console.error('Account is not connected.');
       return;
     }
-    */
     const { abi: contractAbi } = await provider!.getClassAt(contractAddress);
     if (contractAbi === undefined) {
       throw new Error(`Contract at address ${contractAddress} does not have an ABI.`);
@@ -158,14 +154,25 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     console.log(`Transaction hash: ${res.transaction_hash}`);
     await provider!.waitForTransaction(res.transaction_hash);
     console.log(`✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`);
+    */
+    const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
+    const res = await newAccount.execute([{
+      contractAddress,
+      entrypoint: functionName,
+      calldata: args
+    }], {
+      maxFee: 100_000_000_000_000,
+    });
+    console.log(`Transaction hash: ${res.transaction_hash}`);
+    await provider!.waitForTransaction(res.transaction_hash);
+    console.log(`✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`);
   }
 
   const invokeContractCalls = useCallback(async (calls: Call[]) => {
-    if (!ENABLE_STARKNET) {
+    if (!STARKNET_ENABLED) {
       return;
     }
 
-    console.log('Invoking calls:', calls);
     const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
     const res = await newAccount.execute(calls, {
       maxFee: 100_000_000_000_000,
@@ -174,62 +181,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     await provider!.waitForTransaction(res.transaction_hash);
     console.log(`✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`);
   }, [provider, myPrivateKey]);
-
-  const addToMultiCall = useCallback(async (call: Call) => {
-    if (!ENABLE_STARKNET) {
-      return;
-    }
-    setMultiCalls((prev) => {
-      const newMultiCalls = [...prev, call];
-      if (newMultiCalls.length >= MAX_MULTICALL) {
-        invokeContractCalls(newMultiCalls);
-        return [];
-      }
-      return newMultiCalls;
-    });
-  }, [invokeContractCalls]);
-
-  const invokeInitMyGame = async () => {
-    if (!ENABLE_STARKNET) {
-      return;
-    }
-    /*
-    TODO
-    if (!account) {
-      console.error('Account is not connected.');
-      return;
-    }
-    */
-    // TODO: Check if the game is already initialized
-    console.log("Invoking init_my_game on contract at address:", POW_CONTRACT_ADDRESS);
-    const { abi: contractAbi } = await provider!.getClassAt(POW_CONTRACT_ADDRESS);
-    if (contractAbi === undefined) {
-      throw new Error(`Contract at address ${POW_CONTRACT_ADDRESS} does not have an ABI.`);
-    }
-    const contract = new Contract(contractAbi, POW_CONTRACT_ADDRESS, provider!);
-    const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
-    contract.connect(newAccount!);
-
-    const myCall = contract.populate("init_my_game", []);
-    /*
-    const rest = newAccount.execute([
-      {
-        contractAddress: POW_CONTRACT_ADDRESS,
-        entrypoint: "init_my_game",
-        calldata: []
-      },
-    ], {
-      maxFee: 100_000_000_000_000,
-    });
-    */
-    const res = await contract.init_my_game(myCall.calldata).catch((error) => {
-      console.error('Error invoking init_my_game:', error);
-      throw error;
-    });
-    console.log(`Transaction hash: ${res.transaction_hash}`);
-    await provider!.waitForTransaction(res.transaction_hash);
-    console.log(`✅ initMyGame executed successfully. ${res.transaction_hash}`);
-  }
 
   const value = {
     chain,
@@ -241,8 +192,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     disconnectAccount,
     invokeContract,
     invokeContractCalls,
-    addToMultiCall,
-    invokeInitMyGame,
   };
   return (
     <StarknetConnector.Provider value={value}>

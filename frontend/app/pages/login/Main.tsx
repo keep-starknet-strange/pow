@@ -13,7 +13,7 @@ type LoginMainPageProps = {
 
 export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) => {
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
-  const { account, deployAccount, connectAccount, getMyAddress, invokeInitMyGame } = useStarknetConnector();
+  const { account, deployAccount, getMyAddress, invokeInitMyGame } = useStarknetConnector();
   return (
     <ImageBackground
       className="flex-1 items-center justify-between"
@@ -36,6 +36,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
         <BasicButton
           label="Play!"
           onPress={async () => {
+            await deployAccount();
             setLoginPage('accountCreation');
           }}
           style={{ width: 250 }}

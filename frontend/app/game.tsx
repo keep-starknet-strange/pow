@@ -19,6 +19,8 @@ import { LoginPage } from "./pages/LoginPage";
 import { useEventManager, EventType } from "./context/EventManager";
 import { useSound } from "./context/Sound";
 import { useStarknetConnector } from "./context/StarknetConnector";
+import { useFocEngine } from "./context/FocEngineConnector";
+import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
 import { useInAppNotifications } from "./context/InAppNotifications";
 import { useAchievement } from "./context/Achievements";
@@ -31,9 +33,20 @@ import { TxBuilderObserver } from "./observers/TxBuilderObserver";
 
 export default function game() {
   const { registerObserver, unregisterObserver } = useEventManager();
-  const { account } = useStarknetConnector();
   const { stakingUnlocked } = useStaking();
   const { isTutorialActive } = useTutorial();
+
+  const { account } = useStarknetConnector();
+  const { user, connectAccount } = useFocEngine();
+  useEffect(() => {
+    if (account) {
+      try {
+        connectAccount(account.address);
+      } catch (error) {
+        console.log("Error connecting account:", error);
+      }
+    }
+  }, [account]);
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<null | number>(null);
@@ -56,15 +69,15 @@ export default function game() {
   }, [updateAchievement]);
 
   const { getWorkingBlock } = useGame();
-  const { addToMultiCall } = useStarknetConnector();
+  const { addAction } = usePowContractConnector();
   const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(null);
   useEffect(() => {
     if (txBuilderObserver !== null) {
       // Unregister the previous observer if it exists
       unregisterObserver(txBuilderObserver);
     }
-    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addToMultiCall, getWorkingBlock)));
-  }, [addToMultiCall, getWorkingBlock]);
+    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)));
+  }, [addAction, getWorkingBlock]);
   const { playSoundEffect } = useSound();
   const { notify } = useEventManager()
   const [soundObserver, setSoundObserver] = useState<null | number>(null);
@@ -116,7 +129,7 @@ export default function game() {
 
   return (
     <View className="flex-1 bg-[#010a12ff] relative">
-        {account ? (
+        {user ? (
           <View className="flex-1">
             { isTutorialActive && <TutorialOverlay/> }
             <Header />
