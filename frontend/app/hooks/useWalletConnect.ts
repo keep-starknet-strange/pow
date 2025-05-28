@@ -1,28 +1,28 @@
-import 'react-native-get-random-values';
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Linking,
-  ImageBackground,
-  Alert,
-} from "react-native";
-import { UniversalProvider } from "@walletconnect/universal-provider";
-import background from "../../assets/background.png";
+ import 'react-native-get-random-values';
+ import { useState, useEffect, useCallback } from "react";
+ import { UniversalProvider } from "@walletconnect/universal-provider";
+ import type { SessionTypes } from '@walletconnect/types';
+ import { Linking, Alert } from "react-native";
+ 
+ const WALLET_DEEPLINKS = {
+  braavos: (uri: string) => `braavos://wc?uri=${encodeURIComponent(uri)}`,
+  argent: (uri: string) => `argent://wc?uri=${encodeURIComponent(uri)}`,
+};
 
+const WC_PROJECT_ID = 'ad27f7ecf50cf0802b7cd433724dff24';
 
-export const OffboardPage: React.FC = () => {
+ export function useStarknetWalletConnect() {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<SessionTypes.Struct | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeWallet, setActiveWallet] = useState<'argent' | 'braavos' | null>(null);
 
   const initializeProvider = async () => {
     try {
-      const projectId = "ad27f7ecf50cf0802b7cd433724dff24"; // Replace this
+      const projectId = WC_PROJECT_ID;
       const metadata = {
         name: "POW",
         description: "Earn STRK and connect to Argent Mobile",
@@ -37,7 +37,6 @@ export const OffboardPage: React.FC = () => {
       });
 
       setProvider(providerInstance);
-      console.log("Provider initialized:", !!providerInstance);
 
       const activeSessions = Object.values(providerInstance.session || {});
       if (activeSessions.length > 0) {
@@ -54,15 +53,18 @@ export const OffboardPage: React.FC = () => {
     }
   };
 
-  const connect = async () => {
+  const connect = async (wallet: 'argent' | 'braavos') => {
     if (!provider) return;
+    setActiveWallet(wallet);
+    setConnecting(true);
+    setError(null);
 
     try {
       const { uri, approval } = await provider.client.connect({
         requiredNamespaces: {
           starknet: {
             chains: ["starknet:SNMAIN"],
-            methods: ["starknet_account", "starknet_requestAddInvokeTransaction"],
+            methods: ['starknet_requestAddInvokeTransaction', 'starknet_signMessage'],
             events: ["accountsChanged", "chainChanged"],
           },
         },
@@ -71,10 +73,10 @@ export const OffboardPage: React.FC = () => {
         setError(err.message);
       }
       });
-
+ 
       if (uri) {
         console.log("WalletConnect URI:", uri);
-        await Linking.openURL(`braavos://wc?uri=${encodeURIComponent(uri)}`);
+        await Linking.openURL(WALLET_DEEPLINKS[wallet](uri));
       }
 
       const newSession = await approval();
@@ -87,7 +89,7 @@ export const OffboardPage: React.FC = () => {
     }
   };
 
-  const sendTransaction = async () => {
+  const claimRewards = async () => {
     if (!provider || !session || !account) return;
 
     const amount = "0xa"; // 10 STRK tokens, assumed to be the low u256 amount
@@ -98,7 +100,7 @@ export const OffboardPage: React.FC = () => {
         calls: [
           {
             contractAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7", // STRK contract
-            entrypoint: "transfer",
+            entrypoint: "claimRewards",
             calldata: [
               account, // to self
               amount,
@@ -110,7 +112,9 @@ export const OffboardPage: React.FC = () => {
     };
 
     try {
-      await Linking.openURL("argent://");
+      if (activeWallet) {
+        await Linking.openURL(WALLET_DEEPLINKS[activeWallet](''));
+      }
 
       const result = await provider.client.request({
         topic: session.topic,
@@ -133,50 +137,31 @@ export const OffboardPage: React.FC = () => {
     }
   };
 
+  const disconnect = useCallback(async () => {
+    if (session && provider.client) {
+      await provider.disconnect({
+        topic: session.topic,
+        reason: { code: 6000, message: 'User disconnected' },
+      });
+      setSession(null);
+      setAccount(null);
+      setTxHash(null);
+    }
+  }, [session, provider]);
+
+
   useEffect(() => {
     initializeProvider();
   }, []);
 
-  return (
-    <ImageBackground className="flex-1" source={background} resizeMode="cover">
-      <View className="flex-1 justify-center items-center px-6">
-        <Text className="text-4xl font-bold text-[#e7e7e7] mb-4">
-          🎉 You earned 10 STRK!
-        </Text>
-
-        {!account ? (
-          <>
-            <Text className="text-xl text-[#e7e7e7] mb-4 text-center">
-              Connect your wallet to receive them.
-            </Text>
-            <TouchableOpacity
-              className="bg-blue-500 py-3 px-6 rounded-xl mb-4"
-              onPress={connect}
-            >
-              <Text className="text-white text-lg font-bold">Connect Argent</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text className="text-[#e7e7e7] mb-2">Connected: {account}</Text>
-            <TouchableOpacity
-              className="bg-green-500 py-3 px-6 rounded-xl mb-4"
-              onPress={sendTransaction}
-            >
-              <Text className="text-white text-lg font-bold">Claim STRK</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {txHash && (
-          <Text className="text-green-300 mt-2 text-center">
-            Transaction sent: {txHash}
-          </Text>
-        )}
-        {error && (
-          <Text className="text-red-400 mt-2 text-center">Error: {error}</Text>
-        )}
-      </View>
-    </ImageBackground>
-  );
-};
+  return {
+    connectArgent: () => connect('argent'),
+    connectBraavos: () => connect('braavos'),
+    claimRewards,
+    txHash,
+    disconnect,
+    session,
+    connecting,
+    error,
+  };
+}
