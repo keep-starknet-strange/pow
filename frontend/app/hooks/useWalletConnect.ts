@@ -11,7 +11,7 @@
 
 const WC_PROJECT_ID = 'ad27f7ecf50cf0802b7cd433724dff24';
 
- export function useStarknetWalletConnect() {
+ export function useWalletConnect() {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<any>(null);
   const [session, setSession] = useState<SessionTypes.Struct | null>(null);
@@ -158,6 +158,7 @@ const WC_PROJECT_ID = 'ad27f7ecf50cf0802b7cd433724dff24';
     connectArgent: () => connect('argent'),
     connectBraavos: () => connect('braavos'),
     claimRewards,
+    account,
     txHash,
     disconnect,
     session,
