@@ -24,7 +24,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
 
-  const rewardUnlocked = false;
+  const rewardUnlocked = true;
 
   const claimReward = async () => {
     if (!gameAccount || accountInput.trim() === "") {
@@ -91,13 +91,13 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
         
               <TouchableOpacity
               className="py-2"
-              disabled={!accountInput.trim()}
+              disabled={!debouncedInput.trim()}
               onPress={() => {
                 Linking.openURL(`https://starkscan.co/contract/${accountInput}`)
               }}
               >
-                <Text className={`${!accountInput.trim() ? 'text-gray-400' : 'text-[#80bfff]'} underline text-center my-4`}>
-                  View on StarkScan  ({accountInput.slice(0, 4)}...{accountInput.slice(-4)})
+                <Text className={`${!debouncedInput.trim() ? 'text-gray-400' : 'text-[#80bfff]'} underline text-center my-4`}>
+                  View on StarkScan  ({debouncedInput.slice(0, 4)}...{debouncedInput.slice(-4)})
                 </Text>
               </TouchableOpacity>
 
@@ -105,7 +105,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
                 <BasicButton
                   label="Claim STRK"
                   onPress={claimReward}
-                  disabled={!accountInput.trim() || !gameAccount}
+                  disabled={!debouncedInput.trim() || !gameAccount}
                   />
               </View>
 
