@@ -12,9 +12,13 @@ import background from "../../../assets/background.png";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from '../../context/StarknetConnector';
 import BasicButton from '../../components/buttons/Basic';
-import { WebView } from 'react-native-webview';
 
-export const ClaimRewardSection: React.FC = () => {
+type ClaimRewardProps = {
+  setSettingTab: (tab: "Main") => void;
+};
+
+
+export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }) => {
   const { connectArgent, connectBraavos, account, txHash, error } = useWalletConnect();
   const {account: gameAccount, invokeContract} = useStarknetConnector();
   const [accountInput, setAccountInput] = useState("");
@@ -115,6 +119,15 @@ export const ClaimRewardSection: React.FC = () => {
               )}
             </>
       )}
+      <TouchableOpacity
+        onPress={() => setSettingTab("Main")}
+        className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center mt-6"
+      >
+        <Text className="text-2xl text-white">
+          ← Back to Settings
+        </Text>
+      </TouchableOpacity>
+
       </View>
     </ImageBackground>
   );
