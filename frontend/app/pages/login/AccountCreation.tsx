@@ -37,9 +37,9 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
       >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ImageBackground
-          className="flex-1 items-center justify-between relative"
           source={background}
           resizeMode="cover"
+          style={{ flex: 1 }}
         >
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'space-between' }}
