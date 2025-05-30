@@ -65,7 +65,9 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
               </Text>
               {/* // TODO: fix/keyboard-covers-input-fields */}
               <TextInput
-                className="bg-[#ffff8010] w-full rounded-lg mt-2 px-2 py-1 text-xl text-[#ffff80] border-2 border-[#ffff80] shadow-lg shadow-black/50"
+                className="bg-[#ffff8010] w-full rounded-lg mt-2 px-2
+                          py-1 text-xl text-[#ffff80] border-2 border-[#ffff80]
+                          shadow-lg shadow-black/50"
                 placeholder="Satoshi"
                 placeholderTextColor="#ffff8080"
                 autoCapitalize="none"
@@ -132,138 +134,138 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
                 >
-                <Text className="text-[#ffff80] text-md text-left w-full">
-                  Heads
-                </Text>
-                <ScrollView
-                  className="flex-1 w-full"
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {getNounsHeadsList().map((head, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="p-2 h-20 aspect-square rounded-2xl mx-1"
-                      style={{
-                        borderWidth: newAvatar.head === index ? 2 : 0,
-                        borderColor: newAvatar.head === index ? '#ffff80' : 'transparent',
-                        backgroundColor: newAvatar.head === index ? '#ffff8010' : 'transparent',
-                      }}
-                      onPress={() => {
-                        setNewAvatar({
-                          ...newAvatar,
-                          head: index,
-                        });
-                      }}
-                    >
-                      <Image
-                        source={head}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <Text className="text-[#ffff80] text-md text-left w-full">
-                  Glasses
-                </Text>
-                <ScrollView
-                  className="flex-1 w-full"
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {getNounsGlassesList().map((glasses, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="p-2 h-20 aspect-square rounded-2xl mx-1"
-                      style={{
-                        borderWidth: newAvatar.glasses === index ? 2 : 0,
-                        borderColor: newAvatar.glasses === index ? '#ffff80' : 'transparent',
-                        backgroundColor: newAvatar.glasses === index ? '#ffff8010' : 'transparent',
-                      }}
-                      onPress={() => {
-                        setNewAvatar({
-                          ...newAvatar,
-                          glasses: index,
-                        });
-                      }}
-                    >
-                      <Image
-                        source={glasses}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <Text className="text-[#ffff80] text-md text-left w-full">
-                  Bodies
-                </Text>
-                <ScrollView
-                  className="flex-1 w-full"
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {getNounsBodiesList().map((body, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="p-2 h-20 aspect-square rounded-2xl mx-1"
-                      style={{
-                        borderWidth: newAvatar.body === index ? 2 : 0,
-                        borderColor: newAvatar.body === index ? '#ffff80' : 'transparent',
-                        backgroundColor: newAvatar.body === index ? '#ffff8010' : 'transparent',
-                      }}
-                      onPress={() => {
-                        setNewAvatar({
-                          ...newAvatar,
-                          body: index,
-                        });
-                      }}
-                    >
-                      <Image
-                        source={body}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <Text className="text-[#ffff80] text-md text-left w-full">
-                  Accessories
-                </Text>
-                <ScrollView
-                  className="flex-1 w-full"
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {getNounsAccessoriesList().map((accessory, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="p-2 h-20 aspect-square rounded-2xl mx-1"
-                      style={{
-                        borderWidth: newAvatar.accessories === index ? 2 : 0,
-                        borderColor: newAvatar.accessories === index ? '#ffff80' : 'transparent',
-                        backgroundColor: newAvatar.accessories === index ? '#ffff8010' : 'transparent',
-                      }}
-                      onPress={() => {
-                        setNewAvatar({
-                          ...newAvatar,
-                          accessories: index,
-                        });
-                      }}
-                    >
-                      <Image
-                        source={accessory}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                  <Text className="text-[#ffff80] text-md text-left w-full">
+                    Heads
+                  </Text>
+                  <ScrollView
+                    className="flex-1 w-full"
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {getNounsHeadsList().map((head, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-2 h-20 aspect-square rounded-2xl mx-1"
+                        style={{
+                          borderWidth: newAvatar.head === index ? 2 : 0,
+                          borderColor: newAvatar.head === index ? '#ffff80' : 'transparent',
+                          backgroundColor: newAvatar.head === index ? '#ffff8010' : 'transparent',
+                        }}
+                        onPress={() => {
+                          setNewAvatar({
+                            ...newAvatar,
+                            head: index,
+                          });
+                        }}
+                      >
+                        <Image
+                          source={head}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <Text className="text-[#ffff80] text-md text-left w-full">
+                    Glasses
+                  </Text>
+                  <ScrollView
+                    className="flex-1 w-full"
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {getNounsGlassesList().map((glasses, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-2 h-20 aspect-square rounded-2xl mx-1"
+                        style={{
+                          borderWidth: newAvatar.glasses === index ? 2 : 0,
+                          borderColor: newAvatar.glasses === index ? '#ffff80' : 'transparent',
+                          backgroundColor: newAvatar.glasses === index ? '#ffff8010' : 'transparent',
+                        }}
+                        onPress={() => {
+                          setNewAvatar({
+                            ...newAvatar,
+                            glasses: index,
+                          });
+                        }}
+                      >
+                        <Image
+                          source={glasses}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <Text className="text-[#ffff80] text-md text-left w-full">
+                    Bodies
+                  </Text>
+                  <ScrollView
+                    className="flex-1 w-full"
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {getNounsBodiesList().map((body, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-2 h-20 aspect-square rounded-2xl mx-1"
+                        style={{
+                          borderWidth: newAvatar.body === index ? 2 : 0,
+                          borderColor: newAvatar.body === index ? '#ffff80' : 'transparent',
+                          backgroundColor: newAvatar.body === index ? '#ffff8010' : 'transparent',
+                        }}
+                        onPress={() => {
+                          setNewAvatar({
+                            ...newAvatar,
+                            body: index,
+                          });
+                        }}
+                      >
+                        <Image
+                          source={body}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <Text className="text-[#ffff80] text-md text-left w-full">
+                    Accessories
+                  </Text>
+                  <ScrollView
+                    className="flex-1 w-full"
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {getNounsAccessoriesList().map((accessory, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-2 h-20 aspect-square rounded-2xl mx-1"
+                        style={{
+                          borderWidth: newAvatar.accessories === index ? 2 : 0,
+                          borderColor: newAvatar.accessories === index ? '#ffff80' : 'transparent',
+                          backgroundColor: newAvatar.accessories === index ? '#ffff8010' : 'transparent',
+                        }}
+                        onPress={() => {
+                          setNewAvatar({
+                            ...newAvatar,
+                            accessories: index,
+                          });
+                        }}
+                      >
+                        <Image
+                          source={accessory}
+                          className="w-full h-full"
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </ScrollView>
                 <BasicButton
                   label="Apply"
