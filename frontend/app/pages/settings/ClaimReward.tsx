@@ -119,15 +119,12 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
               )}
             </>
       )}
-      <TouchableOpacity
-        onPress={() => setSettingTab("Main")}
-        className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center mt-6"
-      >
-        <Text className="text-2xl text-white">
-          ← Back to Settings
-        </Text>
-      </TouchableOpacity>
 
+      <BasicButton
+        label="Back to Settings"
+        onPress={() => setSettingTab("Main")}
+        style={{ paddingHorizontal: 24, marginTop: 20 }}
+      />
       </View>
     </ImageBackground>
   );
