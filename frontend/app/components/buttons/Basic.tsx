@@ -9,7 +9,7 @@ type BasicButtonProps = {
   disabled?: boolean;
 };
 
-const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, disabled }) => {
+const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, disabled = false }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
