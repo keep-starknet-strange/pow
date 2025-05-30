@@ -9,7 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "argent",
+          "argentx",
+          "argentmobile",
+          "braavos"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
