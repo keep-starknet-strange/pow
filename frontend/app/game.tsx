@@ -1,6 +1,6 @@
 import "./global.css";
 
-import { useState, useEffect, Component } from "react";
+import { useState, useEffect } from "react";
 import { View } from "react-native";
 
 import { Header } from "./components/Header";
