@@ -15,7 +15,6 @@ import { AchievementsPage } from "./pages/AchievementsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { StakingPage } from "./pages/StakingPage";
 import { LoginPage } from "./pages/LoginPage";
-import { OffboardPage } from "./pages/OffBoardPage";
 
 import { useEventManager, EventType } from "./context/EventManager";
 import { useSound } from "./context/Sound";
@@ -103,10 +102,6 @@ export default function game() {
     name: "Settings",
     icon: "⚙️",
     component: SettingsPage
-  }, {
-    name: "Offboard",
-    icon: "🏄",
-    component: OffboardPage
   }];
   const [currentPage, setCurrentPage] = useState(tabs[0]);
   const switchPage = (name: string) => {

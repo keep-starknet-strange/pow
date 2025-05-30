@@ -27,7 +27,7 @@ const ResetTutorialButton: React.FC = () => {
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white p-6 rounded-lg">
+          <View className="p-6 rounded-lg">
             <Text className="text-lg font-bold text-black mb-4">
               Are you sure?
             </Text>

@@ -9,7 +9,7 @@ import { useSound } from "../../context/Sound";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 
 export type SettingsMainSectionProps = {
-  setSettingTab: (tab: "About" | "Credits" | "Help") => void;
+  setSettingTab: (tab: "About" | "Credits" | "Help" | "ClaimReward") => void;
 };
 
 const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab }) => {
@@ -19,11 +19,12 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
 
   const toggleNotifs = () => setNotifs(!notifs);
 
-  const settingsComponents: { label: string; tab?: "About" | "Credits" | "Help", onPress?: () => void, icon?: string }[] = [
+  const settingsComponents: { label: string; tab?: "About" | "Credits" | "Help" | "ClaimReward", onPress?: () => void, icon?: string }[] = [
     { label: "About", tab: "About", icon: "📖" },
     { label: "Credits", tab: "Credits", icon: "🎉" },
     { label: "Help", tab: "Help", icon: "❓" },
     { label: "Review", icon: "📝" },
+    { label: "Claim Reward", tab: "ClaimReward", icon: "🎁" },
     { label: "Logout", onPress: disconnectAccount, icon: "🚪" },
   ];
 

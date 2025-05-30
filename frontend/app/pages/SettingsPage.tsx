@@ -6,12 +6,14 @@ import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
 import HelpSection from "./settings/Help";
 import SettingsMainSection from "./settings/Main"; 
+import { ClaimRewardSection } from "./settings/ClaimReward";
 
 const tabs = {
   Main: SettingsMainSection,
   About: AboutSection,
   Credits: CreditsSection,
   Help: HelpSection,
+  ClaimReward: ClaimRewardSection,
 };
 
 export const SettingsPage: React.FC = () => {
