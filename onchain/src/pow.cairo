@@ -35,7 +35,7 @@ mod PowGame {
     struct Storage {
         game_masters: Map<ContractAddress, bool>,
         reward_token: ContractAddress,
-        reward_threshold: u128,
+        reward_balance_threshold: u128,
         reward_managers:  Map<ContractAddress, bool>,
         genesis_block_reward: u128,
         max_chain_id: u32,
@@ -59,7 +59,7 @@ mod PowGame {
     struct RewardParams {
         reward_token: ContractAddress,
         reward_amount: u128,
-        reward_threshold: u128,
+        reward_balance_threshold: u128,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -112,7 +112,7 @@ mod PowGame {
         self.game_masters.write(host, true);
         self.reward_managers.write(reward_manager, true);
         self.reward_token.write(reward_params.reward_token);
-        self.reward_threshold.write(reward_params.reward_threshold);
+        self.reward_balance_threshold.write(reward_params.reward_balance_threshold);
         self.reward_amount.write(reward_params.reward_amount);
     }
 
@@ -166,15 +166,15 @@ mod PowGame {
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
             let balance = self.user_balances.read(caller);
-            let reward_threshold = self.reward_threshold.read();
-            assert!(balance >= reward_threshold, "Not enough balance to claim reward");
+            let reward_balance_threshold = self.reward_balance_threshold.read();
+            assert!(balance >= reward_balance_threshold, "Not enough balance to claim reward");
             
             self.reward_claimed.write(caller, true);
 
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
-            assert!(success, "Reward transfer failed");
+            assert!(success "Reward transfer failed");
             self.emit(RewardClaimed {
                 user: caller,
                 recipient
@@ -187,7 +187,7 @@ mod PowGame {
             assert!(!claimed, "Reward already claimed");
 
             self.reward_claimed.write(game_address, true);
-            
+
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
@@ -202,7 +202,7 @@ mod PowGame {
             RewardParams {
                 reward_token: self.reward_token.read(),
                 reward_amount: self.reward_amount.read(),
-                reward_threshold: self.reward_threshold.read(),
+                reward_balance_threshold: self.reward_balance_threshold.read(),
             }
         }
 
