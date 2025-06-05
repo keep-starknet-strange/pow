@@ -38,7 +38,7 @@ mod PowGame {
         reward_balance_threshold: u128,
         reward_managers:  Map<ContractAddress, bool>,
         genesis_block_reward: u128,
-        max_chain_id: u32,
+        max_chain_id: (u128, u128),
         // Maps: user address -> user max chain unlocked
         user_max_chains: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
@@ -59,7 +59,6 @@ mod PowGame {
     struct RewardParams {
         reward_token: ContractAddress,
         reward_amount: u128,
-        reward_balance_threshold: u128,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -106,13 +105,13 @@ mod PowGame {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, reward_manager: ContractAddress,) {
+    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, reward_manager: ContractAddress) {
         self.genesis_block_reward.write(1);
         self.max_chain_id.write(2);
         self.game_masters.write(host, true);
         self.reward_managers.write(reward_manager, true);
         self.reward_token.write(reward_params.reward_token);
-        self.reward_balance_threshold.write(reward_params.reward_balance_threshold);
+        self.reward_prestige_threshold.write(reward_params.reward_balance_threshold);
         self.reward_amount.write(reward_params.reward_amount);
     }
 
@@ -165,9 +164,9 @@ mod PowGame {
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
-            let balance = self.user_balances.read(caller);
-            let reward_balance_threshold = self.reward_balance_threshold.read();
-            assert!(balance >= reward_balance_threshold, "Not enough balance to claim reward");
+            let prestige = self.get_user_prestige.read(caller);
+            let reward_prestige_threshold = self.reward_prestige_threshold.read();
+            assert!(prestige >= reward_prestige_threshold, "Not enough balance to claim reward");
             
             self.reward_claimed.write(caller, true);
 
@@ -202,7 +201,7 @@ mod PowGame {
             RewardParams {
                 reward_token: self.reward_token.read(),
                 reward_amount: self.reward_amount.read(),
-                reward_balance_threshold: self.reward_balance_threshold.read(),
+                reward_prestige_threshold: self.reward_prestige_threshold.read()
             }
         }
 
