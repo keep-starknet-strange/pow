@@ -193,6 +193,7 @@ mod PowGame {
         }
 
         fn claim_reward(ref self: ContractState, recipient: ContractAddress) {
+            self.pausable.assert_not_paused();
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
@@ -213,7 +214,7 @@ mod PowGame {
         }
 
         fn game_master_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
-             self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
             assert!(!claimed, "Reward already claimed");
 
