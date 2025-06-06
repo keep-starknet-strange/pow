@@ -178,7 +178,7 @@ mod PowGame {
             });
         }
 
-        fn manager_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
+        fn game_master_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
              self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
             assert!(!claimed, "Reward already claimed");
