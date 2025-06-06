@@ -55,12 +55,21 @@ pub mod PowTransactionsComponent {
         new_level: u32,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct DappsUnlocked {
+        #[key]
+        user: ContractAddress,
+        #[key]
+        chain_id: u32,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     pub enum Event {
         TransactionConfigUpdated: TransactionConfigUpdated,
         TransactionFeeLevelUpdated: TransactionFeeLevelUpdated,
         TransactionSpeedLevelUpdated: TransactionSpeedLevelUpdated,
+        DappsUnlocked: DappsUnlocked,
     }
 
     #[embeddable_as(PowTransactionsImpl)]
@@ -224,6 +233,7 @@ pub mod PowTransactionsComponent {
         fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
             self.dapps_unlocked.write((caller, chain_id), true);
+            self.emit(DappsUnlocked { user: caller, chain_id });
         }
 
         fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {

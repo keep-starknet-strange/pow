@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
-import { Call, Account, constants, Contract, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import { Call, Account, ec, RpcProvider, hash, CallData } from 'starknet';
 
 export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'http://localhost:5050/rpc';
 export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'

@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useEventManager } from "../context/EventManager";
+import { useFocEngine } from "./FocEngineConnector";
+import { usePowContractConnector } from "./PowContractConnector"
 import { useBalance } from "../context/Balance";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
@@ -24,6 +26,8 @@ type UpgradesContextType = {
   getNextPrestigeCost: () => number;
 };
 
+// curl http://localhost:8080/events/get-unique-with\?contractAddress\=0x3f521e989acabd697addbf1c456d10ae9a4f5ad8bb680cf843da0ad765b4b80\&eventType\=pow_game::upgrades::component::PowUpgradesComponent::UpgradeLevelUpdated\&uniqueKey\=upgrade_id -X POST -d "{\"chain_id\":0}"
+
 export const useUpgrades = () => {
   const context = useContext(UpgradesContext);
   if (!context) {
@@ -34,6 +38,9 @@ export const useUpgrades = () => {
 const UpgradesContext = createContext<UpgradesContextType | undefined>(undefined);
 
 export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, getUniqueEventsWith } = useFocEngine();
+  const { powGameContractAddress } = usePowContractConnector();
+
   const [upgrades, setUpgrades] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
   const [automations, setAutomation] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
   const [currentPrestige, setCurrentPrestige] = useState<number>(0);
@@ -87,8 +94,75 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   useEffect(() => {
+    const fetchUpgradeLevels = async () => {
+      if (!user) return;
+      if (!powGameContractAddress) return;
+      // TODO: Hardcoded chain ids
+      const chainIds = [0, 1]; // L1 and L2
+      for (const chainId of chainIds) {
+        const events = await getUniqueEventsWith(
+          powGameContractAddress,
+          "pow_game::upgrades::component::PowUpgradesComponent::UpgradeLevelUpdated",
+          "upgrade_id",
+          { chain_id: chainId, user: user.account_address }
+        );
+        if (!events) {
+          console.warn(`No upgrade events found for chainId: ${chainId}`);
+          continue;
+        }
+        const upgradesFeeLevels: { upgradeId: number, level: number }[] = events.map((event: any) => ({
+          upgradeId: event.upgrade_id,
+          level: event.new_level
+        }));
+        setUpgrades((prevUpgrades) => {
+          const newUpgrades = { ...prevUpgrades };
+          if (!newUpgrades[chainId]) {
+            newUpgrades[chainId] = {};
+          }
+          upgradesFeeLevels.forEach(({ upgradeId, level }) => {
+            newUpgrades[chainId][upgradeId] = level - 1; // Convert to zero-based index
+          });
+          return newUpgrades;
+        });
+      }
+    };
+    const fetchAutomationLevels = async () => {
+      if (!user) return;
+      if (!powGameContractAddress) return;
+      // TODO: Hardcoded chain ids
+      const chainIds = [0, 1]; // L1 and L2
+      for (const chainId of chainIds) {
+        const events = await getUniqueEventsWith(
+          powGameContractAddress,
+          "pow_game::upgrades::component::PowUpgradesComponent::AutomationLevelUpdated",
+          "automation_id",
+          { chain_id: chainId, user: user.account_address }
+        );
+        if (!events) {
+          console.warn(`No automation events found for chainId: ${chainId}`);
+          continue;
+        }
+        const automationsFeeLevels: { automationId: number, level: number }[] = events.map((event: any) => ({
+          automationId: event.automation_id,
+          level: event.new_level
+        }));
+        setAutomation((prevAutomations) => {
+          const newAutomations = { ...prevAutomations };
+          if (!newAutomations[chainId]) {
+            newAutomations[chainId] = {};
+          }
+          automationsFeeLevels.forEach(({ automationId, level }) => {
+            newAutomations[chainId][automationId] = level - 1; // Convert to zero-based index
+          });
+          return newAutomations;
+        });
+      }
+    };
+
     resetUpgrades();
-  }, []);
+    fetchUpgradeLevels();
+    fetchAutomationLevels();
+  }, [user, powGameContractAddress, getUniqueEventsWith]);
 
   const upgrade = (chainId: number, upgradeId: number) => {
     setUpgrades((prevUpgrades) => {

@@ -21,6 +21,8 @@ type FocEngineContextType = {
   claimUsername: (account: Account | null, username: string) => Promise<any>;
 
   getRegisteredContract: (contractName: string, contractVersion?: string) => Promise<string | null>;
+  getLatestEventWith: (contractAddress: string, eventType: string, filters?: Record<string, any>) => Promise<any>;
+  getUniqueEventsWith: (contractAddress: string, eventType: string, uniqueKey: string, filters?: Record<string, any>) => Promise<any>;
 };
 
 const FocEngineConnector = createContext<FocEngineContextType | undefined>(undefined);
@@ -163,11 +165,51 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
+  const getLatestEventWith = useCallback(async (contractAddress: string, eventType: string, filters: Record<string, any> = {}) => {
+    try {
+      const response = await fetch(`${FOC_ENGINE_API}/events/get-latest-with?contractAddress=${contractAddress}&eventType=${eventType}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(filters),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch latest event");
+      }
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching latest event:", error);
+      return null;
+    }
+  }, []);
+
+  const getUniqueEventsWith = useCallback(async (contractAddress: string, eventType: string, uniqueKey: string, filters: Record<string, any> = {}) => {
+    try {
+      const response = await fetch(`${FOC_ENGINE_API}/events/get-unique-with?contractAddress=${contractAddress}&eventType=${eventType}&uniqueKey=${uniqueKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(filters),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch unique event");
+      }
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching unique event:", error);
+      return null;
+    }
+  }, []);
+  
   return (
     <FocEngineConnector.Provider value={{
       user, registryContractAddress, accountsContractAddress,
       getAccount, claimUsername, connectAccount,
-      getRegisteredContract
+      getRegisteredContract, getLatestEventWith, getUniqueEventsWith
     }}>
       {children}
     </FocEngineConnector.Provider>

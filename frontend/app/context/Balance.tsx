@@ -1,5 +1,7 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useEventManager } from "./EventManager";
+import { useFocEngine } from "./FocEngineConnector";
+import { usePowContractConnector } from "./PowContractConnector";
 
 type BalanceContextType = {
   balance: number;
@@ -20,8 +22,27 @@ export const BalanceContext = createContext<BalanceContextType | undefined>(unde
 
 export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notify } = useEventManager();
+  const { user, getLatestEventWith } = useFocEngine();
+  const { powGameContractAddress } = usePowContractConnector();
   // TODO: balance to bigint?
   const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (powGameContractAddress && user) {
+        try {
+          const balance = await getLatestEventWith(powGameContractAddress, "pow_game::pow::PowGame::BalanceUpdated", {
+            user: user.account_address,
+          });
+          setBalance(balance.new_balance);
+        } catch (error) {
+          console.error("Error fetching balance:", error);
+        }
+      }
+    };
+
+    fetchBalance();
+  }, [powGameContractAddress, user, getLatestEventWith]);
 
   const updateBalance = (change: number) => {
     setBalance(prevBalance => {
