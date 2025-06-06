@@ -104,11 +104,10 @@ mod PowGame {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, reward_manager: ContractAddress) {
+    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams) {
         self.genesis_block_reward.write(1);
         self.max_chain_id.write(2);
         self.game_masters.write(host, true);
-        self.reward_managers.write(reward_manager, true);
         self.reward_token.write(reward_params.reward_token);
         self.reward_prestige_threshold.write(reward_params.reward_balance_threshold);
         self.reward_amount.write(reward_params.reward_amount);
@@ -230,10 +229,6 @@ mod PowGame {
         fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
             assert!(self.game_masters.read(user), "Invalid game master");
         }
-
-        fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
-            assert!(self.reward_managers.read(user), "Invalid reward master");
-        } 
 
         fn check_block_not_full(self: @ContractState, chain_id: u32) {
             let caller = get_caller_address();
