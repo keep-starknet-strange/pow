@@ -13,6 +13,14 @@ pub trait IPowGame<TContractState> {
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
 }
 
+// Game Rewards management
+#[starknet::interface]
+pub trait IPowGameRewards<TContractState> {
+    fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
+    fn claim_reward(ref self: TContractState, recipient: ContractAddress) -> u128;
+    fn get_reward_params(self: @TContractState) -> RewardParams;
+}
+
 // Game asserts / check helper functions
 #[starknet::interface]
 pub trait IPowGameValidation<TContractState> {
