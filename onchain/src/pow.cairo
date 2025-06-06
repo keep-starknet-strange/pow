@@ -35,7 +35,8 @@ mod PowGame {
     struct Storage {
         game_masters: Map<ContractAddress, bool>,
         reward_token: ContractAddress,
-        reward_balance_threshold: u128,
+        reward_prestige_threshold: u128,
+        reward_amount: u256,
         genesis_block_reward: u128,
         max_chain_id: u128,
         // Maps: user address -> user max chain unlocked
@@ -57,7 +58,8 @@ mod PowGame {
     #[derive(Drop)]
     struct RewardParams {
         reward_token: ContractAddress,
-        reward_amount: u128,
+        reward_amount: u256,
+        reward_prestige_threshold: u128,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -109,7 +111,7 @@ mod PowGame {
         self.max_chain_id.write(2);
         self.game_masters.write(host, true);
         self.reward_token.write(reward_params.reward_token);
-        self.reward_prestige_threshold.write(reward_params.reward_balance_threshold);
+        self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
         self.reward_amount.write(reward_params.reward_amount);
     }
 
@@ -164,7 +166,7 @@ mod PowGame {
             assert!(!claimed, "Reward already claimed");
             let prestige = self.get_user_prestige.read(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
-            assert!(prestige >= reward_prestige_threshold, "Not enough balance to claim reward");
+            assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");
             
             self.reward_claimed.write(caller, true);
 
@@ -203,7 +205,7 @@ mod PowGame {
             }
         }
 
-        fn remove_funds(ref self: ContractState, token_address: ContractAddress, recipient: ContractAddress, value: u128) {
+        fn remove_funds(ref self: ContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256) {
             let caller = get_caller_address();
             self.check_valid_game_master(caller);
             let success: bool = IERC20Dispatcher { contract_address: token_address }
