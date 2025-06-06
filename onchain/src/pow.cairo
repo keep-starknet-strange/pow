@@ -37,7 +37,7 @@ mod PowGame {
         reward_token: ContractAddress,
         reward_balance_threshold: u128,
         genesis_block_reward: u128,
-        max_chain_id: (u128, u128),
+        max_chain_id: u128,
         // Maps: user address -> user max chain unlocked
         user_max_chains: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
