@@ -36,7 +36,6 @@ mod PowGame {
         game_masters: Map<ContractAddress, bool>,
         reward_token: ContractAddress,
         reward_balance_threshold: u128,
-        reward_managers:  Map<ContractAddress, bool>,
         genesis_block_reward: u128,
         max_chain_id: (u128, u128),
         // Maps: user address -> user max chain unlocked
@@ -154,7 +153,7 @@ mod PowGame {
     #[abi(embed_v0)]
     impl PowGameRewardsImpl of IPowGameRewards<ContractState> {
         fn set_reward_params(ref self: ContractState, params: RewardParams) {
-            self.check_valid_reward_manager(get_caller_address());
+            self.check_valid_game_master(get_caller_address());
             self.reward_token.write(params.reward_token);
             self.reward_threshold.write(params.reward_threshold);
             self.reward_amount.write(params.reward_amount);
@@ -181,7 +180,7 @@ mod PowGame {
         }
 
         fn manager_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
-             self.check_valid_reward_manager(get_caller_address());
+             self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
             assert!(!claimed, "Reward already claimed");
 
@@ -205,19 +204,9 @@ mod PowGame {
             }
         }
 
-        fn add_reward_manager(ref self: ContractState, user: ContractAddress) {
-            self.check_valid_reward_manager(get_caller_address());
-            self.reward_managers.write(user, true);
-        }
-
-        fn remove_reward_manager(ref self: ContractState, user: ContractAddress) {
-            self.check_valid_reward_manager(get_caller_address());
-            self.reward_managers.write(user, false);
-        }
-
         fn remove_funds(ref self: ContractState, token_address: ContractAddress, recipient: ContractAddress, value: u128) {
             let caller = get_caller_address();
-            self.check_valid_reward_manager(caller);
+            self.check_valid_game_master(caller);
             let success: bool = IERC20Dispatcher { contract_address: token_address }
                 .transfer(recipient, value);
 
@@ -242,7 +231,7 @@ mod PowGame {
             assert!(self.game_masters.read(user), "Invalid game master");
         }
 
-        fn check_valid_reward_manager(self: @ContractState, user: ContractAddress) {
+        fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
             assert!(self.reward_managers.read(user), "Invalid reward master");
         } 
 
