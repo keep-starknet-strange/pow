@@ -8,6 +8,8 @@ edition = "2024_07"
 [dependencies]
 starknet = "2.11.1"
 openzeppelin_token = "0.18.0"
+openzeppelin_upgrades = "0.18.0"
+openzeppelin_security = "0.18.0"
 
 [dev-dependencies]
 snforge_std = "0.42.0"

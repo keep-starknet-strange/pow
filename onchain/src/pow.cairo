@@ -5,23 +5,23 @@ mod PowGame {
     use pow_game::store::*;
     use pow_game::transactions::{DA_TX_TYPE_ID, PROOF_TX_TYPE_ID};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-
+    
     // Import the components
     use pow_game::upgrades::component::PowUpgradesComponent;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess,
+        StoragePointerWriteAccess, ClassHash,
     };
     use starknet::{ContractAddress, get_caller_address};
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
     impl PowUpgradesComponentImpl =
-        PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+    PowUpgradesComponent::PowUpgradesImpl<ContractState>;
     use pow_game::transactions::component::PowTransactionsComponent;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
     impl PowTransactionsComponentImpl =
-        PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+    PowTransactionsComponent::PowTransactionsImpl<ContractState>;
     use pow_game::prestige::component::PrestigeComponent;
     component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
     #[abi(embed_v0)]
@@ -30,12 +30,22 @@ mod PowGame {
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
+    use openzeppelin_upgrades::interface::IUpgradeable;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
+    use openzeppelin_security::PausableComponent;
+    component!(path: PausableComponent, storage: pausable, event: PausableEvent);
+    #[abi(embed_v0)]
+    impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
+    impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
+
 
     #[storage]
     struct Storage {
         game_masters: Map<ContractAddress, bool>,
         reward_token: ContractAddress,
         reward_balance_threshold: u128,
+        reward_paused: bool,
         genesis_block_reward: u128,
         max_chain_id: u128,
         // Maps: user address -> user max chain unlocked
@@ -52,6 +62,10 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
+        #[substorage(v0)]
+        pausable: PausableComponent::Storage
     }
 
     #[derive(Drop)]
@@ -101,6 +115,10 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event,
+        #[flat]
+        PausableEvent: PausableComponent::Event,
     }
 
     #[constructor]
@@ -147,6 +165,22 @@ mod PowGame {
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
             self.user_balances.read(user)
         }
+
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.check_valid_game_master(get_caller_address());
+            self.upgradeable.upgrade(new_class_hash);
+        }
+
+        fn pause(ref self: ContractState) {
+            self.check_valid_game_master();
+            self.pausable.pause();
+        }
+
+        fn unpause(ref self: ContractState) {
+            self.check_valid_game_master();
+            self.pausable.unpause();
+    }
+
     }
 
     #[abi(embed_v0)]
