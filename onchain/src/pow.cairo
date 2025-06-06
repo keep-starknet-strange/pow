@@ -226,7 +226,7 @@ mod PowGame {
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
-            assert!(success. , Errors::REWARD_FAILED);
+            assert!(success, Errors::REWARD_FAILED);
             self.emit(RewardClaimed {
                 user: caller,
                 recipient
@@ -245,7 +245,7 @@ mod PowGame {
 
             assert!(success, Errors::REWARD_FAILED);
             self.emit(RewardClaimed {
-                user: game,
+                user: game_address,
                 recipient
             });
         }
@@ -320,7 +320,7 @@ mod PowGame {
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let block_size = block_width * block_width;
             let working_block = self.get_block_building_state(caller, chain_id);
-            assert!(working_block.size.into() >= block_size, "Block is not full");
+            assert!(working_block.size.into() >= block_size, Errors::BLOCK_NOT_FULL);
 
             // Try Mining
             do_click_block(ref self, chain_id);
