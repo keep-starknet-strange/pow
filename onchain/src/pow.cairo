@@ -121,6 +121,26 @@ mod PowGame {
         PausableEvent: PausableComponent::Event,
     }
 
+    pub mod Errors {
+    pub const ALREADY_INITIALIZED: felt252 = 'Account already initialized';
+    pub const INVALID_CHAIN_ID: felt252 = 'Invalid chain id';
+    pub const CHAIN_NOT_UNLOCKED: felt252 = 'Chain not unlocked';
+    pub const INVALID_GAME_MASTER: felt252 = 'Invalid game master';
+    pub const BLOCK_FULL: felt252 = 'Block is full';
+    pub const BLOCK_NOT_FULL: felt252 = 'Block is not full';
+    pub const DA_NOT_AVAILABLE: felt252 = 'DA compression not available on genesis chain';
+    pub const DA_NOT_FULL: felt252 = 'DA is not full';
+    pub const PROOF_NOT_AVAILABLE: felt252 = 'Proof compression not available on genesis chain';
+    pub const PROOF_NOT_FULL: felt252 = 'Proof is not full';
+    pub const NOT_ENOUGH_BALANCE: felt252 = 'Not enough balance';
+    pub const REWARD_CLAIMED: felt252 = 'Reward already claimed';
+    pub const REWARD_FAILED: felt252 = 'Reward transfer failed';
+    pub const REMOVE_FUNDS_FAILED: felt252 = 'remove_funds failed';
+    pub const INSUFFICIENT_PRESTIGE: felt252 = 'Not enough balance to claim reward';
+    pub const NOT_ENOUGH_CHAINS: felt252 = 'Not enough chains unlocked';
+}
+
+
     #[constructor]
     fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams) {
         self.genesis_block_reward.write(1);
@@ -196,17 +216,17 @@ mod PowGame {
             self.pausable.assert_not_paused();
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
-            assert!(!claimed, "Reward already claimed");
+            assert!(!claimed, Errors::REWARD_CLAIMED);
             let prestige = self.get_user_prestige.read(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
-            assert!(prestige >= reward_prestige_threshold, "Not enough balance to claim reward");
+            assert!(prestige >= reward_prestige_threshold, Errors::INSUFFICIENT_PRESTIGE);
             
             self.reward_claimed.write(caller, true);
 
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
-            assert!(success "Reward transfer failed");
+            assert!(success. , Errors::REWARD_FAILED);
             self.emit(RewardClaimed {
                 user: caller,
                 recipient
@@ -216,14 +236,14 @@ mod PowGame {
         fn game_master_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
             self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
-            assert!(!claimed, "Reward already claimed");
+            assert!(!claimed, Errors::REWARD_CLAIMED);
 
             self.reward_claimed.write(game_address, true);
 
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
-            assert!(success, "Reward transfer failed");
+            assert!(success, Errors::REWARD_FAILED);
             self.emit(RewardClaimed {
                 user: game,
                 recipient
@@ -244,7 +264,7 @@ mod PowGame {
             let success: bool = IERC20Dispatcher { contract_address: token_address }
                 .transfer(recipient, value);
 
-            assert!(success, "remove_funds failed");
+            assert!(success, Errors::REMOVE_FUNDS_FAILED);
         }
     }
 
@@ -252,17 +272,17 @@ mod PowGame {
     impl PowGameValidationImpl of IPowGameValidation<ContractState> {
         fn check_valid_chain_id(self: @ContractState, chain_id: u32) {
             let max_chain_id = self.max_chain_id.read();
-            assert!(chain_id < max_chain_id, "Invalid chain id");
+            assert!(chain_id < max_chain_id, Errors::INVALID_CHAIN_ID);
         }
 
         fn check_user_valid_chain(self: @ContractState, chain_id: u32) {
             let caller = get_caller_address();
             let max_chain_id = self.user_max_chains.read(caller);
-            assert!(chain_id < max_chain_id, "Chain not unlocked");
+            assert!(chain_id < max_chain_id, Errors::CHAIN_NOT_UNLOCKED);
         }
 
         fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
-            assert!(self.game_masters.read(user), "Invalid game master");
+            assert!(self.game_masters.read(user), Errors::INVALID_GAME_MASTER);
         }
 
         fn check_block_not_full(self: @ContractState, chain_id: u32) {
@@ -270,7 +290,7 @@ mod PowGame {
             let working_block = self.get_block_building_state(caller, chain_id);
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let block_size = block_width * block_width;
-            assert!(working_block.size.into() < block_size, "Block is full");
+            assert!(working_block.size.into() < block_size, Errors::BLOCK_FULL);
         }
     }
 
@@ -278,7 +298,7 @@ mod PowGame {
     impl PowGameActionsImpl of IPowGameActions<ContractState> {
         fn init_my_game(ref self: ContractState) {
             let caller = get_caller_address();
-            assert!(self.user_max_chains.read(caller) == 0, "Account already initialized");
+            assert!(self.user_max_chains.read(caller) == 0, Errors::ALREADY_INITIALIZED);
             unlock_next_chain(ref self);
         }
 
@@ -327,11 +347,11 @@ mod PowGame {
 
         fn store_da(ref self: ContractState, chain_id: u32) {
             // Validation
-            assert!(chain_id > 0, "DA compression not available on genesis chain");
+            assert!(chain_id > 0, Errors::DA_NOT_AVAILABLE);
             let caller = get_caller_address();
             let da_size = self.get_my_upgrade(chain_id, 'DA compression');
             let working_da = self.get_da_building_state(caller, chain_id);
-            assert!(working_da.size.into() >= da_size, "DA is not full");
+            assert!(working_da.size.into() >= da_size, Errors::DA_NOT_FULL);
 
             // Try Storing
             do_click_da(ref self, chain_id);
@@ -351,11 +371,11 @@ mod PowGame {
 
         fn prove(ref self: ContractState, chain_id: u32) {
             // Validation
-            assert!(chain_id > 0, "Proof compression not available on genesis chain");
+            assert!(chain_id > 0, Errors::PROOF_NOT_AVAILABLE);
             let caller = get_caller_address();
             let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
             let working_proof = self.get_proof_building_state(caller, chain_id);
-            assert!(working_proof.size.into() >= proof_size, "Proof is not full");
+            assert!(working_proof.size.into() >= proof_size, Errors::PROOF_NOT_FULL);
 
             // Try Proving
             do_click_proof(ref self, chain_id);
@@ -436,7 +456,7 @@ mod PowGame {
 
     fn debit_user(ref self: ContractState, user: ContractAddress, cost: u128) {
         let balance = self.user_balances.read(user);
-        assert!(balance >= cost, "Not enough balance");
+        assert!(balance >= cost, Errors::NOT_ENOUGH_BALANCE);
         let new_balance = balance - cost;
         self.user_balances.write(user, new_balance);
         self.emit(BalanceUpdated { user, old_balance: balance, new_balance });
@@ -494,7 +514,7 @@ mod PowGame {
         // Validation
         let caller = get_caller_address();
         let my_max_chain_id = self.user_max_chains.read(caller);
-        assert!(my_max_chain_id >= self.max_chain_id.read(), "Not enough chains unlocked");
+        assert!(my_max_chain_id >= self.max_chain_id.read(), Errors::NOT_ENOUGH_CHAINS);
         // TODO: Check upgrades, txs, etc. levels
 
         self.prestige();
