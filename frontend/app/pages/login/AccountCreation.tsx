@@ -15,7 +15,7 @@ type AccountCreationProps = {
 
 export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPage }) => {
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
-  const { account, deployAccount, connectAccount, getMyAddress, invokeInitMyGame } = useStarknetConnector();
+  const { account, deployAccount, connectAccount, getMyAddress, invokeInitMyGame, invokeInitMyGamePaymaster } = useStarknetConnector();
 
   const [username, setUsername] = React.useState<string>('');
   const [avatar, setAvatar] = React.useState<NounsAttributes>(getRandomNounsAttributes());
@@ -84,9 +84,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
               <BasicButton
                 label="Save"
                 onPress={async () => {
-                  await deployAccount();
+                  await invokeInitMyGamePaymaster();
                   await connectAccount();
-                  await invokeInitMyGame();
                 }}
                 style={{ width: 250 }}
               />
