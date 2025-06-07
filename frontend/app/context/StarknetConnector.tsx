@@ -1,12 +1,22 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
-import { Call, Account, constants, Contract, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import { toBeHex } from "ethers";
+import { Call, Account, constants, Contract, ec, TypedData, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import {
+  BASE_URL,
+  executeCalls,
+  fetchBuildTypedData,
+  fetchExecuteTransaction,
+  formatCall,
+  GaslessOptions,
+  SEPOLIA_BASE_URL,
+} from "@avnu/gasless-sdk";
 
 export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'http://localhost:5050/rpc';
-export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
+export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
 
-export const POW_CONTRACT_ADDRESS = "0x06278f64edb9a1b2f55c6861462783ffd086333301b92c76da7a91bb03122b78";
-// sepolia: export const POW_CONTRACT_ADDRESS = "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4";
+// sepolia:
+export const POW_CONTRACT_ADDRESS = "0x029a999bdc75fe7ae7298da73b257f117f846454c2ba1e7d3f5f60b29b510bf4";
 // mainnet: export const POW_CONTRACT_ADDRESS = "0x07f27ac57250f4eb2bde1c2f7223397c542b96e1f39a042f0987835881eed781";
 export const MAX_MULTICALL = 50;
 
@@ -21,10 +31,12 @@ type StarknetConnectorContextType = {
   disconnectAccount: () => Promise<void>;
   invokeContract: (contractAddress: string, functionName: string, args: any[]) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
+  invokeWithPaymaster: (account: Account, calls: Call[], deploymentData?: any) => Promise<void>;
 
   addToMultiCall: (call: Call) => Promise<void>;
 
   invokeInitMyGame: () => Promise<void>;
+  invokeInitMyGamePaymaster: () => Promise<void>;
 };
 
 const StarknetConnector = createContext<StarknetConnectorContextType | undefined>(undefined);
@@ -40,9 +52,9 @@ export const useStarknetConnector = () => {
 export const getStarknetProvider = (chain: string): RpcProvider => {
   switch (chain) {
     case "SN_MAINNET":
-      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL, specVersion: "0.7" });
+      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL, specVersion: "0.7", chainId: constants.StarknetChainId.SN_MAIN });
     case "SN_SEPOLIA":
-      return new RpcProvider({ nodeUrl: SEPOLIA_RPC_URL });
+      return new RpcProvider({ nodeUrl: SEPOLIA_RPC_URL, specVersion: "0.7", chainId: constants.StarknetChainId.SN_SEPOLIA });
     case "SN_DEVNET":
       return new RpcProvider({ nodeUrl: LOCALHOST_RPC_URL, specVersion: "0.8" });
     default:
@@ -53,7 +65,7 @@ export const getStarknetProvider = (chain: string): RpcProvider => {
 export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
-  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
+  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_SEPOLIA");
   const [multiCall, setMultiCalls] = useState<Call[]>([]);
 
   const ENABLE_STARKNET = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
@@ -63,12 +75,25 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     setProvider(providerInstance);
   }, [chain]);
 
-  const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9";
-  // const ozAccountClassHash = "0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f";
-  const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
+  const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4dfd";
+  const argentAccountClassHash = "0x01a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003";
   const getDeployCalldata = (privateKey: string) => {
     const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
-    const constructorCalldata = CallData.compile({ public_key: starkKeyPub });
+    const constructorCalldata = CallData.compile({ owner: starkKeyPub, guardian: "0x0" });
+    return constructorCalldata;
+  }
+
+  const stringIntToHex = (value: string | number): string => {
+    if (typeof value === 'number') {
+      value = value.toString();
+    }
+    const hexValue = BigInt(value).toString(16);
+    return `0x${hexValue.padStart(64, '0')}`;
+  }
+
+  const getDeployCalldataHex = (privateKey: string) => {
+    const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
+    const constructorCalldata = [starkKeyPub, "0x0"];
     return constructorCalldata;
   }
 
@@ -77,7 +102,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     const constructorCalldata = getDeployCalldata(privateKey);
     const contractAddress = hash.calculateContractAddressFromHash(
       starkKeyPub,
-      ozAccountClassHash,
+      argentAccountClassHash,
       constructorCalldata,
       0,
     );
@@ -88,7 +113,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     return generateAddress(myPrivateKey);
   }
 
-  const deployAccount = async () => {
+  const deployAccount = useCallback(async () => {
     if (!ENABLE_STARKNET) {
       return;
     }
@@ -110,7 +135,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     const accountInstance = new Account(provider!, contractAddress, myPrivateKey);
     console.log('Deploying OpenZeppelin account...', provider, contractAddress, myPrivateKey);
     const { transaction_hash, contract_address } = await accountInstance.deployAccount({
-      classHash: ozAccountClassHash,
+      classHash: argentAccountClassHash,
       constructorCalldata: constructorCalldata,
       addressSalt: starkKeyPub,
       contractAddress: contractAddress,
@@ -122,7 +147,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     await provider!.waitForTransaction(transaction_hash);
     console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
     connectAccount();
-  }
+  }, [provider, myPrivateKey]);
 
   const connectAccount = async () => {
     const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
@@ -175,6 +200,72 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     console.log(`✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`);
   }, [provider, myPrivateKey]);
 
+  const invokeWithPaymaster = useCallback(async (account: Account, calls: Call[], deploymentData?: any) => {
+    if (!ENABLE_STARKNET) {
+      return;
+    }
+
+    const apiKey = process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY || "";
+    if (apiKey === "") {
+      // TODO: buildGaslessTxData(address, calls, network, deploymentData?)
+      // TODO: sendGaslessTx(address, txData, signature, network, deploymentData?)
+
+      // Run using backend paymaster provider
+      const formattedCalls = formatCall(calls);
+      const focEngineUrl = 'http://localhost:8080';
+      const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
+      const gaslessTxInput = {
+        account: account.address,
+        calls: formattedCalls,
+        network: chain,
+        deploymentData: deploymentData || undefined,
+      };
+      const gaslessTxRes: { data: TypedData } = await fetch(buildGaslessTxDataUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gaslessTxInput),
+      }).then((response) => response.json()).catch((error) => {
+        console.error('Error fetching gasless transaction data:', error);
+        throw error;
+      });
+      let signature = await account.signMessage(gaslessTxRes.data);
+      if (Array.isArray(signature)) {
+        signature = signature.map((sig) => toBeHex(BigInt(sig)));
+      } else if (signature.r && signature.s) {
+        signature = [toBeHex(BigInt(signature.r)), toBeHex(BigInt(signature.s))];
+      }
+      const sendGaslessTxUrl = `${focEngineUrl}/paymaster/send-gasless-tx`;
+      const sendGaslessTxInput = {
+        account: account.address,
+        txData: JSON.stringify(gaslessTxRes.data),
+        signature: signature,
+        network: chain,
+        deploymentData: deploymentData || undefined,
+      };
+      const sendGaslessTxRes = await fetch(sendGaslessTxUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sendGaslessTxInput),
+      }).then((response) => response.json()).catch((error) => {
+        console.error('Error sending gasless transaction:', error);
+        throw error;
+      });
+      console.log('Gasless transaction sent:', sendGaslessTxRes);
+    } else {
+      // Use gasless-sdk to execute calls with paymaster
+      const options: GaslessOptions = { baseUrl: chain === "SN_SEPOLIA" ? SEPOLIA_BASE_URL : BASE_URL, apiKey };
+      const res = await executeCalls(account, calls, { deploymentData }, options).catch((error) => {
+        console.error('Error executing calls with paymaster:', error);
+        throw error;
+      });
+      console.log('Response from executeCalls with paymaster:', res);
+    }
+  }, [provider, chain]);
+
   const addToMultiCall = useCallback(async (call: Call) => {
     if (!ENABLE_STARKNET) {
       return;
@@ -182,12 +273,16 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     setMultiCalls((prev) => {
       const newMultiCalls = [...prev, call];
       if (newMultiCalls.length >= MAX_MULTICALL) {
-        invokeContractCalls(newMultiCalls);
+        if (!account) {
+          console.error('Account is not connected.');
+          return newMultiCalls;
+        }
+        invokeWithPaymaster(account, newMultiCalls);
         return [];
       }
       return newMultiCalls;
     });
-  }, [invokeContractCalls]);
+  }, [invokeWithPaymaster, account, ENABLE_STARKNET]);
 
   const invokeInitMyGame = async () => {
     if (!ENABLE_STARKNET) {
@@ -202,7 +297,10 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     */
     // TODO: Check if the game is already initialized
     console.log("Invoking init_my_game on contract at address:", POW_CONTRACT_ADDRESS);
-    const { abi: contractAbi } = await provider!.getClassAt(POW_CONTRACT_ADDRESS);
+    const { abi: contractAbi } = await provider!.getClassAt(POW_CONTRACT_ADDRESS).catch((error) => {
+      console.error('Error getting contract ABI:', error, provider);
+      throw error;
+    });
     if (contractAbi === undefined) {
       throw new Error(`Contract at address ${POW_CONTRACT_ADDRESS} does not have an ABI.`);
     }
@@ -211,17 +309,6 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     contract.connect(newAccount!);
 
     const myCall = contract.populate("init_my_game", []);
-    /*
-    const rest = newAccount.execute([
-      {
-        contractAddress: POW_CONTRACT_ADDRESS,
-        entrypoint: "init_my_game",
-        calldata: []
-      },
-    ], {
-      maxFee: 100_000_000_000_000,
-    });
-    */
     const res = await contract.init_my_game(myCall.calldata).catch((error) => {
       console.error('Error invoking init_my_game:', error);
       throw error;
@@ -230,6 +317,31 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     await provider!.waitForTransaction(res.transaction_hash);
     console.log(`✅ initMyGame executed successfully. ${res.transaction_hash}`);
   }
+
+  const createInitMyGameCall = (): Call => {
+    return {
+      contractAddress: POW_CONTRACT_ADDRESS,
+      entrypoint: "init_my_game",
+      calldata: []
+    };
+  }
+
+  const invokeInitMyGamePaymaster = useCallback(async () => {
+    if (!ENABLE_STARKNET) {
+      return;
+    }
+    const call = createInitMyGameCall();
+    const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
+    setAccount(newAccount);
+    const deploymentData = {
+      classHash: argentAccountClassHash,
+      calldata: getDeployCalldataHex(myPrivateKey),
+      salt: ec.starkCurve.getStarkKey(myPrivateKey),
+      unique: "0x0"
+    };
+    console.log("Invoking init_my_game with paymaster on contract at address:", POW_CONTRACT_ADDRESS);
+    await invokeWithPaymaster(newAccount, [call], deploymentData);
+  }, [provider, myPrivateKey, argentAccountClassHash]);
 
   const value = {
     chain,
@@ -241,8 +353,10 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     disconnectAccount,
     invokeContract,
     invokeContractCalls,
+    invokeWithPaymaster,
     addToMultiCall,
     invokeInitMyGame,
+    invokeInitMyGamePaymaster,
   };
   return (
     <StarknetConnector.Provider value={value}>
