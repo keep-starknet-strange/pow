@@ -172,6 +172,12 @@
     "name": "Mine a block 1st try",
     "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
     "updateOn": "MineClicked"
+  },
+  {
+    "id": 29,
+    "name": "STRK Reward Unlocked",
+    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "updateOn": "BalanceUpdated"
   }
 ]
 

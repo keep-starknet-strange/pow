@@ -1,8 +1,18 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
-import { Call, Account, ec, RpcProvider, hash, CallData } from 'starknet';
+import { toBeHex } from "ethers";
+import { Call, Account, constants, Contract, ec, TypedData, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import {
+  BASE_URL,
+  executeCalls,
+  fetchBuildTypedData,
+  fetchExecuteTransaction,
+  formatCall,
+  GaslessOptions,
+  SEPOLIA_BASE_URL,
+} from "@avnu/gasless-sdk";
 
 export const LOCALHOST_RPC_URL = process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || 'http://localhost:5050/rpc';
-export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://rpc.starknet-testnet.lava.build:443' // https://starknet-sepolia.public.blastapi.io/rpc/v0_8'
+export const SEPOLIA_RPC_URL = process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL || 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
 export const MAINNET_RPC_URL = process.env.EXPO_PUBLIC_MAINNET_RPC_URL || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
 
 type StarknetConnectorContextType = {
@@ -16,6 +26,7 @@ type StarknetConnectorContextType = {
   disconnectAccount: () => Promise<void>;
   invokeContract: (contractAddress: string, functionName: string, args: any[]) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
+  invokeWithPaymaster: (account: Account, calls: Call[], deploymentData?: any) => Promise<void>;
 };
 
 const StarknetConnector = createContext<StarknetConnectorContextType | undefined>(undefined);
@@ -31,9 +42,9 @@ export const useStarknetConnector = () => {
 export const getStarknetProvider = (chain: string): RpcProvider => {
   switch (chain) {
     case "SN_MAINNET":
-      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL, specVersion: "0.7" });
+      return new RpcProvider({ nodeUrl: MAINNET_RPC_URL, specVersion: "0.7", chainId: constants.StarknetChainId.SN_MAIN });
     case "SN_SEPOLIA":
-      return new RpcProvider({ nodeUrl: SEPOLIA_RPC_URL });
+      return new RpcProvider({ nodeUrl: SEPOLIA_RPC_URL, specVersion: "0.7", chainId: constants.StarknetChainId.SN_SEPOLIA });
     case "SN_DEVNET":
       return new RpcProvider({ nodeUrl: LOCALHOST_RPC_URL, specVersion: "0.8" });
     default:
@@ -44,7 +55,7 @@ export const getStarknetProvider = (chain: string): RpcProvider => {
 export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
-  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_DEVNET");
+  const [chain, setChain] = useState<string>(process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_SEPOLIA");
 
   const STARKNET_ENABLED = process.env.EXPO_PUBLIC_ENABLE_STARKNET === "true" || process.env.EXPO_PUBLIC_ENABLE_STARKNET === "1";
 
@@ -53,12 +64,25 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     setProvider(providerInstance);
   }, [chain]);
 
-  const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4da9";
-  // const ozAccountClassHash = "0x061dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f";
-  const ozAccountClassHash = "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
+  const myPrivateKey = "0x0000000000000000000000000000000071d7bb07b9a64f6f78ac4c816aff4dfd";
+  const argentAccountClassHash = "0x01a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003";
   const getDeployCalldata = (privateKey: string) => {
     const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
-    const constructorCalldata = CallData.compile({ public_key: starkKeyPub });
+    const constructorCalldata = CallData.compile({ owner: starkKeyPub, guardian: "0x0" });
+    return constructorCalldata;
+  }
+
+  const stringIntToHex = (value: string | number): string => {
+    if (typeof value === 'number') {
+      value = value.toString();
+    }
+    const hexValue = BigInt(value).toString(16);
+    return `0x${hexValue.padStart(64, '0')}`;
+  }
+
+  const getDeployCalldataHex = (privateKey: string) => {
+    const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
+    const constructorCalldata = [starkKeyPub, "0x0"];
     return constructorCalldata;
   }
 
@@ -67,7 +91,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     const constructorCalldata = getDeployCalldata(privateKey);
     const contractAddress = hash.calculateContractAddressFromHash(
       starkKeyPub,
-      ozAccountClassHash,
+      argentAccountClassHash,
       constructorCalldata,
       0,
     );
@@ -78,8 +102,8 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     return generateAddress(myPrivateKey);
   }
 
-  const deployAccount = async () => {
-    if (!STARKNET_ENABLED) {
+  const deployAccount = useCallback(async () => {
+    if (!ENABLE_STARKNET) {
       return;
     }
     if (!provider) {
@@ -100,7 +124,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     const accountInstance = new Account(provider!, contractAddress, myPrivateKey);
     console.log('Deploying OpenZeppelin account...', provider, contractAddress, myPrivateKey);
     const { transaction_hash, contract_address } = await accountInstance.deployAccount({
-      classHash: ozAccountClassHash,
+      classHash: argentAccountClassHash,
       constructorCalldata: constructorCalldata,
       addressSalt: starkKeyPub,
       contractAddress: contractAddress,
@@ -119,7 +143,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     await provider!.waitForTransaction(transaction_hash);
     console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
     connectAccount();
-  }
+  }, [provider, myPrivateKey]);
 
   const connectAccount = async () => {
     const newAccount = new Account(provider!, generateAddress(myPrivateKey), myPrivateKey);
@@ -182,6 +206,72 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     console.log(`✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`);
   }, [provider, myPrivateKey]);
 
+  const invokeWithPaymaster = useCallback(async (account: Account, calls: Call[], deploymentData?: any) => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
+
+    const apiKey = process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY || "";
+    if (apiKey === "") {
+      // TODO: buildGaslessTxData(address, calls, network, deploymentData?)
+      // TODO: sendGaslessTx(address, txData, signature, network, deploymentData?)
+
+      // Run using backend paymaster provider
+      const formattedCalls = formatCall(calls);
+      const focEngineUrl = 'http://localhost:8080';
+      const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
+      const gaslessTxInput = {
+        account: account.address,
+        calls: formattedCalls,
+        network: chain,
+        deploymentData: deploymentData || undefined,
+      };
+      const gaslessTxRes: { data: TypedData } = await fetch(buildGaslessTxDataUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gaslessTxInput),
+      }).then((response) => response.json()).catch((error) => {
+        console.error('Error fetching gasless transaction data:', error);
+        throw error;
+      });
+      let signature = await account.signMessage(gaslessTxRes.data);
+      if (Array.isArray(signature)) {
+        signature = signature.map((sig) => toBeHex(BigInt(sig)));
+      } else if (signature.r && signature.s) {
+        signature = [toBeHex(BigInt(signature.r)), toBeHex(BigInt(signature.s))];
+      }
+      const sendGaslessTxUrl = `${focEngineUrl}/paymaster/send-gasless-tx`;
+      const sendGaslessTxInput = {
+        account: account.address,
+        txData: JSON.stringify(gaslessTxRes.data),
+        signature: signature,
+        network: chain,
+        deploymentData: deploymentData || undefined,
+      };
+      const sendGaslessTxRes = await fetch(sendGaslessTxUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sendGaslessTxInput),
+      }).then((response) => response.json()).catch((error) => {
+        console.error('Error sending gasless transaction:', error);
+        throw error;
+      });
+      console.log('Gasless transaction sent:', sendGaslessTxRes);
+    } else {
+      // Use gasless-sdk to execute calls with paymaster
+      const options: GaslessOptions = { baseUrl: chain === "SN_SEPOLIA" ? SEPOLIA_BASE_URL : BASE_URL, apiKey };
+      const res = await executeCalls(account, calls, { deploymentData }, options).catch((error) => {
+        console.error('Error executing calls with paymaster:', error);
+        throw error;
+      });
+      console.log('Response from executeCalls with paymaster:', res);
+    }
+  }, [provider, chain]);
+
   const value = {
     chain,
     account,
@@ -192,6 +282,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     disconnectAccount,
     invokeContract,
     invokeContractCalls,
+    invokeWithPaymaster,
   };
   return (
     <StarknetConnector.Provider value={value}>

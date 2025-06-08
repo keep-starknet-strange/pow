@@ -111,6 +111,7 @@ export class AchievementObserver implements Observer {
       "Reach ₿10K": 10_000,
       "Reach ₿1M": 1_000_000,
       "Reach ₿100M": 100_000_000,
+      "STRK Reward Unlocked": 1_000_000_000,
     };
     const target = balanceTargets[achievement.name];
     if (target) {
