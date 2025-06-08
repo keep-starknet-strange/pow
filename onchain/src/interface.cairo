@@ -1,4 +1,6 @@
 use starknet::ContractAddress;
+use pow_game::pow::PowGame::RewardParams;
+
 
 // Game configuration & state
 #[starknet::interface]
@@ -12,6 +14,17 @@ pub trait IPowGame<TContractState> {
 
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
 }
+
+// Game Rewards management
+#[starknet::interface]
+pub trait IPowGameRewards<TContractState> {
+    fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
+    fn claim_reward(ref self: TContractState, recipient: ContractAddress);
+    fn get_reward_params(self: @TContractState) -> RewardParams;
+    fn game_master_give_reward(ref self: TContractState, game_address: ContractAddress, recipient: ContractAddress);
+    fn remove_funds(ref self: TContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256);
+}   
+
 
 // Game asserts / check helper functions
 #[starknet::interface]
