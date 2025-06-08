@@ -1,7 +1,7 @@
 #[starknet::contract]
-mod PowGame {
+pub mod PowGame {
     use pow_game::actions::*;
-    use pow_game::interface::{IPowGame, IPowGameValidation};
+    use pow_game::interface::{IPowGame, IPowGameValidation, IPowGameRewards};
     use pow_game::store::*;
     use pow_game::transactions::{DA_TX_TYPE_ID, PROOF_TX_TYPE_ID};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
@@ -35,10 +35,10 @@ mod PowGame {
     struct Storage {
         game_masters: Map<ContractAddress, bool>,
         reward_token: ContractAddress,
-        reward_prestige_threshold: u128,
+        reward_prestige_threshold: u32,
         reward_amount: u256,
         genesis_block_reward: u128,
-        max_chain_id: u128,
+        max_chain_id: u32,
         // Maps: user address -> user max chain unlocked
         user_max_chains: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
@@ -55,11 +55,11 @@ mod PowGame {
         builder: BuilderComponent::Storage,
     }
 
-    #[derive(Drop)]
-    struct RewardParams {
+    #[derive(Drop, Serde)]
+    pub struct RewardParams {
         reward_token: ContractAddress,
         reward_amount: u256,
-        reward_prestige_threshold: u128,
+        reward_prestige_threshold: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -153,18 +153,18 @@ mod PowGame {
 
     #[abi(embed_v0)]
     impl PowGameRewardsImpl of IPowGameRewards<ContractState> {
-        fn set_reward_params(ref self: ContractState, params: RewardParams) {
+        fn set_reward_params(ref self: ContractState, reward_params: RewardParams) {
             self.check_valid_game_master(get_caller_address());
-            self.reward_token.write(params.reward_token);
-            self.reward_threshold.write(params.reward_threshold);
-            self.reward_amount.write(params.reward_amount);
+            self.reward_token.write(reward_params.reward_token);
+            self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
+            self.reward_amount.write(reward_params.reward_amount);
         }
 
         fn claim_reward(ref self: ContractState, recipient: ContractAddress) {
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
-            let prestige = self.get_user_prestige.read(caller);
+            let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
             assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");
             
@@ -173,7 +173,7 @@ mod PowGame {
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
                 .transfer(recipient, self.reward_amount.read());
 
-            assert!(success "Reward transfer failed");
+            assert!(success, "Reward transfer failed");
             self.emit(RewardClaimed {
                 user: caller,
                 recipient
@@ -184,7 +184,7 @@ mod PowGame {
              self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
             assert!(!claimed, "Reward already claimed");
-
+            
             self.reward_claimed.write(game_address, true);
 
             let success: bool = IERC20Dispatcher { contract_address: self.reward_token.read() }
@@ -192,7 +192,7 @@ mod PowGame {
 
             assert!(success, "Reward transfer failed");
             self.emit(RewardClaimed {
-                user: game,
+                user: game_address,
                 recipient
             });
         }
