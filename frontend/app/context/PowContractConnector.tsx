@@ -16,7 +16,7 @@ type PowContractContextType = {
   addAction: (action: PowAction) => void;
 }
 
-export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50;
+export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 10;
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(undefined);
 
@@ -29,13 +29,16 @@ export const usePowContractConnector = () => {
 };
 
 export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { invokeContractCalls, invokeContract } = useStarknetConnector();
-  const { getRegisteredContract } = useFocEngine();
+  const { deployAccount, generateAccountAddress, invokeContractCalls, invokeWithPaymaster, generatePrivateKey, STARKNET_ENABLED, network } = useStarknetConnector();
+  const { getRegisteredContract, mintFunds } = useFocEngine();
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<string | null>(null);
   const [actionCalls, setActionCalls] = useState<Call[]>([]);
 
   useEffect(() => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
     async function fetchPowGameContractAddress() {
       const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
       if (contract) {
@@ -48,15 +51,39 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [getRegisteredContract]);
 
   const initMyGame = useCallback(async () => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
     if (!powGameContractAddress) {
       console.error("powGameContractAddress is not set");
       return;
     }
+
+    const privateKey = generatePrivateKey();
     console.log("Initializing my game...");
-    invokeContract(powGameContractAddress, "init_my_game", [])
-  }, [powGameContractAddress, invokeContract]);
+    if (network === "SN_DEVNET") {
+      const accountAddress = generateAccountAddress(privateKey, "devnet");
+      await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
+      deployAccount(privateKey, "devnet");
+      addAction({
+        contract: powGameContractAddress,
+        action: "init_my_game",
+        args: [],
+      });
+    } else {
+      const initMyGameCall: Call = {
+        contractAddress: powGameContractAddress,
+        entrypoint: "init_my_game",
+        calldata: [],
+      };
+      invokeWithPaymaster([initMyGameCall], privateKey);
+    }
+  }, [powGameContractAddress, invokeWithPaymaster, network, deployAccount, generateAccountAddress, generatePrivateKey, invokeContractCalls, mintFunds, STARKNET_ENABLED]);
 
   const addAction = useCallback((action: PowAction) => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
     if (!action.contract && !powGameContractAddress) {
       console.error("powGameContractAddress is not set");
       return;
@@ -75,9 +102,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const remainingActions = actionCalls.slice(MAX_ACTIONS);
       console.log("Invoking contract calls:", invokeActions.length);
       setActionCalls(remainingActions);
-      invokeContractCalls(invokeActions)
+      if (network === "SN_DEVNET") {
+        invokeContractCalls(invokeActions);
+      } else {
+        invokeWithPaymaster(invokeActions)
+      }
     }
-  }, [actionCalls, invokeContractCalls]);
+  }, [actionCalls, invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED]);
 
   return (
     <PowContractConnector.Provider value={{ powGameContractAddress, initMyGame, addAction }}>

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
-import { Account } from "starknet";
+import { useStarknetConnector } from "./StarknetConnector";
 
 export const FOC_ENGINE_API = process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
 
@@ -17,8 +17,9 @@ type FocEngineContextType = {
   user: FocAccount | null;
 
   getAccount: (accountAddress: string) => Promise<FocAccount | null>;
-  connectAccount: (accountAddress: string) => Promise<void>;
-  claimUsername: (account: Account | null, username: string) => Promise<any>;
+  refreshAccount: () => Promise<void>;
+  claimUsername: (username: string) => Promise<any>;
+  mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
 
   getRegisteredContract: (contractName: string, contractVersion?: string) => Promise<string | null>;
   getLatestEventWith: (contractAddress: string, eventType: string, filters?: Record<string, any>) => Promise<any>;
@@ -46,6 +47,8 @@ export const useFocEngine = () => {
 }
 
 export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { account, network, invokeContractCalls, invokeWithPaymaster, STARKNET_ENABLED } = useStarknetConnector();
+
   const [registryContractAddress, setRegistryContractAddress] = useState<string | null>(null);
   const [accountsContractAddress, setAccountsContractAddress] = useState<string | null>(null);
   const [user, setUser] = useState<FocAccount | null>(null);
@@ -79,18 +82,38 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   useEffect(() => {
+    if (!STARKNET_ENABLED) {
+      console.warn("Starknet is not enabled, skipping contract address fetch");
+      return;
+    }
+
     fetchRegistryContractAddress();
     fetchAccountsContractAddress();
-  }, [fetchRegistryContractAddress, fetchAccountsContractAddress]);
+  }, [fetchRegistryContractAddress, fetchAccountsContractAddress, STARKNET_ENABLED]);
 
-  const connectAccount = useCallback(async (accountAddress: string) => {
-    const accountData = await getAccount(accountAddress);
+  const refreshAccount = useCallback(async () => {
+    if (!account) {
+      console.error("No user account connected");
+      return;
+    }
+    const accountData = await getAccount(account.address);
     if (accountData) {
       setUser(accountData);
     } else {
-      console.error("Failed to fetch account data");
+      // If no account data is found, set a default user object
+      setUser({
+        account_address: account.address,
+        contract_address: accountsContractAddress || "",
+        account: { username: "" },
+      });
     }
-  }, []);
+  }, [account]);
+
+  useEffect(() => {
+    if (account) {
+      refreshAccount();
+    }
+  }, [account]);
 
   const getAccount = useCallback(async (accountAddress: string) => {
     try {
@@ -102,14 +125,17 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       // Example response: {"data": {"account":{"username":"magic"},"account_address":"0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691","contract_address":"0x23386fe159ca18338f619b0a753e124db2cebd45f23cc992ce693cde465d617"}}
       return data.data;
     } catch (error) {
-      console.error("Error fetching account data:", error);
       return null;
     }
   }, []);
 
-  const claimUsername = useCallback(async (account: Account | null, username: string) => {
-    if (!account) {
-      console.error("Account is not connected");
+  const claimUsername = useCallback(async (username: string) => {
+    if (!STARKNET_ENABLED) {
+      setUser({
+        account_address: account?.address || "",
+        contract_address: accountsContractAddress || "",
+        account: { username },
+      });
       return;
     }
 
@@ -124,23 +150,50 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error("Username invalid");
       return;
     }
-    console.log(`Claiming username ${username} for account ${account.address} on ${accountsContractAddress}`);
-    const res = await account.execute({
+    console.log(`Claiming username: ${username}`);
+    const call = {
       contractAddress: accountsContractAddress,
       entrypoint: "claim_username",
       calldata: [usernameHex],
-    }, { maxFee: 100_000_000_000_000, }).catch((err) => {
-      console.error("Error claiming username:", err);
-      return null;
+    };
+    if (network === "SN_DEVNET") {
+      await invokeContractCalls([call]);
+    } else {
+      await invokeWithPaymaster([call]);
+    }
+    await refreshAccount(); // TODO: delays can cause issues, consider using a more robust solution
+  }, [accountsContractAddress, invokeWithPaymaster, STARKNET_ENABLED, account, network, invokeContractCalls]);
+
+  const mintFunds = async (address: string, amount: bigint, unit?: string) => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
+
+    const res = await fetch(`${FOC_ENGINE_API}/accounts/mint-funds`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: address,
+        amount: amount.toString(),
+        unit: unit || "FRI"
+      }),
     });
-    console.log(`Claim username Tx hash: ${res?.transaction_hash}`);
-    await account.waitForTransaction(res!.transaction_hash);
-    console.log(`✅ Claim tx ${res!.transaction_hash} confirmed`);
-    await connectAccount(account.address);
-    return res;
-  }, [accountsContractAddress]);
+    if (!res.ok) {
+      const errorText = await res.json();
+      console.error("Failed to mint funds:", errorText);
+      return;
+    }
+    const data = await res.json();
+    console.log("Minted funds:", address, amount, unit, data);
+    return data;
+  };
 
   const getRegisteredContract = useCallback(async (contractName: string, contractVersion: string = "latest") => {
+    if (!STARKNET_ENABLED) {
+      return null;
+    }
     try {
       const contractNameHex = toShortHexString(contractName);
       if (!contractNameHex) {
@@ -166,6 +219,9 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const getLatestEventWith = useCallback(async (contractAddress: string, eventType: string, filters: Record<string, any> = {}) => {
+    if (!STARKNET_ENABLED) {
+      return null;
+    }
     try {
       const response = await fetch(`${FOC_ENGINE_API}/events/get-latest-with?contractAddress=${contractAddress}&eventType=${eventType}`, {
         method: "POST",
@@ -186,6 +242,9 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const getUniqueEventsWith = useCallback(async (contractAddress: string, eventType: string, uniqueKey: string, filters: Record<string, any> = {}) => {
+    if (!STARKNET_ENABLED) {
+      return null;
+    }
     try {
       const response = await fetch(`${FOC_ENGINE_API}/events/get-unique-with?contractAddress=${contractAddress}&eventType=${eventType}&uniqueKey=${uniqueKey}`, {
         method: "POST",
@@ -208,7 +267,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <FocEngineConnector.Provider value={{
       user, registryContractAddress, accountsContractAddress,
-      getAccount, claimUsername, connectAccount,
+      refreshAccount, getAccount, claimUsername, mintFunds,
       getRegisteredContract, getLatestEventWith, getUniqueEventsWith
     }}>
       {children}

@@ -18,7 +18,6 @@ import { LoginPage } from "./pages/LoginPage";
 
 import { useEventManager, EventType } from "./context/EventManager";
 import { useSound } from "./context/Sound";
-import { useStarknetConnector } from "./context/StarknetConnector";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
@@ -36,17 +35,7 @@ export default function game() {
   const { stakingUnlocked } = useStaking();
   const { isTutorialActive } = useTutorial();
 
-  const { account } = useStarknetConnector();
-  const { user, connectAccount } = useFocEngine();
-  useEffect(() => {
-    if (account) {
-      try {
-        connectAccount(account.address);
-      } catch (error) {
-        console.log("Error connecting account:", error);
-      }
-    }
-  }, [account]);
+  const { user } = useFocEngine();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<null | number>(null);
@@ -129,7 +118,7 @@ export default function game() {
 
   return (
     <View className="flex-1 bg-[#010a12ff] relative">
-        {user ? (
+        {user && user.account.username !== "" ? (
           <View className="flex-1">
             { isTutorialActive && <TutorialOverlay/> }
             <Header />

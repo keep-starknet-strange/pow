@@ -8,7 +8,6 @@
         "$ACCOUNT"
       ],
       "init_commands": [
-        "setup-accounts.sh",
         "setup-contracts.sh"
       ]
     }

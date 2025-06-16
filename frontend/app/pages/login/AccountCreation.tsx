@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, View, ScrollView, Text, TouchableOpacity, ImageBackground, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, } from 'react-native';
 import { useStarknetConnector } from '../../context/StarknetConnector';
 import { useFocEngine } from '../../context/FocEngineConnector';
-import { usePowContractConnector } from '../../context/PowContractConnector';
 import { PFPView } from '../../components/PFPView';
 import BasicButton from '../../components/buttons/Basic';
 import { getNounsHeadsList, getNounsBodiesList,
@@ -17,9 +16,8 @@ type AccountCreationProps = {
 
 export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPage }) => {
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
-  const { account, connectAccount } = useStarknetConnector();
+  const { account } = useStarknetConnector();
   const { claimUsername } = useFocEngine();
-  const { initMyGame } = usePowContractConnector();
 
   const [username, setUsername] = React.useState<string>('');
   const [avatar, setAvatar] = React.useState<NounsAttributes>(getRandomNounsAttributes());
@@ -88,9 +86,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
               <BasicButton
                 label="Save"
                 onPress={async () => {
-                  await claimUsername(account, username);
-                  await connectAccount();
-                  await initMyGame();
+                  await claimUsername(username);
                 }}
                 style={{ width: 250 }}
               />
