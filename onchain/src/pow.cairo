@@ -13,7 +13,7 @@ mod PowGame {
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_caller_address, ClassHash};
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
     impl PowUpgradesComponentImpl =
@@ -31,6 +31,17 @@ mod PowGame {
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
+
+    use openzeppelin_upgrades::interface::IUpgradeable;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+
+    use openzeppelin_security::PausableComponent;
+    component!(path: PausableComponent, storage: pausable, event: PausableEvent);
+    #[abi(embed_v0)]
+    impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
+    impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
@@ -54,6 +65,10 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
+        #[substorage(v0)]
+        pausable: PausableComponent::Storage,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -97,6 +112,10 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
+         #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event,
+         #[flat]
+        PausableEvent: PausableComponent::Event,
     }
 
     #[constructor]
@@ -107,6 +126,14 @@ mod PowGame {
         self.reward_token_address.write(reward_params.reward_token_address);
         self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
         self.reward_amount.write(reward_params.reward_amount);
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.check_valid_game_master(get_caller_address());
+            self.upgradeable.upgrade(new_class_hash);
+        }
     }
 
     #[abi(embed_v0)]
@@ -155,6 +182,7 @@ mod PowGame {
         }
 
         fn claim_reward(ref self: ContractState, recipient: ContractAddress) {
+            self.pausable.assert_not_paused();
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
@@ -206,6 +234,16 @@ mod PowGame {
                 .transfer(recipient, value);
 
             assert!(success, "remove_funds failed");
+        }
+
+        fn pause_rewards(ref self: ContractState) {
+            self.check_valid_game_master(get_caller_address());
+            self.pausable.pause();
+        }
+
+        fn unpause_rewards(ref self: ContractState) {
+            self.check_valid_game_master(get_caller_address());
+            self.pausable.unpause();
         }
     }
 
