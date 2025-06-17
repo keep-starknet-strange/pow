@@ -14,7 +14,7 @@ export type SettingsMainSectionProps = {
 
 const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab }) => {
   const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
-  const { disconnectAccount } = useStarknetConnector();
+  const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } = useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
 
   const toggleNotifs = () => setNotifs(!notifs);
@@ -25,6 +25,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab
     { label: "Help", tab: "Help", icon: "❓" },
     { label: "Review", icon: "📝" },
     { label: "Claim Reward", tab: "ClaimReward", icon: "🎁" },
+    { label: "Reset Account", onPress: disconnectAndDeleteAccount, icon: "🔄" },
+    { label: "Reset All", onPress: () => clearPrivateKeys("pow_game"), icon: "🗑️" },
     { label: "Logout", onPress: disconnectAccount, icon: "🚪" },
   ];
 

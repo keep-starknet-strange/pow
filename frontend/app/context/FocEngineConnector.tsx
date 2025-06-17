@@ -94,8 +94,10 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const refreshAccount = useCallback(async () => {
     if (!account) {
       console.error("No user account connected");
+      setUser(null);
       return;
     }
+    console.log(`Refreshing account data for address: ${account.address}`);
     const accountData = await getAccount(account.address);
     if (accountData) {
       setUser(accountData);

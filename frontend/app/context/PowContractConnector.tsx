@@ -29,7 +29,7 @@ export const usePowContractConnector = () => {
 };
 
 export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { deployAccount, generateAccountAddress, invokeContractCalls, invokeWithPaymaster, generatePrivateKey, STARKNET_ENABLED, network } = useStarknetConnector();
+  const { deployAccount, generateAccountAddress, invokeContractCalls, invokeWithPaymaster, generatePrivateKey, STARKNET_ENABLED, network, storePrivateKey } = useStarknetConnector();
   const { getRegisteredContract, mintFunds } = useFocEngine();
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<string | null>(null);
@@ -65,6 +65,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const accountAddress = generateAccountAddress(privateKey, "devnet");
       await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
       deployAccount(privateKey, "devnet");
+      storePrivateKey(privateKey, "pow_game", "devnet");
       addAction({
         contract: powGameContractAddress,
         action: "init_my_game",
@@ -77,6 +78,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({ c
         calldata: [],
       };
       invokeWithPaymaster([initMyGameCall], privateKey);
+      storePrivateKey(privateKey, "pow_game");
     }
   }, [powGameContractAddress, invokeWithPaymaster, network, deployAccount, generateAccountAddress, generatePrivateKey, invokeContractCalls, mintFunds, STARKNET_ENABLED]);
 

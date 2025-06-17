@@ -1,4 +1,6 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 import { toBeHex } from "ethers";
 import { Call, Account, constants, ec, TypedData, RpcProvider, hash, CallData } from 'starknet';
 import {
@@ -19,12 +21,20 @@ type StarknetConnectorContextType = {
   account: Account | null;
   provider: RpcProvider | null;
 
+  storePrivateKey: (privateKey: string, appName: string, accountClassName?: string) => Promise<void>;
+  getAvailableKeys: (appName: string) => Promise<string[]>;
+  getPrivateKey: (key: string) => Promise<string | null>;
   generatePrivateKey: () => string;
+  clearPrivateKey: (key: string) => Promise<void>;
+  clearPrivateKeys: (appName: string) => Promise<void>;
+
   generateAccountAddress: (privateKey: string, accountClassName?: string) => string;
   getDeploymentData: (privateKey: string, accountClassName?: string) => any;
   deployAccount: (privateKey: string, accountClassName?: string) => Promise<void>;
+  connectStorageAccount: (key: string) => Promise<void>;
   connectAccount: (privateKey: string) => Promise<void>;
   disconnectAccount: () => void;
+  disconnectAndDeleteAccount: () => Promise<void>;
 
   invokeContract: (contractAddress: string, functionName: string, args: any[]) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
@@ -85,6 +95,84 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     const randomBytes = new Uint8Array(length / 2);
     window.crypto.getRandomValues(randomBytes);
     return Array.from(randomBytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  const storePrivateKey = async (privateKey: string, appName: string, accountClassName?: string): Promise<void> => {
+    const accountAddress = generateAccountAddress(privateKey, accountClassName);
+    const key = `${network}.${appName}.${accountClassName || "argentX"}.${accountAddress}`;
+    await SecureStore.setItemAsync(key, privateKey).catch((error) => {
+      console.error('Error storing private key:', error);
+      throw error;
+    });
+    // Store the key in a list of available keys ( using async unsecure storage )
+    const availableKeys = await getAvailableKeys(appName);
+    if (!availableKeys.includes(key)) {
+      const keyStorageName = `starknet.${network}.${appName}.keys`;
+      await AsyncStorage.setItem(keyStorageName, JSON.stringify([...availableKeys, key])).catch((error) => {
+        console.error('Error storing available keys:', error);
+        throw error;
+      });
+    }
+    console.log(`✅ Private key for ${key} stored successfully.`);
+    console.log(`Available keys: ${JSON.stringify(await getAvailableKeys(appName))}`);
+  };
+
+  const clearPrivateKey = async (key: string): Promise<void> => {
+    try {
+      await SecureStore.deleteItemAsync(key);
+      console.log(`✅ Private key for ${key} cleared successfully.`);
+      // Remove the key from the list of available keys
+      const appName = key.split('.')[1];
+      const availableKeys = await getAvailableKeys(appName);
+      const updatedKeys = availableKeys.filter(k => k !== key);
+      const keyStorageName = `starknet.${network}.${appName}.keys`;
+      await AsyncStorage.setItem(keyStorageName, JSON.stringify(updatedKeys));
+    } catch (error) {
+      console.error('Error clearing private key:', error);
+    }
+  }
+
+  const clearPrivateKeys = async (appName: string): Promise<void> => {
+    try {
+      const keyStorageName = `starknet.${network}.${appName}.keys`;
+      const keys = await AsyncStorage.getItem(keyStorageName);
+      if (keys) {
+        const parsedKeys: string[] = JSON.parse(keys);
+        await Promise.all(parsedKeys.map(key => SecureStore.deleteItemAsync(key)));
+        await AsyncStorage.removeItem(keyStorageName);
+        console.log(`✅ All private keys for ${appName} cleared successfully.`);
+      } else {
+        console.warn(`No keys found for app: ${appName}`);
+      }
+    } catch (error) {
+      console.error('Error clearing private keys:', error);
+    }
+  }
+
+  const getAvailableKeys = async (appName: string): Promise<string[]> => {
+    try {
+      const keyStorageName = `starknet.${network}.${appName}.keys`;
+      const keys = await AsyncStorage.getItem(keyStorageName);
+      return keys ? JSON.parse(keys) : [];
+    } catch (error) {
+      console.error('Error retrieving available keys:', error);
+      return [];
+    }
+  };
+
+  const getPrivateKey = async (key: string): Promise<string | null> => {
+    try {
+      const privateKey = await SecureStore.getItemAsync(key);
+      if (privateKey) {
+        return privateKey;
+      } else {
+        console.warn(`Private key for ${key} not found.`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error retrieving private key:', error);
+      return null;
+    }
   }
 
   const generatePrivateKey = () => {
@@ -171,11 +259,46 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     console.log('✅ Connected to account:', newAccount.address);
   }, [provider]);
 
+  // Key is in format: network.appName.accountClassName.accountAddress
+  const connectStorageAccount = useCallback(async (key: string) => {
+    // TODO: Check if the account is deployed
+    if (!STARKNET_ENABLED) {
+      return;
+    }
+    if (!provider) {
+      console.error('Provider is not initialized.');
+      return;
+    }
+    console.log('Connecting to account from storage:', key);
+    const privateKey = await getPrivateKey(key);
+    if (!privateKey) {
+      console.error(`Private key for ${key} not found.`);
+      return;
+    }
+    const accountClassName = key.split('.').slice(2, 3)[0];
+    const accountAddress = generateAccountAddress(privateKey, accountClassName);
+    const newAccount = new Account(provider!, accountAddress, privateKey);
+    setAccount(newAccount);
+    console.log('✅ Connected to account from storage:', newAccount.address);
+  }, [provider]);
+
   const disconnectAccount = () => {
     if (account) {
       setAccount(null);
     }
   }
+
+  const disconnectAndDeleteAccount = useCallback(async () => {
+    if (!account) {
+      return;
+    }
+    const accountAddress = account.address;
+    const appName = accountAddress.split('.')[1];
+    const accountClassName = accountAddress.split('.')[2];
+    const key = `${network}.${appName}.${accountClassName}.${accountAddress}`;
+    await clearPrivateKey(key);
+    disconnectAccount();
+  }, [account, network, clearPrivateKey, disconnectAccount]);
 
   const deployAccount = useCallback(async (privateKey: string, accountClassName?: string) => {
     if (!STARKNET_ENABLED) {
@@ -359,12 +482,19 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
     network,
     account,
     provider,
+    storePrivateKey,
+    clearPrivateKey,
+    clearPrivateKeys,
+    getAvailableKeys,
+    getPrivateKey,
     generatePrivateKey,
     generateAccountAddress,
     getDeploymentData,
     deployAccount,
+    connectStorageAccount,
     connectAccount,
     disconnectAccount,
+    disconnectAndDeleteAccount,
     invokeContract,
     invokeContractCalls,
     invokeWithPaymaster,
