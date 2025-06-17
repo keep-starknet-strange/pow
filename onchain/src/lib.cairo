@@ -2,6 +2,7 @@ pub mod actions;
 pub mod interface;
 pub mod pow;
 pub mod store;
+pub mod types;
 
 pub mod upgrades {
     pub mod component;
