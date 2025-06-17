@@ -1,7 +1,6 @@
 use starknet::ContractAddress;
 use pow_game::types::RewardParams;
 
-
 // Game configuration & state
 #[starknet::interface]
 pub trait IPowGame<TContractState> {
@@ -23,8 +22,7 @@ pub trait IPowGameRewards<TContractState> {
     fn get_reward_params(self: @TContractState) -> RewardParams;
     fn game_master_give_reward(ref self: TContractState, game_address: ContractAddress, recipient: ContractAddress);
     fn remove_funds(ref self: TContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256);
-}   
-
+}
 
 // Game asserts / check helper functions
 #[starknet::interface]
