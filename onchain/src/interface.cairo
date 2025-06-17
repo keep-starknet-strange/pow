@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use pow_game::pow::PowGame::RewardParams;
+use pow_game::types::RewardParams;
 
 
 // Game configuration & state
