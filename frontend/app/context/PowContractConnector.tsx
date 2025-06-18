@@ -23,7 +23,7 @@ type PowContractContextType = {
   getUserAutomationLevels: (chainId: number, automationCount: number) => Promise<number[] | undefined>;
 }
 
-export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 10;
+export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50;
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(undefined);
 
