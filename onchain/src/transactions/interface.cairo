@@ -43,6 +43,12 @@ pub trait IPowTransactions<TContractState> {
     fn get_user_transaction_speed_level(
         self: @TContractState, user: ContractAddress, chain_id: u32, tx_type_id: u32,
     ) -> u32;
+    fn get_user_transaction_fee_levels(
+        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32
+    ) -> Span<u32>;
+    fn get_user_transaction_speed_levels(
+        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32
+    ) -> Span<u32>;
     fn unlock_dapps(ref self: TContractState, chain_id: u32);
     fn level_transaction_fee(ref self: TContractState, chain_id: u32, tx_type_id: u32);
     fn level_transaction_speed(ref self: TContractState, chain_id: u32, tx_type_id: u32);

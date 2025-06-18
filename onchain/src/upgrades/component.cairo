@@ -138,6 +138,36 @@ pub mod PowUpgradesComponent {
             self.automation_levels.read((user, chain_id, automation_id))
         }
 
+        fn get_user_upgrade_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            upgrade_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != upgrade_count {
+                levels.append(self.upgrade_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
+        }
+
+        fn get_user_automation_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            automation_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != automation_count {
+                levels.append(self.automation_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
+        }
+
         fn level_upgrade(ref self: ComponentState<TContractState>, chain_id: u32, upgrade_id: u32) {
             let caller = get_caller_address();
             let current_level = self.upgrade_levels.read((caller, chain_id, upgrade_id));

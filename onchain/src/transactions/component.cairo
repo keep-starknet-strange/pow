@@ -134,6 +134,36 @@ pub mod PowTransactionsComponent {
             self.transaction_speed_levels.read((user, chain_id, tx_type_id))
         }
 
+        fn get_user_transaction_fee_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            tx_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != tx_count {
+                levels.append(self.transaction_fee_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
+        }
+
+        fn get_user_transaction_speed_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            tx_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != tx_count {
+                levels.append(self.transaction_speed_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
+        }
+
         fn level_transaction_fee(
             ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
         ) {

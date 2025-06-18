@@ -39,7 +39,7 @@ const UpgradesContext = createContext<UpgradesContextType | undefined>(undefined
 
 export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powGameContractAddress } = usePowContractConnector();
+  const { powGameContractAddress, getUserUpgradeLevels, getUserAutomationLevels } = usePowContractConnector();
 
   const [upgrades, setUpgrades] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
   const [automations, setAutomation] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
@@ -100,6 +100,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
+        /* TODO: Use Foc engine?
         const events = await getUniqueEventsWith(
           powGameContractAddress,
           "pow_game::upgrades::component::PowUpgradesComponent::UpgradeLevelUpdated",
@@ -124,6 +125,23 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
           return newUpgrades;
         });
+        */
+        const userUpgradesConfig = chainId == 0 ? upgradesJson.L1 : upgradesJson.L2;
+        const upgradesCount = userUpgradesConfig.length;
+        const userUpgradeLevels = await getUserUpgradeLevels(chainId, upgradesCount);
+        if (!userUpgradeLevels) {
+          continue;
+        }
+        setUpgrades((prevUpgrades) => {
+          const newUpgrades = { ...prevUpgrades };
+          if (!newUpgrades[chainId]) {
+            newUpgrades[chainId] = {};
+          }
+          userUpgradeLevels.forEach((level: number, upgradeId: number) => {
+            newUpgrades[chainId][upgradeId] = level; // Already zero-based index
+          });
+          return newUpgrades;
+        });
       }
     };
     const fetchAutomationLevels = async () => {
@@ -132,6 +150,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
+        /* TODO: Use Foc engine?
         const events = await getUniqueEventsWith(
           powGameContractAddress,
           "pow_game::upgrades::component::PowUpgradesComponent::AutomationLevelUpdated",
@@ -153,6 +172,23 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
           automationsFeeLevels.forEach(({ automationId, level }) => {
             newAutomations[chainId][automationId] = level - 1; // Convert to zero-based index
+          });
+          return newAutomations;
+        });
+        */
+        const userAutomationsConfig = chainId == 0 ? automationsJson.L1 : automationsJson.L2;
+        const automationsCount = userAutomationsConfig.length;
+        const userAutomationLevels = await getUserAutomationLevels(chainId, automationsCount);
+        if (!userAutomationLevels) {
+          continue;
+        }
+        setAutomation((prevAutomations) => {
+          const newAutomations = { ...prevAutomations };
+          if (!newAutomations[chainId]) {
+            newAutomations[chainId] = {};
+          }
+          userAutomationLevels.forEach((level: number, automationId: number) => {
+            newAutomations[chainId][automationId] = level; // Already zero-based index
           });
           return newAutomations;
         });
