@@ -405,7 +405,7 @@ export const StarknetConnectorProvider: React.FC<{ children: React.ReactNode }> 
       return;
     }
 
-    let deploymentData = privateKey ? getDeploymentData(privateKey) : undefined;
+    const deploymentData = privateKey ? getDeploymentData(privateKey) : undefined;
     if (!account && !deploymentData) {
       console.error('No account connected and no deployment data provided.');
       return;
