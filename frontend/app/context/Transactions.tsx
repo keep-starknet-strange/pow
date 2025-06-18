@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useEventManager } from "../context/EventManager";
+import { useFocEngine } from "./FocEngineConnector";
+import { usePowContractConnector } from "./PowContractConnector";
 import { useBalance } from "../context/Balance";
 import { useUpgrades } from "../context/Upgrades";
 import transactionJson from "../configs/transactions.json";
@@ -46,6 +48,8 @@ const TransactionsContext = createContext<TransactionsContextType | undefined>(u
 
 export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { tryBuy } = useBalance();
+  const { user, getUniqueEventsWith } = useFocEngine();
+  const { powGameContractAddress, getUserTxFeeLevels, getUserTxSpeedLevels } = usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
 
   const [transactionFees, setTransactionFees] = useState<{ [chainId: number]: { [txId: number]: number } }>({});
@@ -96,8 +100,197 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   useEffect(() => {
+    /*
+    const fetchTransactionLevels = async () => {
+      if (!user) return;
+      if (!powGameContractAddress) return;
+      // TODO: Hardcoded chain ids
+      const chainIds = [0, 1]; // L1 and L2
+      for (const chainId of chainIds) {
+        const events = await getUniqueEventsWith(
+          powGameContractAddress,
+          "pow_game::transactions::component::PowTransactionsComponent::TransactionFeeLevelUpdated",
+          "tx_type_id",
+          { chain_id: chainId, user: user.account_address }
+        );
+        if (!events) {
+          console.warn("No events found for chain", chainId);
+          continue;
+        }
+        const txJsonConfig = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+        const maxTxId = txJsonConfig.length - 1;
+        const transactionFeesLevels: { txId: number; level: number }[] = [];
+        const dappFeesLevels: { txId: number; level: number }[] = [];
+        events.forEach((event: any) => {
+          if (event.tx_type_id > maxTxId) {
+            // Dapp event
+            const dappId = event.tx_type_id - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+            const level = event.new_level;
+            dappFeesLevels.push({ txId: dappId, level });
+          } else {
+            // Transaction event
+            const txId = event.tx_type_id;
+            const level = event.new_level;
+            transactionFeesLevels.push({ txId, level });
+          }
+        });
+        // Set the transaction levels
+        setTransactionFees((prevFees) => {
+          const newFees = { ...prevFees };
+          if (!newFees[chainId]) {
+            newFees[chainId] = {};
+          }
+          transactionFeesLevels.forEach(({ txId, level }) => {
+            newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+          });
+          return newFees;
+        });
+        // Set the dapp levels
+        setDappFees((prevFees) => {
+          const newFees = { ...prevFees };
+          if (!newFees[chainId]) {
+            newFees[chainId] = {};
+          }
+          dappFeesLevels.forEach(({ txId, level }) => {
+            newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+          });
+          return newFees;
+        });
+      }
+    };
+    */
+
+    const fetchTransactionSpeeds = async () => {
+      if (!user) return;
+      if (!powGameContractAddress) return;
+      // TODO: Hardcoded chain ids
+      const chainIds = [0, 1]; // L1 and L2
+      for (const chainId of chainIds) {
+        /* TODO: Use foc engine?
+        const events = await getUniqueEventsWith(
+          powGameContractAddress,
+          "pow_game::transactions::component::PowTransactionsComponent::TransactionSpeedLevelUpdated",
+          "tx_type_id",
+          { chain_id: chainId, user: user.account_address }
+        );
+        if (!events) {
+          console.warn("No events found for chain", chainId);
+          continue;
+        }
+        */
+        const txJsonConfig = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+        const maxTxId = txJsonConfig.length - 1;
+        const dappsJsonConfig = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+        const maxDappId = dappsJsonConfig.length - 1;
+        const maxId = maxTxId + maxDappId + 1; // Dapp IDs are offset by the number of transactions
+        const txFeeLevels = await getUserTxFeeLevels(chainId, maxId);
+        const txSpeedLevels = await getUserTxSpeedLevels(chainId, maxId);
+        if (!txFeeLevels || !txSpeedLevels) {
+          continue;
+        }
+        // Set the transaction levels
+        setTransactionFees((prevFees) => {
+          const newFees = { ...prevFees };
+          if (!newFees[chainId]) {
+            newFees[chainId] = {};
+          }
+          txFeeLevels.forEach((level, txId) => {
+            if (txId <= maxTxId) {
+              newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+            }
+          });
+          return newFees;
+        });
+        // Set the dapp levels
+        setDappFees((prevFees) => {
+          const newFees = { ...prevFees };
+          if (!newFees[chainId]) {
+            newFees[chainId] = {};
+          }
+          txFeeLevels.forEach((level, txId) => {
+            if (txId > maxTxId) {
+              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+              newFees[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+            }
+          });
+          return newFees;
+        });
+        // Set the transaction speeds
+        setTransactionSpeeds((prevSpeeds) => {
+          const newSpeeds = { ...prevSpeeds };
+          if (!newSpeeds[chainId]) {
+            newSpeeds[chainId] = {};
+          }
+          txSpeedLevels.forEach((level, txId) => {
+            if (txId <= maxTxId) {
+              newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+            } else {
+              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+            }
+          });
+          return newSpeeds;
+        });
+        // Set the dapp speeds
+        setDappSpeeds((prevSpeeds) => {
+          const newSpeeds = { ...prevSpeeds };
+          if (!newSpeeds[chainId]) {
+            newSpeeds[chainId] = {};
+          }
+          txSpeedLevels.forEach((level, txId) => {
+            if (txId > maxTxId) {
+              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+            }
+          });
+          return newSpeeds;
+        });
+        /* TODO: Use foc engine?
+        const transactionSpeedsLevels: { txId: number; level: number }[] = [];
+        const dappSpeedsLevels: { txId: number; level: number }[] = [];
+        events.forEach((event: any) => {
+          if (event.tx_type_id > maxTxId) {
+            // Dapp event
+            const dappId = event.tx_type_id - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+            const level = event.new_level;
+            dappSpeedsLevels.push({ txId: dappId, level });
+          } else {
+            // Transaction event
+            const txId = event.tx_type_id;
+            const level = event.new_level;
+            transactionSpeedsLevels.push({ txId, level });
+          }
+        });
+        // Set the transaction levels
+        setTransactionSpeeds((prevSpeeds) => {
+          const newSpeeds = { ...prevSpeeds };
+          if (!newSpeeds[chainId]) {
+            newSpeeds[chainId] = {};
+          }
+          transactionSpeedsLevels.forEach(({ txId, level }) => {
+            newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+          });
+          return newSpeeds;
+        });
+        // Set the dapp levels
+        setDappSpeeds((prevSpeeds) => {
+          const newSpeeds = { ...prevSpeeds };
+          if (!newSpeeds[chainId]) {
+            newSpeeds[chainId] = {};
+          }
+          dappSpeedsLevels.forEach(({ txId, level }) => {
+            newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+          });
+          return newSpeeds;
+        });
+        */
+      }
+    };
+
     resetTransactions();
-  }, []);
+    // fetchTransactionLevels();
+    fetchTransactionSpeeds();
+  }, [user, powGameContractAddress, getUniqueEventsWith, getUserTxFeeLevels, getUserTxSpeedLevels]);
 
   const txFeeUpgrade = (chainId: number, txId: number) => {
     setTransactionFees((prevFees) => {

@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "start:devnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true expo start",
+    "start:devnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_DEVNET expo start",
+    "start:sepolia": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_SEPOLIA expo start",
+    "start:mainnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_MAINNET expo start",
     "start:nomock": "EXPO_PUBLIC_USE_MOCK=false expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
@@ -58,7 +60,8 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "starknet": "^7.4.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "expo-secure-store": "~14.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

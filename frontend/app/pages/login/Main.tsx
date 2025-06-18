@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { useStarknetConnector } from '../../context/StarknetConnector';
+import { usePowContractConnector } from '../../context/PowContractConnector';
 import BasicButton from '../../components/buttons/Basic';
 import logo from '../../../assets/logo/pow.png';
 import titleDesc from '../../../assets/images/title-desc.png';
@@ -12,8 +13,10 @@ type LoginMainPageProps = {
 };
 
 export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) => {
+  const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
+  const { initMyGame } = usePowContractConnector();
+
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
-  const { account, deployAccount, connectAccount, getMyAddress, invokeInitMyGame } = useStarknetConnector();
   return (
     <ImageBackground
       className="flex-1 items-center justify-between"
@@ -36,6 +39,12 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
         <BasicButton
           label="Play!"
           onPress={async () => {
+            const keys = await getAvailableKeys("pow_game");
+            if (keys.length > 0) {
+              await connectStorageAccount(keys[0]);
+            } else {
+              await initMyGame();
+            }
             setLoginPage('accountCreation');
           }}
           style={{ width: 250 }}

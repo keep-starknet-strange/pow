@@ -55,12 +55,21 @@ pub mod PowTransactionsComponent {
         new_level: u32,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct DappsUnlocked {
+        #[key]
+        user: ContractAddress,
+        #[key]
+        chain_id: u32,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     pub enum Event {
         TransactionConfigUpdated: TransactionConfigUpdated,
         TransactionFeeLevelUpdated: TransactionFeeLevelUpdated,
         TransactionSpeedLevelUpdated: TransactionSpeedLevelUpdated,
+        DappsUnlocked: DappsUnlocked,
     }
 
     #[embeddable_as(PowTransactionsImpl)]
@@ -123,6 +132,36 @@ pub mod PowTransactionsComponent {
             tx_type_id: u32,
         ) -> u32 {
             self.transaction_speed_levels.read((user, chain_id, tx_type_id))
+        }
+
+        fn get_user_transaction_fee_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            tx_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != tx_count {
+                levels.append(self.transaction_fee_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
+        }
+
+        fn get_user_transaction_speed_levels(
+            self: @ComponentState<TContractState>,
+            user: ContractAddress,
+            chain_id: u32,
+            tx_count: u32,
+        ) -> Span<u32> {
+            let mut idx = 0;
+            let mut levels = array![];
+            while idx != tx_count {
+                levels.append(self.transaction_speed_levels.read((user, chain_id, idx)));
+                idx += 1;
+            }
+            levels.span()
         }
 
         fn level_transaction_fee(
@@ -224,6 +263,7 @@ pub mod PowTransactionsComponent {
         fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
             self.dapps_unlocked.write((caller, chain_id), true);
+            self.emit(DappsUnlocked { user: caller, chain_id });
         }
 
         fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
