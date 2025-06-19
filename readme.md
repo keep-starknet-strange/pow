@@ -51,7 +51,7 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/keep-starknet-strange/pow.git
-cd click-chain
+cd pow
 ```
 
 Install dependencies:
