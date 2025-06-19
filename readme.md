@@ -50,7 +50,7 @@ Ensure you have the following installed:
 Clone the repository:
 
 ```sh
-git clone https://github.com/keep-starknet-strange/click-chain.git
+git clone https://github.com/keep-starknet-strange/pow.git
 cd click-chain
 ```
 
