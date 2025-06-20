@@ -20,7 +20,6 @@ pub mod transactions {
         PROOF_TX_TYPE_ID, TransactionFeeConfig, TransactionSpeedConfig,
     };
 }
-// hmmm
 
 pub mod prestige {
     pub mod component;
