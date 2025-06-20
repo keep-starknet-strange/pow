@@ -18,6 +18,12 @@ source = "registry+https://scarbs.xyz/"
 checksum = "sha256:46c4cc6c95c9baa4c7d5cc0ed2bdaf334f46c25a8c92b3012829fff936e3042b"
 
 [[package]]
+name = "openzeppelin_security"
+version = "0.18.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:1db3a41e02ed48806587981340ed01ee7d552c3ad52cb33a6d81c1ed5cba9ee0"
+
+[[package]]
 name = "openzeppelin_token"
 version = "0.18.0"
 source = "registry+https://scarbs.xyz/"
@@ -29,6 +35,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "openzeppelin_upgrades"
+version = "0.18.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:33c9d0865364fc18a5e7b471fe53c3b0f3e0aec56a94f435089638fad2a4a35b"
+
+[[package]]
 name = "openzeppelin_utils"
 version = "0.18.0"
 source = "registry+https://scarbs.xyz/"
@@ -38,7 +50,9 @@ checksum = "sha256:725b212839f3eddc32791408609099c5e808c167ca0cf331d8c1d778b07a4
 name = "pow_game"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin_security",
  "openzeppelin_token",
+ "openzeppelin_upgrades",
  "snforge_std",
 ]
 
