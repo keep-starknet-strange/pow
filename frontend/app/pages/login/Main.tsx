@@ -4,8 +4,8 @@ import { useStarknetConnector } from '../../context/StarknetConnector';
 import { usePowContractConnector } from '../../context/PowContractConnector';
 import BasicButton from '../../components/buttons/Basic';
 import logo from '../../../assets/logo/pow.png';
-import titleDesc from '../../../assets/images/title-desc.png';
 import background from '../../../assets/background.png';
+import backgroundGrid from '../../../assets/background-grid.png';
 import starknetLogo from '../../../assets/logo/starknet.png';
 
 type LoginMainPageProps = {
@@ -23,19 +23,24 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
       source={background}
       resizeMode="cover"
     >
+      <ImageBackground
+        className="absolute top-0 left-0 right-0 bottom-0"
+        source={backgroundGrid}
+        resizeMode="cover"
+      />
       <View className="flex items-center justify-center">
         <Image
           source={logo}
           style={{ width: 300, height: 300, marginTop: 100 }}
           resizeMode="contain"
         />
-        <Image
-          source={titleDesc}
-          style={{ width: 300, height: 30 }}
-          resizeMode="contain"
-        />
+        <Text
+          className="text-[#101119] text-2xl font-Xerxes text-center"
+        >
+          Click. Build. Mine.
+        </Text>
       </View>
-      <View className="flex-1 items-center justify-center gap-4">
+      <View className="flex-1 items-center justify-center gap-2">
         <BasicButton
           label="Play!"
           onPress={async () => {
@@ -56,19 +61,19 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
           style={{ width: 250 }}
         />
         <View className="flex flex-row items-center justify-between gap-2">
-          <Text className="text-white text-md">
+          <Text className="text-[#101119] text-lg font-Pixels">
             Powered by Starknet
           </Text>
           <Image
             source={starknetLogo}
-            style={{ width: 40, height: 40 }}
+            style={{ width: 30, height: 30 }}
             resizeMode="contain"
           />
         </View>
       </View>
       <View className="flex flex-row items-center justify-between w-full px-10 py-6">
-        <Text className="text-white text-sm">Version {version}</Text>
-        <Text className="text-white text-sm">We are open source!</Text>
+        <Text className="text-[#101119] text-md font-Pixels">Version {version}</Text>
+        <Text className="text-[#101119] text-md font-Pixels">We are open source!</Text>
       </View>
     </ImageBackground>
   );

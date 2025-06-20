@@ -82,7 +82,7 @@ export const LeaderboardPage: React.FC = () => {
      </View>
      <ScrollView className="flex-1">
        {leaderboard.map((user, index) => (
-         <View key={user.id} className={`flex flex-row justify-between items-center p-4 ${index % 2 === 0 ? 'bg-[#ffff8010]' : 'bg-[#ffff8020]'}`}>
+         <View key={user.id} className={`flex flex-row justify-between items-center p-4 ${index % 2 === 0 ? 'bg-[#10111910]' : 'bg-[#10111920]'}`}>
            <View className="flex flex-row items-center flex-1">
              {userIconsSvgMap[user.name] && (
                <View className="w-[3rem] aspect-square mr-2 rounded-full overflow-hidden">
