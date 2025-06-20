@@ -13,14 +13,11 @@ export const MainPage: React.FC = () => {
   return (
     <View
       className="flex-1"
-      style={{
-        transform: [{ translateY: currentView === "L1" ? 0 : -Dimensions.get("window").height }],
-      }}
     >
       <ImageBackground
-        style={{ height: Dimensions.get("window").height }}
         source={background}
         resizeMode="cover"
+        style={{ flex: 1 }}
       >
         <L1Phase setCurrentView={setCurrentView} />
       </ImageBackground>

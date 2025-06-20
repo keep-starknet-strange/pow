@@ -15,12 +15,12 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ style, label, isOn, onSymbo
     <TouchableOpacity
       onPress={onToggle}
       className="rounded-full items-center justify-around flex-row p-2
-                 border-2 border-[#ffff80] shadow-lg shadow-[#ffff80]"
+                 border-2 border-[#101119] shadow-lg shadow-[#101119]"
       style={{
         ...style,
       }}
     >
-      <Text className="text-[#ffff80] font-bold text-2xl">{label}</Text>
+      <Text className="text-[#101119] font-bold text-2xl">{label}</Text>
       <Text className="font-bold text-4xl">{isOn ? onSymbol : offSymbol}</Text>
     </TouchableOpacity>
   );

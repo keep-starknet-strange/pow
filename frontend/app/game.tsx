@@ -124,7 +124,7 @@ export default function game() {
             <Header />
             <InAppNotification />
             <currentPage.component/>
-            <Footer tabs={tabs} switchPage={switchPage} />
+            <Footer tabs={tabs} switchPage={switchPage} selectedTab={currentPage.name} />
           </View>
         ) : (
           <View className="flex-1">

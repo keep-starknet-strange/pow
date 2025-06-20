@@ -1,13 +1,12 @@
 import React from "react";
-import { Text, View, Image } from "react-native";
+import { Text, View } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
-import rewardImg from "../../assets/images/coin.png";
-import feeImg from "../../assets/images/bitcoin.png";
 import { shortMoneyString } from "../utils/helpers";
+import { Canvas, Image, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 export type WorkingBlockViewProps = {
   chainId: number;
@@ -17,12 +16,31 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { workingBlocks, getWorkingBlock } = useGame();
   const { getUpgradeValue } = useUpgrades();
 
+  const currentBlockOutlineImg = useImage(require('../../assets/block/blockchain_grid.png'));
+
   return (
     <View className="flex flex-col items-center justify-center">
-      <View className={`flex flex-row justify-center aspect-square ${props.chainId === 0 ? "w-[22rem]" : "w-[16rem]"}`}>
-        <BlockView chainId={props.chainId} block={getWorkingBlock(props.chainId)} completed={false} />
+      <View className={`flex flex-row justify-center ${props.chainId === 0 ? "w-[346px] h-[408px]" : "w-[16rem]"}`}>
+        <View className="absolute top-0 left-0 w-full h-full">
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={currentBlockOutlineImg}
+            fit="cover"
+            x={0}
+            y={0}
+            width={144*2.4}
+            height={170*2.4}
+            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+          />
+        </Canvas>
+        </View>
+      
+        <View className="z-[10] absolute top-[35px] left-[4px] w-[338px] h-[338px]">
+          <BlockView chainId={props.chainId} block={getWorkingBlock(props.chainId)} completed={false} />
+        </View>
+
         {workingBlocks[props.chainId]?.isBuilt && (
-          <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
+          <View className="z-[15] absolute top-[35px] left-[4px] w-[338px] h-[338px]">
             {props.chainId === 0 ? (
               <Miner />
             ) : (
@@ -30,29 +48,23 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
             )}
           </View>
         )}
-      </View>
-
-      <View
-        className="flex flex-row justify-between items-center w-[22rem] mt-[0.5rem] px-2
-                   bg-[#ffff8008] rounded-lg shadow-lg border-2 border-[#ffff80b0]"
-      >
-        <Text className="text-2xl font-bold text-[#f9f980d0]">
+        <Text className="text-[20px] font-bold text-[#c3c3c3] font-Pixels
+                         absolute top-[8px] left-[10px]">
           Block {workingBlocks[props.chainId]?.blockId}
         </Text>
-        <View className="flex flex-row items-center gap-4">
-          <View className="flex flex-row items-center gap-1">
-            <Image source={feeImg} className="w-6 h-6" />
-            <Text className="text-xl font-bold text-[#f9f980d0]">
-              {shortMoneyString(workingBlocks[props.chainId]?.fees)}
-            </Text>
-          </View>
-          <View className="flex flex-row items-center gap-1">
-            <Image source={rewardImg} className="w-6 h-6" />
-            <Text className="text-xl font-bold text-[#f9f980d0]">
-              {shortMoneyString(workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward"))}
-            </Text>
-          </View>
-        </View>
+        <Text className="text-[20px] font-bold text-[#c3c3c3] font-Pixels
+                         absolute bottom-[10px] left-[170px]">
+           {workingBlocks[props.chainId]?.transactions.length}/{
+             getUpgradeValue(props.chainId, "Block Size") ** 2
+           }
+        </Text>
+        <Text className="text-[20px] font-bold text-[#fff7ff] font-Pixels
+                         absolute bottom-[10px] left-[280px]">
+          {shortMoneyString(
+            workingBlocks[props.chainId]?.fees + 
+            (workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward"))
+          )}
+        </Text>
       </View>
     </View>
   );

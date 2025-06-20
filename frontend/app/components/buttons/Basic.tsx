@@ -16,16 +16,16 @@ const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, 
       disabled={disabled}
       className={`
         rounded-full items-center justify-around flex-row p-2
-        border-2 border-[#ffff80] shadow-lg shadow-[#ffff80]
-        ${disabled ? 'border-gray-400 shadow-gray-400' : 'border-[#ffff80] shadow-[#ffff80]'}
+        border-4 border-[#101119] shadow-lg shadow-[#3093e1]
+        ${disabled ? 'border-gray-400 shadow-gray-400' : 'border-[#101119] shadow-[#101119]'}
       `}
       style={{
         ...style,
       }}
     >
       <Text className={`
-          font-bold text-4xl
-          ${disabled ? 'text-gray-400' : 'text-[#ffff80]'}
+          font-Xerxes font-bold text-4xl
+          ${disabled ? 'text-gray-400' : 'text-[#101119]'}
         `}
       >
         {label}
@@ -33,7 +33,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, 
       {icon && (
         <Text className={`
             font-bold text-4xl
-            ${disabled ? 'text-gray-400' : 'text-[#ffff80]'}
+            ${disabled ? 'text-gray-400' : 'text-[#101119]'}
           `}
         >
         {icon}
