@@ -34,3 +34,10 @@ pub mod builder {
 
     pub use interface::{BuildingState, IBuilderDispatcher, IBuilderDispatcherTrait};
 }
+
+pub mod staking {
+    pub mod component;
+    pub mod interface;
+
+    pub use interface::{IStakingDispatcher, IStakingDispatcherTrait, StakingConfig, SlashingConfig};
+}
