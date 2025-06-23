@@ -31,6 +31,8 @@ mod PowGame {
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
+    use pow_game::staking::component::StakingComponent;
+    component!(path: StakingComponent, storage: staking, event: StakingEvent);
 
     #[storage]
     struct Storage {
@@ -54,6 +56,8 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
+        #[substorage(v0)]
+        staking: StakingComponent::Storage,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -97,6 +101,8 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
+        #[flat]
+        StakingEvent: StakingComponent::Event,
     }
 
     #[constructor]
