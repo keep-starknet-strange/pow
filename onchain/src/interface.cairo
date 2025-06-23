@@ -22,6 +22,8 @@ pub trait IPowGameRewards<TContractState> {
     fn get_reward_params(self: @TContractState) -> RewardParams;
     fn game_master_give_reward(ref self: TContractState, game_address: ContractAddress, recipient: ContractAddress);
     fn remove_funds(ref self: TContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256);
+    fn pause_rewards(ref self: TContractState);
+    fn unpause_rewards(ref self: TContractState);
 }
 
 // Game asserts / check helper functions
