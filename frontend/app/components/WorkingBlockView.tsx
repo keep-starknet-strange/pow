@@ -2,11 +2,12 @@ import React from "react";
 import { Text, View } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
+import { useImageProvider } from "../context/ImageProvider";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
 import { shortMoneyString } from "../utils/helpers";
-import { Canvas, Image, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 export type WorkingBlockViewProps = {
   chainId: number;
@@ -15,8 +16,7 @@ export type WorkingBlockViewProps = {
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { workingBlocks, getWorkingBlock } = useGame();
   const { getUpgradeValue } = useUpgrades();
-
-  const currentBlockOutlineImg = useImage(require('../../assets/block/blockchain_grid.png'));
+  const { getImage } = useImageProvider();
 
   return (
     <View className="flex flex-col items-center justify-center">
@@ -24,8 +24,8 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
         <View className="absolute top-0 left-0 w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={currentBlockOutlineImg}
-            fit="cover"
+            image={getImage("block.grid")}
+            fit="fill"
             x={0}
             y={0}
             width={144*2.4}

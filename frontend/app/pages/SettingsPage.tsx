@@ -23,7 +23,7 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <ImageBackground
-      className="flex-1 flex flex-col gap-2 pt-10 px-8"
+      className="flex-1 flex flex-col gap-2 px-8"
       source={background}
       resizeMode="cover"
     >

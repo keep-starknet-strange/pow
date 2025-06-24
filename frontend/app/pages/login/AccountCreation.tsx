@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, View, ScrollView, Text, TouchableOpacity, ImageBackground, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, } from 'react-native';
 import { useStarknetConnector } from '../../context/StarknetConnector';
 import { useFocEngine } from '../../context/FocEngineConnector';
+import { useImageProvider } from '../../context/ImageProvider';
 import { PFPView } from '../../components/PFPView';
 import BasicButton from '../../components/buttons/Basic';
 import { getNounsHeadsList, getNounsBodiesList,
@@ -10,7 +11,7 @@ import { getNounsHeadsList, getNounsBodiesList,
 } from '../../configs/nouns';
 import background from '../../../assets/background.png';
 import backgroundGrid from '../../../assets/background-grid.png';
-import { Canvas, Image as SkiaImg, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Canvas, Image as SkiaImg, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 type AccountCreationProps = {
   setLoginPage: (page: string) => void;
@@ -20,6 +21,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
   const { account } = useStarknetConnector();
   const { claimUsername } = useFocEngine();
+  const { getImage } = useImageProvider();
 
   const [username, setUsername] = React.useState<string>('');
   const [avatar, setAvatar] = React.useState<NounsAttributes>(getRandomNounsAttributes());
@@ -33,8 +35,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
     setCreatingAvatar(false);
     setAvatar(newAvatar);
   }
-
-  const outlineImg = useImage(require('../../../assets/block/blockchain_grid_inactive.png'));
 
   return (
       <KeyboardAvoidingView
@@ -68,8 +68,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
               <View className="absolute top-0 left-0 w-[250px] h-[250px]">
                 <Canvas style={{ flex: 1 }} className="w-full h-full">
                   <SkiaImg
-                    image={outlineImg}
-                    fit="cover"
+                    image={getImage('block.grid.min')}
+                    fit="fill"
                     x={0}
                     y={0}
                     sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}

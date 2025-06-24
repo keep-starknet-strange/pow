@@ -1,17 +1,18 @@
 import { Text, View } from 'react-native';
-import { Canvas, Image, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { useImageProvider } from "../context/ImageProvider";
 import { useBalance } from "../context/Balance";
 import { shortMoneyString } from "../utils/helpers";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
-  const header = useImage(require('../../assets/balance.png'));
+  const { getImage } = useImageProvider();
   return (
     <View
-      className="bg-[#101119] h-[72px] p-0 relative"
+      className="bg-[#101119] h-[76px] p-0 relative"
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
-        <Image image={header} fit="cover" x={0} y={0} width={402} height={72} sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}/>
+        <Image image={getImage('balance')} fit="fill" x={0} y={0} width={402} height={76} sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}/>
       </Canvas>
       <View className="absolute right-0 h-full flex items-center justify-center pr-3">
         <Text className="text-[#fff2fdff] text-5xl font-bold font-Xerxes">{shortMoneyString(balance)}</Text>

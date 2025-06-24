@@ -1,7 +1,8 @@
 import { Text, View, TouchableOpacity } from 'react-native';
 import { TargetId } from '../context/Tutorial';
+import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from '../hooks/useTutorialLayout';
-import { Canvas, Image, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 export type FooterProps = {
   tabs: {name: string, icon: string}[];
@@ -11,32 +12,19 @@ export type FooterProps = {
 
 export const Footer: React.FC<FooterProps> = (props) => {
   const {ref, onLayout} = useTutorialLayout("storeTab" as TargetId)
-  const menuButtonImg = useImage(require('../../assets/navigation/menu_button_normal.png'));
-  const menuButtonSelectedImg = useImage(require('../../assets/navigation/menu_button_selected.png'));
-
-  const gameTabIcon = useImage(require('../../assets/navigation/icon_game.png'));
-  const gameTabSelectedIcon = useImage(require('../../assets/navigation/icon_game_selected.png'));
-  const storeTabIcon = useImage(require('../../assets/navigation/icon_shop.png'));
-  const storeTabSelectedIcon = useImage(require('../../assets/navigation/icon_shop_selected.png'));
-  const achievementsTabIcon = useImage(require('../../assets/navigation/icon_flag.png'));
-  const achievementsTabSelectedIcon = useImage(require('../../assets/navigation/icon_flag_selected.png'));
-  const leaderboardTabIcon = useImage(require('../../assets/navigation/icon_medal.png'));
-  const leaderboardTabSelectedIcon = useImage(require('../../assets/navigation/icon_medal_selected.png'));
-  const settingsTabIcon = useImage(require('../../assets/navigation/icon_settings.png'));
-  const settingsTabSelectedIcon = useImage(require('../../assets/navigation/icon_settings_selected.png'));
-
+  const { getImage } = useImageProvider();
   const getTabIcon = (tabName: string, selected: boolean) => {
     switch (tabName) {
       case 'Main':
-        return selected ? gameTabSelectedIcon : gameTabIcon;
+        return selected ? getImage('nav.icon.game.active') : getImage('nav.icon.game');
       case 'Store':
-        return selected ? storeTabSelectedIcon : storeTabIcon;
+        return selected ? getImage('nav.icon.shop.active') : getImage('nav.icon.shop');
       case 'Achievements':
-        return selected ? achievementsTabSelectedIcon : achievementsTabIcon;
+        return selected ? getImage('nav.icon.flag.active') : getImage('nav.icon.flag');
       case 'Leaderboard':
-        return selected ? leaderboardTabSelectedIcon : leaderboardTabIcon;
+        return selected ? getImage('nav.icon.medal.active') : getImage('nav.icon.medal');
       case 'Settings':
-        return selected ? settingsTabSelectedIcon : settingsTabIcon;
+        return selected ? getImage('nav.icon.settings.active') : getImage('nav.icon.settings');
       default:
         return null;
     }
@@ -61,8 +49,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
           >
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
-                image={tab.name === props.selectedTab ? menuButtonSelectedImg : menuButtonImg}
-                fit="contain"
+                image={tab.name === props.selectedTab ? getImage('nav.button.active') : getImage('nav.button')}
+                fit="fill"
                 x={0}
                 y={0}
                 width={68}

@@ -3,6 +3,7 @@ import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue
 import { Dimensions } from 'react-native';
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
+import { useImageProvider } from "../../context/ImageProvider";
 import { newTransaction } from "../../types/Chains";
 import { getTxIcon } from "../../utils/transactions";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
@@ -10,7 +11,7 @@ import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
 import { shortMoneyString } from "../../utils/helpers";
-import { Canvas, Image as SkiaImg, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Canvas, Image as SkiaImg, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 const window = Dimensions.get('window');
 
@@ -21,6 +22,7 @@ export type TxButtonProps = {
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
+  const { getImage } = useImageProvider();
   const { addTransaction } = useGame();
   const { transactionFees, dappFees, getNextTxFeeCost, getNextDappFeeCost,
           getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
@@ -80,7 +82,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     if (speed <= 0) return;
     const randomValue = Math.floor(Math.random() * 300) - 150;
     Animated.timing(sequenceAnim, {
-      toValue: 100,
+      toValue: 94,
       easing: Easing.linear,
       duration: (5000 / speed) + randomValue,
       useNativeDriver: false,
@@ -91,10 +93,153 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     });
   }, [sequencedDone, speed]);
 
-  const txBackgroundImg = useImage(require("../../../assets/transactions/backgrounds/button_green_empty.png"));
-  const txNameplateImg = useImage(require("../../../assets/transactions/nameplate/nameplate_green.png"));
-  const txIconImg = useImage(require("../../../assets/transactions/icons/icon_tx_lg.png"));
-  const txPlaqueImg = useImage(require("../../../assets/transactions/value_plaque.png"));
+  const getTxBg = (chainId: number, txId: number, isDapp: boolean) => {
+    switch (chainId) {
+      case 0:
+        switch (txId) {
+          case 0:
+            return getImage('tx.button.bg.green');
+          case 1:
+            return getImage('tx.button.bg.yellow');
+          case 2:
+            return getImage('tx.button.bg.blue');
+          case 3:
+            return getImage('tx.button.bg.pink');
+          case 4:
+            return getImage('tx.button.bg.purple');
+          default:
+            return getImage('tx.button.bg.green');
+        }
+      case 1:
+        switch (txId) {
+          case 0:
+            return getImage('tx.button.bg.purple');
+          case 1:
+            return getImage('tx.button.bg.green');
+          case 2:
+            return getImage('tx.button.bg.yellow');
+          case 3:
+            return getImage('tx.button.bg.blue');
+          case 4:
+            return getImage('tx.button.bg.pink');
+          default:
+            return getImage('tx.button.bg.green');
+        }
+      default:
+        return getImage('tx.button.bg.green');
+    }
+  }
+
+  const getTxInner = (chainId: number, txId: number, isDapp: boolean) => {
+    switch (chainId) {
+      case 0:
+        switch (txId) {
+          case 0:
+            return getImage('tx.button.inner.green');
+          case 1:
+            return getImage('tx.button.inner.yellow');
+          case 2:
+            return getImage('tx.button.inner.blue');
+          case 3:
+            return getImage('tx.button.inner.pink');
+          case 4:
+            return getImage('tx.button.inner.purple');
+          default:
+            return getImage('tx.button.inner.green');
+        }
+      case 1:
+        switch (txId) {
+          case 0:
+            return getImage('tx.button.inner.purple');
+          case 1:
+            return getImage('tx.button.inner.green');
+          case 2:
+            return getImage('tx.button.inner.yellow');
+          case 3:
+            return getImage('tx.button.inner.blue');
+          case 4:
+            return getImage('tx.button.inner.pink');
+          default:
+            return getImage('tx.button.inner.green');
+        }
+      default:
+        return getImage('tx.button.inner.green');
+    }
+  }
+
+  const getTxNameplate = (chainId: number, txId: number, isDapp: boolean) => {
+    switch (chainId) {
+      case 0:
+        switch (txId) {
+          case 0:
+            return getImage('tx.nameplate.green');
+          case 1:
+            return getImage('tx.nameplate.yellow');
+          case 2:
+            return getImage('tx.nameplate.blue');
+          case 3:
+            return getImage('tx.nameplate.pink');
+          case 4:
+            return getImage('tx.nameplate.purple');
+          default:
+            return getImage('tx.nameplate.green');
+        }
+      case 1:
+        switch (txId) {
+          case 0:
+            return getImage('tx.nameplate.purple');
+          case 1:
+            return getImage('tx.nameplate.green');
+          case 2:
+            return getImage('tx.nameplate.yellow');
+          case 3:
+            return getImage('tx.nameplate.blue');
+          case 4:
+            return getImage('tx.nameplate.pink');
+          default:
+            return getImage('tx.nameplate.green');
+        }
+      default:
+        return getImage('tx.nameplate.green');
+    }
+  }
+
+  const getTxIcon = (chainId: number, txId: number, isDapp: boolean) => {
+    switch (chainId) {
+      case 0:
+        switch (txId) {
+          case 0:
+            return getImage('tx.icon.tx');
+          case 1:
+            return getImage('tx.icon.tx');
+          case 2:
+            return getImage('tx.icon.blob');
+          case 3:
+            return getImage('tx.icon.nft');
+          case 4:
+            return getImage('tx.icon.nft');
+          default:
+            return getImage('tx.icon.tx');
+        }
+      case 1:
+        switch (txId) {
+          case 0:
+            return getImage('tx.icon.tx');
+          case 1:
+            return getImage('tx.icon.tx');
+          case 2:
+            return getImage('tx.icon.blob');
+          case 3:
+            return getImage('tx.icon.nft');
+          case 4:
+            return getImage('tx.icon.nft');
+          default:
+            return getImage('tx.icon.tx');
+        }
+      default:
+        return getImage('tx.icon.tx');
+    }
+  }
 
   return (
     <View className="relative">
@@ -104,7 +249,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         style={{
           width: window.width * 0.18,
         }}
-        className="relative h-[94px]"
+        className="relative h-[94px] overflow-hidden"
         onPress={() => {
           if (feeLevel === -1) {
             if (props.isDapp) {
@@ -122,7 +267,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       }}>
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <SkiaImg
-            image={txBackgroundImg}
+            image={getTxBg(props.chainId, props.txType.id, false)}
             fit="fill"
             sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
             x={0}
@@ -132,22 +277,40 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           />
         </Canvas>
       </View>
-      <View className="absolute h-[94px]" style={{
-        width: window.width * 0.18,
+      <Animated.View className="absolute w-full bottom-0"
+        style={{
+          width: window.width * 0.18,
+          height: speed > 0 ? sequenceAnim : '100%'
+        }}
+      >
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <SkiaImg
+          image={getTxInner(props.chainId, props.txType.id, false)}
+          fit="fill"
+          sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+          x={0}
+          y={0}
+          width={window.width * 0.18}
+          height={94}
+        />
+        </Canvas>
+      </Animated.View>
+      <View className="absolute left-[3px] h-[94px] w-full" style={{
+        width: window.width * 0.17,
       }}>
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <SkiaImg
-            image={txNameplateImg}
-            fit="contain"
+            image={getTxNameplate(props.chainId, props.txType.id, false)}
+            fit="fill"
             sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
             x={0}
             y={2}
-            width={window.width * 0.18}
+            width={window.width * 0.165}
             height={19}
           />
         </Canvas>
       </View>
-      <Text className="absolute top-[4px] w-full text-center text-[1rem] font-bold text-[#fff8ff] font-Pixels">
+      <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] font-bold text-[#fff8ff] font-Pixels">
         {props.txType.name}
       </Text>
       <View className="absolute h-[94px]" style={{
@@ -155,7 +318,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       }}>
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <SkiaImg
-            image={txIconImg}
+            image={getTxIcon(props.chainId, props.txType.id, false)}
             fit="contain"
             sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
             x={0}
@@ -184,8 +347,8 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       }}>
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <SkiaImg
-          image={txPlaqueImg}
-          fit="contain"
+          image={getImage('tx.plaque')}
+          fit="fill"
           sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
           x={0}
           y={0}

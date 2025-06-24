@@ -11,6 +11,7 @@ import { UpgradesProvider } from "./context/Upgrades";
 import { TransactionsProvider } from "./context/Transactions";
 import { ChainsProvider } from "./context/Chains";
 import { StakingProvider } from "./context/Staking";
+import { ImageProvider } from "./context/ImageProvider";
 import { GameProvider } from "./context/Game";
 import { AchievementProvider } from "./context/Achievements";
 import { TutorialProvider } from "./context/Tutorial";
@@ -49,7 +50,9 @@ export default function App() {
                           <GameProvider>
                             <TransactionsProvider>
                               <AchievementProvider>
-                                <Game />
+                                <ImageProvider>
+                                  <Game />
+                                </ImageProvider>
                               </AchievementProvider>
                             </TransactionsProvider>
                           </GameProvider>
