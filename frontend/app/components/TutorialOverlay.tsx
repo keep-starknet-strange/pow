@@ -163,7 +163,7 @@ export const TutorialOverlay: React.FC = () => {
 
   if (!visible || !isLayoutReady) return null;
   return (
-    <View className="absolute inset-0 z-10" pointerEvents="box-none">
+    <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {/* Masks */}
       {masks.map((m, i) => (
         <View
@@ -191,13 +191,13 @@ export const TutorialOverlay: React.FC = () => {
 
       {/* Arrow */}
       <View
-        className="absolute z-50"
+        className="absolute z-[50]"
         style={[{ left: arrowLeft }, arrowStyle]}
       />
 
       {/* Bubble */}
       <View
-        className="absolute items-center z-50"
+        className="absolute items-center z-[50]"
         style={{ left: bubbleLeft, top: bubbleTop, width: BUBBLE_WIDTH }}
       >
         <View

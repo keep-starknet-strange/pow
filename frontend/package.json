@@ -12,7 +12,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "lint:fix": "expo lint --fix"
   },
   "jest": {
     "preset": "jest-expo"
