@@ -5,12 +5,11 @@ import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
 import { useImageProvider } from "../../context/ImageProvider";
 import { newTransaction } from "../../types/Chains";
-import { getTxIcon } from "../../utils/transactions";
-import questionMarkIcon from "../../../assets/images/questionMark.png";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
 import { shortMoneyString } from "../../utils/helpers";
+import { PopupAnimation } from "../../components/PopupAnimation";
 import { Canvas, Image as SkiaImg, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 const window = Dimensions.get('window');
@@ -65,9 +64,11 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     }
   }, [props.chainId, props.txType.id, props.isDapp, getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed]);
 
+  const [lastTxTime, setLastTxTime] = useState<number>(0);
   const addNewTransaction = async () => {
     const newTx = newTransaction(props.txType.id, fee, props.isDapp);
     addTransaction(props.chainId, newTx);
+    setLastTxTime(Date.now());
   }
 
   const sequenceAnim = useAnimatedValue(0);
@@ -237,6 +238,15 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
 
   return (
     <View className="relative">
+      <PopupAnimation
+        popupStartTime={lastTxTime}
+        popupValue={
+          `${feeLevel === -1
+            ? "-" + shortMoneyString(feeCost)
+            : "+" + shortMoneyString(fee)}`
+        }
+        color={feeLevel === -1 ? "#CA1F4B" : "#F0E130"}
+      />
       <TouchableOpacity
         ref={ref}
         onLayout={onLayout}
@@ -246,6 +256,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         className="relative h-[94px] overflow-hidden"
         onPress={() => {
           if (feeLevel === -1) {
+            setLastTxTime(Date.now());
             if (props.isDapp) {
               dappFeeUpgrade(props.chainId, props.txType.id);
             } else {
@@ -271,10 +282,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           />
         </Canvas>
       </View>
-      <Animated.View className="absolute w-full bottom-0"
+      <Animated.View className="absolute w-full bottom-0 h-full"
         style={{
           width: window.width * 0.18,
-          height: speed > 0 ? sequenceAnim : '100%'
+          maxHeight: speed > 0 ? sequenceAnim : '100%',
         }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">

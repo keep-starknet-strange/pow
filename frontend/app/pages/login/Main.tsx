@@ -50,6 +50,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
         <BasicButton
           label="Settings"
           onPress={async () => {
+            setLoginPage('settings');
           }}
           style={{ width: 250 }}
         />

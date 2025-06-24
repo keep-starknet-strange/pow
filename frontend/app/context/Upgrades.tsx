@@ -138,7 +138,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             newUpgrades[chainId] = {};
           }
           userUpgradeLevels.forEach((level: number, upgradeId: number) => {
-            newUpgrades[chainId][upgradeId] = level; // Already zero-based index
+            newUpgrades[chainId][upgradeId] = level - 1; // Already zero-based index
           });
           return newUpgrades;
         });
@@ -188,7 +188,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             newAutomations[chainId] = {};
           }
           userAutomationLevels.forEach((level: number, automationId: number) => {
-            newAutomations[chainId][automationId] = level; // Already zero-based index
+            newAutomations[chainId][automationId] = level - 1; // Already zero-based index
           });
           return newAutomations;
         });

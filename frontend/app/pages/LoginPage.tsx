@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useImageProvider } from "../context/ImageProvider";
 import { LoginMainPage } from './login/Main';
 import { AccountCreationPage } from './login/AccountCreation';
+import { SettingsPage } from './SettingsPage';
 import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 export const LoginPage: React.FC = () => {
@@ -11,6 +12,7 @@ export const LoginPage: React.FC = () => {
   const loginPages = {
     login: LoginMainPage,
     accountCreation: AccountCreationPage,
+    settings: SettingsPage
   };
   const [currentPage, setCurrentPage] = useState<keyof typeof loginPages>('login');
   const ActivePage = loginPages[currentPage];

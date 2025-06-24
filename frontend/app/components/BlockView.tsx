@@ -31,12 +31,14 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   const animatedObjectStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: yOffset.value }],
+      transform: [{
+        scale: 1- (yOffset.value / 600),
+      }],
     };
   });
 
   const animate = () => {
-    yOffset.value = withTiming(0, { duration: 250 });
+    yOffset.value = withTiming(0, { duration: 300 });
   };
 
   useEffect(() => {
