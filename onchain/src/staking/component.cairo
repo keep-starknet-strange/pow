@@ -8,12 +8,13 @@ pub mod StakingComponent {
 
     #[storage]
     pub struct Storage {
+        // Staking configuration
         staking_config: StakingConfig,
-        slashing_config: SlashingConfig,
         // Maps: user address -> staked amount
         user_stakes: Map<ContractAddress, u128>,
         // Maps: user address -> reward amount
         user_rewards: Map<ContractAddress, u128>,
+        // Maps: user address -> last validation timestamp
         user_last_validation: Map<ContractAddress, u64>,
     }
 
