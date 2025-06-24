@@ -14,9 +14,13 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function randomTransaction(chainId: number, minFee = 1, maxFee = 10): Transaction {
+export function randomTransaction(
+  chainId: number,
+  minFee = 1,
+  maxFee = 10,
+): Transaction {
   const txMetaList = chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-  const typeIds = Object.keys(txMetaList).map(k => Number(k));
+  const typeIds = Object.keys(txMetaList).map((k) => Number(k));
   const typeId = typeIds[randInt(0, typeIds.length - 1)];
   const fee = randInt(minFee, maxFee);
   const icon = getTxIcon(chainId, typeId);
@@ -26,16 +30,14 @@ export function randomTransaction(chainId: number, minFee = 1, maxFee = 10): Tra
 export function randomTransactionsForBlock(
   chainId: number,
   count: number,
-  feeRange: [number, number] = [1, 10]
+  feeRange: [number, number] = [1, 10],
 ): Transaction[] {
   return Array.from({ length: count }, () =>
-    randomTransaction(chainId, feeRange[0], feeRange[1])
+    randomTransaction(chainId, feeRange[0], feeRange[1]),
   );
 }
 
-export function randomTransactions(
-  opts: GeneratorOptions
-): Transaction[] {
+export function randomTransactions(opts: GeneratorOptions): Transaction[] {
   const {
     chainId,
     minTxPerBlock = 1,

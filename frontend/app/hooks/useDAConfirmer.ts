@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
@@ -14,12 +14,12 @@ export const useDAConfirmer = (
   const [daProgress, setDaConfirmProgress] = useState(0);
 
   const daConfirm = () => {
-    setDaConfirmCounter(prevCounter => {
+    setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       notify("DaClicked", { counter: newCounter });
       return newCounter;
     });
-  }
+  };
 
   useEffect(() => {
     if (daConfirmCounter === 0) return;
@@ -49,12 +49,12 @@ export const useDAConfirmer = (
   useAutoClicker(
     shouldAutoClick,
     5000 / (getAutomationValue(1, "DA") || 1),
-    daConfirm
+    daConfirm,
   );
 
   return {
     daConfirmCounter,
     daProgress,
-    daConfirm
+    daConfirm,
   };
-}
+};

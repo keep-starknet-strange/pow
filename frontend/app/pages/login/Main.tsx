@@ -1,22 +1,30 @@
-import React from 'react';
-import { Image, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
-import { useStarknetConnector } from '../../context/StarknetConnector';
-import { usePowContractConnector } from '../../context/PowContractConnector';
-import BasicButton from '../../components/buttons/Basic';
-import logo from '../../../assets/logo/pow.png';
-import titleDesc from '../../../assets/images/title-desc.png';
-import background from '../../../assets/background.png';
-import starknetLogo from '../../../assets/logo/starknet.png';
+import React from "react";
+import {
+  Image,
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
+import { useStarknetConnector } from "../../context/StarknetConnector";
+import { usePowContractConnector } from "../../context/PowContractConnector";
+import BasicButton from "../../components/buttons/Basic";
+import logo from "../../../assets/logo/pow.png";
+import titleDesc from "../../../assets/images/title-desc.png";
+import background from "../../../assets/background.png";
+import starknetLogo from "../../../assets/logo/starknet.png";
 
 type LoginMainPageProps = {
   setLoginPage: (page: string) => void;
 };
 
-export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) => {
+export const LoginMainPage: React.FC<LoginMainPageProps> = ({
+  setLoginPage,
+}) => {
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
   const { initMyGame } = usePowContractConnector();
 
-  const version = process.env.EXPO_APP_VERSION || '0.0.1';
+  const version = process.env.EXPO_APP_VERSION || "0.0.1";
   return (
     <ImageBackground
       className="flex-1 items-center justify-between"
@@ -45,20 +53,17 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
             } else {
               await initMyGame();
             }
-            setLoginPage('accountCreation');
+            setLoginPage("accountCreation");
           }}
           style={{ width: 250 }}
         />
         <BasicButton
           label="Settings"
-          onPress={async () => {
-          }}
+          onPress={async () => {}}
           style={{ width: 250 }}
         />
         <View className="flex flex-row items-center justify-between gap-2">
-          <Text className="text-white text-md">
-            Powered by Starknet
-          </Text>
+          <Text className="text-white text-md">Powered by Starknet</Text>
           <Image
             source={starknetLogo}
             style={{ width: 40, height: 40 }}
@@ -72,6 +77,6 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
       </View>
     </ImageBackground>
   );
-}
+};
 
 export default LoginMainPage;

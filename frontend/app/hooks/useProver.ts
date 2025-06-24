@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
@@ -14,12 +14,12 @@ export const useProver = (
   const [proverProgress, setProverProgress] = useState(0);
 
   const prove = () => {
-    setProverCounter(prevCounter => {
+    setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       notify("ProveClicked", { counter: newCounter });
       return newCounter;
     });
-  }
+  };
 
   useEffect(() => {
     if (proverCounter === 0) return;
@@ -49,12 +49,12 @@ export const useProver = (
   useAutoClicker(
     shouldAutoClick,
     5000 / (getAutomationValue(1, "Prover") || 1),
-    prove
+    prove,
   );
 
   return {
     proverCounter,
     proverProgress,
-    prove
+    prove,
   };
-}
+};

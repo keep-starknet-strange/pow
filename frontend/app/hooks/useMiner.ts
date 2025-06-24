@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
@@ -6,7 +6,7 @@ import { Block } from "../types/Chains";
 
 export const useMiner = (
   onBlockMined: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined
+  getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
@@ -14,13 +14,16 @@ export const useMiner = (
   const [miningProgress, setMiningProgress] = useState(0);
 
   const mineBlock = () => {
-    setMineCounter(prevCounter => {
+    setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = getUpgradeValue(0, "Block Difficulty");
-      notify("MineClicked", { counter: newCounter, difficulty: blockDifficulty });
+      notify("MineClicked", {
+        counter: newCounter,
+        difficulty: blockDifficulty,
+      });
       return newCounter;
     });
-  }
+  };
 
   useEffect(() => {
     if (mineCounter === 0) return;
@@ -45,12 +48,12 @@ export const useMiner = (
   useAutoClicker(
     shouldAutoClick,
     5000 / (getAutomationValue(0, "Miner") || 1),
-    mineBlock
+    mineBlock,
   );
 
   return {
     mineCounter,
     miningProgress,
-    mineBlock
+    mineBlock,
   };
-}
+};

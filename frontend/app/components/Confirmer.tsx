@@ -1,6 +1,11 @@
-import { View, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
-import { useTutorialLayout } from '../hooks/useTutorialLayout';
-import { TargetId } from '../context/Tutorial';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import { TargetId } from "../context/Tutorial";
 
 export type ConfirmerProps = {
   progress: number;
@@ -11,8 +16,10 @@ export type ConfirmerProps = {
 };
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
-  const enabled = props.renderedBy !== undefined && ["miner", "sequencer", "da", 'prover'].includes(props.renderedBy);
-  let tutorialProps = {}
+  const enabled =
+    props.renderedBy !== undefined &&
+    ["miner", "sequencer", "da", "prover"].includes(props.renderedBy);
+  let tutorialProps = {};
   let ref, onLayout;
   if (enabled) {
     const targetId = `${props.renderedBy}Confirmer` as TargetId;

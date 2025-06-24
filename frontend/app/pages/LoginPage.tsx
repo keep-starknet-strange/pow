@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { LoginMainPage } from './login/Main';
-import { AccountCreationPage } from './login/AccountCreation';
+import React, { useState } from "react";
+import { View } from "react-native";
+import { LoginMainPage } from "./login/Main";
+import { AccountCreationPage } from "./login/AccountCreation";
 
 export const LoginPage: React.FC = () => {
   const loginPages = {
     login: LoginMainPage,
     accountCreation: AccountCreationPage,
   };
-  const [currentPage, setCurrentPage] = useState<keyof typeof loginPages>('login');
+  const [currentPage, setCurrentPage] =
+    useState<keyof typeof loginPages>("login");
   const ActivePage = loginPages[currentPage];
 
   const setLoginPage = (page: string) => {
@@ -20,6 +21,6 @@ export const LoginPage: React.FC = () => {
       <ActivePage setLoginPage={setLoginPage} />
     </View>
   );
-}
+};
 
 export default LoginPage;

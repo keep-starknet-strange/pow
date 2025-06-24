@@ -14,9 +14,15 @@ export const PrestigeUnlock: React.FC = () => {
   return (
     <View>
       {showUnlock && (
-        <UnlockView icon={prestigeIcon} name="Prestige" description="Reset and build bigger!" cost={getNextPrestigeCost()} onPress={() => prestige()}
-          style={{ marginTop: 26, marginBottom: 0 }} />
+        <UnlockView
+          icon={prestigeIcon}
+          name="Prestige"
+          description="Reset and build bigger!"
+          cost={getNextPrestigeCost()}
+          onPress={() => prestige()}
+          style={{ marginTop: 26, marginBottom: 0 }}
+        />
       )}
     </View>
   );
-}
+};

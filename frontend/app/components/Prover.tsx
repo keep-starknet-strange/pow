@@ -7,14 +7,14 @@ import * as proverImages from "../configs/provers";
 export const getProverImage = (proverId: number) => {
   const images = Object.values(proverImages);
   return images[proverId] || images[0];
-}
+};
 
 import * as ProvingAnimation from "../configs/proving";
 export const getProvingAnimation = (progress: number) => {
   const animations = Object.values(ProvingAnimation);
   const animationIndex = Math.floor(progress * animations.length);
   return animations[animationIndex] || animations[0];
-}
+};
 
 export const Prover: React.FC = () => {
   const { automations } = useUpgrades();

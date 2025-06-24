@@ -16,7 +16,7 @@ export interface L1PhaseProps {
 
 export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
   const { dappsUnlocked } = useTransactions();
-  const {ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
+  const { ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
   const { l2 } = useGame();
   return (
     <View className="flex flex-col items-center mt-10">
@@ -63,6 +63,6 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
       </View>
     </View>
   );
-}
+};
 
 export default L1Phase;

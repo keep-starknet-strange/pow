@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, Dimensions, Animated, useAnimatedValue } from "react-native";
+import {
+  Image,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  Animated,
+  useAnimatedValue,
+} from "react-native";
 import { useEventManager } from "../../context/EventManager";
 import { useSound } from "../../context/Sound";
 import { useUpgrades } from "../../context/Upgrades";
-import { getTxIcon, getRandomInscriptionImage, getRandomNFTImage } from "../../utils/transactions";
+import {
+  getTxIcon,
+  getRandomInscriptionImage,
+  getRandomNFTImage,
+} from "../../utils/transactions";
 import transactions from "../../configs/transactions.json";
 import questionMarkIcon from "../../../assets/images/questionMark.png";
 
@@ -19,7 +30,12 @@ export type DappsButtonProps = {
 export const DappsButton: React.FC<DappsButtonProps> = (props) => {
   const { notify } = useEventManager();
   const { gameState, updateBalance, unlockL2 } = useGameState();
-  const { l1TransactionTypes, l2TransactionTypes, l1TxFeeUpgrade, l2TxFeeUpgrade } = useUpgrades();
+  const {
+    l1TransactionTypes,
+    l2TransactionTypes,
+    l1TxFeeUpgrade,
+    l2TxFeeUpgrade,
+  } = useUpgrades();
 
   const [chainId, setChainId] = useState(0);
   const [txTypes, setTxTypes] = useState(l1TransactionTypes);
@@ -45,8 +61,9 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
 
   const tryBuyTx = (txTypeId: number) => {
     if (txTypes[txTypeId].feeLevel !== 0) return;
-    const txType = chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
-    
+    const txType =
+      chainId === 0 ? transactions.L1[txTypeId] : transactions.L2[txTypeId];
+
     if (gameState.balance < txType.feeCosts[0]) return;
     if (chainId === 0) {
       l1TxFeeUpgrade(txTypeId);
@@ -77,10 +94,7 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
         else props.toggleOpen();
       }}
     >
-      <Image
-        source={icon}
-        className="w-full h-full object-contain"
-      />
+      <Image source={icon} className="w-full h-full object-contain" />
       {props.isOpen && (
         <Text
           className="text-white text-center text-[2rem] font-bold
@@ -92,4 +106,4 @@ export const DappsButton: React.FC<DappsButtonProps> = (props) => {
       )}
     </TouchableOpacity>
   );
-}
+};

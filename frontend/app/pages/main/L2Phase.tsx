@@ -20,7 +20,7 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
       <View
         className="w-full pb-[1.2rem] rounded-t-lg"
         style={{
-          marginTop: 16
+          marginTop: 16,
         }}
       >
         <TouchableOpacity
@@ -55,6 +55,6 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
       </View>
     </View>
   );
-}
+};
 
 export default L2Phase;

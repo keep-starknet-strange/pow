@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { useEventManager } from "./EventManager";
 import { useFocEngine } from "./FocEngineConnector";
 import { usePowContractConnector } from "./PowContractConnector";
@@ -13,14 +13,18 @@ type BalanceContextType = {
 export const useBalance = () => {
   const context = useContext(BalanceContext);
   if (!context) {
-    throw new Error('useBalance must be used within a BalanceProvider');
+    throw new Error("useBalance must be used within a BalanceProvider");
   }
   return context;
-}
+};
 
-export const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
+export const BalanceContext = createContext<BalanceContextType | undefined>(
+  undefined,
+);
 
-export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { notify } = useEventManager();
   const { user, getLatestEventWith } = useFocEngine();
   const { powGameContractAddress, getUserBalance } = usePowContractConnector();
@@ -49,7 +53,7 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [powGameContractAddress, user, getLatestEventWith]);
 
   const updateBalance = (change: number) => {
-    setBalance(prevBalance => {
+    setBalance((prevBalance) => {
       const newBalance = prevBalance + change;
       notify("BalanceUpdated", { balance: newBalance, change });
       return newBalance;
@@ -68,8 +72,10 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <BalanceContext.Provider value={{ balance, setBalance, tryBuy, updateBalance }}>
+    <BalanceContext.Provider
+      value={{ balance, setBalance, tryBuy, updateBalance }}
+    >
       {children}
     </BalanceContext.Provider>
   );
-}
+};

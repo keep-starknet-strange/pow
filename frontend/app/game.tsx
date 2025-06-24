@@ -38,37 +38,49 @@ export default function game() {
   const { user } = useFocEngine();
 
   const { sendInAppNotification } = useInAppNotifications();
-  const [inAppNotificationObserver, setInAppNotificationObserver] = useState<null | number>(null);
+  const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
+    null | number
+  >(null);
   useEffect(() => {
     if (inAppNotificationObserver !== null) {
       // Unregister the previous observer if it exists
       unregisterObserver(inAppNotificationObserver);
     }
-    setInAppNotificationObserver(registerObserver(new InAppNotificationsObserver(sendInAppNotification)));
+    setInAppNotificationObserver(
+      registerObserver(new InAppNotificationsObserver(sendInAppNotification)),
+    );
   }, [sendInAppNotification]);
 
   const { updateAchievement } = useAchievement();
-  const [achievementObserver, setAchievementObserver] = useState<null | number>(null);
+  const [achievementObserver, setAchievementObserver] = useState<null | number>(
+    null,
+  );
   useEffect(() => {
     if (achievementObserver !== null) {
       // Unregister the previous observer if it exists
       unregisterObserver(achievementObserver);
     }
-    setAchievementObserver(registerObserver(new AchievementObserver(updateAchievement)));
+    setAchievementObserver(
+      registerObserver(new AchievementObserver(updateAchievement)),
+    );
   }, [updateAchievement]);
 
   const { getWorkingBlock } = useGame();
   const { addAction } = usePowContractConnector();
-  const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(null);
+  const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(
+    null,
+  );
   useEffect(() => {
     if (txBuilderObserver !== null) {
       // Unregister the previous observer if it exists
       unregisterObserver(txBuilderObserver);
     }
-    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)));
+    setTxBuilderObserver(
+      registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)),
+    );
   }, [addAction, getWorkingBlock]);
   const { playSoundEffect } = useSound();
-  const { notify } = useEventManager()
+  const { notify } = useEventManager();
   const [soundObserver, setSoundObserver] = useState<null | number>(null);
   useEffect(() => {
     if (soundObserver !== null) {
@@ -78,59 +90,68 @@ export default function game() {
     setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
   }, [playSoundEffect]);
 
-  const tabs = [{
-    name: "Main",
-    icon: "🎮",
-    component: MainPage
-  },
-  ...(stakingUnlocked ? [{
-    name: "Staking",
-    icon: "🥩",
-    component: StakingPage
-  }] : []),
-  {
-    name: "Store",
-    icon: "🛒",
-    component: StorePage
-  }, {
-    name: "Leaderboard",
-    icon: "🏆",
-    component: LeaderboardPage
-  }, {
-    name: "Achievements",
-    icon: "🎉",
-    component: AchievementsPage
-  }, {
-    name: "Settings",
-    icon: "⚙️",
-    component: SettingsPage
-  }];
+  const tabs = [
+    {
+      name: "Main",
+      icon: "🎮",
+      component: MainPage,
+    },
+    ...(stakingUnlocked
+      ? [
+          {
+            name: "Staking",
+            icon: "🥩",
+            component: StakingPage,
+          },
+        ]
+      : []),
+    {
+      name: "Store",
+      icon: "🛒",
+      component: StorePage,
+    },
+    {
+      name: "Leaderboard",
+      icon: "🏆",
+      component: LeaderboardPage,
+    },
+    {
+      name: "Achievements",
+      icon: "🎉",
+      component: AchievementsPage,
+    },
+    {
+      name: "Settings",
+      icon: "⚙️",
+      component: SettingsPage,
+    },
+  ];
   const [currentPage, setCurrentPage] = useState(tabs[0]);
   const switchPage = (name: string) => {
-    if (!tabs.some(tab => tab.name === name)) {
+    if (!tabs.some((tab) => tab.name === name)) {
       console.warn(`Tab with name "${name}" does not exist.`);
       return;
     }
-    notify(('switchPage') as EventType, { name });
+    notify("switchPage" as EventType, { name });
     playSoundEffect("BasicClick");
-    setCurrentPage(tabs.find(tab => tab.name === name) || currentPage);
-  }
+    setCurrentPage(tabs.find((tab) => tab.name === name) || currentPage);
+  };
 
   return (
     <View className="flex-1 bg-[#010a12ff] relative">
-        {user && user.account.username !== "" ? (
-          <View className="flex-1">
-            { isTutorialActive && <TutorialOverlay/> }
-            <Header />
-            <InAppNotification />
-            <currentPage.component/>
-            <Footer tabs={tabs} switchPage={switchPage} />
-          </View>
-        ) : (
-          <View className="flex-1">
-            <LoginPage />
-          </View>
-        )}
+      {user && user.account.username !== "" ? (
+        <View className="flex-1">
+          {isTutorialActive && <TutorialOverlay />}
+          <Header />
+          <InAppNotification />
+          <currentPage.component />
+          <Footer tabs={tabs} switchPage={switchPage} />
+        </View>
+      ) : (
+        <View className="flex-1">
+          <LoginPage />
+        </View>
+      )}
     </View>
   );
 }

@@ -3,7 +3,7 @@ import { View, Dimensions, ImageBackground } from "react-native";
 import { useGame } from "../context/Game";
 import { L1Phase } from "./main/L1Phase";
 import { L2Phase } from "./main/L2Phase";
-import background from '../../assets/background.png';
+import background from "../../assets/background.png";
 
 export const MainPage: React.FC = () => {
   const { l2 } = useGame();
@@ -14,7 +14,12 @@ export const MainPage: React.FC = () => {
     <View
       className="flex-1"
       style={{
-        transform: [{ translateY: currentView === "L1" ? 0 : -Dimensions.get("window").height }],
+        transform: [
+          {
+            translateY:
+              currentView === "L1" ? 0 : -Dimensions.get("window").height,
+          },
+        ],
       }}
     >
       <ImageBackground
@@ -35,6 +40,6 @@ export const MainPage: React.FC = () => {
       )}
     </View>
   );
-}
+};
 
 export default MainPage;

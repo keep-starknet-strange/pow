@@ -8,7 +8,7 @@ export const newEmptyTransaction = () => {
     style: { backgroundColor: "#f7f7f7" },
     image: questionMarkImage,
   };
-}
+};
 
 export const daTxTypeId = 101;
 export const proofTxTypeId = 102;
@@ -18,49 +18,53 @@ export const getRandomInscriptionImage = () => {
   const images = Object.values(inscriptionImages);
   const randomIndex = Math.floor(Math.random() * images.length);
   return images[randomIndex];
-}
+};
 
-import * as nftImages from "../configs/nfts"; 
+import * as nftImages from "../configs/nfts";
 export const getRandomNFTImage = () => {
   const images = Object.values(nftImages);
   const randomIndex = Math.floor(Math.random() * images.length);
   return images[randomIndex];
-}
+};
 
 export const getChainIcons = (chain: number) => {
   const layerIcons: any = {
     0: {
-      "Transfer": transferIcon,
-      "Segwit": segwitIcon,
-      "Blobs": blobIcon,
-      "Inscriptions": getRandomInscriptionImage(),
-      "Runes": runesIcon,
-      "Dapp": dappIcon,
-      "L2": l2BatchIcon,
-      "PowSwap": powSwapIcon,
-      "ClosedOcean": closedOceanIcon,
-      "Pave": paveIcon,
-      "Libra": libraIcon,
+      Transfer: transferIcon,
+      Segwit: segwitIcon,
+      Blobs: blobIcon,
+      Inscriptions: getRandomInscriptionImage(),
+      Runes: runesIcon,
+      Dapp: dappIcon,
+      L2: l2BatchIcon,
+      PowSwap: powSwapIcon,
+      ClosedOcean: closedOceanIcon,
+      Pave: paveIcon,
+      Libra: libraIcon,
       "Crypto Dragons": cryptoDragonsIcon,
     },
     1: {
-      "Transfer": transferIcon,
-      "Bridge": transferIcon,
-      "NFTs": getRandomNFTImage(),
-      "Oracles": oracleIcon,
-      "Attestations": attestationIcon,
-      "Dapp": dappIcon,
-      "AppChain": dojoIcon,
-      "AVNU": avnuIcon,
+      Transfer: transferIcon,
+      Bridge: transferIcon,
+      NFTs: getRandomNFTImage(),
+      Oracles: oracleIcon,
+      Attestations: attestationIcon,
+      Dapp: dappIcon,
+      AppChain: dojoIcon,
+      AVNU: avnuIcon,
       "art/peace": artPeaceIcon,
-      "Vesu": vesuIcon,
-      "Eternum": eternumIcon,
+      Vesu: vesuIcon,
+      Eternum: eternumIcon,
     },
   };
   return layerIcons[chain];
-}
+};
 
-export const getTxIcon = (chainId: number, txTypeId: number, isDapp?: boolean) => {
+export const getTxIcon = (
+  chainId: number,
+  txTypeId: number,
+  isDapp?: boolean,
+) => {
   // TODO: Hardcoded for now, need to be dynamic
   if (txTypeId === daTxTypeId) {
     return blobIcon;
@@ -68,16 +72,26 @@ export const getTxIcon = (chainId: number, txTypeId: number, isDapp?: boolean) =
     return l2BatchIcon;
   }
   if (isDapp) {
-    const dappMeta = chainId === 0 ? dappsJson.L1.transactions[txTypeId] : dappsJson.L2.transactions[txTypeId];
+    const dappMeta =
+      chainId === 0
+        ? dappsJson.L1.transactions[txTypeId]
+        : dappsJson.L2.transactions[txTypeId];
     const icons = getChainIcons(chainId);
     return icons?.[dappMeta.name] || questionMarkImage;
   }
-  const txMeta = chainId === 0 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
+  const txMeta =
+    chainId === 0
+      ? transactionsJson.L1[txTypeId]
+      : transactionsJson.L2[txTypeId];
   const icons = getChainIcons(chainId);
   return icons?.[txMeta.name] || questionMarkImage;
-}
+};
 
-export const getTxStyle = (chainId: number, txTypeId: number, isDapp?: boolean) => {
+export const getTxStyle = (
+  chainId: number,
+  txTypeId: number,
+  isDapp?: boolean,
+) => {
   // TODO: Hardcoded for now, need to be dynamic
   if (txTypeId === 101) {
     return {
@@ -89,16 +103,22 @@ export const getTxStyle = (chainId: number, txTypeId: number, isDapp?: boolean) 
     };
   }
   if (isDapp) {
-    const dappMeta = chainId === 0 ? dappsJson.L1.transactions[txTypeId] : dappsJson.L2.transactions[txTypeId];
+    const dappMeta =
+      chainId === 0
+        ? dappsJson.L1.transactions[txTypeId]
+        : dappsJson.L2.transactions[txTypeId];
     return {
       backgroundColor: dappMeta.color || "#f7f7f7",
     };
   }
-  const txMeta = chainId === 0 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
+  const txMeta =
+    chainId === 0
+      ? transactionsJson.L1[txTypeId]
+      : transactionsJson.L2[txTypeId];
   return {
     backgroundColor: txMeta.color || "#f7f7f7",
   };
-}
+};
 
 // Above as import
 import transferIcon from "../../assets/images/transaction/transfer.png";
@@ -119,8 +139,14 @@ import vesuIcon from "../../assets/images/dapps/vesu.png";
 import eternumIcon from "../../assets/images/dapps/eternum.png";
 import oracleIcon from "../../assets/images/transaction/oracle.png";
 import attestationIcon from "../../assets/images/transaction/attestation.png";
-export const createTx = (chain: number, txTypeId: number, txFee: number, txIcon?: string) => {
-  const txMeta = chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
+export const createTx = (
+  chain: number,
+  txTypeId: number,
+  txFee: number,
+  txIcon?: string,
+) => {
+  const txMeta =
+    chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
   const image = txIcon || getTxIcon(chain, txTypeId);
   return {
     type: txMeta.name,
@@ -128,4 +154,4 @@ export const createTx = (chain: number, txTypeId: number, txFee: number, txIcon?
     style: { backgroundColor: txMeta.color },
     image: image,
   };
-}
+};

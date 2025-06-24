@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useEventManager } from "../context/EventManager";
 import { useFocEngine } from "./FocEngineConnector";
 import { usePowContractConnector } from "./PowContractConnector";
@@ -40,33 +46,55 @@ type TransactionsContextType = {
 export const useTransactions = () => {
   const context = useContext(TransactionsContext);
   if (!context) {
-    throw new Error("useTransactions must be used within a TransactionsProvider");
+    throw new Error(
+      "useTransactions must be used within a TransactionsProvider",
+    );
   }
   return context;
-}
-const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
+};
+const TransactionsContext = createContext<TransactionsContextType | undefined>(
+  undefined,
+);
 
-export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { tryBuy } = useBalance();
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powGameContractAddress, getUserTxFeeLevels, getUserTxSpeedLevels } = usePowContractConnector();
+  const { powGameContractAddress, getUserTxFeeLevels, getUserTxSpeedLevels } =
+    usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
 
-  const [transactionFees, setTransactionFees] = useState<{ [chainId: number]: { [txId: number]: number } }>({});
-  const [transactionSpeeds, setTransactionSpeeds] = useState<{ [chainId: number]: { [txId: number]: number } }>({});
-  const [dappFees, setDappFees] = useState<{ [chainId: number]: { [dappId: number]: number } }>({});
-  const [dappSpeeds, setDappSpeeds] = useState<{ [chainId: number]: { [dappId: number]: number } }>({});
-  const [dappsUnlocked, setDappsUnlocked] = useState<{ [chainId: number]: boolean }>({});
+  const [transactionFees, setTransactionFees] = useState<{
+    [chainId: number]: { [txId: number]: number };
+  }>({});
+  const [transactionSpeeds, setTransactionSpeeds] = useState<{
+    [chainId: number]: { [txId: number]: number };
+  }>({});
+  const [dappFees, setDappFees] = useState<{
+    [chainId: number]: { [dappId: number]: number };
+  }>({});
+  const [dappSpeeds, setDappSpeeds] = useState<{
+    [chainId: number]: { [dappId: number]: number };
+  }>({});
+  const [dappsUnlocked, setDappsUnlocked] = useState<{
+    [chainId: number]: boolean;
+  }>({});
 
   const { notify } = useEventManager();
 
   const resetTransactions = () => {
     // Initialize transaction levels
-    const initTransactionFees: { [chainId: number]: { [txId: number]: number } } = {};
-    const initTransactionSpeeds: { [chainId: number]: { [txId: number]: number } } = {};
+    const initTransactionFees: {
+      [chainId: number]: { [txId: number]: number };
+    } = {};
+    const initTransactionSpeeds: {
+      [chainId: number]: { [txId: number]: number };
+    } = {};
     for (const chainId in transactionJson) {
       const chainIdInt = chainId === "L1" ? 0 : 1;
-      const transactionsJsonData = chainId === "L1" ? transactionJson.L1 : transactionJson.L2;
+      const transactionsJsonData =
+        chainId === "L1" ? transactionJson.L1 : transactionJson.L2;
       initTransactionFees[chainIdInt] = {};
       initTransactionSpeeds[chainIdInt] = {};
       // Initialize all levels to -1
@@ -80,11 +108,16 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // Initialize dapp levels
     const initDappsUnlocked: { [chainId: number]: boolean } = {};
-    const initDappFees: { [chainId: number]: { [dappId: number]: number } } = {};
-    const initDappSpeeds: { [chainId: number]: { [dappId: number]: number } } = {};
+    const initDappFees: { [chainId: number]: { [dappId: number]: number } } =
+      {};
+    const initDappSpeeds: { [chainId: number]: { [dappId: number]: number } } =
+      {};
     for (const chainId in dappsJson) {
       const chainIdInt = chainId === "L1" ? 0 : 1;
-      const dappsJsonData = chainId === "L1" ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappsJsonData =
+        chainId === "L1"
+          ? dappsJson.L1.transactions
+          : dappsJson.L2.transactions;
       initDappFees[chainIdInt] = {};
       initDappSpeeds[chainIdInt] = {};
       // Initialize all levels to -1
@@ -178,9 +211,11 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           continue;
         }
         */
-        const txJsonConfig = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+        const txJsonConfig =
+          chainId === 0 ? transactionJson.L1 : transactionJson.L2;
         const maxTxId = txJsonConfig.length - 1;
-        const dappsJsonConfig = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+        const dappsJsonConfig =
+          chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
         const maxDappId = dappsJsonConfig.length - 1;
         const maxId = maxTxId + maxDappId + 1; // Dapp IDs are offset by the number of transactions
         const txFeeLevels = await getUserTxFeeLevels(chainId, maxId);
@@ -196,7 +231,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
           txFeeLevels.forEach((level, txId) => {
             if (txId <= maxTxId) {
-              newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+              newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newFees;
@@ -210,7 +245,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           txFeeLevels.forEach((level, txId) => {
             if (txId > maxTxId) {
               const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
-              newFees[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+              newFees[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newFees;
@@ -223,10 +258,10 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
           txSpeedLevels.forEach((level, txId) => {
             if (txId <= maxTxId) {
-              newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed 
+              newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed
             } else {
               const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
-              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newSpeeds;
@@ -240,7 +275,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           txSpeedLevels.forEach((level, txId) => {
             if (txId > maxTxId) {
               const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
-              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed 
+              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newSpeeds;
@@ -290,7 +325,13 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     resetTransactions();
     // fetchTransactionLevels();
     fetchTransactionSpeeds();
-  }, [user, powGameContractAddress, getUniqueEventsWith, getUserTxFeeLevels, getUserTxSpeedLevels]);
+  }, [
+    user,
+    powGameContractAddress,
+    getUniqueEventsWith,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+  ]);
 
   const txFeeUpgrade = (chainId: number, txId: number) => {
     setTransactionFees((prevFees) => {
@@ -299,22 +340,33 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         newFees[chainId] = {};
       }
       // Check if level already max
-      const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-      const transactionData = transactionJsonData.find(tx => tx.id === txId);
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
       if (!transactionData) {
-        console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
         return newFees;
       }
       const currentLevel = newFees[chainId][txId];
       if (currentLevel >= transactionData.feeCosts.length - 1) {
-        console.warn(`Transaction fee level already at max for transaction ID ${txId} on chain ${chainId}`);
+        console.warn(
+          `Transaction fee level already at max for transaction ID ${txId} on chain ${chainId}`,
+        );
         return newFees;
       }
       const cost = transactionData.feeCosts[currentLevel + 1];
-      if(!tryBuy(cost)) return prevFees;
+      if (!tryBuy(cost)) return prevFees;
       // Upgrade the fee level by 1
       newFees[chainId][txId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId, isDapp: false, type: "txFee", level: currentLevel + 1 });
+      notify("TxUpgradePurchased", {
+        chainId,
+        txId,
+        isDapp: false,
+        type: "txFee",
+        level: currentLevel + 1,
+      });
       return newFees;
     });
   };
@@ -326,22 +378,33 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         newSpeeds[chainId] = {};
       }
       // Check if level already max
-      const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-      const transactionData = transactionJsonData.find(tx => tx.id === txId);
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
       if (!transactionData) {
-        console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
         return newSpeeds;
       }
       const currentLevel = newSpeeds[chainId][txId];
       if (currentLevel >= transactionData.speedCosts.length - 1) {
-        console.warn(`Transaction speed level already at max for transaction ID ${txId} on chain ${chainId}`);
+        console.warn(
+          `Transaction speed level already at max for transaction ID ${txId} on chain ${chainId}`,
+        );
         return newSpeeds;
       }
       const cost = transactionData.speedCosts[currentLevel + 1];
-      if(!tryBuy(cost)) return prevSpeeds;
+      if (!tryBuy(cost)) return prevSpeeds;
       // Upgrade the speed level by 1
       newSpeeds[chainId][txId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId, isDapp: false, type: "txSpeed", level: currentLevel + 1 });
+      notify("TxUpgradePurchased", {
+        chainId,
+        txId,
+        isDapp: false,
+        type: "txSpeed",
+        level: currentLevel + 1,
+      });
       return newSpeeds;
     });
   };
@@ -353,22 +416,31 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         newFees[chainId] = {};
       }
       // Check if level already max
-      const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-      const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
         console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
         return newFees;
       }
       const currentLevel = newFees[chainId][dappId];
       if (currentLevel >= dappData.feeCosts.length - 1) {
-        console.warn(`Dapp fee level already at max for dapp ID ${dappId} on chain ${chainId}`);
+        console.warn(
+          `Dapp fee level already at max for dapp ID ${dappId} on chain ${chainId}`,
+        );
         return newFees;
       }
       const cost = dappData.feeCosts[currentLevel + 1];
-      if(!tryBuy(cost)) return prevFees;
+      if (!tryBuy(cost)) return prevFees;
       // Upgrade the fee level by 1
       newFees[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId: dappId, isDapp: true, type: "dappFee", level: currentLevel + 1 });
+      notify("TxUpgradePurchased", {
+        chainId,
+        txId: dappId,
+        isDapp: true,
+        type: "dappFee",
+        level: currentLevel + 1,
+      });
       return newFees;
     });
   };
@@ -380,22 +452,31 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         newSpeeds[chainId] = {};
       }
       // Check if level already max
-      const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-      const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
         console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
         return newSpeeds;
       }
       const currentLevel = newSpeeds[chainId][dappId];
       if (currentLevel >= dappData.speedCosts.length - 1) {
-        console.warn(`Dapp speed level already at max for dapp ID ${dappId} on chain ${chainId}`);
+        console.warn(
+          `Dapp speed level already at max for dapp ID ${dappId} on chain ${chainId}`,
+        );
         return newSpeeds;
       }
       const cost = dappData.speedCosts[currentLevel + 1];
-      if(!tryBuy(cost)) return prevSpeeds;
+      if (!tryBuy(cost)) return prevSpeeds;
       // Upgrade the speed level by 1
       newSpeeds[chainId][dappId] = currentLevel + 1;
-      notify("TxUpgradePurchased", { chainId, txId: dappId, isDapp: true, type: "dappSpeed", level: currentLevel + 1});
+      notify("TxUpgradePurchased", {
+        chainId,
+        txId: dappId,
+        isDapp: true,
+        type: "dappSpeed",
+        level: currentLevel + 1,
+      });
       return newSpeeds;
     });
   };
@@ -403,7 +484,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const unlockDapps = (chainId: number) => {
     setDappsUnlocked((prevUnlocked) => {
       const cost = getDappUnlockCost(chainId);
-      if(!tryBuy(cost)) return prevUnlocked;
+      if (!tryBuy(cost)) return prevUnlocked;
       const newUnlocked = { ...prevUnlocked };
       newUnlocked[chainId] = true;
       notify("DappsPurchased", { chainId });
@@ -411,120 +492,174 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   };
 
-  const getTransactionFee = useCallback((chainId: number, txId: number) => {
-    const txFees = transactionFees[chainId] || {};
-    const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-    const transactionData = transactionJsonData.find(tx => tx.id === txId);
-    if (!transactionData || txFees[txId] === undefined) {
-      console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = txFees[txId];
-    const mevBoost = getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
-  }, [transactionFees, getUpgradeValue]);
+  const getTransactionFee = useCallback(
+    (chainId: number, txId: number) => {
+      const txFees = transactionFees[chainId] || {};
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
+      if (!transactionData || txFees[txId] === undefined) {
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
+        return 0;
+      }
+      const level = txFees[txId];
+      const mevBoost = getUpgradeValue(chainId, "MEV Boost");
+      return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
+    },
+    [transactionFees, getUpgradeValue],
+  );
 
-  const getTransactionSpeed = useCallback((chainId: number, txId: number) => {
-    const txSpeeds = transactionSpeeds[chainId] || {};
-    const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-    const transactionData = transactionJsonData.find(tx => tx.id === txId);
-    if (!transactionData || txSpeeds[txId] === undefined) {
-      console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = txSpeeds[txId];
-    return level === -1 ? 0 : transactionData.speeds[level];
-  }, [transactionSpeeds]);
+  const getTransactionSpeed = useCallback(
+    (chainId: number, txId: number) => {
+      const txSpeeds = transactionSpeeds[chainId] || {};
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
+      if (!transactionData || txSpeeds[txId] === undefined) {
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
+        return 0;
+      }
+      const level = txSpeeds[txId];
+      return level === -1 ? 0 : transactionData.speeds[level];
+    },
+    [transactionSpeeds],
+  );
 
-  const getDappFee = useCallback((chainId: number, dappId: number) => {
-    const dappFeesLevels = dappFees[chainId] || {};
-    const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-    const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
-    if (!dappData || dappFeesLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = dappFeesLevels[dappId];
-    const mevBoost = getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : dappData.fees[level] * mevBoost;
-  }, [dappFees, getUpgradeValue]);
+  const getDappFee = useCallback(
+    (chainId: number, dappId: number) => {
+      const dappFeesLevels = dappFees[chainId] || {};
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
+      if (!dappData || dappFeesLevels[dappId] === undefined) {
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        return 0;
+      }
+      const level = dappFeesLevels[dappId];
+      const mevBoost = getUpgradeValue(chainId, "MEV Boost");
+      return level === -1 ? 0 : dappData.fees[level] * mevBoost;
+    },
+    [dappFees, getUpgradeValue],
+  );
 
-  const getDappSpeed = useCallback((chainId: number, dappId: number) => {
-    const dappSpeedLevels = dappSpeeds[chainId] || {};
-    const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-    const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
-    if (!dappData || dappSpeedLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = dappSpeedLevels[dappId];
-    return level === -1 ? 0 : dappData.speeds[level];
-  }, [dappSpeeds]);
+  const getDappSpeed = useCallback(
+    (chainId: number, dappId: number) => {
+      const dappSpeedLevels = dappSpeeds[chainId] || {};
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
+      if (!dappData || dappSpeedLevels[dappId] === undefined) {
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        return 0;
+      }
+      const level = dappSpeedLevels[dappId];
+      return level === -1 ? 0 : dappData.speeds[level];
+    },
+    [dappSpeeds],
+  );
 
   const getDappUnlockCost = (chainId: number) => {
     const dappsJsonCost = chainId === 0 ? dappsJson.L1.cost : dappsJson.L2.cost;
     return dappsJsonCost;
-  }
+  };
 
-  const getNextTxFeeCost = useCallback((chainId: number, txId: number) => {
-    const txFees = transactionFees[chainId] || {};
-    const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-    const transactionData = transactionJsonData.find(tx => tx.id === txId);
-    if (!transactionData || txFees[txId] === undefined) {
-      console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = txFees[txId];
-    return transactionData.feeCosts[level + 1] || 0;
-  }, [transactionFees]);
+  const getNextTxFeeCost = useCallback(
+    (chainId: number, txId: number) => {
+      const txFees = transactionFees[chainId] || {};
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
+      if (!transactionData || txFees[txId] === undefined) {
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
+        return 0;
+      }
+      const level = txFees[txId];
+      return transactionData.feeCosts[level + 1] || 0;
+    },
+    [transactionFees],
+  );
 
-  const getNextTxSpeedCost = useCallback((chainId: number, txId: number) => {
-    const txSpeeds = transactionSpeeds[chainId] || {};
-    const transactionJsonData = chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-    const transactionData = transactionJsonData.find(tx => tx.id === txId);
-    if (!transactionData || txSpeeds[txId] === undefined) {
-      console.warn(`Transaction with ID ${txId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = txSpeeds[txId];
-    return transactionData.speedCosts[level + 1] || 0;
-  }, [transactionSpeeds]);
+  const getNextTxSpeedCost = useCallback(
+    (chainId: number, txId: number) => {
+      const txSpeeds = transactionSpeeds[chainId] || {};
+      const transactionJsonData =
+        chainId === 0 ? transactionJson.L1 : transactionJson.L2;
+      const transactionData = transactionJsonData.find((tx) => tx.id === txId);
+      if (!transactionData || txSpeeds[txId] === undefined) {
+        console.warn(
+          `Transaction with ID ${txId} not found for chain ${chainId}`,
+        );
+        return 0;
+      }
+      const level = txSpeeds[txId];
+      return transactionData.speedCosts[level + 1] || 0;
+    },
+    [transactionSpeeds],
+  );
 
-  const getNextDappFeeCost = useCallback((chainId: number, dappId: number) => {
-    const dappFeesLevels = dappFees[chainId] || {};
-    const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-    const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
-    if (!dappData || dappFeesLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = dappFeesLevels[dappId];
-    return dappData.feeCosts[level + 1] || 0;
-  }, [dappFees]);
+  const getNextDappFeeCost = useCallback(
+    (chainId: number, dappId: number) => {
+      const dappFeesLevels = dappFees[chainId] || {};
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
+      if (!dappData || dappFeesLevels[dappId] === undefined) {
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        return 0;
+      }
+      const level = dappFeesLevels[dappId];
+      return dappData.feeCosts[level + 1] || 0;
+    },
+    [dappFees],
+  );
 
-  const getNextDappSpeedCost = useCallback((chainId: number, dappId: number) => {
-    const dappSpeedLevels = dappSpeeds[chainId] || {};
-    const dappsJsonData = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-    const dappData = dappsJsonData.find(dapp => dapp.id === dappId);
-    if (!dappData || dappSpeedLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-      return 0;
-    }
-    const level = dappSpeedLevels[dappId];
-    return dappData.speedCosts[level + 1] || 0;
-  }, [dappSpeeds]);
+  const getNextDappSpeedCost = useCallback(
+    (chainId: number, dappId: number) => {
+      const dappSpeedLevels = dappSpeeds[chainId] || {};
+      const dappsJsonData =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
+      if (!dappData || dappSpeedLevels[dappId] === undefined) {
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        return 0;
+      }
+      const level = dappSpeedLevels[dappId];
+      return dappData.speedCosts[level + 1] || 0;
+    },
+    [dappSpeeds],
+  );
 
   return (
     <TransactionsContext.Provider
       value={{
-        transactionFees, transactionSpeeds, dappFees, dappSpeeds,
-        txFeeUpgrade, txSpeedUpgrade, dappFeeUpgrade, dappSpeedUpgrade,
-        dappsUnlocked, unlockDapps, getDappUnlockCost,
-        getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
-        getNextTxFeeCost, getNextTxSpeedCost, getNextDappFeeCost, getNextDappSpeedCost
+        transactionFees,
+        transactionSpeeds,
+        dappFees,
+        dappSpeeds,
+        txFeeUpgrade,
+        txSpeedUpgrade,
+        dappFeeUpgrade,
+        dappSpeedUpgrade,
+        dappsUnlocked,
+        unlockDapps,
+        getDappUnlockCost,
+        getTransactionFee,
+        getTransactionSpeed,
+        getDappFee,
+        getDappSpeed,
+        getNextTxFeeCost,
+        getNextTxSpeedCost,
+        getNextDappFeeCost,
+        getNextDappSpeedCost,
       }}
     >
       {children}
     </TransactionsContext.Provider>
   );
-}
+};

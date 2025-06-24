@@ -7,14 +7,14 @@ import * as sequencerImages from "../configs/sequencers";
 export const getSequencerImage = (sequencerId: number) => {
   const images = Object.values(sequencerImages);
   return images[sequencerId] || images[0];
-}
+};
 
 import * as SequencingAnimation from "../configs/sequencing";
 export const getSequencingAnimation = (progress: number) => {
   const animations = Object.values(SequencingAnimation);
   const animationIndex = Math.floor(progress * animations.length);
   return animations[animationIndex] || animations[0];
-}
+};
 
 export const Sequencer: React.FC = () => {
   const { automations } = useUpgrades();

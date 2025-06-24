@@ -11,7 +11,7 @@ import { shortMoneyString } from "../utils/helpers";
 
 export type WorkingBlockViewProps = {
   chainId: number;
-}
+};
 
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { workingBlocks, getWorkingBlock } = useGame();
@@ -19,15 +19,17 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
 
   return (
     <View className="flex flex-col items-center justify-center">
-      <View className={`flex flex-row justify-center aspect-square ${props.chainId === 0 ? "w-[22rem]" : "w-[16rem]"}`}>
-        <BlockView chainId={props.chainId} block={getWorkingBlock(props.chainId)} completed={false} />
+      <View
+        className={`flex flex-row justify-center aspect-square ${props.chainId === 0 ? "w-[22rem]" : "w-[16rem]"}`}
+      >
+        <BlockView
+          chainId={props.chainId}
+          block={getWorkingBlock(props.chainId)}
+          completed={false}
+        />
         {workingBlocks[props.chainId]?.isBuilt && (
           <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">
-            {props.chainId === 0 ? (
-              <Miner />
-            ) : (
-              <Sequencer />
-            )}
+            {props.chainId === 0 ? <Miner /> : <Sequencer />}
           </View>
         )}
       </View>
@@ -49,13 +51,16 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           <View className="flex flex-row items-center gap-1">
             <Image source={rewardImg} className="w-6 h-6" />
             <Text className="text-xl font-bold text-[#f9f980d0]">
-              {shortMoneyString(workingBlocks[props.chainId]?.reward || getUpgradeValue(props.chainId, "Block Reward"))}
+              {shortMoneyString(
+                workingBlocks[props.chainId]?.reward ||
+                  getUpgradeValue(props.chainId, "Block Reward"),
+              )}
             </Text>
           </View>
         </View>
       </View>
     </View>
   );
-}
+};
 
 export default WorkingBlockView;

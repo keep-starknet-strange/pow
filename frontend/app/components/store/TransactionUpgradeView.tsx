@@ -1,24 +1,35 @@
-import React, {useEffect, useState} from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 import moneyImg from "../../../assets/images/money.png";
 import overclockImg from "../../../assets/images/overclock.png";
 import { useTransactions } from "../../context/Transactions";
 import { getTxIcon } from "../../utils/transactions";
-import { IconWithLock } from './transactionUpgrade/IconWithLock';
-import { TxDetails } from './transactionUpgrade/TxDetails';
-import { TransactionUpgradeActions } from './transactionUpgrade/TransactionUpgradeActions';
+import { IconWithLock } from "./transactionUpgrade/IconWithLock";
+import { TxDetails } from "./transactionUpgrade/TxDetails";
+import { TransactionUpgradeActions } from "./transactionUpgrade/TransactionUpgradeActions";
 
 export type TransactionUpgradeViewProps = {
   chainId: number;
   txData: any; // TODO: define a proper type for txData
   isDapp?: boolean;
-}
+};
 
-export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (props) => {
+export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
+  props,
+) => {
   const {
-    transactionFees, transactionSpeeds, dappFees, dappSpeeds,
-    getNextTxFeeCost, getNextTxSpeedCost, getNextDappFeeCost, getNextDappSpeedCost,
-    txFeeUpgrade, txSpeedUpgrade, dappFeeUpgrade, dappSpeedUpgrade
+    transactionFees,
+    transactionSpeeds,
+    dappFees,
+    dappSpeeds,
+    getNextTxFeeCost,
+    getNextTxSpeedCost,
+    getNextDappFeeCost,
+    getNextDappSpeedCost,
+    txFeeUpgrade,
+    txSpeedUpgrade,
+    dappFeeUpgrade,
+    dappSpeedUpgrade,
   } = useTransactions();
 
   const [txIcon, setTxIcon] = useState<any>(null);
@@ -43,60 +54,68 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (pr
       setNextTxSpeedCost(getNextTxSpeedCost(props.chainId, props.txData.id));
     }
   }, [
-    props.chainId, props.txData.id, props.isDapp,
-    transactionFees, transactionSpeeds, dappFees, dappSpeeds,
-    getNextTxFeeCost, getNextTxSpeedCost, getNextDappFeeCost, getNextDappSpeedCost
+    props.chainId,
+    props.txData.id,
+    props.isDapp,
+    transactionFees,
+    transactionSpeeds,
+    dappFees,
+    dappSpeeds,
+    getNextTxFeeCost,
+    getNextTxSpeedCost,
+    getNextDappFeeCost,
+    getNextDappSpeedCost,
   ]);
   return (
-   <View className="flex flex-row w-full items-center">
-    <IconWithLock
-      source={txIcon}
-      color={props.txData.color}
-      locked={txFeeLevel === -1}
-    />
-    <TxDetails
-      name={props.txData.name}
-      description={props.txData.description}
-    />
-    <TransactionUpgradeActions
-      locked={txFeeLevel === -1}
-      nextCost={nextTxFeeCost}
-      onBuyPress={() => {
-              if (props.isDapp) {
-                dappFeeUpgrade(props.chainId, props.txData.id);
-              } else {
-                txFeeUpgrade(props.chainId, props.txData.id);
-              }
-            }}
-      feeProps={{
-        level: txFeeLevel,
-        maxLevel: props.txData.feeCosts.length,
-        nextCost: nextTxFeeCost,
-        onPress: () => {
-              if (props.isDapp) {
-                dappFeeUpgrade(props.chainId, props.txData.id);
-              } else {
-                txFeeUpgrade(props.chainId, props.txData.id);
-              }
-            },
-        icon: moneyImg,
-        color: props.txData.color.substring(0, 7) + 'f0',
-      }}
-      speedProps={{
-        level: txSpeedLevel,
-        maxLevel: props.txData.speedCosts.length,
-        nextCost: nextTxSpeedCost,
-        onPress: () => {
-              if (props.isDapp) {
-                dappSpeedUpgrade(props.chainId, props.txData.id);
-              } else {
-                txSpeedUpgrade(props.chainId, props.txData.id);
-              }
-            },
-        icon: overclockImg,
-        color: props.txData.color.substring(0, 7) + 'f0',
-      }}
-    />
-</View>
+    <View className="flex flex-row w-full items-center">
+      <IconWithLock
+        source={txIcon}
+        color={props.txData.color}
+        locked={txFeeLevel === -1}
+      />
+      <TxDetails
+        name={props.txData.name}
+        description={props.txData.description}
+      />
+      <TransactionUpgradeActions
+        locked={txFeeLevel === -1}
+        nextCost={nextTxFeeCost}
+        onBuyPress={() => {
+          if (props.isDapp) {
+            dappFeeUpgrade(props.chainId, props.txData.id);
+          } else {
+            txFeeUpgrade(props.chainId, props.txData.id);
+          }
+        }}
+        feeProps={{
+          level: txFeeLevel,
+          maxLevel: props.txData.feeCosts.length,
+          nextCost: nextTxFeeCost,
+          onPress: () => {
+            if (props.isDapp) {
+              dappFeeUpgrade(props.chainId, props.txData.id);
+            } else {
+              txFeeUpgrade(props.chainId, props.txData.id);
+            }
+          },
+          icon: moneyImg,
+          color: props.txData.color.substring(0, 7) + "f0",
+        }}
+        speedProps={{
+          level: txSpeedLevel,
+          maxLevel: props.txData.speedCosts.length,
+          nextCost: nextTxSpeedCost,
+          onPress: () => {
+            if (props.isDapp) {
+              dappSpeedUpgrade(props.chainId, props.txData.id);
+            } else {
+              txSpeedUpgrade(props.chainId, props.txData.id);
+            }
+          },
+          icon: overclockImg,
+          color: props.txData.color.substring(0, 7) + "f0",
+        }}
+      />
+    </View>
   );
-}
+};

@@ -8,7 +8,9 @@ export const ProverView = () => {
   const { getProver } = useGame();
   const { getUpgradeValue } = useUpgrades();
 
-  const [blockWidth, setBlockWidth] = useState(100 / (getUpgradeValue(1, "Recursive Proving") || 1));
+  const [blockWidth, setBlockWidth] = useState(
+    100 / (getUpgradeValue(1, "Recursive Proving") || 1),
+  );
   useEffect(() => {
     const maxSize = getUpgradeValue(1, "Recursive Proving");
     setBlockWidth(100 / (maxSize || 1));

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useEventManager } from "./EventManager";
 import { useBalance } from "./Balance";
 import { useUpgrades } from "./Upgrades";
@@ -45,9 +51,11 @@ export const useGame = () => {
     throw new Error("useGame must be used within a GameProvider");
   }
   return context;
-}
+};
 
-export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { notify } = useEventManager();
   const { updateBalance, tryBuy } = useBalance();
   const { getUpgradeValue } = useUpgrades();
@@ -55,13 +63,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [workingBlocks, setWorkingBlocks] = useState<Block[]>([]);
   const [l2, setL2] = useState<L2 | undefined>(undefined);
-  
+
   const resetGameState = () => {
     const initBlock = newBlock(0, genesisBlockReward);
     initBlock.isBuilt = true; // Mark the genesis block as built
     setWorkingBlocks([initBlock]);
     setL2(undefined);
-  }
+  };
 
   useEffect(() => {
     resetGameState();
@@ -75,9 +83,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     */
   }, []);
 
-  const getWorkingBlock = useCallback((chainId: number) => {
-    return workingBlocks[chainId] || null;
-  }, [workingBlocks]);
+  const getWorkingBlock = useCallback(
+    (chainId: number) => {
+      return workingBlocks[chainId] || null;
+    },
+    [workingBlocks],
+  );
 
   const addTransaction = (chainId: number, transaction: Transaction) => {
     if (workingBlocks[chainId]?.isBuilt) return;
@@ -88,7 +99,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return newWorkingBlocks;
       }
       const block = newWorkingBlocks[chainId];
-      const maxBlockSize = getUpgradeValue(chainId, "Block Size")**2;
+      const maxBlockSize = getUpgradeValue(chainId, "Block Size") ** 2;
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
         return newWorkingBlocks;
@@ -101,11 +112,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       notify("TxAdded", { chainId, tx: transaction });
       return newWorkingBlocks;
     });
-  }
+  };
 
   const onBlockMined = () => {
     const completedBlock = workingBlocks[0];
-    const blockReward = completedBlock.reward || getUpgradeValue(0, "Block Reward");
+    const blockReward =
+      completedBlock.reward || getUpgradeValue(0, "Block Reward");
     completedBlock.reward = blockReward;
     setWorkingBlocks((prevState) => {
       const newWorkingBlocks = [...prevState];
@@ -116,7 +128,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     notify("MineDone", { block: completedBlock });
     updateBalance(blockReward + completedBlock.fees);
     addBlock(0, completedBlock);
-  }
+  };
   const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);
 
   // TODO: DA / Prover fee split? const daSplit = 0.5; // TODO: Config
@@ -128,12 +140,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward = block.reward || getUpgradeValue(1, "Block Reward");
       // TODO: DA / Prover fee split? newL2Instance.da.blockFees += (block.fees + blockReward) * daSplit;
-      newL2Instance.da.blockFees += (block.fees + blockReward);
+      newL2Instance.da.blockFees += block.fees + blockReward;
       const daMaxSize = getUpgradeValue(1, "DA compression");
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return newL2Instance;
     });
-  }
+  };
 
   const addBlockToProver = (block: Block) => {
     if (!l2) return;
@@ -143,16 +155,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward = block.reward || getUpgradeValue(1, "Block Reward");
       // TODO: newL2Instance.prover.blockFees += (block.fees + blockReward) * (1 - daSplit);
-      newL2Instance.prover.blockFees += (block.fees + blockReward);
+      newL2Instance.prover.blockFees += block.fees + blockReward;
       const proverMaxSize = getUpgradeValue(1, "Recursive Proving");
-      newL2Instance.prover.isBuilt = newL2Instance.prover.blocks.length >= proverMaxSize;
+      newL2Instance.prover.isBuilt =
+        newL2Instance.prover.blocks.length >= proverMaxSize;
       return newL2Instance;
     });
-  }
+  };
 
   const onBlockSequenced = () => {
     const completedBlock = workingBlocks[1];
-    const blockReward = completedBlock.reward || getUpgradeValue(1, "Block Reward");
+    const blockReward =
+      completedBlock.reward || getUpgradeValue(1, "Block Reward");
     completedBlock.reward = blockReward;
     setWorkingBlocks((prevState) => {
       const newWorkingBlocks = [...prevState];
@@ -164,8 +178,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addBlockToDa(completedBlock);
     addBlockToProver(completedBlock);
     addBlock(1, completedBlock);
-  }
-  const { sequencingProgress, sequenceBlock } = useSequencer(onBlockSequenced, getWorkingBlock);
+  };
+  const { sequencingProgress, sequenceBlock } = useSequencer(
+    onBlockSequenced,
+    getWorkingBlock,
+  );
 
   const getL2 = useCallback(() => {
     return l2;
@@ -186,7 +203,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newL2Instance.da = newL2DA();
       return newL2Instance;
     });
-  }
+  };
   const { daProgress, daConfirm } = useDAConfirmer(onDAConfirmed, getDa);
 
   const getProver = useCallback(() => {
@@ -197,14 +214,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const onProverConfirmed = () => {
     setL2((prevState) => {
       if (!prevState) return prevState;
-      const newTx = newTransaction(proofTxTypeId, prevState.prover.blockFees, l2Batch);
+      const newTx = newTransaction(
+        proofTxTypeId,
+        prevState.prover.blockFees,
+        l2Batch,
+      );
       // TODO: Issue when L1 block is built already
       addTransaction(0, newTx);
       const newL2Instance = { ...prevState };
       newL2Instance.prover = newL2Prover();
       return newL2Instance;
     });
-  }
+  };
   const { proverProgress, prove } = useProver(onProverConfirmed, getProver);
 
   const defaultL2Cost = 1000; // TODO: Config
@@ -214,7 +235,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const initL2 = () => {
     const cost = getL2Cost();
-    if(!tryBuy(cost)) return;
+    if (!tryBuy(cost)) return;
 
     setWorkingBlocks((prevState) => {
       if (l2) return prevState;
@@ -228,15 +249,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     addChain();
     notify("L2Purchased", {});
-  }
+  };
 
   return (
-    <GameContext.Provider value={{
-      workingBlocks, getWorkingBlock, addTransaction,
-      miningProgress, mineBlock, sequencingProgress, sequenceBlock,
-      daProgress, daConfirm, proverProgress, prove,
-      l2, getL2, getL2Cost, initL2, getDa, getProver,
-    }}>
+    <GameContext.Provider
+      value={{
+        workingBlocks,
+        getWorkingBlock,
+        addTransaction,
+        miningProgress,
+        mineBlock,
+        sequencingProgress,
+        sequenceBlock,
+        daProgress,
+        daConfirm,
+        proverProgress,
+        prove,
+        l2,
+        getL2,
+        getL2Cost,
+        initL2,
+        getDa,
+        getProver,
+      }}
+    >
       {children}
     </GameContext.Provider>
   );

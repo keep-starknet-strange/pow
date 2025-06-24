@@ -1,5 +1,11 @@
 import React from "react";
-import { Image, ImageSourcePropType, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import coinImg from "../../../assets/images/bitcoin.png";
 import { shortMoneyString } from "../../utils/helpers";
 
@@ -32,9 +38,7 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
       </View>
       {props.owned ? (
         <View className="flex flex-row items-center justify-center pr-1">
-          <Text className="text-lg font-bold pl-1 text-[#ffff80]">
-            Owned
-          </Text>
+          <Text className="text-lg font-bold pl-1 text-[#ffff80]">Owned</Text>
         </View>
       ) : (
         <View className="flex flex-row items-center justify-center pr-1">
@@ -46,4 +50,4 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
       )}
     </TouchableOpacity>
   );
-}
+};

@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View, TouchableOpacity, Easing, Animated, useAnimatedValue } from "react-native";
-import { Dimensions } from 'react-native';
+import {
+  Image,
+  Text,
+  View,
+  TouchableOpacity,
+  Easing,
+  Animated,
+  useAnimatedValue,
+} from "react-native";
+import { Dimensions } from "react-native";
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
 import { newTransaction } from "../../types/Chains";
@@ -11,7 +19,7 @@ import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
 import { shortMoneyString } from "../../utils/helpers";
 
-const window = Dimensions.get('window');
+const window = Dimensions.get("window");
 
 export type TxButtonProps = {
   chainId: number;
@@ -21,13 +29,25 @@ export type TxButtonProps = {
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { addTransaction } = useGame();
-  const { transactionFees, dappFees, getNextTxFeeCost, getNextDappFeeCost,
-          getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed,
-          txFeeUpgrade, dappFeeUpgrade
-        } = useTransactions();
-  const enabled = props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp
-  const { ref, onLayout } = useTutorialLayout("firstTransactionButton" as TargetId, enabled);
-  
+  const {
+    transactionFees,
+    dappFees,
+    getNextTxFeeCost,
+    getNextDappFeeCost,
+    getTransactionFee,
+    getTransactionSpeed,
+    getDappFee,
+    getDappSpeed,
+    txFeeUpgrade,
+    dappFeeUpgrade,
+  } = useTransactions();
+  const enabled =
+    props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp;
+  const { ref, onLayout } = useTutorialLayout(
+    "firstTransactionButton" as TargetId,
+    enabled,
+  );
+
   const [feeLevel, setFeeLevel] = useState<number>(-1);
 
   useEffect(() => {
@@ -46,7 +66,13 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     } else {
       setFeeCost(getNextTxFeeCost(chainId, props.txType.id));
     }
-  }, [props.chainId, props.txType.id, props.isDapp, getNextTxFeeCost, getNextDappFeeCost]);
+  }, [
+    props.chainId,
+    props.txType.id,
+    props.isDapp,
+    getNextTxFeeCost,
+    getNextDappFeeCost,
+  ]);
 
   const [fee, setFee] = useState<number>(0);
   const [speed, setSpeed] = useState<number>(0);
@@ -60,13 +86,21 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       setFee(getTransactionFee(chainId, props.txType.id));
       setSpeed(getTransactionSpeed(chainId, props.txType.id));
     }
-  }, [props.chainId, props.txType.id, props.isDapp, getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed]);
+  }, [
+    props.chainId,
+    props.txType.id,
+    props.isDapp,
+    getTransactionFee,
+    getTransactionSpeed,
+    getDappFee,
+    getDappSpeed,
+  ]);
 
   const addNewTransaction = async () => {
     const newTx = newTransaction(props.txType.id, fee, icon, props.isDapp);
     setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
     addTransaction(props.chainId, newTx);
-  }
+  };
 
   const [icon, setIcon] = useState<any>(questionMarkIcon);
   useEffect(() => {
@@ -81,7 +115,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     Animated.timing(sequenceAnim, {
       toValue: 100,
       easing: Easing.linear,
-      duration: (5000 / speed) + randomValue,
+      duration: 5000 / speed + randomValue,
       useNativeDriver: false,
     }).start(() => {
       sequenceAnim.setValue(0);
@@ -114,55 +148,52 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           addNewTransaction();
         }}
       >
-      <View className="w-full h-full relative overflow-hidden">
-        <Image
-          source={icon}
-          className="w-full h-full object-contain p-1"
-        />
-        {speed > 0 && (
-          <Animated.View
-            className="absolute bg-[#f9f9f980] rounded-full
+        <View className="w-full h-full relative overflow-hidden">
+          <Image source={icon} className="w-full h-full object-contain p-1" />
+          {speed > 0 && (
+            <Animated.View
+              className="absolute bg-[#f9f9f980] rounded-full
                        top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]"
-            style={{
-              height: sequenceAnim,
-              width: sequenceAnim
-            }}
-          />
-        )}
-      </View>
-      {feeLevel === -1 && (
-        <View
-          className="absolute w-full h-full bg-[#292929d9] rounded-lg
+              style={{
+                height: sequenceAnim,
+                width: sequenceAnim,
+              }}
+            />
+          )}
+        </View>
+        {feeLevel === -1 && (
+          <View
+            className="absolute w-full h-full bg-[#292929d9] rounded-lg
                      flex items-center justify-center
                      border-2 border-[#f9f9f920] pointer-events-none
                      top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+          >
+            <Image
+              source={lockImg}
+              className="w-full h-full object-contain p-2 mb-3"
+            />
+          </View>
+        )}
+        <Text
+          className="absolute top-0 w-full text-center text-[0.6rem] font-bold"
+          style={{
+            color: feeLevel === -1 ? props.txType.color : "#292929d0",
+          }}
         >
-          <Image
-            source={lockImg}
-            className="w-full h-full object-contain p-2 mb-3"
-          />
-        </View>
-      )}
-      <Text
-        className="absolute top-0 w-full text-center text-[0.6rem] font-bold"
-        style={{
-          color: feeLevel === -1 ? props.txType.color : "#292929d0",
-        }}
-      >
-        {props.txType.name}
-      </Text>
-      <Text
-        className="absolute w-[4.2rem] border-2 bg-[#292929] rounded-lg
+          {props.txType.name}
+        </Text>
+        <Text
+          className="absolute w-[4.2rem] border-2 bg-[#292929] rounded-lg
                    bottom-[-1rem] text-center text-[1rem] font-bold"
-        style={{
-          color: feeLevel === -1 ? "#f76060a0" : "#60f760a0",
-          borderColor: props.txType.color,
-        }}
-      >
-        {feeLevel === -1 ? "" : "+"}
-        {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
-      </Text>
-    </TouchableOpacity>
-  </View>
+          style={{
+            color: feeLevel === -1 ? "#f76060a0" : "#60f760a0",
+            borderColor: props.txType.color,
+          }}
+        >
+          {feeLevel === -1 ? "" : "+"}
+          {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
-}
+};

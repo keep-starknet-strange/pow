@@ -1,7 +1,7 @@
 export const shortMoneyString = (value: number): string => {
   const absValue = Math.abs(value);
   if (absValue < 1e3) {
-    return '₿' + value.toString();
+    return "₿" + value.toString();
   } else if (absValue < 1e6) {
     return `₿${(value / 1e3).toFixed(1)}K`;
   } else if (absValue < 1e9) {
@@ -19,4 +19,4 @@ export const shortMoneyString = (value: number): string => {
     const mantissa = (value / Math.pow(10, exponent)).toFixed(1);
     return `₿${mantissa}e${exponent}`;
   }
-}
+};
