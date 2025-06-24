@@ -18,11 +18,11 @@
     "highlightTargetId": "firstTransactionButton"
   },
   "checkStore": {
-      "title": "Checkout the store to buy stuff",
-      "description": "Checkout out the store to buy stuff.",
-      "bubbleTargetId": "storeTab",
-      "highlightTargetId": "storeTab"
-    },
+    "title": "Checkout the store to buy stuff",
+    "description": "Checkout out the store to buy stuff.",
+    "bubbleTargetId": "storeTab",
+    "highlightTargetId": "storeTab"
+  },
   "purchaseFeeUpgrade": {
     "title": "Purchase Fee Upgrade",
     "description": "Now click on the fee upgrade to increase your fee per transaction.",

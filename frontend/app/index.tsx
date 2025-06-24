@@ -63,7 +63,7 @@ export default function App() {
                 </PowContractProvider>
               </FocEngineProvider>
             </StarknetConnectorProvider>
-         </SoundProvider>
+          </SoundProvider>
         </TutorialProvider>
       </InAppNotificationsProvider>
     </EventManagerProvider>

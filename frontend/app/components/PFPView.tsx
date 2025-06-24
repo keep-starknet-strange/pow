@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Image } from "react-native";
 import {
-  getNounsHead, getNounsGlasses, getNounsBody, getNounsAccessories,
-  NounsAttributes
-} from '../configs/nouns';
+  getNounsHead,
+  getNounsGlasses,
+  getNounsBody,
+  getNounsAccessories,
+  NounsAttributes,
+} from "../configs/nouns";
 
 type PFPViewProps = {
   user?: string | undefined;
   attributes?: NounsAttributes;
-}
+};
 
 export const PFPView: React.FC<PFPViewProps> = ({ user, attributes }) => {
   const [nounsAttributes, setNounsAttributes] = useState(attributes);

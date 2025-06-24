@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useInAppNotifications } from "../context/InAppNotifications";
 import { useSound } from "../context/Sound";
@@ -10,20 +16,28 @@ type AchievementContextType = {
   achievementsProgress: { [key: number]: number };
 };
 
-const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
+const AchievementContext = createContext<AchievementContextType | undefined>(
+  undefined,
+);
 
 export const useAchievement = () => {
   const context = useContext(AchievementContext);
   if (!context) {
-    throw new Error("useAchievement must be used within an AchievementProvider");
+    throw new Error(
+      "useAchievement must be used within an AchievementProvider",
+    );
   }
   return context;
-}
+};
 
-export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { sendInAppNotification } = useInAppNotifications();
   const { playSoundEffect } = useSound();
-  const [achievementsProgress, setAchievementsProgress] = useState<{ [key: number]: number }>({});
+  const [achievementsProgress, setAchievementsProgress] = useState<{
+    [key: number]: number;
+  }>({});
   useEffect(() => {
     const initialAchievementsProgress: { [key: number]: number } = {};
     achievementsJson.forEach((achievement: any) => {
@@ -37,31 +51,45 @@ export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({ c
             initialAchievementsProgress[achievement.id] = parseInt(value, 10);
           }
         })
-        .catch((error) => console.error("Error fetching achievement progress:", error));
+        .catch((error) =>
+          console.error("Error fetching achievement progress:", error),
+        );
     });
     setAchievementsProgress(initialAchievementsProgress);
   }, []);
 
-  const updateAchievement = useCallback((achievementId: number, progress: number) => {
-    setAchievementsProgress((prevAchievements) => ({
-      ...prevAchievements,
-      [achievementId]: Math.min(progress, 100), // Ensure progress does not exceed 100
-    }));
-    if (progress >= 100) {
-      playSoundEffect("AchievementCompleted");
-      const typeId = inAppNotificationsJson.find(
-        (notification) => notification.eventType === "AchievementCompleted"
-      )?.id || 0;
-      const achievement = achievementsJson.find((ach) => ach.id === achievementId);
-      const message = "Achieved! " + (achievement?.name || "Unknown");
-      sendInAppNotification(typeId, message);
-    }
-    AsyncStorage.setItem(`achievement_${achievementId}`, progress.toString())
-      .catch((error) => console.error("Error saving achievement progress:", error));
-  }, [playSoundEffect]);
+  const updateAchievement = useCallback(
+    (achievementId: number, progress: number) => {
+      setAchievementsProgress((prevAchievements) => ({
+        ...prevAchievements,
+        [achievementId]: Math.min(progress, 100), // Ensure progress does not exceed 100
+      }));
+      if (progress >= 100) {
+        playSoundEffect("AchievementCompleted");
+        const typeId =
+          inAppNotificationsJson.find(
+            (notification) => notification.eventType === "AchievementCompleted",
+          )?.id || 0;
+        const achievement = achievementsJson.find(
+          (ach) => ach.id === achievementId,
+        );
+        const message = "Achieved! " + (achievement?.name || "Unknown");
+        sendInAppNotification(typeId, message);
+      }
+      AsyncStorage.setItem(
+        `achievement_${achievementId}`,
+        progress.toString(),
+      ).catch((error) =>
+        console.error("Error saving achievement progress:", error),
+      );
+    },
+    [playSoundEffect],
+  );
 
   return (
-    <AchievementContext.Provider value={{ updateAchievement, achievementsProgress }}>
+    <AchievementContext.Provider
+      value={{ updateAchievement, achievementsProgress }}
+    >
       {children}
     </AchievementContext.Provider>
   );

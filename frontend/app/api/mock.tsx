@@ -1,7 +1,9 @@
 import { newEmptyTransaction } from "../utils/transactions";
 import { GameState } from "../types/GameState";
 
-export const mockAddress = process.env.EXPO_PUBLIC_MOCK_ADDRESS || "0x04db37570e07ef111103674778c3716ec5b877e0dec0e9ab90bb3d6b299d4589";
+export const mockAddress =
+  process.env.EXPO_PUBLIC_MOCK_ADDRESS ||
+  "0x04db37570e07ef111103674778c3716ec5b877e0dec0e9ab90bb3d6b299d4589";
 
 export const mockGameState: GameState = {
   balance: 14200,
@@ -13,7 +15,7 @@ export const mockGameState: GameState = {
         reward: 5,
         fees: 7,
         hp: 8,
-        transactions: Array.from({ length: 12 }, (_) => (newEmptyTransaction())),
+        transactions: Array.from({ length: 12 }, (_) => newEmptyTransaction()),
         maxSize: 64,
       },
       pastBlocks: Array.from({ length: 3 }, (_, i) => ({
@@ -21,7 +23,7 @@ export const mockGameState: GameState = {
         reward: 5,
         fees: 0,
         hp: 0,
-        transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
+        transactions: Array.from({ length: 64 }, (_) => newEmptyTransaction()),
         maxSize: 64,
       })),
     },
@@ -32,7 +34,7 @@ export const mockGameState: GameState = {
         reward: 10,
         fees: 2,
         hp: 1,
-        transactions: Array.from({ length: 12 }, (_) => (newEmptyTransaction())),
+        transactions: Array.from({ length: 12 }, (_) => newEmptyTransaction()),
         maxSize: 64,
       },
       pastBlocks: Array.from({ length: 1 }, (_, i) => ({
@@ -40,7 +42,7 @@ export const mockGameState: GameState = {
         reward: 10,
         fees: 0,
         hp: 0,
-        transactions: Array.from({ length: 64 }, (_) => (newEmptyTransaction())),
+        transactions: Array.from({ length: 64 }, (_) => newEmptyTransaction()),
         maxSize: 64,
       })),
     },

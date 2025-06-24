@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
@@ -6,7 +6,7 @@ import { Block } from "../types/Chains";
 
 export const useSequencer = (
   onBlockSequenced: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined
+  getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
@@ -14,12 +14,12 @@ export const useSequencer = (
   const [sequencingProgress, setSequencingProgress] = useState(0);
 
   const sequenceBlock = () => {
-    setSequenceCounter(prevCounter => {
+    setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       notify("SequenceClicked", { counter: newCounter });
       return newCounter;
     });
-  }
+  };
 
   useEffect(() => {
     if (sequenceCounter === 0) return;
@@ -48,12 +48,12 @@ export const useSequencer = (
   useAutoClicker(
     shouldAutoClick,
     5000 / (getAutomationValue(1, "Sequencer") || 1),
-    sequenceBlock
+    sequenceBlock,
   );
 
   return {
     sequenceCounter,
     sequencingProgress,
-    sequenceBlock
+    sequenceBlock,
   };
-}
+};

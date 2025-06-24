@@ -9,7 +9,8 @@ export type DappsUnlockProps = {
 };
 
 export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
-  const { dappsUnlocked, unlockDapps, getDappUnlockCost, transactionFees } = useTransactions();
+  const { dappsUnlocked, unlockDapps, getDappUnlockCost, transactionFees } =
+    useTransactions();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
     if (dappsUnlocked[props.chainId]) {
@@ -33,9 +34,15 @@ export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   return (
     <View>
       {showUnlock && (
-        <UnlockView icon={dappsIcon} name="Dapps" description="Get access to Dapps" cost={getDappUnlockCost(props.chainId)} onPress={() => unlockDapps(props.chainId)}
-          style={{ marginTop: 26, marginBottom: 0 }} />
+        <UnlockView
+          icon={dappsIcon}
+          name="Dapps"
+          description="Get access to Dapps"
+          cost={getDappUnlockCost(props.chainId)}
+          onPress={() => unlockDapps(props.chainId)}
+          style={{ marginTop: 26, marginBottom: 0 }}
+        />
       )}
     </View>
   );
-}
+};

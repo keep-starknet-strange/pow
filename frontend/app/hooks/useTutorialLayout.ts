@@ -3,10 +3,7 @@ import { View, InteractionManager } from "react-native";
 import { useTutorial, TargetId } from "../context/Tutorial";
 import tutorialConfig from "../configs/tutorial.json";
 
-export function useTutorialLayout(
-  id: TargetId,
-  enabled: boolean = true
-) {
+export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   const ref = useRef<View>(null);
   const { step, registerLayout, isTutorialActive } = useTutorial();
 
@@ -14,11 +11,7 @@ export function useTutorialLayout(
   const stepTargets = [bubbleTargetId, highlightTargetId];
 
   const measure = useCallback(() => {
-    if (
-      !enabled ||
-      !isTutorialActive ||
-      !stepTargets.includes(id.toString())
-    ) {
+    if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) {
       return;
     }
     ref.current?.measureInWindow((x, y, width, height) => {

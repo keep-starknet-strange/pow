@@ -1,26 +1,26 @@
 import React, { createContext, useContext, useState } from "react";
 
 export type EventType =
-  'MineClicked' |
-  'MineDone' |
-  'SequenceClicked' |
-  'SequenceDone' |
-  'ProveClicked' |
-  'ProveDone' |
-  'DaClicked' |
-  'DaDone' |
-  'BalanceUpdated' |
-  'ItemPurchased' |
-  'BuyFailed' |
-  'TxUpgradePurchased' |
-  'UpgradePurchased' |
-  'AutomationPurchased' |
-  'DappsPurchased' |
-  'StakingPurchased' |
-  'L2Purchased' |
-  'PrestigePurchased' |
-  'TxAdded' |
-  'AchievementCompleted';
+  | "MineClicked"
+  | "MineDone"
+  | "SequenceClicked"
+  | "SequenceDone"
+  | "ProveClicked"
+  | "ProveDone"
+  | "DaClicked"
+  | "DaDone"
+  | "BalanceUpdated"
+  | "ItemPurchased"
+  | "BuyFailed"
+  | "TxUpgradePurchased"
+  | "UpgradePurchased"
+  | "AutomationPurchased"
+  | "DappsPurchased"
+  | "StakingPurchased"
+  | "L2Purchased"
+  | "PrestigePurchased"
+  | "TxAdded"
+  | "AchievementCompleted";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): void;
@@ -32,17 +32,23 @@ type EventManagerContextType = {
   notify(eventName: EventType, data?: any): void;
 };
 
-const EventManagerContext = createContext<EventManagerContextType | undefined>(undefined);
+const EventManagerContext = createContext<EventManagerContextType | undefined>(
+  undefined,
+);
 
 export const useEventManager = () => {
   const context = useContext(EventManagerContext);
   if (!context) {
-    throw new Error("useEventManager must be used within an EventManagerProvider");
+    throw new Error(
+      "useEventManager must be used within an EventManagerProvider",
+    );
   }
   return context;
-}
+};
 
-export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [observers, setObservers] = useState<Map<number, Observer>>(new Map());
 
   const registerObserver = (observer: Observer): number => {
@@ -67,8 +73,10 @@ export const EventManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   return (
-    <EventManagerContext.Provider value={{ notify, registerObserver, unregisterObserver }}>
+    <EventManagerContext.Provider
+      value={{ notify, registerObserver, unregisterObserver }}
+    >
       {children}
     </EventManagerContext.Provider>
   );
-}
+};

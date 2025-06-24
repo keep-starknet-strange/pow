@@ -29,19 +29,29 @@ export function useVisibleBlocks(
   chainId: number,
   createdAtSec: number,
   tick: number,
-  windowSize: number
+  windowSize: number,
 ): [Block[], number] {
   const blocksRef = useRef<Block[]>([]);
 
-  const initialTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 9 };
-  const updateTxConfig: TxConfig = { chainId, minTxPerBlock: 4, maxTxPerBlock: 16, minFee: 1, maxFee: 10 };
+  const initialTxConfig: TxConfig = {
+    chainId,
+    minTxPerBlock: 4,
+    maxTxPerBlock: 9,
+  };
+  const updateTxConfig: TxConfig = {
+    chainId,
+    minTxPerBlock: 4,
+    maxTxPerBlock: 16,
+    minFee: 1,
+    maxFee: 10,
+  };
 
   useEffect(() => {
     const elapsed = Math.max(1, getNowSec() - createdAtSec);
     const count = Math.min(elapsed, windowSize);
 
     blocksRef.current = Array.from({ length: count }, (_, i) =>
-      buildBlock(elapsed - i, initialTxConfig)
+      buildBlock(elapsed - i, initialTxConfig),
     );
   }, [chainId, createdAtSec, windowSize]);
 

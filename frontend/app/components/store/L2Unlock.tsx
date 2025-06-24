@@ -50,8 +50,8 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
 
   return (
     <View>
-      {(alwaysShow || showUnlock) && (
-        miniView ? (
+      {(alwaysShow || showUnlock) &&
+        (miniView ? (
           <View
             className="flex flex-col items-center justify-center w-full
                        mt-6"
@@ -82,9 +82,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
               initL2();
             }}
           />
-        )
-      )}
+        ))}
     </View>
   );
-}
-
+};

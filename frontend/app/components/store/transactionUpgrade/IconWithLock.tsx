@@ -1,13 +1,17 @@
-import { View, Image } from 'react-native'
-import lockImg from '../../../../assets/images/lock.png'
+import { View, Image } from "react-native";
+import lockImg from "../../../../assets/images/lock.png";
 
 type IconWithLockProps = {
-  source: any
-  color: string
-  locked: boolean
-}
+  source: any;
+  color: string;
+  locked: boolean;
+};
 
-export const IconWithLock: React.FC<IconWithLockProps> = ({ source, color, locked }) => (
+export const IconWithLock: React.FC<IconWithLockProps> = ({
+  source,
+  color,
+  locked,
+}) => (
   <View
     className="flex flex-col justify-center rounded-lg border-2 border-[#e7e7e740] relative w-[4.5rem] h-[4.5rem]"
     style={{ backgroundColor: color }}
@@ -19,4 +23,4 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({ source, color, locke
       </View>
     )}
   </View>
-)
+);

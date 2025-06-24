@@ -10,7 +10,9 @@ export const DaView = () => {
   const { getDa } = useGame();
   const { getUpgradeValue } = useUpgrades();
 
-  const [daWidth, setDaWidth] = useState(100 / (getUpgradeValue(1, "DA compression") || 1));
+  const [daWidth, setDaWidth] = useState(
+    100 / (getUpgradeValue(1, "DA compression") || 1),
+  );
   useEffect(() => {
     setDaWidth(100 / (getUpgradeValue(1, "DA compression") || 1));
   }, [getUpgradeValue]);
@@ -39,4 +41,4 @@ export const DaView = () => {
       )}
     </View>
   );
-}
+};
