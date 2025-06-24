@@ -6,7 +6,7 @@ import { TxButton } from "./buttons/TxButton";
 
 export type TransactionButtonsViewProps = {
   chainId: number;
-  isDapps?: boolean;
+  isDapps: boolean;
 }
 
 export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (props) => {

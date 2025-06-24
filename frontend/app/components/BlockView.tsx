@@ -72,9 +72,9 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           case 2:
             return getImage('block.icon.blob');
           case 3:
-            return getImage('block.icon.sn');
+            return getImage('block.icon.nft');
           case 4:
-            return getImage('block.icon.sn');
+            return getImage('block.icon.nft');
           default:
             return getImage('unknown');
         }

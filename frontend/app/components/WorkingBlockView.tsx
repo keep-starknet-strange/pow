@@ -20,7 +20,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
 
   return (
     <View className="flex flex-col items-center justify-center">
-      <View className={`flex flex-row justify-center ${props.chainId === 0 ? "w-[346px] h-[408px]" : "w-[16rem]"}`}>
+      <View className={"flex flex-row justify-center w-[346px] h-[408px]"}>
         <View className="absolute top-0 left-0 w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image

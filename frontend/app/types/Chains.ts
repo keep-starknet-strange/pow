@@ -3,16 +3,13 @@ import { ImageSourcePropType } from "react-native";
 export type Transaction = {
   typeId: number;
   fee: number;
-  icon: ImageSourcePropType;
   isDapp?: boolean;
 };
 
-export const newTransaction = (typeId: number, fee: number, icon: ImageSourcePropType,
-  isDapp?: boolean): Transaction => {
+export const newTransaction = (typeId: number, fee: number, isDapp?: boolean): Transaction => {
   return {
     typeId,
     fee,
-    icon,
     isDapp
   }
 }

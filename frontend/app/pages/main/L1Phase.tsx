@@ -38,10 +38,8 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
         </View>
         <WorkingBlockView chainId={0} />
       </View>
-      <View className="mt-[1.2rem] w-full">
-        {dappsUnlocked[0] ? (
-          <TransactionButtonsView chainId={0} isDapps={true} />
-        ) : (
+      <View className="mt-[0.5rem] w-full">
+        {!dappsUnlocked[0] && (
           <DappsUnlock chainId={0} />
         )}
       </View>
@@ -58,7 +56,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
           />
         </Canvas>
         <View className="absolute top-[4px] left-0 right-0">
-          <TransactionButtonsView chainId={0} isDapps={false} />
+          <TransactionButtonsView chainId={0} isDapps={dappsUnlocked[0]} />
         </View>
       </View>
     </View>

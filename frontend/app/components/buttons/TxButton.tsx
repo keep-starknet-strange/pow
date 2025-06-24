@@ -18,7 +18,7 @@ const window = Dimensions.get('window');
 export type TxButtonProps = {
   chainId: number;
   txType: any; // TODO: Define a proper type for txType
-  isDapp?: boolean;
+  isDapp: boolean;
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
@@ -66,15 +66,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [props.chainId, props.txType.id, props.isDapp, getTransactionFee, getTransactionSpeed, getDappFee, getDappSpeed]);
 
   const addNewTransaction = async () => {
-    const newTx = newTransaction(props.txType.id, fee, icon, props.isDapp);
-    setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
+    const newTx = newTransaction(props.txType.id, fee, props.isDapp);
     addTransaction(props.chainId, newTx);
   }
-
-  const [icon, setIcon] = useState<any>(questionMarkIcon);
-  useEffect(() => {
-    setIcon(getTxIcon(props.chainId, props.txType.id, props.isDapp));
-  }, [props.chainId, props.txType.id, props.isDapp, getTxIcon]);
 
   const sequenceAnim = useAnimatedValue(0);
   const [sequencedDone, setSequencedDone] = useState(0);

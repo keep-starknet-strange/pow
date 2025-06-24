@@ -17,7 +17,7 @@ export const DaView = () => {
 
   return (
     <View
-      className="flex flex-row items-center w-[12rem] h-[7rem]
+      className="flex flex-row items-center w-[13rem] h-[6rem]
                  bg-[#6060f710] rounded-lg shadow-lg relative
                  border-2 border-[#6060f7c0] overflow-hidden"
     >

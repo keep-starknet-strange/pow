@@ -43,16 +43,9 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
         keyboardVerticalOffset={100} // tweak this as needed based on header height
       >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ImageBackground
-          source={background}
-          resizeMode="cover"
+        <View
           style={{ flex: 1 }}
         >
-          <ImageBackground
-            className="absolute top-0 left-0 right-0 bottom-0"
-            source={backgroundGrid}
-            resizeMode="cover"
-          />
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'space-between' }}
             keyboardShouldPersistTaps="handled"
@@ -297,7 +290,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({ setLoginPa
               </View>
             )}
           </ScrollView>
-        </ImageBackground>
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );

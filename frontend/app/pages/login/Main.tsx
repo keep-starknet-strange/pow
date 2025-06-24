@@ -18,16 +18,9 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
 
   const version = process.env.EXPO_APP_VERSION || '0.0.1';
   return (
-    <ImageBackground
+    <View
       className="flex-1 items-center justify-between"
-      source={background}
-      resizeMode="cover"
     >
-      <ImageBackground
-        className="absolute top-0 left-0 right-0 bottom-0"
-        source={backgroundGrid}
-        resizeMode="cover"
-      />
       <View className="flex items-center justify-center">
         <Image
           source={logo}
@@ -75,7 +68,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({ setLoginPage }) =>
         <Text className="text-[#101119] text-md font-Pixels">Version {version}</Text>
         <Text className="text-[#101119] text-md font-Pixels">We are open source!</Text>
       </View>
-    </ImageBackground>
+    </View>
   );
 }
 
