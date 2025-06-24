@@ -10,7 +10,14 @@ type ToggleButtonProps = {
   style?: object;
 };
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ style, label, isOn, onSymbol, offSymbol, onToggle }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({
+  style,
+  label,
+  isOn,
+  onSymbol,
+  offSymbol,
+  onToggle,
+}) => {
   return (
     <TouchableOpacity
       onPress={onToggle}

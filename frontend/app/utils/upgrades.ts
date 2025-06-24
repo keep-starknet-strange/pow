@@ -46,48 +46,48 @@ export const getUpgradeIcons = (chainId: number) => {
     },
   };
   return layerIcons[chainId];
-}
+};
 
 export const getAutomationIcons = (chainId: number) => {
   const automationIcons: any = {
     0: {
-      "Miner": {
-        "None": baseMinerIcon,
-        "CPU": cpuMinerIcon,
-        "GPU": gpuMinerIcon,
-        "ASIC": asicMinerIcon,
-        "Antminer": antminerIcon,
-        "Bitmain": bitmainIcon,
-        "Quantum": quantumMinerIcon,
-      }
+      Miner: {
+        None: baseMinerIcon,
+        CPU: cpuMinerIcon,
+        GPU: gpuMinerIcon,
+        ASIC: asicMinerIcon,
+        Antminer: antminerIcon,
+        Bitmain: bitmainIcon,
+        Quantum: quantumMinerIcon,
+      },
     },
     1: {
-      "Sequencer": {
-        "None": baseSeqIcon,
-        "Base": baseSeqIcon,
-        "Rust": improvedSeqIcon,
-        "Cloud": cloudSeqIcon,
-        "Cairo": cairoNativeSeqIcon,
-        "Parallel": parallelizedSeqIcon,
-        "Decentralized": decentralizedSeqIcon,
+      Sequencer: {
+        None: baseSeqIcon,
+        Base: baseSeqIcon,
+        Rust: improvedSeqIcon,
+        Cloud: cloudSeqIcon,
+        Cairo: cairoNativeSeqIcon,
+        Parallel: parallelizedSeqIcon,
+        Decentralized: decentralizedSeqIcon,
       },
-      "Prover": {
-        "None": optimisticProverIcon,
-        "Optimistic": optimisticProverIcon,
-        "SNARK": zkSnarkProverIcon,
-        "STARK": zkStarkProverIcon,
-        "Stone": starkStoneProverIcon,
-        "STWO": starkStwoProverIcon,
+      Prover: {
+        None: optimisticProverIcon,
+        Optimistic: optimisticProverIcon,
+        SNARK: zkSnarkProverIcon,
+        STARK: zkStarkProverIcon,
+        Stone: starkStoneProverIcon,
+        STWO: starkStwoProverIcon,
       },
-      "DA": {
-        "None": calldataIcon,
-        "Calldata": calldataIcon,
-        "Blobs": blobsIcon,
-        "Zip": compressionIcon,
-        "DAS": dasIcon,
-        "Volition": volitionIcon,
-      }
-    }
+      DA: {
+        None: calldataIcon,
+        Calldata: calldataIcon,
+        Blobs: blobsIcon,
+        Zip: compressionIcon,
+        DAS: dasIcon,
+        Volition: volitionIcon,
+      },
+    },
   };
   return automationIcons[chainId];
-}
+};

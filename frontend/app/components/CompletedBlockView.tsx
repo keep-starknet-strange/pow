@@ -1,16 +1,23 @@
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
 import { useImageProvider } from "../context/ImageProvider";
-import { Block } from '../types/Chains';
-import { BlockView } from './BlockView';
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { Block } from "../types/Chains";
+import { BlockView } from "./BlockView";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 export type CompletedBlockViewProps = {
   chainId: number;
   block: Block | null;
 };
 
-export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (props) => {
+export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
+  props,
+) => {
   const { getImage } = useImageProvider();
 
   return (
@@ -22,9 +29,12 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (props) => 
             fit="fill"
             x={0}
             y={0}
-            width={144*2.4}
-            height={142*2.4}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            width={144 * 2.4}
+            height={142 * 2.4}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
@@ -37,7 +47,10 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (props) => 
             y={0}
             width={16}
             height={20}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
@@ -50,12 +63,14 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (props) => 
             y={0}
             width={16}
             height={20}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
       <BlockView chainId={props.chainId} block={props.block} completed={true} />
     </View>
   );
-}
-
+};

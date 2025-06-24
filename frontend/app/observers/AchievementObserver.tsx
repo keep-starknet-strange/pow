@@ -8,14 +8,16 @@ import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";
 import { Transaction, Block } from "../types/Chains";
 
-type Achievement = typeof achievements[number];
+type Achievement = (typeof achievements)[number];
 
 export class AchievementObserver implements Observer {
   updateAchievement: (achievementId: number, progress: number) => void;
   achievementsByEvent: Map<string, Achievement[]>;
   completedAchievements: Set<number>;
 
-  constructor(updateAchievement: (achievementId: number, progress: number) => void) {
+  constructor(
+    updateAchievement: (achievementId: number, progress: number) => void,
+  ) {
     this.updateAchievement = (achievementId, progress) => {
       updateAchievement(achievementId, progress);
       if (progress >= 100) {
@@ -26,16 +28,21 @@ export class AchievementObserver implements Observer {
     this.completedAchievements = new Set<number>();
     // Load completed achievements from local storage
     achievements.forEach((achievement) => {
-      AsyncStorage.getItem(`achievement_${achievement.id}`).then((value) => {
-        if (value !== null) {
-          const parsedProgress = parseInt(value, 10);
-          if (parsedProgress >= 100) {
-            this.completedAchievements.add(achievement.id);
+      AsyncStorage.getItem(`achievement_${achievement.id}`)
+        .then((value) => {
+          if (value !== null) {
+            const parsedProgress = parseInt(value, 10);
+            if (parsedProgress >= 100) {
+              this.completedAchievements.add(achievement.id);
+            }
           }
-        }
-      }).catch((error) => {
-        console.error("Error loading achievements from local storage:", error);
-      });
+        })
+        .catch((error) => {
+          console.error(
+            "Error loading achievements from local storage:",
+            error,
+          );
+        });
     });
   }
 
@@ -100,7 +107,10 @@ export class AchievementObserver implements Observer {
   private handleTxAdded(achievement: Achievement, tx: Transaction) {
     if (achievement.name === "Get ₿100 in 1 Transaction" && tx.fee >= 100) {
       this.updateAchievement(achievement.id, 100);
-    } else if (achievement.name === "Get ₿1K in 1 Transaction" && tx.fee >= 1000) {
+    } else if (
+      achievement.name === "Get ₿1K in 1 Transaction" &&
+      tx.fee >= 1000
+    ) {
       this.updateAchievement(achievement.id, 100);
     }
   }
@@ -169,11 +179,12 @@ export class AchievementObserver implements Observer {
     const checkFilter = (name: string) => {
       const filter = achievementFilter[name];
       return filter ? filter[0] === chainId && filter[1] === isDapp : false;
-    }
+    };
     if (!checkFilter(achievement.name)) return;
 
     if (isDapp) {
-      const txConfigJson = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+      const txConfigJson =
+        chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
       const lastUnlockableTxId = txConfigJson[txConfigJson.length - 1].id + 1;
       // Update progress if new txId unlocked
       if (level === 0) {
@@ -181,7 +192,8 @@ export class AchievementObserver implements Observer {
         this.updateAchievement(achievement.id, progress);
       }
     } else {
-      const txConfigJson = chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+      const txConfigJson =
+        chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
       const lastUnlockableTxId = txConfigJson[txConfigJson.length - 1].id + 1;
       // Update progress if new txId unlocked
       if (level === 0) {
@@ -196,32 +208,46 @@ export class AchievementObserver implements Observer {
     if (achievement.name === "Max All L1 Upgrades" && chainId === 1) return;
     if (achievement.name === "Max All L2 Upgrades" && chainId === 0) return;
     const upgradeConfigJson = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
-    const maxUpgradeLevelsCombined = Object.values(upgradeConfigJson).reduce((acc, upgrade) => acc + upgrade.values.length, 0);
+    const maxUpgradeLevelsCombined = Object.values(upgradeConfigJson).reduce(
+      (acc, upgrade) => acc + upgrade.values.length,
+      0,
+    );
     const currentUpgrades = newUpgrades[chainId] as Record<number, number>;
-    const currentLevelsCombined = Object.values(currentUpgrades).reduce((acc, level) => acc + level + 1, 0);
-    const progress = Math.min((currentLevelsCombined / maxUpgradeLevelsCombined) * 100, 100);
+    const currentLevelsCombined = Object.values(currentUpgrades).reduce(
+      (acc, level) => acc + level + 1,
+      0,
+    );
+    const progress = Math.min(
+      (currentLevelsCombined / maxUpgradeLevelsCombined) * 100,
+      100,
+    );
     this.updateAchievement(achievement.id, progress);
   }
 
   private handleAutomationPurchased(achievement: Achievement, data: any) {
     // notify("AutomationPurchased", { chainId, automationId, level: newAutomations[chainId][automationId] });
     const { chainId, automationId, level } = data;
-    const automationConfigJson = chainId === 0 ? automationsJson.L1 : automationsJson.L2;
-    const automationName = automationConfigJson.find((automation) => automation.id === automationId)?.name;
+    const automationConfigJson =
+      chainId === 0 ? automationsJson.L1 : automationsJson.L2;
+    const automationName = automationConfigJson.find(
+      (automation) => automation.id === automationId,
+    )?.name;
     // Map: achievement.name => automationName
     const achievementFilter: Record<string, string> = {
       "Get a Quantum Miner": "Miner",
       "Decentralize the Sequencer": "Sequencer",
       "Achieve STWO Scaling": "Prover",
-      "Scale with DA Volition": "DA"
+      "Scale with DA Volition": "DA",
     };
     const checkFilter = (name: string) => {
       const filter = achievementFilter[name];
       return filter ? filter === automationName : false;
-    }
+    };
     if (!checkFilter(achievement.name)) return;
 
-    const maxLevel = automationConfigJson.find((automation) => automation.id === automationId)?.levels.length;
+    const maxLevel = automationConfigJson.find(
+      (automation) => automation.id === automationId,
+    )?.levels.length;
     if (!maxLevel) return;
     const progress = Math.min(((level + 1) / maxLevel) * 100, 100);
     this.updateAchievement(achievement.id, progress);

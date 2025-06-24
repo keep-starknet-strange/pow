@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useEventManager } from "../context/EventManager";
 import { useBalance } from "../context/Balance";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
@@ -10,11 +16,16 @@ const BLOCKS_PER_GAME_YEAR = 10;
 function calculateRewards(
   totalAmount: number,
   baseApy: number,
-  elapsedSeconds: number
+  elapsedSeconds: number,
 ): number {
-  return (totalAmount
-    * Math.pow(1 + (baseApy / BLOCKS_PER_GAME_YEAR), BLOCKS_PER_GAME_YEAR * elapsedSeconds))
-  - totalAmount
+  return (
+    totalAmount *
+      Math.pow(
+        1 + baseApy / BLOCKS_PER_GAME_YEAR,
+        BLOCKS_PER_GAME_YEAR * elapsedSeconds,
+      ) -
+    totalAmount
+  );
 }
 
 type StakingContextType = {
@@ -27,7 +38,7 @@ type StakingContextType = {
   stakingUnlocked: boolean;
   getStakingUnlockCost: (poolIdx: number) => number;
   unlockStaking: (poolIdx: number) => void;
-}
+};
 
 export const useStaking = () => {
   const context = useContext(StakingContext);
@@ -35,11 +46,13 @@ export const useStaking = () => {
     throw new Error("useStaking must be used within a StakingProvider");
   }
   return context;
-}
+};
 
 const StakingContext = createContext<StakingContextType | undefined>(undefined);
 
-export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { notify } = useEventManager();
   const { tryBuy, updateBalance } = useBalance();
   const [stakingPools, setStakingPools] = useState<StakingPool[]>([]);
@@ -48,7 +61,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const resetStaking = () => {
     setStakingPools([]);
     setStakingUnlocked(false);
-  }
+  };
 
   useEffect(() => {
     resetStaking();
@@ -56,19 +69,22 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const getStakingUnlockCost = useCallback((poolIdx: number) => {
     return stakingConfig[poolIdx].unlockCosts[0];
-    }, []);
+  }, []);
 
-  const unlockStaking = useCallback((poolIdx: number) => {
-    const cost = getStakingUnlockCost(poolIdx);
-    if(!tryBuy(cost)) return;
-    setStakingUnlocked(true);
-    setStakingPools(prev => {
-      const pools = [...prev];
-      pools[poolIdx] = newStakingPool(0, 0);
-      return pools;
-    })
-    notify('StakingPurchased');
-  }, [tryBuy]);
+  const unlockStaking = useCallback(
+    (poolIdx: number) => {
+      const cost = getStakingUnlockCost(poolIdx);
+      if (!tryBuy(cost)) return;
+      setStakingUnlocked(true);
+      setStakingPools((prev) => {
+        const pools = [...prev];
+        pools[poolIdx] = newStakingPool(0, 0);
+        return pools;
+      });
+      notify("StakingPurchased");
+    },
+    [tryBuy],
+  );
 
   const updatePool = (poolIdx: number, fn: (p: any) => any) =>
     setStakingPools((prev) => {
@@ -81,16 +97,16 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const stakeTokens = useCallback(
     (poolIdx: number, amount: number) => {
-      if(!tryBuy(amount)) return;
+      if (!tryBuy(amount)) return;
 
-      updatePool(poolIdx, pool => ({
+      updatePool(poolIdx, (pool) => ({
         ...pool,
         stakedAmount: pool.stakedAmount + amount,
-        lastBlockUpdated:  Math.floor(Date.now() / 1000),
-        rewardAccrued: pool.rewardAccrued
+        lastBlockUpdated: Math.floor(Date.now() / 1000),
+        rewardAccrued: pool.rewardAccrued,
       }));
     },
-    [tryBuy]
+    [tryBuy],
   );
 
   const claimRewards = useCallback(
@@ -99,33 +115,32 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (!pool) return;
       if (pool.rewardAccrued <= 0) return;
       updateBalance(pool.rewardAccrued);
-      updatePool(poolIdx, pool => (
-        {
+      updatePool(poolIdx, (pool) => ({
         ...pool,
         rewardAccrued: 0,
-        lastBlockUpdated: Math.floor(Date.now() / 1000)
+        lastBlockUpdated: Math.floor(Date.now() / 1000),
       }));
     },
-    [updateBalance, stakingPools]
+    [updateBalance, stakingPools],
   );
 
   const accrueAll = useCallback(() => {
     const now = Math.floor(Date.now() / 1000);
-  
-    setStakingPools(prev => {
+
+    setStakingPools((prev) => {
       if (!prev) return prev;
-  
+
       const newStakingPools = prev.map((pool, idx) => {
         if (pool.stakedAmount <= 0) return pool;
-  
-      const cfg = stakingConfig[idx];
-      const elapsed = now - pool.lastBlockUpdated;
-      const reward  = calculateRewards(
-        pool.stakedAmount + pool.rewardAccrued,
-        cfg.baseApy,
-        elapsed
-      );
-  
+
+        const cfg = stakingConfig[idx];
+        const elapsed = now - pool.lastBlockUpdated;
+        const reward = calculateRewards(
+          pool.stakedAmount + pool.rewardAccrued,
+          cfg.baseApy,
+          elapsed,
+        );
+
         return {
           ...pool,
           rewardAccrued: pool.rewardAccrued + reward,
@@ -140,19 +155,19 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const accrueAndCheckSlashingAll = useCallback(() => {
     const now = Math.floor(Date.now() / 1000);
 
-    setStakingPools(prevPools =>
+    setStakingPools((prevPools) =>
       prevPools.map((pool, idx) => {
         if (pool.stakedAmount <= 0) return pool;
 
-        const oldTs   = pool.lastBlockUpdated;
+        const oldTs = pool.lastBlockUpdated;
         const elapsed = now - oldTs;
-        const cfg     = stakingConfig[idx];
+        const cfg = stakingConfig[idx];
 
         // 1) accrue rewards
         const updatedRewards = calculateRewards(
           pool.stakedAmount + pool.rewardAccrued,
           cfg.baseApy,
-          elapsed
+          elapsed,
         );
 
         // 2) maybe slash
@@ -160,10 +175,15 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (elapsed > cfg.slashing.dueTime) {
           // scale probability by how far overdue
           const over = elapsed - cfg.slashing.dueTime;
-          const prob = Math.min(cfg.slashing.chance * (over / cfg.slashing.dueTime), 1);
+          const prob = Math.min(
+            cfg.slashing.chance * (over / cfg.slashing.dueTime),
+            1,
+          );
 
           if (Math.random() < prob) {
-            const slashAmt = Math.floor(pool.stakedAmount * cfg.slashing.fraction);
+            const slashAmt = Math.floor(
+              pool.stakedAmount * cfg.slashing.fraction,
+            );
             updatedStake -= slashAmt;
           }
         }
@@ -175,22 +195,24 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           stakedAmount: updatedStake,
           lastBlockUpdated: now,
         };
-      })
+      }),
     );
   }, []);
 
   return (
-    <StakingContext.Provider value={{
-      stakingPools,
-      accrueAll,
-      stakeTokens, 
-      claimRewards,
-      stakingUnlocked, 
-      unlockStaking, 
-      getStakingUnlockCost,
-      accrueAndCheckSlashingAll
-    }}>
+    <StakingContext.Provider
+      value={{
+        stakingPools,
+        accrueAll,
+        stakeTokens,
+        claimRewards,
+        stakingUnlocked,
+        unlockStaking,
+        getStakingUnlockCost,
+        accrueAndCheckSlashingAll,
+      }}
+    >
       {children}
     </StakingContext.Provider>
   );
-}
+};

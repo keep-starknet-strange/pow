@@ -1,15 +1,15 @@
-import { TouchableOpacity, Image, Text } from 'react-native'
-import { shortMoneyString } from '../../../utils/helpers'
+import { TouchableOpacity, Image, Text } from "react-native";
+import { shortMoneyString } from "../../../utils/helpers";
 
 type UpgradeButtonProps = {
-  icon?: any
-  label?: string
-  level: number
-  maxLevel: number
-  nextCost: number
-  color: string
-  onPress: () => void
-}
+  icon?: any;
+  label?: string;
+  level: number;
+  maxLevel: number;
+  nextCost: number;
+  color: string;
+  onPress: () => void;
+};
 
 export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   icon,
@@ -20,12 +20,12 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   color,
   onPress,
 }) => {
-  const isLocked = !icon
+  const isLocked = !icon;
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       onPress={onPress}
       className={`flex justify-center items-center rounded-lg p-2 relative border-2 border-[#e7e7e770] mr-1 ${
-        isLocked ? 'bg-[#f7f760d0]' : 'bg-[#e7e7e730]'
+        isLocked ? "bg-[#f7f760d0]" : "bg-[#e7e7e730]"
       }`}
     >
       {icon ? (
@@ -43,10 +43,10 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
             {level + 1}/{maxLevel}
           </Text>
           <Text className="absolute top-[-0.7rem] text-center px-1 w-[3.6rem] border-2 border-[#e7e7e770] rounded-xl text-[#171717] text-sm font-bold bg-[#e7e760f0]">
-            {level === maxLevel ? 'Max' : `${shortMoneyString(nextCost)}`}
+            {level === maxLevel ? "Max" : `${shortMoneyString(nextCost)}`}
           </Text>
         </>
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};

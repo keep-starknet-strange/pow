@@ -1,7 +1,13 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useEventManager } from "../context/EventManager";
 import { useFocEngine } from "./FocEngineConnector";
-import { usePowContractConnector } from "./PowContractConnector"
+import { usePowContractConnector } from "./PowContractConnector";
 import { useBalance } from "../context/Balance";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
@@ -34,22 +40,35 @@ export const useUpgrades = () => {
     throw new Error("useUpgrades must be used within an UpgradesProvider");
   }
   return context;
-}
-const UpgradesContext = createContext<UpgradesContextType | undefined>(undefined);
+};
+const UpgradesContext = createContext<UpgradesContextType | undefined>(
+  undefined,
+);
 
-export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powGameContractAddress, getUserUpgradeLevels, getUserAutomationLevels } = usePowContractConnector();
+  const {
+    powGameContractAddress,
+    getUserUpgradeLevels,
+    getUserAutomationLevels,
+  } = usePowContractConnector();
 
-  const [upgrades, setUpgrades] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
-  const [automations, setAutomation] = useState<{ [chainId: number]: { [upgradeId: number]: number } }>({});
+  const [upgrades, setUpgrades] = useState<{
+    [chainId: number]: { [upgradeId: number]: number };
+  }>({});
+  const [automations, setAutomation] = useState<{
+    [chainId: number]: { [upgradeId: number]: number };
+  }>({});
   const [currentPrestige, setCurrentPrestige] = useState<number>(0);
   const { notify } = useEventManager();
   const { tryBuy } = useBalance();
 
   const resetUpgrades = () => {
     // Initialize upgrades
-    const initUpgrades: { [chainId: number]: { [upgradeId: number]: number } } = {};
+    const initUpgrades: { [chainId: number]: { [upgradeId: number]: number } } =
+      {};
     for (const chainId in upgradesJson) {
       let chainIdInt: number;
       let upgradeJsonChain;
@@ -70,7 +89,9 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
     setUpgrades(initUpgrades);
-    const initAutomation: { [chainId: number]: { [upgradeId: number]: number } } = {};
+    const initAutomation: {
+      [chainId: number]: { [upgradeId: number]: number };
+    } = {};
     for (const chainId in automationsJson) {
       let chainIdInt: number;
       let automationJsonChain;
@@ -126,9 +147,13 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return newUpgrades;
         });
         */
-        const userUpgradesConfig = chainId == 0 ? upgradesJson.L1 : upgradesJson.L2;
+        const userUpgradesConfig =
+          chainId == 0 ? upgradesJson.L1 : upgradesJson.L2;
         const upgradesCount = userUpgradesConfig.length;
-        const userUpgradeLevels = await getUserUpgradeLevels(chainId, upgradesCount);
+        const userUpgradeLevels = await getUserUpgradeLevels(
+          chainId,
+          upgradesCount,
+        );
         if (!userUpgradeLevels) {
           continue;
         }
@@ -176,9 +201,13 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return newAutomations;
         });
         */
-        const userAutomationsConfig = chainId == 0 ? automationsJson.L1 : automationsJson.L2;
+        const userAutomationsConfig =
+          chainId == 0 ? automationsJson.L1 : automationsJson.L2;
         const automationsCount = userAutomationsConfig.length;
-        const userAutomationLevels = await getUserAutomationLevels(chainId, automationsCount);
+        const userAutomationLevels = await getUserAutomationLevels(
+          chainId,
+          automationsCount,
+        );
         if (!userAutomationLevels) {
           continue;
         }
@@ -187,9 +216,11 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (!newAutomations[chainId]) {
             newAutomations[chainId] = {};
           }
-          userAutomationLevels.forEach((level: number, automationId: number) => {
-            newAutomations[chainId][automationId] = level - 1; // Already zero-based index
-          });
+          userAutomationLevels.forEach(
+            (level: number, automationId: number) => {
+              newAutomations[chainId][automationId] = level - 1; // Already zero-based index
+            },
+          );
           return newAutomations;
         });
       }
@@ -207,25 +238,35 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         newUpgrades[chainId] = {};
       }
       // Check if already upgraded to the maximum level
-      const upgradeJsonChain = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
-      const upgrade = upgradeJsonChain.find(upgrade => upgrade.id === upgradeId);
+      const upgradeJsonChain =
+        chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
+      const upgrade = upgradeJsonChain.find(
+        (upgrade) => upgrade.id === upgradeId,
+      );
       if (!upgrade) {
         console.warn(`Upgrade not found: ${upgradeId} for chainId: ${chainId}`);
         return newUpgrades;
       }
       const currentLevel = newUpgrades[chainId][upgradeId];
       if (currentLevel >= upgrade.values.length - 1) {
-        console.warn(`Upgrade already at maximum level: ${upgradeId} for chainId: ${chainId}`);
+        console.warn(
+          `Upgrade already at maximum level: ${upgradeId} for chainId: ${chainId}`,
+        );
         return newUpgrades;
       }
       const cost = upgrade.costs[currentLevel + 1];
-      if(!tryBuy(cost)) return newUpgrades;
+      if (!tryBuy(cost)) return newUpgrades;
       // Increment upgrade level
       newUpgrades[chainId][upgradeId] = currentLevel + 1;
-      notify("UpgradePurchased", { chainId, upgradeId, level: newUpgrades[chainId][upgradeId], newUpgrades: newUpgrades });
+      notify("UpgradePurchased", {
+        chainId,
+        upgradeId,
+        level: newUpgrades[chainId][upgradeId],
+        newUpgrades: newUpgrades,
+      });
       return newUpgrades;
     });
-  }
+  };
 
   const upgradeAutomation = (chainId: number, automationId: number) => {
     setAutomation((prevAutomations) => {
@@ -234,22 +275,33 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         newAutomations[chainId] = {};
       }
       // Check if already upgraded to the maximum level
-      const automationJsonChain = chainId === 0 ? automationsJson.L1 : automationsJson.L2;
-      const automation = automationJsonChain.find(automation => automation.id === automationId);
+      const automationJsonChain =
+        chainId === 0 ? automationsJson.L1 : automationsJson.L2;
+      const automation = automationJsonChain.find(
+        (automation) => automation.id === automationId,
+      );
       if (!automation) {
-        console.warn(`Automation not found: ${automationId} for chainId: ${chainId}`);
+        console.warn(
+          `Automation not found: ${automationId} for chainId: ${chainId}`,
+        );
         return newAutomations;
       }
       const currentLevel = newAutomations[chainId][automationId];
       if (currentLevel >= automation.levels.length - 1) {
-        console.warn(`Automation already at maximum level: ${automationId} for chainId: ${chainId}`);
+        console.warn(
+          `Automation already at maximum level: ${automationId} for chainId: ${chainId}`,
+        );
         return newAutomations;
       }
       const cost = automation.levels[currentLevel + 1].cost;
-      if(!tryBuy(cost)) return newAutomations;
+      if (!tryBuy(cost)) return newAutomations;
       // Increment automation level
       newAutomations[chainId][automationId] = currentLevel + 1;
-      notify("AutomationPurchased", { chainId, automationId, level: newAutomations[chainId][automationId] });
+      notify("AutomationPurchased", {
+        chainId,
+        automationId,
+        level: newAutomations[chainId][automationId],
+      });
       return newAutomations;
     });
   };
@@ -261,87 +313,145 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       resetUpgrades();
       return nextPrestige;
     });
-  }
+  };
 
-  const getUpgradeValue = useCallback((chainId: number, upgradeName: string): number => {
-    // Get the upgrade info
-    const chainUpgrades = upgrades[chainId] || {};
-    const upgradeJsonChain = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
-    const upgrade = upgradeJsonChain.find(upgrade => upgrade.name === upgradeName);
-    if (!upgrade || chainUpgrades[upgrade.id] === undefined) {
-      console.warn(`Upgrade not found: ${upgradeName} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getUpgradeValue = useCallback(
+    (chainId: number, upgradeName: string): number => {
+      // Get the upgrade info
+      const chainUpgrades = upgrades[chainId] || {};
+      const upgradeJsonChain =
+        chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
+      const upgrade = upgradeJsonChain.find(
+        (upgrade) => upgrade.name === upgradeName,
+      );
+      if (!upgrade || chainUpgrades[upgrade.id] === undefined) {
+        console.warn(
+          `Upgrade not found: ${upgradeName} for chainId: ${chainId}`,
+        );
+        return 0;
+      }
 
-    const level = (chainUpgrades[upgrade.id] !== undefined ? chainUpgrades[upgrade.id] : -1);
-    return level === -1 ? upgrade.baseValue : upgrade.values[level];
-  }, [upgrades]);
+      const level =
+        chainUpgrades[upgrade.id] !== undefined
+          ? chainUpgrades[upgrade.id]
+          : -1;
+      return level === -1 ? upgrade.baseValue : upgrade.values[level];
+    },
+    [upgrades],
+  );
 
-  const getUpgradeValueAt = useCallback((chainId: number, upgradeId: number): number => {
-    const chainUpgrades = upgrades[chainId] || {};
-    const upgradeJsonChain = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
-    const upgrade = upgradeJsonChain.find(upgrade => upgrade.id === upgradeId);
-    if (!upgrade || chainUpgrades[upgradeId] === undefined) {
-      console.warn(`Upgrade not found: ${upgradeId} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getUpgradeValueAt = useCallback(
+    (chainId: number, upgradeId: number): number => {
+      const chainUpgrades = upgrades[chainId] || {};
+      const upgradeJsonChain =
+        chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
+      const upgrade = upgradeJsonChain.find(
+        (upgrade) => upgrade.id === upgradeId,
+      );
+      if (!upgrade || chainUpgrades[upgradeId] === undefined) {
+        console.warn(`Upgrade not found: ${upgradeId} for chainId: ${chainId}`);
+        return 0;
+      }
 
-    const level = (chainUpgrades[upgradeId] !== undefined ? chainUpgrades[upgradeId] : -1);
-    return level === -1 ? upgrade.baseValue : upgrade.values[level];
-  }, [upgrades]);
+      const level =
+        chainUpgrades[upgradeId] !== undefined ? chainUpgrades[upgradeId] : -1;
+      return level === -1 ? upgrade.baseValue : upgrade.values[level];
+    },
+    [upgrades],
+  );
 
-  const getNextUpgradeCost = useCallback((chainId: number, upgradeId: number): number => {
-    const chainUpgrades = upgrades[chainId] || {};
-    const upgradeJsonChain = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
-    const upgrade = upgradeJsonChain.find(upgrade => upgrade.id === upgradeId);
-    if (!upgrade || chainUpgrades[upgradeId] === undefined) {
-      console.warn(`Upgrade not found: ${upgradeId} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getNextUpgradeCost = useCallback(
+    (chainId: number, upgradeId: number): number => {
+      const chainUpgrades = upgrades[chainId] || {};
+      const upgradeJsonChain =
+        chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
+      const upgrade = upgradeJsonChain.find(
+        (upgrade) => upgrade.id === upgradeId,
+      );
+      if (!upgrade || chainUpgrades[upgradeId] === undefined) {
+        console.warn(`Upgrade not found: ${upgradeId} for chainId: ${chainId}`);
+        return 0;
+      }
 
-    const level = (chainUpgrades[upgradeId] !== undefined ? chainUpgrades[upgradeId] : -1);
-    return upgrade.costs[level+1] || 0;
-  }, [upgrades]);
+      const level =
+        chainUpgrades[upgradeId] !== undefined ? chainUpgrades[upgradeId] : -1;
+      return upgrade.costs[level + 1] || 0;
+    },
+    [upgrades],
+  );
 
-  const getAutomationValue = useCallback((chainId: number, automationName: string): number => {
-    // Get the automation info
-    const chainAutomations = automations[chainId] || {};
-    const automationJsonChain = chainId === 0 ? automationsJson.L1 : automationsJson.L2;
-    const automation = automationJsonChain.find(automation => automation.name === automationName);
-    if (!automation || chainAutomations[automation.id] === undefined) {
-      console.warn(`Automation not found: ${automationName} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getAutomationValue = useCallback(
+    (chainId: number, automationName: string): number => {
+      // Get the automation info
+      const chainAutomations = automations[chainId] || {};
+      const automationJsonChain =
+        chainId === 0 ? automationsJson.L1 : automationsJson.L2;
+      const automation = automationJsonChain.find(
+        (automation) => automation.name === automationName,
+      );
+      if (!automation || chainAutomations[automation.id] === undefined) {
+        console.warn(
+          `Automation not found: ${automationName} for chainId: ${chainId}`,
+        );
+        return 0;
+      }
 
-    const level = (chainAutomations[automation.id] !== undefined ? chainAutomations[automation.id] : -1);
-    return level === -1 ? 0 : automation.levels[level].speed;
-  }, [automations]);
+      const level =
+        chainAutomations[automation.id] !== undefined
+          ? chainAutomations[automation.id]
+          : -1;
+      return level === -1 ? 0 : automation.levels[level].speed;
+    },
+    [automations],
+  );
 
-  const getAutomationSpeedAt = useCallback((chainId: number, automationId: number): number => {
-    const chainAutomations = automations[chainId] || {};
-    const automationJsonChain = chainId === 0 ? automationsJson.L1 : automationsJson.L2;
-    const automation = automationJsonChain.find(automation => automation.id === automationId);
-    if (!automation || chainAutomations[automationId] === undefined) {
-      console.warn(`Automation not found: ${automationId} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getAutomationSpeedAt = useCallback(
+    (chainId: number, automationId: number): number => {
+      const chainAutomations = automations[chainId] || {};
+      const automationJsonChain =
+        chainId === 0 ? automationsJson.L1 : automationsJson.L2;
+      const automation = automationJsonChain.find(
+        (automation) => automation.id === automationId,
+      );
+      if (!automation || chainAutomations[automationId] === undefined) {
+        console.warn(
+          `Automation not found: ${automationId} for chainId: ${chainId}`,
+        );
+        return 0;
+      }
 
-    const level = (chainAutomations[automationId] !== undefined ? chainAutomations[automationId] : -1);
-    return level === -1 ? 0 : automation.levels[level].speed;
-  }, [automations]);
+      const level =
+        chainAutomations[automationId] !== undefined
+          ? chainAutomations[automationId]
+          : -1;
+      return level === -1 ? 0 : automation.levels[level].speed;
+    },
+    [automations],
+  );
 
-  const getNextAutomationCost = useCallback((chainId: number, automationId: number): number => {
-    const chainAutomations = automations[chainId] || {};
-    const automationJsonChain = chainId === 0 ? automationsJson.L1 : automationsJson.L2;
-    const automation = automationJsonChain.find(automation => automation.id === automationId);
-    if (!automation || chainAutomations[automationId] === undefined) {
-      console.warn(`Automation not found: ${automationId} for chainId: ${chainId}`);
-      return 0;
-    }
+  const getNextAutomationCost = useCallback(
+    (chainId: number, automationId: number): number => {
+      const chainAutomations = automations[chainId] || {};
+      const automationJsonChain =
+        chainId === 0 ? automationsJson.L1 : automationsJson.L2;
+      const automation = automationJsonChain.find(
+        (automation) => automation.id === automationId,
+      );
+      if (!automation || chainAutomations[automationId] === undefined) {
+        console.warn(
+          `Automation not found: ${automationId} for chainId: ${chainId}`,
+        );
+        return 0;
+      }
 
-    const level = (chainAutomations[automationId] !== undefined ? chainAutomations[automationId] : -1);
-    return automation.levels[level + 1]?.cost || 0;
-  }, [automations]);
+      const level =
+        chainAutomations[automationId] !== undefined
+          ? chainAutomations[automationId]
+          : -1;
+      return automation.levels[level + 1]?.cost || 0;
+    },
+    [automations],
+  );
 
   const getNextPrestigeCost = useCallback((): number => {
     const prestigeCost = prestigeJson[currentPrestige + 1]?.cost || 0;
@@ -349,12 +459,23 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [currentPrestige]);
 
   return (
-    <UpgradesContext.Provider value={{
-      upgrades, automations, upgrade, upgradeAutomation,
-      getUpgradeValue, getUpgradeValueAt, getNextUpgradeCost,
-      getAutomationValue, getAutomationSpeedAt, getNextAutomationCost,
-      currentPrestige, prestige, getNextPrestigeCost
-    }}>
+    <UpgradesContext.Provider
+      value={{
+        upgrades,
+        automations,
+        upgrade,
+        upgradeAutomation,
+        getUpgradeValue,
+        getUpgradeValueAt,
+        getNextUpgradeCost,
+        getAutomationValue,
+        getAutomationSpeedAt,
+        getNextAutomationCost,
+        currentPrestige,
+        prestige,
+        getNextPrestigeCost,
+      }}
+    >
       {children}
     </UpgradesContext.Provider>
   );

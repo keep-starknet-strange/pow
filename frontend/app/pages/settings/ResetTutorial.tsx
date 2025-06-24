@@ -2,7 +2,6 @@ import { useState } from "react";
 import { View, Text, Modal } from "react-native";
 import ToggleButton from "../../components/buttons/Toggle";
 
-
 const ResetTutorialButton: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -16,7 +15,6 @@ const ResetTutorialButton: React.FC = () => {
 
   return (
     <View>
-
       <ToggleButton
         label="Reset Tutorial"
         isOn={isTutorialReset}

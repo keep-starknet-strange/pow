@@ -8,14 +8,14 @@ import * as minerImages from "../configs/miners";
 export const getMinerImage = (minerId: number) => {
   const images = Object.values(minerImages);
   return images[minerId] || images[0];
-}
+};
 
 import * as miningAnimation from "../configs/mining";
 export const getMiningAnimation = (mineProgress: number) => {
   const animations = Object.values(miningAnimation);
   const animationIndex = Math.floor(animations.length * mineProgress);
   return animations[animationIndex] || animations[0];
-}
+};
 
 export const Miner: React.FC = () => {
   const { automations, getUpgradeValue } = useUpgrades();
@@ -26,10 +26,14 @@ export const Miner: React.FC = () => {
   const [mineColor, setMineColor] = useState("#CA1F4B");
   const generateRandomHash = (isDone: boolean) => {
     const difficulty = getUpgradeValue(0, "Block Difficulty");
-    const randomPart = Math.floor(Math.random() * 0xFFFFFFFFFFFFFFFF).toString(16).padStart(16, '0');
+    const randomPart = Math.floor(Math.random() * 0xffffffffffffffff)
+      .toString(16)
+      .padStart(16, "0");
     // Replace first `difficulty` bytes with 00 if done
-    return isDone ? `0x${"00".repeat(difficulty)}${randomPart}` : `0x${randomPart}`;
-  }
+    return isDone
+      ? `0x${"00".repeat(difficulty)}${randomPart}`
+      : `0x${randomPart}`;
+  };
   useEffect(() => {
     setMineHash(generateRandomHash(miningProgress === 1));
     setMineColor(miningProgress === 1 ? "#20DF20" : "#CA1F4B");
@@ -37,8 +41,7 @@ export const Miner: React.FC = () => {
   }, [miningProgress]);
 
   return (
-    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative"
-    >
+    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
       <Confirmer
         progress={miningProgress}
         image={getMinerImage(automations[0][0] + 1)}

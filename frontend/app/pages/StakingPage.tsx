@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text } from 'react-native';
+import { ScrollView, View, Text } from "react-native";
 import { useBalance } from "../context/Balance";
 import { useStaking } from "../context/Staking";
 import { useTicker } from "../hooks/useTicker";
@@ -19,7 +19,7 @@ export const StakingPage: React.FC = (props) => {
   const windowSize = 4;
   const pools = stakingPools.map((stakingPool, idx) => {
     const meta = stakingConfig[idx];
-   return {meta, stakingPool, idx};
+    return { meta, stakingPool, idx };
   });
 
   useEffect(() => {
@@ -30,7 +30,10 @@ export const StakingPage: React.FC = (props) => {
     id: number;
     stakingAmount: number;
   }
-  const onPressStake = (id: StakeParams['id'], stakingAmount: StakeParams['stakingAmount']): void => {
+  const onPressStake = (
+    id: StakeParams["id"],
+    stakingAmount: StakeParams["stakingAmount"],
+  ): void => {
     const amt: number = stakingAmount;
     if (amt > balance) {
       setInsufficientFunds(true);
@@ -39,9 +42,14 @@ export const StakingPage: React.FC = (props) => {
     }
   };
   return (
-    <ScrollView className="flex-1 bg-gray-900 px-4 py-6"  contentContainerClassName="pb-24">
+    <ScrollView
+      className="flex-1 bg-gray-900 px-4 py-6"
+      contentContainerClassName="pb-24"
+    >
       <View className="flex flex-row justify-end items-center p-2">
-        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">🥩Staking</Text>
+        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2">
+          🥩Staking
+        </Text>
       </View>
       {pools?.map((props, idx) => {
         return (
@@ -54,17 +62,17 @@ export const StakingPage: React.FC = (props) => {
             stakingPool={props.stakingPool}
             claimRewards={claimRewards}
             onPressStake={onPressStake}
-        /> 
-        )
+          />
+        );
       })}
 
-    <StakingUnlock />
+      <StakingUnlock />
 
-    <AlertModal
-      visible={insufficientFunds}
-      title="Insufficient Funds"
-      onClose={() => setInsufficientFunds(false)}
-    />
-  </ScrollView>
-  )
-}
+      <AlertModal
+        visible={insufficientFunds}
+        title="Insufficient Funds"
+        onClose={() => setInsufficientFunds(false)}
+      />
+    </ScrollView>
+  );
+};

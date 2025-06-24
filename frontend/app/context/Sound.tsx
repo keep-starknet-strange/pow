@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import soundsJson from "../configs/sounds.json";
@@ -31,7 +37,9 @@ export const useSound = () => {
 };
 
 // Sound Provider Component
-export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isSoundOn, setIsSoundOn] = useState(false);
   const [isMusicOn, setIsMusicOn] = useState(false);
   const [soundEffectVolume, setSoundEffectVolumeInner] = useState(1);
@@ -68,21 +76,29 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
   const minPitchShift = 0.5;
   const maxPitchShift = 2.0;
-  const playSoundEffect = useCallback(async (type: string, pitchShift: number = 1.0) => {
-    if (!isSoundOn || !soundEffects[type] || !Object.prototype.hasOwnProperty.call(soundsJson, type)) return;
+  const playSoundEffect = useCallback(
+    async (type: string, pitchShift: number = 1.0) => {
+      if (
+        !isSoundOn ||
+        !soundEffects[type] ||
+        !Object.prototype.hasOwnProperty.call(soundsJson, type)
+      )
+        return;
 
-    if (pitchShift < minPitchShift) {
-      pitchShift = minPitchShift;
-    } else if (pitchShift > maxPitchShift) {
-      pitchShift = maxPitchShift;
-    }
-    const soundConfig = soundsJson[type as keyof typeof soundsJson];
-    const { sound } = await Audio.Sound.createAsync(soundEffects[type], {
-      volume: soundEffectVolume * (soundConfig.volume || 1.0),
-      rate: (soundConfig.rate || 1.0) * pitchShift,
-    });
-    await sound.playAsync();
-  }, [isSoundOn, soundEffectVolume]);
+      if (pitchShift < minPitchShift) {
+        pitchShift = minPitchShift;
+      } else if (pitchShift > maxPitchShift) {
+        pitchShift = maxPitchShift;
+      }
+      const soundConfig = soundsJson[type as keyof typeof soundsJson];
+      const { sound } = await Audio.Sound.createAsync(soundEffects[type], {
+        volume: soundEffectVolume * (soundConfig.volume || 1.0),
+        rate: (soundConfig.rate || 1.0) * pitchShift,
+      });
+      await sound.playAsync();
+    },
+    [isSoundOn, soundEffectVolume],
+  );
 
   // TODO: Choose random music from a list of songs
   // Music
@@ -100,21 +116,23 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           {
             volume: musicVolume,
             isLooping: false,
-          }
+          },
         );
         setCurrentMusic(musicSound);
         await musicSound.playAsync();
       } catch (error) {
         console.error("Failed to play music:", error);
       }
-    }
+    };
 
     playMusic();
   }, [isMusicOn, musicVolume]);
   useEffect(() => {
-    return currentMusic ? () => {
-      currentMusic.unloadAsync();
-    } : undefined;
+    return currentMusic
+      ? () => {
+          currentMusic.unloadAsync();
+        }
+      : undefined;
   }, [currentMusic]);
 
   useEffect(() => {
@@ -147,7 +165,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const newValue = !prev;
       AsyncStorage.setItem(SOUND_ENABLED_KEY, newValue.toString());
       return newValue;
-    });;
+    });
   };
 
   const toggleMusic = () => {
@@ -169,10 +187,19 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <SoundContext.Provider value={{ isSoundOn, isMusicOn, toggleSound, toggleMusic,
-      soundEffectVolume, setSoundEffectVolume, musicVolume, setMusicVolume,
-      playSoundEffect
-    }}>
+    <SoundContext.Provider
+      value={{
+        isSoundOn,
+        isMusicOn,
+        toggleSound,
+        toggleMusic,
+        soundEffectVolume,
+        setSoundEffectVolume,
+        musicVolume,
+        setMusicVolume,
+        playSoundEffect,
+      }}
+    >
       {children}
     </SoundContext.Provider>
   );

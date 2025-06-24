@@ -12,7 +12,12 @@ import { DappsUnlock } from "../../components/store/DappsUnlock";
 import { L2Unlock } from "../../components/store/L2Unlock";
 import { useTutorialLayout } from "../../hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 export interface L1PhaseProps {
   setCurrentView: (view: string) => void;
@@ -22,7 +27,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
   const { chains, getLatestBlock } = useChains();
   const { dappsUnlocked } = useTransactions();
   const { getImage } = useImageProvider();
-  const {ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
+  const { ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
   const { l2 } = useGame();
 
   return (
@@ -39,9 +44,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
         <WorkingBlockView chainId={0} />
       </View>
       <View className="mt-[0.5rem] w-full">
-        {!dappsUnlocked[0] && (
-          <DappsUnlock chainId={0} />
-        )}
+        {!dappsUnlocked[0] && <DappsUnlock chainId={0} />}
       </View>
       <View className="absolute bottom-[22px] left-0 right-0 h-[200px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -52,7 +55,10 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
             y={0}
             width={402}
             height={200}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
         <View className="absolute top-[4px] left-0 right-0">
@@ -61,6 +67,6 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
       </View>
     </View>
   );
-}
+};
 
 export default L1Phase;

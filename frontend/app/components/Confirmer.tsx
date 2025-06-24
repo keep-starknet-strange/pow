@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Image, ImageSourcePropType, Easing, Animated, useAnimatedValue } from 'react-native';
-import { useTutorialLayout } from '../hooks/useTutorialLayout';
-import { PopupAnimation } from './PopupAnimation';
-import { TargetId } from '../context/Tutorial';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  ImageSourcePropType,
+  Easing,
+  Animated,
+  useAnimatedValue,
+} from "react-native";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import { PopupAnimation } from "./PopupAnimation";
+import { TargetId } from "../context/Tutorial";
 
 export type ConfirmerProps = {
   progress: number;
@@ -18,8 +26,10 @@ export type ConfirmerProps = {
 };
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
-  const enabled = props.renderedBy !== undefined && ["miner", "sequencer", "da", 'prover'].includes(props.renderedBy);
-  let tutorialProps = {}
+  const enabled =
+    props.renderedBy !== undefined &&
+    ["miner", "sequencer", "da", "prover"].includes(props.renderedBy);
+  let tutorialProps = {};
   let ref, onLayout;
   if (enabled) {
     const targetId = `${props.renderedBy}Confirmer` as TargetId;
@@ -75,7 +85,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
                   outputRange: [0, -20],
                 }),
               },
-            ]
+            ],
           }}
           className="w-28 h-28"
         />

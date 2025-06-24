@@ -1,45 +1,59 @@
-import { Text, View, TouchableOpacity } from 'react-native';
-import { TargetId } from '../context/Tutorial';
+import { Text, View, TouchableOpacity } from "react-native";
+import { TargetId } from "../context/Tutorial";
 import { useImageProvider } from "../context/ImageProvider";
-import { useTutorialLayout } from '../hooks/useTutorialLayout';
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 export type FooterProps = {
-  tabs: {name: string, icon: string}[];
+  tabs: { name: string; icon: string }[];
   selectedTab: string;
   switchPage: (page: string) => void;
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
-  const {ref, onLayout} = useTutorialLayout("storeTab" as TargetId)
+  const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
   const { getImage } = useImageProvider();
   const getTabIcon = (tabName: string, selected: boolean) => {
     switch (tabName) {
-      case 'Main':
-        return selected ? getImage('nav.icon.game.active') : getImage('nav.icon.game');
-      case 'Store':
-        return selected ? getImage('nav.icon.shop.active') : getImage('nav.icon.shop');
-      case 'Achievements':
-        return selected ? getImage('nav.icon.flag.active') : getImage('nav.icon.flag');
-      case 'Leaderboard':
-        return selected ? getImage('nav.icon.medal.active') : getImage('nav.icon.medal');
-      case 'Settings':
-        return selected ? getImage('nav.icon.settings.active') : getImage('nav.icon.settings');
+      case "Main":
+        return selected
+          ? getImage("nav.icon.game.active")
+          : getImage("nav.icon.game");
+      case "Store":
+        return selected
+          ? getImage("nav.icon.shop.active")
+          : getImage("nav.icon.shop");
+      case "Achievements":
+        return selected
+          ? getImage("nav.icon.flag.active")
+          : getImage("nav.icon.flag");
+      case "Leaderboard":
+        return selected
+          ? getImage("nav.icon.medal.active")
+          : getImage("nav.icon.medal");
+      case "Settings":
+        return selected
+          ? getImage("nav.icon.settings.active")
+          : getImage("nav.icon.settings");
       default:
         return null;
     }
-  }
+  };
 
   // TODO: Add small lines between the icons
   return (
-    <View className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
+    <View
+      className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
                      absolute bottom-0 items-center z-[50] gap-2
-    ">
+    "
+    >
       {props.tabs.map((tab, index) => {
-        const tutorialProps =
-          tab.name === "Store"
-            ? { ref, onLayout }
-            : {};
+        const tutorialProps = tab.name === "Store" ? { ref, onLayout } : {};
         return (
           <TouchableOpacity
             key={index}
@@ -49,16 +63,31 @@ export const Footer: React.FC<FooterProps> = (props) => {
           >
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
-                image={tab.name === props.selectedTab ? getImage('nav.button.active') : getImage('nav.button')}
+                image={
+                  tab.name === props.selectedTab
+                    ? getImage("nav.button.active")
+                    : getImage("nav.button")
+                }
                 fit="fill"
                 x={0}
                 y={0}
                 width={68}
                 height={68}
-                sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
               />
             </Canvas>
-            <Canvas style={{ position: 'absolute', left: 0, top: 0, width: 68, height: 68 }}>
+            <Canvas
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: 68,
+                height: 68,
+              }}
+            >
               <Image
                 image={getTabIcon(tab.name, tab.name === props.selectedTab)}
                 fit="contain"
@@ -66,7 +95,10 @@ export const Footer: React.FC<FooterProps> = (props) => {
                 y={10}
                 width={48}
                 height={48}
-                sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
               />
             </Canvas>
           </TouchableOpacity>

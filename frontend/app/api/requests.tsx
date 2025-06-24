@@ -1,14 +1,18 @@
-export const focFunUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://api.foc.fun';
-export const useMock = (process.env.EXPO_PUBLIC_USE_MOCK === undefined || process.env.EXPO_PUBLIC_USE_MOCK === '' || process.env.EXPO_PUBLIC_USE_MOCK === 'true');
+export const focFunUrl =
+  process.env.EXPO_PUBLIC_BACKEND_URL || "https://api.foc.fun";
+export const useMock =
+  process.env.EXPO_PUBLIC_USE_MOCK === undefined ||
+  process.env.EXPO_PUBLIC_USE_MOCK === "" ||
+  process.env.EXPO_PUBLIC_USE_MOCK === "true";
 
 export const fetchWrapper = async (url: string, options = {}) => {
   const controller = new AbortController();
   const signal = controller.signal;
   try {
     const response = await fetch(`${focFunUrl}/${url}`, {
-      mode: 'cors',
+      mode: "cors",
       signal,
-      ...options
+      ...options,
     });
     if (!response.ok) {
       console.log(`Failed to fetch ${url}, got response:`, response);
@@ -26,6 +30,6 @@ export const fetchWrapper = async (url: string, options = {}) => {
 export const mockResponse = (data: any) => {
   return {
     data,
-    status: 200
+    status: 200,
   };
-}
+};

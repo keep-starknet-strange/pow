@@ -1,10 +1,9 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import BlockView from '../../components/BlockView';
-import type { Block } from '../../types/Chains';
-import type { StakingPool } from '../../types/StakingPool';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import BlockView from "../../components/BlockView";
+import type { Block } from "../../types/Chains";
+import type { StakingPool } from "../../types/StakingPool";
 import { useVisibleBlocks } from "../../hooks/useVisibleBlocks";
-
 
 export interface StakingChainProps {
   idx: number;
@@ -34,11 +33,10 @@ const StakingChain: React.FC<StakingChainProps> = ({
     meta.chainId,
     stakingPool.createdAt,
     tick,
-    windowSize
+    windowSize,
   );
   return (
     <View className="bg-gray-800 rounded-2xl p-5 mt-6">
-
       <Text className="text-white text-lg font-semibold mb-2">
         {/* TODO: change icon to imag */}
         {meta.icon} {meta.name}
@@ -47,9 +45,12 @@ const StakingChain: React.FC<StakingChainProps> = ({
       {blocksShown > 0 && (
         <View className="flex-row-reverse w-full px-2 mt-4">
           {visibleBlocks.map((block, bi) => (
-            <View key={block.blockId + meta.name} className="flex-row items-center">
+            <View
+              key={block.blockId + meta.name}
+              className="flex-row items-center"
+            >
               <View className="h-28 w-28">
-                <BlockView chainId={3} block={block} completed={true}/>
+                <BlockView chainId={3} block={block} completed={true} />
               </View>
               {bi !== 0 && (
                 <View className="w-2 h-1 mx-[2px] bg-[#f9f9f980] rounded-lg" />

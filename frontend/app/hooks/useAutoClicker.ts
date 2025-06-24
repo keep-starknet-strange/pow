@@ -3,7 +3,7 @@ import { useEffect } from "react";
 export const useAutoClicker = (
   isEnabled: boolean,
   intervalMs: number,
-  clickFn: () => void
+  clickFn: () => void,
 ) => {
   useEffect(() => {
     if (!isEnabled || intervalMs <= 0) return;
