@@ -32,8 +32,10 @@ mod PowGame {
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
     use pow_game::staking::component::StakingComponent;
+    use pow_game::staking::StakingConfig;
     component!(path: StakingComponent, storage: staking, event: StakingEvent);
-
+    #[abi(embed_v0)]
+    impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
     use openzeppelin_upgrades::interface::IUpgradeable;
     use openzeppelin_upgrades::UpgradeableComponent;
     impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
@@ -173,8 +175,25 @@ mod PowGame {
             self.game_masters.write(user, false);
         }
 
+        fn staking_config(self: @ContractState) -> StakingConfig {
+            self.staking.get_staking_config()
+        }
+
+        fn setup_staking_config(ref self: ContractState, user: ContractAddress, config: StakingConfig) {
+            self.check_valid_game_master(get_caller_address());
+            self.staking.setup_staking(user, config);
+        }
+
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
             self.user_balances.read(user)
+        }
+
+        fn get_staked_amount(self: @ContractState, user: ContractAddress) -> u128 {
+            self.staking.get_staked_amount(user)
+        }
+
+        fn get_reward_amount(self: @ContractState, user: ContractAddress) -> u128 {
+            self.staking.get_reward_amount(user)
         }
     }
 
@@ -376,6 +395,29 @@ mod PowGame {
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
 
             self.reset_proof(chain_id);
+        }
+
+        fn stake_tokens(ref self: ContractState, amount: u128) {
+            let caller = get_caller_address();
+            debit_user(ref self, caller, amount);
+            self.staking.stake(caller, amount);
+        }
+
+        fn claim_staking_rewards(ref self: ContractState){
+            let caller = get_caller_address();
+            let reward = self.staking.claim_rewards(caller);
+            pay_user(ref self, caller, reward);
+        }
+
+        fn validate_stake(ref self: ContractState) {
+            let caller = get_caller_address();
+            self.staking.validate(caller);
+        }
+        
+        fn withdraw_staked_tokens(ref self: ContractState) {
+            let caller = get_caller_address();
+            let withdrawal = self.staking.withdraw_stake(caller);
+            pay_user(ref self, caller, withdrawal);
         }
     }
 
