@@ -7,45 +7,60 @@ mod PowGame {
     use pow_game::types::RewardParams;
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
-    // Import the components
-    use pow_game::upgrades::component::PowUpgradesComponent;
-    use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess,
+   // --- External Dependencies ---
+    use starknet::{
+        ContractAddress, get_caller_address, ClassHash,
+        storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess},
     };
-    use starknet::{ContractAddress, get_caller_address, ClassHash};
+    use openzeppelin_upgrades::interface::IUpgradeable;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_security::PausableComponent;
+
+    // --- Game Components ---
+
+    // Upgrades
+    use pow_game::upgrades::component::PowUpgradesComponent;
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
-    impl PowUpgradesComponentImpl =
-        PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+    impl PowUpgradesComponentImpl = PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+
+    // Transactions
     use pow_game::transactions::component::PowTransactionsComponent;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
-    impl PowTransactionsComponentImpl =
-        PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+    impl PowTransactionsComponentImpl = PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+
+    // Prestige
     use pow_game::prestige::component::PrestigeComponent;
     component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
     #[abi(embed_v0)]
     impl PrestigeComponentImpl = PrestigeComponent::PrestigeImpl<ContractState>;
+
+    // Builder
     use pow_game::builder::component::BuilderComponent;
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
+
+    // Staking
     use pow_game::staking::component::StakingComponent;
     use pow_game::staking::StakingConfig;
     component!(path: StakingComponent, storage: staking, event: StakingEvent);
     #[abi(embed_v0)]
     impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
-    use openzeppelin_upgrades::interface::IUpgradeable;
-    use openzeppelin_upgrades::UpgradeableComponent;
-    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
-    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
 
-    use openzeppelin_security::PausableComponent;
+    // -- Admin Components --
+
+    // Upgradability
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
+
+    // Pausability
     component!(path: PausableComponent, storage: pausable, event: PausableEvent);
     #[abi(embed_v0)]
     impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
     impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
+
 
     #[storage]
     struct Storage {
