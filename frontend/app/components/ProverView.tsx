@@ -16,7 +16,7 @@ export const ProverView = () => {
 
   return (
     <View
-      className="flex flex-row items-center w-[14rem] h-[7rem]
+      className="flex flex-row items-center w-[13rem] h-[6rem]
                  bg-[#f760f710] rounded-lg shadow-lg relative
                  border-2 border-[#f760f7c0] overflow-hidden"
     >

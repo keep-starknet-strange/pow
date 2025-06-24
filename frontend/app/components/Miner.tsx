@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
@@ -18,8 +18,23 @@ export const getMiningAnimation = (mineProgress: number) => {
 }
 
 export const Miner: React.FC = () => {
-  const { automations } = useUpgrades();
+  const { automations, getUpgradeValue } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
+
+  const [mineStartTime, setMineStartTime] = useState(Date.now());
+  const [mineHash, setMineHash] = useState("0xdEadBeefDeadBeEf");
+  const [mineColor, setMineColor] = useState("#CA1F4B");
+  const generateRandomHash = (isDone: boolean) => {
+    const difficulty = getUpgradeValue(0, "Block Difficulty");
+    const randomPart = Math.floor(Math.random() * 0xFFFFFFFFFFFFFFFF).toString(16).padStart(16, '0');
+    // Replace first `difficulty` bytes with 00 if done
+    return isDone ? `0x${"00".repeat(difficulty)}${randomPart}` : `0x${randomPart}`;
+  }
+  useEffect(() => {
+    setMineHash(generateRandomHash(miningProgress === 1));
+    setMineColor(miningProgress === 1 ? "#20DF20" : "#CA1F4B");
+    setMineStartTime(Date.now());
+  }, [miningProgress]);
 
   return (
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative"
@@ -30,6 +45,11 @@ export const Miner: React.FC = () => {
         getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
         renderedBy="miner"
+        confirmPopup={{
+          startTime: mineStartTime,
+          value: mineHash,
+          color: mineColor,
+        }}
       />
     </View>
   );

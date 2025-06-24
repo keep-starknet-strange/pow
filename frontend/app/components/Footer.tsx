@@ -1,18 +1,40 @@
 import { Text, View, TouchableOpacity } from 'react-native';
 import { TargetId } from '../context/Tutorial';
+import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from '../hooks/useTutorialLayout';
+import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+
 export type FooterProps = {
   tabs: {name: string, icon: string}[];
+  selectedTab: string;
   switchPage: (page: string) => void;
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
   const {ref, onLayout} = useTutorialLayout("storeTab" as TargetId)
+  const { getImage } = useImageProvider();
+  const getTabIcon = (tabName: string, selected: boolean) => {
+    switch (tabName) {
+      case 'Main':
+        return selected ? getImage('nav.icon.game.active') : getImage('nav.icon.game');
+      case 'Store':
+        return selected ? getImage('nav.icon.shop.active') : getImage('nav.icon.shop');
+      case 'Achievements':
+        return selected ? getImage('nav.icon.flag.active') : getImage('nav.icon.flag');
+      case 'Leaderboard':
+        return selected ? getImage('nav.icon.medal.active') : getImage('nav.icon.medal');
+      case 'Settings':
+        return selected ? getImage('nav.icon.settings.active') : getImage('nav.icon.settings');
+      default:
+        return null;
+    }
+  }
 
   // TODO: Add small lines between the icons
   return (
-    <View className="absolute bottom-0 left-0 bg-[#010108ff] z-[5] flex flex-row justify-around w-full pb-[1.5rem] rounded-2xl pt-[1rem] px-[0.5rem]
-      border-2 border-[#2020600f0] border-b-0 shadow-2 shadow-[#000000]">
+    <View className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
+                     absolute bottom-0 items-center z-[50] gap-2
+    ">
       {props.tabs.map((tab, index) => {
         const tutorialProps =
           tab.name === "Store"
@@ -21,11 +43,32 @@ export const Footer: React.FC<FooterProps> = (props) => {
         return (
           <TouchableOpacity
             key={index}
-            className="flex flex-row"
+            className="flex flex-row h-[68px] w-[68px] relative"
             onPress={() => props.switchPage(tab.name)}
             {...tutorialProps}
           >
-              <Text className="text-[#f7f7f7] text-[2.8rem]">{tab.icon}</Text>
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <Image
+                image={tab.name === props.selectedTab ? getImage('nav.button.active') : getImage('nav.button')}
+                fit="fill"
+                x={0}
+                y={0}
+                width={68}
+                height={68}
+                sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+              />
+            </Canvas>
+            <Canvas style={{ position: 'absolute', left: 0, top: 0, width: 68, height: 68 }}>
+              <Image
+                image={getTabIcon(tab.name, tab.name === props.selectedTab)}
+                fit="contain"
+                x={10}
+                y={10}
+                width={48}
+                height={48}
+                sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+              />
+            </Canvas>
           </TouchableOpacity>
         );
       })}

@@ -5,7 +5,11 @@
       "version": "v0.0.1",
       "class_name": "PowGame",
       "constructor_args": [
-        "$ACCOUNT"
+        "$ACCOUNT",
+        "0x4718F5A0FC34CC1AF16A1CDEE98FFB20C31F5CD61D6AB07201858F4287C938D",
+        "0x100",
+        "0x0",
+        "0x1"
       ],
       "init_commands": [
         "setup-contracts.sh"

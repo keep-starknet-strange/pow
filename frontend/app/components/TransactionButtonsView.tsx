@@ -6,7 +6,7 @@ import { TxButton } from "./buttons/TxButton";
 
 export type TransactionButtonsViewProps = {
   chainId: number;
-  isDapps?: boolean;
+  isDapps: boolean;
 }
 
 export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (props) => {
@@ -23,7 +23,7 @@ export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (pr
   }, [props.chainId, props.isDapps]);
 
   return (
-    <View className="flex flex-row w-full items-center justify-center gap-3">      
+    <View className="flex flex-row w-full items-center justify-around">
       {transactionTypes.map((txType, index) => (
         <View
           className="flex flex-col items-center justify-center relative"

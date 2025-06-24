@@ -3,12 +3,11 @@ import { View, Text, Image } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
+import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../context/Tutorial";
 import { Block } from "../types/Chains";
-import { getTxStyle } from "../utils/transactions";
-import feeImg from "../../assets/images/bitcoin.png";
-import { shortMoneyString } from "../utils/helpers";
+import { Canvas, Image as SkiaImg, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 
 export type BlockViewProps = {
   chainId: number;
@@ -17,6 +16,7 @@ export type BlockViewProps = {
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
+  const { getImage } = useImageProvider();
   const { currentPrestige, getUpgradeValue } = useUpgrades();
   const [txWidth, setTxWidth] = useState<number>(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
   const enabled = props.block?.blockId === 0
@@ -31,12 +31,14 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   const animatedObjectStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: yOffset.value }],
+      transform: [{
+        scale: 1- (yOffset.value / 600),
+      }],
     };
   });
 
   const animate = () => {
-    yOffset.value = withTiming(0, { duration: 250 });
+    yOffset.value = withTiming(0, { duration: 300 });
   };
 
   useEffect(() => {
@@ -44,18 +46,139 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     animate();
   }, [props.block?.transactions.length]);
 
+  const maxBlockSize = getUpgradeValue(props.chainId, "Block Size") ** 2;
+
+  const getTxIcon = (chainId: number, typeId: number) => {
+    switch (chainId) {
+      case 0:
+        switch (typeId) {
+          case 0:
+            return getImage('block.icon.tx');
+          case 1:
+            return getImage('block.icon.tx');
+          case 2:
+            return getImage('block.icon.blob');
+          case 3:
+            return getImage('block.icon.nft');
+          case 4:
+            return getImage('block.icon.nft');
+          default:
+            return getImage('unknown');
+        }
+      case 1:
+        switch (typeId) {
+          case 0:
+            return getImage('block.icon.tx');
+          case 1:
+            return getImage('block.icon.tx');
+          case 2:
+            return getImage('block.icon.blob');
+          case 3:
+            return getImage('block.icon.nft');
+          case 4:
+            return getImage('block.icon.nft');
+          default:
+            return getImage('unknown');
+        }
+      default:
+        return getImage('unknown');
+    }
+  }
+
+  const getTxImg = (chainId: number, typeId: number) => {
+    switch (chainId) {
+      case 0:
+        switch (typeId) {
+          case 0:
+            return getImage('block.bg.green');
+          case 1:
+            return getImage('block.bg.yellow');
+          case 2:
+            return getImage('block.bg.blue');
+          case 3:
+            return getImage('block.bg.pink');
+          case 4:
+            return getImage('block.bg.purple');
+          default:
+            return getImage('unknown');
+        }
+      case 1:
+        switch (typeId) {
+          case 0:
+            return getImage('block.bg.blue');
+          case 1:
+            return getImage('block.bg.green');
+          case 2:
+            return getImage('block.bg.pink');
+          case 3:
+            return getImage('block.bg.purple');
+          case 4:
+            return getImage('block.bg.yellow');
+          default:
+            return getImage('unknown');
+        }
+      default:
+        return getImage('unknown');
+    }
+  }
+
   return (
-    <View className="w-full h-full flex flex-col items-center justify-center">
-      <View className="flex-1 bg-[#ffff8008] aspect-square rounded-xl border-2 border-[#ffff80b0] relative overflow-hidden">
-        <View className="flex flex-wrap w-full aspect-square rounded-xl overflow-hidden">
+    <View className="w-full h-full flex flex-col items-center justify-center relative">
+      <View className="flex-1 bg-[#10111908] aspect-square relative">
+        <View className="flex flex-wrap w-full aspect-square">
+          <View className="absolute top-0 left-0 w-full h-full flex flex-wrap w-full aspect-square overflow-hidden">
+            {props.block?.blockId !== 0 && Array.from({ length: maxBlockSize || 0 }, (_, index) => (
+              <View
+                key={index}
+                style={{ width: `${txWidth}%`, height: `${txWidth}%` }}
+              >
+                <Canvas style={{ flex: 1 }} className="w-full h-full">
+                  <SkiaImg
+                    image={getImage('block.bg.empty')}
+                    fit="fill"
+                    sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                    x={0}
+                    y={0}
+                    width={txWidth*3.3}
+                    height={txWidth*3.3}
+                  />
+                </Canvas>
+              </View>
+            ))}
+          </View>
           {props.block?.transactions.map((tx, index) => (
             index !== (props.block?.transactions.length || 1) - 1 && (
               <View
                 key={index}
-                className="border-2 border-[#ffffff20] rounded-lg overflow-hidden"
-                style={{ width: `${txWidth}%`, height: `${txWidth}%`, ...getTxStyle(props.chainId, tx.typeId) }}
+                className="relative"
+                style={{ width: `${txWidth}%`, height: `${txWidth}%` }}
               >
-                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={tx.icon} />
+                <Canvas style={{ flex: 1 }} className="w-full h-full">
+                  <SkiaImg
+                    image={getTxImg(props.chainId, tx.typeId)}
+                    fit="fill"
+                    sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                    x={0}
+                    y={0}
+                    width={txWidth*3.4}
+                    height={txWidth*3.4}
+                  />
+                </Canvas>
+                <View
+                  className="absolute top-0 left-0 w-full h-full"
+                >
+                  <Canvas style={{ flex: 1 }} className="w-full h-full">
+                    <SkiaImg
+                      image={getTxIcon(props.chainId, tx.typeId)}
+                      fit="contain"
+                      sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                      x={txWidth*(3.4-1.4)/2}
+                      y={txWidth*(3.4-1.4)/2}
+                      width={txWidth*1.4}
+                      height={txWidth*1.4}
+                    />
+                  </Canvas>
+                </View>
               </View>
             )
           ))}
@@ -79,12 +202,34 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 }]}/>
               </Animated.View>
               <Animated.View
-                className="border-2 border-[#ffffff20] rounded-lg overflow-hidden"
-                style={[animatedObjectStyle, {
-                  ...getTxStyle(props.chainId, props.block?.transactions[props.block?.transactions.length - 1].typeId || 0),
-                }]}
+                style={[animatedObjectStyle, { position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%' }]}
               >
-                <Image className="w-full h-full flex flex-col items-center justify-center rounded-lg" source={props.block?.transactions[props.block?.transactions.length - 1].icon} />
+                <Canvas style={{ flex: 1 }} className="w-full h-full">
+                  <SkiaImg
+                    image={getTxImg(props.chainId, props.block?.transactions[props.block?.transactions.length - 1].typeId || 0)}
+                    fit="fill"
+                    sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                    x={0}
+                    y={0}
+                    width={txWidth*3.4}
+                    height={txWidth*3.4}
+                  />
+                </Canvas>
+                <View
+                  className="absolute top-0 left-0 w-full h-full"
+                >
+                  <Canvas style={{ flex: 1 }} className="w-full h-full">
+                    <SkiaImg
+                      image={getTxIcon(props.chainId, props.block?.transactions[props.block?.transactions.length - 1].typeId || 0)}
+                      fit="contain"
+                      sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+                      x={txWidth*(3.4-1.4)/2}
+                      y={txWidth*(3.4-1.4)/2}
+                      width={txWidth*1.4}
+                      height={txWidth*1.4}
+                    />
+                  </Canvas>
+                </View>
               </Animated.View>
             </View>
           )}
@@ -94,13 +239,11 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 ref={ref}
                 onLayout={onLayout}
                 >
-            {!props.completed && (
-              <Text className="text-[#ffff80ff] text-xl font-bold underline text-center pt-2">
-                Genesis Block
-              </Text>
-            )}
+            <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">
+              Genesis Block
+            </Text>
             <Text
-              className={`text-[#ffff80ff] font-bold text-center ${props.completed ? "text-sm" : "text-xl"}`}
+              className={`text-[#101119ff] font-bold text-center font-Pixels mt-[0.5rem] text-2xl`}
             >
               {props.chainId === 0 ? messagesJson.genesis.L1[currentPrestige] : messagesJson.genesis.L2[currentPrestige]}
             </Text>
@@ -108,22 +251,11 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         )}
         {props.completed && (
           <View
-            className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between bg-[#171717c0] rounded-xl"
+            className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-[#17171770] rounded-xl"
           >
-            <Text className="text-[#e9e980f0] text-3xl font-bold m-1">
-              #{props.block?.blockId}
+            <Text className="text-[#fff7ff] text-3xl font-bold font-Xerxes">
+              Block {props.block?.blockId}
             </Text>
-            <View className="flex flex-col items-end justify-center w-full px-2">
-              <View className="flex flex-row items-center gap-1">
-                <Image
-                  source={feeImg}
-                  className="w-4 h-4"
-                />
-                <Text className="text-[#e9e980f0] text-lg font-bold">
-                  {shortMoneyString((props.block?.fees || 0) + (props.block?.reward || 0))}
-                </Text>
-              </View>
-            </View>
           </View>
         )}
       </View>

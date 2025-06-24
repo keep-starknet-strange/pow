@@ -11,12 +11,20 @@ type FocAccount = {
   };
 };
 
+type FocAccounts = {
+  accounts: {
+    username: string;
+    address: string;
+  }[];
+};
+
 type FocEngineContextType = {
   registryContractAddress: string | null;
   accountsContractAddress: string | null;
   user: FocAccount | null;
 
   getAccount: (accountAddress: string) => Promise<FocAccount | null>;
+  getAccounts: (addresses: string[]) => Promise<FocAccounts | null>;
   refreshAccount: () => Promise<void>;
   claimUsername: (username: string) => Promise<any>;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
@@ -24,6 +32,7 @@ type FocEngineContextType = {
   getRegisteredContract: (contractName: string, contractVersion?: string) => Promise<string | null>;
   getLatestEventWith: (contractAddress: string, eventType: string, filters?: Record<string, any>) => Promise<any>;
   getUniqueEventsWith: (contractAddress: string, eventType: string, uniqueKey: string, filters?: Record<string, any>) => Promise<any>;
+  getUniqueEventsOrdered: (contractAddress: string, eventType: string, uniqueKey: string, orderKey: string, filters?: Record<string, any>) => Promise<any>;
 };
 
 const FocEngineConnector = createContext<FocEngineContextType | undefined>(undefined);
@@ -130,6 +139,30 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return null;
     }
   }, []);
+
+  const getAccounts = useCallback(async (addresses: string[]) => {
+    if (!STARKNET_ENABLED) {
+      return [];
+    }
+    try {
+      const response = await fetch(`${FOC_ENGINE_API}/accounts/get-accounts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ addresses }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch accounts data");
+      }
+      const data = await response.json();
+      // Example response: {"data": [{"account":{"username":"magic"},"account_address":"0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691","contract_address":"0x23386fe159ca18338f619b0a753e124db2cebd45f23cc992ce693cde465d617"}]}
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+      return null;
+    }
+  }, [STARKNET_ENABLED]);
 
   const claimUsername = useCallback(async (username: string) => {
     if (!STARKNET_ENABLED) {
@@ -265,12 +298,38 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return null;
     }
   }, []);
+
+  const getUniqueEventsOrdered = useCallback(async (contractAddress: string, eventType: string, uniqueKey: string,
+  orderKey: string, filters: Record<string, any> = {}) => {
+    if (!STARKNET_ENABLED) {
+      return null;
+    }
+    try {
+      const response = await fetch(`${FOC_ENGINE_API}/events/get-unique-ordered?contractAddress=${contractAddress}&eventType=${eventType}&uniqueKey=${uniqueKey}&orderKey=${orderKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(filters),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error fetching unique ordered events:", error);
+        throw new Error("Failed to fetch unique ordered events");
+      }
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching unique ordered events:", error);
+      return null;
+    }
+  }, []);
   
   return (
     <FocEngineConnector.Provider value={{
       user, registryContractAddress, accountsContractAddress,
       refreshAccount, getAccount, claimUsername, mintFunds,
-      getRegisteredContract, getLatestEventWith, getUniqueEventsWith
+      getRegisteredContract, getLatestEventWith, getUniqueEventsWith, getUniqueEventsOrdered, getAccounts
     }}>
       {children}
     </FocEngineConnector.Provider>

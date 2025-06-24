@@ -7,6 +7,7 @@ type ChainsContextType = {
   getChain: (chainId: number) => Chain;
   addChain: () => void;
   getBlock: (chainId: number, blockId: number) => Block | null;
+  getLatestBlock: (chainId: number) => Block | null;
   addBlock: (chainId: number, block: Block) => void;
 };
 
@@ -57,6 +58,12 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return chain.blocks.find(block => block.blockId === blockId) || null;
   }
 
+  const getLatestBlock = (chainId: number) => {
+    const chain = getChain(chainId);
+    if (!chain || chain.blocks.length === 0) return null;
+    return chain.blocks[chain.blocks.length - 1];
+  }
+
   const addBlock = (chainId: number, block: Block) => {
     setChains((prevState) => {
       if (!prevState[chainId]) {
@@ -66,7 +73,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const newChains = [...prevState];
       newChains[chainId] = {
         ...prevState[chainId],
-        blocks: [...prevState[chainId].blocks, block].slice(-5) // Limit to 5 blocks
+        blocks: [...prevState[chainId].blocks, block].slice(-3) // Limit to 3 blocks
       };
       return newChains;
     });
@@ -74,7 +81,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   
   return (
     <ChainsContext.Provider value={{
-      chains, getChain, addChain, getBlock, addBlock
+      chains, getChain, addChain, getBlock, addBlock, getLatestBlock
     }}>
       {children}
     </ChainsContext.Provider>

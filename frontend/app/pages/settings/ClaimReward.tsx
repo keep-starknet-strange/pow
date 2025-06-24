@@ -49,12 +49,12 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
     <ImageBackground className="flex-1" source={background} resizeMode="cover">
       <View className="flex-1 justify-center items-center px-6">
         { !rewardUnlocked ? (
-            <Text className="text-4xl font-bold text-[#ffff80] mb-4">
+            <Text className="text-4xl font-bold text-[#101119] mb-4">
               Keep playing to Earn STRK!
             </Text>
           ) : (
             <>
-              <Text className="text-4xl font-bold text-[#ffff80] mb-4">
+              <Text className="text-4xl font-bold text-[#101119] mb-4">
                 🎉 You earned 10 STRK!
               </Text>
 
@@ -79,9 +79,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ setSettingTab }
               </View>
 
               <TextInput
-              className="bg-[#ffff8010] w-3/4 rounded-lg my-4 p-2 text-xl text-[#ffff80] border-2 border-[#ffff80] shadow-lg shadow-black/50"
+              className="bg-[#10111910] w-3/4 rounded-lg my-4 p-2 text-xl text-[#101119] border-2 border-[#101119] shadow-lg shadow-black/50"
               placeholder="copy/paste your account address"
-              placeholderTextColor="#ffff8080"
+              placeholderTextColor="#10111980"
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="off"
