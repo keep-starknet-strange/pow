@@ -6,13 +6,17 @@ export type Transaction = {
   isDapp?: boolean;
 };
 
-export const newTransaction = (typeId: number, fee: number, isDapp?: boolean): Transaction => {
+export const newTransaction = (
+  typeId: number,
+  fee: number,
+  isDapp?: boolean,
+): Transaction => {
   return {
     typeId,
     fee,
-    isDapp
-  }
-}
+    isDapp,
+  };
+};
 
 export type Block = {
   blockId: number;
@@ -28,9 +32,9 @@ export const newBlock = (blockId: number, reward?: number): Block => {
     fees: 0,
     transactions: [],
     isBuilt: false,
-    reward
+    reward,
   };
-}
+};
 
 export type Chain = {
   chainId: number;
@@ -39,5 +43,5 @@ export type Chain = {
 
 export const newChain = (chainId: number): Chain => ({
   chainId,
-  blocks: []
+  blocks: [],
 });

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Text, View, Easing, Animated, useAnimatedValue } from 'react-native';
+import React, { useEffect } from "react";
+import { Text, View, Easing, Animated, useAnimatedValue } from "react-native";
 
 export type PopupAnimationProps = {
   popupStartTime?: number;
@@ -8,8 +8,12 @@ export type PopupAnimationProps = {
   animRange?: [number, number];
 };
 
-export const PopupAnimation: React.FC<PopupAnimationProps> = ({ popupStartTime, popupValue, color, animRange }) => {
-
+export const PopupAnimation: React.FC<PopupAnimationProps> = ({
+  popupStartTime,
+  popupValue,
+  color,
+  animRange,
+}) => {
   const popupAnimation = useAnimatedValue(0);
   useEffect(() => {
     if (!popupStartTime) return;
@@ -44,7 +48,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({ popupStartTime, 
       <Text
         className="text-xl font-bold text-center"
         style={{
-          color: color || 'black',
+          color: color || "black",
         }}
       >
         {popupValue}

@@ -19,14 +19,16 @@ export const useChains = () => {
     throw new Error("useChains must be used within a ChainsProvider");
   }
   return context;
-}
+};
 
-export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [chains, setChains] = useState<Chain[]>([]);
 
   const resetChains = () => {
     setChains([newChain(0)]);
-  }
+  };
 
   useEffect(() => {
     resetChains();
@@ -42,7 +44,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const getChain = (chainId: number) => {
     return chains[chainId] || null;
-  }
+  };
 
   const addChain = () => {
     setChains((prevState) => {
@@ -50,19 +52,19 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const chain = newChain(newChainId);
       return [...prevState, chain];
     });
-  }
+  };
 
   const getBlock = (chainId: number, blockId: number) => {
     const chain = getChain(chainId);
     if (!chain) return null;
-    return chain.blocks.find(block => block.blockId === blockId) || null;
-  }
+    return chain.blocks.find((block) => block.blockId === blockId) || null;
+  };
 
   const getLatestBlock = (chainId: number) => {
     const chain = getChain(chainId);
     if (!chain || chain.blocks.length === 0) return null;
     return chain.blocks[chain.blocks.length - 1];
-  }
+  };
 
   const addBlock = (chainId: number, block: Block) => {
     setChains((prevState) => {
@@ -73,16 +75,23 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const newChains = [...prevState];
       newChains[chainId] = {
         ...prevState[chainId],
-        blocks: [...prevState[chainId].blocks, block].slice(-3) // Limit to 3 blocks
+        blocks: [...prevState[chainId].blocks, block].slice(-3), // Limit to 3 blocks
       };
       return newChains;
     });
-  }
-  
+  };
+
   return (
-    <ChainsContext.Provider value={{
-      chains, getChain, addChain, getBlock, addBlock, getLatestBlock
-    }}>
+    <ChainsContext.Provider
+      value={{
+        chains,
+        getChain,
+        addChain,
+        getBlock,
+        addBlock,
+        getLatestBlock,
+      }}
+    >
       {children}
     </ChainsContext.Provider>
   );

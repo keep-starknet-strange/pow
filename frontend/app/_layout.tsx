@@ -17,7 +17,7 @@ export default function RootLayout() {
         ),
       }}
     >
-      <Stack.Screen name="index" options={{ }} />
+      <Stack.Screen name="index" options={{}} />
     </Stack>
   );
 }

@@ -9,7 +9,13 @@ type BasicButtonProps = {
   disabled?: boolean;
 };
 
-const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, disabled = false }) => {
+const BasicButton: React.FC<BasicButtonProps> = ({
+  label,
+  onPress,
+  style,
+  icon,
+  disabled = false,
+}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -17,27 +23,29 @@ const BasicButton: React.FC<BasicButtonProps> = ({ label, onPress, style, icon, 
       className={`
         rounded-full items-center justify-around flex-row p-2
         border-4 border-[#101119] shadow-lg shadow-[#3093e1]
-        ${disabled ? 'border-gray-400 shadow-gray-400' : 'border-[#101119] shadow-[#101119]'}
+        ${disabled ? "border-gray-400 shadow-gray-400" : "border-[#101119] shadow-[#101119]"}
       `}
       style={{
         ...style,
       }}
     >
-      <Text className={`
+      <Text
+        className={`
           font-Xerxes font-bold text-4xl
-          ${disabled ? 'text-gray-400' : 'text-[#101119]'}
+          ${disabled ? "text-gray-400" : "text-[#101119]"}
         `}
       >
         {label}
       </Text>
       {icon && (
-        <Text className={`
+        <Text
+          className={`
             font-bold text-4xl
-            ${disabled ? 'text-gray-400' : 'text-[#101119]'}
+            ${disabled ? "text-gray-400" : "text-[#101119]"}
           `}
         >
-        {icon}
-      </Text>
+          {icon}
+        </Text>
       )}
     </TouchableOpacity>
   );

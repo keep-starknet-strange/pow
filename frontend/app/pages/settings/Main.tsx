@@ -12,33 +12,64 @@ export type SettingsMainSectionProps = {
   setSettingTab: (tab: "About" | "Credits" | "Help" | "ClaimReward") => void;
 };
 
-const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({ setSettingTab }) => {
+const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
+  setSettingTab,
+}) => {
   const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
-  const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } = useStarknetConnector();
+  const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
+    useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
 
   const toggleNotifs = () => setNotifs(!notifs);
 
-  const settingsComponents: { label: string; tab?: "About" | "Credits" | "Help" | "ClaimReward", onPress?: () => void, icon?: string }[] = [
+  const settingsComponents: {
+    label: string;
+    tab?: "About" | "Credits" | "Help" | "ClaimReward";
+    onPress?: () => void;
+    icon?: string;
+  }[] = [
     { label: "About", tab: "About", icon: "📖" },
     { label: "Credits", tab: "Credits", icon: "🎉" },
     { label: "Help", tab: "Help", icon: "❓" },
     { label: "Review", icon: "📝" },
     { label: "Claim Reward", tab: "ClaimReward", icon: "🎁" },
     { label: "Reset Account", onPress: disconnectAndDeleteAccount, icon: "🔄" },
-    { label: "Reset All", onPress: () => clearPrivateKeys("pow_game"), icon: "🗑️" },
+    {
+      label: "Reset All",
+      onPress: () => clearPrivateKeys("pow_game"),
+      icon: "🗑️",
+    },
     { label: "Logout", onPress: disconnectAccount, icon: "🚪" },
   ];
 
   return (
     <View className="flex flex-col gap-2 mt-4 w-full justify-center">
-
       <View className="flex flex-row justify-around gap-4 w-full">
-        <ToggleButton label="Sound" isOn={isSoundOn} onToggle={toggleSound} onSymbol="🔊" offSymbol="🔇" style={{ flex: 1 }}/>
-        <ToggleButton label="Music" isOn={isMusicOn} onToggle={toggleMusic} onSymbol="🔊" offSymbol="🔇" style={{ flex: 1 }}/>
+        <ToggleButton
+          label="Sound"
+          isOn={isSoundOn}
+          onToggle={toggleSound}
+          onSymbol="🔊"
+          offSymbol="🔇"
+          style={{ flex: 1 }}
+        />
+        <ToggleButton
+          label="Music"
+          isOn={isMusicOn}
+          onToggle={toggleMusic}
+          onSymbol="🔊"
+          offSymbol="🔇"
+          style={{ flex: 1 }}
+        />
       </View>
 
-      <ToggleButton label="Notifications" isOn={notifs} onToggle={toggleNotifs} onSymbol="🔔" offSymbol="🔕" />
+      <ToggleButton
+        label="Notifications"
+        isOn={notifs}
+        onToggle={toggleNotifs}
+        onSymbol="🔔"
+        offSymbol="🔕"
+      />
       <ResetTutorialButton />
 
       {settingsComponents.map(({ label, tab, onPress, icon }) => (

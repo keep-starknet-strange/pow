@@ -9,7 +9,12 @@ import { DaView } from "../../components/DaView";
 import { ProverView } from "../../components/ProverView";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 export interface L2PhaseProps {
   setCurrentView: (view: string) => void;
@@ -34,9 +39,7 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
         <WorkingBlockView chainId={1} />
       </View>
       <View className="mt-[0.5rem] w-full">
-        {!dappsUnlocked[1] && (
-          <DappsUnlock chainId={1} />
-        )}
+        {!dappsUnlocked[1] && <DappsUnlock chainId={1} />}
         <View className="flex flex-row justify-between items-center px-4">
           <DaView />
           <ProverView />
@@ -51,7 +54,10 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
             y={0}
             width={402}
             height={200}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
         <View className="absolute top-[4px] left-0 right-0">
@@ -60,6 +66,6 @@ export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
       </View>
     </View>
   );
-}
+};
 
 export default L2Phase;

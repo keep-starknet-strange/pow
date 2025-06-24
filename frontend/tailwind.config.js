@@ -6,9 +6,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Xerxes', 'sans-serif'],
-        'Xerxes': ['Xerxes', 'sans-serif'],
-        'Pixels': ['Pixels', 'sans-serif'],
+        sans: ["Xerxes", "sans-serif"],
+        Xerxes: ["Xerxes", "sans-serif"],
+        Pixels: ["Pixels", "sans-serif"],
       },
     },
   },

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import * as Font from 'expo-font';
+import React, { useEffect, useState } from "react";
+import * as Font from "expo-font";
 import { EventManagerProvider } from "./context/EventManager";
 import { InAppNotificationsProvider } from "./context/InAppNotifications";
 import { SoundProvider } from "./context/Sound";
@@ -23,8 +23,8 @@ export default function App() {
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
-        'Xerxes': require('../assets/fonts/Xerxes-10.ttf'),
-        'Pixels': require('../assets/fonts/04B_03_.ttf'),
+        Xerxes: require("../assets/fonts/Xerxes-10.ttf"),
+        Pixels: require("../assets/fonts/04B_03_.ttf"),
       });
       setFontLoaded(true);
     }

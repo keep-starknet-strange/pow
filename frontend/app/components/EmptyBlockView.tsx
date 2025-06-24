@@ -1,5 +1,10 @@
 import { View } from "react-native";
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import { useImageProvider } from "../context/ImageProvider";
 
 export const EmptyBlockView: React.FC = () => {
@@ -14,9 +19,12 @@ export const EmptyBlockView: React.FC = () => {
             fit="fill"
             x={0}
             y={0}
-            width={144*2.4}
-            height={142*2.4}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            width={144 * 2.4}
+            height={142 * 2.4}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
@@ -29,7 +37,10 @@ export const EmptyBlockView: React.FC = () => {
             y={0}
             width={16}
             height={20}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
@@ -42,14 +53,16 @@ export const EmptyBlockView: React.FC = () => {
             y={0}
             width={16}
             height={20}
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
           />
         </Canvas>
       </View>
 
       <View className="flex-1 bg-[#10111908] aspect-square relative">
-        <View className="flex flex-wrap w-full aspect-square">
-        </View>
+        <View className="flex flex-wrap w-full aspect-square"></View>
       </View>
     </View>
   );
