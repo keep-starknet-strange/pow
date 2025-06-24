@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
   return (
     <View
       className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
-                     absolute bottom-0 items-center z-[50] gap-2
+                     absolute bottom-0 items-center z-[20] gap-2
     "
     >
       {props.tabs.map((tab, index) => {

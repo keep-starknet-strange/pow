@@ -5,6 +5,7 @@ type BasicButtonProps = {
   label: string;
   onPress?: () => void;
   style?: object;
+  textStyle?: object;
   icon?: string;
   disabled?: boolean;
 };
@@ -13,6 +14,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({
   label,
   onPress,
   style,
+  textStyle,
   icon,
   disabled = false,
 }) => {
@@ -34,6 +36,9 @@ const BasicButton: React.FC<BasicButtonProps> = ({
           font-Xerxes font-bold text-4xl
           ${disabled ? "text-gray-400" : "text-[#101119]"}
         `}
+        style={{
+          ...textStyle,
+        }}
       >
         {label}
       </Text>
@@ -43,6 +48,9 @@ const BasicButton: React.FC<BasicButtonProps> = ({
             font-bold text-4xl
             ${disabled ? "text-gray-400" : "text-[#101119]"}
           `}
+          style={{
+            ...textStyle,
+          }}
         >
           {icon}
         </Text>
