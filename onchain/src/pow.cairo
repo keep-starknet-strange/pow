@@ -188,11 +188,11 @@ mod PowGame {
             self.user_balances.read(user)
         }
 
-        fn get_staked_amount(self: @ContractState, user: ContractAddress) -> u128 {
+        fn get_user_staked_amount(self: @ContractState, user: ContractAddress) -> u128 {
             self.staking.get_staked_amount(user)
         }
 
-        fn get_reward_amount(self: @ContractState, user: ContractAddress) -> u128 {
+        fn get_user_reward_amount(self: @ContractState, user: ContractAddress) -> u128 {
             self.staking.get_reward_amount(user)
         }
     }

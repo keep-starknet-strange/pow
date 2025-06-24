@@ -31,6 +31,12 @@ pub mod StakingComponent {
         StakeUpdated: StakeUpdated,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct Slashed {
+        #[key] user: ContractAddress,
+        amount: u128,
+    }
+
     #[embeddable_as(StakingImpl)]
     impl Staking<
         TContractState, +HasComponent<TContractState>,
@@ -63,6 +69,7 @@ pub mod StakingComponent {
             let user_stake = self.user_stakes.read(user);
             let user_rewards = self.user_rewards.read(user);
             let total_stake = user_stake + user_rewards;
+            self.user_last_validation.write(user, current_time);
             
             if time_since_last_validation > config.slashing_config.due_time {
                 // Slash logic
@@ -71,7 +78,7 @@ pub mod StakingComponent {
             } else {
                 // Reward logic
                 let reward: u128 = total_stake * (time_since_last_validation.into()) / config.reward_rate;
-                self.user_rewards.write(user, self.user_rewards.read(user) + reward);
+                self.user_rewards.write(user, user_rewards + reward);
             }
         }
 

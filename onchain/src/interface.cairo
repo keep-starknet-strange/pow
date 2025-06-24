@@ -15,8 +15,8 @@ pub trait IPowGame<TContractState> {
     fn setup_staking_config(ref self: TContractState, user: ContractAddress, config: StakingConfig);
 
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
-    fn get_staked_amount(self: @TContractState, user: ContractAddress) -> u128;
-    fn get_reward_amount(self: @TContractState, user: ContractAddress) -> u128;
+    fn get_user_staked_amount(self: @TContractState, user: ContractAddress) -> u128;
+    fn get_user_reward_amount(self: @TContractState, user: ContractAddress) -> u128;
 }
 
 // Game Rewards management
