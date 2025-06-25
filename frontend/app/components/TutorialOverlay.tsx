@@ -98,7 +98,8 @@ export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const insets = useSafeAreaInsets();
-  const headerH = useHeaderHeight();
+  const headerH = 76;
+  const [layoutOffsetY, setLayoutOffsetY] = useState(0);
 
   const config = (
     step in tutorialConfig
@@ -162,8 +163,12 @@ export const TutorialOverlay: React.FC = () => {
   }, [step, setVisible]);
 
   if (!visible || !isLayoutReady) return null;
+  console.log("target.y", bubbleTarget.y, "bubbleTop", bubbleTop, "highlight.y", highlightTarget.y, "layoutOffsetY", layoutOffsetY, headerH);
+
   return (
-    <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
+    <View className="absolute inset-0 z-[50]" pointerEvents="box-none" onLayout={(e) => {
+    setLayoutOffsetY(e.nativeEvent.layout.y);
+  }}>
       {/* Masks */}
       {masks.map((m, i) => (
         <View
@@ -181,7 +186,7 @@ export const TutorialOverlay: React.FC = () => {
         pointerEvents="none"
         style={{
           position: "absolute",
-          top: highlightTarget.y - headerH - 4,
+          top: highlightTarget.y - 4 ,
           left: highlightTarget.x - 4,
           width: highlightTarget.width + 8,
           height: highlightTarget.height + 8,

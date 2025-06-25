@@ -139,9 +139,9 @@ export default function game() {
 
   return (
     <View className="flex-1 bg-[#010a12ff] relative">
+      {isTutorialActive && <TutorialOverlay />}
       {user && user.account.username !== "" ? (
         <View className="flex-1">
-          {isTutorialActive && <TutorialOverlay />}
           <Header />
           <InAppNotification />
           <currentPage.component />
