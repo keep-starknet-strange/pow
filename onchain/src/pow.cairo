@@ -46,7 +46,6 @@ mod PowGame {
     use pow_game::staking::component::StakingComponent;
     use pow_game::staking::StakingConfig;
     component!(path: StakingComponent, storage: staking, event: StakingEvent);
-    #[abi(embed_v0)]
     impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
 
     // -- Admin Components --
@@ -190,10 +189,6 @@ mod PowGame {
             self.game_masters.write(user, false);
         }
 
-        fn staking_config(self: @ContractState) -> StakingConfig {
-            self.staking.get_staking_config()
-        }
-
         fn setup_staking_config(ref self: ContractState, user: ContractAddress, config: StakingConfig) {
             self.check_valid_game_master(get_caller_address());
             self.staking.setup_staking(user, config);
@@ -201,14 +196,6 @@ mod PowGame {
 
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
             self.user_balances.read(user)
-        }
-
-        fn get_user_staked_amount(self: @ContractState, user: ContractAddress) -> u128 {
-            self.staking.get_staked_amount(user)
-        }
-
-        fn get_user_reward_amount(self: @ContractState, user: ContractAddress) -> u128 {
-            self.staking.get_reward_amount(user)
         }
     }
 

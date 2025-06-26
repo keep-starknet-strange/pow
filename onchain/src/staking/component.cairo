@@ -1,6 +1,6 @@
 #[starknet::component]
 pub mod StakingComponent {
-    use pow_game::staking::interface::{IStaking, StakingConfig, SlashingConfig};
+    use pow_game::staking::interface::{IStaking, StakingConfig};
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
@@ -56,17 +56,16 @@ pub mod StakingComponent {
         }
 
         fn claim_rewards(ref self: ComponentState<TContractState>, user: ContractAddress) -> u128 {
-            self.validate(user);
             let reward = self.user_rewards.read(user);
             self.user_rewards.write(user, 0);
             return reward;
         }
         
-        fn validate(ref self: ComponentState<TContractState>, user: ContractAddress) {
+        fn validate(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) {
             let last_validation = self.user_last_validation.read(user);
             let current_time = get_block_timestamp();
-            let time_since_last_validation = current_time - last_validation;
             let config = self.staking_config.read();
+            let time_since_last_validation = current_time - last_validation / config.slashing_config.due_time;
             let user_stake = self.user_stakes.read(user);
             let user_rewards = self.user_rewards.read(user);
             let total_stake = user_stake + user_rewards;
@@ -83,8 +82,8 @@ pub mod StakingComponent {
             }
         }
 
-        fn withdraw_stake(ref self: ComponentState<TContractState>, user: ContractAddress) -> u128 {
-            self.validate(user);
+        fn withdraw_stake(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) -> u128 {
+            self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, 0);
             return current_stake;
@@ -96,6 +95,14 @@ pub mod StakingComponent {
 
         fn get_reward_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
             self.user_rewards.read(user)
+        }
+
+        fn check_timing(self: @ComponentState<TContractState>, now: u64) {
+            let block_timestamp = get_block_timestamp();
+            let leanience_margin = self.get_staking_config().slashing_config.leanianece_margin;
+            let expected_block_time = 30; // 30 seconds
+            assert(now >= block_timestamp - leanience_margin, 'Timestamp too far behind');
+            assert(now <= block_timestamp + 2 * expected_block_time, 'Timestamp too far ahead');
         }
     }
 }
