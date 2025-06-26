@@ -84,6 +84,7 @@ pub mod StakingComponent {
         }
 
         fn withdraw_stake(ref self: ComponentState<TContractState>, user: ContractAddress) -> u128 {
+            self.validate(user);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, 0);
             return current_stake;
