@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { useTutorial, TargetId } from "../context/Tutorial";
 import tutorialConfig from "../configs/tutorial.json";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const BUBBLE_MAX_WIDTH = 260;
@@ -35,17 +35,16 @@ function useBubblePosition(
   target: { x: number; y: number; width: number; height: number },
   bubbleHeight: number,
   insetTop: number,
-  headerHeight: number,
 ): Position {
   const { x, y, width, height } = target;
 
   // Preferred below target
-  let top = y + height + ARROW_SIZE + ARROW_SPACING - headerHeight;
+  let top = y + height + ARROW_SIZE + ARROW_SPACING - insetTop;
   const roomBelow = SCREEN_HEIGHT - (y + height) - insetTop;
   const below = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING;
 
   if (!below) {
-    top = y - bubbleHeight - ARROW_SIZE - ARROW_SPACING - headerHeight;
+    top = y - bubbleHeight - ARROW_SIZE - ARROW_SPACING - insetTop;
   }
 
   // Clamp within screen
@@ -98,8 +97,6 @@ export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const insets = useSafeAreaInsets();
-  const headerH = 76;
-  const [layoutOffsetY, setLayoutOffsetY] = useState(0);
 
   const config = (
     step in tutorialConfig
@@ -140,20 +137,19 @@ export const TutorialOverlay: React.FC = () => {
   } = useBubblePosition(
     bubbleTarget,
     bubbleHeight,
-    insets.top + headerH,
-    headerH,
+    insets.top,
   );
 
   const masks = useMemo(() => {
     const { x, y, width, height } = highlightTarget;
-    const topOffset = y - headerH;
+    const topOffset = y - insets.top;
     return [
       { top: 0, left: 0, right: 0, height: topOffset },
       { top: topOffset + height, left: 0, right: 0, bottom: 0 },
       { top: topOffset, left: 0, width: x, height },
       { top: topOffset, left: x + width, right: 0, height },
     ];
-  }, [highlightTarget, headerH]);
+  }, [highlightTarget]);
 
   // Show overlay on step change
   useEffect(() => {
@@ -163,12 +159,10 @@ export const TutorialOverlay: React.FC = () => {
   }, [step, setVisible]);
 
   if (!visible || !isLayoutReady) return null;
-  console.log("target.y", bubbleTarget.y, "bubbleTop", bubbleTop, "highlight.y", highlightTarget.y, "layoutOffsetY", layoutOffsetY, headerH);
+  console.log("target.y", bubbleTarget.y, "bubbleTop", bubbleTop, "highlight.y", highlightTarget.y, "safeAreaInsets.top", insets.top);
 
   return (
-    <View className="absolute inset-0 z-[50]" pointerEvents="box-none" onLayout={(e) => {
-    setLayoutOffsetY(e.nativeEvent.layout.y);
-  }}>
+    <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {/* Masks */}
       {masks.map((m, i) => (
         <View
@@ -186,7 +180,7 @@ export const TutorialOverlay: React.FC = () => {
         pointerEvents="none"
         style={{
           position: "absolute",
-          top: highlightTarget.y - 4 ,
+          top: highlightTarget.y - 3 - insets.top,
           left: highlightTarget.x - 4,
           width: highlightTarget.width + 8,
           height: highlightTarget.height + 8,
