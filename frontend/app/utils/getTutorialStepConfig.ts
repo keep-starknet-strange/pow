@@ -7,12 +7,14 @@ export function getTutorialStepConfig(step: string): {
   bubbleTargetId: TargetId;
   highlightTargetId: TargetId;
 } {
-  return (step in tutorialConfig
-    ? tutorialConfig[step as keyof typeof tutorialConfig]
-    : {
-        title: "",
-        description: "",
-        bubbleTargetId: "",
-        highlightTargetId: "",
-      }) as any;
+  return (
+    step in tutorialConfig
+      ? tutorialConfig[step as keyof typeof tutorialConfig]
+      : {
+          title: "",
+          description: "",
+          bubbleTargetId: "",
+          highlightTargetId: "",
+        }
+  ) as any;
 }

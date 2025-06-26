@@ -14,11 +14,26 @@ export const TutorialOverlay: React.FC = () => {
   const [bubbleHeight, setBubbleHeight] = useState(0);
 
   const stepConfig = getTutorialStepConfig(step);
-  const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
-  const highlightLayout = layouts?.[stepConfig.highlightTargetId] ?? { x: 0, y: 0, width: 0, height: 0 };
+  const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  };
+  const highlightLayout = layouts?.[stepConfig.highlightTargetId] ?? {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  };
 
   const isReady = bubbleLayout.width > 0 && bubbleLayout.height > 0;
-  const { left: bubbleLeft, top: bubbleTop, style: arrowStyle, arrowLeft } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
+  const {
+    left: bubbleLeft,
+    top: bubbleTop,
+    style: arrowStyle,
+    arrowLeft,
+  } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
   const masks = useHighlightMasks(highlightLayout, insets.top);
 
   useEffect(() => {
@@ -30,7 +45,14 @@ export const TutorialOverlay: React.FC = () => {
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {masks.map((m, i) => (
-        <View key={i} style={[{ position: "absolute" }, m, { backgroundColor: "rgba(0,0,0,0.7)" }]} />
+        <View
+          key={i}
+          style={[
+            { position: "absolute" },
+            m,
+            { backgroundColor: "rgba(0,0,0,0.7)" },
+          ]}
+        />
       ))}
 
       <View
@@ -44,16 +66,31 @@ export const TutorialOverlay: React.FC = () => {
         }}
       />
 
-      <View className="absolute z-[50]" style={[{ left: arrowLeft }, arrowStyle]} />
+      <View
+        className="absolute z-[50]"
+        style={[{ left: arrowLeft }, arrowStyle]}
+      />
 
-      <View className="absolute items-center z-[50]" style={{ left: bubbleLeft, top: bubbleTop, width: BUBBLE_WIDTH }}>
+      <View
+        className="absolute items-center z-[50]"
+        style={{ left: bubbleLeft, top: bubbleTop, width: BUBBLE_WIDTH }}
+      >
         <View
           className="bg-[#272727] p-3 rounded-2xl border border-yellow-400 shadow-lg"
-          onLayout={(e: LayoutChangeEvent) => setBubbleHeight(Math.round(e.nativeEvent.layout.height))}
+          onLayout={(e: LayoutChangeEvent) =>
+            setBubbleHeight(Math.round(e.nativeEvent.layout.height))
+          }
         >
-          <Text className="text-base font-semibold text-gray-100 mb-1 text-center">{stepConfig.title}</Text>
-          <Text className="text-sm text-gray-300 mb-2 text-center">{stepConfig.description}</Text>
-          <TouchableOpacity onPress={() => setVisible(false)} className="self-center bg-yellow-400 px-4 py-2 rounded">
+          <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
+            {stepConfig.title}
+          </Text>
+          <Text className="text-sm text-gray-300 mb-2 text-center">
+            {stepConfig.description}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setVisible(false)}
+            className="self-center bg-yellow-400 px-4 py-2 rounded"
+          >
             <Text className="text-sm font-semibold text-black">Got it</Text>
           </TouchableOpacity>
         </View>

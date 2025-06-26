@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 
-export function useHighlightMasks(highlightTarget: { x: number; y: number; width: number; height: number }, insetTop: number) {
+export function useHighlightMasks(
+  highlightTarget: { x: number; y: number; width: number; height: number },
+  insetTop: number,
+) {
   return useMemo(() => {
     const { x, y, width, height } = highlightTarget;
     const topOffset = y - insetTop;
