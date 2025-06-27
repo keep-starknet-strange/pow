@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, LayoutChangeEvent, StatusBar, Dimensions } from "react-native";
 import { useTutorial } from "../context/Tutorial";
 import { useBubblePosition } from "../hooks/useBubblePosition";
+import { useHighlightMasks, useHightlightPosition } from "../hooks/useHighlightMasks";
 import { useHighlightMasks } from "../hooks/useHighlightMasks";
 import { useTopInset } from "../hooks/useTopInset";
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
@@ -33,8 +34,10 @@ export const TutorialOverlay: React.FC = () => {
     top: bubbleTop,
     style: arrowStyle,
     arrowLeft,
-  } = useBubblePosition(bubbleLayout, bubbleHeight, topInset);
-  const masks = useHighlightMasks(highlightLayout, topInset);
+  } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
+
+  const highlightPosition = useHightlightPosition(highlightLayout, insets.top);
+  const masks = useHighlightMasks(highlightPosition);
 
   useEffect(() => {
     if (step !== "completed") setVisible(true);
@@ -66,10 +69,10 @@ console.log({
         pointerEvents="none"
         className="absolute border-2 border-yellow-400 rounded-2xl shadow-lg"
         style={{
-          top: highlightLayout.y - 3 - topInset,
-          left: highlightLayout.x - 4,
-          width: highlightLayout.width + 8,
-          height: highlightLayout.height + 8,
+          top: highlightPosition.top,
+          left: highlightPosition.left,
+          width: highlightPosition.width,
+          height: highlightPosition.height,
         }}
       />
 

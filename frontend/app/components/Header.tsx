@@ -1,19 +1,25 @@
-import { Text, View } from "react-native";
 import {
   Canvas,
-  Image,
   FilterMode,
+  Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../context/ImageProvider";
+import { Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBalance } from "../context/Balance";
+import { useImageProvider } from "../context/ImageProvider";
 import { shortMoneyString } from "../utils/helpers";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
   const { getImage } = useImageProvider();
+  const insets = useSafeAreaInsets();
+
   return (
-    <View className="bg-[#101119] h-[76px] p-0 relative">
+    <View 
+      style={{marginTop: insets.top}}
+      className="bg-[#101119] h-[76px] p-0 relative"
+    >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
           image={getImage("balance")}
@@ -26,7 +32,7 @@ export const Header: React.FC = () => {
         />
       </Canvas>
       <View className="absolute right-0 h-full flex items-center justify-center pr-3">
-        <Text className="text-[#fff2fdff] text-5xl font-bold font-Xerxes">
+        <Text className="text-[#fff2fdff] text-5xl font-Xerxes">
           {shortMoneyString(balance)}
         </Text>
       </View>

@@ -1,20 +1,10 @@
-import { Header } from "@react-navigation/elements";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
-    <Stack
+    <Stack 
       screenOptions={{
-        header: ({ options }) => (
-          <Header
-            {...options}
-            headerStyle={{
-              height: 60,
-              backgroundColor: "#101119",
-            }}
-            title=""
-          />
-        ),
+        headerShown: false
       }}
     >
       <Stack.Screen name="index" options={{}} />

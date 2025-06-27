@@ -145,13 +145,13 @@ export const LeaderboardPage: React.FC = () => {
         </Text>
       </View>
       <View className="flex flex-row justify-between items-center p-4 transparent">
-        <Text className="text-lg font-bold text-white flex-1 font-Pixels">
+        <Text className="text-lg text-white flex-1 font-Pixels">
           Leaderboard
         </Text>
-        <Text className="text-lg font-bold text-white w-[5rem] text-center font-Pixels">
+        <Text className="text-lg text-white w-[5rem] text-center font-Pixels">
           Prestige
         </Text>
-        <Text className="text-lg font-bold text-white w-[6rem] text-right font-Pixels">
+        <Text className="text-lg text-white w-[6rem] text-right font-Pixels">
           Score
         </Text>
       </View>
@@ -169,7 +169,7 @@ export const LeaderboardPage: React.FC = () => {
               >
                 <PFPView user={user.address} attributes={user.nouns} />
               </View>
-              <Text className="text-2xl font-bold text-white font-Pixels">
+              <Text className="text-2xl text-white font-Pixels">
                 {user.name}
               </Text>
             </View>
@@ -179,7 +179,7 @@ export const LeaderboardPage: React.FC = () => {
                 className="w-[3rem] aspect-square rounded-full"
               />
             </View>
-            <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
+            <Text className="text-xl text-white w-[6rem] text-right font-Pixels">
               {shortMoneyString(user.balance)}
             </Text>
           </View>
