@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTutorial } from "../context/Tutorial";
 import { useBubblePosition } from "../hooks/useBubblePosition";
-import { useHighlightMasks } from "../hooks/useHighlightMasks";
+import { useHighlightMasks, useHightlightPosition } from "../hooks/useHighlightMasks";
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
 
 const BUBBLE_WIDTH = 260;
@@ -34,7 +34,9 @@ export const TutorialOverlay: React.FC = () => {
     style: arrowStyle,
     arrowLeft,
   } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
-  const masks = useHighlightMasks(highlightLayout, insets.top);
+
+  const highlightPosition = useHightlightPosition(highlightLayout, insets.top);
+  const masks = useHighlightMasks(highlightPosition);
 
   useEffect(() => {
     if (step !== "completed") setVisible(true);
@@ -59,10 +61,10 @@ export const TutorialOverlay: React.FC = () => {
         pointerEvents="none"
         className="absolute border-2 border-yellow-400 rounded-2xl shadow-lg"
         style={{
-          top: highlightLayout.y - 3 - insets.top,
-          left: highlightLayout.x - 4,
-          width: highlightLayout.width + 8,
-          height: highlightLayout.height + 8,
+          top: highlightPosition.top,
+          left: highlightPosition.left,
+          width: highlightPosition.width,
+          height: highlightPosition.height,
         }}
       />
 

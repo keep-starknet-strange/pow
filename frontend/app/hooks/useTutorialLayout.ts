@@ -1,12 +1,13 @@
 import { useRef, useCallback, useEffect } from "react";
-import { View, InteractionManager } from "react-native";
+import { View, InteractionManager, Platform } from "react-native";
 import { useTutorial, TargetId } from "../context/Tutorial";
 import tutorialConfig from "../configs/tutorial.json";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   const ref = useRef<View>(null);
   const { step, registerLayout, isTutorialActive } = useTutorial();
-
+  const insets = useSafeAreaInsets();
   const { bubbleTargetId, highlightTargetId } = tutorialConfig[step];
   const stepTargets = [bubbleTargetId, highlightTargetId];
 
@@ -15,9 +16,16 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
       return;
     }
     ref.current?.measureInWindow((x, y, width, height) => {
-      registerLayout(id, { x, y, width, height });
+      // Based on this https://reactnative.dev/docs/dimensions#get
+      // the y position is excluding the safe area on Android
+      const actualY = Platform.select({
+        ios: y,
+        android: insets.top + y
+      }) ?? y
+
+      registerLayout(id, { x, y: actualY, width, height });
     });
-  }, [enabled, isTutorialActive, registerLayout, step, id, stepTargets]);
+  }, [enabled, isTutorialActive, registerLayout, step, id, stepTargets, insets]);
 
   const onLayout = useCallback(() => {
     measure();
