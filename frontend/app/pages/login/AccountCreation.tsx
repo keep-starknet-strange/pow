@@ -83,7 +83,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{flex: 1}}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "position" : "height"}
+            behavior="position"
             keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
           >
             <View
