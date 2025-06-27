@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  LayoutChangeEvent,
-} from "react-native";
+import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import { useTutorial } from "../context/Tutorial";
 import { useBubblePosition } from "../hooks/useBubblePosition";
 import {

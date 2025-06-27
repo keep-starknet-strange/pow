@@ -13,7 +13,7 @@ const clamp = (val: number, min: number, max: number) =>
 
 export function useBubblePosition(
   target: { x: number; y: number; width: number; height: number },
-  bubbleHeight: number
+  bubbleHeight: number,
 ) {
   const { x, y, width, height } = target;
   const roomBelow = SCREEN_HEIGHT - (y + height);

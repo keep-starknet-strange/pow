@@ -18,9 +18,12 @@ export function useHighlightMasks(highlightPosition: {
   }, [highlightPosition]);
 }
 
-export function useHightlightPosition(
-  highlightTarget: { x: number; y: number; width: number; height: number },
-) {
+export function useHightlightPosition(highlightTarget: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}) {
   return useMemo(() => {
     const { x, y, width, height } = highlightTarget;
     const topOffset = y;
