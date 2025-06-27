@@ -76,7 +76,8 @@ pub mod StakingComponent {
                 let how_late = time_since_last_validation / config.slashing_config.due_time;
                 let slash_amount = user_stake / config.slashing_config.slash_fraction;
                 let scaled_slash = slash_amount * how_late.into();
-                self.user_stakes.write(user, user_stake - scaled_slash);
+                let slashed_amount = if scaled_slash < user_stake { scaled_slash } else { user_stake };
+                self.user_stakes.write(user, user_stake - slashed_amount);
             } else {
                 // Reward logic
                 let reward: u128 = total_stake * (time_since_last_validation.into()) / config.reward_rate;
