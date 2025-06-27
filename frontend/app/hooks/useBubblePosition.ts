@@ -13,20 +13,19 @@ const clamp = (val: number, min: number, max: number) =>
 
 export function useBubblePosition(
   target: { x: number; y: number; width: number; height: number },
-  bubbleHeight: number,
-  insetTop: number,
+  bubbleHeight: number
 ) {
   const { x, y, width, height } = target;
-  const roomBelow = SCREEN_HEIGHT - (y + height) - insetTop;
-  const showBelow = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING;
+  const roomBelow = SCREEN_HEIGHT - (y + height);
+  const showBelow = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING + 10;
 
   let top = showBelow
-    ? y + height + ARROW_SIZE + ARROW_SPACING - insetTop
-    : y - bubbleHeight - ARROW_SIZE - ARROW_SPACING - insetTop;
+    ? y + height + ARROW_SIZE + ARROW_SPACING
+    : y - bubbleHeight - ARROW_SIZE - ARROW_SPACING;
 
   top = clamp(
     top,
-    insetTop + HORIZONTAL_MARGIN,
+    HORIZONTAL_MARGIN,
     SCREEN_HEIGHT - bubbleHeight - HORIZONTAL_MARGIN,
   );
   const left = clamp(

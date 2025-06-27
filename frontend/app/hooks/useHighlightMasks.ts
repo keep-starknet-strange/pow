@@ -20,11 +20,10 @@ export function useHighlightMasks(highlightPosition: {
 
 export function useHightlightPosition(
   highlightTarget: { x: number; y: number; width: number; height: number },
-  insetTop: number,
 ) {
   return useMemo(() => {
     const { x, y, width, height } = highlightTarget;
-    const topOffset = y - insetTop;
+    const topOffset = y;
 
     return {
       top: y - 4,
@@ -32,5 +31,5 @@ export function useHightlightPosition(
       width: width + 8,
       height: height + 8,
     };
-  }, [highlightTarget, insetTop]);
+  }, [highlightTarget]);
 }
