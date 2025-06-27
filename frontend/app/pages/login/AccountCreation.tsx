@@ -43,9 +43,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 }) => {
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   const { account } = useStarknetConnector();
-  const { claimUsername } = useFocEngine();
+  const { isUsernameUnique, isUsernameValid, usernameValidationError, claimUsername } = useFocEngine();
   const { getImage } = useImageProvider();
 
+  const [usernameError, setUsernameError] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
@@ -143,7 +144,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             </Text>
             {/* // TODO: fix/keyboard-covers-input-fields */}
             <TextInput
-              className="bg-[#10111910] w-full rounded-lg mt-2 px-2
+              className="bg-[#10111910] w-full rounded-lg mt-2 px-2 h-[3rem]
                         py-1 text-xl text-[#101119] border-2 border-[#101119]
                         shadow-lg shadow-black/50 font-Pixels"
               placeholder="Satoshi"
@@ -152,16 +153,33 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               autoCorrect={false}
               autoComplete="off"
               value={username}
-              onChangeText={setUsername}
+              onChangeText={(text) => {
+                setUsername(text);
+                setUsernameError("");
+                // TODO: validate username if no change in 2 seconds
+              }}
             />
             <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
               Please notice: your username will be public
             </Text>
+            {usernameError ? (
+              <Text className="text-red-500 text-md mt-2 font-Pixels">
+                {usernameError}
+              </Text>
+            ) : null}
           </View>
           <View className="flex-1 items-center justify-center gap-4">
             <BasicButton
               label="Save"
-              onPress={async () => {
+              onPress={async () => { 
+                if (!isUsernameValid(username)) {
+                  setUsernameError(`Invalid username:\n${usernameValidationError}`);
+                  return;
+                }
+                if (!(await isUsernameUnique(username))) {
+                  setUsernameError("This username is unavailable.");
+                  return;
+                }
                 await claimUsername(username);
               }}
               style={{ width: 250 }}

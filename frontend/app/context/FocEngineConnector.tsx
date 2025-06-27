@@ -34,6 +34,9 @@ type FocEngineContextType = {
   getAccounts: (addresses: string[]) => Promise<FocAccounts | null>;
   refreshAccount: () => Promise<void>;
   claimUsername: (username: string) => Promise<any>;
+  isUsernameUnique: (username: string) => Promise<boolean>;
+  isUsernameValid: (username: string) => boolean;
+  usernameValidationError: string;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
 
   getRegisteredContract: (
@@ -267,6 +270,39 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       invokeContractCalls,
     ],
   );
+  
+  const isUsernameUnique = useCallback(
+    async (username: string) => {
+      if (!STARKNET_ENABLED) {
+        return true;
+      }
+      const usernameHex = toShortHexString(username);
+      if (!usernameHex) {
+        console.error("Username invalid");
+        return false;
+      }
+      try {
+        const takenUsernames: string[] = [
+          "TestUser1",
+          "TestUser2",
+          "TestUser3"
+        ];
+        return !takenUsernames.includes(username);
+      } catch (error) {
+        console.error("Error checking username uniqueness:", error);
+        return false;
+      }
+    },
+    [STARKNET_ENABLED],
+  );
+
+  const usernameValidationError = "3-20 characters, a-z A-Z 0-9 and _ only";
+  const isUsernameValid = (username: string) => {
+    // Add your validation logic here
+    // For example, check length and allowed characters
+    const regex = /^[a-zA-Z0-9_]{3,20}$/; // Alphanumeric and underscores, 3-20 characters
+    return regex.test(username);
+  };
 
   const mintFunds = async (address: string, amount: bigint, unit?: string) => {
     if (!STARKNET_ENABLED) {
@@ -440,6 +476,9 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshAccount,
         getAccount,
         claimUsername,
+        isUsernameUnique,
+        isUsernameValid,
+        usernameValidationError,
         mintFunds,
         getRegisteredContract,
         getLatestEventWith,

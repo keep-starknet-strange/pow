@@ -2,7 +2,7 @@
   "L1": [
     {
       "id": 0,
-      "name": "Transfer",
+      "name": "Tx",
       "description": "Send funds between wallets.",
       "color": "#60f760a0",
       "feeCosts": [1, 4, 16, 32, 64, 128, 256, 512, 1024, 2048],
@@ -22,7 +22,7 @@
     },
     {
       "id": 2,
-      "name": "Blobs",
+      "name": "Blob",
       "description": "Stores data on the chain.",
       "color": "#6060f7a0",
       "feeCosts": [3, 12, 48, 96, 192, 384, 768, 1536, 3072, 6144],
@@ -32,7 +32,7 @@
     },
     {
       "id": 3,
-      "name": "Inscriptions",
+      "name": "Ordinal",
       "description": "Etches images to the chain.",
       "color": "#f760f7a0",
       "feeCosts": [5, 20, 80, 160, 320, 640, 1280, 2560, 5120, 10240],
@@ -54,8 +54,8 @@
   "L2": [
     {
       "id": 0,
-      "name": "Transfer",
-      "description": "Send funds between wallets.",
+      "name": "Bridge",
+      "description": "Send funds to L2.",
       "color": "#60f760a0",
       "feeCosts": [
         100, 400, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800
@@ -68,8 +68,8 @@
     },
     {
       "id": 1,
-      "name": "Bridge",
-      "description": "Transfer assets between chains.",
+      "name": "Swap",
+      "description": "Trade ERC20 assets.",
       "color": "#60f7f7a0",
       "feeCosts": [
         200, 800, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600
@@ -96,8 +96,8 @@
     },
     {
       "id": 3,
-      "name": "Oracles",
-      "description": "Fetch data from the chain.",
+      "name": "Oracle",
+      "description": "Fetch data from the world.",
       "color": "#6060f7a0",
       "feeCosts": [
         400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200
@@ -110,8 +110,8 @@
     },
     {
       "id": 4,
-      "name": "Attestations",
-      "description": "Attest to data on the chain.",
+      "name": "DAO",
+      "description": "Manage decentralized organizations.",
       "color": "#f76060a0",
       "feeCosts": [
         500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000

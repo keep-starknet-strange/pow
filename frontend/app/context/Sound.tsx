@@ -8,6 +8,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import soundsJson from "../configs/sounds.json";
+import * as Haptics from 'expo-haptics';
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -74,6 +75,39 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
     AchievementCompleted: achievementUnlockedSource,
     BasicClick: basicClickSource,
   };
+  const playHaptic = async (type: string) => {
+    switch (type) {
+      case "Error":
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        break;
+      case "Success":
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        break;
+      case "Warning":
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        break;
+      case "Light":
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        break;
+      case "Medium":
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        break;
+      case "Heavy":
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        break;
+      case "Rigid":
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+        break;
+      case "Soft":
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+        break;
+      case "None":
+        break;
+      default:
+        console.warn(`Unknown haptic type: ${type}`);
+        break;
+    }
+  };
   const minPitchShift = 0.5;
   const maxPitchShift = 2.0;
   const playSoundEffect = useCallback(
@@ -91,6 +125,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
         pitchShift = maxPitchShift;
       }
       const soundConfig = soundsJson[type as keyof typeof soundsJson];
+      playHaptic(soundConfig.haptic);
       const { sound } = await Audio.Sound.createAsync(soundEffects[type], {
         volume: soundEffectVolume * (soundConfig.volume || 1.0),
         rate: (soundConfig.rate || 1.0) * pitchShift,
