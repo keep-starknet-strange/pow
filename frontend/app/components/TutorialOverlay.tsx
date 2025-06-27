@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, LayoutChangeEvent, StatusBar, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  LayoutChangeEvent,
+  StatusBar,
+  Dimensions,
+} from "react-native";
 import { useTutorial } from "../context/Tutorial";
 import { useBubblePosition } from "../hooks/useBubblePosition";
-import { useHighlightMasks, useHightlightPosition } from "../hooks/useHighlightMasks";
-import { useHighlightMasks } from "../hooks/useHighlightMasks";
+import {
+  useHighlightMasks,
+  useHightlightPosition,
+} from "../hooks/useHighlightMasks";
 import { useTopInset } from "../hooks/useTopInset";
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
 
@@ -11,7 +20,7 @@ const BUBBLE_WIDTH = 260;
 
 export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
-  const topInset = useTopInset()
+  const topInset = useTopInset();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   console.log("topInset", topInset);
   const stepConfig = getTutorialStepConfig(step);
@@ -34,9 +43,9 @@ export const TutorialOverlay: React.FC = () => {
     top: bubbleTop,
     style: arrowStyle,
     arrowLeft,
-  } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
+  } = useBubblePosition(bubbleLayout, bubbleHeight, topInset);
 
-  const highlightPosition = useHightlightPosition(highlightLayout, insets.top);
+  const highlightPosition = useHightlightPosition(highlightLayout, topInset);
   const masks = useHighlightMasks(highlightPosition);
 
   useEffect(() => {
@@ -44,13 +53,13 @@ export const TutorialOverlay: React.FC = () => {
   }, [step]);
 
   if (!visible || !isReady) return null;
-console.log({
-  highlightTargetY: highlightLayout.y,
-  topInset,
-  screenHeight: Dimensions.get("window").height,
-  statusBarHeight: StatusBar.currentHeight,
-  calculatedTop: highlightLayout.y - 3 - topInset,
-});
+  console.log({
+    highlightTargetY: highlightLayout.y,
+    topInset,
+    screenHeight: Dimensions.get("window").height,
+    statusBarHeight: StatusBar.currentHeight,
+    calculatedTop: highlightLayout.y - 3 - topInset,
+  });
 
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">

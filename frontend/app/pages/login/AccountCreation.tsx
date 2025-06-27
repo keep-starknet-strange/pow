@@ -47,7 +47,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const { claimUsername } = useFocEngine();
   const { getImage } = useImageProvider();
   const insets = useSafeAreaInsets();
-  
+
   const [username, setUsername] = React.useState<string>("");
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
@@ -81,7 +81,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <KeyboardAvoidingView
             behavior="position"
             keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
@@ -129,13 +129,17 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                   className="py-1 border-2 border-[#101119] rounded-md px-2"
                   onPress={() => setAvatar(getRandomNounsAttributes())}
                 >
-                  <Text className="text-[#101119] text-xl font-Pixels">Roll</Text>
+                  <Text className="text-[#101119] text-xl font-Pixels">
+                    Roll
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="py-1 border-2 border-[#101119] rounded-md px-2"
                   onPress={() => setCreatingAvatar(!creatingAvatar)}
                 >
-                  <Text className="text-[#101119] text-xl font-Pixels">edit</Text>
+                  <Text className="text-[#101119] text-xl font-Pixels">
+                    edit
+                  </Text>
                 </TouchableOpacity>
               </View>
 
@@ -193,7 +197,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
       {creatingAvatar && (
         <View
-          style={{paddingBottom: insets.bottom}}
+          style={{ paddingBottom: insets.bottom }}
           className="absolute left-0 right-0 bottom-0 bg-[#101119] rounded-t-3xl px-4 py-2 h-[30rem]
                               flex flex-col items-center justify-start gap-1 w-full
                               shadow-lg shadow-black/50"

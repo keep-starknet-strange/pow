@@ -10,12 +10,12 @@ export const InAppNotification = () => {
   // TODO: Animation
   // TODO: Improve flow when multiple notifications are present
   return (
-    <View 
+    <View
       style={{
-        paddingTop: insets.top
+        paddingTop: insets.top,
       }}
       className="absolute top-0 right-0 z-[100] w-[65%]"
-      >
+    >
       {inAppNotifications.length > 0 && (
         <View
           className="my-2 py-3 px-2 bg-[#10111908]

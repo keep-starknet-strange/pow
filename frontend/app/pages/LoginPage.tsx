@@ -65,7 +65,6 @@ export const LoginPage: React.FC = () => {
       <SafeAreaView>
         <ActivePage setLoginPage={setLoginPage} />
       </SafeAreaView>
-
     </View>
   );
 };

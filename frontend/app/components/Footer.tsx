@@ -51,7 +51,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
   // TODO: Add small lines between the icons
   return (
     <View
-      style={{paddingBottom: insets.bottom}}
+      style={{ paddingBottom: insets.bottom }}
       className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
                      absolute bottom-0 items-center z-[20] gap-2
     "

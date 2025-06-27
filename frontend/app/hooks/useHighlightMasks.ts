@@ -1,8 +1,11 @@
 import { useMemo } from "react";
 
-export function useHighlightMasks(
-  highlightPosition: { top: number; left: number; width: number; height: number }
-) {
+export function useHighlightMasks(highlightPosition: {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}) {
   return useMemo(() => {
     const { top, left, width, height } = highlightPosition;
 
@@ -17,14 +20,14 @@ export function useHighlightMasks(
 
 export function useHightlightPosition(
   highlightTarget: { x: number; y: number; width: number; height: number },
-  insetTop: number
+  insetTop: number,
 ) {
   return useMemo(() => {
     const { x, y, width, height } = highlightTarget;
     const topOffset = y - insetTop;
 
     return {
-      top: y - 3,
+      top: y - 4,
       left: x - 4,
       width: width + 8,
       height: height + 8,

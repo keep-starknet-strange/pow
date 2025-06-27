@@ -16,8 +16,8 @@ export const Header: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View 
-      style={{marginTop: insets.top}}
+    <View
+      style={{ marginTop: insets.top }}
       className="bg-[#101119] h-[76px] p-0 relative"
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">

@@ -18,14 +18,23 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
     ref.current?.measureInWindow((x, y, width, height) => {
       // Based on this https://reactnative.dev/docs/dimensions#get
       // the y position is excluding the safe area on Android
-      const actualY = Platform.select({
-        ios: y,
-        android: insets.top + y
-      }) ?? y
+      const actualY =
+        Platform.select({
+          ios: y,
+          android: insets.top + y,
+        }) ?? y;
 
       registerLayout(id, { x, y: actualY, width, height });
     });
-  }, [enabled, isTutorialActive, registerLayout, step, id, stepTargets, insets]);
+  }, [
+    enabled,
+    isTutorialActive,
+    registerLayout,
+    step,
+    id,
+    stepTargets,
+    insets,
+  ]);
 
   const onLayout = useCallback(() => {
     measure();
