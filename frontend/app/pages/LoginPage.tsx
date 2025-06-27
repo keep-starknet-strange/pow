@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, Dimensions } from "react-native";
 import { useImageProvider } from "../context/ImageProvider";
 import { LoginMainPage } from "./login/Main";
 import { AccountCreationPage } from "./login/AccountCreation";
@@ -13,6 +13,7 @@ import {
 
 export const LoginPage: React.FC = () => {
   const { getImage } = useImageProvider();
+  const { width, height } = Dimensions.get("window");
 
   const loginPages = {
     login: LoginMainPage,
@@ -29,15 +30,15 @@ export const LoginPage: React.FC = () => {
 
   return (
     <View className="flex-1 items-center">
-      <View className="absolute h-[1000px] w-full">
+      <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("background")}
-            fit="fill"
+            fit="cover"
             x={0}
             y={0}
-            width={410}
-            height={1000}
+            width={width}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -45,15 +46,15 @@ export const LoginPage: React.FC = () => {
           />
         </Canvas>
       </View>
-      <View className="absolute h-[1000px] w-full">
+      <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("background.grid")}
-            fit="fill"
+            fit="cover"
             x={0}
             y={0}
-            width={410}
-            height={1000}
+            width={width}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,

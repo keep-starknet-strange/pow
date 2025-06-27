@@ -1,30 +1,16 @@
 import "./global.css";
 
 import { useState, useEffect } from "react";
-import { View } from "react-native";
 
-import { Header } from "./components/Header";
-import { InAppNotification } from "./components/InAppNotification";
-import { Footer } from "./components/Footer";
-import { TutorialOverlay } from "./components/TutorialOverlay";
+import { RootNavigator } from "./navigation/RootNavigator";
 
-import { MainPage } from "./pages/MainPage";
-import { StorePage } from "./pages/StorePage";
-import { LeaderboardPage } from "./pages/LeaderboardPage";
-import { AchievementsPage } from "./pages/AchievementsPage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { StakingPage } from "./pages/StakingPage";
-import { LoginPage } from "./pages/LoginPage";
-
-import { useEventManager, EventType } from "./context/EventManager";
-import { useSound } from "./context/Sound";
+import { useEventManager } from "./context/EventManager";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
 import { useInAppNotifications } from "./context/InAppNotifications";
 import { useAchievement } from "./context/Achievements";
-import { useStaking } from "./context/Staking";
-import { useTutorial } from "./context/Tutorial";
+import { useSound } from "./context/Sound";
 import { InAppNotificationsObserver } from "./observers/InAppNotificationsObserver";
 import { AchievementObserver } from "./observers/AchievementObserver";
 import { SoundObserver } from "./observers/SoundObserver";
@@ -32,10 +18,6 @@ import { TxBuilderObserver } from "./observers/TxBuilderObserver";
 
 export default function game() {
   const { registerObserver, unregisterObserver } = useEventManager();
-  const { stakingUnlocked } = useStaking();
-  const { isTutorialActive } = useTutorial();
-
-  const { user } = useFocEngine();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
@@ -79,8 +61,8 @@ export default function game() {
       registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)),
     );
   }, [addAction, getWorkingBlock]);
+
   const { playSoundEffect } = useSound();
-  const { notify } = useEventManager();
   const [soundObserver, setSoundObserver] = useState<null | number>(null);
   useEffect(() => {
     if (soundObserver !== null) {
@@ -90,72 +72,5 @@ export default function game() {
     setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
   }, [playSoundEffect]);
 
-  const tabs = [
-    {
-      name: "Main",
-      icon: "🎮",
-      component: MainPage,
-    },
-    ...(stakingUnlocked
-      ? [
-          {
-            name: "Staking",
-            icon: "🥩",
-            component: StakingPage,
-          },
-        ]
-      : []),
-    {
-      name: "Store",
-      icon: "🛒",
-      component: StorePage,
-    },
-    {
-      name: "Leaderboard",
-      icon: "🏆",
-      component: LeaderboardPage,
-    },
-    {
-      name: "Achievements",
-      icon: "🎉",
-      component: AchievementsPage,
-    },
-    {
-      name: "Settings",
-      icon: "⚙️",
-      component: SettingsPage,
-    },
-  ];
-  const [currentPage, setCurrentPage] = useState(tabs[0]);
-  const switchPage = (name: string) => {
-    if (!tabs.some((tab) => tab.name === name)) {
-      console.warn(`Tab with name "${name}" does not exist.`);
-      return;
-    }
-    notify("switchPage" as EventType, { name });
-    playSoundEffect("BasicClick");
-    setCurrentPage(tabs.find((tab) => tab.name === name) || currentPage);
-  };
-
-  return (
-    <View className="flex-1 bg-[#010a12ff] relative">
-      {user && user.account.username !== "" ? (
-        <View className="flex-1">
-          {isTutorialActive && <TutorialOverlay />}
-          <Header />
-          <InAppNotification />
-          <currentPage.component />
-          <Footer
-            tabs={tabs}
-            switchPage={switchPage}
-            selectedTab={currentPage.name}
-          />
-        </View>
-      ) : (
-        <View className="flex-1">
-          <LoginPage />
-        </View>
-      )}
-    </View>
-  );
+  return <RootNavigator />;
 }

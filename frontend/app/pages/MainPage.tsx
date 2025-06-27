@@ -14,20 +14,21 @@ import {
 export const MainPage: React.FC = () => {
   const { l2 } = useGame();
   const { getImage } = useImageProvider();
+  const { width, height } = Dimensions.get("window");
 
   const [currentView, setCurrentView] = React.useState(l2 ? "L2" : "L1");
 
   return (
     <View className="flex-1 relative">
-      <View className="absolute h-[1000px] w-full">
+      <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("background")}
-            fit="fill"
+            fit="cover"
             x={0}
             y={0}
-            width={410}
-            height={1000}
+            width={width}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -35,15 +36,15 @@ export const MainPage: React.FC = () => {
           />
         </Canvas>
       </View>
-      <View className="absolute h-[1000px] w-full">
+      <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("background.grid")}
-            fit="fill"
+            fit="cover"
             x={0}
             y={0}
-            width={410}
-            height={1000}
+            width={width}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
