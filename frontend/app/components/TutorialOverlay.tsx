@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, TouchableOpacity, LayoutChangeEvent, StatusBar, Dimensions } from "react-native";
 import { useTutorial } from "../context/Tutorial";
 import { useBubblePosition } from "../hooks/useBubblePosition";
 import { useHighlightMasks } from "../hooks/useHighlightMasks";
+import { useTopInset } from "../hooks/useTopInset";
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
 
 const BUBBLE_WIDTH = 260;
 
 export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
-  const insets = useSafeAreaInsets();
+  const topInset = useTopInset()
   const [bubbleHeight, setBubbleHeight] = useState(0);
-
+  console.log("topInset", topInset);
   const stepConfig = getTutorialStepConfig(step);
   const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
     x: 0,
@@ -33,14 +33,21 @@ export const TutorialOverlay: React.FC = () => {
     top: bubbleTop,
     style: arrowStyle,
     arrowLeft,
-  } = useBubblePosition(bubbleLayout, bubbleHeight, insets.top);
-  const masks = useHighlightMasks(highlightLayout, insets.top);
+  } = useBubblePosition(bubbleLayout, bubbleHeight, topInset);
+  const masks = useHighlightMasks(highlightLayout, topInset);
 
   useEffect(() => {
     if (step !== "completed") setVisible(true);
   }, [step]);
 
   if (!visible || !isReady) return null;
+console.log({
+  highlightTargetY: highlightLayout.y,
+  topInset,
+  screenHeight: Dimensions.get("window").height,
+  statusBarHeight: StatusBar.currentHeight,
+  calculatedTop: highlightLayout.y - 3 - topInset,
+});
 
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
@@ -59,7 +66,7 @@ export const TutorialOverlay: React.FC = () => {
         pointerEvents="none"
         className="absolute border-2 border-yellow-400 rounded-2xl shadow-lg"
         style={{
-          top: highlightLayout.y - 3 - insets.top,
+          top: highlightLayout.y - 3 - topInset,
           left: highlightLayout.x - 4,
           width: highlightLayout.width + 8,
           height: highlightLayout.height + 8,

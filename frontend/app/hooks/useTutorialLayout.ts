@@ -14,7 +14,7 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
     if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) {
       return;
     }
-    ref.current?.measureInWindow((x, y, width, height) => {
+    ref.current?.measure((x, y, width, height) => {
       registerLayout(id, { x, y, width, height });
     });
   }, [enabled, isTutorialActive, registerLayout, step, id, stepTargets]);
