@@ -57,20 +57,20 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           </View>
         )}
         <Text
-          className="text-[20px] font-bold text-[#c3c3c3] font-Pixels
+          className="text-[20px] text-[#c3c3c3] font-Pixels
                          absolute top-[8px] left-[10px]"
         >
           Block {workingBlocks[props.chainId]?.blockId}
         </Text>
         <Text
-          className="text-[20px] font-bold text-[#c3c3c3] font-Pixels
+          className="text-[20px] text-[#c3c3c3] font-Pixels
                          absolute bottom-[10px] left-[170px]"
         >
           {workingBlocks[props.chainId]?.transactions.length}/
           {getUpgradeValue(props.chainId, "Block Size") ** 2}
         </Text>
         <Text
-          className="text-[20px] font-bold text-[#fff7ff] font-Pixels
+          className="text-[20px] text-[#fff7ff] font-Pixels
                          absolute bottom-[10px] left-[280px]"
         >
           {shortMoneyString(

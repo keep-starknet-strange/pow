@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
         />
       </Canvas>
       <View className="absolute right-0 h-full flex items-center justify-center pr-3">
-        <Text className="text-[#fff2fdff] text-5xl font-bold font-Xerxes">
+        <Text className="text-[#fff2fdff] text-5xl font-Xerxes">
           {shortMoneyString(balance)}
         </Text>
       </View>

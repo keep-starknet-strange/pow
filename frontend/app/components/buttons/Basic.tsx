@@ -33,7 +33,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({
     >
       <Text
         className={`
-          font-Xerxes font-bold text-4xl
+          font-Xerxes text-4xl
           ${disabled ? "text-gray-400" : "text-[#101119]"}
         `}
         style={{
