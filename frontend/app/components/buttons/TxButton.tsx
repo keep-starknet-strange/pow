@@ -370,7 +370,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             />
           </Canvas>
         </View>
-        <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] font-bold text-[#fff8ff] font-Pixels">
+        <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] text-[#fff8ff] font-Pixels">
           {props.txType.name}
         </Text>
         <View
@@ -430,7 +430,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         </Canvas>
       </View>
       <View className="absolute bottom-[-22px] left-0 w-full h-[20px] justify-center">
-        <Text className="text-[1rem] font-bold text-[#fff8ff] font-Pixels text-right pr-1">
+        <Text className="text-[1rem] text-[#fff8ff] font-Pixels text-right pr-1">
           {feeLevel === -1 ? "-" : "+"}
           {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
         </Text>

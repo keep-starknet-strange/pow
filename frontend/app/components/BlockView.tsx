@@ -300,7 +300,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
               Genesis Block
             </Text>
             <Text
-              className={`text-[#101119ff] font-bold text-center font-Pixels mt-[0.5rem] text-2xl`}
+              className={`text-[#101119ff] text-center font-Pixels mt-[0.5rem] text-2xl`}
             >
               {props.chainId === 0
                 ? messagesJson.genesis.L1[currentPrestige]

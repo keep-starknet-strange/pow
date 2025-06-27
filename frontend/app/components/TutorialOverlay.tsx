@@ -1,170 +1,50 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import { useTutorial } from "../context/Tutorial";
+import { useBubblePosition } from "../hooks/useBubblePosition";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  LayoutChangeEvent,
-  Dimensions,
-  ViewStyle,
-  StyleProp,
-} from "react-native";
-import { useTutorial, TargetId } from "../context/Tutorial";
-import tutorialConfig from "../configs/tutorial.json";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
+  useHighlightMasks,
+  useHightlightPosition,
+} from "../hooks/useHighlightMasks";
+import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const BUBBLE_MAX_WIDTH = 260;
-const HORIZONTAL_MARGIN = 8;
-const ARROW_SIZE = 8;
-const ARROW_SPACING = 4;
-const BUBBLE_WIDTH = Math.min(SCREEN_WIDTH * 0.8, BUBBLE_MAX_WIDTH);
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-interface Position {
-  left: number;
-  top: number;
-  style: StyleProp<ViewStyle>;
-  arrowLeft: number;
-}
-
-function useBubblePosition(
-  target: { x: number; y: number; width: number; height: number },
-  bubbleHeight: number,
-  insetTop: number,
-  headerHeight: number,
-): Position {
-  const { x, y, width, height } = target;
-
-  // Preferred below target
-  let top = y + height + ARROW_SIZE + ARROW_SPACING - headerHeight;
-  const roomBelow = SCREEN_HEIGHT - (y + height) - insetTop;
-  const below = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING;
-
-  if (!below) {
-    top = y - bubbleHeight - ARROW_SIZE - ARROW_SPACING - headerHeight;
-  }
-
-  // Clamp within screen
-  top = clamp(
-    top,
-    insetTop + HORIZONTAL_MARGIN,
-    SCREEN_HEIGHT - bubbleHeight - HORIZONTAL_MARGIN,
-  );
-  const left = clamp(
-    x + width / 2 - BUBBLE_WIDTH / 2,
-    HORIZONTAL_MARGIN,
-    SCREEN_WIDTH - BUBBLE_WIDTH - HORIZONTAL_MARGIN,
-  );
-
-  // Arrow style
-  const arrowStyle: ViewStyle = below
-    ? {
-        position: "absolute",
-        top: top - ARROW_SIZE,
-        borderLeftWidth: ARROW_SIZE,
-        borderRightWidth: ARROW_SIZE,
-        borderBottomWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: "#FBBF24",
-      }
-    : {
-        position: "absolute",
-        top: top + bubbleHeight,
-        borderLeftWidth: ARROW_SIZE,
-        borderRightWidth: ARROW_SIZE,
-        borderTopWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderTopColor: "#FBBF24",
-      };
-
-  const arrowLeft = clamp(
-    x + width / 2 - ARROW_SIZE,
-    HORIZONTAL_MARGIN,
-    SCREEN_WIDTH - ARROW_SIZE - HORIZONTAL_MARGIN,
-  );
-  return useMemo(
-    () => ({ left, top, style: arrowStyle, arrowLeft }),
-    [left, top, arrowStyle, arrowLeft, target],
-  );
-}
+const BUBBLE_WIDTH = 260;
 
 export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
   const [bubbleHeight, setBubbleHeight] = useState(0);
-  const insets = useSafeAreaInsets();
-  const headerH = useHeaderHeight();
-
-  const config = (
-    step in tutorialConfig
-      ? tutorialConfig[step as keyof typeof tutorialConfig]
-      : {
-          title: "",
-          description: "",
-          topOffset: 0,
-          bubbleTargetId: "",
-          highlightTargetId: "",
-        }
-  ) as {
-    title: string;
-    description: string;
-    bubbleTargetId: TargetId;
-    highlightTargetId: TargetId;
-  };
-  const bubbleTarget = layouts?.[config.bubbleTargetId] ?? {
+  const stepConfig = getTutorialStepConfig(step);
+  const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
     x: 0,
     y: 0,
     width: 0,
     height: 0,
   };
-  const highlightTarget = layouts?.[config.highlightTargetId] ?? {
+  const highlightLayout = layouts?.[stepConfig.highlightTargetId] ?? {
     x: 0,
     y: 0,
     width: 0,
     height: 0,
   };
-  const isLayoutReady = bubbleTarget.width > 0 && bubbleTarget.height > 0;
 
-  // Compute positions unconditionally
+  const isReady = bubbleLayout.width > 0 && bubbleLayout.height > 0;
   const {
     left: bubbleLeft,
     top: bubbleTop,
     style: arrowStyle,
     arrowLeft,
-  } = useBubblePosition(
-    bubbleTarget,
-    bubbleHeight,
-    insets.top + headerH,
-    headerH,
-  );
+  } = useBubblePosition(bubbleLayout, bubbleHeight);
 
-  const masks = useMemo(() => {
-    const { x, y, width, height } = highlightTarget;
-    const topOffset = y - headerH;
-    return [
-      { top: 0, left: 0, right: 0, height: topOffset },
-      { top: topOffset + height, left: 0, right: 0, bottom: 0 },
-      { top: topOffset, left: 0, width: x, height },
-      { top: topOffset, left: x + width, right: 0, height },
-    ];
-  }, [highlightTarget, headerH]);
+  const highlightPosition = useHightlightPosition(highlightLayout);
+  const masks = useHighlightMasks(highlightPosition);
 
-  // Show overlay on step change
   useEffect(() => {
-    if (step !== "completed") {
-      setVisible(true);
-    }
-  }, [step, setVisible]);
+    if (step !== "completed") setVisible(true);
+  }, [step]);
 
-  if (!visible || !isLayoutReady) return null;
+  if (!visible || !isReady) return null;
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
-      {/* Masks */}
       {masks.map((m, i) => (
         <View
           key={i}
@@ -176,42 +56,37 @@ export const TutorialOverlay: React.FC = () => {
         />
       ))}
 
-      {/* Highlight */}
       <View
         pointerEvents="none"
+        className="absolute border-2 border-yellow-400 rounded-2xl shadow-lg"
         style={{
-          position: "absolute",
-          top: highlightTarget.y - headerH - 4,
-          left: highlightTarget.x - 4,
-          width: highlightTarget.width + 8,
-          height: highlightTarget.height + 8,
+          top: highlightPosition.top,
+          left: highlightPosition.left,
+          width: highlightPosition.width,
+          height: highlightPosition.height,
         }}
-        className="border-2 border-yellow-400 rounded-2xl shadow-lg"
       />
 
-      {/* Arrow */}
       <View
         className="absolute z-[50]"
         style={[{ left: arrowLeft }, arrowStyle]}
       />
 
-      {/* Bubble */}
       <View
         className="absolute items-center z-[50]"
         style={{ left: bubbleLeft, top: bubbleTop, width: BUBBLE_WIDTH }}
       >
         <View
           className="bg-[#272727] p-3 rounded-2xl border border-yellow-400 shadow-lg"
-          onLayout={(e: LayoutChangeEvent) => {
-            const h = Math.round(e.nativeEvent.layout.height);
-            if (h !== bubbleHeight) setBubbleHeight(h);
-          }}
+          onLayout={(e: LayoutChangeEvent) =>
+            setBubbleHeight(Math.round(e.nativeEvent.layout.height))
+          }
         >
           <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
-            {config.title}
+            {stepConfig.title}
           </Text>
           <Text className="text-sm text-gray-300 mb-2 text-center">
-            {config.description}
+            {stepConfig.description}
           </Text>
           <TouchableOpacity
             onPress={() => setVisible(false)}

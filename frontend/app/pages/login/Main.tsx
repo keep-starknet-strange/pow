@@ -69,13 +69,9 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
           />
         </View>
       </View>
-      <View className="flex flex-row items-center justify-between w-full px-10 py-6">
-        <Text className="text-[#101119] text-md font-Pixels">
-          Version {version}
-        </Text>
-        <Text className="text-[#101119] text-md font-Pixels">
-          We are open source!
-        </Text>
+      <View className="flex flex-row items-center justify-between w-full px-10 py-2">
+        <Text className="text-[#101119] font-Pixels">Version {version}</Text>
+        <Text className="text-[#101119] font-Pixels">We are open source!</Text>
       </View>
     </View>
   );
