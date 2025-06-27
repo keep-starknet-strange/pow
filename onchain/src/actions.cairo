@@ -8,6 +8,10 @@ pub trait IPowGameActions<TContractState> {
     fn mine_block(ref self: TContractState, chain_id: u32);
     fn store_da(ref self: TContractState, chain_id: u32);
     fn prove(ref self: TContractState, chain_id: u32);
+    fn stake_tokens(ref self: TContractState, amount: u128);
+    fn claim_staking_rewards(ref self: TContractState);
+    fn validate_stake(ref self: TContractState);
+    fn withdraw_staked_tokens(ref self: TContractState);
 }
 
 #[derive(Drop, starknet::Event)]
