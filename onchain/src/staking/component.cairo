@@ -30,6 +30,11 @@ pub mod StakingComponent {
     #[derive(Drop, starknet::Event)]
     pub enum Event {
         StakeUpdated: StakeUpdated,
+        Slashed: Slashed,
+        Reward: Reward,
+        WithdrawStake: WithdrawStake,
+        ClaimRewards: ClaimRewards,
+        StakingConfigUpdate: StakingConfigUpdate,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -37,6 +42,30 @@ pub mod StakingComponent {
         #[key] user: ContractAddress,
         amount: u128,
     }
+
+    #[derive(Drop, starknet::Event)]
+    struct Reward {
+        #[key] user: ContractAddress,
+        amount: u128,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct WithdrawStake {
+        #[key] user: ContractAddress,
+        amount: u128,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct ClaimRewards {
+        #[key] user: ContractAddress,
+        amount: u128,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct StakingConfigUpdate
+    {
+        #[key] config: StakingConfig,
+    } 
 
     #[embeddable_as(StakingImpl)]
     impl Staking<
@@ -48,6 +77,7 @@ pub mod StakingComponent {
 
         fn setup_staking(ref self: ComponentState<TContractState>, user: ContractAddress, config: StakingConfig) {
             self.staking_config.write(config);
+            self.emit(StakingConfigUpdate { config: config });
         }
         fn stake(ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128) {
             let current_stake = self.user_stakes.read(user);
@@ -58,6 +88,7 @@ pub mod StakingComponent {
         fn claim_rewards(ref self: ComponentState<TContractState>, user: ContractAddress) -> u128 {
             let reward = self.user_rewards.read(user);
             self.user_rewards.write(user, 0);
+            self.emit(ClaimRewards { user: user, amount: reward });
             return reward;
         }
         
@@ -78,10 +109,12 @@ pub mod StakingComponent {
                 let scaled_slash = slash_amount * how_late.into();
                 let slashed_amount = if scaled_slash < user_stake { scaled_slash } else { user_stake };
                 self.user_stakes.write(user, user_stake - slashed_amount);
+                self.emit(Slashed { user: user, amount: slashed_amount });
             } else {
                 // Reward logic
                 let reward: u128 = total_stake * (time_since_last_validation.into()) / config.reward_rate;
                 self.user_rewards.write(user, user_rewards + reward);
+                self.emit(Reward { user: user, amount: reward });
             }
         }
 
@@ -89,6 +122,7 @@ pub mod StakingComponent {
             self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, 0);
+            self.emit(WithdrawStake { user: user, amount: current_stake });
             return current_stake;
         }
 
