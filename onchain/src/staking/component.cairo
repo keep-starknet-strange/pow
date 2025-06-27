@@ -62,19 +62,21 @@ pub mod StakingComponent {
         }
         
         fn validate(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) {
+            self.check_timing(now);
             let last_validation = self.user_last_validation.read(user);
-            let current_time = get_block_timestamp();
             let config = self.staking_config.read();
-            let time_since_last_validation = current_time - last_validation / config.slashing_config.due_time;
+            let time_since_last_validation = now - last_validation / config.slashing_config.due_time;
             let user_stake = self.user_stakes.read(user);
             let user_rewards = self.user_rewards.read(user);
             let total_stake = user_stake + user_rewards;
-            self.user_last_validation.write(user, current_time);
+            self.user_last_validation.write(user, now);
             
             if time_since_last_validation > config.slashing_config.due_time {
                 // Slash logic
+                let how_late = time_since_last_validation / config.slashing_config.due_time;
                 let slash_amount = user_stake / config.slashing_config.slash_fraction;
-                self.user_stakes.write(user, user_stake - slash_amount);
+                let scaled_slash = slash_amount * how_late.into();
+                self.user_stakes.write(user, user_stake - scaled_slash);
             } else {
                 // Reward logic
                 let reward: u128 = total_stake * (time_since_last_validation.into()) / config.reward_rate;
