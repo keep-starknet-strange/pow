@@ -65,26 +65,40 @@ export const getTxIcon = (
   txTypeId: number,
   isDapp?: boolean,
 ) => {
-  // TODO: Hardcoded for now, need to be dynamic
-  if (txTypeId === daTxTypeId) {
-    return blobIcon;
-  } else if (txTypeId === proofTxTypeId) {
-    return l2BatchIcon;
+  switch (chainId) {
+    case 0:
+      switch (txTypeId) {
+        case 0:
+          return "tx.icon.tx";
+        case 1:
+          return "tx.icon.tx";
+        case 2:
+          return "tx.icon.blob";
+        case 3:
+          return "tx.icon.nft";
+        case 4:
+          return "tx.icon.runes";
+        default:
+          return "unknown";
+      }
+    case 1:
+      switch (txTypeId) {
+        case 0:
+          return "tx.icon.bridge";
+        case 1:
+          return "tx.icon.tx";
+        case 2:
+          return "tx.icon.nft";
+        case 3:
+          return "tx.icon.isa";
+        case 4:
+          return "tx.icon.dao";
+        default:
+          return "unknown";
+      }
+    default:
+      return "unknown";
   }
-  if (isDapp) {
-    const dappMeta =
-      chainId === 0
-        ? dappsJson.L1.transactions[txTypeId]
-        : dappsJson.L2.transactions[txTypeId];
-    const icons = getChainIcons(chainId);
-    return icons?.[dappMeta.name] || questionMarkImage;
-  }
-  const txMeta =
-    chainId === 0
-      ? transactionsJson.L1[txTypeId]
-      : transactionsJson.L2[txTypeId];
-  const icons = getChainIcons(chainId);
-  return icons?.[txMeta.name] || questionMarkImage;
 };
 
 export const getTxStyle = (

@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
 import { StorePage } from "../pages/StorePage";
@@ -10,31 +10,131 @@ import { SettingsPage } from "../pages/SettingsPage";
 import { StakingPage } from "../pages/StakingPage";
 
 import { useStaking } from "../context/Staking";
-import { useSound } from "../context/Sound";
-import { useEventManager, EventType } from "../context/EventManager";
+import { useEventManager } from "../context/EventManager";
+import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../context/Tutorial";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 const Tab = createBottomTabNavigator();
 
-function StoreTabButton() {
+function StoreTabButton({
+  isActive,
+  onPress
+}: {
+  isActive: boolean;
+  onPress: any;
+}) {
   const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
 
   return (
-    <TouchableOpacity ref={ref} onLayout={onLayout}>
-      <Text style={{ fontSize: 28, color: "#f7f7f7" }}>🛒</Text>
+    <View ref={ref} onLayout={onLayout} className="">
+      <TabBarButton
+        tabName="Store"
+        isActive={isActive}
+        onPress={onPress}
+      />
+    </View>
+  );
+}
+
+function TabBarButton({
+  tabName,
+  isActive,
+  onPress
+}: {
+  tabName: string;
+  isActive: boolean;
+  onPress: any;
+}) {
+  const { getImage } = useImageProvider();
+  const getTabIcon = (tabName: string, selected: boolean) => {
+    switch (tabName) {
+      case "Main":
+        return selected
+          ? getImage("nav.icon.game.active")
+          : getImage("nav.icon.game");
+      case "Store":
+        return selected
+          ? getImage("nav.icon.shop.active")
+          : getImage("nav.icon.shop");
+      case "Achievements":
+        return selected
+          ? getImage("nav.icon.flag.active")
+          : getImage("nav.icon.flag");
+      case "Leaderboard":
+        return selected
+          ? getImage("nav.icon.medal.active")
+          : getImage("nav.icon.medal");
+      case "Settings":
+        return selected
+          ? getImage("nav.icon.settings.active")
+          : getImage("nav.icon.settings");
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      className="flex flex-row h-[68px] w-[68px] relative"
+      onPress={onPress}
+    >
+      <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <Image
+          image={
+            isActive
+              ? getImage("nav.button.active")
+              : getImage("nav.button")
+          }
+          fit="fill"
+          x={0}
+          y={0}
+          width={68}
+          height={68}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+        />
+      </Canvas>
+      <Canvas
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 68,
+          height: 68,
+        }}
+      >
+        <Image
+          image={getTabIcon(tabName, isActive)}
+          fit="contain"
+          x={10}
+          y={10}
+          width={48}
+          height={48}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+        />
+      </Canvas>
     </TouchableOpacity>
   );
 }
 
 export function TabNavigator() {
   const { stakingUnlocked } = useStaking();
-  const { playSoundEffect } = useSound();
   const { notify } = useEventManager();
 
   const handleTabPress = (routeName: string) => {
-    notify("switchPage" as EventType, { name: routeName });
-    playSoundEffect("BasicClick");
+    notify("SwitchPage", { name: routeName });
   };
 
   return (
@@ -42,28 +142,17 @@ export function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#010108ff",
-          borderTopWidth: 2,
-          borderTopColor: "#2020600f0",
+          backgroundColor: "#101119ff",
+          borderTopWidth: 0,
           paddingBottom: 24,
-          paddingTop: 16,
-          height: 90,
+          paddingTop: 8,
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          shadowColor: "#000000",
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 8,
-        },
-        tabBarActiveTintColor: "#f7f7f7",
-        tabBarInactiveTintColor: "#f7f7f7",
-        tabBarLabelStyle: {
-          fontSize: 0, // Hide labels, we're using emoji icons
+          height: 96,
+          zIndex: 20,
+          paddingHorizontal: 16,
         },
         tabBarShowLabel: false,
       }}
@@ -72,8 +161,12 @@ export function TabNavigator() {
         name="Main"
         component={MainPage}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 28, color: "#f7f7f7" }}>🎮</Text>
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Main"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
           ),
         }}
         listeners={{
@@ -86,8 +179,12 @@ export function TabNavigator() {
           name="Staking"
           component={StakingPage}
           options={{
-            tabBarIcon: () => (
-              <Text style={{ fontSize: 28, color: "#f7f7f7" }}>🥩</Text>
+            tabBarButton: (props) => (
+              <TabBarButton
+                tabName="Staking"
+                isActive={props["aria-selected"] || false}
+                onPress={props.onPress}
+              />
             ),
           }}
           listeners={{
@@ -100,7 +197,12 @@ export function TabNavigator() {
         name="Store"
         component={StorePage}
         options={{
-          tabBarIcon: () => <StoreTabButton />,
+          tabBarButton: (props) => (
+            <StoreTabButton
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
+          ),
         }}
         listeners={{
           tabPress: () => handleTabPress("Store"),
@@ -111,8 +213,12 @@ export function TabNavigator() {
         name="Leaderboard"
         component={LeaderboardPage}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 28, color: "#f7f7f7" }}>🏆</Text>
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Leaderboard"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
           ),
         }}
         listeners={{
@@ -124,8 +230,12 @@ export function TabNavigator() {
         name="Achievements"
         component={AchievementsPage}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 28, color: "#f7f7f7" }}>🎉</Text>
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Achievements"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
           ),
         }}
         listeners={{
@@ -137,8 +247,12 @@ export function TabNavigator() {
         name="Settings"
         component={SettingsPage}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 28, color: "#f7f7f7" }}>⚙️</Text>
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Settings"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
           ),
         }}
         listeners={{

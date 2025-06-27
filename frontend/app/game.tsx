@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { RootNavigator } from "./navigation/RootNavigator";
 
 import { useEventManager } from "./context/EventManager";
-import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
 import { useInAppNotifications } from "./context/InAppNotifications";

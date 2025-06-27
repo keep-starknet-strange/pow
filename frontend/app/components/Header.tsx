@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import React from "react";
+import { Text, View, Dimensions } from "react-native";
 import {
   Canvas,
   Image,
@@ -7,20 +8,28 @@ import {
 } from "@shopify/react-native-skia";
 import { useImageProvider } from "../context/ImageProvider";
 import { useBalance } from "../context/Balance";
+import { useGame } from "../context/Game";
 import { shortMoneyString } from "../utils/helpers";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
   const { getImage } = useImageProvider();
+  const { l2 } = useGame();
+  const headerBg = l2 ? "balance.l2" : "balance.l1";
+  const { width } = Dimensions.get("window");
+
   return (
-    <View className="bg-[#101119] h-[76px] p-0 relative">
+    <View
+      className="bg-[#101119] h-[76px] p-0 relative"
+      style={{ width: width }}
+    >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
-          image={getImage("balance")}
+          image={getImage(headerBg)}
           fit="fill"
           x={0}
           y={0}
-          width={402}
+          width={width}
           height={76}
           sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
         />
@@ -30,7 +39,6 @@ export const Header: React.FC = () => {
           {shortMoneyString(balance)}
         </Text>
       </View>
-      <View className="absolute bottom-[-4px] left-0 right-0 h-[8px] bg-[#10c01950]" />
     </View>
   );
 };

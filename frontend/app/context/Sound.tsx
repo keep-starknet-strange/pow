@@ -74,6 +74,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
     TxAdded: txClickedSource,
     AchievementCompleted: achievementUnlockedSource,
     BasicClick: basicClickSource,
+    SwitchPage: basicClickSource,
   };
   const playHaptic = async (type: string) => {
     switch (type) {

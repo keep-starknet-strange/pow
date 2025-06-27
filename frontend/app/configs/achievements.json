@@ -2,181 +2,211 @@
   {
     "id": 0,
     "name": "Reach L1 Block 10",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L1 Chain",
+    "image": "achievements.l1.blocks.1",
     "updateOn": "MineDone"
   },
   {
     "id": 1,
     "name": "Reach L1 Block 100",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L1 Chain",
+    "image": "achievements.l1.blocks.2",
     "updateOn": "MineDone"
   },
   {
     "id": 2,
     "name": "Reach L1 Block 1000",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L1 Chain",
+    "image": "achievements.l1.blocks.3",
     "updateOn": "MineDone"
   },
   {
     "id": 3,
     "name": "Reach L1 Block 10K",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L1 Chain",
+    "image": "achievements.l1.blocks.4",
     "updateOn": "MineDone"
   },
   {
     "id": 4,
     "name": "Reach L2 Block 100",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L2 Chain",
+    "image": "achievements.l2.blocks.1",
     "updateOn": "SequenceDone"
   },
   {
     "id": 5,
     "name": "Reach L2 Block 1000",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L2 Chain",
+    "image": "achievements.l2.blocks.2",
     "updateOn": "SequenceDone"
   },
   {
     "id": 6,
     "name": "Reach L2 Block 10K",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L2 Chain",
+    "image": "achievements.l2.blocks.3",
     "updateOn": "SequenceDone"
   },
   {
     "id": 7,
     "name": "Reach L2 Block 100K",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "L2 Chain",
+    "image": "achievements.l2.blocks.4",
     "updateOn": "SequenceDone"
   },
   {
     "id": 8,
     "name": "Reach ₿100",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Hodl",
+    "image": "achievements.money.1",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 9,
     "name": "Reach ₿10K",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Hodl",
+    "image": "achievements.money.2",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 10,
     "name": "Reach ₿1M",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Hodl",
+    "image": "achievements.money.3",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 11,
     "name": "Reach ₿100M",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Hodl",
+    "image": "achievements.money.4",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 12,
-    "name": "Unlock all L1 Transactions",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "name": "Unlock all L1 Txs",
+    "category": "Transactions",
+    "image": "achievements.l1.transactions",
     "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 13,
     "name": "Unlock all L1 Dapps",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "category": "Transactions",
+    "image": "achievements.l1.dapps",
     "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 14,
-    "name": "Unlock all L2 Transactions",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "name": "Unlock all L2 Txs",
+    "category": "Transactions",
+    "image": "achievements.l2.transactions",
     "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 15,
     "name": "Unlock all L2 Dapps",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "category": "Transactions",
+    "image": "achievements.l2.dapps",
     "updateOn": "TxUpgradePurchased"
   },
   {
     "id": 16,
     "name": "Max All L1 Upgrades",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "category": "Upgrades",
+    "image": "achievements.l1.upgrades",
     "updateOn": "UpgradePurchased"
   },
   {
     "id": 17,
     "name": "Max All L2 Upgrades",
-    "image": "https://api.art-peace.net/stencils/stencil-0012849111697822e1269cfdb40c26ead60789a99039d644c1f8d6df8dcd7fbb.png",
+    "category": "Upgrades",
+    "image": "achievements.l2.upgrades",
     "updateOn": "UpgradePurchased"
   },
   {
     "id": 18,
-    "name": "Get a Quantum Miner",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "name": "Achieve Quantum Mining",
+    "category": "Automation",
+    "image": "achievements.automation.miner",
     "updateOn": "AutomationPurchased"
   },
   {
     "id": 19,
     "name": "Decentralize the Sequencer",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Automation",
+    "image": "achievements.automation.sequencer",
     "updateOn": "AutomationPurchased"
   },
   {
     "id": 20,
     "name": "Achieve STWO Scaling",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "Automation",
+    "image": "achievements.automation.stwo",
     "updateOn": "AutomationPurchased"
   },
   {
     "id": 21,
     "name": "Scale with DA Volition",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "Automation",
+    "image": "achievements.automation.da",
     "updateOn": "AutomationPurchased"
   },
   {
     "id": 22,
     "name": "Proof of Stake!",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Story",
+    "image": "achievements.stake",
     "updateOn": "StakingPurchased"
   },
   {
     "id": 23,
     "name": "Scale with Layer 2!",
-    "image": "https://api.art-peace.net/stencils/stencil-0002c72fbf5063acdd8d3a031b391d52869b9a8e60b0f0f32d4c29acf0940fe7.png",
+    "category": "Story",
+    "image": "achievements.l2",
     "updateOn": "L2Purchased"
   },
   {
     "id": 24,
     "name": "Prestige!",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Story",
+    "image": "achievements.prestige",
     "updateOn": "PrestigePurchased"
   },
   {
     "id": 25,
     "name": "Reach Max Prestige",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Story",
+    "image": "achievements.prestige.max",
     "updateOn": "PrestigePurchased"
   },
   {
     "id": 26,
     "name": "Get ₿100 in 1 Transaction",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Missions",
+    "image": "achievements.mission.btc.1",
     "updateOn": "TxAdded"
   },
   {
     "id": 27,
     "name": "Get ₿1K in 1 Transaction",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Missions",
+    "image": "achievements.mission.btc.2",
     "updateOn": "TxAdded"
   },
   {
     "id": 28,
     "name": "Mine a block 1st try",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Missions",
+    "image": "achievements.mission.mine",
     "updateOn": "MineClicked"
   },
   {
     "id": 29,
     "name": "STRK Reward Unlocked",
-    "image": "https://api.art-peace.net/stencils/stencil-003aaba2a65145884120024fefdc1fddad19053ab0b041856522f104b82e2fbf.png",
+    "category": "Missions",
+    "image": "achievements.mission.strk",
     "updateOn": "BalanceUpdated"
   }
 ]

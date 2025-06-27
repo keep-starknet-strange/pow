@@ -25,7 +25,7 @@ export class TutorialObserver implements Observer {
     this.handlers.set("MineDone-addTransactionsToBlock", () =>
       this.advanceStep(),
     );
-    this.handlers.set("switchPage-Store-checkStore", () => this.advanceStep());
+    this.handlers.set("SwitchPage-Store-checkStore", () => this.advanceStep());
     this.handlers.set("TxUpgradePurchased-purchaseFeeUpgrade", () =>
       this.advanceStep(),
     );

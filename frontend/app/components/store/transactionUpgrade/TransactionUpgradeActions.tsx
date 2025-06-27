@@ -46,35 +46,32 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
   );
   return locked ? (
     <UpgradeButton
-      label={`Buy ${shortMoneyString(nextCost)}`}
+      label={`Unlock Transaction`}
       level={0}
-      maxLevel={0}
+      maxLevel={1}
       nextCost={nextCost}
-      color="#f7f760"
       onPress={onBuyPress}
     />
   ) : (
-    <View className="flex flex-row justify-center items-center">
+    <View className="flex flex-col gap-1">
       {feeProps && (
-        <View ref={feeRef} onLayout={onLayoutFee} className="pt-3 pb-4">
+        <View ref={feeRef} onLayout={onLayoutFee} className="">
           <UpgradeButton
-            icon={feeProps.icon}
+            label={`Upgrade Value`}
             level={feeProps.level}
             maxLevel={feeProps.maxLevel}
             nextCost={feeProps.nextCost}
-            color={feeProps.color}
             onPress={feeProps.onPress}
           />
         </View>
       )}
       {speedProps && (
-        <View ref={speedRef} onLayout={onLayoutSpeed} className="pt-3 pb-4">
+        <View ref={speedRef} onLayout={onLayoutSpeed} className="">
           <UpgradeButton
-            icon={speedProps.icon}
+            label={`Upgrade Speed`}
             level={speedProps.level}
             maxLevel={speedProps.maxLevel}
             nextCost={speedProps.nextCost}
-            color={speedProps.color}
             onPress={speedProps.onPress}
           />
         </View>

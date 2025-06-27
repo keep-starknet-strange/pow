@@ -1,26 +1,76 @@
-import { View, Image } from "react-native";
-import lockImg from "../../../../assets/images/lock.png";
+import { View } from "react-native";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
+import { useImageProvider } from "../../../context/ImageProvider";
 
 type IconWithLockProps = {
-  source: any;
-  color: string;
+  txIcon: string;
   locked: boolean;
 };
 
 export const IconWithLock: React.FC<IconWithLockProps> = ({
-  source,
-  color,
+  txIcon,
   locked,
-}) => (
-  <View
-    className="flex flex-col justify-center rounded-lg border-2 border-[#e7e7e740] relative w-[4.5rem] h-[4.5rem]"
-    style={{ backgroundColor: color }}
-  >
-    <Image source={source} className="w-full h-full rounded-lg p-1" />
-    {locked && (
-      <View className="absolute w-full h-full top-0 left-0 flex justify-center items-center bg-[#272727c0] rounded-lg">
-        <Image source={lockImg} className="w-[3rem] h-[3rem]" />
+}) => {
+  const { getImage } = useImageProvider();
+
+  return (
+    <View
+      className="flex flex-col justify-center relative w-[64px] h-[64px] relative"
+    >
+      <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <Image
+          image={getImage("shop.tx.bg")}
+          fit="fill"
+          x={0}
+          y={0}
+          width={64}
+          height={64}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.None,
+          }}
+        />
+      </Canvas>
+      <View className="absolute top-0 left-0 w-full h-full">
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage(txIcon)}
+            fit="fill"
+            x={14}
+            y={14}
+            width={36}
+            height={36}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.None,
+            }}
+          />
+        </Canvas>
       </View>
-    )}
-  </View>
-);
+      {locked && (
+        <View className="absolute top-0 left-0 w-full h-full
+                         bg-[#10111970] rounded-sm">
+          <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Image
+              image={getImage("shop.lock")}
+              fit="fill"
+              x={14}
+              y={14}
+              width={36}
+              height={36}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.None,
+              }}
+            />
+          </Canvas>
+        </View>
+      )}
+    </View>
+  );
+};
