@@ -22,7 +22,6 @@ pub mod StakingComponent {
     struct StakeUpdated {
         #[key]
         user: ContractAddress,
-        #[key]
         amount: u128,
     }
 
@@ -39,32 +38,36 @@ pub mod StakingComponent {
 
     #[derive(Drop, starknet::Event)]
     struct Slashed {
-        #[key] user: ContractAddress,
+        #[key] 
+        user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct Reward {
-        #[key] user: ContractAddress,
+        #[key] 
+        user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct WithdrawStake {
-        #[key] user: ContractAddress,
+        #[key] 
+        user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct ClaimRewards {
-        #[key] user: ContractAddress,
+        #[key] 
+        user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct StakingConfigUpdate
     {
-        #[key] config: StakingConfig,
+        config: StakingConfig,
     } 
 
     #[embeddable_as(StakingImpl)]
