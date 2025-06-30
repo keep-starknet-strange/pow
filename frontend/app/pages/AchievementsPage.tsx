@@ -15,28 +15,30 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 
 export const AchievementsPage: React.FC = () => {
   const { achievementsProgress } = useAchievement();
   const { width, height } = Dimensions.get("window");
   const { getImage } = useImageProvider();
 
-  const [categories, setCategories] = React.useState<{ [key: string]: any[] }>({});
-  useEffect(() => {
-  const cats = achievementJson.reduce(
-    (acc, achievement) => {
-      const category = achievement.category || "General";
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(achievement);
-      return acc;
-    },
-    {} as { [key: string]: any[] }
+  const [categories, setCategories] = React.useState<{ [key: string]: any[] }>(
+    {},
   );
-  setCategories(cats);
-}, []);
+  useEffect(() => {
+    const cats = achievementJson.reduce(
+      (acc, achievement) => {
+        const category = achievement.category || "General";
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(achievement);
+        return acc;
+      },
+      {} as { [key: string]: any[] },
+    );
+    setCategories(cats);
+  }, []);
 
   return (
     <View className="flex-1 relative">
@@ -63,7 +65,7 @@ export const AchievementsPage: React.FC = () => {
             fit="fill"
             x={0}
             y={0}
-            width={width-8}
+            width={width - 8}
             height={24}
             sampling={{
               filter: FilterMode.Nearest,
@@ -110,7 +112,10 @@ export const AchievementsPage: React.FC = () => {
               showsHorizontalScrollIndicator={false}
             >
               {achievements.map((achievement, index) => (
-                <View className="relative flex flex-col w-[117px] h-[158px] mx-[4px]" key={index}>
+                <View
+                  className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
+                  key={index}
+                >
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <Image
                       image={getImage("achievements.tile.locked")}
@@ -134,7 +139,11 @@ export const AchievementsPage: React.FC = () => {
                     <View className="absolute top-0 left-0 w-[117px] h-[158px]">
                       <Canvas style={{ flex: 1 }} className="w-full h-full">
                         <Image
-                          image={getImage(achievementsProgress[achievement.id] === 100 ? "achievements.tile.achieved" : "achievements.tile.overlay")}
+                          image={getImage(
+                            achievementsProgress[achievement.id] === 100
+                              ? "achievements.tile.achieved"
+                              : "achievements.tile.overlay",
+                          )}
                           fit="fill"
                           x={0}
                           y={0}
@@ -173,8 +182,15 @@ export const AchievementsPage: React.FC = () => {
         ))}
         <View className="h-[40px]" />
         <LinearGradient
-          style={{ position: "absolute", top: 0, right: 0, width: 120, height: "100%", marginRight: 8, 
-            pointerEvents: "none" }}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 120,
+            height: "100%",
+            marginRight: 8,
+            pointerEvents: "none",
+          }}
           colors={["transparent", "#000000c0"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}

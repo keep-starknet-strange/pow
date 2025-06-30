@@ -507,7 +507,7 @@ export const StarknetConnectorProvider: React.FC<{
         return;
       }
 
-      const res = await (account)
+      const res = await account
         .execute(calls, {
           maxFee: 100_000_000_000_000,
         })

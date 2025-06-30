@@ -58,11 +58,7 @@ export const StorePage: React.FC = () => {
     }
   }, [storeType]);
 
-  const subTabs = [
-    "Transactions",
-    "Upgrades",
-    "Automation"
-  ];
+  const subTabs = ["Transactions", "Upgrades", "Automation"];
   const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
 
   return (
@@ -75,7 +71,7 @@ export const StorePage: React.FC = () => {
             x={0}
             y={-62}
             width={width}
-            height={height-170}
+            height={height - 170}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -90,7 +86,7 @@ export const StorePage: React.FC = () => {
             fit="fill"
             x={0}
             y={0}
-            width={width-8}
+            width={width - 8}
             height={24}
             sampling={{
               filter: FilterMode.Nearest,
@@ -109,17 +105,21 @@ export const StorePage: React.FC = () => {
         {subTabs.map((tab) => (
           <View
             className="relative flex justify-center"
-            style={{ width: (width - 2 * subTabs.length - 6) / subTabs.length,
-                     height: activeSubTab === tab ? 32 : 24 }}
+            style={{
+              width: (width - 2 * subTabs.length - 6) / subTabs.length,
+              height: activeSubTab === tab ? 32 : 24,
+            }}
             key={tab}
           >
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
-                image={getImage(activeSubTab === tab ? "shop.tab.active" : "shop.tab")}
+                image={getImage(
+                  activeSubTab === tab ? "shop.tab.active" : "shop.tab",
+                )}
                 fit="fill"
                 x={0}
                 y={0}
-                width={(width - 2 * subTabs.length - 6) / subTabs.length }
+                width={(width - 2 * subTabs.length - 6) / subTabs.length}
                 height={activeSubTab === tab ? 32 : 24}
                 sampling={{
                   filter: FilterMode.Nearest,

@@ -25,7 +25,7 @@ const Tab = createBottomTabNavigator();
 
 function StoreTabButton({
   isActive,
-  onPress
+  onPress,
 }: {
   isActive: boolean;
   onPress: any;
@@ -34,11 +34,7 @@ function StoreTabButton({
 
   return (
     <View ref={ref} onLayout={onLayout} className="">
-      <TabBarButton
-        tabName="Store"
-        isActive={isActive}
-        onPress={onPress}
-      />
+      <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
     </View>
   );
 }
@@ -46,7 +42,7 @@ function StoreTabButton({
 function TabBarButton({
   tabName,
   isActive,
-  onPress
+  onPress,
 }: {
   tabName: string;
   isActive: boolean;
@@ -88,9 +84,7 @@ function TabBarButton({
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
           image={
-            isActive
-              ? getImage("nav.button.active")
-              : getImage("nav.button")
+            isActive ? getImage("nav.button.active") : getImage("nav.button")
           }
           fit="fill"
           x={0}

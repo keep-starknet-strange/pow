@@ -19,9 +19,7 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
   const { getImage } = useImageProvider();
 
   return (
-    <View
-      className="flex flex-col justify-center relative w-[64px] h-[64px] relative"
-    >
+    <View className="flex flex-col justify-center relative w-[64px] h-[64px] relative">
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
           image={getImage("shop.tx.bg")}
@@ -53,8 +51,10 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
         </Canvas>
       </View>
       {locked && (
-        <View className="absolute top-0 left-0 w-full h-full
-                         bg-[#10111970] rounded-sm">
+        <View
+          className="absolute top-0 left-0 w-full h-full
+                         bg-[#10111970] rounded-sm"
+        >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
               image={getImage("shop.lock")}

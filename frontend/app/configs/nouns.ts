@@ -63,7 +63,7 @@ export const createNounsAttributes = (
   head: number,
   body: number,
   glasses: number,
-  accessories: number
+  accessories: number,
 ): NounsAttributes => {
   return {
     head,
@@ -71,4 +71,4 @@ export const createNounsAttributes = (
     glasses,
     accessories,
   };
-}
+};

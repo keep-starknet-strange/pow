@@ -23,7 +23,10 @@ import { useImageProvider } from "../context/ImageProvider";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import background from "../../assets/background.png";
 import { shortMoneyString } from "../utils/helpers";
-import { getRandomNounsAttributes, createNounsAttributes } from "../configs/nouns";
+import {
+  getRandomNounsAttributes,
+  createNounsAttributes,
+} from "../configs/nouns";
 
 import * as prestigeImages from "../configs/prestige";
 export const getPrestigeIcon = (prestige: number) => {
@@ -31,7 +34,7 @@ export const getPrestigeIcon = (prestige: number) => {
     return `shop.lock`;
   }
   return `prestige.${prestige}`;
-}
+};
 /*
   const images = Object.values(prestigeImages);
   return images[prestige] || images[0];
@@ -145,12 +148,14 @@ export const LeaderboardPage: React.FC = () => {
           address: score.user,
           balance: score.new_balance,
           prestige: 0, // TODO
-          nouns: account?.account.metadata ? createNounsAttributes(
-            parseInt(account.account.metadata[0], 16),
-            parseInt(account.account.metadata[1], 16),
-            parseInt(account.account.metadata[2], 16),
-            parseInt(account.account.metadata[3], 16),
-          ) : getRandomNounsAttributes(),
+          nouns: account?.account.metadata
+            ? createNounsAttributes(
+                parseInt(account.account.metadata[0], 16),
+                parseInt(account.account.metadata[1], 16),
+                parseInt(account.account.metadata[2], 16),
+                parseInt(account.account.metadata[3], 16),
+              )
+            : getRandomNounsAttributes(),
           name: account?.account.username || shortAddress,
           id: index + 1,
         };
@@ -186,7 +191,7 @@ export const LeaderboardPage: React.FC = () => {
             fit="fill"
             x={0}
             y={0}
-            width={width-8}
+            width={width - 8}
             height={24}
             sampling={{
               filter: FilterMode.Nearest,
@@ -267,12 +272,14 @@ export const LeaderboardPage: React.FC = () => {
               <PFPView
                 user={user?.account_address}
                 attributes={
-                  user.account.metadata ? createNounsAttributes(
-                    parseInt(user.account.metadata[0], 16),
-                    parseInt(user.account.metadata[1], 16),
-                    parseInt(user.account.metadata[2], 16),
-                    parseInt(user.account.metadata[3], 16),
-                  ) : getRandomNounsAttributes()
+                  user.account.metadata
+                    ? createNounsAttributes(
+                        parseInt(user.account.metadata[0], 16),
+                        parseInt(user.account.metadata[1], 16),
+                        parseInt(user.account.metadata[2], 16),
+                        parseInt(user.account.metadata[3], 16),
+                      )
+                    : getRandomNounsAttributes()
                 }
               />
             </View>
@@ -307,110 +314,5 @@ export const LeaderboardPage: React.FC = () => {
     </View>
   );
 };
-/* TODO
-    <ImageBackground className="flex-1" source={background} resizeMode="cover">
-      <View className="flex flex-row justify-end items-center p-2">
-        <Text className="text-[#e7e7e7] text-4xl font-bold mr-2 font-Xerxes">
-          🏆 Rankings
-        </Text>
-      </View>
-      <View className="flex flex-row justify-between items-center p-4 transparent">
-        <Text className="text-lg font-bold text-white flex-1 font-Pixels">
-          Leaderboard
-        </Text>
-        <Text className="text-lg font-bold text-white w-[5rem] text-center font-Pixels">
-          Prestige
-        </Text>
-        <Text className="text-lg font-bold text-white w-[6rem] text-right font-Pixels">
-          Score
-        </Text>
-      </View>
-      <ScrollView className="flex-1">
-        {leaderboard.map((user, index) => (
-          <View
-            key={user.id}
-            className={`flex flex-row justify-between items-center p-2 ${index % 2 === 0 ? "bg-[#10111910]" : "bg-[#10111920]"}`}
-          >
-            <View className="flex flex-row items-center flex-1">
-              <View
-                className="w-[4rem] aspect-square mr-2 rounded-xl overflow-hidden bg-[#11111160]
-                              border-2 border-[#e7e7e740] shadow-lg shadow-black/20
-             "
-              >
-                <PFPView user={user.address} attributes={user.nouns} />
-              </View>
-              <Text className="text-2xl font-bold text-white font-Pixels">
-                {user.name}
-              </Text>
-            </View>
-            <View className="flex flex-row items-center justify-center w-[4rem]">
-              <View className="w-[36px] aspect-square">
-                <Canvas style={{ flex: 1 }} className="w-full h-full">
-                  <Image
-                    image={getImage(getPrestigeIcon(user.prestige))}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={36}
-                    height={36}
-                    sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.None }}
-                  />
-                </Canvas>
-              </View>
-            </View>
-            <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
-              {shortMoneyString(user.balance)}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-      {user && (
-        <View className={`flex flex-row justify-between items-center p-2 bg-[#101119]
-          absolute bottom-[90px] left-0 right-0 z-10
-          `}>
-          <View className="flex flex-row items-center flex-1">
-            <View
-              className="w-[4rem] aspect-square mr-2 rounded-xl overflow-hidden bg-[#11111160]
-                         border-2 border-[#e7e7e740] shadow-lg shadow-black/20">
-              <PFPView
-                user={user?.account_address}
-                attributes={
-                  user.account.metadata ? createNounsAttributes(
-                    parseInt(user.account.metadata[0], 16),
-                    parseInt(user.account.metadata[1], 16),
-                    parseInt(user.account.metadata[2], 16),
-                    parseInt(user.account.metadata[3], 16),
-                  ) : getRandomNounsAttributes()
-                }
-              />
-            </View>
-            <Text className="text-2xl font-bold text-white font-Pixels">
-              {user?.account.username}
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-center w-[4rem]">
-            <View className="w-[36px] aspect-square">
-              <Canvas style={{ flex: 1 }} className="w-full h-full">
-                <Image
-                  image={getImage(getPrestigeIcon(currentPrestige))}
-                  fit="fill"
-                  x={0}
-                  y={0}
-                  width={36}
-                  height={36}
-                  sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.None }}
-                />
-              </Canvas>
-            </View>
-          </View>
-          <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
-            {shortMoneyString(balance)}
-          </Text>
-        </View>
-      )}
-    </ImageBackground>
-  );
-};
-*/
 
 export default LeaderboardPage;

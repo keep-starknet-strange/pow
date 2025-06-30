@@ -36,14 +36,26 @@ type FocEngineContextType = {
   user: FocAccount | null;
 
   connectContract: (contractAddress: string) => void;
-  getAccount: (accountAddress: string, contract?: string, includeMetadata?: boolean) => Promise<FocAccount | null>;
-  getAccounts: (addresses: string[], contract?: string, includeMetadata?: boolean) => Promise<FocAccount[] | null>;
+  getAccount: (
+    accountAddress: string,
+    contract?: string,
+    includeMetadata?: boolean,
+  ) => Promise<FocAccount | null>;
+  getAccounts: (
+    addresses: string[],
+    contract?: string,
+    includeMetadata?: boolean,
+  ) => Promise<FocAccount[] | null>;
   refreshUser: (contract?: string) => Promise<void>;
   claimUsername: (username: string, contract?: string) => Promise<void>;
   isUsernameUnique: (username: string, contract?: string) => Promise<boolean>;
   isUsernameValid: (username: string) => boolean;
   setUserMetadata: (metadata: string[], contract?: string) => Promise<void>;
-  initializeAccount: (username: string, metadata: string[], contract?: string) => Promise<void>;
+  initializeAccount: (
+    username: string,
+    metadata: string[],
+    contract?: string,
+  ) => Promise<void>;
   usernameValidationError: string;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
 
@@ -104,13 +116,13 @@ const fromBigNString = (bigNString: bigint | string) => {
     result += String.fromCharCode(code);
   }
   return result;
-}
+};
 
 const formatMetadata = (metadata: bigint[]) => {
   return metadata.map((item) => {
     return item.toString(16).padStart(64, "0");
   });
-}
+};
 
 const fromShortHexString = (hexString: string) => {
   if (!hexString.startsWith("0x")) {
@@ -124,7 +136,7 @@ const fromShortHexString = (hexString: string) => {
     result += String.fromCharCode(code);
   }
   return result;
-}
+};
 
 export const useFocEngine = () => {
   const context = useContext(FocEngineConnector);
@@ -158,7 +170,9 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
   const [accountsContract, setAccountsContract] = useState<Contract | null>(
     null,
   );
-  const [userContract, setUserContract] = useState<string | undefined>(undefined);
+  const [userContract, setUserContract] = useState<string | undefined>(
+    undefined,
+  );
   const [user, setUser] = useState<FocAccount | null>(null);
 
   const fetchRegistryContractAddress = useCallback(async () => {
@@ -176,7 +190,11 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         setRegistryContractAddress(contract);
         const { abi: registryAbi } = await provider.getClassAt(contract);
         if (registryAbi) {
-          const registryContract = new Contract(registryAbi, contract, provider);
+          const registryContract = new Contract(
+            registryAbi,
+            contract,
+            provider,
+          );
           setRegistryContract(registryContract);
         }
       }
@@ -249,12 +267,17 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     [STARKNET_ENABLED, provider, account],
   );
 
-  const getAccount = useCallback(async (accountAddress: string, contract?: string, includeMetadata = false) => {
-    if (!STARKNET_ENABLED || !accountsContract) {
-      return null;
-    }
-    try {
-      /* TODO: Use foc-engine API to fetch account data 
+  const getAccount = useCallback(
+    async (
+      accountAddress: string,
+      contract?: string,
+      includeMetadata = false,
+    ) => {
+      if (!STARKNET_ENABLED || !accountsContract) {
+        return null;
+      }
+      try {
+        /* TODO: Use foc-engine API to fetch account data 
       const response = await fetch(
         `${FOC_ENGINE_API}/accounts/get-account?accountAddress=${accountAddress}`,
       );
@@ -265,57 +288,66 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       // Example response: {"data": {"account":{"username":"magic"},"account_address":"0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691","contract_address":"0x23386fe159ca18338f619b0a753e124db2cebd45f23cc992ce693cde465d617"}}
       return data.data;
        */
-      let accountData: any;
-      if (contract) {
-        accountData = await accountsContract.get_contract_account(contract, accountAddress);
-      } else if (userContract) {
-        accountData = await accountsContract.get_contract_account(userContract, accountAddress);
-      } else {
-        accountData = await accountsContract.get_account(accountAddress);
-      }
-      if (!accountData || !accountData.username) {
-        console.log(`accountData:`, accountData);
-        console.warn(`No account data found for address: ${accountAddress}`);
+        let accountData: any;
+        if (contract) {
+          accountData = await accountsContract.get_contract_account(
+            contract,
+            accountAddress,
+          );
+        } else if (userContract) {
+          accountData = await accountsContract.get_contract_account(
+            userContract,
+            accountAddress,
+          );
+        } else {
+          accountData = await accountsContract.get_account(accountAddress);
+        }
+        if (!accountData || !accountData.username) {
+          console.log(`accountData:`, accountData);
+          console.warn(`No account data found for address: ${accountAddress}`);
+          return null;
+        }
+        const account: FocAccount = {
+          account_address: accountAddress,
+          contract_address:
+            contract || userContract || accountsContractAddress || "",
+          account: {
+            username: fromBigNString(accountData.username) || "",
+            metadata: includeMetadata
+              ? formatMetadata(accountData.metadata) || null
+              : null, // Optional metadata field
+          },
+        };
+        return account;
+      } catch (error) {
         return null;
       }
-      const account: FocAccount = {
-        account_address: accountAddress,
-        contract_address: contract || userContract || accountsContractAddress || "",
-        account: {
-          username: fromBigNString(accountData.username) || "",
-          metadata: includeMetadata ? formatMetadata(accountData.metadata) || null : null, // Optional metadata field
-        },
-      };
-      return account;
-    } catch (error) {
-      return null;
-    }
-  }, [
-    STARKNET_ENABLED,
-    accountsContract,
-    accountsContractAddress,
-    userContract,
-  ]);
+    },
+    [STARKNET_ENABLED, accountsContract, accountsContractAddress, userContract],
+  );
 
-  const refreshUser = useCallback(async (contract?: string) => {
-    if (!account) {
-      console.error("No user account connected");
-      setUser(null);
-      return;
-    }
-    const accountData = await getAccount(account.address, contract, true);
-    console.log("Refreshed account data:", accountData);
-    if (accountData) {
-      setUser(accountData);
-    } else {
-      // If no account data is found, set a default user object
-      setUser({
-        account_address: account.address,
-        contract_address: accountsContractAddress || "",
-        account: { username: "", metadata: null }, // Optional metadata field
-      });
-    }
-  }, [account, getAccount, accountsContractAddress]);
+  const refreshUser = useCallback(
+    async (contract?: string) => {
+      if (!account) {
+        console.error("No user account connected");
+        setUser(null);
+        return;
+      }
+      const accountData = await getAccount(account.address, contract, true);
+      console.log("Refreshed account data:", accountData);
+      if (accountData) {
+        setUser(accountData);
+      } else {
+        // If no account data is found, set a default user object
+        setUser({
+          account_address: account.address,
+          contract_address: accountsContractAddress || "",
+          account: { username: "", metadata: null }, // Optional metadata field
+        });
+      }
+    },
+    [account, getAccount, accountsContractAddress],
+  );
 
   useEffect(() => {
     if (account) {
@@ -349,9 +381,15 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         */
         let accountData: any[] = [];
         if (contract) {
-          accountData = await accountsContract.get_contract_accounts(contract, addresses);
+          accountData = await accountsContract.get_contract_accounts(
+            contract,
+            addresses,
+          );
         } else if (userContract) {
-          accountData = await accountsContract.get_contract_accounts(userContract, addresses);
+          accountData = await accountsContract.get_contract_accounts(
+            userContract,
+            addresses,
+          );
         } else {
           accountData = await accountsContract.get_accounts(addresses);
         }
@@ -360,14 +398,19 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
           console.warn("No accounts found for the provided addresses");
           return null;
         }
-        const accounts: FocAccount[] = accountData.map((data: any, index: number) => ({
-          account_address: addresses[index],
-          contract_address: contract || userContract || accountsContractAddress || "",
-          account: {
-            username: fromBigNString(data.username) || "",
-            metadata: includeMetadata ? formatMetadata(data.metadata) || null : null, // Optional metadata field
-          },
-        }));
+        const accounts: FocAccount[] = accountData.map(
+          (data: any, index: number) => ({
+            account_address: addresses[index],
+            contract_address:
+              contract || userContract || accountsContractAddress || "",
+            account: {
+              username: fromBigNString(data.username) || "",
+              metadata: includeMetadata
+                ? formatMetadata(data.metadata) || null
+                : null, // Optional metadata field
+            },
+          }),
+        );
         return accounts;
       } catch (error) {
         console.error("Error fetching accounts:", error);
@@ -382,7 +425,8 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!STARKNET_ENABLED) {
         setUser({
           account_address: account?.address || "",
-          contract_address: contract || userContract || accountsContractAddress || "",
+          contract_address:
+            contract || userContract || accountsContractAddress || "",
           account: { username, metadata: null }, // Optional metadata field
         });
         return;
@@ -434,7 +478,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       userContract,
     ],
   );
-  
+
   const isUsernameUnique = useCallback(
     async (username: string, contract?: string) => {
       if (!STARKNET_ENABLED || !accountsContract) {
@@ -448,9 +492,15 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         let isClaimed = false;
         if (contract) {
-          isClaimed = await accountsContract.is_contract_username_claimed(contract, usernameHex);
+          isClaimed = await accountsContract.is_contract_username_claimed(
+            contract,
+            usernameHex,
+          );
         } else if (userContract) {
-          isClaimed = await accountsContract.is_contract_username_claimed(userContract, usernameHex);
+          isClaimed = await accountsContract.is_contract_username_claimed(
+            userContract,
+            usernameHex,
+          );
         } else {
           isClaimed = await accountsContract.is_username_claimed(usernameHex);
         }
@@ -461,7 +511,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         return false;
       }
     },
-    [STARKNET_ENABLED, accountsContract]
+    [STARKNET_ENABLED, accountsContract],
   );
 
   const usernameValidationError = "3-20 characters, a-z A-Z 0-9 and _ only";
@@ -523,15 +573,12 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const initializeAccount = useCallback(
-    async (
-      username: string,
-      metadata: string[] = [],
-      contract?: string,
-    ) => {
+    async (username: string, metadata: string[] = [], contract?: string) => {
       if (!STARKNET_ENABLED) {
         setUser({
           account_address: account?.address || "",
-          contract_address: contract || userContract || accountsContractAddress || "",
+          contract_address:
+            contract || userContract || accountsContractAddress || "",
           account: { username, metadata: null }, // Optional metadata field
         });
         return;
@@ -562,7 +609,11 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         entrypointClaim = "claim_contract_username";
         calldataClaim = [userContract, usernameHex];
         entrypointMetadata = "set_contract_account_metadata";
-        calldataMetadata = [userContract, metadata.length.toString(), ...metadata];
+        calldataMetadata = [
+          userContract,
+          metadata.length.toString(),
+          ...metadata,
+        ];
       } else {
         calldataClaim = [usernameHex];
         calldataMetadata = [metadata.length.toString(), ...metadata];
@@ -598,7 +649,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       userContract,
     ],
   );
-  
+
   const mintFunds = async (address: string, amount: bigint, unit?: string) => {
     if (!STARKNET_ENABLED) {
       return;

@@ -8,7 +8,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import soundsJson from "../configs/sounds.json";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";

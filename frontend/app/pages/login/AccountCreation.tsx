@@ -43,7 +43,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 }) => {
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   const { account } = useStarknetConnector();
-  const { isUsernameUnique, isUsernameValid, usernameValidationError, initializeAccount } = useFocEngine();
+  const {
+    isUsernameUnique,
+    isUsernameValid,
+    usernameValidationError,
+    initializeAccount,
+  } = useFocEngine();
   const { getImage } = useImageProvider();
 
   const [usernameError, setUsernameError] = React.useState<string>("");
@@ -171,16 +176,23 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           <View className="flex-1 items-center justify-center gap-4">
             <BasicButton
               label="Save"
-              onPress={async () => { 
+              onPress={async () => {
                 if (!isUsernameValid(username)) {
-                  setUsernameError(`Invalid username:\n${usernameValidationError}`);
+                  setUsernameError(
+                    `Invalid username:\n${usernameValidationError}`,
+                  );
                   return;
                 }
                 if (!(await isUsernameUnique(username))) {
                   setUsernameError("This username is unavailable.");
                   return;
                 }
-                await initializeAccount(username, [`0x` + avatar.head.toString(16), `0x` + avatar.body.toString(16), `0x` + avatar.glasses.toString(16), `0x` + avatar.accessories.toString(16)]);
+                await initializeAccount(username, [
+                  `0x` + avatar.head.toString(16),
+                  `0x` + avatar.body.toString(16),
+                  `0x` + avatar.glasses.toString(16),
+                  `0x` + avatar.accessories.toString(16),
+                ]);
               }}
               style={{ width: 250 }}
             />

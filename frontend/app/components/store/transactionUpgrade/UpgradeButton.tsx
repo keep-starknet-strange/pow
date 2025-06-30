@@ -51,11 +51,17 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
           }}
         />
       </Canvas>
-      <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">{label}</Text>
+      <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
+        {label}
+      </Text>
       {level === maxLevel ? (
-        <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]">Max</Text>
+        <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]">
+          Max
+        </Text>
       ) : (
-        <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]">Cost: {shortMoneyString(nextCost)}</Text>
+        <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]">
+          Cost: {shortMoneyString(nextCost)}
+        </Text>
       )}
     </TouchableOpacity>
   );

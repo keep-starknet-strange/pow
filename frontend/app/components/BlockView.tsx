@@ -232,12 +232,14 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 <View className="absolute top-0 left-0 w-full h-full">
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <SkiaImg
-                      image={getImage(getTxIcon(
-                        props.chainId,
-                        props.block?.transactions[
-                          props.block?.transactions.length - 1
-                        ].typeId || 0,
-                      ))}
+                      image={getImage(
+                        getTxIcon(
+                          props.chainId,
+                          props.block?.transactions[
+                            props.block?.transactions.length - 1
+                          ].typeId || 0,
+                        ),
+                      )}
                       fit="contain"
                       sampling={{
                         filter: FilterMode.Nearest,

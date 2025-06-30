@@ -40,7 +40,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
       default:
         return "unknown";
     }
-  }
+  };
 
   return (
     <View className="flex flex-col w-full">
@@ -58,7 +58,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
         className="relative"
         style={{
           width: width - 32,
-          height: 36
+          height: 36,
         }}
         onPress={() => {
           upgrade(props.chainId, props.upgrade.id);
@@ -78,12 +78,19 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
             }}
           />
         </Canvas>
-        <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">Purchase Upgrade</Text>
+        <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
+          Purchase Upgrade
+        </Text>
         {level === props.upgrade.costs.length ? (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">Max</Text>
+          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">
+            Max
+          </Text>
         ) : (
           <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
-            Cost: {shortMoneyString(getNextUpgradeCost(props.chainId, props.upgrade.id))}
+            Cost:{" "}
+            {shortMoneyString(
+              getNextUpgradeCost(props.chainId, props.upgrade.id),
+            )}
           </Text>
         )}
       </TouchableOpacity>

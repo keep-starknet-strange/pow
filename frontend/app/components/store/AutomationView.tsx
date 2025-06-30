@@ -20,9 +20,14 @@ export type AutomationViewProps = {
 export const AutomationView: React.FC<AutomationViewProps> = (props) => {
   const { getImage } = useImageProvider();
   const { width } = Dimensions.get("window");
-  const { automations, upgradeAutomation, getNextAutomationCost } = useUpgrades();
+  const { automations, upgradeAutomation, getNextAutomationCost } =
+    useUpgrades();
 
-  const getAutomationIcon = (chainId: number, automationName: string, levelId: number) => {
+  const getAutomationIcon = (
+    chainId: number,
+    automationName: string,
+    levelId: number,
+  ) => {
     switch (automationName) {
       case "Miner":
         switch (levelId) {
@@ -43,20 +48,20 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
           default:
             return "unknown";
         }
-      case "Prover":
+      case "Sequencer":
         switch (levelId) {
           case 0:
-            return "shop.automation.prover.0";
+            return "shop.automation.sequencer.0";
           case 1:
-            return "shop.automation.prover.1";
+            return "shop.automation.sequencer.1";
           case 2:
-            return "shop.automation.prover.2";
+            return "shop.automation.sequencer.2";
           case 3:
-            return "shop.automation.prover.3";
+            return "shop.automation.sequencer.3";
           case 4:
-            return "shop.automation.prover.4";
+            return "shop.automation.sequencer.4";
           case 5:
-            return "shop.automation.prover.5";
+            return "shop.automation.sequencer.5";
           default:
             return "unknown";
         }
@@ -95,7 +100,7 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
       default:
         return "unknown";
     }
-  }
+  };
 
   const [level, setLevel] = useState(0);
   useEffect(() => {
@@ -111,7 +116,7 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
           txIcon={getAutomationIcon(
             props.chainId,
             props.automation.name,
-            level
+            level,
           )}
           locked={false}
         />
@@ -124,7 +129,7 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
         className="relative"
         style={{
           width: width - 32,
-          height: 36
+          height: 36,
         }}
         onPress={() => {
           upgradeAutomation(props.chainId, props.automation.id);
@@ -146,13 +151,20 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
         </Canvas>
         <View className="flex flex-row absolute left-[8px] top-[6px] gap-2">
           <Text className="font-Pixels text-xl text-[#fff7ff]">Upgrade to</Text>
-          <Text className="font-Pixels text-xl text-[#c89632]">{props.automation.levels[level]?.name || "Max"}</Text>
+          <Text className="font-Pixels text-xl text-[#c89632]">
+            {props.automation.levels[level]?.name || "Max"}
+          </Text>
         </View>
         {level === props.automation.levels.length ? (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">Max</Text>
+          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">
+            Max
+          </Text>
         ) : (
           <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
-            Cost: {shortMoneyString(getNextAutomationCost(props.chainId, props.automation.id))}
+            Cost:{" "}
+            {shortMoneyString(
+              getNextAutomationCost(props.chainId, props.automation.id),
+            )}
           </Text>
         )}
       </TouchableOpacity>

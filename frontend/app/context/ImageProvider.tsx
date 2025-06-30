@@ -75,9 +75,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
   const txIconTxSm = useImage(require(`${txIconsPath}/icon_tx_sm.png`));
   const txIconBlobSm = useImage(require(`${txIconsPath}/icon_blob_sm.png`));
   const txIconNftSm = useImage(require(`${txIconsPath}/icon_nft_sm.png`));
-  const txIconBridgeSm = useImage(
-    require(`${txIconsPath}/icon_bridge_sm.png`),
-  );
+  const txIconBridgeSm = useImage(require(`${txIconsPath}/icon_bridge_sm.png`));
   const txIconDaoSm = useImage(require(`${txIconsPath}/icon_dao_sm.png`));
   const txIconIsaSm = useImage(require(`${txIconsPath}/icon_isa_sm.png`));
   const txIconRunesSm = useImage(require(`${txIconsPath}/icon_runes_sm.png`));
@@ -180,86 +178,186 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
   const shopNamePlaque = useImage(require(`${shopPath}/shop_name_plaque.png`));
   const shopTab = useImage(require(`${shopPath}/shop_tab.png`));
   const shopTabActive = useImage(require(`${shopPath}/shop_tab_active.png`));
-  const shopTxBuyButton = useImage(require(`${shopPath}/shop_transactions_buy_button.png`));
-  const shopAutoBuyButton = useImage(require(`${shopPath}/shop_automation_buy_button.png`));
+  const shopTxBuyButton = useImage(
+    require(`${shopPath}/shop_transactions_buy_button.png`),
+  );
+  const shopAutoBuyButton = useImage(
+    require(`${shopPath}/shop_automation_buy_button.png`),
+  );
   const shopIconBg = useImage(require(`${shopPath}/shop_icon_background.png`));
   const shopLock = useImage(require(`${shopPath}/icon_lock.png`));
 
   const upgradesPath = `${assetsPath}/shop/icons/upgrades`;
-  const shopBlockDifficulty = useImage(require(`${upgradesPath}/icon_blockDifficulty.png`));
+  const shopBlockDifficulty = useImage(
+    require(`${upgradesPath}/icon_blockDifficulty.png`),
+  );
   const shopBlockSize = useImage(require(`${upgradesPath}/icon_blockSize.png`));
-  const shopBlockReward = useImage(require(`${upgradesPath}/icon_blockReward.png`));
+  const shopBlockReward = useImage(
+    require(`${upgradesPath}/icon_blockReward.png`),
+  );
   const shopDaComp = useImage(require(`${upgradesPath}/icon_daComp.png`));
   const shopMevBoost = useImage(require(`${upgradesPath}/icon_mevBoost.png`));
-  const shopRecursiveProof = useImage(require(`${upgradesPath}/icon_recursiveProof.png`));
+  const shopRecursiveProof = useImage(
+    require(`${upgradesPath}/icon_recursiveProof.png`),
+  );
 
   const automationsPath = `${assetsPath}/shop/icons/automations`;
-  const shopAutomationsMinerBase = useImage(require(`${automationsPath}/Miner/icon_baseMiner.png`));
-  const shopAutomationsMinerCpu = useImage(require(`${automationsPath}/Miner/icon_cpu.png`));
-  const shopAutomationsMinerGpu = useImage(require(`${automationsPath}/Miner/icon_mining.png`));
-  const shopAutomationsMinerAsic = useImage(require(`${automationsPath}/Miner/icon_asic.png`));
-  const shopAutomationsMinerAnt = useImage(require(`${automationsPath}/Miner/icon_antMiner.png`));
-  const shopAutomationsMinerBitmain = useImage(require(`${automationsPath}/Miner/icon_bitmain.png`));
-  const shopAutomationsMinerQuantum = useImage(require(`${automationsPath}/Miner/icon_quantumMiner.png`));
+  const shopAutomationsMinerBase = useImage(
+    require(`${automationsPath}/Miner/icon_baseMiner.png`),
+  );
+  const shopAutomationsMinerCpu = useImage(
+    require(`${automationsPath}/Miner/icon_cpu.png`),
+  );
+  const shopAutomationsMinerGpu = useImage(
+    require(`${automationsPath}/Miner/icon_mining.png`),
+  );
+  const shopAutomationsMinerAsic = useImage(
+    require(`${automationsPath}/Miner/icon_asic.png`),
+  );
+  const shopAutomationsMinerAnt = useImage(
+    require(`${automationsPath}/Miner/icon_antMiner.png`),
+  );
+  const shopAutomationsMinerBitmain = useImage(
+    require(`${automationsPath}/Miner/icon_bitmain.png`),
+  );
+  const shopAutomationsMinerQuantum = useImage(
+    require(`${automationsPath}/Miner/icon_quantumMiner.png`),
+  );
 
   // Achievements Images
   const achievementsPath = `${assetsPath}/achievements`;
-  const achievmentsBg = useImage(require(`${achievementsPath}/achievements_bg.png`));
-  const achievementsTileLocked = useImage(require(`${achievementsPath}/achievements_tile_locked.png`));
-  const achievementsTileProgress = useImage(require(`${achievementsPath}/achievements_tile_in_progress.png`));
-  const achievementsTileAchieved = useImage(require(`${achievementsPath}/achievements_achieved.png`));
-  const achievementsTitle = useImage(require(`${achievementsPath}/achievements_category_plaque.png`));
-  const achievementsTileOverlay = useImage(require(`${achievementsPath}/achievements_tile.png`));
+  const achievmentsBg = useImage(
+    require(`${achievementsPath}/achievements_bg.png`),
+  );
+  const achievementsTileLocked = useImage(
+    require(`${achievementsPath}/achievements_tile_locked.png`),
+  );
+  const achievementsTileProgress = useImage(
+    require(`${achievementsPath}/achievements_tile_in_progress.png`),
+  );
+  const achievementsTileAchieved = useImage(
+    require(`${achievementsPath}/achievements_achieved.png`),
+  );
+  const achievementsTitle = useImage(
+    require(`${achievementsPath}/achievements_category_plaque.png`),
+  );
+  const achievementsTileOverlay = useImage(
+    require(`${achievementsPath}/achievements_tile.png`),
+  );
 
   const achievmentsIconsPath = `${assetsPath}/achievements/icons`;
-  const achievements100 = useImage(require(`${achievmentsIconsPath}/icon_100.png`));
-  const achievements1000 = useImage(require(`${achievmentsIconsPath}/icon_1000.png`));
-  const achievementsStake = useImage(require(`${achievmentsIconsPath}/icon_achieveStake.png`));
-  const achievementsL2 = useImage(require(`${achievmentsIconsPath}/icon_achieveL2.png`));
-  const achievementsMining = useImage(require(`${achievmentsIconsPath}/icon_achieveMining.png`));
+  const achievements100 = useImage(
+    require(`${achievmentsIconsPath}/icon_100.png`),
+  );
+  const achievements1000 = useImage(
+    require(`${achievmentsIconsPath}/icon_1000.png`),
+  );
+  const achievementsStake = useImage(
+    require(`${achievmentsIconsPath}/icon_achieveStake.png`),
+  );
+  const achievementsL2 = useImage(
+    require(`${achievmentsIconsPath}/icon_achieveL2.png`),
+  );
+  const achievementsMining = useImage(
+    require(`${achievmentsIconsPath}/icon_achieveMining.png`),
+  );
   const achievementsMoneyPath = `${achievmentsIconsPath}/Money`;
-  const achievementsMoney1 = useImage(require(`${achievementsMoneyPath}/icon_100btc.png`));
-  const achievementsMoney2 = useImage(require(`${achievementsMoneyPath}/icon_1000btc.png`));
-  const achievementsMoney3 = useImage(require(`${achievementsMoneyPath}/icon_10000btc.png`));
-  
+  const achievementsMoney1 = useImage(
+    require(`${achievementsMoneyPath}/icon_100btc.png`),
+  );
+  const achievementsMoney2 = useImage(
+    require(`${achievementsMoneyPath}/icon_1000btc.png`),
+  );
+  const achievementsMoney3 = useImage(
+    require(`${achievementsMoneyPath}/icon_10000btc.png`),
+  );
+
   const achievementsAutomationPath = `${achievmentsIconsPath}/Automation`;
-  const achievementsAutomationDa = useImage(require(`${achievementsAutomationPath}/icon_achieveDa.png`));
-  const achievementsAutomationStwo = useImage(require(`${achievementsAutomationPath}/icon_achieveStwo.png`));
+  const achievementsAutomationDa = useImage(
+    require(`${achievementsAutomationPath}/icon_achieveDa.png`),
+  );
+  const achievementsAutomationStwo = useImage(
+    require(`${achievementsAutomationPath}/icon_achieveStwo.png`),
+  );
 
   const achievementsLayerPath = `${achievmentsIconsPath}/Layer1-2`;
-  const achievementsL1Dapps = useImage(require(`${achievementsLayerPath}/icon_l1dapps.png`));
-  const achievementsL1Transactions = useImage(require(`${achievementsLayerPath}/icon_l1transactions.png`));
-  const achievementsL1Upgrades = useImage(require(`${achievementsLayerPath}/icon_l1upgrades.png`));
-  const achievementsL1Blocks1 = useImage(require(`${achievementsLayerPath}/icon_l110blocks.png`));
-  const achievementsL1Blocks2 = useImage(require(`${achievementsLayerPath}/icon_l1100blocks.png`));
-  const achievementsL1Blocks3 = useImage(require(`${achievementsLayerPath}/icon_l11000blocks.png`));
-  const achievementsL2Dapps = useImage(require(`${achievementsLayerPath}/icon_l2dapps.png`));
-  const achievementsL2Transactions = useImage(require(`${achievementsLayerPath}/icon_l2transactions.png`));
-  const achievementsL2Upgrades = useImage(require(`${achievementsLayerPath}/icon_l2upgrades.png`));
-  const achievementsL2Blocks1 = useImage(require(`${achievementsLayerPath}/icon_l210blocks.png`));
-  const achievementsL2Blocks2 = useImage(require(`${achievementsLayerPath}/icon_l2100blocks.png`));
-  const achievementsL2Blocks3 = useImage(require(`${achievementsLayerPath}/icon_l21000blocks.png`));
+  const achievementsL1Dapps = useImage(
+    require(`${achievementsLayerPath}/icon_l1dapps.png`),
+  );
+  const achievementsL1Transactions = useImage(
+    require(`${achievementsLayerPath}/icon_l1transactions.png`),
+  );
+  const achievementsL1Upgrades = useImage(
+    require(`${achievementsLayerPath}/icon_l1upgrades.png`),
+  );
+  const achievementsL1Blocks1 = useImage(
+    require(`${achievementsLayerPath}/icon_l110blocks.png`),
+  );
+  const achievementsL1Blocks2 = useImage(
+    require(`${achievementsLayerPath}/icon_l1100blocks.png`),
+  );
+  const achievementsL1Blocks3 = useImage(
+    require(`${achievementsLayerPath}/icon_l11000blocks.png`),
+  );
+  const achievementsL2Dapps = useImage(
+    require(`${achievementsLayerPath}/icon_l2dapps.png`),
+  );
+  const achievementsL2Transactions = useImage(
+    require(`${achievementsLayerPath}/icon_l2transactions.png`),
+  );
+  const achievementsL2Upgrades = useImage(
+    require(`${achievementsLayerPath}/icon_l2upgrades.png`),
+  );
+  const achievementsL2Blocks1 = useImage(
+    require(`${achievementsLayerPath}/icon_l210blocks.png`),
+  );
+  const achievementsL2Blocks2 = useImage(
+    require(`${achievementsLayerPath}/icon_l2100blocks.png`),
+  );
+  const achievementsL2Blocks3 = useImage(
+    require(`${achievementsLayerPath}/icon_l21000blocks.png`),
+  );
 
   // Prestige icons
   const prestigeIconsPath = `${assetsPath}/prestige`;
-  const prestige1 = useImage(require(`${prestigeIconsPath}/icon_prestige1.png`));
-  const prestige2 = useImage(require(`${prestigeIconsPath}/icon_prestige2.png`));
-  const prestige3 = useImage(require(`${prestigeIconsPath}/icon_prestige3.png`));
-  const prestige4 = useImage(require(`${prestigeIconsPath}/icon_prestige4.png`));
-  const prestige5 = useImage(require(`${prestigeIconsPath}/icon_prestige5.png`));
-  const prestige6 = useImage(require(`${prestigeIconsPath}/icon_prestige6.png`));
-  const prestige7 = useImage(require(`${prestigeIconsPath}/icon_prestige7.png`));
-  const prestige8 = useImage(require(`${prestigeIconsPath}/icon_prestige8.png`));
-  const prestige9 = useImage(require(`${prestigeIconsPath}/icon_prestige9.png`));
-  const prestige10 = useImage(require(`${prestigeIconsPath}/icon_prestige10.png`));
+  const prestige1 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige1.png`),
+  );
+  const prestige2 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige2.png`),
+  );
+  const prestige3 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige3.png`),
+  );
+  const prestige4 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige4.png`),
+  );
+  const prestige5 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige5.png`),
+  );
+  const prestige6 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige6.png`),
+  );
+  const prestige7 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige7.png`),
+  );
+  const prestige8 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige8.png`),
+  );
+  const prestige9 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige9.png`),
+  );
+  const prestige10 = useImage(
+    require(`${prestigeIconsPath}/icon_prestige10.png`),
+  );
 
   const imagesMap: Record<string, ReturnType<typeof useImage>> = {
-    "background": background,
+    background: background,
     "background.grid": backgroundGrid,
     "background.shop": shopBg,
     "balance.l1": balanceL1,
     "balance.l2": balanceL2,
-    "unknown": unknownImage,
+    unknown: unknownImage,
     "tx.button.bg.blue": txButtonBlueEmpty,
     "tx.button.bg.green": txButtonGreenEmpty,
     "tx.button.bg.pink": txButtonPinkEmpty,
