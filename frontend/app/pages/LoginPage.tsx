@@ -10,6 +10,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const LoginPage: React.FC = () => {
   const { getImage } = useImageProvider();
@@ -62,7 +63,9 @@ export const LoginPage: React.FC = () => {
           />
         </Canvas>
       </View>
-      <ActivePage setLoginPage={setLoginPage} />
+      <SafeAreaView>
+        <ActivePage setLoginPage={setLoginPage} />
+      </SafeAreaView>
     </View>
   );
 };

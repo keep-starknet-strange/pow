@@ -229,7 +229,7 @@ export const LeaderboardPage: React.FC = () => {
               >
                 <PFPView user={user.address} attributes={user.nouns} />
               </View>
-              <Text className="text-2xl font-bold text-white font-Pixels">
+              <Text className="text-2xl text-white font-Pixels">
                 {user.name}
               </Text>
             </View>
@@ -251,7 +251,7 @@ export const LeaderboardPage: React.FC = () => {
                 </Canvas>
               </View>
             </View>
-            <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
+            <Text className="text-xl text-white w-[6rem] text-right font-Pixels">
               {shortMoneyString(user.balance)}
             </Text>
           </View>
