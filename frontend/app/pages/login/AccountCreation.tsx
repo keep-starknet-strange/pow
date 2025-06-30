@@ -43,7 +43,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 }) => {
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   const { account } = useStarknetConnector();
-  const { isUsernameUnique, isUsernameValid, usernameValidationError, claimUsername } = useFocEngine();
+  const { isUsernameUnique, isUsernameValid, usernameValidationError, initializeAccount } = useFocEngine();
   const { getImage } = useImageProvider();
 
   const [usernameError, setUsernameError] = React.useState<string>("");
@@ -180,7 +180,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                   setUsernameError("This username is unavailable.");
                   return;
                 }
-                await claimUsername(username);
+                await initializeAccount(username, [`0x` + avatar.head.toString(16), `0x` + avatar.body.toString(16), `0x` + avatar.glasses.toString(16), `0x` + avatar.accessories.toString(16)]);
               }}
               style={{ width: 250 }}
             />

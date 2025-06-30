@@ -41,7 +41,7 @@ type PowContractContextType = {
   ) => Promise<number[] | undefined>;
 };
 
-export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50;
+export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 10;
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(
   undefined,
@@ -72,7 +72,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     provider,
     account,
   } = useStarknetConnector();
-  const { getRegisteredContract, mintFunds } = useFocEngine();
+  const { getRegisteredContract, mintFunds, connectContract } = useFocEngine();
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<
     string | null
@@ -91,6 +91,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
       if (contract) {
         setPowGameContractAddress(contract);
+        connectContract(contract); // TODO: Allow getRegisteredContract args
         const { abi: powGameAbi } = await provider.getClassAt(contract);
         if (powGameAbi) {
           const powGameContract = new Contract(powGameAbi, contract, provider);
@@ -131,6 +132,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
       deployAccount(privateKey, "devnet");
       storePrivateKey(privateKey, "pow_game", "devnet");
+      // TODO: Invoke like else statement with account deployment
       addAction({
         contract: powGameContractAddress,
         action: "init_my_game",
