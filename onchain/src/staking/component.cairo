@@ -78,11 +78,29 @@ pub mod StakingComponent {
             self.staking_config.read()
         }
 
+        fn get_staked_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
+            self.user_stakes.read(user)
+        }
+
+        fn get_reward_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
+            self.user_rewards.read(user)
+        }
+    }
+
+    #[generate_trait]
+    pub impl InternalImpl<
+        TContractState, +HasComponent<TContractState>,
+        > of InternalTrait<TContractState> {
         fn setup_staking(ref self: ComponentState<TContractState>, user: ContractAddress, config: StakingConfig) {
+            assert(config.slashing_config.slash_fraction > 0, 'slash_fraction must be > 0');
+            assert(config.slashing_config.due_time > 0, 'due_time must be > 0');
+            assert(config.reward_rate > 0, 'reward_rate must be > 0');
+            
             self.staking_config.write(config);
             self.emit(StakingConfigUpdate { config: config });
         }
-        fn stake(ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128) {
+        fn stake(ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128, now: u64) {
+            self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, current_stake + amount);
             self.emit(StakeUpdated { user: user, amount });
@@ -96,11 +114,14 @@ pub mod StakingComponent {
         }
         
         fn validate(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) {
+            let user_stake = self.user_stakes.read(user);
+            if user_stake == 0 {
+                return;
+            }
             self.check_timing(now);
             let last_validation = self.user_last_validation.read(user);
             let config = self.staking_config.read();
-            let time_since_last_validation = now - last_validation / config.slashing_config.due_time;
-            let user_stake = self.user_stakes.read(user);
+            let time_since_last_validation = now - last_validation;
             let user_rewards = self.user_rewards.read(user);
             let total_stake = user_stake + user_rewards;
             self.user_last_validation.write(user, now);
@@ -129,17 +150,9 @@ pub mod StakingComponent {
             return current_stake;
         }
 
-        fn get_staked_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
-            self.user_stakes.read(user)
-        }
-
-        fn get_reward_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
-            self.user_rewards.read(user)
-        }
-
         fn check_timing(self: @ComponentState<TContractState>, now: u64) {
             let block_timestamp = get_block_timestamp();
-            let leanience_margin = self.get_staking_config().slashing_config.leanianece_margin;
+            let leanience_margin = self.get_staking_config().slashing_config.leaniance_margin;
             let expected_block_time = 30; // 30 seconds
             assert(now >= block_timestamp - leanience_margin, 'Timestamp too far behind');
             assert(now <= block_timestamp + 2 * expected_block_time, 'Timestamp too far ahead');

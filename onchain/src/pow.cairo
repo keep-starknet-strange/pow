@@ -46,7 +46,9 @@ mod PowGame {
     use pow_game::staking::component::StakingComponent;
     use pow_game::staking::StakingConfig;
     component!(path: StakingComponent, storage: staking, event: StakingEvent);
+    #[abi(embed_v0)]
     impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
+    impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
 
     // -- Admin Components --
 
@@ -399,10 +401,10 @@ mod PowGame {
             self.reset_proof(chain_id);
         }
 
-        fn stake_tokens(ref self: ContractState, amount: u128) {
+        fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
             let caller = get_caller_address();
             debit_user(ref self, caller, amount);
-            self.staking.stake(caller, amount);
+            self.staking.stake(caller, amount, now);
         }
 
         fn claim_staking_rewards(ref self: ContractState){
@@ -411,14 +413,14 @@ mod PowGame {
             pay_user(ref self, caller, reward);
         }
 
-        fn validate_stake(ref self: ContractState) {
+        fn validate_stake(ref self: ContractState, now: u64) {
             let caller = get_caller_address();
-            self.staking.validate(caller);
+            self.staking.validate(caller, now);
         }
         
-        fn withdraw_staked_tokens(ref self: ContractState) {
+        fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
             let caller = get_caller_address();
-            let withdrawal = self.staking.withdraw_stake(caller);
+            let withdrawal = self.staking.withdraw_stake(caller, now);
             pay_user(ref self, caller, withdrawal);
         }
     }
