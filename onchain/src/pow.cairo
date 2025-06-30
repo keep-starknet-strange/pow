@@ -7,41 +7,61 @@ mod PowGame {
     use pow_game::types::RewardParams;
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
-    // Import the components
-    use pow_game::upgrades::component::PowUpgradesComponent;
-    use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess,
+   // --- External Dependencies ---
+    use starknet::{
+        ContractAddress, get_caller_address, ClassHash,
+        storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess},
     };
-    use starknet::{ContractAddress, get_caller_address, ClassHash};
+    use openzeppelin_upgrades::interface::IUpgradeable;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_security::PausableComponent;
+
+    // --- Game Components ---
+
+    // Upgrades
+    use pow_game::upgrades::component::PowUpgradesComponent;
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
-    impl PowUpgradesComponentImpl =
-        PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+    impl PowUpgradesComponentImpl = PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+
+    // Transactions
     use pow_game::transactions::component::PowTransactionsComponent;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
-    impl PowTransactionsComponentImpl =
-        PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+    impl PowTransactionsComponentImpl = PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+
+    // Prestige
     use pow_game::prestige::component::PrestigeComponent;
     component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
     #[abi(embed_v0)]
     impl PrestigeComponentImpl = PrestigeComponent::PrestigeImpl<ContractState>;
+
+    // Builder
     use pow_game::builder::component::BuilderComponent;
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
 
-    use openzeppelin_upgrades::interface::IUpgradeable;
-    use openzeppelin_upgrades::UpgradeableComponent;
-    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
-    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+    // Staking
+    use pow_game::staking::component::StakingComponent;
+    use pow_game::staking::StakingConfig;
+    component!(path: StakingComponent, storage: staking, event: StakingEvent);
+    #[abi(embed_v0)]
+    impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
+    impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
 
-    use openzeppelin_security::PausableComponent;
+    // -- Admin Components --
+
+    // Upgradability
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
+
+    // Pausability
     component!(path: PausableComponent, storage: pausable, event: PausableEvent);
     #[abi(embed_v0)]
     impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
     impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
+
 
     #[storage]
     struct Storage {
@@ -65,6 +85,8 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
+        #[substorage(v0)]
+        staking: StakingComponent::Storage,
         #[substorage(v0)]
         upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
@@ -112,6 +134,8 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
+        #[flat]
+        StakingEvent: StakingComponent::Event,
          #[flat]
         UpgradeableEvent: UpgradeableComponent::Event,
          #[flat]
@@ -165,6 +189,11 @@ mod PowGame {
             // TODO: Add host that cannot be removed?
             self.check_valid_game_master(get_caller_address());
             self.game_masters.write(user, false);
+        }
+
+        fn setup_staking_config(ref self: ContractState, user: ContractAddress, config: StakingConfig) {
+            self.check_valid_game_master(get_caller_address());
+            self.staking.setup_staking(user, config);
         }
 
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
@@ -370,6 +399,29 @@ mod PowGame {
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
 
             self.reset_proof(chain_id);
+        }
+
+        fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
+            let caller = get_caller_address();
+            debit_user(ref self, caller, amount);
+            self.staking.stake(caller, amount, now);
+        }
+
+        fn claim_staking_rewards(ref self: ContractState){
+            let caller = get_caller_address();
+            let reward = self.staking.claim_rewards(caller);
+            pay_user(ref self, caller, reward);
+        }
+
+        fn validate_stake(ref self: ContractState, now: u64) {
+            let caller = get_caller_address();
+            self.staking.validate(caller, now);
+        }
+        
+        fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
+            let caller = get_caller_address();
+            let withdrawal = self.staking.withdraw_stake(caller, now);
+            pay_user(ref self, caller, withdrawal);
         }
     }
 

@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use pow_game::types::RewardParams;
+use pow_game::staking::{StakingConfig};
 
 // Game configuration & state
 #[starknet::interface]
@@ -10,6 +11,7 @@ pub trait IPowGame<TContractState> {
     fn set_max_chain_id(ref self: TContractState, chain_id: u32);
     fn add_game_master(ref self: TContractState, user: ContractAddress);
     fn remove_game_master(ref self: TContractState, user: ContractAddress);
+    fn setup_staking_config(ref self: TContractState, user: ContractAddress, config: StakingConfig);
 
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
 }
