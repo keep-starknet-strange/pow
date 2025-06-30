@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import moneyImg from "../../../assets/images/money.png";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { useUpgrades } from "../../context/Upgrades";
-import { getUpgradeIcons } from "../../utils/upgrades";
 import { shortMoneyString } from "../../utils/helpers";
+import { IconWithLock } from "./transactionUpgrade/IconWithLock";
+import { TxDetails } from "./transactionUpgrade/TxDetails";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
+import { useImageProvider } from "../../context/ImageProvider";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -11,64 +18,81 @@ export type UpgradeViewProps = {
 };
 
 export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
+  const { getImage } = useImageProvider();
+  const { width } = Dimensions.get("window");
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();
 
   const [level, setLevel] = useState(0);
-  const [upgradeIcon, setUpgradeIcon] = useState(
-    getUpgradeIcons(props.chainId)[props.upgrade.name],
-  );
   useEffect(() => {
     setLevel(upgrades[props.chainId][props.upgrade.id] + 1 || 0);
-    setUpgradeIcon(getUpgradeIcons(props.chainId)[props.upgrade.name]);
   }, [props.chainId, props.upgrade, upgrades]);
 
+  const getUpgradeIcon = (chainId: number, upgradeName: string) => {
+    switch (upgradeName) {
+      case "Block Difficulty":
+        return "shop.upgrades.blockDifficulty";
+      case "Block Reward":
+        return "shop.upgrades.blockReward";
+      case "Block Size":
+        return "shop.upgrades.blockSize";
+      case "MEV Boost":
+        return "shop.upgrades.mevBoost";
+      default:
+        return "unknown";
+    }
+  };
+
   return (
-    <View className="flex flex-row w-full items-center">
-      <View
-        className="flex flex-col justify-center items-center p-1
-                       rounded-full border-2 border-[#e7e7e740] relative"
-        style={{ backgroundColor: props.upgrade.color }}
-      >
-        <Image
-          source={upgradeIcon}
-          className="w-[3.6rem] h-[3.6rem] rounded-full"
+    <View className="flex flex-col w-full">
+      <View className="flex flex-row w-full mb-[4px]">
+        <IconWithLock
+          txIcon={getUpgradeIcon(props.chainId, props.upgrade.name)}
+          locked={false}
         />
-        <Text
-          className="absolute bottom-[-0.5rem] text-center px-1 w-[3.6rem]
-                     border-2 border-[#e7e7e740] rounded-xl
-                    text-[#171717] text-sm font-bold"
-          style={{
-            backgroundColor: props.upgrade.color.substring(0, 7) + "f0",
-          }}
-        >
-          {level}/{props.upgrade.costs.length}
-        </Text>
-      </View>
-      <View className="flex flex-col justify-start items-start ml-2 gap-1 flex-1">
-        <Text className="text-[#e7e7e7] text-xl font-bold">
-          {props.upgrade.name}
-        </Text>
-        <Text className="text-[#e7e7e7] text-md">
-          {props.upgrade.description}
-        </Text>
+        <TxDetails
+          name={props.upgrade.name}
+          description={props.upgrade.description}
+        />
       </View>
       <TouchableOpacity
-        className="flex justify-center items-center bg-[#e7e7e730]
-                   rounded-lg p-2 relative border-2 border-[#e7e7e740]"
+        className="relative"
+        style={{
+          width: width - 32,
+          height: 36,
+        }}
         onPress={() => {
           upgrade(props.chainId, props.upgrade.id);
         }}
       >
-        <Image source={moneyImg} className="w-[3rem] h-[3rem]" />
-        <Text
-          className="absolute top-[-1rem] text-center px-1 w-[3.6rem]
-                     border-2 border-[#e7e7e740] rounded-xl
-                     text-[#171717] text-sm font-bold bg-[#e7e760f0]"
-        >
-          {level === props.upgrade.costs.length
-            ? "MAX"
-            : `${shortMoneyString(getNextUpgradeCost(props.chainId, props.upgrade.id))}`}
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage("shop.auto.buy")}
+            fit="fill"
+            x={0}
+            y={0}
+            width={width - 32}
+            height={36}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.None,
+            }}
+          />
+        </Canvas>
+        <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
+          Purchase Upgrade
         </Text>
+        {level === props.upgrade.costs.length ? (
+          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">
+            Max
+          </Text>
+        ) : (
+          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
+            Cost:{" "}
+            {shortMoneyString(
+              getNextUpgradeCost(props.chainId, props.upgrade.id),
+            )}
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );

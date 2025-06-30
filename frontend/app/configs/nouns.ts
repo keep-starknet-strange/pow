@@ -58,3 +58,17 @@ export const getRandomNounsAttributes = (): NounsAttributes => {
   };
   return randomAttributes;
 };
+
+export const createNounsAttributes = (
+  head: number,
+  body: number,
+  glasses: number,
+  accessories: number,
+): NounsAttributes => {
+  return {
+    head,
+    body,
+    glasses,
+    accessories,
+  };
+};

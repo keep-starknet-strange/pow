@@ -20,7 +20,8 @@ export type EventType =
   | "L2Purchased"
   | "PrestigePurchased"
   | "TxAdded"
-  | "AchievementCompleted";
+  | "AchievementCompleted"
+  | "SwitchPage";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): void;

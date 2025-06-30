@@ -1,54 +1,72 @@
 {
   "MineClicked": {
     "volume": 0.4,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Heavy"
   },
   "MineDone": {
     "volume": 0.7,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Success"
   },
   "SequenceClicked": {
     "volume": 0.5,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Heavy"
   },
   "SequenceDone": {
     "volume": 0.4,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Success"
   },
   "ProveClicked": {
     "volume": 0.1,
-    "rate": 0.8
+    "rate": 0.8,
+    "haptic": "Rigid"
   },
   "ProveDone": {
     "volume": 0.4,
-    "rate": 1
+    "rate": 1,
+    "haptic": "Success"
   },
   "DaClicked": {
     "volume": 0.3,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Rigid"
   },
   "DaDone": {
     "volume": 0.3,
-    "rate": 1.2
+    "rate": 1.2,
+    "haptic": "Success"
   },
   "ItemPurchased": {
     "volume": 0.5,
-    "rate": 1
+    "rate": 1,
+    "haptic": "Soft"
   },
   "BuyFailed": {
     "volume": 1,
-    "rate": 1
+    "rate": 1,
+    "haptic": "Error"
   },
   "TxAdded": {
     "volume": 1,
-    "rate": 1
+    "rate": 1,
+    "haptic": "Medium"
   },
   "AchievementCompleted": {
     "volume": 1,
-    "rate": 1.1
+    "rate": 1.1,
+    "haptic": "Soft"
   },
   "BasicClick": {
     "volume": 0.5,
-    "rate": 1
+    "rate": 1,
+    "haptic": "None"
+  },
+  "SwitchPage": {
+    "volume": 0.5,
+    "rate": 1,
+    "haptic": "Light"
   }
 }

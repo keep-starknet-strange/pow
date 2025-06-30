@@ -4,7 +4,7 @@ export const shortMoneyString = (
 ): string => {
   const absValue = Math.abs(value);
   if (absValue < 1e3) {
-    return includeSymbol ? `₿${value.toFixed(2)}` : value.toFixed(2);
+    return includeSymbol ? `₿${value.toFixed(0)}` : value.toFixed(0);
   } else if (absValue < 1e6) {
     return includeSymbol
       ? `₿${(value / 1e3).toFixed(1)}K`

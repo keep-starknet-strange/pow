@@ -67,16 +67,17 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
     getNextDappSpeedCost,
   ]);
   return (
-    <View className="flex flex-row w-full items-center">
-      <IconWithLock
-        source={txIcon}
-        color={props.txData.color}
-        locked={txFeeLevel === -1}
-      />
-      <TxDetails
-        name={props.txData.name}
-        description={props.txData.description}
-      />
+    <View className="flex flex-col w-full">
+      <View className="flex flex-row w-full mb-[4px]">
+        <IconWithLock
+          txIcon={getTxIcon(props.chainId, props.txData.id, props.isDapp)}
+          locked={txFeeLevel === -1}
+        />
+        <TxDetails
+          name={props.txData.name}
+          description={props.txData.description}
+        />
+      </View>
       <TransactionUpgradeActions
         locked={txFeeLevel === -1}
         nextCost={nextTxFeeCost}

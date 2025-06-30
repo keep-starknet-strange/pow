@@ -11,6 +11,7 @@ import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../context/Tutorial";
 import { Block } from "../types/Chains";
+import { getTxIcon } from "../utils/transactions";
 import {
   Canvas,
   Image as SkiaImg,
@@ -65,43 +66,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   }, [props.block?.transactions.length]);
 
   const maxBlockSize = getUpgradeValue(props.chainId, "Block Size") ** 2;
-
-  const getTxIcon = (chainId: number, typeId: number) => {
-    switch (chainId) {
-      case 0:
-        switch (typeId) {
-          case 0:
-            return getImage("block.icon.tx");
-          case 1:
-            return getImage("block.icon.tx");
-          case 2:
-            return getImage("block.icon.blob");
-          case 3:
-            return getImage("block.icon.nft");
-          case 4:
-            return getImage("block.icon.nft");
-          default:
-            return getImage("unknown");
-        }
-      case 1:
-        switch (typeId) {
-          case 0:
-            return getImage("block.icon.tx");
-          case 1:
-            return getImage("block.icon.tx");
-          case 2:
-            return getImage("block.icon.blob");
-          case 3:
-            return getImage("block.icon.nft");
-          case 4:
-            return getImage("block.icon.nft");
-          default:
-            return getImage("unknown");
-        }
-      default:
-        return getImage("unknown");
-    }
-  };
 
   const getTxImg = (chainId: number, typeId: number) => {
     switch (chainId) {
@@ -193,7 +157,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                   <View className="absolute top-0 left-0 w-full h-full">
                     <Canvas style={{ flex: 1 }} className="w-full h-full">
                       <SkiaImg
-                        image={getTxIcon(props.chainId, tx.typeId)}
+                        image={getImage(getTxIcon(props.chainId, tx.typeId))}
                         fit="contain"
                         sampling={{
                           filter: FilterMode.Nearest,
@@ -268,11 +232,13 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 <View className="absolute top-0 left-0 w-full h-full">
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <SkiaImg
-                      image={getTxIcon(
-                        props.chainId,
-                        props.block?.transactions[
-                          props.block?.transactions.length - 1
-                        ].typeId || 0,
+                      image={getImage(
+                        getTxIcon(
+                          props.chainId,
+                          props.block?.transactions[
+                            props.block?.transactions.length - 1
+                          ].typeId || 0,
+                        ),
                       )}
                       fit="contain"
                       sampling={{
