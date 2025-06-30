@@ -105,9 +105,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/b-j-roberts"><img src="https://avatars.githubusercontent.com/u/54774639?v=4?s=100" width="100px;" alt="Brandon R"/><br /><sub><b>Brandon R</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/raito/commits?author=b-j-roberts" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZackAttax"><img src="https://avatars.githubusercontent.com/u/77751416?v=4?s=100" width="100px;" alt="ZackAttax"/><br /><sub><b>ZackAttax</b></sub></a><br /><a href="https://github.com/ZackAttax" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/0xsisyfos"><img src="https://avatars.githubusercontent.com/u/107465625?v=4?s=100" width="100px;" alt="0xsisyfos"/><br /><sub><b>0xsisyfos</b></sub></a><br /><a href="https://github.com/0xsisyfos" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/b-j-roberts"><img src="https://avatars.githubusercontent.com/u/54774639?v=4?s=100" width="100px;" alt="Brandon R"/><br /><sub><b>Brandon R</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/pow/commits?author=b-j-roberts" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZackAttax"><img src="https://avatars.githubusercontent.com/u/77751416?v=4?s=100" width="100px;" alt="ZackAttax"/><br /><sub><b>ZackAttax</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/pow/commits?author=ZackAttax" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/0xsisyfos"><img src="https://avatars.githubusercontent.com/u/107465625?v=4?s=100" width="100px;" alt="0xsisyfos"/><br /><sub><b>0xsisyfos</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/pow/commits?author=0xsisyfos" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Aleksefo"><img src="https://avatars.githubusercontent.com/u/18084119?v=4?s=100" width="100px;" alt="Aleksefo"/><br /><sub><b>Aleksefo</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/pow/commits?author=Aleksefo" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/micbakos"><img src="https://avatars.githubusercontent.com/u/6217006?v=4?s=100" width="100px;" alt="micbakos"/><br /><sub><b>micbakos</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/pow/commits?author=micbakos" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
