@@ -164,14 +164,14 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const stopMusic = async () => {
       try {
-        await currentMusic?.stopAsync()
+        await currentMusic?.stopAsync();
       } catch (error) {
         console.error("Failed to stop music:", error);
       }
     };
 
     if (isMusicOn && !isPlayingMusic) {
-      playMusic()
+      playMusic();
     } else if (!isMusicOn && isPlayingMusic) {
       stopMusic();
     }
@@ -181,16 +181,16 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
     currentMusic?.setOnPlaybackStatusUpdate((status) => {
       let isPlaying = false;
       if (status.isLoaded) {
-        isPlaying = status.isPlaying
+        isPlaying = status.isPlaying;
       }
-      
-      setIsPlayingMusic(isPlaying)
+
+      setIsPlayingMusic(isPlaying);
     });
 
     return currentMusic
       ? () => {
-        currentMusic.unloadAsync();
-      }
+          currentMusic.unloadAsync();
+        }
       : undefined;
   }, [currentMusic]);
 
