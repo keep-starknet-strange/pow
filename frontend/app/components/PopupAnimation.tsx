@@ -29,7 +29,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
 
   return (
     <Animated.View
-      className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center z-[3]"
+      className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center"
       style={{
         transform: [
           {
