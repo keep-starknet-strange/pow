@@ -9,6 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import soundsJson from "../configs/sounds.json";
 import * as Haptics from "expo-haptics";
+import { Sound } from "expo-av/build/Audio";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -140,12 +141,12 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
   // Music
   const song1Source = require("../../assets/music/the-return-of-the-8-bit-era-301292.mp3");
   const song2Source = require("../../assets/music/jungle-ish-beat-for-video-games-314073.mp3");
-  const [currentMusic, setCurrentMusic] = useState<any>(null);
+  const [currentMusic, setCurrentMusic] = useState<Sound | null>(null);
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+
   // Start music playback
   useEffect(() => {
     const playMusic = async () => {
-      if (!isMusicOn) return;
-
       try {
         const { sound: musicSound } = await Audio.Sound.createAsync(
           song1Source,
@@ -161,13 +162,35 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    playMusic();
-  }, [isMusicOn, musicVolume]);
+    const stopMusic = async () => {
+      try {
+        await currentMusic?.stopAsync()
+      } catch (error) {
+        console.error("Failed to stop music:", error);
+      }
+    };
+
+    if (isMusicOn && !isPlayingMusic) {
+      playMusic()
+    } else if (!isMusicOn && isPlayingMusic) {
+      stopMusic();
+    }
+  }, [isMusicOn, isPlayingMusic, musicVolume]);
+
   useEffect(() => {
+    currentMusic?.setOnPlaybackStatusUpdate((status) => {
+      let isPlaying = false;
+      if (status.isLoaded) {
+        isPlaying = status.isPlaying
+      }
+      
+      setIsPlayingMusic(isPlaying)
+    });
+
     return currentMusic
       ? () => {
-          currentMusic.unloadAsync();
-        }
+        currentMusic.unloadAsync();
+      }
       : undefined;
   }, [currentMusic]);
 
