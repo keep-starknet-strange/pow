@@ -17,6 +17,7 @@ import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../context/Tutorial";
 import { shortMoneyString } from "../../utils/helpers";
+import transactionConfig from  "../../configs/transactions.json";
 import { PopupAnimation } from "../../components/PopupAnimation";
 import {
   Canvas,
@@ -49,7 +50,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     dappFeeUpgrade,
   } = useTransactions();
   const enabled =
-    props.txType.name === "Transfer" && props.chainId === 0 && !props.isDapp;
+    props.txType.name === transactionConfig.L1[0].name && props.chainId === 0 && !props.isDapp;
   const { ref, onLayout } = useTutorialLayout(
     "firstTransactionButton" as TargetId,
     enabled,
