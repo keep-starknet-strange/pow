@@ -6,10 +6,10 @@ import React, {
   useCallback,
 } from "react";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export type InAppNotificationType = {
-  id: string,
+  id: string;
   notificationTypeId: number;
   message: string;
 };
@@ -50,7 +50,11 @@ export const InAppNotificationsProvider: React.FC<{
           message ||
           inAppNotificationsJson[notificationTypeId].message ||
           "Unknown notification type";
-        const newNotification = { id: uuidv4(), notificationTypeId, message: notifMsg };
+        const newNotification = {
+          id: uuidv4(),
+          notificationTypeId,
+          message: notifMsg,
+        };
         if (prev.length >= notificationLimit) {
           // Remove the oldest notification
           return [...prev.slice(1), newNotification];
@@ -61,18 +65,19 @@ export const InAppNotificationsProvider: React.FC<{
     [],
   );
 
-  const clearInAppNotification = useCallback(
-    (id: string) => {
-      setInAppNotifications((prev) => {
-        return prev.filter((n) => n.id !== id)
-      })
-    },
-    []
-  );
+  const clearInAppNotification = useCallback((id: string) => {
+    setInAppNotifications((prev) => {
+      return prev.filter((n) => n.id !== id);
+    });
+  }, []);
 
   return (
     <InAppNotificationsContext.Provider
-      value={{ inAppNotifications, sendInAppNotification, clearInAppNotification }}
+      value={{
+        inAppNotifications,
+        sendInAppNotification,
+        clearInAppNotification,
+      }}
     >
       {children}
     </InAppNotificationsContext.Provider>
