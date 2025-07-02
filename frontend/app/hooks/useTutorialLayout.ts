@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect } from "react";
 import { View, InteractionManager, Platform } from "react-native";
-import { useTutorial, TargetId } from "../context/Tutorial";
+import { useTutorial, TargetId } from "../stores/useTutorialStore";
 import tutorialConfig from "../configs/tutorial.json";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

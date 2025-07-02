@@ -9,7 +9,7 @@ import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
 import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../context/Tutorial";
+import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
 import { getTxIcon } from "../utils/transactions";
 import {

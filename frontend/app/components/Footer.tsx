@@ -1,5 +1,5 @@
-import { Text, View, TouchableOpacity } from "react-native";
-import { TargetId } from "../context/Tutorial";
+import { View, TouchableOpacity } from "react-native";
+import { TargetId } from "../stores/useTutorialStore";
 import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import {

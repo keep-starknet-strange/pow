@@ -15,7 +15,7 @@ import { useImageProvider } from "../../context/ImageProvider";
 import { newTransaction } from "../../types/Chains";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "../../context/Tutorial";
+import { TargetId } from "../../stores/useTutorialStore";
 import { shortMoneyString } from "../../utils/helpers";
 import transactionConfig from "../../configs/transactions.json";
 import { PopupAnimation } from "../../components/PopupAnimation";

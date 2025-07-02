@@ -2,7 +2,7 @@ import { Animated, Text, useAnimatedValue, View } from "react-native";
 import {
   InAppNotificationType,
   useInAppNotifications,
-} from "../context/InAppNotifications";
+} from "../stores/useInAppNotificationsStore";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect, useRef, useState } from "react";
