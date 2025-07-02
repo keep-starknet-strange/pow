@@ -6,8 +6,10 @@ import React, {
   useCallback,
 } from "react";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
+import { v4 as uuidv4 } from "uuid";
 
 export type InAppNotificationType = {
+  id: string;
   notificationTypeId: number;
   message: string;
 };
@@ -15,6 +17,7 @@ export type InAppNotificationType = {
 type InAppNotificationsContextType = {
   inAppNotifications: InAppNotificationType[];
   sendInAppNotification: (notificationTypeId: number, message?: string) => void;
+  clearInAppNotification: (id: string) => void;
 };
 
 const InAppNotificationsContext = React.createContext<
@@ -47,7 +50,11 @@ export const InAppNotificationsProvider: React.FC<{
           message ||
           inAppNotificationsJson[notificationTypeId].message ||
           "Unknown notification type";
-        const newNotification = { notificationTypeId, message: notifMsg };
+        const newNotification = {
+          id: uuidv4(),
+          notificationTypeId,
+          message: notifMsg,
+        };
         if (prev.length >= notificationLimit) {
           // Remove the oldest notification
           return [...prev.slice(1), newNotification];
@@ -58,24 +65,19 @@ export const InAppNotificationsProvider: React.FC<{
     [],
   );
 
-  useEffect(() => {
-    // Clear notifications after a certain period
-    const timer = setTimeout(() => {
-      setInAppNotifications((prev) => {
-        // Trim the oldest notification
-        if (prev.length > 0) {
-          return prev.slice(1);
-        }
-        return prev;
-      });
-    }, 1500); // Adjust the timeout duration as needed
-
-    return () => clearTimeout(timer);
-  }, [inAppNotifications]);
+  const clearInAppNotification = useCallback((id: string) => {
+    setInAppNotifications((prev) => {
+      return prev.filter((n) => n.id !== id);
+    });
+  }, []);
 
   return (
     <InAppNotificationsContext.Provider
-      value={{ inAppNotifications, sendInAppNotification }}
+      value={{
+        inAppNotifications,
+        sendInAppNotification,
+        clearInAppNotification,
+      }}
     >
       {children}
     </InAppNotificationsContext.Provider>

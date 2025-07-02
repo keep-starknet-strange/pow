@@ -1,42 +1,98 @@
-import { Text, View } from "react-native";
-import { useInAppNotifications } from "../context/InAppNotifications";
+import { Animated, Text, useAnimatedValue, View } from "react-native";
+import {
+  InAppNotificationType,
+  useInAppNotifications,
+} from "../context/InAppNotifications";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect, useRef, useState } from "react";
+
+const HEADER_HEIGHT = 76;
 
 export const InAppNotification = () => {
-  const { inAppNotifications } = useInAppNotifications();
+  const { inAppNotifications, clearInAppNotification } =
+    useInAppNotifications();
+  const [activeNotification, setActiveNotification] =
+    useState<InAppNotificationType | null>(null);
   const insets = useSafeAreaInsets();
 
-  // TODO: Animation
+  const opacityAnimation = useAnimatedValue(0);
+  const translationAnimation = useAnimatedValue(-HEADER_HEIGHT);
+
+  useEffect(() => {
+    setActiveNotification(inAppNotifications[0]);
+  }, [inAppNotifications]);
+
+  useEffect(() => {
+    if (activeNotification != null) {
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(translationAnimation, {
+            toValue: 0,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+          Animated.timing(translationAnimation, {
+            delay: 800,
+            toValue: -HEADER_HEIGHT,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(opacityAnimation, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacityAnimation, {
+            delay: 600,
+            toValue: 0,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => {
+        if (activeNotification) {
+          clearInAppNotification(activeNotification.id);
+        }
+      });
+    }
+  }, [opacityAnimation, activeNotification]);
+
   // TODO: Improve flow when multiple notifications are present
   return (
     <View
       style={{
-        paddingTop: insets.top,
+        marginTop: insets.top + HEADER_HEIGHT,
+        position: "absolute",
+        zIndex: 100,
+        width: "100%",
+        alignItems: "center",
       }}
-      className="absolute top-0 right-0 z-[100] w-[65%]"
     >
-      {inAppNotifications.length > 0 && (
-        <View
-          className="my-2 py-3 px-2 bg-[#10111908]
-                         border-2 border-r-0 rounded-l-lg"
+      {activeNotification && (
+        <Animated.View
+          className="my-2 py-3 px-2 bg-[#1011198b] border-2 rounded"
           style={{
             borderColor:
-              inAppNotificationsJson[inAppNotifications[0].notificationTypeId]
+              inAppNotificationsJson[activeNotification.notificationTypeId]
                 .color || "#101119b0",
+            opacity: opacityAnimation,
+            transform: [{ translateY: translationAnimation }],
           }}
         >
           <Text
             className="text-md font-bold text-nowrap"
             style={{
               color:
-                inAppNotificationsJson[inAppNotifications[0].notificationTypeId]
+                inAppNotificationsJson[activeNotification.notificationTypeId]
                   .color || "#101119b0",
             }}
           >
-            {inAppNotifications[0].message}
+            {inAppNotifications[0]?.message}
           </Text>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
