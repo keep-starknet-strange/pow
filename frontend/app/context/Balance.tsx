@@ -27,13 +27,13 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { notify } = useEventManager();
   const { user, getLatestEventWith } = useFocEngine();
-  const { powGameContractAddress, getUserBalance } = usePowContractConnector();
+  const { powContract, getUserBalance } = usePowContractConnector();
   // TODO: balance to bigint?
   const [balance, setBalance] = useState<number>(0);
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           /*
            * TODO: Use Foc Engine?
@@ -46,11 +46,13 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
         } catch (error) {
           console.error("Error fetching balance:", error);
         }
+      } else {
+        setBalance(0);
       }
     };
 
     fetchBalance();
-  }, [powGameContractAddress, user, getLatestEventWith]);
+  }, [powContract, user, getLatestEventWith]);
 
   const updateBalance = (change: number) => {
     setBalance((prevBalance) => {

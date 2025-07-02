@@ -61,7 +61,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   const { notify } = useEventManager();
   const { updateBalance, tryBuy } = useBalance();
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserBlockNumber, getUserBlockState, getUserMaxChainId, initMyGame } = usePowContractConnector();
+  const { powContract, getUserBlockNumber, getUserBlockState, getUserMaxChainId, initMyGame } = usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
   const { addBlock, addChain } = useChains();
 
@@ -77,7 +77,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const fetchGameState = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const maxChainId = await getUserMaxChainId() || 0;
@@ -127,6 +127,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error fetching game state:", error);
           resetGameState();
         }
+      } else {
+        resetGameState();
       }
     };
     fetchGameState();
@@ -138,7 +140,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     getNewGameState();
     */
-  }, [powGameContractAddress, user]);
+  }, [powContract, user]);
 
   const getWorkingBlock = useCallback(
     (chainId: number) => {

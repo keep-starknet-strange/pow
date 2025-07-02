@@ -61,7 +61,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { tryBuy } = useBalance();
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powGameContractAddress, getUserTxFeeLevels, getUserTxSpeedLevels } =
+  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } =
     usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
 
@@ -195,7 +195,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const fetchTransactionSpeeds = async () => {
       if (!user) return;
-      if (!powGameContractAddress) return;
+      if (!powContract) return;
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
@@ -329,7 +329,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchTransactionSpeeds();
   }, [
     user,
-    powGameContractAddress,
+    powContract,
     getUniqueEventsWith,
     getUserTxFeeLevels,
     getUserTxSpeedLevels,

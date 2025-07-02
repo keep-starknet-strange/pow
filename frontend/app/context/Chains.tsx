@@ -28,7 +28,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [chains, setChains] = useState<Chain[]>([newChain(0)]);
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserBlockNumber, getUserMaxChainId } = usePowContractConnector();
+  const { powContract, getUserBlockNumber, getUserMaxChainId } = usePowContractConnector();
 
   const resetChains = () => {
     setChains([newChain(0)]);
@@ -36,7 +36,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const fetchChainState = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const maxChainId = await getUserMaxChainId() || 0;
@@ -79,6 +79,8 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Error fetching chain state:", error);
           resetChains();
         }
+      } else {
+        resetChains();
       }
     }
     fetchChainState();
@@ -90,7 +92,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     getNewGameState();
     */
-  }, [powGameContractAddress, user]);
+  }, [powContract, user, getUserBlockNumber, getUserMaxChainId]);
 
   const getChain = (chainId: number) => {
     return chains[chainId] || null;
