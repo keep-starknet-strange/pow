@@ -13,7 +13,7 @@ import { useStaking } from "../context/Staking";
 import { useEventManager } from "../context/EventManager";
 import { useImageProvider } from "../context/ImageProvider";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../context/Tutorial";
+import { TargetId } from "../stores/useTutorialStore";
 import {
   Canvas,
   Image,

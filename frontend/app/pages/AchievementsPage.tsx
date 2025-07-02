@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useAchievement } from "../context/Achievements";
+import { useAchievement } from "../stores/useAchievementsStore";
 import { useImageProvider } from "../context/ImageProvider";
 import achievementJson from "../configs/achievements.json";
 import {

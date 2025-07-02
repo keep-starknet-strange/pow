@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, Dimensions } from "react-native";
 import { useChains } from "../../context/Chains";
 import { useTransactions } from "../../context/Transactions";
 import { useGame } from "../../context/Game";
@@ -9,9 +9,6 @@ import { EmptyBlockView } from "../../components/EmptyBlockView";
 import { WorkingBlockView } from "../../components/WorkingBlockView";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
-import { L2Unlock } from "../../components/store/L2Unlock";
-import { useTutorialLayout } from "../../hooks/useTutorialLayout";
-import { TargetId } from "../../context/Tutorial";
 import {
   Canvas,
   Image,
@@ -27,8 +24,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
   const { chains, getLatestBlock } = useChains();
   const { dappsUnlocked } = useTransactions();
   const { getImage } = useImageProvider();
-  const { ref, onLayout } = useTutorialLayout("manageL2" as TargetId, true);
-  const { l2 } = useGame();
+  const window = Dimensions.get("window");
 
   return (
     <View className="flex flex-col items-center h-full">
@@ -53,7 +49,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
             fit="fill"
             x={0}
             y={0}
-            width={402}
+            width={window.width}
             height={200}
             sampling={{
               filter: FilterMode.Nearest,

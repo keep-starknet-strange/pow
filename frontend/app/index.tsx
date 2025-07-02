@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { EventManagerProvider } from "./context/EventManager";
-import { InAppNotificationsProvider } from "./context/InAppNotifications";
-import { SoundProvider } from "./context/Sound";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
@@ -13,8 +11,6 @@ import { ChainsProvider } from "./context/Chains";
 import { StakingProvider } from "./context/Staking";
 import { ImageProvider } from "./context/ImageProvider";
 import { GameProvider } from "./context/Game";
-import { AchievementProvider } from "./context/Achievements";
-import { TutorialProvider } from "./context/Tutorial";
 import Game from "./game";
 
 export default function App() {
@@ -37,35 +33,27 @@ export default function App() {
 
   return (
     <EventManagerProvider>
-      <InAppNotificationsProvider>
-        <TutorialProvider>
-          <SoundProvider>
-            <StarknetConnectorProvider>
-              <FocEngineProvider>
-                <PowContractProvider>
-                  <BalanceProvider>
-                    <UpgradesProvider>
-                      <ChainsProvider>
-                        <StakingProvider>
-                          <GameProvider>
-                            <TransactionsProvider>
-                              <AchievementProvider>
-                                <ImageProvider>
-                                  <Game />
-                                </ImageProvider>
-                              </AchievementProvider>
-                            </TransactionsProvider>
-                          </GameProvider>
-                        </StakingProvider>
-                      </ChainsProvider>
-                    </UpgradesProvider>
-                  </BalanceProvider>
-                </PowContractProvider>
-              </FocEngineProvider>
-            </StarknetConnectorProvider>
-          </SoundProvider>
-        </TutorialProvider>
-      </InAppNotificationsProvider>
+      <StarknetConnectorProvider>
+        <FocEngineProvider>
+          <PowContractProvider>
+            <BalanceProvider>
+              <UpgradesProvider>
+                <ChainsProvider>
+                  <StakingProvider>
+                    <GameProvider>
+                      <TransactionsProvider>
+                        <ImageProvider>
+                          <Game />
+                        </ImageProvider>
+                      </TransactionsProvider>
+                    </GameProvider>
+                  </StakingProvider>
+                </ChainsProvider>
+              </UpgradesProvider>
+            </BalanceProvider>
+          </PowContractProvider>
+        </FocEngineProvider>
+      </StarknetConnectorProvider>
     </EventManagerProvider>
   );
 }

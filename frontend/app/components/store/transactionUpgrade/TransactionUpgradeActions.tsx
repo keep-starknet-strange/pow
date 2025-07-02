@@ -1,8 +1,7 @@
 import { View } from "react-native";
 import { UpgradeButton } from "./UpgradeButton";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/context/Tutorial";
-import { shortMoneyString } from "../../../utils/helpers";
+import { TargetId } from "@/app/stores/useTutorialStore";
 
 type ActionsProps = {
   locked: boolean;

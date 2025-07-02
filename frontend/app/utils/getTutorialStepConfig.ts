@@ -1,5 +1,5 @@
 import tutorialConfig from "../configs/tutorial.json";
-import { TargetId } from "../context/Tutorial";
+import { TargetId } from "../stores/useTutorialStore";
 
 export function getTutorialStepConfig(step: string): {
   title: string;

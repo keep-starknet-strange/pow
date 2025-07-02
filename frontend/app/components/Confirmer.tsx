@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { PopupAnimation } from "./PopupAnimation";
-import { TargetId } from "../context/Tutorial";
+import { TargetId } from "../stores/useTutorialStore";
 
 export type ConfirmerProps = {
   progress: number;

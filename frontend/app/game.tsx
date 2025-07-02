@@ -5,18 +5,27 @@ import { useState, useEffect } from "react";
 import { RootNavigator } from "./navigation/RootNavigator";
 
 import { useEventManager } from "./context/EventManager";
+import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
-import { useInAppNotifications } from "./context/InAppNotifications";
-import { useAchievement } from "./context/Achievements";
-import { useSound } from "./context/Sound";
+import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
+import {
+  useAchievement,
+  useAchievementsStore,
+} from "./stores/useAchievementsStore";
+import { useSound, useSoundStore } from "./stores/useSoundStore";
 import { InAppNotificationsObserver } from "./observers/InAppNotificationsObserver";
 import { AchievementObserver } from "./observers/AchievementObserver";
 import { SoundObserver } from "./observers/SoundObserver";
 import { TxBuilderObserver } from "./observers/TxBuilderObserver";
+import { TutorialObserver } from "./observers/TutorialObserver";
+import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
 export default function game() {
+  const { user } = useFocEngine();
   const { registerObserver, unregisterObserver } = useEventManager();
+  const { setSoundDependency, initializeAchievements } = useAchievementsStore();
+  const { initializeSound } = useSoundStore();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
@@ -70,6 +79,30 @@ export default function game() {
     }
     setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
   }, [playSoundEffect]);
+
+  useEffect(() => {
+    initializeSound();
+  }, [initializeSound]);
+
+  const { advanceStep, setVisible, step } = useTutorial();
+  const { setObserverId, clearObserverId } = useTutorialStore();
+  const [tutorialObserver, setTutorialObserver] = useState<null | number>(null);
+  useEffect(() => {
+    if (tutorialObserver !== null) {
+      unregisterObserver(tutorialObserver);
+      clearObserverId();
+    }
+    const observerId = registerObserver(
+      new TutorialObserver(advanceStep, setVisible, step),
+    );
+    setTutorialObserver(observerId);
+    setObserverId(observerId);
+  }, [advanceStep, setVisible, step]);
+
+  useEffect(() => {
+    setSoundDependency(playSoundEffect);
+    initializeAchievements(user?.account_address);
+  }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
 
   return <RootNavigator />;
 }

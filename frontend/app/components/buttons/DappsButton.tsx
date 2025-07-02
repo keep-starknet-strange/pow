@@ -8,7 +8,6 @@ import {
   useAnimatedValue,
 } from "react-native";
 import { useEventManager } from "../../context/EventManager";
-import { useSound } from "../../context/Sound";
 import { useUpgrades } from "../../context/Upgrades";
 import {
   getTxIcon,
