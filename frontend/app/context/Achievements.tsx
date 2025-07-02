@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocEngine } from "../context/FocEngineConnector";
 import { useInAppNotifications } from "../context/InAppNotifications";
 import { useSound } from "../context/Sound";
 import achievementsJson from "../configs/achievements.json";
@@ -35,6 +36,7 @@ export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { sendInAppNotification } = useInAppNotifications();
   const { playSoundEffect } = useSound();
+  const { user } = useFocEngine();
   const [achievementsProgress, setAchievementsProgress] = useState<{
     [key: number]: number;
   }>({});
@@ -45,7 +47,7 @@ export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     // Load saved progress from local storage
     achievementsJson.forEach((achievement: any) => {
-      AsyncStorage.getItem(`achievement_${achievement.id}`)
+      AsyncStorage.getItem(`${user?.account_address}.achievement_${achievement.id}`)
         .then((value) => {
           if (value !== null) {
             initialAchievementsProgress[achievement.id] = parseInt(value, 10);
@@ -56,7 +58,7 @@ export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({
         );
     });
     setAchievementsProgress(initialAchievementsProgress);
-  }, []);
+  }, [user]);
 
   const updateAchievement = useCallback(
     (achievementId: number, progress: number) => {
@@ -77,13 +79,13 @@ export const AchievementProvider: React.FC<{ children: React.ReactNode }> = ({
         sendInAppNotification(typeId, message);
       }
       AsyncStorage.setItem(
-        `achievement_${achievementId}`,
+        `${user?.account_address}.achievement_${achievementId}`,
         progress.toString(),
       ).catch((error) =>
         console.error("Error saving achievement progress:", error),
       );
     },
-    [playSoundEffect],
+    [playSoundEffect, user, sendInAppNotification],
   );
 
   return (

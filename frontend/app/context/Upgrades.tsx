@@ -400,7 +400,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         chainAutomations[automation.id] !== undefined
           ? chainAutomations[automation.id]
           : -1;
-      return level === -1 ? 0 : automation.levels[level].speed;
+      return level === -1 ? 0 : (automation.levels[level]?.speed | 0);
     },
     [automations],
   );

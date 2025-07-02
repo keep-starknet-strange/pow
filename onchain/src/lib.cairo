@@ -8,7 +8,7 @@ pub mod upgrades {
     pub mod component;
     pub mod interface;
 
-    pub use interface::{IPowUpgradesDispatcher, IPowUpgradesDispatcherTrait, UpgradeConfig};
+    pub use interface::{IPowUpgradesDispatcher, IPowUpgradesDispatcherTrait, UpgradeConfig, UpgradeSetupParams, AutomationSetupParams};
 }
 
 pub mod transactions {
@@ -17,7 +17,7 @@ pub mod transactions {
 
     pub use interface::{
         DA_TX_TYPE_ID, IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
-        PROOF_TX_TYPE_ID, TransactionFeeConfig, TransactionSpeedConfig,
+        PROOF_TX_TYPE_ID, TransactionFeeConfig, TransactionSpeedConfig, TransactionSetupParams,
     };
 }
 
@@ -25,7 +25,7 @@ pub mod prestige {
     pub mod component;
     pub mod interface;
 
-    pub use interface::{IPrestigeDispatcher, IPrestigeDispatcherTrait, PrestigeConfig};
+    pub use interface::{IPrestigeDispatcher, IPrestigeDispatcherTrait, PrestigeConfig, PrestigeSetupParams};
 }
 
 pub mod builder {

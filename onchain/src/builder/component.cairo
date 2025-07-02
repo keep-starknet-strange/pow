@@ -7,6 +7,8 @@ pub mod BuilderComponent {
     // TODO: Find a way to simplify this ( blocks, da, proofs )
     #[storage]
     pub struct Storage {
+        // Maps: (user address, chain id) -> in progress block height
+        building_block_height: Map<(ContractAddress, u32), u64>,
         // Maps: (user address, chain id) -> in progress block
         building_blocks: Map<(ContractAddress, u32), BuildingState>,
         // Maps: (user address, chain id) -> click counter
@@ -90,6 +92,12 @@ pub mod BuilderComponent {
     impl Builder<
         TContractState, +HasComponent<TContractState>,
     > of IBuilder<ComponentState<TContractState>> {
+        fn get_block_building_height(
+            self: @ComponentState<TContractState>, user: ContractAddress, chain_id: u32,
+        ) -> u64 {
+            self.building_block_height.read((user, chain_id))
+        }
+
         fn get_block_building_state(
             self: @ComponentState<TContractState>, user: ContractAddress, chain_id: u32,
         ) -> BuildingState {
@@ -125,7 +133,12 @@ pub mod BuilderComponent {
         ) -> u128 {
             self.proof_clicks.read((user, chain_id))
         }
+    }
 
+    #[generate_trait]
+    pub impl InternalImpl<
+      TContractState, +HasComponent<TContractState>,
+    > of InternalTrait<TContractState> {
         fn build_block(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
             let mut block = self.building_blocks.read((user, chain_id));
@@ -150,6 +163,8 @@ pub mod BuilderComponent {
             self.emit(BuildingBlockUpdate { user, chain_id, new_block: empty_block });
             self.block_clicks.write((user, chain_id), 0);
             self.emit(BuildingBlockClicked { user, chain_id, click_count: 0 });
+            let last_height = self.building_block_height.read((user, chain_id));
+            self.building_block_height.write((user, chain_id), last_height + 1);
         }
 
         fn build_da(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
@@ -203,5 +218,6 @@ pub mod BuilderComponent {
             self.proof_clicks.write((user, chain_id), 0);
             self.emit(BuildingProofClicked { user, chain_id, click_count: 0 });
         }
+
     }
 }

@@ -188,7 +188,12 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       if (data.data.registry_contracts[0] && provider) {
         const contract = data.data.registry_contracts[0];
         setRegistryContractAddress(contract);
-        const { abi: registryAbi } = await provider.getClassAt(contract);
+        const { abi: registryAbi } = await provider.getClassAt(contract).catch(
+          (error) => {
+            console.error("Error fetching registry ABI:", error);
+            return { abi: null };
+          },
+        );
         if (registryAbi) {
           const registryContract = new Contract(
             registryAbi,
@@ -216,7 +221,12 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       if (data.data.accounts_contract && provider) {
         const contract = data.data.accounts_contract;
         setAccountsContractAddress(contract);
-        const { abi: accountsAbi } = await provider.getClassAt(contract);
+        const { abi: accountsAbi } = await provider.getClassAt(contract).catch(
+          (error) => {
+            console.error("Error fetching accounts ABI:", error);
+            return { abi: null };
+          },
+        );
         if (accountsAbi) {
           const accountsContract = new Contract(
             accountsAbi,
@@ -504,7 +514,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         } else {
           isClaimed = await accountsContract.is_username_claimed(usernameHex);
         }
-        console.log(`Username "${username}" is unique:`, !isClaimed);
         return !isClaimed;
       } catch (error) {
         console.error("Error checking username uniqueness:", error);
@@ -636,7 +645,13 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         await invokeWithPaymaster(calls);
       }
-      await refreshUser(contract || userContract); // TODO: delays can cause issues, consider using a more robust solution
+      setUser({
+        account_address: account?.address || "",
+        contract_address:
+          contract || userContract || accountsContractAddress || "",
+        account: { username, metadata: metadata || null }, // Optional metadata field
+      });
+      // await refreshUser(contract || userContract); // TODO: delays can cause issues, consider using a more robust solution
     },
     [
       accountsContractAddress,

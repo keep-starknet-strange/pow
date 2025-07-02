@@ -20,27 +20,34 @@ mod PowGame {
 
     // Upgrades
     use pow_game::upgrades::component::PowUpgradesComponent;
+    use pow_game::upgrades::{UpgradeSetupParams, AutomationSetupParams};
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
     impl PowUpgradesComponentImpl = PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+    impl PowUpgradesInternalImpl = PowUpgradesComponent::InternalImpl<ContractState>;
 
     // Transactions
     use pow_game::transactions::component::PowTransactionsComponent;
+    use pow_game::transactions::TransactionSetupParams;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
     impl PowTransactionsComponentImpl = PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+    impl PowTransactionsInternalImpl = PowTransactionsComponent::InternalImpl<ContractState>;
 
     // Prestige
     use pow_game::prestige::component::PrestigeComponent;
+    use pow_game::prestige::PrestigeSetupParams;
     component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
     #[abi(embed_v0)]
     impl PrestigeComponentImpl = PrestigeComponent::PrestigeImpl<ContractState>;
+    impl PrestigeInternalImpl = PrestigeComponent::InternalImpl<ContractState>;
 
     // Builder
     use pow_game::builder::component::BuilderComponent;
     component!(path: BuilderComponent, storage: builder, event: BuilderEvent);
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
+    impl BuilderInternalImpl = BuilderComponent::InternalImpl<ContractState>;
 
     // Staking
     use pow_game::staking::component::StakingComponent;
@@ -136,9 +143,9 @@ mod PowGame {
         BuilderEvent: BuilderComponent::Event,
         #[flat]
         StakingEvent: StakingComponent::Event,
-         #[flat]
+        #[flat]
         UpgradeableEvent: UpgradeableComponent::Event,
-         #[flat]
+        #[flat]
         PausableEvent: PausableComponent::Event,
     }
 
@@ -191,13 +198,37 @@ mod PowGame {
             self.game_masters.write(user, false);
         }
 
-        fn setup_staking_config(ref self: ContractState, user: ContractAddress, config: StakingConfig) {
-            self.check_valid_game_master(get_caller_address());
-            self.staking.setup_staking(user, config);
+        fn get_user_max_chain_id(self: @ContractState, user: ContractAddress) -> u32 {
+            self.user_max_chains.read(user)
         }
 
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
             self.user_balances.read(user)
+        }
+
+        fn setup_upgrade_config(ref self: ContractState, config: UpgradeSetupParams) {
+            self.check_valid_game_master(get_caller_address());
+            self.upgrades.setup_upgrade(config);
+        }
+
+        fn setup_automation_config(ref self: ContractState, config: AutomationSetupParams) {
+            self.check_valid_game_master(get_caller_address());
+            self.upgrades.setup_automation(config);
+        }
+
+        fn setup_transaction_config(ref self: ContractState, config: TransactionSetupParams) {
+            self.check_valid_game_master(get_caller_address());
+            self.transactions.setup_transaction_config(config);
+        }
+
+        fn setup_prestige_config(ref self: ContractState, config: PrestigeSetupParams) {
+            self.check_valid_game_master(get_caller_address());
+            self.prestige.setup_prestige(config);
+        }
+
+        fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
+            self.check_valid_game_master(get_caller_address());
+            self.staking.setup_staking(config);
         }
     }
 
@@ -343,14 +374,14 @@ mod PowGame {
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
             if (chain_id != 0) {
               // Add block to da & proof
-              self.build_proof(chain_id, fees + reward);
-              self.build_da(chain_id, fees + reward);
+              self.builder.build_proof(chain_id, fees + reward);
+              self.builder.build_da(chain_id, fees + reward);
             } else {
               pay_user(ref self, caller, fees + reward);
             }
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
-            self.reset_block(chain_id);
+            self.builder.reset_block(chain_id);
         }
 
         fn store_da(ref self: ContractState, chain_id: u32) {
@@ -374,7 +405,7 @@ mod PowGame {
             do_add_transaction(ref self, chain_id - 1, DA_TX_TYPE_ID, total_fees);
             self.emit(DAStored { user: caller, chain_id, fees: total_fees });
 
-            self.reset_da(chain_id);
+            self.builder.reset_da(chain_id);
         }
 
         fn prove(ref self: ContractState, chain_id: u32) {
@@ -398,7 +429,7 @@ mod PowGame {
             do_add_transaction(ref self, chain_id - 1, PROOF_TX_TYPE_ID, total_fees);
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
 
-            self.reset_proof(chain_id);
+            self.builder.reset_proof(chain_id);
         }
 
         fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
@@ -431,35 +462,35 @@ mod PowGame {
             let cost = self.get_next_tx_fee_cost(chain_id, tx_type_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
-            self.level_transaction_fee(chain_id, tx_type_id);
+            self.transactions.level_transaction_fee(chain_id, tx_type_id);
         }
 
         fn buy_tx_speed(ref self: ContractState, chain_id: u32, tx_type_id: u32) {
             let cost = self.get_next_tx_speed_cost(chain_id, tx_type_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
-            self.level_transaction_speed(chain_id, tx_type_id);
+            self.transactions.level_transaction_speed(chain_id, tx_type_id);
         }
 
         fn buy_upgrade(ref self: ContractState, chain_id: u32, upgrade_id: u32) {
             let cost = self.get_next_upgrade_cost(chain_id, upgrade_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
-            self.level_upgrade(chain_id, upgrade_id);
+            self.upgrades.level_upgrade(chain_id, upgrade_id);
         }
 
         fn buy_automation(ref self: ContractState, chain_id: u32, automation_id: u32) {
             let cost = self.get_next_automation_cost(chain_id, automation_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
-            self.level_automation(chain_id, automation_id);
+            self.upgrades.level_automation(chain_id, automation_id);
         }
 
         fn buy_dapps(ref self: ContractState, chain_id: u32) {
             let cost = 100; // TODO: get from config
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
-            self.unlock_dapps(chain_id);
+            self.transactions.unlock_dapps(chain_id);
         }
 
         fn buy_next_chain(ref self: ContractState) {
@@ -500,7 +531,7 @@ mod PowGame {
         self.check_valid_chain_id(chain_id);
         self.check_user_valid_chain(chain_id);
         self.check_block_not_full(chain_id);
-        self.build_block(chain_id, total_fees);
+        self.builder.build_block(chain_id, total_fees);
         self.emit(TransactionAdded { user: caller, chain_id, tx_type_id, fees: total_fees });
     }
 
@@ -508,21 +539,21 @@ mod PowGame {
         self.check_valid_chain_id(chain_id);
         self.check_user_valid_chain(chain_id);
 
-        self.click_block(chain_id);
+        self.builder.click_block(chain_id);
     }
 
     fn do_click_da(ref self: ContractState, chain_id: u32) {
         self.check_valid_chain_id(chain_id);
         self.check_user_valid_chain(chain_id);
 
-        self.click_da(chain_id);
+        self.builder.click_da(chain_id);
     }
 
     fn do_click_proof(ref self: ContractState, chain_id: u32) {
         self.check_valid_chain_id(chain_id);
         self.check_user_valid_chain(chain_id);
 
-        self.click_proof(chain_id);
+        self.builder.click_proof(chain_id);
     }
 
     fn unlock_next_chain(ref self: ContractState) {
@@ -533,11 +564,12 @@ mod PowGame {
         // Finalize genesis block
         if (new_chain_id != 0) {
           // Add genesis block to da & proof
-          self.build_proof(new_chain_id, self.genesis_block_reward.read());
-          self.build_da(new_chain_id, self.genesis_block_reward.read());
+          self.builder.build_proof(new_chain_id, self.genesis_block_reward.read());
+          self.builder.build_da(new_chain_id, self.genesis_block_reward.read());
         } else {
           pay_user(ref self, caller, self.genesis_block_reward.read());
         }
+        self.builder.reset_block(new_chain_id);
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
 
@@ -548,7 +580,7 @@ mod PowGame {
         assert!(my_max_chain_id >= self.max_chain_id.read(), "Not enough chains unlocked");
         // TODO: Check upgrades, txs, etc. levels
 
-        self.prestige();
+        self.prestige.prestige();
 
         // Reset user state
         self.user_max_chains.write(caller, 0);
@@ -556,9 +588,9 @@ mod PowGame {
         let mut chain_id = 0;
         let max_chain_id = self.max_chain_id.read();
         while chain_id != max_chain_id {
-            self.reset_block(chain_id);
-            self.reset_da(chain_id);
-            self.reset_proof(chain_id);
+            self.builder.reset_block(chain_id);
+            self.builder.reset_da(chain_id);
+            self.builder.reset_proof(chain_id);
             self.transactions.reset_tx_levels(chain_id);
             self.upgrades.reset_upgrade_levels(chain_id);
             chain_id += 1;

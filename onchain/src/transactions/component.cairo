@@ -88,34 +88,6 @@ pub mod PowTransactionsComponent {
             self.transaction_speed_config.read((chain_id, tx_type_id, level))
         }
 
-        // TODO: Clear TransactionFeeConfig & TransactionSpeedConfig for higher than len()
-        fn setup_transaction_config(
-            ref self: ComponentState<TContractState>, params: TransactionSetupParams,
-        ) {
-            let chain_id = params.chain_id;
-            let tx_type_id = params.tx_type_id;
-            let mut idx = 0;
-            let maxFeeLevel = params.fee_levels.len();
-            while idx != maxFeeLevel {
-                self
-                    .transaction_fee_config
-                    .write((chain_id, tx_type_id, idx), params.fee_levels[idx].clone());
-                idx += 1;
-            }
-            idx = 0;
-            let maxSpeedLevel = params.speed_levels.len();
-            while idx != maxSpeedLevel {
-                self
-                    .transaction_speed_config
-                    .write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
-                idx += 1;
-            }
-            if params.is_dapp {
-                self.dapps.write((chain_id, tx_type_id), true);
-            }
-            self.emit(TransactionConfigUpdated { chain_id, tx_type_id, new_config: params });
-        }
-
         fn get_user_transaction_fee_level(
             self: @ComponentState<TContractState>,
             user: ContractAddress,
@@ -162,6 +134,83 @@ pub mod PowTransactionsComponent {
                 idx += 1;
             }
             levels.span()
+        }
+
+        // TODO: If maxlevel
+        fn get_next_tx_fee_cost(
+            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
+        ) -> u128 {
+            let caller = get_caller_address();
+            let next_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id)) + 1;
+            self.transaction_fee_config.read((chain_id, tx_type_id, next_level)).cost
+        }
+
+        fn get_next_tx_speed_cost(
+            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
+        ) -> u128 {
+            let caller = get_caller_address();
+            let next_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id)) + 1;
+            self.transaction_speed_config.read((chain_id, tx_type_id, next_level)).cost
+        }
+
+        fn get_my_tx_fee_value(
+            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
+        ) -> u128 {
+            let caller = get_caller_address();
+            let level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
+            self.transaction_fee_config.read((chain_id, tx_type_id, level)).value
+        }
+
+        fn get_my_tx_speed_value(
+            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
+        ) -> u128 {
+            let caller = get_caller_address();
+            let level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
+            self.transaction_speed_config.read((chain_id, tx_type_id, level)).value
+        }
+
+        fn check_has_tx(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
+            let level = self
+                .transaction_fee_levels
+                .read((get_caller_address(), chain_id, tx_type_id));
+            assert!(level != 0, "Tx Type Locked");
+        }
+
+        fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
+            self.dapps.read((chain_id, tx_type_id))
+        }
+    }
+
+    #[generate_trait]
+    pub impl InternalImpl<
+      TContractState, +HasComponent<TContractState>,
+    > of InternalTrait<TContractState> {
+        // TODO: Clear TransactionFeeConfig & TransactionSpeedConfig for higher than len()
+        fn setup_transaction_config(
+            ref self: ComponentState<TContractState>, params: TransactionSetupParams,
+        ) {
+            let chain_id = params.chain_id;
+            let tx_type_id = params.tx_type_id;
+            let mut idx = 0;
+            let maxFeeLevel = params.fee_levels.len();
+            while idx != maxFeeLevel {
+                self
+                    .transaction_fee_config
+                    .write((chain_id, tx_type_id, idx), params.fee_levels[idx].clone());
+                idx += 1;
+            }
+            idx = 0;
+            let maxSpeedLevel = params.speed_levels.len();
+            while idx != maxSpeedLevel {
+                self
+                    .transaction_speed_config
+                    .write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
+                idx += 1;
+            }
+            if params.is_dapp {
+                self.dapps.write((chain_id, tx_type_id), true);
+            }
+            self.emit(TransactionConfigUpdated { chain_id, tx_type_id, new_config: params });
         }
 
         fn level_transaction_fee(
@@ -220,54 +269,10 @@ pub mod PowTransactionsComponent {
             self.dapps_unlocked.write((caller, chain_id), false);
         }
 
-        // TODO: If maxlevel
-        fn get_next_tx_fee_cost(
-            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
-        ) -> u128 {
-            let caller = get_caller_address();
-            let next_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id)) + 1;
-            self.transaction_fee_config.read((chain_id, tx_type_id, next_level)).cost
-        }
-
-        fn get_next_tx_speed_cost(
-            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
-        ) -> u128 {
-            let caller = get_caller_address();
-            let next_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id)) + 1;
-            self.transaction_speed_config.read((chain_id, tx_type_id, next_level)).cost
-        }
-
-        fn get_my_tx_fee_value(
-            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
-        ) -> u128 {
-            let caller = get_caller_address();
-            let level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
-            self.transaction_fee_config.read((chain_id, tx_type_id, level)).value
-        }
-
-        fn get_my_tx_speed_value(
-            self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
-        ) -> u128 {
-            let caller = get_caller_address();
-            let level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
-            self.transaction_speed_config.read((chain_id, tx_type_id, level)).value
-        }
-
-        fn check_has_tx(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) {
-            let level = self
-                .transaction_fee_levels
-                .read((get_caller_address(), chain_id, tx_type_id));
-            assert!(level != 0, "Tx Type Locked");
-        }
-
         fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
             self.dapps_unlocked.write((caller, chain_id), true);
             self.emit(DappsUnlocked { user: caller, chain_id });
-        }
-
-        fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
-            self.dapps.read((chain_id, tx_type_id))
         }
     }
 }

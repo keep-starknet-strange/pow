@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Chain, newChain, Block } from "../types/Chains";
+import { useFocEngine } from "./FocEngineConnector";
+import { usePowContractConnector } from "./PowContractConnector";
 
 type ChainsContextType = {
   chains: Chain[];
@@ -24,14 +26,62 @@ export const useChains = () => {
 export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [chains, setChains] = useState<Chain[]>([]);
+  const [chains, setChains] = useState<Chain[]>([newChain(0)]);
+  const { user } = useFocEngine();
+  const { powGameContractAddress, getUserBlockNumber, getUserMaxChainId } = usePowContractConnector();
 
   const resetChains = () => {
     setChains([newChain(0)]);
   };
 
   useEffect(() => {
-    resetChains();
+    const fetchChainState = async () => {
+      if (powGameContractAddress && user) {
+        try {
+          // TODO: Use foc engine?
+          const maxChainId = await getUserMaxChainId() || 0;
+          // Setup l1 state
+          const blockNumber = await getUserBlockNumber(0) || 0;
+          // TODO: Get block size?
+          const chain = newChain(0);
+          if (blockNumber > 0) {
+            chain.blocks.push({
+              blockId: blockNumber - 1,
+              fees: 0,
+              transactions: Array.from({ length: 25 }, (_, i) => ({
+                typeId: 0,
+                fee: 0,
+                isDapp: false
+              })),
+              isBuilt: true,
+            });
+          }
+          if (maxChainId > 1) {
+            const l2Chain = newChain(1);
+            const l2BlockNumber = await getUserBlockNumber(1) || 0;
+            if (l2BlockNumber > 0) {
+              l2Chain.blocks.push({
+                blockId: l2BlockNumber - 1,
+                fees: 0,
+                transactions: Array.from({ length: 25 }, (_, i) => ({
+                  typeId: 0,
+                  fee: 0,
+                  isDapp: false
+                })),
+                isBuilt: true,
+              });
+            }
+            setChains([chain, l2Chain]);
+          } else {
+            setChains([chain]);
+          }
+        } catch (error) {
+          console.error("Error fetching chain state:", error);
+          resetChains();
+        }
+      }
+    }
+    fetchChainState();
     /*
     const getNewGameState = async () => {
       const newGameState = await getGameState(mockAddress);
@@ -40,7 +90,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     getNewGameState();
     */
-  }, []);
+  }, [powGameContractAddress, user]);
 
   const getChain = (chainId: number) => {
     return chains[chainId] || null;

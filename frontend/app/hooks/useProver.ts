@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
 import { L2Prover } from "../types/L2";
@@ -10,8 +12,26 @@ export const useProver = (
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
+  const { user } = useFocEngine();
+  const { powGameContractAddress, getUserProofClicks } = usePowContractConnector();
   const [proverCounter, setProverCounter] = useState(0);
   const [proverProgress, setProverProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchProofCounter = async () => {
+      if (powGameContractAddress && user) {
+        try {
+          // TODO: Use foc engine?
+          const clicks = await getUserProofClicks(0);
+          setProverCounter(clicks || 0);
+        } catch (error) {
+          console.error("Error fetching mine counter:", error);
+          setProverCounter(0);
+        }
+      }
+    };
+    fetchProofCounter();
+  }, [powGameContractAddress, user, getUserProofClicks]);
 
   const prove = () => {
     setProverCounter((prevCounter) => {

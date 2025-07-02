@@ -81,7 +81,8 @@ echo "Contract class hash: $POR_GAME_CONTRACT_CLASSHASH"
 
 # Deploying the contract
 ACCOUNT_ADDRESS=$(cat $STARKNET_ACCOUNT | jq -r '.deployment.address')
-CALLDATA=$(echo -n $ACCOUNT_ADDRESS)
+ETH_TOKEN_ADDRESS=0x4718F5A0FC34CC1AF16A1CDEE98FFB20C31F5CD61D6AB07201858F4287C938D
+CALLDATA=$(echo -n $ACCOUNT_ADDRESS $ETH_TOKEN_ADDRESS 0x100 0x0 0x1)
 echo "Deploying the contract..."
 echo "starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POR_GAME_CONTRACT_CLASSHASH $CALLDATA"
 starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POR_GAME_CONTRACT_CLASSHASH $CALLDATA

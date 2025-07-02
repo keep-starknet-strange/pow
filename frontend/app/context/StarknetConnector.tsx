@@ -30,7 +30,10 @@ export const LOCALHOST_RPC_URL =
   process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || "http://localhost:5050/rpc";
 export const SEPOLIA_RPC_URL =
   process.env.EXPO_PUBLIC_SEPOLIA_RPC_URL ||
-  "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
+  "https://starknet-sepolia.infura.io/v3/2L0kNQGRBEf4gYmySjgK0EnpRlY";
+  // "https://starknet-sepolia.drpc.org";
+  // "https://rpc.starknet-testnet.lava.build:443";
+  // "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
 export const MAINNET_RPC_URL =
   process.env.EXPO_PUBLIC_MAINNET_RPC_URL ||
   "https://starknet-mainnet.public.blastapi.io/rpc/v0_7";
@@ -567,7 +570,7 @@ export const StarknetConnectorProvider: React.FC<{
 
         // Run using backend paymaster provider
         const formattedCalls = formatCall(calls);
-        const focEngineUrl = "http://localhost:8080";
+        const focEngineUrl = "http://34.36.233.23"; // http://localhost:8080";
         const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
         const gaslessTxInput = {
           account: invokeAccount.address,

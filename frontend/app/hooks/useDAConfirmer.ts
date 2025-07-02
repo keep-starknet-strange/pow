@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
 import { L2DA } from "../types/L2";
@@ -9,9 +11,27 @@ export const useDAConfirmer = (
   getDa: () => L2DA | undefined,
 ) => {
   const { notify } = useEventManager();
+  const { user } = useFocEngine();
+  const { powGameContractAddress, getUserDaClicks } = usePowContractConnector();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
   const [daProgress, setDaConfirmProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchDaCounter = async () => {
+      if (powGameContractAddress && user) {
+        try {
+          // TODO: Use foc engine?
+          const clicks = await getUserDaClicks(1);
+          setDaConfirmCounter(clicks || 0);
+        } catch (error) {
+          console.error("Error fetching mine counter:", error);
+          setDaConfirmCounter(0);
+        }
+      }
+    };
+    fetchDaCounter();
+  }, [powGameContractAddress, user, getUserDaClicks]);
 
   const daConfirm = () => {
     setDaConfirmCounter((prevCounter) => {

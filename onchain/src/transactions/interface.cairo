@@ -33,7 +33,6 @@ pub trait IPowTransactions<TContractState> {
     fn get_transaction_speed_config(
         self: @TContractState, chain_id: u32, tx_type_id: u32, level: u32,
     ) -> TransactionSpeedConfig;
-    fn setup_transaction_config(ref self: TContractState, params: TransactionSetupParams);
 
     // User transactions
     fn is_dapp(self: @TContractState, chain_id: u32, tx_type_id: u32) -> bool;
@@ -49,10 +48,6 @@ pub trait IPowTransactions<TContractState> {
     fn get_user_transaction_speed_levels(
         self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32
     ) -> Span<u32>;
-    fn unlock_dapps(ref self: TContractState, chain_id: u32);
-    fn level_transaction_fee(ref self: TContractState, chain_id: u32, tx_type_id: u32);
-    fn level_transaction_speed(ref self: TContractState, chain_id: u32, tx_type_id: u32);
-    fn reset_tx_levels(ref self: TContractState, chain_id: u32);
 
     // Use transactions
     fn get_next_tx_fee_cost(self: @TContractState, chain_id: u32, tx_type_id: u32) -> u128;

@@ -1,5 +1,8 @@
 use starknet::ContractAddress;
 use pow_game::types::RewardParams;
+use pow_game::upgrades::{UpgradeSetupParams, AutomationSetupParams};
+use pow_game::transactions::{TransactionSetupParams};
+use pow_game::prestige::{PrestigeSetupParams};
 use pow_game::staking::{StakingConfig};
 
 // Game configuration & state
@@ -11,9 +14,14 @@ pub trait IPowGame<TContractState> {
     fn set_max_chain_id(ref self: TContractState, chain_id: u32);
     fn add_game_master(ref self: TContractState, user: ContractAddress);
     fn remove_game_master(ref self: TContractState, user: ContractAddress);
-    fn setup_staking_config(ref self: TContractState, user: ContractAddress, config: StakingConfig);
-
+    fn get_user_max_chain_id(self: @TContractState, user: ContractAddress) -> u32;
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
+
+    fn setup_upgrade_config(ref self: TContractState, config: UpgradeSetupParams);
+    fn setup_automation_config(ref self: TContractState, config: AutomationSetupParams);
+    fn setup_transaction_config(ref self: TContractState, config: TransactionSetupParams);
+    fn setup_prestige_config(ref self: TContractState, config: PrestigeSetupParams);
+    fn setup_staking_config(ref self: TContractState, config: StakingConfig);
 }
 
 // Game Rewards management

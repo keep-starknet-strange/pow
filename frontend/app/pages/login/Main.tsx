@@ -22,7 +22,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
   setLoginPage,
 }) => {
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
-  const { initMyGame } = usePowContractConnector();
+  const { createGameAccount } = usePowContractConnector();
 
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   return (
@@ -45,7 +45,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
             if (keys.length > 0) {
               await connectStorageAccount(keys[0]);
             } else {
-              await initMyGame();
+              await createGameAccount();
             }
             setLoginPage("accountCreation");
           }}

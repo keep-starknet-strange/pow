@@ -91,7 +91,7 @@ pub mod StakingComponent {
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>,
         > of InternalTrait<TContractState> {
-        fn setup_staking(ref self: ComponentState<TContractState>, user: ContractAddress, config: StakingConfig) {
+        fn setup_staking(ref self: ComponentState<TContractState>, config: StakingConfig) {
             assert(config.slashing_config.slash_fraction > 0, 'slash_fraction must be > 0');
             assert(config.slashing_config.due_time > 0, 'due_time must be > 0');
             assert(config.reward_rate > 0, 'reward_rate must be > 0');
@@ -99,6 +99,7 @@ pub mod StakingComponent {
             self.staking_config.write(config);
             self.emit(StakingConfigUpdate { config: config });
         }
+
         fn stake(ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128, now: u64) {
             self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
