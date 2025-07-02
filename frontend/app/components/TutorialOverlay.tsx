@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
-import { useTutorial } from "../context/Tutorial";
+import { useTutorial } from "../stores/useTutorialStore";
 import { useBubblePosition } from "../hooks/useBubblePosition";
 import {
   useHighlightMasks,

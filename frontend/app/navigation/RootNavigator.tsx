@@ -9,7 +9,7 @@ import { InAppNotification } from "../components/InAppNotification";
 import { TutorialOverlay } from "../components/TutorialOverlay";
 
 import { useFocEngine } from "../context/FocEngineConnector";
-import { useTutorial } from "../context/Tutorial";
+import { useTutorial } from "../stores/useTutorialStore";
 
 const Stack = createStackNavigator();
 

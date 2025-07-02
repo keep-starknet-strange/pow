@@ -5,7 +5,7 @@ import ToggleButton from "../../components/buttons/Toggle";
 import BasicButton from "../../components/buttons/Basic";
 import ResetTutorialButton from "./ResetTutorial";
 
-import { useSound } from "../../context/Sound";
+import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 
 export type SettingsMainSectionProps = {
