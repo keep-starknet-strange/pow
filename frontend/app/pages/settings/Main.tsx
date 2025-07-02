@@ -7,18 +7,23 @@ import ResetTutorialButton from "./ResetTutorial";
 
 import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
+import { useFocEngine } from "@/app/context/FocEngineConnector";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (tab: "About" | "Credits" | "Help" | "ClaimReward") => void;
+  goBackToLogin: () => void;
 };
 
 const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   setSettingTab,
+  goBackToLogin
 }) => {
   const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
+  const { user } = useFocEngine();
+  const isAuthenticated = user && user.account.username !== "";
 
   const toggleNotifs = () => setNotifs(!notifs);
 
@@ -71,6 +76,14 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
         offSymbol="🔕"
       />
       <ResetTutorialButton />
+
+      {!isAuthenticated && (
+        <BasicButton
+          key="Back"
+          label="Back"
+          onPress={goBackToLogin}
+        />
+      )}
 
       {settingsComponents.map(({ label, tab, onPress, icon }) => (
         <BasicButton
