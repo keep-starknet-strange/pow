@@ -9,7 +9,6 @@ import { AchievementsPage } from "../pages/AchievementsPage";
 import { SettingsPage } from "../pages/SettingsPage";
 import { StakingPage } from "../pages/StakingPage";
 
-import { useStaking } from "../context/Staking";
 import { useEventManager } from "../context/EventManager";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
@@ -146,10 +145,8 @@ function TabBarButton({
 }
 
 export function TabNavigator() {
-  const { stakingUnlocked } = useStaking();
   const { notify } = useEventManager();
   const insets = useSafeAreaInsets();
-
   const handleTabPress = (routeName: string) => {
     notify("SwitchPage", { name: routeName });
   };
@@ -188,25 +185,22 @@ export function TabNavigator() {
         }}
       />
 
-      {stakingUnlocked && (
-        <Tab.Screen
-          name="Staking"
-          component={StakingPage}
-          options={{
-            tabBarButton: (props) => (
-              <TabBarButton
-                tabName="Staking"
-                isActive={props["aria-selected"] || false}
-                onPress={props.onPress}
-              />
-            ),
-          }}
-          listeners={{
-            tabPress: () => handleTabPress("Staking"),
-          }}
-        />
-      )}
-
+      <Tab.Screen
+        name="Staking"
+        component={StakingPage}
+        options={{
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Staking"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
+          ),
+        }}
+        listeners={{
+          tabPress: () => handleTabPress("Staking"),
+        }}
+      />
       <Tab.Screen
         name="Store"
         component={StorePage}

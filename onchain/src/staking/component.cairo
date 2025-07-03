@@ -11,6 +11,8 @@ pub mod StakingComponent {
     pub struct Storage {
         // Staking configuration
         staking_config: StakingConfig,
+        // Maps: user address -> unlocked status
+        staking_unlocked: Map<ContractAddress, bool>,
         // Maps: user address -> staked amount
         user_stakes: Map<ContractAddress, u128>,
         // Maps: user address -> reward amount
@@ -35,6 +37,7 @@ pub mod StakingComponent {
         WithdrawStake: WithdrawStake,
         ClaimRewards: ClaimRewards,
         StakingConfigUpdate: StakingConfigUpdate,
+        StakingUnlocked: StakingUnlocked,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -70,6 +73,13 @@ pub mod StakingComponent {
         config: StakingConfig,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct StakingUnlocked {
+        #[key]
+        user: ContractAddress,
+        is_unlocked: bool,
+    }
+
     #[embeddable_as(StakingImpl)]
     impl Staking<
         TContractState, +HasComponent<TContractState>,
@@ -84,6 +94,10 @@ pub mod StakingComponent {
 
         fn get_reward_amount(self: @ComponentState<TContractState>, user: ContractAddress) -> u128 {
             self.user_rewards.read(user)
+        }
+
+        fn get_staking_unlocked(self: @ComponentState<TContractState>, user: ContractAddress) -> bool {
+            self.staking_unlocked.read(user)
         }
     }
 
@@ -100,9 +114,15 @@ pub mod StakingComponent {
             self.emit(StakingConfigUpdate { config: config });
         }
 
+        fn unlock_staking(ref self: ComponentState<TContractState>, user: ContractAddress) {
+            self.staking_unlocked.write(user.into(), true);
+            self.emit(StakingUnlocked{ user, is_unlocked: true });
+        }
+
         fn stake(
             ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128, now: u64,
         ) {
+            assert(self.staking_unlocked.read(user), 'staking not unlocked');
             self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, current_stake + amount);
@@ -131,9 +151,9 @@ pub mod StakingComponent {
 
             if time_since_last_validation > config.slashing_config.due_time {
                 // Slash logic
-                let how_late = time_since_last_validation / config.slashing_config.due_time;
+                let periods_late = time_since_last_validation / config.slashing_config.due_time;
                 let slash_amount = user_stake / config.slashing_config.slash_fraction;
-                let scaled_slash = slash_amount * how_late.into();
+                let scaled_slash = slash_amount * periods_late.into();
                 let slashed_amount = if scaled_slash < user_stake {
                     scaled_slash
                 } else {

@@ -5,46 +5,13 @@ const assetsPath = "../../assets";
 
 const imagePaths = {
   // General Images
-  logo: require(`${assetsPath}/logo/pow.png`),
-  sublogo: require(`${assetsPath}/logo/sublogo.png`),
-  starknet: require(`${assetsPath}/logo/starknet_pixel.png`),
   background: require(`${assetsPath}/background.png`),
   backgroundGrid: require(`${assetsPath}/background-grid.png`),
-  topBar: require(`${assetsPath}/top_bar.png`),
-  iconRandom: require(`${assetsPath}/icons/icon_dice.png`),
-  iconClose: require(`${assetsPath}/icons/icon_cross.png`),
-  iconEdit: require(`${assetsPath}/icons/icon_isa_sm.png`),
-  basicButton: require(`${assetsPath}/basic_button.png`),
-  secondaryButton: require(`${assetsPath}/secondary_button.png`),
+  balanceL1: require(`${assetsPath}/gui_balance_top_l1.png`),
+  balanceL2: require(`${assetsPath}/gui_balance_top_l2.png`),
   unknownImage: require(`${assetsPath}/images/questionMark.png`),
-  header: require(`${assetsPath}/gui_top.png`),
-  headerSwitch: require(`${assetsPath}/lSwitch_background.png`),
-  headerSwitchActive: require(`${assetsPath}/lSwitch_active.png`),
-  headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.png`),
-
-  // Account Creation
-  nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.png`),
-  nounsSlots: require(`${assetsPath}/nouns/slot.png`),
-  nounsTabInactive: require(`${assetsPath}/nouns/slot_inactive.png`),
-  nounsTabActive: require(`${assetsPath}/nouns/slot_active.png`),
-  nounsCreatorBg: require(`${assetsPath}/nouns/create_bg.png`),
-  nounsCreatorButton: require(`${assetsPath}/nouns/button.png`),
-
-  // L2
-  l2BarsBg: require(`${assetsPath}/l2/l2_bars_bg.png`),
-  l2BarsBar: require(`${assetsPath}/l2/l2_bars_bar.png`),
-  l2BarsPlaque: require(`${assetsPath}/l2/l2_number_plaque.png`),
 
   // Transaction Images - Backgrounds
-  txBackground: require(`${assetsPath}/transactions/gui_bottom.png`),
-  l2TxBackground: require(`${assetsPath}/l2/l2_gui_bottom.png`),
-  txsBorder: require(`${assetsPath}/transactions/transactions_border.png`),
-  txTabActive: require(
-    `${assetsPath}/transactions/transactions_tab_active.png`,
-  ),
-  txTabInactive: require(
-    `${assetsPath}/transactions/transactions_tab_inactive.png`,
-  ),
   txButtonBlueEmpty: require(
     `${assetsPath}/transactions/backgrounds/button_blue_empty.png`,
   ),
@@ -110,8 +77,7 @@ const imagePaths = {
   txNameplateYellow: require(
     `${assetsPath}/transactions/nameplate/nameplate_yellow.png`,
   ),
-  txPlaquePlus: require(`${assetsPath}/transactions/value_plaque_plus.png`),
-  txPlaqueMinus: require(`${assetsPath}/transactions/value_plaque_minus.png`),
+  txPlaque: require(`${assetsPath}/transactions/value_plaque.png`),
 
   // Block Images
   blockTxBgBlue: require(
@@ -141,21 +107,27 @@ const imagePaths = {
     `${assetsPath}/block/blockchain_grid_chainconnector.png`,
   ),
 
+  // Staking
+  stakingBg: require(`${assetsPath}/staking/staking_bg.png`),
+  stakingButtonBg: require(`${assetsPath}/staking/button.png`),
+  stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.png`),
+
   // Navigation Images
+  navBg: require(`${assetsPath}/navigation/background.png`),
   navButton: require(`${assetsPath}/navigation/menu_button_normal.png`),
   navButtonActive: require(`${assetsPath}/navigation/menu_button_selected.png`),
   navIconGame: require(`${assetsPath}/navigation/icon_game.png`),
-  navIconStaking: require(`${assetsPath}/navigation/icon_stake.png`),
   navIconShop: require(`${assetsPath}/navigation/icon_shop.png`),
   navIconFlag: require(`${assetsPath}/navigation/icon_flag.png`),
   navIconMedal: require(`${assetsPath}/navigation/icon_medal.png`),
   navIconSettings: require(`${assetsPath}/navigation/icon_settings.png`),
   navIconGameActive: require(`${assetsPath}/navigation/icon_game_selected.png`),
-  navIconStakingActive: require(
-    `${assetsPath}/navigation/icon_stake_selected.png`,
-  ),
   navIconShopActive: require(`${assetsPath}/navigation/icon_shop_selected.png`),
   navIconFlagActive: require(`${assetsPath}/navigation/icon_flag_selected.png`),
+  navIconStaking: require(`${assetsPath}/navigation/icon_staking.png`),
+  navIconStakingActive: require(
+    `${assetsPath}/navigation/icon_staking_selected.png`,
+  ),
   navIconMedalActive: require(
     `${assetsPath}/navigation/icon_medal_selected.png`,
   ),
@@ -165,8 +137,6 @@ const imagePaths = {
 
   // Shop Images
   shopBg: require(`${assetsPath}/shop/shop_bg.png`),
-  shopBtc: require(`${assetsPath}/shop/icons/icon_btcSmall.png`),
-  shopClock: require(`${assetsPath}/shop/icons/icon_clockSmall.png`),
   shopTitle: require(`${assetsPath}/shop/title_bar.png`),
   shopSeparator: require(`${assetsPath}/shop/shop_line.png`),
   shopNamePlaque: require(`${assetsPath}/shop/shop_name_plaque.png`),
@@ -257,20 +227,11 @@ const imagePaths = {
   achievementsMoney3: require(
     `${assetsPath}/achievements/icons/Money/icon_10000btc.png`,
   ),
-  achievmentsMoney4: require(
-    `${assetsPath}/achievements/icons/Money/icon_1000000btc.png`,
-  ),
   achievementsAutomationDa: require(
     `${assetsPath}/achievements/icons/Automation/icon_achieveDa.png`,
   ),
   achievementsAutomationStwo: require(
     `${assetsPath}/achievements/icons/Automation/icon_achieveStwo.png`,
-  ),
-  achievmentsAutomationSequencer: require(
-    `${assetsPath}/achievements/icons/Automation/icon_decSeq.png`,
-  ),
-  achievmentsAutomationMiner: require(
-    `${assetsPath}/achievements/icons/Automation/icon_quantumMiner.png`,
   ),
   achievementsL1Dapps: require(
     `${assetsPath}/achievements/icons/Layer1-2/icon_l1dapps.png`,
@@ -290,9 +251,6 @@ const imagePaths = {
   achievementsL1Blocks3: require(
     `${assetsPath}/achievements/icons/Layer1-2/icon_l11000blocks.png`,
   ),
-  achievementsL1Blocks4: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l110000blocks.png`,
-  ),
   achievementsL2Dapps: require(
     `${assetsPath}/achievements/icons/Layer1-2/icon_l2dapps.png`,
   ),
@@ -310,58 +268,6 @@ const imagePaths = {
   ),
   achievementsL2Blocks3: require(
     `${assetsPath}/achievements/icons/Layer1-2/icon_l21000blocks.png`,
-  ),
-  achievementsL2Blocks4: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l210000blocks.png`,
-  ),
-
-  shopAutomationsSequencer0: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_base.png`,
-  ),
-  shopAutomationsSequencer1: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cloud.png`,
-  ),
-  shopAutomationsSequencer2: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cairo.png`,
-  ),
-  shopAutomationsSequencer3: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_parallel.png`,
-  ),
-  shopAutomationsSequencer4: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_decentralized.png`,
-  ),
-  shopAutomationsProver0: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_optimistic.png`,
-  ),
-  shopAutomationsProver1: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_snark.png`,
-  ),
-  shopAutomationsProver2: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stark.png`,
-  ),
-  shopAutomationsProver3: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stone.png`,
-  ),
-  shopAutomationsProver4: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_recursiveProof.png`,
-  ),
-  shopAutomationsProver5: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stwo.png`,
-  ),
-  shopAutomationsDa0: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_calldata.png`,
-  ),
-  shopAutomationsDa1: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_daCompression.png`,
-  ),
-  shopAutomationsDa2: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_daComp.png`,
-  ),
-  shopAutomationsDa3: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_das.png`,
-  ),
-  shopAutomationsDa4: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_volition.png`,
   ),
 
   // Prestige Icons
@@ -388,34 +294,14 @@ export const useImagePreloader = () => {
 
   // Load all images using useImage hook
   const images = {
-    logo: useImage(imagePaths.logo),
-    sublogo: useImage(imagePaths.sublogo),
-    starknet: useImage(imagePaths.starknet),
+    // General Images
     background: useImage(imagePaths.background),
     backgroundGrid: useImage(imagePaths.backgroundGrid),
-    header: useImage(imagePaths.header),
-    headerSwitch: useImage(imagePaths.headerSwitch),
-    headerSwitchActive: useImage(imagePaths.headerSwitchActive),
-    headerSwitchInactive: useImage(imagePaths.headerSwitchInactive),
-    topBar: useImage(imagePaths.topBar),
-    iconRandom: useImage(imagePaths.iconRandom),
-    iconClose: useImage(imagePaths.iconClose),
-    iconEdit: useImage(imagePaths.iconEdit),
-    basicButton: useImage(imagePaths.basicButton),
-    secondaryButton: useImage(imagePaths.secondaryButton),
+    balanceL1: useImage(imagePaths.balanceL1),
+    balanceL2: useImage(imagePaths.balanceL2),
     unknownImage: useImage(imagePaths.unknownImage),
-    nounsTitleplate: useImage(imagePaths.nounsTitleplate),
-    nounsSlots: useImage(imagePaths.nounsSlots),
-    nounsTabInactive: useImage(imagePaths.nounsTabInactive),
-    nounsTabActive: useImage(imagePaths.nounsTabActive),
-    nounsCreatorBg: useImage(imagePaths.nounsCreatorBg),
-    nounsCreatorButton: useImage(imagePaths.nounsCreatorButton),
-    l2BarsBg: useImage(imagePaths.l2BarsBg),
-    l2BarsBar: useImage(imagePaths.l2BarsBar),
-    l2BarsPlaque: useImage(imagePaths.l2BarsPlaque),
-    txsBorder: useImage(imagePaths.txsBorder),
-    txTabActive: useImage(imagePaths.txTabActive),
-    txTabInactive: useImage(imagePaths.txTabInactive),
+
+    // Transaction Images - Backgrounds
     txButtonBlueEmpty: useImage(imagePaths.txButtonBlueEmpty),
     txButtonGreenEmpty: useImage(imagePaths.txButtonGreenEmpty),
     txButtonPinkEmpty: useImage(imagePaths.txButtonPinkEmpty),
@@ -426,6 +312,8 @@ export const useImagePreloader = () => {
     txButtonPinkInner: useImage(imagePaths.txButtonPinkInner),
     txButtonPurpleInner: useImage(imagePaths.txButtonPurpleInner),
     txButtonYellowInner: useImage(imagePaths.txButtonYellowInner),
+
+    // Transaction Images - Icons
     txIconTx: useImage(imagePaths.txIconTx),
     txIconBlob: useImage(imagePaths.txIconBlob),
     txIconNft: useImage(imagePaths.txIconNft),
@@ -440,13 +328,16 @@ export const useImagePreloader = () => {
     txIconDaoSm: useImage(imagePaths.txIconDaoSm),
     txIconIsaSm: useImage(imagePaths.txIconIsaSm),
     txIconRunesSm: useImage(imagePaths.txIconRunesSm),
+
+    // Transaction Images - Nameplates
     txNameplateBlue: useImage(imagePaths.txNameplateBlue),
     txNameplateGreen: useImage(imagePaths.txNameplateGreen),
     txNameplatePink: useImage(imagePaths.txNameplatePink),
     txNameplatePurple: useImage(imagePaths.txNameplatePurple),
     txNameplateYellow: useImage(imagePaths.txNameplateYellow),
-    txPlaquePlus: useImage(imagePaths.txPlaquePlus),
-    txPlaqueMinus: useImage(imagePaths.txPlaqueMinus),
+    txPlaque: useImage(imagePaths.txPlaque),
+
+    // Block Images
     blockTxBgBlue: useImage(imagePaths.blockTxBgBlue),
     blockTxBgGreen: useImage(imagePaths.blockTxBgGreen),
     blockTxBgPink: useImage(imagePaths.blockTxBgPink),
@@ -459,8 +350,14 @@ export const useImagePreloader = () => {
     blockGrid: useImage(imagePaths.blockGrid),
     blockGridMin: useImage(imagePaths.blockGridMin),
     blockConnector: useImage(imagePaths.blockConnector),
-    txBackground: useImage(imagePaths.txBackground),
-    l2TxBackground: useImage(imagePaths.l2TxBackground),
+
+    // Staking
+    stakingBg: useImage(imagePaths.stakingBg),
+    stakingButtonBg: useImage(imagePaths.stakingButtonBg),
+    stakingAmountsBg: useImage(imagePaths.stakingAmountsBg),
+
+    // Navigation Images
+    navBg: useImage(imagePaths.navBg),
     navButton: useImage(imagePaths.navButton),
     navButtonActive: useImage(imagePaths.navButtonActive),
     navIconGame: useImage(imagePaths.navIconGame),
@@ -475,9 +372,9 @@ export const useImagePreloader = () => {
     navIconFlagActive: useImage(imagePaths.navIconFlagActive),
     navIconMedalActive: useImage(imagePaths.navIconMedalActive),
     navIconSettingsActive: useImage(imagePaths.navIconSettingsActive),
+
+    // Shop Images
     shopBg: useImage(imagePaths.shopBg),
-    shopBtc: useImage(imagePaths.shopBtc),
-    shopClock: useImage(imagePaths.shopClock),
     shopTitle: useImage(imagePaths.shopTitle),
     shopSeparator: useImage(imagePaths.shopSeparator),
     shopNamePlaque: useImage(imagePaths.shopNamePlaque),
@@ -504,6 +401,8 @@ export const useImagePreloader = () => {
     shopAutomationsMinerQuantum: useImage(
       imagePaths.shopAutomationsMinerQuantum,
     ),
+
+    // Achievement Images
     achievmentsBg: useImage(imagePaths.achievmentsBg),
     achievementsTileLocked: useImage(imagePaths.achievementsTileLocked),
     achievementsTileProgress: useImage(imagePaths.achievementsTileProgress),
@@ -518,43 +417,22 @@ export const useImagePreloader = () => {
     achievementsMoney1: useImage(imagePaths.achievementsMoney1),
     achievementsMoney2: useImage(imagePaths.achievementsMoney2),
     achievementsMoney3: useImage(imagePaths.achievementsMoney3),
-    achievmentsMoney4: useImage(imagePaths.achievmentsMoney4),
     achievementsAutomationDa: useImage(imagePaths.achievementsAutomationDa),
     achievementsAutomationStwo: useImage(imagePaths.achievementsAutomationStwo),
-    achievmentsAutomationSequencer: useImage(
-      imagePaths.achievmentsAutomationSequencer,
-    ),
-    achievmentsAutomationMiner: useImage(imagePaths.achievmentsAutomationMiner),
     achievementsL1Dapps: useImage(imagePaths.achievementsL1Dapps),
     achievementsL1Transactions: useImage(imagePaths.achievementsL1Transactions),
     achievementsL1Upgrades: useImage(imagePaths.achievementsL1Upgrades),
     achievementsL1Blocks1: useImage(imagePaths.achievementsL1Blocks1),
     achievementsL1Blocks2: useImage(imagePaths.achievementsL1Blocks2),
     achievementsL1Blocks3: useImage(imagePaths.achievementsL1Blocks3),
-    achievementsL1Blocks4: useImage(imagePaths.achievementsL1Blocks4),
     achievementsL2Dapps: useImage(imagePaths.achievementsL2Dapps),
     achievementsL2Transactions: useImage(imagePaths.achievementsL2Transactions),
     achievementsL2Upgrades: useImage(imagePaths.achievementsL2Upgrades),
     achievementsL2Blocks1: useImage(imagePaths.achievementsL2Blocks1),
     achievementsL2Blocks2: useImage(imagePaths.achievementsL2Blocks2),
     achievementsL2Blocks3: useImage(imagePaths.achievementsL2Blocks3),
-    achievementsL2Blocks4: useImage(imagePaths.achievementsL2Blocks4),
-    shopAutomationSequencer0: useImage(imagePaths.shopAutomationsSequencer0),
-    shopAutomationSequencer1: useImage(imagePaths.shopAutomationsSequencer1),
-    shopAutomationSequencer2: useImage(imagePaths.shopAutomationsSequencer2),
-    shopAutomationSequencer3: useImage(imagePaths.shopAutomationsSequencer3),
-    shopAutomationSequencer4: useImage(imagePaths.shopAutomationsSequencer4),
-    shopAutomationProver0: useImage(imagePaths.shopAutomationsProver0),
-    shopAutomationProver1: useImage(imagePaths.shopAutomationsProver1),
-    shopAutomationProver2: useImage(imagePaths.shopAutomationsProver2),
-    shopAutomationProver3: useImage(imagePaths.shopAutomationsProver3),
-    shopAutomationProver4: useImage(imagePaths.shopAutomationsProver4),
-    shopAutomationProver5: useImage(imagePaths.shopAutomationsProver5),
-    shopAutomationDa0: useImage(imagePaths.shopAutomationsDa0),
-    shopAutomationDa1: useImage(imagePaths.shopAutomationsDa1),
-    shopAutomationDa2: useImage(imagePaths.shopAutomationsDa2),
-    shopAutomationDa3: useImage(imagePaths.shopAutomationsDa3),
-    shopAutomationDa4: useImage(imagePaths.shopAutomationsDa4),
+
+    // Prestige Icons
     prestige1: useImage(imagePaths.prestige1),
     prestige2: useImage(imagePaths.prestige2),
     prestige3: useImage(imagePaths.prestige3),
@@ -575,34 +453,12 @@ export const useImagePreloader = () => {
     if (allImagesLoaded && globalIsLoading) {
       const imagesMap = {
         background: images.background,
-        logo: images.logo,
-        "logo.sub": images.sublogo,
-        "logo.starknet": images.starknet,
         "background.grid": images.backgroundGrid,
         "background.shop": images.shopBg,
-        header: images.header,
-        "header.switch": images.headerSwitch,
-        "header.switch.active": images.headerSwitchActive,
-        "header.switch.inactive": images.headerSwitchInactive,
-        "bar.top": images.topBar,
-        "icon.random": images.iconRandom,
-        "icon.close": images.iconClose,
-        "icon.edit": images.iconEdit,
-        "button.basic": images.basicButton,
-        "button.secondary": images.secondaryButton,
+        "background.staking": images.stakingBg,
+        "balance.l1": images.balanceL1,
+        "balance.l2": images.balanceL2,
         unknown: images.unknownImage,
-        "nouns.titleplate": images.nounsTitleplate,
-        "nouns.slots": images.nounsSlots,
-        "nouns.tab.inactive": images.nounsTabInactive,
-        "nouns.tab.active": images.nounsTabActive,
-        "nouns.creator.bg": images.nounsCreatorBg,
-        "nouns.creator.button": images.nounsCreatorButton,
-        "l2.bars.bg": images.l2BarsBg,
-        "l2.bars.bar": images.l2BarsBar,
-        "l2.bars.plaque": images.l2BarsPlaque,
-        "tx.border": images.txsBorder,
-        "tx.tab.active": images.txTabActive,
-        "tx.tab.inactive": images.txTabInactive,
         "tx.button.bg.blue": images.txButtonBlueEmpty,
         "tx.button.bg.green": images.txButtonGreenEmpty,
         "tx.button.bg.pink": images.txButtonPinkEmpty,
@@ -632,8 +488,7 @@ export const useImagePreloader = () => {
         "tx.nameplate.pink": images.txNameplatePink,
         "tx.nameplate.purple": images.txNameplatePurple,
         "tx.nameplate.yellow": images.txNameplateYellow,
-        "tx.plaque.plus": images.txPlaquePlus,
-        "tx.plaque.minus": images.txPlaqueMinus,
+        "tx.plaque": images.txPlaque,
         "block.bg.blue": images.blockTxBgBlue,
         "block.bg.green": images.blockTxBgGreen,
         "block.bg.pink": images.blockTxBgPink,
@@ -646,24 +501,21 @@ export const useImagePreloader = () => {
         "block.grid": images.blockGrid,
         "block.grid.min": images.blockGridMin,
         "block.connector": images.blockConnector,
-        "tx.bg": images.txBackground,
-        "tx.bg.l2": images.l2TxBackground,
+        "nav.bg": images.navBg,
         "nav.button": images.navButton,
         "nav.button.active": images.navButtonActive,
         "nav.icon.game": images.navIconGame,
-        "nav.icon.staking": images.navIconStaking,
         "nav.icon.shop": images.navIconShop,
         "nav.icon.flag": images.navIconFlag,
         "nav.icon.medal": images.navIconMedal,
         "nav.icon.settings": images.navIconSettings,
+        "nav.icon.staking": images.navIconStaking,
         "nav.icon.game.active": images.navIconGameActive,
-        "nav.icon.staking.active": images.navIconStakingActive,
         "nav.icon.shop.active": images.navIconShopActive,
         "nav.icon.flag.active": images.navIconFlagActive,
         "nav.icon.medal.active": images.navIconMedalActive,
         "nav.icon.settings.active": images.navIconSettingsActive,
-        "shop.btc": images.shopBtc,
-        "shop.clock": images.shopClock,
+        "nav.icon.staking.active": images.navIconStakingActive,
         "shop.title": images.shopTitle,
         "shop.separator": images.shopSeparator,
         "shop.name.plaque": images.shopNamePlaque,
@@ -676,9 +528,11 @@ export const useImagePreloader = () => {
         "shop.upgrades.blockDifficulty": images.shopBlockDifficulty,
         "shop.upgrades.blockSize": images.shopBlockSize,
         "shop.upgrades.blockReward": images.shopBlockReward,
-        "shop.upgrades.daCompression": images.shopDaComp,
+        "shop.upgrades.daComp": images.shopDaComp,
         "shop.upgrades.mevBoost": images.shopMevBoost,
-        "shop.upgrades.recursiveProving": images.shopRecursiveProof,
+        "shop.upgrades.recursiveProof": images.shopRecursiveProof,
+        "staking.button.bg": images.stakingButtonBg,
+        "staking.amounts.bg": images.stakingAmountsBg,
         "achievements.bg": images.achievmentsBg,
         "achievements.tile.locked": images.achievementsTileLocked,
         "achievements.tile.progress": images.achievementsTileProgress,
@@ -687,8 +541,6 @@ export const useImagePreloader = () => {
         "achievements.title": images.achievementsTitle,
         "achievements.mission.btc.1": images.achievements100,
         "achievements.mission.btc.2": images.achievements1000,
-        "achievements.mission.btc.3": images.achievements1000,
-        "achievements.mission.btc.4": images.achievmentsMoney4,
         "achievements.stake": images.achievementsStake,
         "achievements.l2": images.achievementsL2,
         "achievements.mission.mine": images.achievementsMining,
@@ -697,26 +549,20 @@ export const useImagePreloader = () => {
         "achievements.money.1": images.achievementsMoney1,
         "achievements.money.2": images.achievementsMoney2,
         "achievements.money.3": images.achievementsMoney3,
-        "achievements.money.4": images.achievmentsMoney4,
         "achievements.automation.da": images.achievementsAutomationDa,
         "achievements.automation.stwo": images.achievementsAutomationStwo,
-        "achievements.automation.sequencer":
-          images.achievmentsAutomationSequencer,
-        "achievements.automation.miner": images.achievmentsAutomationMiner,
         "achievements.l1.dapps": images.achievementsL1Dapps,
         "achievements.l1.transactions": images.achievementsL1Transactions,
         "achievements.l1.upgrades": images.achievementsL1Upgrades,
         "achievements.l1.blocks.1": images.achievementsL1Blocks1,
         "achievements.l1.blocks.2": images.achievementsL1Blocks2,
         "achievements.l1.blocks.3": images.achievementsL1Blocks3,
-        "achievements.l1.blocks.4": images.achievementsL1Blocks4,
         "achievements.l2.dapps": images.achievementsL2Dapps,
         "achievements.l2.transactions": images.achievementsL2Transactions,
         "achievements.l2.upgrades": images.achievementsL2Upgrades,
         "achievements.l2.blocks.1": images.achievementsL2Blocks1,
         "achievements.l2.blocks.2": images.achievementsL2Blocks2,
         "achievements.l2.blocks.3": images.achievementsL2Blocks3,
-        "achievements.l2.blocks.4": images.achievementsL2Blocks4,
         ...Array.from({ length: 10 }, (_, i) => ({
           [`prestige.${i + 1}`]:
             images[`prestige${i + 1}` as keyof typeof images],
@@ -729,22 +575,6 @@ export const useImagePreloader = () => {
               }` as keyof typeof images
             ],
         })).reduce((acc, obj) => ({ ...acc, ...obj }), {}),
-        "shop.automation.sequencer.0": images.shopAutomationSequencer0,
-        "shop.automation.sequencer.1": images.shopAutomationSequencer1,
-        "shop.automation.sequencer.2": images.shopAutomationSequencer2,
-        "shop.automation.sequencer.3": images.shopAutomationSequencer3,
-        "shop.automation.sequencer.4": images.shopAutomationSequencer4,
-        "shop.automation.prover.0": images.shopAutomationProver0,
-        "shop.automation.prover.1": images.shopAutomationProver1,
-        "shop.automation.prover.2": images.shopAutomationProver2,
-        "shop.automation.prover.3": images.shopAutomationProver3,
-        "shop.automation.prover.4": images.shopAutomationProver4,
-        "shop.automation.prover.5": images.shopAutomationProver5,
-        "shop.automation.da.0": images.shopAutomationDa0,
-        "shop.automation.da.1": images.shopAutomationDa1,
-        "shop.automation.da.2": images.shopAutomationDa2,
-        "shop.automation.da.3": images.shopAutomationDa3,
-        "shop.automation.da.4": images.shopAutomationDa4,
       };
 
       globalImages = imagesMap;

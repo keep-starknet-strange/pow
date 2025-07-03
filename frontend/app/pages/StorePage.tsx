@@ -12,7 +12,6 @@ import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
 import { DappsUnlock } from "../components/store/DappsUnlock";
 import { L2Unlock } from "../components/store/L2Unlock";
-import { StakingUnlock } from "../components/store/StakingUnlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
 
