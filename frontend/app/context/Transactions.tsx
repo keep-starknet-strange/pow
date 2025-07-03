@@ -61,7 +61,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { tryBuy } = useBalance();
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powGameContractAddress, getUserTxFeeLevels, getUserTxSpeedLevels } =
+  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } =
     usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
 
@@ -195,7 +195,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const fetchTransactionSpeeds = async () => {
       if (!user) return;
-      if (!powGameContractAddress) return;
+      if (!powContract) return;
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
@@ -213,11 +213,11 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
         */
         const txJsonConfig =
           chainId === 0 ? transactionJson.L1 : transactionJson.L2;
-        const maxTxId = txJsonConfig.length - 1;
+        const maxTxId = txJsonConfig.length;
         const dappsJsonConfig =
           chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-        const maxDappId = dappsJsonConfig.length - 1;
-        const maxId = maxTxId + maxDappId + 1; // Dapp IDs are offset by the number of transactions
+        const maxDappId = dappsJsonConfig.length;
+        const maxId = maxTxId + maxDappId; // Dapp IDs are offset by the number of transactions
         const txFeeLevels = await getUserTxFeeLevels(chainId, maxId);
         const txSpeedLevels = await getUserTxSpeedLevels(chainId, maxId);
         if (!txFeeLevels || !txSpeedLevels) {
@@ -230,7 +230,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
             newFees[chainId] = {};
           }
           txFeeLevels.forEach((level, txId) => {
-            if (txId <= maxTxId) {
+            if (txId < maxTxId) {
               newFees[chainId][txId] = level - 1; // -1 offset since 0 indexed
             }
           });
@@ -243,8 +243,8 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
             newFees[chainId] = {};
           }
           txFeeLevels.forEach((level, txId) => {
-            if (txId > maxTxId) {
-              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+            if (txId >= maxTxId) {
+              const dappId = txId - maxTxId; // Dapp IDs are offset by the number of transactions
               newFees[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
@@ -257,11 +257,8 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
             newSpeeds[chainId] = {};
           }
           txSpeedLevels.forEach((level, txId) => {
-            if (txId <= maxTxId) {
+            if (txId < maxTxId) {
               newSpeeds[chainId][txId] = level - 1; // -1 offset since 0 indexed
-            } else {
-              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
-              newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newSpeeds;
@@ -273,12 +270,17 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
             newSpeeds[chainId] = {};
           }
           txSpeedLevels.forEach((level, txId) => {
-            if (txId > maxTxId) {
-              const dappId = txId - maxTxId - 1; // Dapp IDs are offset by the number of transactions
+            if (txId >= maxTxId) {
+              const dappId = txId - maxTxId; // Dapp IDs are offset by the number of transactions
               newSpeeds[chainId][dappId] = level - 1; // -1 offset since 0 indexed
             }
           });
           return newSpeeds;
+        });
+        setDappsUnlocked((prevUnlocked) => {
+          const newUnlocked = { ...prevUnlocked };
+          newUnlocked[chainId] = (txFeeLevels.at(maxTxId + 1) || 0) > 0; // Check if 1st dapp level is >= 0
+          return newUnlocked;
         });
         /* TODO: Use foc engine?
         const transactionSpeedsLevels: { txId: number; level: number }[] = [];
@@ -327,7 +329,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchTransactionSpeeds();
   }, [
     user,
-    powGameContractAddress,
+    powContract,
     getUniqueEventsWith,
     getUserTxFeeLevels,
     getUserTxSpeedLevels,

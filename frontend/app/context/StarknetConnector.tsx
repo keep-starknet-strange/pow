@@ -567,7 +567,8 @@ export const StarknetConnectorProvider: React.FC<{
 
         // Run using backend paymaster provider
         const formattedCalls = formatCall(calls);
-        const focEngineUrl = "http://localhost:8080";
+        const focEngineUrl =
+          process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
         const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
         const gaslessTxInput = {
           account: invokeAccount.address,

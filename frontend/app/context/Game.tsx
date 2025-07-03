@@ -13,6 +13,8 @@ import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
 import { useDAConfirmer } from "../hooks/useDAConfirmer";
 import { useProver } from "../hooks/useProver";
+import { useFocEngine } from "./FocEngineConnector";
+import { usePowContractConnector } from "./PowContractConnector";
 import { Transaction, newTransaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 import { daTxTypeId, proofTxTypeId } from "../utils/transactions";
@@ -58,6 +60,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { notify } = useEventManager();
   const { updateBalance, tryBuy } = useBalance();
+  const { user } = useFocEngine();
+  const {
+    powContract,
+    getUserBlockNumber,
+    getUserBlockState,
+    getUserMaxChainId,
+    initMyGame,
+  } = usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
   const { addBlock, addChain } = useChains();
 
@@ -72,7 +82,65 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    resetGameState();
+    const fetchGameState = async () => {
+      if (powContract && user) {
+        try {
+          // TODO: Use foc engine?
+          const maxChainId = (await getUserMaxChainId()) || 0;
+          // Setup l1 state
+          const blockNumber = (await getUserBlockNumber(0)) || 0;
+          if (blockNumber === 0) {
+            resetGameState();
+            return;
+          }
+          const { size: blockSize, fees: blockFees } = (await getUserBlockState(
+            0,
+          )) || { size: 0, fees: 0 };
+          const l1WorkingBlock: Block = {
+            blockId: blockNumber,
+            fees: blockFees || 0,
+            transactions: Array.from({ length: blockSize || 0 }, () => ({
+              typeId: 0,
+              fee: 0,
+              isDapp: false,
+            })),
+            isBuilt: false,
+            reward: blockNumber === 0 ? genesisBlockReward : undefined,
+          };
+          if (maxChainId > 1) {
+            // Setup l2 state
+            const l2BlockNumber = (await getUserBlockNumber(1)) || 0;
+            const { size: l2BlockSize, fees: l2BlockFees } =
+              (await getUserBlockState(1)) || { size: 0, fees: 0 };
+            const l2WorkingBlock: Block = {
+              blockId: l2BlockNumber,
+              fees: l2BlockFees || 0,
+              transactions: Array.from({ length: l2BlockSize || 0 }, () => ({
+                typeId: 0,
+                fee: 0,
+                isDapp: false,
+              })),
+              isBuilt: false,
+              reward: l2BlockNumber === 0 ? genesisBlockReward : undefined,
+            };
+            const l2Instance: L2 = newL2();
+            l2Instance.da = newL2DA();
+            l2Instance.prover = newL2Prover();
+            setL2(l2Instance);
+            setWorkingBlocks([l1WorkingBlock, l2WorkingBlock]);
+          } else {
+            setWorkingBlocks([l1WorkingBlock]);
+            setL2(undefined);
+          }
+        } catch (error) {
+          console.error("Error fetching game state:", error);
+          resetGameState();
+        }
+      } else {
+        resetGameState();
+      }
+    };
+    fetchGameState();
     /*
     const getNewGameState = async () => {
       const newGameState = await getGameState(mockAddress);
@@ -81,7 +149,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     getNewGameState();
     */
-  }, []);
+  }, [powContract, user]);
 
   const getWorkingBlock = useCallback(
     (chainId: number) => {
@@ -116,6 +184,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const onBlockMined = () => {
     const completedBlock = workingBlocks[0];
+    if (completedBlock.blockId === 0) {
+      initMyGame();
+    }
     const blockReward =
       completedBlock.reward || getUpgradeValue(0, "Block Reward");
     completedBlock.reward = blockReward;

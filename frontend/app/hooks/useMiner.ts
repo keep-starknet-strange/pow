@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
 
@@ -10,8 +12,26 @@ export const useMiner = (
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
+  const { user } = useFocEngine();
+  const { powContract, getUserBlockClicks } = usePowContractConnector();
   const [mineCounter, setMineCounter] = useState(0);
   const [miningProgress, setMiningProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchMineCounter = async () => {
+      if (powContract && user) {
+        try {
+          // TODO: Use foc engine?
+          const clicks = await getUserBlockClicks(0);
+          setMineCounter(clicks || 0);
+        } catch (error) {
+          console.error("Error fetching mine counter:", error);
+          setMineCounter(0);
+        }
+      }
+    };
+    fetchMineCounter();
+  }, [powContract, user, getUserBlockClicks]);
 
   const mineBlock = () => {
     setMineCounter((prevCounter) => {

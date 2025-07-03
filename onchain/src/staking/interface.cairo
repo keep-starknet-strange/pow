@@ -10,9 +10,9 @@ pub struct StakingConfig {
 
 #[derive(Copy, Drop, Serde, starknet::Store)]
 pub struct SlashingConfig {
-    pub slash_fraction: u128, 
+    pub slash_fraction: u128,
     pub due_time: u64, // Time in seconds after which slashing occurs
-    pub leaniance_margin: u64, // Mgit`argin time for slashing
+    pub leaniance_margin: u64 // Mgit`argin time for slashing
 }
 
 #[starknet::interface]

@@ -37,8 +37,6 @@ pub trait IPowUpgrades<TContractState> {
     fn get_automation_config(
         self: @TContractState, chain_id: u32, automation_id: u32, level: u32,
     ) -> AutomationConfig;
-    fn setup_upgrade(ref self: TContractState, params: UpgradeSetupParams);
-    fn setup_automation(ref self: TContractState, params: AutomationSetupParams);
 
     // User upgrades
     fn get_user_upgrade_level(
@@ -53,9 +51,6 @@ pub trait IPowUpgrades<TContractState> {
     fn get_user_automation_levels(
         self: @TContractState, user: ContractAddress, chain_id: u32, automation_count: u32,
     ) -> Span<u32>;
-    fn level_upgrade(ref self: TContractState, chain_id: u32, upgrade_id: u32);
-    fn level_automation(ref self: TContractState, chain_id: u32, automation_id: u32);
-    fn reset_upgrade_levels(ref self: TContractState, chain_id: u32);
 
     // Use upgrades
     fn get_next_upgrade_cost(self: @TContractState, chain_id: u32, upgrade_id: u32) -> u128;

@@ -169,6 +169,11 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
                   Please notice: your username will be public
                 </Text>
+                {usernameError ? (
+                  <Text className="text-red-500 text-md mt-2 font-Pixels">
+                    {usernameError}
+                  </Text>
+                ) : null}
               </View>
             </View>
           </KeyboardAvoidingView>

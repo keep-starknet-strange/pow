@@ -3,6 +3,10 @@
 # This script sets up the POW! contracts from configs
 
 POW_CONTRACT_ADDRESS=$1
+if [ -z "$POW_CONTRACT_ADDRESS" ]; then
+  echo "Usage: $0 <POW_CONTRACT_ADDRESS>"
+  exit 1
+fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR=$SCRIPT_DIR/../..
@@ -123,7 +127,7 @@ for entry in $(echo $L1_UPGRADES | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
-    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_upgrade $SETUP_UPGRADE_CALLDATA
+    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
 done
 for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     _jq() {
@@ -148,7 +152,7 @@ for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
-    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_upgrade $SETUP_UPGRADE_CALLDATA
+    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
 done
 
 echo
@@ -185,7 +189,7 @@ for entry in $(echo $L1_AUTOMATIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
-    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_automation $SETUP_AUTOMATION_CALLDATA
+    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
 done
 for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     _jq() {
@@ -212,7 +216,7 @@ for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
-    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_automation $SETUP_AUTOMATION_CALLDATA
+    starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
 done
 
 echo
@@ -374,7 +378,7 @@ SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS)) $PRESTIGE_COSTS_INFO $((PRES
 
 # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
 # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA
-starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_prestige $SETUP_PRESTIGE_CALLDATA
+starkli invoke --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS setup_prestige_config $SETUP_PRESTIGE_CALLDATA
 echo
 echo "Done setting up prestige!"
 echo

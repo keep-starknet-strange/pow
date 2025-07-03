@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useEventManager } from "../context/EventManager";
 import { useUpgrades } from "../context/Upgrades";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
 
@@ -9,9 +11,27 @@ export const useSequencer = (
   getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
+  const { user } = useFocEngine();
+  const { powContract, getUserBlockClicks } = usePowContractConnector();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const [sequenceCounter, setSequenceCounter] = useState(0);
   const [sequencingProgress, setSequencingProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchSequencerCounter = async () => {
+      if (powContract && user) {
+        try {
+          // TODO: Use foc engine?
+          const clicks = await getUserBlockClicks(1);
+          setSequenceCounter(clicks || 0);
+        } catch (error) {
+          console.error("Error fetching mine counter:", error);
+          setSequenceCounter(0);
+        }
+      }
+    };
+    fetchSequencerCounter();
+  }, [powContract, user, getUserBlockClicks]);
 
   const sequenceBlock = () => {
     setSequenceCounter((prevCounter) => {

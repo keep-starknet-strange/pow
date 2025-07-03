@@ -89,37 +89,6 @@ pub mod PowUpgradesComponent {
             self.automations.read((chain_id, automation_id, level))
         }
 
-        // TODO: Clear UpgradeConfig for values higher than params.costs.len()
-        // TODO: Game master checks on all component setup functions
-        fn setup_upgrade(ref self: ComponentState<TContractState>, params: UpgradeSetupParams) {
-            let chain_id = params.chain_id;
-            let upgrade_id = params.upgrade_id;
-            let mut idx = 0;
-            let maxLevel = params.levels.len();
-            while idx != maxLevel {
-                self.upgrades.write((chain_id, upgrade_id, idx), params.levels[idx].clone());
-                idx += 1;
-            }
-            self.upgrade_ids.write(params.name, upgrade_id);
-            self.emit(UpgradeConfigUpdated { chain_id, upgrade_id, new_config: params });
-        }
-
-        // TODO: Clear AutomationConfig for values higher than params.costs.len()
-        fn setup_automation(
-            ref self: ComponentState<TContractState>, params: AutomationSetupParams,
-        ) {
-            let chain_id = params.chain_id;
-            let automation_id = params.automation_id;
-            let mut idx = 0;
-            let maxLevel = params.levels.len();
-            while idx != maxLevel {
-                self.automations.write((chain_id, automation_id, idx), params.levels[idx].clone());
-                idx += 1;
-            }
-            self.automation_ids.write(params.name, automation_id);
-            self.emit(AutomationConfigUpdated { chain_id, automation_id, new_config: params });
-        }
-
         fn get_user_upgrade_level(
             self: @ComponentState<TContractState>,
             user: ContractAddress,
@@ -166,50 +135,6 @@ pub mod PowUpgradesComponent {
                 idx += 1;
             }
             levels.span()
-        }
-
-        fn level_upgrade(ref self: ComponentState<TContractState>, chain_id: u32, upgrade_id: u32) {
-            let caller = get_caller_address();
-            let current_level = self.upgrade_levels.read((caller, chain_id, upgrade_id));
-            let new_level = current_level + 1;
-            self.upgrade_levels.write((caller, chain_id, upgrade_id), new_level);
-            self
-                .emit(
-                    UpgradeLevelUpdated {
-                        user: caller, chain_id, upgrade_id, old_level: current_level, new_level,
-                    },
-                );
-        }
-
-        fn level_automation(
-            ref self: ComponentState<TContractState>, chain_id: u32, automation_id: u32,
-        ) {
-            let caller = get_caller_address();
-            let current_level = self.automation_levels.read((caller, chain_id, automation_id));
-            let new_level = current_level + 1;
-            self.automation_levels.write((caller, chain_id, automation_id), new_level);
-            self
-                .emit(
-                    AutomationLevelUpdated {
-                        user: caller, chain_id, automation_id, old_level: current_level, new_level,
-                    },
-                );
-        }
-
-        fn reset_upgrade_levels(ref self: ComponentState<TContractState>, chain_id: u32) {
-            let caller = get_caller_address();
-            let mut idx = 0;
-            let upgrades_count = 10; // TODO
-            while idx != upgrades_count {
-                self.upgrade_levels.write((caller, chain_id, idx), 0);
-                idx += 1;
-            }
-            let mut idx = 0;
-            let automations_count = 10; // TODO
-            while idx != automations_count {
-                self.automation_levels.write((caller, chain_id, idx), 0);
-                idx += 1;
-            };
         }
 
         // TODO: If maxlevel
@@ -261,6 +186,86 @@ pub mod PowUpgradesComponent {
             let automation_id = self.automation_ids.read(automation_name);
             let level = self.automation_levels.read((caller, chain_id, automation_id));
             self.automations.read((chain_id, automation_id, level)).value
+        }
+    }
+
+    #[generate_trait]
+    pub impl InternalImpl<
+        TContractState, +HasComponent<TContractState>,
+    > of InternalTrait<TContractState> {
+        // TODO: Clear UpgradeConfig for values higher than params.costs.len()
+        // TODO: Game master checks on all component setup functions
+        fn setup_upgrade(ref self: ComponentState<TContractState>, params: UpgradeSetupParams) {
+            let chain_id = params.chain_id;
+            let upgrade_id = params.upgrade_id;
+            let mut idx = 0;
+            let maxLevel = params.levels.len();
+            while idx != maxLevel {
+                self.upgrades.write((chain_id, upgrade_id, idx), params.levels[idx].clone());
+                idx += 1;
+            }
+            self.upgrade_ids.write(params.name, upgrade_id);
+            self.emit(UpgradeConfigUpdated { chain_id, upgrade_id, new_config: params });
+        }
+
+        // TODO: Clear AutomationConfig for values higher than params.costs.len()
+        fn setup_automation(
+            ref self: ComponentState<TContractState>, params: AutomationSetupParams,
+        ) {
+            let chain_id = params.chain_id;
+            let automation_id = params.automation_id;
+            let mut idx = 0;
+            let maxLevel = params.levels.len();
+            while idx != maxLevel {
+                self.automations.write((chain_id, automation_id, idx), params.levels[idx].clone());
+                idx += 1;
+            }
+            self.automation_ids.write(params.name, automation_id);
+            self.emit(AutomationConfigUpdated { chain_id, automation_id, new_config: params });
+        }
+
+        fn level_upgrade(ref self: ComponentState<TContractState>, chain_id: u32, upgrade_id: u32) {
+            let caller = get_caller_address();
+            let current_level = self.upgrade_levels.read((caller, chain_id, upgrade_id));
+            let new_level = current_level + 1;
+            self.upgrade_levels.write((caller, chain_id, upgrade_id), new_level);
+            self
+                .emit(
+                    UpgradeLevelUpdated {
+                        user: caller, chain_id, upgrade_id, old_level: current_level, new_level,
+                    },
+                );
+        }
+
+        fn level_automation(
+            ref self: ComponentState<TContractState>, chain_id: u32, automation_id: u32,
+        ) {
+            let caller = get_caller_address();
+            let current_level = self.automation_levels.read((caller, chain_id, automation_id));
+            let new_level = current_level + 1;
+            self.automation_levels.write((caller, chain_id, automation_id), new_level);
+            self
+                .emit(
+                    AutomationLevelUpdated {
+                        user: caller, chain_id, automation_id, old_level: current_level, new_level,
+                    },
+                );
+        }
+
+        fn reset_upgrade_levels(ref self: ComponentState<TContractState>, chain_id: u32) {
+            let caller = get_caller_address();
+            let mut idx = 0;
+            let upgrades_count = 10; // TODO
+            while idx != upgrades_count {
+                self.upgrade_levels.write((caller, chain_id, idx), 0);
+                idx += 1;
+            }
+            let mut idx = 0;
+            let automations_count = 10; // TODO
+            while idx != automations_count {
+                self.automation_levels.write((caller, chain_id, idx), 0);
+                idx += 1;
+            };
         }
     }
 }

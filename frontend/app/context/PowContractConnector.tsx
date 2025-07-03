@@ -19,6 +19,7 @@ type PowContractContextType = {
   powGameContractAddress: string | null;
   powContract: Contract | null;
 
+  createGameAccount: () => Promise<void>;
   initMyGame: () => Promise<void>;
   addAction: (action: PowAction) => void;
 
@@ -39,9 +40,19 @@ type PowContractContextType = {
     chainId: number,
     automationCount: number,
   ) => Promise<number[] | undefined>;
+  getUserBlockNumber: (chainId: number) => Promise<number | undefined>;
+  getUserBlockState: (
+    chainId: number,
+  ) => Promise<
+    { size: number | undefined; fees: number | undefined } | undefined
+  >;
+  getUserMaxChainId: () => Promise<number | undefined>;
+  getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
+  getUserDaClicks: (chainId: number) => Promise<number | undefined>;
+  getUserProofClicks: (chainId: number) => Promise<number | undefined>;
 };
 
-export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 10;
+export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50;
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(
   undefined,
@@ -88,7 +99,10 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!provider) {
         return;
       }
-      const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
+      // await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
+      const contract =
+        process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS ||
+        "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3";
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args
@@ -116,46 +130,35 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     powContract.connect(account);
   }, [account, powContract, STARKNET_ENABLED]);
 
-  const initMyGame = useCallback(async () => {
+  const createGameAccount = useCallback(async () => {
     if (!STARKNET_ENABLED) {
-      return;
-    }
-    if (!powGameContractAddress) {
-      console.error("powGameContractAddress is not set");
       return;
     }
 
     const privateKey = generatePrivateKey();
-    console.log("Initializing my game...");
+    console.log("Creating game account...");
     if (network === "SN_DEVNET") {
       const accountAddress = generateAccountAddress(privateKey, "devnet");
       await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
       deployAccount(privateKey, "devnet");
       storePrivateKey(privateKey, "pow_game", "devnet");
-      // TODO: Invoke like else statement with account deployment
-      addAction({
-        contract: powGameContractAddress,
-        action: "init_my_game",
-        args: [],
-      });
     } else {
-      const initMyGameCall: Call = {
-        contractAddress: powGameContractAddress,
-        entrypoint: "init_my_game",
+      const initializeAccountCall: Call = {
+        contractAddress: powGameContractAddress!,
+        entrypoint: "get_genesis_block_reward",
         calldata: [],
       };
-      invokeWithPaymaster([initMyGameCall], privateKey);
+      invokeWithPaymaster([initializeAccountCall], privateKey);
       storePrivateKey(privateKey, "pow_game");
     }
   }, [
-    powGameContractAddress,
     invokeWithPaymaster,
-    network,
-    deployAccount,
-    generateAccountAddress,
     generatePrivateKey,
-    invokeContractCalls,
+    generateAccountAddress,
+    deployAccount,
     mintFunds,
+    powGameContractAddress,
+    network,
     STARKNET_ENABLED,
   ]);
 
@@ -177,6 +180,38 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     [powGameContractAddress],
   );
+
+  const initMyGame = useCallback(async () => {
+    if (!STARKNET_ENABLED) {
+      return;
+    }
+    if (!powGameContractAddress) {
+      console.error("powGameContractAddress is not set");
+      return;
+    }
+
+    if (network === "SN_DEVNET") {
+      // TODO: Invoke like else statement with account deployment
+      addAction({
+        contract: powGameContractAddress,
+        action: "init_my_game",
+        args: [],
+      });
+    } else {
+      const initMyGameCall: Call = {
+        contractAddress: powGameContractAddress,
+        entrypoint: "init_my_game",
+        calldata: [],
+      };
+      invokeWithPaymaster([initMyGameCall]);
+    }
+  }, [
+    powGameContractAddress,
+    invokeWithPaymaster,
+    addAction,
+    network,
+    STARKNET_ENABLED,
+  ]);
 
   const getUserBalance = useCallback(async () => {
     if (!STARKNET_ENABLED || !powContract) {
@@ -281,6 +316,127 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  const getUserBlockNumber = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const blockNumber = await powContract.get_block_building_height(
+          account?.address || "",
+          chainId,
+        );
+        return blockNumber.toString
+          ? parseInt(blockNumber.toString(), 10)
+          : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user block number:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserBlockState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const { size: blockSize, fees: blockFees } =
+          await powContract.get_block_building_state(
+            account?.address || "",
+            chainId,
+          );
+        const blockSizeValue = blockSize.toString
+          ? parseInt(blockSize.toString(), 10)
+          : undefined;
+        const blockFeesValue = blockFees.toString
+          ? parseInt(blockFees.toString(), 10)
+          : undefined;
+        return { size: blockSizeValue, fees: blockFeesValue };
+      } catch (error) {
+        console.error("Failed to fetch user block state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserMaxChainId = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract) {
+      return;
+    }
+    try {
+      const maxChainId = await powContract.get_user_max_chain_id(
+        account?.address || "",
+      );
+      return maxChainId.toString
+        ? parseInt(maxChainId.toString(), 10)
+        : undefined;
+    } catch (error) {
+      console.error("Failed to fetch user max chain ID:", error);
+      return undefined;
+    }
+  }, [account, powContract, STARKNET_ENABLED]);
+
+  const getUserBlockClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_block_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user block clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserDaClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_da_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user DA clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserProofClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_proof_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user proof clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
   useEffect(() => {
     if (actionCalls.length >= MAX_ACTIONS) {
       const invokeActions = actionCalls.slice(0, MAX_ACTIONS);
@@ -305,6 +461,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     <PowContractConnector.Provider
       value={{
         powGameContractAddress,
+        createGameAccount,
         initMyGame,
         addAction,
         getUserBalance,
@@ -313,6 +470,12 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserTxSpeedLevels,
         getUserUpgradeLevels,
         getUserAutomationLevels,
+        getUserBlockNumber,
+        getUserBlockState,
+        getUserMaxChainId,
+        getUserBlockClicks,
+        getUserDaClicks,
+        getUserProofClicks,
       }}
     >
       {children}

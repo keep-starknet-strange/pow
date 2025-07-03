@@ -49,11 +49,8 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const {
-    powGameContractAddress,
-    getUserUpgradeLevels,
-    getUserAutomationLevels,
-  } = usePowContractConnector();
+  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } =
+    usePowContractConnector();
 
   const [upgrades, setUpgrades] = useState<{
     [chainId: number]: { [upgradeId: number]: number };
@@ -117,7 +114,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchUpgradeLevels = async () => {
       if (!user) return;
-      if (!powGameContractAddress) return;
+      if (!powContract) return;
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
@@ -171,7 +168,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
     };
     const fetchAutomationLevels = async () => {
       if (!user) return;
-      if (!powGameContractAddress) return;
+      if (!powContract) return;
       // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       for (const chainId of chainIds) {
@@ -229,7 +226,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
     resetUpgrades();
     fetchUpgradeLevels();
     fetchAutomationLevels();
-  }, [user, powGameContractAddress, getUniqueEventsWith]);
+  }, [user, powContract, getUniqueEventsWith]);
 
   const upgrade = (chainId: number, upgradeId: number) => {
     setUpgrades((prevUpgrades) => {
@@ -400,7 +397,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         chainAutomations[automation.id] !== undefined
           ? chainAutomations[automation.id]
           : -1;
-      return level === -1 ? 0 : automation.levels[level].speed;
+      return level === -1 ? 0 : automation.levels[level]?.speed | 0;
     },
     [automations],
   );

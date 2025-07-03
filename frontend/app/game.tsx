@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { RootNavigator } from "./navigation/RootNavigator";
 
 import { useEventManager } from "./context/EventManager";
+import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
 import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
@@ -21,6 +22,7 @@ import { TutorialObserver } from "./observers/TutorialObserver";
 import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
 export default function game() {
+  const { user } = useFocEngine();
   const { registerObserver, unregisterObserver } = useEventManager();
   const { setSoundDependency, initializeAchievements } = useAchievementsStore();
   const { initializeSound } = useSoundStore();
@@ -99,8 +101,8 @@ export default function game() {
 
   useEffect(() => {
     setSoundDependency(playSoundEffect);
-    initializeAchievements();
-  }, [playSoundEffect, setSoundDependency, initializeAchievements]);
+    initializeAchievements(user?.account_address);
+  }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
 
   return <RootNavigator />;
 }

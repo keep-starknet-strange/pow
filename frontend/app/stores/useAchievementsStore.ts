@@ -5,21 +5,23 @@ import inAppNotificationsJson from "../configs/inAppNotifications.json";
 import { useInAppNotificationsStore } from "./useInAppNotificationsStore";
 
 interface AchievementState {
+  achievementsAccount: string;
   achievementsProgress: { [key: number]: number };
   updateAchievement: (achievementId: number, progress: number) => void;
-  initializeAchievements: () => Promise<void>;
+  initializeAchievements: (account?: string) => Promise<void>;
   playSoundEffect?: (sound: string) => void;
   setSoundDependency: (playSoundEffect: (sound: string) => void) => void;
 }
 
 export const useAchievementsStore = create<AchievementState>((set, get) => ({
+  achievementsAccount: "default",
   achievementsProgress: {},
 
   setSoundDependency: (playSoundEffect) => {
     set({ playSoundEffect });
   },
 
-  initializeAchievements: async () => {
+  initializeAchievements: async (account: string = "default") => {
     const initialAchievementsProgress: { [key: number]: number } = {};
 
     achievementsJson.forEach((achievement: any) => {
@@ -29,7 +31,7 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     for (const achievement of achievementsJson) {
       try {
         const value = await AsyncStorage.getItem(
-          `achievement_${achievement.id}`,
+          `${account}.achievement_${achievement.id}`,
         );
         if (value !== null) {
           initialAchievementsProgress[achievement.id] = parseInt(value, 10);
@@ -39,6 +41,7 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
       }
     }
 
+    set({ achievementsAccount: account });
     set({ achievementsProgress: initialAchievementsProgress });
   },
 
@@ -72,7 +75,7 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     }
 
     AsyncStorage.setItem(
-      `achievement_${achievementId}`,
+      `${get().achievementsAccount}.achievement_${achievementId}`,
       clampedProgress.toString(),
     ).catch((error) =>
       console.error("Error saving achievement progress:", error),

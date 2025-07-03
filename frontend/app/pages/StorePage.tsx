@@ -179,6 +179,16 @@ export const StorePage: React.FC = () => {
             ))}
           </View>
         )}
+        {storeType === "L1" ? (
+          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
+            <StakingUnlock />
+            <L2Unlock alwaysShow={true} />
+          </View>
+        ) : (
+          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
+            <PrestigeUnlock />
+          </View>
+        )}
         <View className="h-[40px]" />
       </ScrollView>
       <View className="h-[100px]" />
@@ -210,16 +220,6 @@ export const StorePage: React.FC = () => {
         <View className="flex flex-row justify-between items-center p-2 mt-[1rem]">
           <Text className="text-[#e7e7e7] text-2xl font-bold">Scaling</Text>
         </View>
-        {storeType === "L1" ? (
-          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
-            <StakingUnlock />
-            <L2Unlock alwaysShow={true} />
-          </View>
-        ) : (
-          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
-            <PrestigeUnlock />
-          </View>
-        )}
         <View className="h-32" />
       </ScrollView>
 

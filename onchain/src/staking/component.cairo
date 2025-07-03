@@ -2,7 +2,8 @@
 pub mod StakingComponent {
     use pow_game::staking::interface::{IStaking, StakingConfig};
     use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_block_timestamp};
 
@@ -38,37 +39,36 @@ pub mod StakingComponent {
 
     #[derive(Drop, starknet::Event)]
     struct Slashed {
-        #[key] 
+        #[key]
         user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct Reward {
-        #[key] 
+        #[key]
         user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct WithdrawStake {
-        #[key] 
+        #[key]
         user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct ClaimRewards {
-        #[key] 
+        #[key]
         user: ContractAddress,
         amount: u128,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct StakingConfigUpdate
-    {
+    struct StakingConfigUpdate {
         config: StakingConfig,
-    } 
+    }
 
     #[embeddable_as(StakingImpl)]
     impl Staking<
@@ -90,16 +90,19 @@ pub mod StakingComponent {
     #[generate_trait]
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>,
-        > of InternalTrait<TContractState> {
-        fn setup_staking(ref self: ComponentState<TContractState>, user: ContractAddress, config: StakingConfig) {
+    > of InternalTrait<TContractState> {
+        fn setup_staking(ref self: ComponentState<TContractState>, config: StakingConfig) {
             assert(config.slashing_config.slash_fraction > 0, 'slash_fraction must be > 0');
             assert(config.slashing_config.due_time > 0, 'due_time must be > 0');
             assert(config.reward_rate > 0, 'reward_rate must be > 0');
-            
+
             self.staking_config.write(config);
             self.emit(StakingConfigUpdate { config: config });
         }
-        fn stake(ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128, now: u64) {
+
+        fn stake(
+            ref self: ComponentState<TContractState>, user: ContractAddress, amount: u128, now: u64,
+        ) {
             self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, current_stake + amount);
@@ -112,7 +115,7 @@ pub mod StakingComponent {
             self.emit(ClaimRewards { user: user, amount: reward });
             return reward;
         }
-        
+
         fn validate(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) {
             let user_stake = self.user_stakes.read(user);
             if user_stake == 0 {
@@ -125,24 +128,32 @@ pub mod StakingComponent {
             let user_rewards = self.user_rewards.read(user);
             let total_stake = user_stake + user_rewards;
             self.user_last_validation.write(user, now);
-            
+
             if time_since_last_validation > config.slashing_config.due_time {
                 // Slash logic
                 let how_late = time_since_last_validation / config.slashing_config.due_time;
                 let slash_amount = user_stake / config.slashing_config.slash_fraction;
                 let scaled_slash = slash_amount * how_late.into();
-                let slashed_amount = if scaled_slash < user_stake { scaled_slash } else { user_stake };
+                let slashed_amount = if scaled_slash < user_stake {
+                    scaled_slash
+                } else {
+                    user_stake
+                };
                 self.user_stakes.write(user, user_stake - slashed_amount);
                 self.emit(Slashed { user: user, amount: slashed_amount });
             } else {
                 // Reward logic
-                let reward: u128 = total_stake * (time_since_last_validation.into()) / config.reward_rate;
+                let reward: u128 = total_stake
+                    * (time_since_last_validation.into())
+                    / config.reward_rate;
                 self.user_rewards.write(user, user_rewards + reward);
                 self.emit(Reward { user: user, amount: reward });
             }
         }
 
-        fn withdraw_stake(ref self: ComponentState<TContractState>, user: ContractAddress, now: u64) -> u128 {
+        fn withdraw_stake(
+            ref self: ComponentState<TContractState>, user: ContractAddress, now: u64,
+        ) -> u128 {
             self.validate(user, now);
             let current_stake = self.user_stakes.read(user);
             self.user_stakes.write(user, 0);

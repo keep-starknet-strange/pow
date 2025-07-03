@@ -1,4 +1,4 @@
- use starknet::{ContractAddress};
+use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde)]
 pub struct RewardParams {
