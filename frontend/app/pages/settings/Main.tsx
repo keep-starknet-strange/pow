@@ -16,7 +16,7 @@ export type SettingsMainSectionProps = {
 
 const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   setSettingTab,
-  goBackToLogin
+  goBackToLogin,
 }) => {
   const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
@@ -78,11 +78,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
       <ResetTutorialButton />
 
       {!isAuthenticated && (
-        <BasicButton
-          key="Back"
-          label="Back"
-          onPress={goBackToLogin}
-        />
+        <BasicButton key="Back" label="Back" onPress={goBackToLogin} />
       )}
 
       {settingsComponents.map(({ label, tab, onPress, icon }) => (

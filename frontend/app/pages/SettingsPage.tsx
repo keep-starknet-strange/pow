@@ -20,9 +20,7 @@ type SettingsProps = {
   setLoginPage: ((page: string) => void) | null;
 };
 
-export const SettingsPage: React.FC<SettingsProps> = ({
-  setLoginPage
-}) => {
+export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
   const [activeTab, setActiveTab] = useState<keyof typeof tabs>("Main");
 
   const ActiveComponent = tabs[activeTab];
@@ -36,8 +34,8 @@ export const SettingsPage: React.FC<SettingsProps> = ({
       <ActiveComponent
         setSettingTab={setActiveTab}
         goBackToLogin={() => {
-          setLoginPage?.("login")
-        }} 
+          setLoginPage?.("login");
+        }}
       />
       {activeTab !== "Main" && (
         <TouchableOpacity
