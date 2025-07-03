@@ -191,7 +191,6 @@ export const StorePage: React.FC = () => {
         )}
         <View className="h-[40px]" />
       </ScrollView>
-      <View className="h-[100px]" />
     </View>
   );
 };

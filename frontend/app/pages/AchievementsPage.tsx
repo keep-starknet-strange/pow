@@ -196,7 +196,6 @@ export const AchievementsPage: React.FC = () => {
           end={{ x: 1, y: 0 }}
         />
       </ScrollView>
-      <View className="h-[100px]" />
     </View>
   );
 };
