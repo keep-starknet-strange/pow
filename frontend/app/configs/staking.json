@@ -1,44 +1,9 @@
-[
-  {
-    "chainId": 0,
-    "name": "Main Chain",
-    "baseApy": 0.06,
-    "stakingAmount": 100,
-    "yieldMultiplier": 25,
-    "icon": "🥩",
-    "unlockCosts": [700],
-    "slashing": {
-      "dueTime": 86400,
-      "chance": 0.1,
-      "fraction": 0.05
-    }
-  },
-  {
-    "chainId": 1,
-    "name": "Fox Chain",
-    "baseApy": 0.09,
-    "stakingAmount": 100,
-    "yieldMultiplier": 30,
-    "icon": "🦊",
-    "unlockCosts": [10],
-    "slashing": {
-      "dueTime": 43200,
-      "chance": 0.05,
-      "fraction": 0.02
-    }
-  },
-  {
-    "chainId": 1,
-    "name": "Phoenix Chain",
-    "baseApy": 0.12,
-    "stakingAmount": 100,
-    "yieldMultiplier": 40,
-    "icon": "🔥",
-    "unlockCosts": [100],
-    "slashing": {
-      "dueTime": 172800,
-      "chance": 0.2,
-      "fraction": 0.1
-    }
+{
+  "minStake": 1000,
+  "rewardRate": 0.05,
+  "slashingConfig": {
+    "slashFraction": 0.1,
+    "dueTime": 3600,
+    "leanianceMargin": 300
   }
-]
+}
