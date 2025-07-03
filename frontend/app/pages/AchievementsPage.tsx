@@ -50,7 +50,7 @@ export const AchievementsPage: React.FC = () => {
             x={0}
             y={-62}
             width={width}
-            height={height - 170}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
