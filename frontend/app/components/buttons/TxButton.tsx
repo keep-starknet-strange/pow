@@ -4,9 +4,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Easing,
-  Animated,
-  useAnimatedValue,
 } from "react-native";
 import { Dimensions } from "react-native";
 import { useGame } from "../../context/Game";
@@ -19,14 +16,15 @@ import { TargetId } from "../../stores/useTutorialStore";
 import { shortMoneyString } from "../../utils/helpers";
 import transactionConfig from "../../configs/transactions.json";
 import { PopupAnimation } from "../../components/PopupAnimation";
+import { useDerivedValue, useSharedValue, withSequence, withTiming, Easing, runOnJS } from "react-native-reanimated";
 import {
   Canvas,
   Image as SkiaImg,
+  ImageShader,
+  Rect,
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-
-const window = Dimensions.get("window");
 
 export type TxButtonProps = {
   chainId: number;
@@ -36,6 +34,7 @@ export type TxButtonProps = {
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { getImage } = useImageProvider();
+  const { width } = Dimensions.get("window");
   const { addTransaction } = useGame();
   const {
     transactionFees,
@@ -112,23 +111,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     addTransaction(props.chainId, newTx);
     setLastTxTime(Date.now());
   };
-
-  const sequenceAnim = useAnimatedValue(0);
-  const [sequencedDone, setSequencedDone] = useState(0);
-  useEffect(() => {
-    if (speed <= 0) return;
-    const randomValue = Math.floor(Math.random() * 300) - 150;
-    Animated.timing(sequenceAnim, {
-      toValue: 94,
-      easing: Easing.linear,
-      duration: 5000 / speed + randomValue,
-      useNativeDriver: false,
-    }).start(() => {
-      sequenceAnim.setValue(0);
-      addNewTransaction();
-      setSequencedDone(sequencedDone + 1);
-    });
-  }, [sequencedDone, speed]);
 
   const getTxBg = (chainId: number, txId: number, isDapp: boolean) => {
     switch (chainId) {
@@ -278,6 +260,36 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     }
   };
 
+  const automationAnimHeight = useSharedValue(94);
+  const automationAnimY = useDerivedValue(() => {
+    return 94 - automationAnimHeight.value;
+  }, [automationAnimHeight]);
+  useEffect(() => {
+    let randomDurationOffset = Math.random() * 500;
+    const interval = setInterval(() => {
+      randomDurationOffset = Math.random() * 500;
+      if (speed > 0) {
+        automationAnimHeight.value = withSequence(withTiming(
+          94,
+          {
+            duration: 5000 / speed + randomDurationOffset,
+            easing: Easing.cubic,
+          },
+          () => runOnJS(addNewTransaction)()
+        ), withTiming(
+          0,
+          {
+            duration: 200,
+            easing: Easing.bounce,
+          }
+        ));
+      } else {
+        automationAnimHeight.value = 94;
+      }
+    }, (5000 / speed) + 200 + randomDurationOffset);
+    return () => clearInterval(interval);
+  }, [speed, automationAnimHeight, addNewTransaction]);
+
   return (
     <View className="relative">
       <PopupAnimation
@@ -293,9 +305,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         ref={ref}
         onLayout={onLayout}
         style={{
-          width: window.width * 0.18,
+          width: width * 0.18,
         }}
-        className="relative h-[94px] overflow-hidden"
+        className="relative h-[94px]"
         onPress={() => {
           if (feeLevel === -1) {
             setLastTxTime(Date.now());
@@ -312,7 +324,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         <View
           className="absolute h-[94px]"
           style={{
-            width: window.width * 0.185,
+            width: width * 0.185,
           }}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -325,37 +337,35 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
               }}
               x={0}
               y={0}
-              width={window.width * 0.185}
+              width={width * 0.185}
               height={94}
             />
           </Canvas>
         </View>
-        <Animated.View
-          className="absolute w-full bottom-0 h-full"
+        <View
+          className="absolute bottom-0 h-full"
           style={{
-            width: window.width * 0.18,
-            maxHeight: speed > 0 ? sequenceAnim : "100%",
+            width: width * 0.18,
           }}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <SkiaImg
-              image={getTxInner(props.chainId, props.txType.id, false)}
-              fit="fill"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={0}
-              width={window.width * 0.18}
-              height={94}
-            />
+            <Rect x={0} y={automationAnimY} width={width * 0.18} height={automationAnimHeight}>
+              <ImageShader
+                image={getTxInner(props.chainId, props.txType.id, false)}
+                fit="fill"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                rect={{ x: 0, y: 0, width: width * 0.18, height: 94 }}
+              />
+            </Rect>
           </Canvas>
-        </Animated.View>
+        </View>
         <View
           className="absolute left-[3px] h-[94px] w-full"
           style={{
-            width: window.width * 0.17,
+            width: width * 0.17,
           }}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -368,7 +378,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
               }}
               x={0}
               y={2}
-              width={window.width * 0.165}
+              width={width * 0.165}
               height={19}
             />
           </Canvas>
@@ -379,7 +389,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         <View
           className="absolute h-[94px]"
           style={{
-            width: window.width * 0.18,
+            width: width * 0.18,
           }}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -392,7 +402,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
               }}
               x={0}
               y={35}
-              width={window.width * 0.18}
+              width={width * 0.18}
               height={40}
             />
           </Canvas>
@@ -414,7 +424,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       <View
         className="absolute bottom-[-22px] left-0 h-[20px]"
         style={{
-          width: window.width * 0.18,
+          width: width * 0.18,
         }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -427,7 +437,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             }}
             x={0}
             y={0}
-            width={window.width * 0.18}
+            width={width * 0.18}
             height={20}
           />
         </Canvas>
