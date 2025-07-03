@@ -191,7 +191,7 @@ pub mod PowUpgradesComponent {
 
     #[generate_trait]
     pub impl InternalImpl<
-      TContractState, +HasComponent<TContractState>,
+        TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
         // TODO: Clear UpgradeConfig for values higher than params.costs.len()
         // TODO: Game master checks on all component setup functions

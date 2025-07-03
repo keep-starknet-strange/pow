@@ -137,7 +137,7 @@ pub mod BuilderComponent {
 
     #[generate_trait]
     pub impl InternalImpl<
-      TContractState, +HasComponent<TContractState>,
+        TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
         fn build_block(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
@@ -218,6 +218,5 @@ pub mod BuilderComponent {
             self.proof_clicks.write((user, chain_id), 0);
             self.emit(BuildingProofClicked { user, chain_id, click_count: 0 });
         }
-
     }
 }

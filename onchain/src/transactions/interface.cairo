@@ -43,10 +43,10 @@ pub trait IPowTransactions<TContractState> {
         self: @TContractState, user: ContractAddress, chain_id: u32, tx_type_id: u32,
     ) -> u32;
     fn get_user_transaction_fee_levels(
-        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32
+        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32,
     ) -> Span<u32>;
     fn get_user_transaction_speed_levels(
-        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32
+        self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32,
     ) -> Span<u32>;
 
     // Use transactions

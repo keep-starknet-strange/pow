@@ -1,9 +1,9 @@
-use starknet::ContractAddress;
+use pow_game::prestige::PrestigeSetupParams;
+use pow_game::staking::StakingConfig;
+use pow_game::transactions::TransactionSetupParams;
 use pow_game::types::RewardParams;
-use pow_game::upgrades::{UpgradeSetupParams, AutomationSetupParams};
-use pow_game::transactions::{TransactionSetupParams};
-use pow_game::prestige::{PrestigeSetupParams};
-use pow_game::staking::{StakingConfig};
+use pow_game::upgrades::{AutomationSetupParams, UpgradeSetupParams};
+use starknet::ContractAddress;
 
 // Game configuration & state
 #[starknet::interface]
@@ -30,8 +30,15 @@ pub trait IPowGameRewards<TContractState> {
     fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
     fn claim_reward(ref self: TContractState, recipient: ContractAddress);
     fn get_reward_params(self: @TContractState) -> RewardParams;
-    fn game_master_give_reward(ref self: TContractState, game_address: ContractAddress, recipient: ContractAddress);
-    fn remove_funds(ref self: TContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256);
+    fn game_master_give_reward(
+        ref self: TContractState, game_address: ContractAddress, recipient: ContractAddress,
+    );
+    fn remove_funds(
+        ref self: TContractState,
+        token_address: ContractAddress,
+        recipient: ContractAddress,
+        value: u256,
+    );
     fn pause_rewards(ref self: TContractState);
     fn unpause_rewards(ref self: TContractState);
 }

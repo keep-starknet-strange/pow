@@ -61,7 +61,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   const { notify } = useEventManager();
   const { updateBalance, tryBuy } = useBalance();
   const { user } = useFocEngine();
-  const { powContract, getUserBlockNumber, getUserBlockState, getUserMaxChainId, initMyGame } = usePowContractConnector();
+  const {
+    powContract,
+    getUserBlockNumber,
+    getUserBlockState,
+    getUserMaxChainId,
+    initMyGame,
+  } = usePowContractConnector();
   const { getUpgradeValue } = useUpgrades();
   const { addBlock, addChain } = useChains();
 
@@ -80,14 +86,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       if (powContract && user) {
         try {
           // TODO: Use foc engine?
-          const maxChainId = await getUserMaxChainId() || 0;
+          const maxChainId = (await getUserMaxChainId()) || 0;
           // Setup l1 state
-          const blockNumber = await getUserBlockNumber(0) || 0;
+          const blockNumber = (await getUserBlockNumber(0)) || 0;
           if (blockNumber === 0) {
             resetGameState();
             return;
           }
-          const {size: blockSize, fees: blockFees} = await getUserBlockState(0) || {size: 0, fees: 0};
+          const { size: blockSize, fees: blockFees } = (await getUserBlockState(
+            0,
+          )) || { size: 0, fees: 0 };
           const l1WorkingBlock: Block = {
             blockId: blockNumber,
             fees: blockFees || 0,
@@ -101,8 +109,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
           };
           if (maxChainId > 1) {
             // Setup l2 state
-            const l2BlockNumber = await getUserBlockNumber(1) || 0;
-            const {size: l2BlockSize, fees: l2BlockFees} = await getUserBlockState(1) || {size: 0, fees: 0};
+            const l2BlockNumber = (await getUserBlockNumber(1)) || 0;
+            const { size: l2BlockSize, fees: l2BlockFees } =
+              (await getUserBlockState(1)) || { size: 0, fees: 0 };
             const l2WorkingBlock: Block = {
               blockId: l2BlockNumber,
               fees: l2BlockFees || 0,

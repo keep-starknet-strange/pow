@@ -28,7 +28,8 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [chains, setChains] = useState<Chain[]>([newChain(0)]);
   const { user } = useFocEngine();
-  const { powContract, getUserBlockNumber, getUserMaxChainId } = usePowContractConnector();
+  const { powContract, getUserBlockNumber, getUserMaxChainId } =
+    usePowContractConnector();
 
   const resetChains = () => {
     setChains([newChain(0)]);
@@ -39,9 +40,9 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
       if (powContract && user) {
         try {
           // TODO: Use foc engine?
-          const maxChainId = await getUserMaxChainId() || 0;
+          const maxChainId = (await getUserMaxChainId()) || 0;
           // Setup l1 state
-          const blockNumber = await getUserBlockNumber(0) || 0;
+          const blockNumber = (await getUserBlockNumber(0)) || 0;
           // TODO: Get block size?
           const chain = newChain(0);
           if (blockNumber > 0) {
@@ -51,14 +52,14 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
               transactions: Array.from({ length: 25 }, (_, i) => ({
                 typeId: 0,
                 fee: 0,
-                isDapp: false
+                isDapp: false,
               })),
               isBuilt: true,
             });
           }
           if (maxChainId > 1) {
             const l2Chain = newChain(1);
-            const l2BlockNumber = await getUserBlockNumber(1) || 0;
+            const l2BlockNumber = (await getUserBlockNumber(1)) || 0;
             if (l2BlockNumber > 0) {
               l2Chain.blocks.push({
                 blockId: l2BlockNumber - 1,
@@ -66,7 +67,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
                 transactions: Array.from({ length: 25 }, (_, i) => ({
                   typeId: 0,
                   fee: 0,
-                  isDapp: false
+                  isDapp: false,
                 })),
                 isBuilt: true,
               });
@@ -82,7 +83,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         resetChains();
       }
-    }
+    };
     fetchChainState();
     /*
     const getNewGameState = async () => {

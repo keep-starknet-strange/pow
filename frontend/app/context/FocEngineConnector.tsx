@@ -188,12 +188,12 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       if (data.data.registry_contracts[0] && provider) {
         const contract = data.data.registry_contracts[0];
         setRegistryContractAddress(contract);
-        const { abi: registryAbi } = await provider.getClassAt(contract).catch(
-          (error) => {
+        const { abi: registryAbi } = await provider
+          .getClassAt(contract)
+          .catch((error) => {
             console.error("Error fetching registry ABI:", error);
             return { abi: null };
-          },
-        );
+          });
         if (registryAbi) {
           const registryContract = new Contract(
             registryAbi,
@@ -221,12 +221,12 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       if (data.data.accounts_contract && provider) {
         const contract = data.data.accounts_contract;
         setAccountsContractAddress(contract);
-        const { abi: accountsAbi } = await provider.getClassAt(contract).catch(
-          (error) => {
+        const { abi: accountsAbi } = await provider
+          .getClassAt(contract)
+          .catch((error) => {
             console.error("Error fetching accounts ABI:", error);
             return { abi: null };
-          },
-        );
+          });
         if (accountsAbi) {
           const accountsContract = new Contract(
             accountsAbi,

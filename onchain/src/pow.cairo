@@ -1,42 +1,47 @@
 #[starknet::contract]
 mod PowGame {
+    use openzeppelin_security::PausableComponent;
+    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_upgrades::interface::IUpgradeable;
     use pow_game::actions::*;
-    use pow_game::interface::{IPowGame, IPowGameValidation, IPowGameRewards};
+    use pow_game::interface::{IPowGame, IPowGameRewards, IPowGameValidation};
     use pow_game::store::*;
     use pow_game::transactions::{DA_TX_TYPE_ID, PROOF_TX_TYPE_ID};
     use pow_game::types::RewardParams;
-    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-
-   // --- External Dependencies ---
-    use starknet::{
-        ContractAddress, get_caller_address, ClassHash,
-        storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess},
-    };
-    use openzeppelin_upgrades::interface::IUpgradeable;
-    use openzeppelin_upgrades::UpgradeableComponent;
-    use openzeppelin_security::PausableComponent;
 
     // --- Game Components ---
 
     // Upgrades
     use pow_game::upgrades::component::PowUpgradesComponent;
-    use pow_game::upgrades::{UpgradeSetupParams, AutomationSetupParams};
+    use pow_game::upgrades::{AutomationSetupParams, UpgradeSetupParams};
+
+    // --- External Dependencies ---
+    use starknet::{
+        ClassHash, ContractAddress, get_caller_address,
+        storage::{
+            Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+            StoragePointerWriteAccess,
+        },
+    };
     component!(path: PowUpgradesComponent, storage: upgrades, event: UpgradeEvent);
     #[abi(embed_v0)]
-    impl PowUpgradesComponentImpl = PowUpgradesComponent::PowUpgradesImpl<ContractState>;
+    impl PowUpgradesComponentImpl =
+        PowUpgradesComponent::PowUpgradesImpl<ContractState>;
     impl PowUpgradesInternalImpl = PowUpgradesComponent::InternalImpl<ContractState>;
+    use pow_game::transactions::TransactionSetupParams;
 
     // Transactions
     use pow_game::transactions::component::PowTransactionsComponent;
-    use pow_game::transactions::TransactionSetupParams;
     component!(path: PowTransactionsComponent, storage: transactions, event: TransactionEvent);
     #[abi(embed_v0)]
-    impl PowTransactionsComponentImpl = PowTransactionsComponent::PowTransactionsImpl<ContractState>;
+    impl PowTransactionsComponentImpl =
+        PowTransactionsComponent::PowTransactionsImpl<ContractState>;
     impl PowTransactionsInternalImpl = PowTransactionsComponent::InternalImpl<ContractState>;
+    use pow_game::prestige::PrestigeSetupParams;
 
     // Prestige
     use pow_game::prestige::component::PrestigeComponent;
-    use pow_game::prestige::PrestigeSetupParams;
     component!(path: PrestigeComponent, storage: prestige, event: PrestigeEvent);
     #[abi(embed_v0)]
     impl PrestigeComponentImpl = PrestigeComponent::PrestigeImpl<ContractState>;
@@ -48,10 +53,10 @@ mod PowGame {
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
     impl BuilderInternalImpl = BuilderComponent::InternalImpl<ContractState>;
+    use pow_game::staking::StakingConfig;
 
     // Staking
     use pow_game::staking::component::StakingComponent;
-    use pow_game::staking::StakingConfig;
     component!(path: StakingComponent, storage: staking, event: StakingEvent);
     #[abi(embed_v0)]
     impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
@@ -249,45 +254,50 @@ mod PowGame {
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
             assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");
-            
+
             self.reward_claimed.write(caller, true);
 
-            let success: bool = IERC20Dispatcher { contract_address: self.reward_token_address.read() }
+            let success: bool = IERC20Dispatcher {
+                contract_address: self.reward_token_address.read(),
+            }
                 .transfer(recipient, self.reward_amount.read());
 
             assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed {
-                user: caller,
-                recipient
-            });
+            self.emit(RewardClaimed { user: caller, recipient });
         }
 
-        fn game_master_give_reward(ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress) {
-             self.check_valid_game_master(get_caller_address());
+        fn game_master_give_reward(
+            ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress,
+        ) {
+            self.check_valid_game_master(get_caller_address());
             let claimed = self.reward_claimed.read(game_address);
             assert!(!claimed, "Reward already claimed");
-            
+
             self.reward_claimed.write(game_address, true);
 
-            let success: bool = IERC20Dispatcher { contract_address: self.reward_token_address.read() }
+            let success: bool = IERC20Dispatcher {
+                contract_address: self.reward_token_address.read(),
+            }
                 .transfer(recipient, self.reward_amount.read());
 
             assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed {
-                user: game_address,
-                recipient
-            });
+            self.emit(RewardClaimed { user: game_address, recipient });
         }
 
         fn get_reward_params(self: @ContractState) -> RewardParams {
             RewardParams {
                 reward_token_address: self.reward_token_address.read(),
                 reward_amount: self.reward_amount.read(),
-                reward_prestige_threshold: self.reward_prestige_threshold.read()
+                reward_prestige_threshold: self.reward_prestige_threshold.read(),
             }
         }
 
-        fn remove_funds(ref self: ContractState, token_address: ContractAddress, recipient: ContractAddress, value: u256) {
+        fn remove_funds(
+            ref self: ContractState,
+            token_address: ContractAddress,
+            recipient: ContractAddress,
+            value: u256,
+        ) {
             let caller = get_caller_address();
             self.check_valid_game_master(caller);
             let success: bool = IERC20Dispatcher { contract_address: token_address }
@@ -373,11 +383,11 @@ mod PowGame {
             let fees = working_block.fees;
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
             if (chain_id != 0) {
-              // Add block to da & proof
-              self.builder.build_proof(chain_id, fees + reward);
-              self.builder.build_da(chain_id, fees + reward);
+                // Add block to da & proof
+                self.builder.build_proof(chain_id, fees + reward);
+                self.builder.build_da(chain_id, fees + reward);
             } else {
-              pay_user(ref self, caller, fees + reward);
+                pay_user(ref self, caller, fees + reward);
             }
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
@@ -438,7 +448,7 @@ mod PowGame {
             self.staking.stake(caller, amount, now);
         }
 
-        fn claim_staking_rewards(ref self: ContractState){
+        fn claim_staking_rewards(ref self: ContractState) {
             let caller = get_caller_address();
             let reward = self.staking.claim_rewards(caller);
             pay_user(ref self, caller, reward);
@@ -448,7 +458,7 @@ mod PowGame {
             let caller = get_caller_address();
             self.staking.validate(caller, now);
         }
-        
+
         fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
             let caller = get_caller_address();
             let withdrawal = self.staking.withdraw_stake(caller, now);
@@ -563,11 +573,11 @@ mod PowGame {
         self.user_max_chains.write(caller, new_chain_id + 1);
         // Finalize genesis block
         if (new_chain_id != 0) {
-          // Add genesis block to da & proof
-          self.builder.build_proof(new_chain_id, self.genesis_block_reward.read());
-          self.builder.build_da(new_chain_id, self.genesis_block_reward.read());
+            // Add genesis block to da & proof
+            self.builder.build_proof(new_chain_id, self.genesis_block_reward.read());
+            self.builder.build_da(new_chain_id, self.genesis_block_reward.read());
         } else {
-          pay_user(ref self, caller, self.genesis_block_reward.read());
+            pay_user(ref self, caller, self.genesis_block_reward.read());
         }
         self.builder.reset_block(new_chain_id);
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });

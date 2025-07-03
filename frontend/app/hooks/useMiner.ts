@@ -8,7 +8,7 @@ import { Block } from "../types/Chains";
 
 export const useMiner = (
   onBlockMined: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined
+  getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();

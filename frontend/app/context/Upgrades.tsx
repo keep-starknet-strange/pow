@@ -49,11 +49,8 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const {
-    powContract,
-    getUserUpgradeLevels,
-    getUserAutomationLevels,
-  } = usePowContractConnector();
+  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } =
+    usePowContractConnector();
 
   const [upgrades, setUpgrades] = useState<{
     [chainId: number]: { [upgradeId: number]: number };
@@ -400,7 +397,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         chainAutomations[automation.id] !== undefined
           ? chainAutomations[automation.id]
           : -1;
-      return level === -1 ? 0 : (automation.levels[level]?.speed | 0);
+      return level === -1 ? 0 : automation.levels[level]?.speed | 0;
     },
     [automations],
   );

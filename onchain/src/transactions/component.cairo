@@ -183,7 +183,7 @@ pub mod PowTransactionsComponent {
 
     #[generate_trait]
     pub impl InternalImpl<
-      TContractState, +HasComponent<TContractState>,
+        TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
         // TODO: Clear TransactionFeeConfig & TransactionSpeedConfig for higher than len()
         fn setup_transaction_config(

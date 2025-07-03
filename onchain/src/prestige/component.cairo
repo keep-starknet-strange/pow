@@ -72,7 +72,7 @@ pub mod PrestigeComponent {
 
     #[generate_trait]
     pub impl InternalImpl<
-      TContractState, +HasComponent<TContractState>,
+        TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
         fn prestige(ref self: ComponentState<TContractState>) {
             let caller = get_caller_address();
@@ -93,5 +93,5 @@ pub mod PrestigeComponent {
             }
             self.emit(PrestigeConfigUpdated { new_config: params });
         }
-   }
+    }
 }

@@ -40,12 +40,12 @@ type PowContractContextType = {
     chainId: number,
     automationCount: number,
   ) => Promise<number[] | undefined>;
-  getUserBlockNumber: (
-    chainId: number,
-  ) => Promise<number | undefined>;
+  getUserBlockNumber: (chainId: number) => Promise<number | undefined>;
   getUserBlockState: (
     chainId: number,
-  ) => Promise<{size: number | undefined; fees: number | undefined} | undefined>;
+  ) => Promise<
+    { size: number | undefined; fees: number | undefined } | undefined
+  >;
   getUserMaxChainId: () => Promise<number | undefined>;
   getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
@@ -100,7 +100,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
       // await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
-      const contract = process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3";
+      const contract =
+        process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS ||
+        "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3";
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args
@@ -159,7 +161,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     network,
     STARKNET_ENABLED,
   ]);
-      
+
   const addAction = useCallback(
     (action: PowAction) => {
       if (!STARKNET_ENABLED) {
@@ -314,39 +316,52 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
-  const getUserBlockNumber = useCallback(async (chainId: number) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const blockNumber = await powContract.get_block_building_height(
-        account?.address || "",
-        chainId,
-      );
-      return blockNumber.toString ? parseInt(blockNumber.toString(), 10) : undefined;
-    } catch (error) {
-      console.error("Failed to fetch user block number:", error);
-      return undefined;
-    }
-  }, [account, powContract, STARKNET_ENABLED]);
+  const getUserBlockNumber = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const blockNumber = await powContract.get_block_building_height(
+          account?.address || "",
+          chainId,
+        );
+        return blockNumber.toString
+          ? parseInt(blockNumber.toString(), 10)
+          : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user block number:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
-  const getUserBlockState = useCallback(async (chainId: number) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const {size: blockSize, fees: blockFees} = await powContract.get_block_building_state(
-        account?.address || "",
-        chainId,
-      );
-      const blockSizeValue = blockSize.toString ? parseInt(blockSize.toString(), 10) : undefined;
-      const blockFeesValue = blockFees.toString ? parseInt(blockFees.toString(), 10) : undefined;
-      return { size: blockSizeValue, fees: blockFeesValue };
-    } catch (error) {
-      console.error("Failed to fetch user block state:", error);
-      return undefined;
-    }
-  }, [account, powContract, STARKNET_ENABLED]);
+  const getUserBlockState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const { size: blockSize, fees: blockFees } =
+          await powContract.get_block_building_state(
+            account?.address || "",
+            chainId,
+          );
+        const blockSizeValue = blockSize.toString
+          ? parseInt(blockSize.toString(), 10)
+          : undefined;
+        const blockFeesValue = blockFees.toString
+          ? parseInt(blockFees.toString(), 10)
+          : undefined;
+        return { size: blockSizeValue, fees: blockFeesValue };
+      } catch (error) {
+        console.error("Failed to fetch user block state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
   const getUserMaxChainId = useCallback(async () => {
     if (!STARKNET_ENABLED || !powContract) {
@@ -356,60 +371,71 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       const maxChainId = await powContract.get_user_max_chain_id(
         account?.address || "",
       );
-      return maxChainId.toString ? parseInt(maxChainId.toString(), 10) : undefined;
+      return maxChainId.toString
+        ? parseInt(maxChainId.toString(), 10)
+        : undefined;
     } catch (error) {
       console.error("Failed to fetch user max chain ID:", error);
       return undefined;
     }
   }, [account, powContract, STARKNET_ENABLED]);
 
-  const getUserBlockClicks = useCallback(async (chainId: number) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const clicks = await powContract.get_block_clicks(
-        account?.address || "",
-        chainId,
-      );
-      return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
-    } catch (error) {
-      console.error("Failed to fetch user block clicks:", error);
-      return undefined;
-    }
-  }, [account, powContract, STARKNET_ENABLED]);
+  const getUserBlockClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_block_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user block clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
-  const getUserDaClicks = useCallback(async (chainId: number) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const clicks = await powContract.get_da_clicks(
-        account?.address || "",
-        chainId,
-      );
-      return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
-    } catch (error) {
-      console.error("Failed to fetch user DA clicks:", error);
-      return undefined;
-    }
-  }, [account, powContract, STARKNET_ENABLED]);
+  const getUserDaClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_da_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user DA clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
-  const getUserProofClicks = useCallback(async (chainId: number) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const clicks = await powContract.get_proof_clicks(
-        account?.address || "",
-        chainId,
-      );
-      return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
-    } catch (error) {
-      console.error("Failed to fetch user proof clicks:", error);
-      return undefined;
-    }
-  }, [account, powContract, STARKNET_ENABLED]);
+  const getUserProofClicks = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const clicks = await powContract.get_proof_clicks(
+          account?.address || "",
+          chainId,
+        );
+        return clicks.toString ? parseInt(clicks.toString(), 10) : undefined;
+      } catch (error) {
+        console.error("Failed to fetch user proof clicks:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
   useEffect(() => {
     if (actionCalls.length >= MAX_ACTIONS) {
