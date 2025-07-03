@@ -56,11 +56,11 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
   const { notify } = useEventManager();
   const { tryBuy, updateBalance } = useBalance();
   const [stakingPools, setStakingPools] = useState<StakingPool[]>([]);
-  const [stakingUnlocked, setStakingUnlocked] = useState(false);
+  const [stakingUnlocked, setStakingUnlocked] = useState(true);
 
   const resetStaking = () => {
     setStakingPools([]);
-    setStakingUnlocked(false);
+    setStakingUnlocked(true);
   };
 
   useEffect(() => {
