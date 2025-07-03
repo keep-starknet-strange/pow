@@ -12,14 +12,14 @@ export const useDAConfirmer = (
 ) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserDaClicks } = usePowContractConnector();
+  const { powContract, getUserDaClicks } = usePowContractConnector();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
   const [daProgress, setDaConfirmProgress] = useState(0);
 
   useEffect(() => {
     const fetchDaCounter = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const clicks = await getUserDaClicks(1);
@@ -31,7 +31,7 @@ export const useDAConfirmer = (
       }
     };
     fetchDaCounter();
-  }, [powGameContractAddress, user, getUserDaClicks]);
+  }, [powContract, user, getUserDaClicks]);
 
   const daConfirm = () => {
     setDaConfirmCounter((prevCounter) => {

@@ -13,13 +13,13 @@ export const useProver = (
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserProofClicks } = usePowContractConnector();
+  const { powContract, getUserProofClicks } = usePowContractConnector();
   const [proverCounter, setProverCounter] = useState(0);
   const [proverProgress, setProverProgress] = useState(0);
 
   useEffect(() => {
     const fetchProofCounter = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const clicks = await getUserProofClicks(0);
@@ -31,7 +31,7 @@ export const useProver = (
       }
     };
     fetchProofCounter();
-  }, [powGameContractAddress, user, getUserProofClicks]);
+  }, [powContract, user, getUserProofClicks]);
 
   const prove = () => {
     setProverCounter((prevCounter) => {

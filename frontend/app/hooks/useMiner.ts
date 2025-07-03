@@ -13,13 +13,13 @@ export const useMiner = (
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserBlockClicks } = usePowContractConnector();
+  const { powContract, getUserBlockClicks } = usePowContractConnector();
   const [mineCounter, setMineCounter] = useState(0);
   const [miningProgress, setMiningProgress] = useState(0);
 
   useEffect(() => {
     const fetchMineCounter = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const clicks = await getUserBlockClicks(0);
@@ -31,7 +31,7 @@ export const useMiner = (
       }
     };
     fetchMineCounter();
-  }, [powGameContractAddress, user, getUserBlockClicks]);
+  }, [powContract, user, getUserBlockClicks]);
 
   const mineBlock = () => {
     setMineCounter((prevCounter) => {

@@ -12,14 +12,14 @@ export const useSequencer = (
 ) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
-  const { powGameContractAddress, getUserBlockClicks } = usePowContractConnector();
+  const { powContract, getUserBlockClicks } = usePowContractConnector();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const [sequenceCounter, setSequenceCounter] = useState(0);
   const [sequencingProgress, setSequencingProgress] = useState(0);
 
   useEffect(() => {
     const fetchSequencerCounter = async () => {
-      if (powGameContractAddress && user) {
+      if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const clicks = await getUserBlockClicks(1);
@@ -31,7 +31,7 @@ export const useSequencer = (
       }
     };
     fetchSequencerCounter();
-  }, [powGameContractAddress, user, getUserBlockClicks]);
+  }, [powContract, user, getUserBlockClicks]);
 
   const sequenceBlock = () => {
     setSequenceCounter((prevCounter) => {
