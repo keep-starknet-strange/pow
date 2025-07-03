@@ -99,7 +99,8 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!provider) {
         return;
       }
-      const contract = "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3"; // await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
+      // await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
+      const contract = process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3";
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args
