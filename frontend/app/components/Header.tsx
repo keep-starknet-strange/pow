@@ -7,10 +7,11 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Easing } from "react-native-reanimated";
+import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useBalance } from "../context/Balance";
 import { useGame } from "../context/Game";
 import { useImageProvider } from "../context/ImageProvider";
-import { shortMoneyString } from "../utils/helpers";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
@@ -37,9 +38,13 @@ export const Header: React.FC = () => {
         />
       </Canvas>
       <View className="absolute right-0 h-full flex items-center justify-center pr-3">
-        <Text className="text-[#fff2fdff] text-5xl font-Xerxes">
-          {shortMoneyString(balance)}
-        </Text>
+        <AnimatedRollingNumber
+          value={balance}
+          enableCompactNotation
+          compactToFixed={2}
+          textStyle={{ fontSize: 50, color: "#fff2fdff", fontFamily: "Xerxes" }}
+          spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+        />
       </View>
     </View>
   );

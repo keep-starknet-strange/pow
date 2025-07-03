@@ -6,7 +6,8 @@ import { useImageProvider } from "../context/ImageProvider";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
-import { shortMoneyString } from "../utils/helpers";
+import { Easing } from "react-native-reanimated";
+import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
   Canvas,
   Image,
@@ -62,23 +63,27 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
         >
           Block {workingBlocks[props.chainId]?.blockId}
         </Text>
-        <Text
-          className="text-[20px] text-[#c3c3c3] font-Pixels
-                         absolute bottom-[10px] left-[170px]"
-        >
-          {workingBlocks[props.chainId]?.transactions.length}/
-          {getUpgradeValue(props.chainId, "Block Size") ** 2}
-        </Text>
-        <Text
-          className="text-[20px] text-[#fff7ff] font-Pixels
-                         absolute bottom-[10px] left-[280px]"
-        >
-          {shortMoneyString(
-            workingBlocks[props.chainId]?.fees +
-              (workingBlocks[props.chainId]?.reward ||
-                getUpgradeValue(props.chainId, "Block Reward")),
-          )}
-        </Text>
+        <View className="absolute bottom-[10px] left-[170px] flex flex-row">
+          <AnimatedRollingNumber
+            value={workingBlocks[props.chainId]?.transactions.length}
+            textStyle={{ fontSize: 20, color: "#c3c3c3", fontFamily: "Pixels" }}
+            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+          />
+          <Text className="text-[20px] text-[#c3c3c3] font-Pixels">
+            /{getUpgradeValue(props.chainId, "Block Size") ** 2}
+          </Text>
+        </View>
+        <View className="absolute bottom-[10px] left-[280px]">
+          <AnimatedRollingNumber
+            value={workingBlocks[props.chainId]?.fees +
+                   (workingBlocks[props.chainId]?.reward ||
+                    getUpgradeValue(props.chainId, "Block Reward"))}
+            enableCompactNotation
+            compactToFixed={1}
+            textStyle={{ fontSize: 20, color: "#fff2fdff", fontFamily: "Pixels" }}
+            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+          />
+        </View>
       </View>
     </View>
   );
