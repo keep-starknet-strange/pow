@@ -42,7 +42,7 @@ export const L1Phase: React.FC<L1PhaseProps> = ({ setCurrentView }) => {
       <View className="mt-[0.5rem] w-full">
         {!dappsUnlocked[0] && <DappsUnlock chainId={0} />}
       </View>
-      <View className="absolute bottom-[22px] left-0 right-0 h-[200px]">
+      <View className="absolute bottom-[0px] left-0 right-0 h-[120px] z-20">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("nav.bg")}
