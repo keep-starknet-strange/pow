@@ -83,141 +83,145 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   return (
     <>
-      <SafeAreaView>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1 }}>
-            <KeyboardAvoidingView
-              behavior="position"
-              keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          }}
+        >
+          <KeyboardAvoidingView
+            behavior="position"
+            keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
+          >
+            <View
+              style={{
+                alignItems: "center",
+              }}
             >
-              <View
-                style={{
-                  alignItems: "center",
-                }}
-              >
-                <Text className="text-[#101119] text-2xl mt-8 font-Pixels">
-                  Create your account
-                </Text>
-                <TouchableOpacity
-                  className="flex items-center justify-center bg-[#10111910]
+              <Text className="text-[#101119] text-2xl mt-8 font-Pixels">
+                Create your account
+              </Text>
+              <TouchableOpacity
+                className="flex items-center justify-center bg-[#10111910]
                             w-[250px] h-[250px] p-4 mt-8
                             rounded-xl shadow-lg shadow-black/50 relative"
-                  onPress={startCreatingAvatar}
-                >
-                  <View className="absolute top-0 left-0 w-[250px] h-[250px]">
-                    <Canvas style={{ flex: 1 }} className="w-full h-full">
-                      <SkiaImg
-                        image={getImage("block.grid.min")}
-                        fit="fill"
-                        x={0}
-                        y={0}
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
-                        width={246}
-                        height={246}
-                      />
-                    </Canvas>
-                  </View>
-                  <PFPView
-                    user={account?.address}
-                    attributes={creatingAvatar ? newAvatar : avatar}
-                  />
-                </TouchableOpacity>
-                <View className="flex flex-row items-center justify-center mt-4 gap-2">
-                  <Text className="text-[#101119] text-xl font-Pixels">
-                    Create your Noun Avatar
-                  </Text>
-                  <TouchableOpacity
-                    className="py-1 border-2 border-[#101119] rounded-md px-2"
-                    onPress={() => setAvatar(getRandomNounsAttributes())}
-                  >
-                    <Text className="text-[#101119] text-xl font-Pixels">
-                      Roll
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="py-1 border-2 border-[#101119] rounded-md px-2"
-                    onPress={() => setCreatingAvatar(!creatingAvatar)}
-                  >
-                    <Text className="text-[#101119] text-xl font-Pixels">
-                      edit
-                    </Text>
-                  </TouchableOpacity>
+                onPress={startCreatingAvatar}
+              >
+                <View className="absolute top-0 left-0 w-[250px] h-[250px]">
+                  <Canvas style={{ flex: 1 }} className="w-full h-full">
+                    <SkiaImg
+                      image={getImage("block.grid.min")}
+                      fit="fill"
+                      x={0}
+                      y={0}
+                      sampling={{
+                        filter: FilterMode.Nearest,
+                        mipmap: MipmapMode.Nearest,
+                      }}
+                      width={246}
+                      height={246}
+                    />
+                  </Canvas>
                 </View>
-
-                <View className="flex flex-col items-start mt-8 w-screen px-8">
-                  <Text className="text-[#101119] text-lg font-Pixels">
-                    Set up a username
+                <PFPView
+                  user={account?.address}
+                  attributes={creatingAvatar ? newAvatar : avatar}
+                />
+              </TouchableOpacity>
+              <View className="flex flex-row items-center justify-center mt-4 gap-2">
+                <Text className="text-[#101119] text-xl font-Pixels">
+                  Create your Noun Avatar
+                </Text>
+                <TouchableOpacity
+                  className="py-1 border-2 border-[#101119] rounded-md px-2"
+                  onPress={() => setAvatar(getRandomNounsAttributes())}
+                >
+                  <Text className="text-[#101119] text-xl font-Pixels">
+                    Roll
                   </Text>
-                  {/* // TODO: fix/keyboard-covers-input-fields */}
-                  <TextInput
-                    className="bg-[#10111910] w-full rounded-lg mt-2 px-2
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="py-1 border-2 border-[#101119] rounded-md px-2"
+                  onPress={() => setCreatingAvatar(!creatingAvatar)}
+                >
+                  <Text className="text-[#101119] text-xl font-Pixels">
+                    edit
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View className="flex flex-col items-start mt-8 w-screen px-8">
+                <Text className="text-[#101119] text-lg font-Pixels">
+                  Set up a username
+                </Text>
+                {/* // TODO: fix/keyboard-covers-input-fields */}
+                <TextInput
+                  className="bg-[#10111910] w-full rounded-lg mt-2 px-2
                           py-1 text-xl text-[#101119] border-2 border-[#101119]
                           shadow-lg shadow-black/50 font-Pixels"
-                    placeholder="Satoshi"
-                    placeholderTextColor="#10111980"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    autoComplete="off"
-                    value={username}
-                    onChangeText={setUsername}
-                  />
-                  <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
-                    Please notice: your username will be public
+                  placeholder="Satoshi"
+                  placeholderTextColor="#10111980"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="off"
+                  value={username}
+                  onChangeText={setUsername}
+                />
+                <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
+                  Please notice: your username will be public
+                </Text>
+                {usernameError ? (
+                  <Text className="text-red-500 text-md mt-2 font-Pixels">
+                    {usernameError}
                   </Text>
-                  {usernameError ? (
-                    <Text className="text-red-500 text-md mt-2 font-Pixels">
-                      {usernameError}
-                    </Text>
-                  ) : null}
-                </View>
+                ) : null}
               </View>
-            </KeyboardAvoidingView>
-            <View className="flex-1 items-center justify-center gap-4">
-              <BasicButton
-                label="Save"
-                onPress={async () => {
-                  if (!isUsernameValid(username)) {
-                    setUsernameError(
-                      `Invalid username:\n${usernameValidationError}`,
-                    );
-                    return;
-                  }
-                  if (!(await isUsernameUnique(username))) {
-                    setUsernameError("This username is unavailable.");
-                    return;
-                  }
-                  await initializeAccount(username, [
-                    `0x` + avatar.head.toString(16),
-                    `0x` + avatar.body.toString(16),
-                    `0x` + avatar.glasses.toString(16),
-                    `0x` + avatar.accessories.toString(16),
-                  ]);
-                }}
-                style={{ width: 250 }}
-              />
-              <BasicButton
-                label="Cancel"
-                onPress={async () => {
-                  setLoginPage("login");
-                }}
-                style={{ width: 250 }}
-              />
             </View>
-
-            <View className="flex flex-row items-center justify-between w-full px-10 py-2">
-              <Text className="text-[#101119] text-md font-Pixels">
-                Version {version}
-              </Text>
-              <Text className="text-[#101119] text-md font-Pixels">
-                We are open source!
-              </Text>
-            </View>
+          </KeyboardAvoidingView>
+          <View className="flex-1 items-center justify-center gap-4">
+            <BasicButton
+              label="Save"
+              onPress={async () => {
+                if (!isUsernameValid(username)) {
+                  setUsernameError(
+                    `Invalid username:\n${usernameValidationError}`,
+                  );
+                  return;
+                }
+                if (!(await isUsernameUnique(username))) {
+                  setUsernameError("This username is unavailable.");
+                  return;
+                }
+                await initializeAccount(username, [
+                  `0x` + avatar.head.toString(16),
+                  `0x` + avatar.body.toString(16),
+                  `0x` + avatar.glasses.toString(16),
+                  `0x` + avatar.accessories.toString(16),
+                ]);
+              }}
+              style={{ width: 250 }}
+            />
+            <BasicButton
+              label="Cancel"
+              onPress={async () => {
+                setLoginPage("login");
+              }}
+              style={{ width: 250 }}
+            />
           </View>
-        </TouchableWithoutFeedback>
-      </SafeAreaView>
+
+          <View className="flex flex-row items-center justify-between w-full px-10 py-2">
+            <Text className="text-[#101119] text-md font-Pixels">
+              Version {version}
+            </Text>
+            <Text className="text-[#101119] text-md font-Pixels">
+              We are open source!
+            </Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
       {creatingAvatar && (
         <View
           style={{ paddingBottom: insets.bottom }}
