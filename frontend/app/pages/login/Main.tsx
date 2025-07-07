@@ -3,15 +3,11 @@ import {
   Image,
   View,
   Text,
-  TouchableOpacity,
-  ImageBackground,
 } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import BasicButton from "../../components/buttons/Basic";
 import logo from "../../../assets/logo/pow.png";
-import background from "../../../assets/background.png";
-import backgroundGrid from "../../../assets/background-grid.png";
 import starknetLogo from "../../../assets/logo/starknet.png";
 
 type LoginMainPageProps = {

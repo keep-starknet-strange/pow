@@ -46,9 +46,12 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
       }}
     >
       <Text
-        className="text-xl font-bold text-center"
+        className="text-3xl text-center font-Pixels"
         style={{
           color: color || "black",
+          textShadowColor: "black",
+          textShadowOffset: { width: 0, height: 2 },
+          textShadowRadius: 4,
         }}
       >
         {popupValue}

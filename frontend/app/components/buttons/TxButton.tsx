@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   Text,
@@ -16,7 +16,7 @@ import { TargetId } from "../../stores/useTutorialStore";
 import { shortMoneyString } from "../../utils/helpers";
 import transactionConfig from "../../configs/transactions.json";
 import { PopupAnimation } from "../../components/PopupAnimation";
-import { useDerivedValue, useSharedValue, withSequence, withTiming, Easing, runOnJS } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withSequence, withTiming, Easing, runOnJS } from "react-native-reanimated";
 import {
   Canvas,
   Image as SkiaImg,
@@ -105,12 +105,31 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     getDappSpeed,
   ]);
 
+  const shakeAnim = useSharedValue(8);
+  const shakeAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: withSequence(
+          withTiming(Math.abs(shakeAnim.value), {
+            duration: 50,
+            easing: Easing.linear,
+          }),
+          withTiming(0, {
+            duration: 50,
+            easing: Easing.linear,
+          }),
+        ),
+      },
+    ],
+  }));
+
   const [lastTxTime, setLastTxTime] = useState<number>(0);
-  const addNewTransaction = async () => {
+  const addNewTransaction = useCallback(async () => {
     const newTx = newTransaction(props.txType.id, fee, props.isDapp);
     addTransaction(props.chainId, newTx);
     setLastTxTime(Date.now());
-  };
+    shakeAnim.value *= -1; // Toggle the shake animation value
+  }, [addTransaction, props.chainId, props.txType.id, fee, props.isDapp, shakeAnim]);
 
   const getTxBg = (chainId: number, txId: number, isDapp: boolean) => {
     switch (chainId) {
@@ -301,6 +320,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         }`}
         color={feeLevel === -1 ? "#CA1F4B" : "#F0E130"}
       />
+      <Animated.View
+        style={[shakeAnimStyle]}
+      >
       <TouchableOpacity
         ref={ref}
         onLayout={onLayout}
@@ -421,6 +443,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           </View>
         )}
       </TouchableOpacity>
+      </Animated.View>
       <View
         className="absolute bottom-[-22px] left-0 h-[20px]"
         style={{

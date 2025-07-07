@@ -1,24 +1,12 @@
 import React, { useState } from "react";
-import { View, Dimensions } from "react-native";
-import { useImageProvider } from "../context/ImageProvider";
+import { View } from "react-native";
 import { LoginMainPage } from "./login/Main";
 import { AccountCreationPage } from "./login/AccountCreation";
 import { SettingsPage } from "./SettingsPage";
-import {
-  Canvas,
-  Image,
-  ImageShader,
-  Rect,
-  Offset,
-  FilterMode,
-  MipmapMode,
-} from "@shopify/react-native-skia";
-import { withTiming, Easing, useDerivedValue, useSharedValue } from "react-native-reanimated";
+import { MainBackground } from "../components/MainBackground";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const LoginPage: React.FC = () => {
-  const { getImage } = useImageProvider();
-  const { width, height } = Dimensions.get("window");
 
   const loginPages = {
     login: LoginMainPage,
@@ -33,114 +21,9 @@ export const LoginPage: React.FC = () => {
     setCurrentPage(page as keyof typeof loginPages);
   };
 
-  const bgOffsetX = useSharedValue(0);
-  const bgOffsetY = useSharedValue(0);
-  // Every 3-5 seconds choose a new background offset
-  React.useEffect(() => {
-    const minTravelTime = 5000;
-    const maxTravelTime = 8000;
-    let travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-    const travelDistance = width * (travelDuration / maxTravelTime);
-    const travelDirectionRadians = Math.random() * 2 * Math.PI;
-    const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-    const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-    const newOffsetX = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    const newOffsetY = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    bgOffsetX.value = newOffsetX;
-    bgOffsetY.value = newOffsetY;
-
-    const interval = setInterval(() => {
-      travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-      const travelDistance = width * (travelDuration / maxTravelTime);
-      const travelDirectionRadians = Math.random() * 2 * Math.PI;
-      const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-      const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-      bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-      bgOffsetY.value = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    }, travelDuration); 
-    return () => clearInterval(interval);
-  }, [bgOffsetX, bgOffsetY, width]);
-
-  const animatedRect = useDerivedValue(() => {
-    return {
-      x: bgOffsetX.value,
-      y: bgOffsetY.value,
-      width: width,
-      height: height,
-    };
-  });
-
-  const bgOffsetX2 = useSharedValue(0);
-  const bgOffsetY2 = useSharedValue(0);
-  React.useEffect(() => {
-    const minTravelTime = 6000;
-    const maxTravelTime = 9000;
-    let travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-    const travelDistance = width * (travelDuration / maxTravelTime);
-    const travelDirectionRadians = Math.random() * 2 * Math.PI;
-    const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-    const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-    const newOffsetX2 = withTiming(bgOffsetX2.value + travelDirectionX, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    const newOffsetY2 = withTiming(bgOffsetY2.value + travelDirectionY, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    bgOffsetX2.value = newOffsetX2;
-    bgOffsetY2.value = newOffsetY2;
-
-    const interval = setInterval(() => {
-      travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-      const travelDistance = width * (travelDuration / maxTravelTime);
-      const travelDirectionRadians = Math.random() * 2 * Math.PI;
-      const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-      const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-      bgOffsetX2.value = withTiming(bgOffsetX2.value + travelDirectionX, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-      bgOffsetY2.value = withTiming(bgOffsetY2.value + travelDirectionY, { duration: travelDuration, easing: Easing.bezier(0.55, -0.33, 0.71, 1.03) });
-    }, travelDuration); 
-    return () => clearInterval(interval);
-  }, [bgOffsetX2, bgOffsetY2, width]);
-  const animatedRect2 = useDerivedValue(() => {
-    return {
-      x: bgOffsetX2.value,
-      y: bgOffsetY2.value,
-      width: width,
-      height: height,
-    };
-  });
-
   return (
     <View className="flex-1 items-center">
-      <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Rect x={0} y={0} width={width} height={height}>
-            <ImageShader
-              image={getImage("background")}
-              fit="cover"
-              rect={animatedRect}
-              tx={"repeat"}
-              ty={"repeat"}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Rect>
-        </Canvas>
-      </View>
-      <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Rect x={0} y={0} width={width} height={height}>
-            <ImageShader
-              image={getImage("background.grid")}
-              fit="cover"
-              rect={animatedRect2}
-              tx={"repeat"}
-              ty={"repeat"}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Rect>
-        </Canvas>
-      </View>
+      <MainBackground />
       <SafeAreaView>
         <ActivePage setLoginPage={setLoginPage} />
       </SafeAreaView>
