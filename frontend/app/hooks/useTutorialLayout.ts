@@ -24,7 +24,7 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
           android: insets.top + y,
         }) ?? y;
 
-      registerLayout(id, { x, y: actualY, width, height });
+      registerLayout(id, { top: x, left: actualY, width, height });
     });
   }, [
     enabled,

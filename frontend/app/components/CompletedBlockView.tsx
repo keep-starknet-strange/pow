@@ -13,6 +13,7 @@ import {
 export type CompletedBlockViewProps = {
   chainId: number;
   block: Block | null;
+  style: StyleProp<ViewStyle>;
 };
 
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
@@ -21,7 +22,9 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
   const { getImage } = useImageProvider();
 
   return (
-    <View className="w-[346px] h-[340px] relative">
+    <View
+      style={props.style}
+    >
       <View className="absolute top-0 left-0 w-full h-full z-[2]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -29,8 +32,8 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
             fit="fill"
             x={0}
             y={0}
-            width={144 * 2.4}
-            height={142 * 2.4}
+            width={props.style.width}
+            height={props.style.height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -38,7 +41,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
           />
         </Canvas>
       </View>
-      <View className="absolute top-[80px] right-[-16px] w-[16px] h-[20px]">
+      <View className="absolute top-[30%] right-[-16px] w-[16px] h-[20px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("block.connector")}
@@ -54,7 +57,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
           />
         </Canvas>
       </View>
-      <View className="absolute bottom-[80px] right-[-16px] w-[16px] h-[20px]">
+      <View className="absolute bottom-[30%] right-[-16px] w-[16px] h-[20px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("block.connector")}

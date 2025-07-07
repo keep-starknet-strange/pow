@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
@@ -17,7 +17,13 @@ import {
 
 export type WorkingBlockViewProps = {
   chainId: number;
+  style: StyleProp<ViewStyle>;
 };
+
+/*
+ * The size of the block's labels that appear on top-left and bottom-right of the image
+ */
+const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { workingBlocks, getWorkingBlock } = useGame();
@@ -25,26 +31,41 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { getImage } = useImageProvider();
 
   return (
-    <View className="flex flex-col items-center justify-center">
-      <View className={"flex flex-row justify-center w-[346px] h-[408px]"}>
-        <View className="absolute top-0 left-0 w-full h-full">
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <Image
-              image={getImage("block.grid")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={144 * 2.4}
-              height={170 * 2.4}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-        </View>
-
-        <View className="z-[10] absolute top-[35px] left-[4px] w-[338px] h-[338px]">
+    <View style={props.style}>
+      <Canvas
+        style={{
+          position: "absolute",
+          top: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT), // Need to draw outside of view bounds
+          width: props.style.width,
+          height:
+            props.style.height +
+            2 * (props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
+        }}
+      >
+        <Image
+          image={getImage("block.grid")}
+          fit="fill"
+          x={0}
+          y={0}
+          width={props.style.width}
+          height={
+            props.style.height +
+            2 * (props.style.height * BLOCK_IMAGE_LABEL_PERCENT)
+          }
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+        />
+      </Canvas>
+        <View
+          style={{
+            position: "absolute",
+            flex: 1,
+            padding: 4,
+            zIndex: 10,
+          }}
+        >
           <BlockView
             chainId={props.chainId}
             block={getWorkingBlock(props.chainId)}
@@ -53,17 +74,41 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
         </View>
 
         {workingBlocks[props.chainId]?.isBuilt && (
-          <View className="z-[15] absolute top-[35px] left-[4px] w-[338px] h-[338px]">
+          <View
+            style={{
+              position: "absolute",
+              flex: 1,
+              width: "100%",
+              height: "100%",
+              zIndex: 15,
+            }}
+          >
             {props.chainId === 0 ? <Miner /> : <Sequencer />}
           </View>
         )}
+
         <Text
-          className="text-[20px] text-[#c3c3c3] font-Pixels
-                         absolute top-[8px] left-[10px]"
+          style={{
+            position: "absolute",
+            fontFamily: "Pixels",
+            color: "#c3c3c3",
+            fontSize: 18,
+            top: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
+            padding: 4,
+          }}
         >
           Block {workingBlocks[props.chainId]?.blockId}
         </Text>
-        <View className="absolute bottom-[10px] left-[170px] flex flex-row">
+
+        <View 
+          style={{
+            flexDirection: 'row',
+            position: "absolute",
+            bottom: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
+            right: props.style.width * 0.27,
+            padding: 4,
+          }}
+        >
           <AnimatedRollingNumber
             value={workingBlocks[props.chainId]?.transactions.length}
             textStyle={{ fontSize: 20, color: "#c3c3c3", fontFamily: "Pixels" }}
@@ -73,7 +118,15 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
             /{getUpgradeValue(props.chainId, "Block Size") ** 2}
           </Text>
         </View>
-        <View className="absolute bottom-[10px] left-[280px]">
+
+        <View 
+          style={{
+            position: "absolute",
+            bottom: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
+            right: 0,
+            padding: 4,  
+          }}
+        >
           <AnimatedRollingNumber
             value={
               workingBlocks[props.chainId]?.fees +
@@ -90,8 +143,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
             spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
           />
         </View>
-      </View>
-    </View>
+    </View> 
   );
 };
 

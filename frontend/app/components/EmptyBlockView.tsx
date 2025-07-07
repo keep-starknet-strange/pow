@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import {
   Canvas,
   Image,
@@ -7,11 +7,15 @@ import {
 } from "@shopify/react-native-skia";
 import { useImageProvider } from "../context/ImageProvider";
 
-export const EmptyBlockView: React.FC = () => {
+export type EmptyViewProps = {
+  style: StyleProp<ViewStyle>;
+};
+
+export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
   const { getImage } = useImageProvider();
 
   return (
-    <View className="w-[346px] h-[340px] relative">
+    <View style={props.style}>
       <View className="absolute top-0 left-0 w-full h-full z-[2]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -19,8 +23,8 @@ export const EmptyBlockView: React.FC = () => {
             fit="fill"
             x={0}
             y={0}
-            width={144 * 2.4}
-            height={142 * 2.4}
+            width={props.style.width}
+            height={props.style.height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -28,7 +32,7 @@ export const EmptyBlockView: React.FC = () => {
           />
         </Canvas>
       </View>
-      <View className="absolute top-[80px] left-[-16px] w-[16px] h-[20px]">
+      <View className="absolute top-[30%] left-[-16px] w-[16px] h-[20px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("block.connector")}
@@ -44,7 +48,7 @@ export const EmptyBlockView: React.FC = () => {
           />
         </Canvas>
       </View>
-      <View className="absolute bottom-[80px] left-[-16px] w-[16px] h-[20px]">
+      <View className="absolute bottom-[30%] left-[-16px] w-[16px] h-[20px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("block.connector")}
