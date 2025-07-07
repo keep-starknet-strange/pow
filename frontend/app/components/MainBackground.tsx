@@ -16,43 +16,44 @@ export const MainBackground: React.FC = () => {
 
   const bgOffsetX = useSharedValue(0);
   const bgOffsetY = useSharedValue(0);
-  const bgOffsetX2 = useSharedValue(0);
-  const bgOffsetY2 = useSharedValue(0);
-  // Every 3-5 seconds choose a new background offset
-  React.useEffect(() => {
-    const minTravelTime = 8000;
-    const maxTravelTime = 10000;
-    let travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+  const bgOverlayX2 = useSharedValue(0);
+  const bgOverlayY2 = useSharedValue(0);
+
+  // Every 8-10 seconds choose a new background offset
+  const minTravelTime = 8000;
+  const maxTravelTime = 10000;
+
+  const getRandomTravelDirection = (travelDuration: number): { x: number; y: number } => {
+    // Compute travel direction to be of unit size `travelDistance`
     const travelDistance = width * (travelDuration / maxTravelTime);
     const travelDirectionRadians = Math.random() * 2 * Math.PI;
-    const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-    const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-    const newOffsetX = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    const newOffsetY = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    bgOffsetX.value = newOffsetX;
-    bgOffsetY.value = newOffsetY;
-    const parallaxScaler = 1.7;
-    const newOffsetX2 = withTiming(bgOffsetX2.value + travelDirectionX * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    const newOffsetY2 = withTiming(bgOffsetY2.value + travelDirectionY * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    bgOffsetX2.value = newOffsetX2;
-    bgOffsetY2.value = newOffsetY2;
+    return {
+      x: Math.cos(travelDirectionRadians) * travelDistance,
+      y: Math.sin(travelDirectionRadians) * travelDistance,
+    };
+  }
+
+  const updateBackgroundOffsets = (travelDuration: number) => {
+    const { x: travelDirectionX, y: travelDirectionY } = getRandomTravelDirection(travelDuration);
+    bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+    bgOffsetY.value = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+    const parallaxScaler = 1.5; // Overlay parallax effect
+    bgOverlayX2.value = withTiming(bgOverlayX2.value + travelDirectionX * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+    bgOverlayY2.value = withTiming(bgOverlayY2.value + travelDirectionY * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+  }
+
+  React.useEffect(() => {
+    let travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+    updateBackgroundOffsets(travelDuration);
 
     const interval = setInterval(() => {
       travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-      const travelDistance = width * (travelDuration / maxTravelTime);
-      const travelDirectionRadians = Math.random() * 2 * Math.PI;
-      const travelDirectionX = Math.cos(travelDirectionRadians) * travelDistance;
-      const travelDirectionY = Math.sin(travelDirectionRadians) * travelDistance;
-      bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-      bgOffsetY.value = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-      const parallaxScaler = 1.5;
-      bgOffsetX2.value = withTiming(bgOffsetX2.value + travelDirectionX * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-      bgOffsetY2.value = withTiming(bgOffsetY2.value + travelDirectionY * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+      updateBackgroundOffsets(travelDuration);
     }, travelDuration + 300); 
     return () => clearInterval(interval);
   }, [bgOffsetX, bgOffsetY, width]);
 
-  const animatedRect = useDerivedValue(() => {
+  const bgRect = useDerivedValue(() => {
     return {
       x: bgOffsetX.value,
       y: bgOffsetY.value,
@@ -61,10 +62,10 @@ export const MainBackground: React.FC = () => {
     };
   });
 
-  const animatedRect2 = useDerivedValue(() => {
+  const bgOverlayRect = useDerivedValue(() => {
     return {
-      x: bgOffsetX2.value,
-      y: bgOffsetY2.value,
+      x: bgOverlayX2.value,
+      y: bgOverlayY2.value,
       width: width,
       height: height,
     };
@@ -78,7 +79,7 @@ export const MainBackground: React.FC = () => {
             <ImageShader
               image={getImage("background")}
               fit="cover"
-              rect={animatedRect}
+              rect={bgRect}
               tx={"repeat"}
               ty={"repeat"}
               sampling={{
@@ -95,7 +96,7 @@ export const MainBackground: React.FC = () => {
             <ImageShader
               image={getImage("background.grid")}
               fit="cover"
-              rect={animatedRect2}
+              rect={bgOverlayRect}
               tx={"repeat"}
               ty={"repeat"}
               sampling={{
