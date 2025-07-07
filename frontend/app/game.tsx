@@ -8,6 +8,7 @@ import { useEventManager } from "./context/EventManager";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGame } from "./context/Game";
+import { useBalanceStore } from "./stores/useBalanceStore";
 import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
 import {
   useAchievement,
@@ -23,9 +24,12 @@ import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
 export default function game() {
   const { user } = useFocEngine();
-  const { registerObserver, unregisterObserver } = useEventManager();
+  const { notify, registerObserver, unregisterObserver } = useEventManager();
+  const { getUserBalance } = usePowContractConnector();
   const { setSoundDependency, initializeAchievements } = useAchievementsStore();
   const { initializeSound } = useSoundStore();
+  const { setNotifyDependency, setFetchBalanceDependency, fetchBalance } =
+    useBalanceStore();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
@@ -103,6 +107,17 @@ export default function game() {
     setSoundDependency(playSoundEffect);
     initializeAchievements(user?.account_address);
   }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
+
+  useEffect(() => {
+    setNotifyDependency(notify);
+    setFetchBalanceDependency(getUserBalance);
+  }, [notify, getUserBalance, setNotifyDependency, setFetchBalanceDependency]);
+
+  useEffect(() => {
+    if (user) {
+      fetchBalance();
+    }
+  }, [user, fetchBalance]);
 
   return <RootNavigator />;
 }

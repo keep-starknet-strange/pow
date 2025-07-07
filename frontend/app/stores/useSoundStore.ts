@@ -10,6 +10,11 @@ const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 
+const musicAssets = [
+  require("../../assets/music/the-return-of-the-8-bit-era-301292.mp3"),
+  require("../../assets/music/jungle-ish-beat-for-video-games-314073.mp3"),
+];
+
 interface SoundState {
   isSoundOn: boolean;
   isMusicOn: boolean;
@@ -19,11 +24,13 @@ interface SoundState {
   isPlayingMusic: boolean;
 
   toggleSound: () => void;
-  toggleMusic: () => void;
+  toggleMusic: () => Promise<void>;
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
   playSoundEffect: (type: string, pitchShift?: number) => Promise<void>;
   initializeSound: () => Promise<void>;
+  playMusic: () => Promise<void>;
+  stopMusic: () => Promise<void>;
 
   setCurrentMusic: (music: Sound | null) => void;
   setIsPlayingMusic: (playing: boolean) => void;
@@ -53,12 +60,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
 
+      const musicOn = musicEnabled === "true" || musicEnabled === null;
+
       set({
         isSoundOn: soundEnabled === "true" || soundEnabled === null,
-        isMusicOn: musicEnabled === "true" || musicEnabled === null,
+        isMusicOn: musicOn,
         soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
         musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
       });
+
+      if (musicOn) {
+        get().playMusic();
+      }
     } catch (error) {
       console.error("Failed to load sound settings:", error);
     }
@@ -72,12 +85,17 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     });
   },
 
-  toggleMusic: () => {
-    set((state) => {
-      const newValue = !state.isMusicOn;
-      AsyncStorage.setItem(MUSIC_ENABLED_KEY, newValue.toString());
-      return { isMusicOn: newValue };
-    });
+  toggleMusic: async () => {
+    const currentState = get();
+    const newValue = !currentState.isMusicOn;
+    set({ isMusicOn: newValue });
+    AsyncStorage.setItem(MUSIC_ENABLED_KEY, newValue.toString());
+
+    if (newValue) {
+      await get().playMusic();
+    } else {
+      await get().stopMusic();
+    }
   },
 
   setSoundEffectVolume: (volume) => {
@@ -88,6 +106,58 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   setMusicVolume: (volume) => {
     set({ musicVolume: volume });
     AsyncStorage.setItem(MUSIC_VOLUME_KEY, volume.toString());
+
+    const { currentMusic } = get();
+    if (currentMusic) {
+      currentMusic.setVolumeAsync(volume);
+    }
+  },
+
+  playMusic: async () => {
+    const { isMusicOn, musicVolume, currentMusic } = get();
+
+    if (!isMusicOn) return;
+
+    try {
+      if (currentMusic) {
+        await currentMusic.stopAsync();
+        await currentMusic.unloadAsync();
+      }
+
+      const randomIndex = Math.floor(Math.random() * musicAssets.length);
+      const musicAsset = musicAssets[randomIndex];
+
+      const { sound } = await Audio.Sound.createAsync(musicAsset, {
+        volume: musicVolume,
+        isLooping: true,
+        shouldPlay: true,
+      });
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded) {
+          set({ isPlayingMusic: status.isPlaying });
+        }
+      });
+
+      set({ currentMusic: sound, isPlayingMusic: true });
+    } catch (error) {
+      console.error("Failed to play music:", error);
+    }
+  },
+
+  stopMusic: async () => {
+    const { currentMusic } = get();
+
+    if (currentMusic) {
+      try {
+        await currentMusic.stopAsync();
+        await currentMusic.unloadAsync();
+      } catch (error) {
+        console.error("Failed to stop music:", error);
+      }
+    }
+
+    set({ currentMusic: null, isPlayingMusic: false });
   },
 
   playSoundEffect: async (type: string, pitchShift: number = 1.0) => {
@@ -187,6 +257,10 @@ export const useSound = () => {
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,
+    playMusic,
+    stopMusic,
+    currentMusic,
+    isPlayingMusic,
   } = useSoundStore();
 
   return {
@@ -199,5 +273,9 @@ export const useSound = () => {
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,
+    playMusic,
+    stopMusic,
+    currentMusic,
+    isPlayingMusic,
   };
 };

@@ -16,7 +16,11 @@ const tabs = {
   ClaimReward: ClaimRewardSection,
 };
 
-export const SettingsPage: React.FC = () => {
+type SettingsProps = {
+  setLoginPage: ((page: string) => void) | null;
+};
+
+export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
   const [activeTab, setActiveTab] = useState<keyof typeof tabs>("Main");
 
   const ActiveComponent = tabs[activeTab];
@@ -25,7 +29,12 @@ export const SettingsPage: React.FC = () => {
     <View className="flex-1 relative">
       <MainBackground />
       <View className="flex flex-col gap-2 px-8">
-        <ActiveComponent setSettingTab={setActiveTab} />
+        <ActiveComponent
+          setSettingTab={setActiveTab}
+          goBackToLogin={() => {
+            setLoginPage?.("login");
+          }}
+        />
         {activeTab !== "Main" && (
           <TouchableOpacity
             onPress={() => {

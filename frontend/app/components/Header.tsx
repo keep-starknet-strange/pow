@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Dimensions } from "react-native";
+import { View, Dimensions } from "react-native";
 import {
   Canvas,
   FilterMode,
@@ -9,7 +9,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Easing } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
-import { useBalance } from "../context/Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import { useGame } from "../context/Game";
 import { useImageProvider } from "../context/ImageProvider";
 

@@ -239,7 +239,7 @@ export function TabNavigator() {
 
       <Tab.Screen
         name="Settings"
-        component={SettingsPage}
+        children={() => <SettingsPage setLoginPage={null} />}
         options={{
           tabBarButton: (props) => (
             <TabBarButton
