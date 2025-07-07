@@ -7,7 +7,6 @@ import { MainBackground } from "../components/MainBackground";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const LoginPage: React.FC = () => {
-
   const loginPages = {
     login: LoginMainPage,
     accountCreation: AccountCreationPage,

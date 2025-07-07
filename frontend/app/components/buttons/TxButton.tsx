@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Image,
-  Text,
-  View,
-  TouchableOpacity,
-} from "react-native";
+import { Image, Text, View, TouchableOpacity } from "react-native";
 import { Dimensions } from "react-native";
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
@@ -16,7 +11,15 @@ import { TargetId } from "../../stores/useTutorialStore";
 import { shortMoneyString } from "../../utils/helpers";
 import transactionConfig from "../../configs/transactions.json";
 import { PopupAnimation } from "../../components/PopupAnimation";
-import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withSequence, withTiming, Easing, runOnJS } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withSequence,
+  withTiming,
+  Easing,
+  runOnJS,
+} from "react-native-reanimated";
 import {
   Canvas,
   Image as SkiaImg,
@@ -129,7 +132,14 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     addTransaction(props.chainId, newTx);
     setLastTxTime(Date.now());
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [addTransaction, props.chainId, props.txType.id, fee, props.isDapp, shakeAnim]);
+  }, [
+    addTransaction,
+    props.chainId,
+    props.txType.id,
+    fee,
+    props.isDapp,
+    shakeAnim,
+  ]);
 
   const getTxBg = (chainId: number, txId: number, isDapp: boolean) => {
     switch (chainId) {
@@ -285,27 +295,30 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [automationAnimHeight]);
   useEffect(() => {
     let randomDurationOffset = Math.random() * 500;
-    const interval = setInterval(() => {
-      randomDurationOffset = Math.random() * 500;
-      if (speed > 0) {
-        automationAnimHeight.value = withSequence(withTiming(
-          94,
-          {
-            duration: 5000 / speed + randomDurationOffset,
-            easing: Easing.cubic,
-          },
-          () => runOnJS(addNewTransaction)()
-        ), withTiming(
-          0,
-          {
-            duration: 200,
-            easing: Easing.bounce,
-          }
-        ));
-      } else {
-        automationAnimHeight.value = 94;
-      }
-    }, (5000 / speed) + 200 + randomDurationOffset);
+    const interval = setInterval(
+      () => {
+        randomDurationOffset = Math.random() * 500;
+        if (speed > 0) {
+          automationAnimHeight.value = withSequence(
+            withTiming(
+              94,
+              {
+                duration: 5000 / speed + randomDurationOffset,
+                easing: Easing.cubic,
+              },
+              () => runOnJS(addNewTransaction)(),
+            ),
+            withTiming(0, {
+              duration: 200,
+              easing: Easing.bounce,
+            }),
+          );
+        } else {
+          automationAnimHeight.value = 94;
+        }
+      },
+      5000 / speed + 200 + randomDurationOffset,
+    );
     return () => clearInterval(interval);
   }, [speed, automationAnimHeight, addNewTransaction]);
 
@@ -320,129 +333,132 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
         }`}
         color={feeLevel === -1 ? "#CA1F4B" : "#F0E130"}
       />
-      <Animated.View
-        style={[shakeAnimStyle]}
-      >
-      <TouchableOpacity
-        ref={ref}
-        onLayout={onLayout}
-        style={{
-          width: width * 0.18,
-        }}
-        className="relative h-[94px]"
-        onPress={() => {
-          if (feeLevel === -1) {
-            setLastTxTime(Date.now());
-            if (props.isDapp) {
-              dappFeeUpgrade(props.chainId, props.txType.id);
-            } else {
-              txFeeUpgrade(props.chainId, props.txType.id);
-            }
-            return;
-          }
-          addNewTransaction();
-        }}
-      >
-        <View
-          className="absolute h-[94px]"
-          style={{
-            width: width * 0.185,
-          }}
-        >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <SkiaImg
-              image={getTxBg(props.chainId, props.txType.id, false)}
-              fit="fill"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={0}
-              width={width * 0.185}
-              height={94}
-            />
-          </Canvas>
-        </View>
-        <View
-          className="absolute bottom-0 h-full"
+      <Animated.View style={[shakeAnimStyle]}>
+        <TouchableOpacity
+          ref={ref}
+          onLayout={onLayout}
           style={{
             width: width * 0.18,
           }}
+          className="relative h-[94px]"
+          onPress={() => {
+            if (feeLevel === -1) {
+              setLastTxTime(Date.now());
+              if (props.isDapp) {
+                dappFeeUpgrade(props.chainId, props.txType.id);
+              } else {
+                txFeeUpgrade(props.chainId, props.txType.id);
+              }
+              return;
+            }
+            addNewTransaction();
+          }}
         >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <Rect x={0} y={automationAnimY} width={width * 0.18} height={automationAnimHeight}>
-              <ImageShader
-                image={getTxInner(props.chainId, props.txType.id, false)}
+          <View
+            className="absolute h-[94px]"
+            style={{
+              width: width * 0.185,
+            }}
+          >
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <SkiaImg
+                image={getTxBg(props.chainId, props.txType.id, false)}
                 fit="fill"
                 sampling={{
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.Nearest,
                 }}
-                rect={{ x: 0, y: 0, width: width * 0.18, height: 94 }}
+                x={0}
+                y={0}
+                width={width * 0.185}
+                height={94}
               />
-            </Rect>
-          </Canvas>
-        </View>
-        <View
-          className="absolute left-[3px] h-[94px] w-full"
-          style={{
-            width: width * 0.17,
-          }}
-        >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <SkiaImg
-              image={getTxNameplate(props.chainId, props.txType.id, false)}
-              fit="fill"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={2}
-              width={width * 0.165}
-              height={19}
-            />
-          </Canvas>
-        </View>
-        <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] text-[#fff8ff] font-Pixels">
-          {props.txType.name}
-        </Text>
-        <View
-          className="absolute h-[94px]"
-          style={{
-            width: width * 0.18,
-          }}
-        >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <SkiaImg
-              image={getTxIcon(props.chainId, props.txType.id, false)}
-              fit="contain"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={35}
-              width={width * 0.18}
-              height={40}
-            />
-          </Canvas>
-        </View>
-        {feeLevel === -1 && (
+            </Canvas>
+          </View>
           <View
-            className="absolute w-full h-full bg-[#292929d9]
+            className="absolute bottom-0 h-full"
+            style={{
+              width: width * 0.18,
+            }}
+          >
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <Rect
+                x={0}
+                y={automationAnimY}
+                width={width * 0.18}
+                height={automationAnimHeight}
+              >
+                <ImageShader
+                  image={getTxInner(props.chainId, props.txType.id, false)}
+                  fit="fill"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  rect={{ x: 0, y: 0, width: width * 0.18, height: 94 }}
+                />
+              </Rect>
+            </Canvas>
+          </View>
+          <View
+            className="absolute left-[3px] h-[94px] w-full"
+            style={{
+              width: width * 0.17,
+            }}
+          >
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <SkiaImg
+                image={getTxNameplate(props.chainId, props.txType.id, false)}
+                fit="fill"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                x={0}
+                y={2}
+                width={width * 0.165}
+                height={19}
+              />
+            </Canvas>
+          </View>
+          <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] text-[#fff8ff] font-Pixels">
+            {props.txType.name}
+          </Text>
+          <View
+            className="absolute h-[94px]"
+            style={{
+              width: width * 0.18,
+            }}
+          >
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <SkiaImg
+                image={getTxIcon(props.chainId, props.txType.id, false)}
+                fit="contain"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                x={0}
+                y={35}
+                width={width * 0.18}
+                height={40}
+              />
+            </Canvas>
+          </View>
+          {feeLevel === -1 && (
+            <View
+              className="absolute w-full h-full bg-[#292929d9]
                      flex items-center justify-center
                      pointer-events-none
                      top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-          >
-            <Image
-              source={lockImg}
-              className="w-full h-full object-contain p-2 mb-3"
-            />
-          </View>
-        )}
-      </TouchableOpacity>
+            >
+              <Image
+                source={lockImg}
+                className="w-full h-full object-contain p-2 mb-3"
+              />
+            </View>
+          )}
+        </TouchableOpacity>
       </Animated.View>
       <View
         className="absolute bottom-[-22px] left-0 h-[20px]"

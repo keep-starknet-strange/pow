@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { View, Dimensions } from "react-native";
 import { useImageProvider } from "../context/ImageProvider";
-import { withTiming, Easing, useDerivedValue, useSharedValue } from "react-native-reanimated";
+import {
+  withTiming,
+  Easing,
+  useDerivedValue,
+  useSharedValue,
+} from "react-native-reanimated";
 import {
   Canvas,
   ImageShader,
@@ -23,7 +28,9 @@ export const MainBackground: React.FC = () => {
   const minTravelTime = 8000;
   const maxTravelTime = 10000;
 
-  const getRandomTravelDirection = (travelDuration: number): { x: number; y: number } => {
+  const getRandomTravelDirection = (
+    travelDuration: number,
+  ): { x: number; y: number } => {
     // Compute travel direction to be of unit size `travelDistance`
     const travelDistance = width * (travelDuration / maxTravelTime);
     const travelDirectionRadians = Math.random() * 2 * Math.PI;
@@ -31,25 +38,40 @@ export const MainBackground: React.FC = () => {
       x: Math.cos(travelDirectionRadians) * travelDistance,
       y: Math.sin(travelDirectionRadians) * travelDistance,
     };
-  }
+  };
 
   const updateBackgroundOffsets = (travelDuration: number) => {
-    const { x: travelDirectionX, y: travelDirectionY } = getRandomTravelDirection(travelDuration);
-    bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    bgOffsetY.value = withTiming(bgOffsetY.value + travelDirectionY, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
+    const { x: travelDirectionX, y: travelDirectionY } =
+      getRandomTravelDirection(travelDuration);
+    bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, {
+      duration: travelDuration,
+      easing: Easing.inOut(Easing.poly(2)),
+    });
+    bgOffsetY.value = withTiming(bgOffsetY.value + travelDirectionY, {
+      duration: travelDuration,
+      easing: Easing.inOut(Easing.poly(2)),
+    });
     const parallaxScaler = 1.5; // Overlay parallax effect
-    bgOverlayX2.value = withTiming(bgOverlayX2.value + travelDirectionX * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-    bgOverlayY2.value = withTiming(bgOverlayY2.value + travelDirectionY * parallaxScaler, { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) });
-  }
+    bgOverlayX2.value = withTiming(
+      bgOverlayX2.value + travelDirectionX * parallaxScaler,
+      { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) },
+    );
+    bgOverlayY2.value = withTiming(
+      bgOverlayY2.value + travelDirectionY * parallaxScaler,
+      { duration: travelDuration, easing: Easing.inOut(Easing.poly(2)) },
+    );
+  };
 
   React.useEffect(() => {
-    let travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+    let travelDuration =
+      minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
     updateBackgroundOffsets(travelDuration);
 
     const interval = setInterval(() => {
-      travelDuration = minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+      travelDuration =
+        minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
       updateBackgroundOffsets(travelDuration);
-    }, travelDuration + 300); 
+    }, travelDuration + 300);
     return () => clearInterval(interval);
   }, [bgOffsetX, bgOffsetY, width]);
 

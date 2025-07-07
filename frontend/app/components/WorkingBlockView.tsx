@@ -75,12 +75,18 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
         </View>
         <View className="absolute bottom-[10px] left-[280px]">
           <AnimatedRollingNumber
-            value={workingBlocks[props.chainId]?.fees +
-                   (workingBlocks[props.chainId]?.reward ||
-                    getUpgradeValue(props.chainId, "Block Reward"))}
+            value={
+              workingBlocks[props.chainId]?.fees +
+              (workingBlocks[props.chainId]?.reward ||
+                getUpgradeValue(props.chainId, "Block Reward"))
+            }
             enableCompactNotation
             compactToFixed={1}
-            textStyle={{ fontSize: 20, color: "#fff2fdff", fontFamily: "Pixels" }}
+            textStyle={{
+              fontSize: 20,
+              color: "#fff2fdff",
+              fontFamily: "Pixels",
+            }}
             spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
           />
         </View>
