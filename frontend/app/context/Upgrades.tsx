@@ -8,7 +8,7 @@ import {
 import { useEventManager } from "../context/EventManager";
 import { useFocEngine } from "./FocEngineConnector";
 import { usePowContractConnector } from "./PowContractConnector";
-import { useBalance } from "../context/Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";

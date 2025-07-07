@@ -6,7 +6,7 @@ import {
   useCallback,
 } from "react";
 import { useEventManager } from "../context/EventManager";
-import { useBalance } from "../context/Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
 // TODO: use configuable function for time/block.id/block.time

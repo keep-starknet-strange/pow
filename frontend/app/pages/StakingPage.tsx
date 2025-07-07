@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text } from "react-native";
-import { useBalance } from "../context/Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import { useStaking } from "../context/Staking";
 import { useTicker } from "../hooks/useTicker";
 import { useVisibleBlocks } from "../hooks/useVisibleBlocks";
