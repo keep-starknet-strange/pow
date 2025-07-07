@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useEventManager } from "./EventManager";
-import { useBalance } from "./Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import { useUpgrades } from "./Upgrades";
 import { useChains } from "./Chains";
 import { useMiner } from "../hooks/useMiner";

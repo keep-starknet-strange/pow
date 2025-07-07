@@ -7,7 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBalance } from "../context/Balance";
+import { useBalance } from "../stores/useBalanceStore";
 import { useGame } from "../context/Game";
 import { useImageProvider } from "../context/ImageProvider";
 import { shortMoneyString } from "../utils/helpers";
