@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, Text, Image, LayoutChangeEvent } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -28,21 +28,31 @@ export type BlockViewProps = {
 export const BlockView: React.FC<BlockViewProps> = (props) => {
   const { getImage } = useImageProvider();
   const { currentPrestige, getUpgradeValue } = useUpgrades();
-  const [txWidth, setTxWidth] = useState<number>(
-    100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)),
-  );
+
+  // The size of the whole block
+  const [blockSize, setBlockSize] = useState<number>(0);
+  // The size of each one of the transactions
+  const [txSize, setTxSize] = useState<number>(0);
+
   const enabled = props.block?.blockId === 0;
   const { ref, onLayout } = useTutorialLayout("blockView" as TargetId, enabled);
+
+  const onBlockLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const { width } = event.nativeEvent.layout;
+
+      setBlockSize(width);
+    },
+    [setBlockSize],
+  );
+
+  const txPerRow = getUpgradeValue(props.chainId, "Block Size");
+
   useEffect(() => {
-    const maxBlockSize = getUpgradeValue(props.chainId, "Block Size") ** 2;
-    // setTxWidth(100 / Math.ceil(Math.sqrt(props.block?.transactions.length || 1)));
-    setTxWidth(
-      100 /
-        Math.ceil(
-          Math.sqrt(maxBlockSize || props.block?.transactions.length || 1),
-        ),
-    );
-  }, [props.block?.transactions.length]);
+    const txSize = blockSize / txPerRow - 0.001; // TODO check that with the team
+
+    setTxSize(txSize);
+  }, [blockSize, txPerRow]);
 
   const yOffset = useSharedValue(600);
 
@@ -64,9 +74,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     yOffset.value = 600; // Start off-scren
     animate();
   }, [props.block?.transactions.length]);
-
-  const maxBlockSize = getUpgradeValue(props.chainId, "Block Size") ** 2;
-
   const getTxImg = (chainId: number, typeId: number) => {
     switch (chainId) {
       case 0:
@@ -108,12 +115,18 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     <View className="w-full h-full flex flex-col items-center justify-center relative">
       <View className="flex-1 bg-[#10111908] aspect-square relative">
         <View className="flex flex-wrap w-full aspect-square">
-          <View className="absolute top-0 left-0 w-full h-full flex flex-wrap w-full aspect-square overflow-hidden">
+          <View
+            className="absolute top-0 left-0 w-full h-full flex flex-wrap aspect-square"
+            onLayout={onBlockLayout}
+          >
             {props.block?.blockId !== 0 &&
-              Array.from({ length: maxBlockSize || 0 }, (_, index) => (
+              Array.from({ length: txPerRow ** 2 || 0 }, (_, index) => (
                 <View
                   key={index}
-                  style={{ width: `${txWidth}%`, height: `${txWidth}%` }}
+                  style={{
+                    width: txSize,
+                    height: txSize,
+                  }}
                 >
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <SkiaImg
@@ -125,8 +138,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                       }}
                       x={0}
                       y={0}
-                      width={txWidth * 3.3}
-                      height={txWidth * 3.3}
+                      width={txSize}
+                      height={txSize}
                     />
                   </Canvas>
                 </View>
@@ -138,7 +151,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 <View
                   key={index}
                   className="relative"
-                  style={{ width: `${txWidth}%`, height: `${txWidth}%` }}
+                  style={{
+                    width: txSize,
+                    height: txSize,
+                  }}
                 >
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <SkiaImg
@@ -150,12 +166,14 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                       }}
                       x={0}
                       y={0}
-                      width={txWidth * 3.4}
-                      height={txWidth * 3.4}
+                      width={txSize}
+                      height={txSize}
                     />
                   </Canvas>
-                  <View className="absolute top-0 left-0 w-full h-full">
-                    <Canvas style={{ flex: 1 }} className="w-full h-full">
+                  <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
+                    <Canvas
+                      style={{ width: txSize * 0.4, height: txSize * 0.4 }}
+                    >
                       <SkiaImg
                         image={getImage(getTxIcon(props.chainId, tx.typeId))}
                         fit="contain"
@@ -163,10 +181,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                           filter: FilterMode.Nearest,
                           mipmap: MipmapMode.Nearest,
                         }}
-                        x={(txWidth * (3.4 - 1.4)) / 2}
-                        y={(txWidth * (3.4 - 1.4)) / 2}
-                        width={txWidth * 1.4}
-                        height={txWidth * 1.4}
+                        x={0}
+                        y={0}
+                        width={txSize * 0.4}
+                        height={txSize * 0.4}
                       />
                     </Canvas>
                   </View>
@@ -176,7 +194,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           {props.block?.transactions.length !== 0 && (
             <View
               className="relative"
-              style={{ width: `${txWidth}%`, height: `${txWidth}%` }}
+              style={{
+                width: txSize,
+                height: txSize,
+              }}
             >
               <Animated.View
                 className="absolute bottom-[-380%] left-0 w-full h-[400%] rounded-b-lg"
@@ -225,12 +246,12 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                     }}
                     x={0}
                     y={0}
-                    width={txWidth * 3.4}
-                    height={txWidth * 3.4}
+                    width={txSize}
+                    height={txSize}
                   />
                 </Canvas>
-                <View className="absolute top-0 left-0 w-full h-full">
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
+                  <Canvas style={{ width: txSize * 0.4, height: txSize * 0.4 }}>
                     <SkiaImg
                       image={getImage(
                         getTxIcon(
@@ -245,10 +266,10 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                         filter: FilterMode.Nearest,
                         mipmap: MipmapMode.Nearest,
                       }}
-                      x={(txWidth * (3.4 - 1.4)) / 2}
-                      y={(txWidth * (3.4 - 1.4)) / 2}
-                      width={txWidth * 1.4}
-                      height={txWidth * 1.4}
+                      x={0}
+                      y={0}
+                      width={txSize * 0.4}
+                      height={txSize * 0.4}
                     />
                   </Canvas>
                 </View>

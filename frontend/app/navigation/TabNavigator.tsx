@@ -20,6 +20,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Tab = createBottomTabNavigator();
 
@@ -126,6 +127,7 @@ function TabBarButton({
 export function TabNavigator() {
   const { stakingUnlocked } = useStaking();
   const { notify } = useEventManager();
+  const insets = useSafeAreaInsets();
 
   const handleTabPress = (routeName: string) => {
     notify("SwitchPage", { name: routeName });
@@ -137,14 +139,9 @@ export function TabNavigator() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#101119ff",
-          borderTopWidth: 0,
-          paddingBottom: 24,
+          height: 96 + insets.bottom,
           paddingTop: 8,
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 96,
+          borderTopWidth: 0,
           zIndex: 20,
           paddingHorizontal: 16,
         },

@@ -15,14 +15,14 @@ export const TutorialOverlay: React.FC = () => {
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const stepConfig = getTutorialStepConfig(step);
   const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
-    x: 0,
-    y: 0,
+    top: 0,
+    left: 0,
     width: 0,
     height: 0,
   };
   const highlightLayout = layouts?.[stepConfig.highlightTargetId] ?? {
-    x: 0,
-    y: 0,
+    top: 0,
+    left: 0,
     width: 0,
     height: 0,
   };
