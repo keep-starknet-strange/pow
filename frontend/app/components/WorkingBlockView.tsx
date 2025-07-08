@@ -35,6 +35,9 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImageProvider();
 
+  // Flag that is set on smaller phones where font size should be adjusted
+  const isSmall = props.placement.width < 250;
+
   return (
     <View
       style={{
@@ -105,9 +108,10 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           position: "absolute",
           fontFamily: "Pixels",
           color: "#c3c3c3",
-          fontSize: 18,
+          fontSize: isSmall ? 16 : 18,
           top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-          padding: 4,
+          paddingLeft: 8,
+          paddingTop: 6,
         }}
       >
         Block {workingBlocks[props.chainId]?.blockId}
@@ -119,15 +123,25 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           position: "absolute",
           bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
           right: props.placement.width * 0.27,
-          padding: 4,
+          paddingRight: 4,
+          paddingBottom: 5,
         }}
       >
         <AnimatedRollingNumber
           value={workingBlocks[props.chainId]?.transactions.length}
-          textStyle={{ fontSize: 20, color: "#c3c3c3", fontFamily: "Pixels" }}
+          textStyle={{
+            fontSize: isSmall ? 16 : 20,
+            color: "#c3c3c3",
+            fontFamily: "Pixels",
+          }}
           spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
         />
-        <Text className="text-[20px] text-[#c3c3c3] font-Pixels">
+        <Text
+          style={{
+            fontSize: isSmall ? 16 : 20,
+          }}
+          className="text-[#c3c3c3] font-Pixels"
+        >
           /{getUpgradeValue(props.chainId, "Block Size") ** 2}
         </Text>
       </View>
@@ -137,7 +151,8 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           position: "absolute",
           bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
           right: 0,
-          padding: 4,
+          paddingRight: 4,
+          paddingBottom: 5,
         }}
       >
         <AnimatedRollingNumber
@@ -149,7 +164,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           enableCompactNotation
           compactToFixed={1}
           textStyle={{
-            fontSize: 20,
+            fontSize: isSmall ? 18 : 20,
             color: "#fff2fdff",
             fontFamily: "Pixels",
           }}

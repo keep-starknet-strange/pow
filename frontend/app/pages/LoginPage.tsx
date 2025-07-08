@@ -4,7 +4,6 @@ import { LoginMainPage } from "./login/Main";
 import { AccountCreationPage } from "./login/AccountCreation";
 import { SettingsPage } from "./SettingsPage";
 import { MainBackground } from "../components/MainBackground";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export const LoginPage: React.FC = () => {
   const loginPages = {
@@ -23,9 +22,7 @@ export const LoginPage: React.FC = () => {
   return (
     <View className="flex-1 items-center">
       <MainBackground />
-      <SafeAreaView>
-        <ActivePage setLoginPage={setLoginPage} />
-      </SafeAreaView>
+      <ActivePage setLoginPage={setLoginPage} />
     </View>
   );
 };

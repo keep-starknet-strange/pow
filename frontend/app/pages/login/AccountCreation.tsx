@@ -83,7 +83,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      {/*<TouchableWithoutFeedback onPress={Keyboard.dismiss}>*/}
         <View
           style={{
             flex: 1,
@@ -221,7 +221,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             </Text>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+        {/*</TouchableWithoutFeedback>*/}
       {creatingAvatar && (
         <View
           style={{ paddingBottom: insets.bottom }}
