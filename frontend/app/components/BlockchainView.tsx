@@ -54,8 +54,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
         <CompletedBlockView
           chainId={0}
           block={getLatestBlock(0)}
-          style={{
-            position: "absolute",
+          placement={{
             top: workingBlockPosition.top,
             left: workingBlockPosition.left - workingBlockPosition.width - 16,
             width: workingBlockPosition.width,
@@ -65,8 +64,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
       )}
 
       <EmptyBlockView
-        style={{
-          position: "absolute",
+        placement={{
           top: workingBlockPosition.top,
           left: workingBlockPosition.left + workingBlockPosition.width + 16,
           width: workingBlockPosition.width,
@@ -76,8 +74,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
 
       <WorkingBlockView
         chainId={props.chainId}
-        style={{
-          position: "absolute",
+        placement={{
           top: workingBlockPosition.top,
           left: workingBlockPosition.left,
           width: workingBlockPosition.width,

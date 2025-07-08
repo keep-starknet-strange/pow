@@ -8,14 +8,27 @@ import {
 import { useImageProvider } from "../context/ImageProvider";
 
 export type EmptyViewProps = {
-  style: StyleProp<ViewStyle>;
+  placement: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 };
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
   const { getImage } = useImageProvider();
 
   return (
-    <View style={props.style}>
+    <View
+      style={{
+        position: "absolute",
+        top: props.placement.top,
+        left: props.placement.left,
+        width: props.placement.width,
+        height: props.placement.height,
+      }}
+    >
       <View className="absolute top-0 left-0 w-full h-full z-[2]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -23,8 +36,8 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
             fit="fill"
             x={0}
             y={0}
-            width={props.style.width}
-            height={props.style.height}
+            width={props.placement.width}
+            height={props.placement.height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,

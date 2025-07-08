@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
 import { useImageProvider } from "../context/ImageProvider";
@@ -17,7 +17,12 @@ import {
 
 export type WorkingBlockViewProps = {
   chainId: number;
-  style: StyleProp<ViewStyle>;
+  placement: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 };
 
 /*
@@ -31,15 +36,23 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { getImage } = useImageProvider();
 
   return (
-    <View style={props.style}>
+    <View
+      style={{
+        position: "absolute",
+        top: props.placement.top,
+        left: props.placement.left,
+        width: props.placement.width,
+        height: props.placement.height,
+      }}
+    >
       <Canvas
         style={{
           position: "absolute",
-          top: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT), // Need to draw outside of view bounds
-          width: props.style.width,
+          top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT), // Need to draw outside of view bounds
+          width: props.placement.width,
           height:
-            props.style.height +
-            2 * (props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
+            props.placement.height +
+            2 * (props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         }}
       >
         <Image
@@ -47,10 +60,10 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           fit="fill"
           x={0}
           y={0}
-          width={props.style.width}
+          width={props.placement.width}
           height={
-            props.style.height +
-            2 * (props.style.height * BLOCK_IMAGE_LABEL_PERCENT)
+            props.placement.height +
+            2 * (props.placement.height * BLOCK_IMAGE_LABEL_PERCENT)
           }
           sampling={{
             filter: FilterMode.Nearest,
@@ -58,92 +71,92 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           }}
         />
       </Canvas>
+      <View
+        style={{
+          position: "absolute",
+          flex: 1,
+          padding: 4,
+          zIndex: 10,
+        }}
+      >
+        <BlockView
+          chainId={props.chainId}
+          block={getWorkingBlock(props.chainId)}
+          completed={false}
+        />
+      </View>
+
+      {workingBlocks[props.chainId]?.isBuilt && (
         <View
           style={{
             position: "absolute",
             flex: 1,
-            padding: 4,
-            zIndex: 10,
+            width: "100%",
+            height: "100%",
+            zIndex: 15,
           }}
         >
-          <BlockView
-            chainId={props.chainId}
-            block={getWorkingBlock(props.chainId)}
-            completed={false}
-          />
+          {props.chainId === 0 ? <Miner /> : <Sequencer />}
         </View>
+      )}
 
-        {workingBlocks[props.chainId]?.isBuilt && (
-          <View
-            style={{
-              position: "absolute",
-              flex: 1,
-              width: "100%",
-              height: "100%",
-              zIndex: 15,
-            }}
-          >
-            {props.chainId === 0 ? <Miner /> : <Sequencer />}
-          </View>
-        )}
+      <Text
+        style={{
+          position: "absolute",
+          fontFamily: "Pixels",
+          color: "#c3c3c3",
+          fontSize: 18,
+          top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+          padding: 4,
+        }}
+      >
+        Block {workingBlocks[props.chainId]?.blockId}
+      </Text>
 
-        <Text
-          style={{
-            position: "absolute",
-            fontFamily: "Pixels",
-            color: "#c3c3c3",
-            fontSize: 18,
-            top: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
-            padding: 4,
-          }}
-        >
-          Block {workingBlocks[props.chainId]?.blockId}
+      <View
+        style={{
+          flexDirection: "row",
+          position: "absolute",
+          bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+          right: props.placement.width * 0.27,
+          padding: 4,
+        }}
+      >
+        <AnimatedRollingNumber
+          value={workingBlocks[props.chainId]?.transactions.length}
+          textStyle={{ fontSize: 20, color: "#c3c3c3", fontFamily: "Pixels" }}
+          spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+        />
+        <Text className="text-[20px] text-[#c3c3c3] font-Pixels">
+          /{getUpgradeValue(props.chainId, "Block Size") ** 2}
         </Text>
+      </View>
 
-        <View 
-          style={{
-            flexDirection: 'row',
-            position: "absolute",
-            bottom: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
-            right: props.style.width * 0.27,
-            padding: 4,
+      <View
+        style={{
+          position: "absolute",
+          bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+          right: 0,
+          padding: 4,
+        }}
+      >
+        <AnimatedRollingNumber
+          value={
+            workingBlocks[props.chainId]?.fees +
+            (workingBlocks[props.chainId]?.reward ||
+              getUpgradeValue(props.chainId, "Block Reward"))
+          }
+          enableCompactNotation
+          compactToFixed={1}
+          textStyle={{
+            fontSize: 20,
+            color: "#fff2fdff",
+            fontFamily: "Pixels",
           }}
-        >
-          <AnimatedRollingNumber
-            value={workingBlocks[props.chainId]?.transactions.length}
-            textStyle={{ fontSize: 20, color: "#c3c3c3", fontFamily: "Pixels" }}
-            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
-          />
-          <Text className="text-[20px] text-[#c3c3c3] font-Pixels">
-            /{getUpgradeValue(props.chainId, "Block Size") ** 2}
-          </Text>
-        </View>
-
-        <View 
-          style={{
-            position: "absolute",
-            bottom: -(props.style.height * BLOCK_IMAGE_LABEL_PERCENT),
-            right: 0,
-            padding: 4,  
-          }}
-        >
-          <AnimatedRollingNumber
-            value={
-              workingBlocks[props.chainId]?.fees +
-              (workingBlocks[props.chainId]?.reward ||
-                getUpgradeValue(props.chainId, "Block Reward"))
-            }
-            enableCompactNotation
-            compactToFixed={1}
-            textStyle={{
-              fontSize: 20,
-              color: "#fff2fdff",
-              fontFamily: "Pixels",
-            }}
-            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
-          />
-        </View>
-    </View> 
+          spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+        />
+      </View>
+    </View>
   );
 };
 
