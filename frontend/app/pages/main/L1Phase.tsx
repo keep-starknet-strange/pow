@@ -3,7 +3,12 @@ import { Dimensions, View } from "react-native";
 import { useTransactions } from "../../context/Transactions";
 import { useImageProvider } from "../../context/ImageProvider";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
-import { Canvas, FilterMode, Image, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  FilterMode,
+  Image,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
 
 export interface L1PhaseProps {

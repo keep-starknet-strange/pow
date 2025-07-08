@@ -50,10 +50,10 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
 
   return (
     <View ref={parentRef} style={props.style}>
-      {chains[0].blocks.length > 0 && (
+      {chains[props.chainId].blocks.length > 0 && (
         <CompletedBlockView
-          chainId={0}
-          block={getLatestBlock(0)}
+          chainId={props.chainId}
+          block={getLatestBlock(props.chainId)}
           placement={{
             top: workingBlockPosition.top,
             left: workingBlockPosition.left - workingBlockPosition.width - 16,
