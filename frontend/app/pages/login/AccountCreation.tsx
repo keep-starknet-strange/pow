@@ -83,7 +83,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   return (
     <>
-      {/*<TouchableWithoutFeedback onPress={Keyboard.dismiss}>*/}
         <View
           style={{
             flex: 1,
@@ -91,7 +90,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             paddingBottom: insets.bottom,
           }}
         >
-          <KeyboardAvoidingView
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAvoidingView
             behavior="position"
             keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
           >
@@ -180,6 +180,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               </View>
             </View>
           </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
           <View className="flex-1 items-center justify-center gap-4">
             <BasicButton
               label="Save"
@@ -221,7 +222,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             </Text>
           </View>
         </View>
-        {/*</TouchableWithoutFeedback>*/}
       {creatingAvatar && (
         <View
           style={{ paddingBottom: insets.bottom }}
