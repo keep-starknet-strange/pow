@@ -1,10 +1,11 @@
 import React from "react";
-import { Image, View, Text } from "react-native";
+import { Image, SafeAreaView, Text, View } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import BasicButton from "../../components/buttons/Basic";
 import logo from "../../../assets/logo/pow.png";
 import starknetLogo from "../../../assets/logo/starknet.png";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type LoginMainPageProps = {
   setLoginPage: (page: string) => void;
@@ -15,10 +16,17 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
 }) => {
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
   const { createGameAccount } = usePowContractConnector();
+  const insets = useSafeAreaInsets();
 
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   return (
-    <View className="flex-1 items-center justify-between">
+    <View
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+      className="flex-1 items-center justify-between"
+    >
       <View className="flex items-center justify-center">
         <Image
           source={logo}

@@ -176,7 +176,7 @@ export const LeaderboardPage: React.FC = () => {
             x={0}
             y={-62}
             width={width}
-            height={height - 170}
+            height={height}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -260,7 +260,7 @@ export const LeaderboardPage: React.FC = () => {
       </ScrollView>
       {user && (
         <View
-          className={`flex flex-row justify-between items-center px-2 py-2 bg-[#101119] absolute bottom-[90px] left-0 right-0 z-10
+          className={`flex flex-row justify-between items-center px-4 py-2 bg-[#101119] z-10
             border-t-[5px] border-[#1b1c26] shadow-lg shadow-black/20 mx-[4px]
             `}
         >
@@ -310,7 +310,6 @@ export const LeaderboardPage: React.FC = () => {
           </Text>
         </View>
       )}
-      <View className="h-[100px]" />
     </View>
   );
 };
