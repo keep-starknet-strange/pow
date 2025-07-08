@@ -1,6 +1,6 @@
 import { View, TouchableOpacity } from "react-native";
 import { TargetId } from "../stores/useTutorialStore";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import {
   Canvas,
@@ -18,7 +18,7 @@ export type FooterProps = {
 
 export const Footer: React.FC<FooterProps> = (props) => {
   const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const insets = useSafeAreaInsets();
 
   const getTabIcon = (tabName: string, selected: boolean) => {

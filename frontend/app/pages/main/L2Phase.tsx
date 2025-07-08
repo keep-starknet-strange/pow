@@ -1,6 +1,6 @@
 import { Dimensions, View } from "react-native";
 import { useTransactions } from "../../context/Transactions";
-import { useImageProvider } from "../../context/ImageProvider";
+import { useImages } from "../../hooks/useImages";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import {
   Canvas,
@@ -16,7 +16,7 @@ export interface L2PhaseProps {
 
 export const L2Phase: React.FC<L2PhaseProps> = ({ setCurrentView }) => {
   const { dappsUnlocked } = useTransactions();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const window = Dimensions.get("window");
 
   return (

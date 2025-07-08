@@ -5,7 +5,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 
 export type EmptyViewProps = {
   placement: {
@@ -17,7 +17,7 @@ export type EmptyViewProps = {
 };
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   return (
     <View

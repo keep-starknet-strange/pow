@@ -6,7 +6,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../../../context/ImageProvider";
+import { useImages } from "../../../hooks/useImages";
 
 type UpgradeButtonProps = {
   icon?: any;
@@ -25,7 +25,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   nextCost,
   onPress,
 }) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width } = Dimensions.get("window");
 
   return (

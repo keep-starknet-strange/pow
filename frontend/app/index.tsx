@@ -8,12 +8,14 @@ import { UpgradesProvider } from "./context/Upgrades";
 import { TransactionsProvider } from "./context/Transactions";
 import { ChainsProvider } from "./context/Chains";
 import { StakingProvider } from "./context/Staking";
-import { ImageProvider } from "./context/ImageProvider";
 import { GameProvider } from "./context/Game";
+import { useImagePreloader } from "./hooks/useImagePreloader";
 import Game from "./game";
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
+
+  useImagePreloader();
 
   useEffect(() => {
     async function loadFont() {
@@ -40,9 +42,7 @@ export default function App() {
                 <StakingProvider>
                   <GameProvider>
                     <TransactionsProvider>
-                      <ImageProvider>
-                        <Game />
-                      </ImageProvider>
+                      <Game />
                     </TransactionsProvider>
                   </GameProvider>
                 </StakingProvider>

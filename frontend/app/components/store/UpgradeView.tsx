@@ -10,7 +10,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../../context/ImageProvider";
+import { useImages } from "../../hooks/useImages";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -18,7 +18,7 @@ export type UpgradeViewProps = {
 };
 
 export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width } = Dimensions.get("window");
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();
 

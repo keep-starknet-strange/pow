@@ -7,7 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
@@ -26,7 +26,7 @@ export type BlockViewProps = {
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { currentPrestige, getUpgradeValue } = useUpgrades();
 
   // The size of the whole block
