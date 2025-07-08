@@ -3,7 +3,6 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -83,15 +82,15 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   return (
     <>
-        <View
-          style={{
-            flex: 1,
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
-          }}
-        >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
+      <View
+        style={{
+          flex: 1,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
             behavior="position"
             keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
           >
@@ -180,48 +179,48 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               </View>
             </View>
           </KeyboardAvoidingView>
-          </TouchableWithoutFeedback>
-          <View className="flex-1 items-center justify-center gap-4">
-            <BasicButton
-              label="Save"
-              onPress={async () => {
-                if (!isUsernameValid(username)) {
-                  setUsernameError(
-                    `Invalid username:\n${usernameValidationError}`,
-                  );
-                  return;
-                }
-                if (!(await isUsernameUnique(username))) {
-                  setUsernameError("This username is unavailable.");
-                  return;
-                }
-                await initializeAccount(username, [
-                  `0x` + avatar.head.toString(16),
-                  `0x` + avatar.body.toString(16),
-                  `0x` + avatar.glasses.toString(16),
-                  `0x` + avatar.accessories.toString(16),
-                ]);
-              }}
-              style={{ width: 250 }}
-            />
-            <BasicButton
-              label="Cancel"
-              onPress={async () => {
-                setLoginPage("login");
-              }}
-              style={{ width: 250 }}
-            />
-          </View>
-
-          <View className="flex flex-row items-center justify-between w-full px-10 py-2">
-            <Text className="text-[#101119] text-md font-Pixels">
-              Version {version}
-            </Text>
-            <Text className="text-[#101119] text-md font-Pixels">
-              We are open source!
-            </Text>
-          </View>
+        </TouchableWithoutFeedback>
+        <View className="flex-1 items-center justify-center gap-4">
+          <BasicButton
+            label="Save"
+            onPress={async () => {
+              if (!isUsernameValid(username)) {
+                setUsernameError(
+                  `Invalid username:\n${usernameValidationError}`,
+                );
+                return;
+              }
+              if (!(await isUsernameUnique(username))) {
+                setUsernameError("This username is unavailable.");
+                return;
+              }
+              await initializeAccount(username, [
+                `0x` + avatar.head.toString(16),
+                `0x` + avatar.body.toString(16),
+                `0x` + avatar.glasses.toString(16),
+                `0x` + avatar.accessories.toString(16),
+              ]);
+            }}
+            style={{ width: 250 }}
+          />
+          <BasicButton
+            label="Cancel"
+            onPress={async () => {
+              setLoginPage("login");
+            }}
+            style={{ width: 250 }}
+          />
         </View>
+
+        <View className="flex flex-row items-center justify-between w-full px-10 py-2">
+          <Text className="text-[#101119] text-md font-Pixels">
+            Version {version}
+          </Text>
+          <Text className="text-[#101119] text-md font-Pixels">
+            We are open source!
+          </Text>
+        </View>
+      </View>
       {creatingAvatar && (
         <View
           style={{ paddingBottom: insets.bottom }}
