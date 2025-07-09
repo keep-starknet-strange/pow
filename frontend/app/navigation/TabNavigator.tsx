@@ -94,7 +94,6 @@ function TabBarButton({
 
   useLayoutEffect(() => {
     buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
-      console.log(`${width} - ${height}`);
       setButtonSize({ width: width - 4, height: height - 4 });
     });
   }, [buttonRef, setButtonSize, tabsAdded]);
