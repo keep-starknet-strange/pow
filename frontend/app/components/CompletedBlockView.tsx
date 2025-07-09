@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { useImageProvider } from "../context/ImageProvider";
-import { Block } from "../types/Chains";
+import { useGame } from "../context/Game";
+import { useChains } from "../context/Chains";
 import { BlockView } from "./BlockView";
 import {
   Canvas,
@@ -9,29 +10,60 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import Animated, { useSharedValue, withSpring, withTiming, withSequence, runOnJS, Easing } from "react-native-reanimated";
 
 export type CompletedBlockViewProps = {
   chainId: number;
-  block: Block | null;
   placement: {
     top: number;
     left: number;
     width: number;
     height: number;
   };
+  completedPlacementLeft: number;
 };
 
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
   props,
 ) => {
   const { getImage } = useImageProvider();
+  const { workingBlocks } = useGame();
+  const { getLatestBlock } = useChains();
+
+  const updateCompletedBlock = (chainId: number) => {
+    const block = getLatestBlock(chainId);
+    if (block) {
+      setCompletedBlock(block);
+    }
+  }
+
+  const [completedBlock, setCompletedBlock] = React.useState(
+    getLatestBlock(props.chainId) || null,
+  );
+  const blockSlideLeftAnim = useSharedValue(props.placement.left);
+  useEffect(() => {
+    blockSlideLeftAnim.value = props.placement.left;
+    if (workingBlocks[props.chainId]?.blockId) {
+      blockSlideLeftAnim.value = withSequence(
+        withSpring(
+          props.completedPlacementLeft,
+          { duration: 500 },
+          () => runOnJS(updateCompletedBlock)(props.chainId)
+        ),
+        withTiming(
+          props.placement.left,
+          { duration: 100, easing: Easing.inOut(Easing.ease) }
+        ),
+      );
+    }
+  }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
 
   return (
-    <View
+    <Animated.View
       style={{
         position: "absolute",
         top: props.placement.top,
-        left: props.placement.left,
+        left: blockSlideLeftAnim,
         width: props.placement.width,
         height: props.placement.height,
       }}
@@ -84,7 +116,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
           />
         </Canvas>
       </View>
-      <BlockView chainId={props.chainId} block={props.block} completed={true} />
-    </View>
+      <BlockView chainId={props.chainId} block={completedBlock} completed={true} />
+    </Animated.View>
   );
 };

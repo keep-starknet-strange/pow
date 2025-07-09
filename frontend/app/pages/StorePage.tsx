@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
+import Animated, { FadeInLeft } from "react-native-reanimated";
 
 import { useTransactions } from "../context/Transactions";
 import { useGame } from "../context/Game";
@@ -71,7 +72,7 @@ export const StorePage: React.FC = () => {
             x={0}
             y={-62}
             width={width}
-            height={height}
+            height={height-62}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -94,9 +95,12 @@ export const StorePage: React.FC = () => {
             }}
           />
         </Canvas>
-        <Text className="text-[#fff7ff] text-xl font-bold absolute right-2 font-Pixels">
+        <Animated.Text
+          className="text-[#fff7ff] text-xl font-bold absolute right-2 font-Pixels"
+          entering={FadeInLeft}
+        >
           SHOP
-        </Text>
+        </Animated.Text>
       </View>
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"

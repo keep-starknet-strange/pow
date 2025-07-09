@@ -18,7 +18,7 @@ const BLOCK_SIZE_PERCENT = 0.7;
 export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
   const parentRef = useRef<View>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
-  const { chains, getLatestBlock } = useChains();
+  const { chains } = useChains();
 
   const [workingBlockPosition, setWorkingBlockPosition] = useState({
     top: 0,
@@ -53,23 +53,29 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
       {chains[props.chainId].blocks.length > 0 && (
         <CompletedBlockView
           chainId={props.chainId}
-          block={getLatestBlock(props.chainId)}
           placement={{
             top: workingBlockPosition.top,
             left: workingBlockPosition.left - workingBlockPosition.width - 16,
             width: workingBlockPosition.width,
             height: workingBlockPosition.height,
           }}
+          completedPlacementLeft={
+            workingBlockPosition.left - 2 * workingBlockPosition.width - 16
+          }
         />
       )}
 
       <EmptyBlockView
+        chainId={props.chainId}
         placement={{
           top: workingBlockPosition.top,
           left: workingBlockPosition.left + workingBlockPosition.width + 16,
           width: workingBlockPosition.width,
           height: workingBlockPosition.height,
         }}
+        completedPlacementLeft={
+          workingBlockPosition.left
+        }
       />
 
       <WorkingBlockView
@@ -80,6 +86,9 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
           width: workingBlockPosition.width,
           height: workingBlockPosition.height,
         }}
+        completedPlacementLeft={
+          workingBlockPosition.left - workingBlockPosition.width - 16
+        }
       />
     </View>
   );

@@ -68,7 +68,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
   ]);
   return (
     <View className="flex flex-col w-full">
-      <View className="flex flex-row w-full mb-[4px]">
+      <View className="flex flex-row w-full mb-[4px]" >
         <IconWithLock
           txIcon={getTxIcon(props.chainId, props.txData.id, props.isDapp)}
           locked={txFeeLevel === -1}

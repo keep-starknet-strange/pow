@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
@@ -6,7 +6,7 @@ import { useImageProvider } from "../context/ImageProvider";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
-import { Easing } from "react-native-reanimated";
+import Animated, { runOnJS, Easing, useSharedValue, withSequence, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
   Canvas,
@@ -23,6 +23,7 @@ export type WorkingBlockViewProps = {
     width: number;
     height: number;
   };
+  completedPlacementLeft: number;
 };
 
 /*
@@ -38,14 +39,61 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   // Flag that is set on smaller phones where font size should be adjusted
   const isSmall = props.placement.width < 250;
 
+  const updateWorkingBlock = (chainId: number) => {
+    const block = getWorkingBlock(chainId);
+    if (block) {
+      setWorkingBlock(block);
+    }
+  }
+
+  const blockSlideLeftAnim = useSharedValue(props.placement.left);
+  const blockOpacityAnim = useSharedValue(1);
+  useEffect(() => {
+    blockSlideLeftAnim.value = props.placement.left;
+    blockOpacityAnim.value = 1;
+    if (workingBlocks[props.chainId]?.blockId) {
+      blockSlideLeftAnim.value = withSequence(
+        withSpring(
+          props.completedPlacementLeft,
+          { duration: 700 }
+        ),
+        withTiming(
+          props.completedPlacementLeft,
+          { duration: 200, easing: Easing.inOut(Easing.ease) },
+          () => {
+            runOnJS(updateWorkingBlock)(props.chainId);
+          }
+        ),
+        withTiming(
+          props.placement.left,
+          { duration: 100, easing: Easing.inOut(Easing.ease) }
+        ),
+        withTiming(
+          props.placement.left,
+          { duration: 200, easing: Easing.inOut(Easing.ease) }
+        )
+      );
+      blockOpacityAnim.value = withSequence(
+        withTiming(1, { duration: 700 }),
+        withTiming(0, { duration: 200 }),
+        withTiming(0, { duration: 100 }),
+        withTiming(1, { duration: 200 })
+      );
+    }
+  }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
+
+  const [workingBlock, setWorkingBlock] = React.useState(
+    getWorkingBlock(props.chainId)
+  );
   return (
-    <View
+    <Animated.View
       style={{
         position: "absolute",
         top: props.placement.top,
-        left: props.placement.left,
+        left: blockSlideLeftAnim,
         width: props.placement.width,
         height: props.placement.height,
+        opacity: blockOpacityAnim,
       }}
     >
       <Canvas
@@ -84,7 +132,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
       >
         <BlockView
           chainId={props.chainId}
-          block={getWorkingBlock(props.chainId)}
+          block={workingBlock}
           completed={false}
         />
       </View>
@@ -171,7 +219,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
         />
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

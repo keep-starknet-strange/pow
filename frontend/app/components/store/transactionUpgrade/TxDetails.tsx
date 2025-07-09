@@ -5,6 +5,8 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import React from "react";
+import Animated, { FadeInRight } from "react-native-reanimated";
 import { useImageProvider } from "../../../context/ImageProvider";
 
 type TxDetailsProps = {
@@ -32,13 +34,13 @@ export const TxDetails: React.FC<TxDetailsProps> = ({ name, description }) => {
             }}
           />
         </Canvas>
-        <Text className="absolute top-0 left-[8px] text-[#fff7ff] text-xl font-bold font-Pixels">
+        <Animated.Text className="absolute top-0 left-[8px] text-[#fff7ff] text-xl font-bold font-Pixels" entering={FadeInRight}>
           {name}
-        </Text>
+        </Animated.Text>
       </View>
-      <Text className="text-[#717171] text-lg font-Pixels leading-none mt-[2px]">
+      <Animated.Text className="text-[#717171] text-lg font-Pixels leading-none mt-[2px]" entering={FadeInRight}>
         {description}
-      </Text>
+      </Animated.Text>
     </View>
   );
 };
