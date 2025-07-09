@@ -11,7 +11,7 @@ import { StakingPage } from "../pages/StakingPage";
 
 import { useStaking } from "../context/Staking";
 import { useEventManager } from "../context/EventManager";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
 import {
@@ -49,7 +49,7 @@ function TabBarButton({
   isActive: boolean;
   onPress: any;
 }) {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const getTabIcon = (tabName: string, selected: boolean) => {
     switch (tabName) {
       case "Main":

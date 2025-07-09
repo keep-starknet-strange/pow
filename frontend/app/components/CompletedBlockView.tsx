@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { Block } from "../types/Chains";
 import { BlockView } from "./BlockView";
 import {
@@ -24,7 +24,7 @@ export type CompletedBlockViewProps = {
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
   props,
 ) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   return (
     <View

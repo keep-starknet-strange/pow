@@ -5,7 +5,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../../../context/ImageProvider";
+import { useImages } from "../../../hooks/useImages";
 
 type IconWithLockProps = {
   txIcon: string;
@@ -16,7 +16,7 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
   txIcon,
   locked,
 }) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   return (
     <View className="flex flex-col justify-center relative w-[64px] h-[64px] relative">

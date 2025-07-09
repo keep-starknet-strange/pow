@@ -5,7 +5,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../../../context/ImageProvider";
+import { useImages } from "../../../hooks/useImages";
 
 type TxDetailsProps = {
   name: string;
@@ -13,7 +13,7 @@ type TxDetailsProps = {
 };
 
 export const TxDetails: React.FC<TxDetailsProps> = ({ name, description }) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   return (
     <View className="flex flex-col justify-start items-start px-2 gap-1 flex-1">

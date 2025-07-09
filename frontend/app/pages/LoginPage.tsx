@@ -26,5 +26,3 @@ export const LoginPage: React.FC = () => {
     </View>
   );
 };
-
-export default LoginPage;

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "../../context/FocEngineConnector";
-import { useImageProvider } from "../../context/ImageProvider";
+import { useImages } from "../../hooks/useImages";
 import { PFPView } from "../../components/PFPView";
 import BasicButton from "../../components/buttons/Basic";
 import {
@@ -46,7 +46,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     usernameValidationError,
     initializeAccount,
   } = useFocEngine();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const insets = useSafeAreaInsets();
 
   const [usernameError, setUsernameError] = React.useState<string>("");

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Dimensions } from "react-native";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import {
   withTiming,
   Easing,
@@ -16,7 +16,7 @@ import {
 } from "@shopify/react-native-skia";
 
 export const MainBackground: React.FC = () => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
   const bgOffsetX = useSharedValue(0);
