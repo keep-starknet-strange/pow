@@ -11,11 +11,11 @@ import { Easing } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useBalance } from "../stores/useBalanceStore";
 import { useGame } from "../context/Game";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { l2 } = useGame();
   const headerBg = l2 ? "balance.l2" : "balance.l1";
   const { width } = Dimensions.get("window");

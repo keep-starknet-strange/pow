@@ -14,7 +14,7 @@ import {
 import Animated, { Easing, FadeInLeft, FadeInRight } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { PopupAnimation } from "../PopupAnimation";
-import { useImageProvider } from "../../context/ImageProvider";
+import { useImages } from "../../hooks/useImages";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -22,7 +22,7 @@ export type UpgradeViewProps = {
 };
 
 export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { balance } = useBalance();
   const { width } = Dimensions.get("window");
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();

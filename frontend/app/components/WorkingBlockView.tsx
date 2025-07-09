@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGame } from "../context/Game";
 import { useUpgrades } from "../context/Upgrades";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
@@ -34,7 +34,7 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   const { workingBlocks, getWorkingBlock } = useGame();
   const { getUpgradeValue } = useUpgrades();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   // Flag that is set on smaller phones where font size should be adjusted
   const isSmall = props.placement.width < 250;

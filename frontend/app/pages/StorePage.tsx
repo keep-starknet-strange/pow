@@ -4,7 +4,7 @@ import Animated, { FadeInLeft } from "react-native-reanimated";
 
 import { useTransactions } from "../context/Transactions";
 import { useGame } from "../context/Game";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
 import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
@@ -29,7 +29,7 @@ import {
 export const StorePage: React.FC = () => {
   const { dappsUnlocked } = useTransactions();
   const { l2 } = useGame();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
   const [insufficientFunds, setInsufficientFunds] = useState(false);

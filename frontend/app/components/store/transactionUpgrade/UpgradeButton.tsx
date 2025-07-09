@@ -7,7 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useBalance } from "../../../stores/useBalanceStore";
-import { useImageProvider } from "../../../context/ImageProvider";
+import { useImages } from "../../../hooks/useImages";
 import React from "react";
 import Animated, {
   Easing,
@@ -33,7 +33,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   nextCost,
   onPress,
 }) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width } = Dimensions.get("window");
   const { balance } = useBalance();
 

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
 import { StorePage } from "../pages/StorePage";
@@ -11,7 +11,7 @@ import { StakingPage } from "../pages/StakingPage";
 
 import { useStaking } from "../context/Staking";
 import { useEventManager } from "../context/EventManager";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
 import {
@@ -27,15 +27,22 @@ const Tab = createBottomTabNavigator();
 function StoreTabButton({
   isActive,
   onPress,
+  tabsAdded,
 }: {
   isActive: boolean;
   onPress: any;
+  tabsAdded: boolean;
 }) {
   const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
 
   return (
     <View ref={ref} onLayout={onLayout} className="">
-      <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
+      <TabBarButton
+        tabName="Store"
+        isActive={isActive}
+        onPress={onPress}
+        tabsAdded={tabsAdded}
+      />
     </View>
   );
 }
@@ -44,45 +51,71 @@ function TabBarButton({
   tabName,
   isActive,
   onPress,
+  tabsAdded,
 }: {
   tabName: string;
   isActive: boolean;
   onPress: any;
+  tabsAdded: boolean;
 }) {
-  const { getImage } = useImageProvider();
-  const getTabIcon = (tabName: string, selected: boolean) => {
-    switch (tabName) {
-      case "Main":
-        return selected
-          ? getImage("nav.icon.game.active")
-          : getImage("nav.icon.game");
-      case "Store":
-        return selected
-          ? getImage("nav.icon.shop.active")
-          : getImage("nav.icon.shop");
-      case "Achievements":
-        return selected
-          ? getImage("nav.icon.flag.active")
-          : getImage("nav.icon.flag");
-      case "Leaderboard":
-        return selected
-          ? getImage("nav.icon.medal.active")
-          : getImage("nav.icon.medal");
-      case "Settings":
-        return selected
-          ? getImage("nav.icon.settings.active")
-          : getImage("nav.icon.settings");
-      default:
-        return null;
-    }
-  };
+  const { getImage } = useImages();
+  const buttonRef = useRef<View>(null);
+  const [buttonSize, setButtonSize] = useState({ width: 0, height: 0 });
+
+  const getTabIcon = useCallback(
+    (tabName: string, selected: boolean) => {
+      switch (tabName) {
+        case "Main":
+          return selected
+            ? getImage("nav.icon.game.active")
+            : getImage("nav.icon.game");
+        case "Store":
+          return selected
+            ? getImage("nav.icon.shop.active")
+            : getImage("nav.icon.shop");
+        case "Achievements":
+          return selected
+            ? getImage("nav.icon.flag.active")
+            : getImage("nav.icon.flag");
+        case "Leaderboard":
+          return selected
+            ? getImage("nav.icon.medal.active")
+            : getImage("nav.icon.medal");
+        case "Settings":
+          return selected
+            ? getImage("nav.icon.settings.active")
+            : getImage("nav.icon.settings");
+        default:
+          return null;
+      }
+    },
+    [getImage],
+  );
+
+  useLayoutEffect(() => {
+    buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
+      setButtonSize({ width: width - 4, height: height - 4 });
+    });
+  }, [buttonRef, setButtonSize, tabsAdded]);
 
   return (
     <TouchableOpacity
-      className="flex flex-row h-[68px] w-[68px] relative"
+      style={{
+        width: "100%",
+        aspectRatio: "1 / 1",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      ref={buttonRef}
       onPress={onPress}
     >
-      <Canvas style={{ flex: 1 }} className="w-full h-full">
+      <Canvas
+        style={{
+          position: "absolute",
+          width: buttonSize.width,
+          height: buttonSize.height,
+        }}
+      >
         <Image
           image={
             isActive ? getImage("nav.button.active") : getImage("nav.button")
@@ -90,8 +123,8 @@ function TabBarButton({
           fit="fill"
           x={0}
           y={0}
-          width={68}
-          height={68}
+          width={buttonSize.width}
+          height={buttonSize.height}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -100,20 +133,17 @@ function TabBarButton({
       </Canvas>
       <Canvas
         style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: 68,
-          height: 68,
+          width: buttonSize.width * 0.7,
+          height: buttonSize.height * 0.7,
         }}
       >
         <Image
           image={getTabIcon(tabName, isActive)}
           fit="contain"
-          x={10}
-          y={10}
-          width={48}
-          height={48}
+          x={0}
+          y={0}
+          width={buttonSize.width * 0.7}
+          height={buttonSize.height * 0.7}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -157,6 +187,7 @@ export function TabNavigator() {
               tabName="Main"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
+              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -175,6 +206,7 @@ export function TabNavigator() {
                 tabName="Staking"
                 isActive={props["aria-selected"] || false}
                 onPress={props.onPress}
+                tabsAdded={stakingUnlocked}
               />
             ),
           }}
@@ -192,6 +224,7 @@ export function TabNavigator() {
             <StoreTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
+              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -209,6 +242,7 @@ export function TabNavigator() {
               tabName="Leaderboard"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
+              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -226,6 +260,7 @@ export function TabNavigator() {
               tabName="Achievements"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
+              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -243,6 +278,7 @@ export function TabNavigator() {
               tabName="Settings"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
+              tabsAdded={stakingUnlocked}
             />
           ),
         }}

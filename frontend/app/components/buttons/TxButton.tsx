@@ -3,7 +3,7 @@ import { Image, Text, View, TouchableOpacity } from "react-native";
 import { Dimensions } from "react-native";
 import { useGame } from "../../context/Game";
 import { useTransactions } from "../../context/Transactions";
-import { useImageProvider } from "../../context/ImageProvider";
+import { useImages } from "../../hooks/useImages";
 import { newTransaction } from "../../types/Chains";
 import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
@@ -36,7 +36,7 @@ export type TxButtonProps = {
 };
 
 export const TxButton: React.FC<TxButtonProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { width } = Dimensions.get("window");
   const { addTransaction } = useGame();
   const {

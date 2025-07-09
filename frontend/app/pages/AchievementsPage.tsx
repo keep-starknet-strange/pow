@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useAchievement } from "../stores/useAchievementsStore";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
 import {
   Canvas,
@@ -20,7 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 export const AchievementsPage: React.FC = () => {
   const { achievementsProgress } = useAchievement();
   const { width, height } = Dimensions.get("window");
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   const [categories, setCategories] = React.useState<{ [key: string]: any[] }>(
     {},

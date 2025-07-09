@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { useImageProvider } from "../context/ImageProvider";
 import { useGame } from "../context/Game";
 import { useChains } from "../context/Chains";
+import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
 import {
   Canvas,
@@ -26,7 +26,7 @@ export type CompletedBlockViewProps = {
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
   props,
 ) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { workingBlocks } = useGame();
   const { getLatestBlock } = useChains();
 

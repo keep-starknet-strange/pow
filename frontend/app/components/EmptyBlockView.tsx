@@ -6,7 +6,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { useGame } from "../context/Game";
 import Animated, { useSharedValue, withTiming, withSpring, withSequence, runOnJS, Easing } from "react-native-reanimated";
 
@@ -22,7 +22,7 @@ export type EmptyViewProps = {
 };
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { workingBlocks } = useGame();
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);

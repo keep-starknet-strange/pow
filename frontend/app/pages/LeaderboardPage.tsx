@@ -19,7 +19,7 @@ import { useStarknetConnector } from "../context/StarknetConnector";
 import { useBalance } from "../stores/useBalanceStore";
 import { useUpgrades } from "../context/Upgrades";
 import { useFocEngine } from "../context/FocEngineConnector";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import background from "../../assets/background.png";
 import { shortMoneyString } from "../utils/helpers";
@@ -43,7 +43,7 @@ export const getPrestigeIcon = (prestige: number) => {
 
 export const LeaderboardPage: React.FC = () => {
   const { STARKNET_ENABLED } = useStarknetConnector();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
   const { getAccounts, getUniqueEventsOrdered, user } = useFocEngine();
   const { width, height } = Dimensions.get("window");
   const { balance } = useBalance();

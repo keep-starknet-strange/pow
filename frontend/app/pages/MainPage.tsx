@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { useGame } from "../context/Game";
-import { useImageProvider } from "../context/ImageProvider";
+import { useImages } from "../hooks/useImages";
 import { L1Phase } from "./main/L1Phase";
 import { L2Phase } from "./main/L2Phase";
 import {
@@ -14,7 +14,7 @@ import { MainBackground } from "../components/MainBackground";
 
 export const MainPage: React.FC = () => {
   const { l2 } = useGame();
-  const { getImage } = useImageProvider();
+  const { getImage } = useImages();
 
   const [currentView, setCurrentView] = React.useState(l2 ? "L2" : "L1");
   useEffect(() => {
