@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, SafeAreaView, Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import BasicButton from "../../components/buttons/Basic";
