@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useAchievement } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -73,9 +74,12 @@ export const AchievementsPage: React.FC = () => {
             }}
           />
         </Canvas>
-        <Text className="text-[#fff7ff] text-xl absolute right-2 font-Pixels">
+        <Animated.Text
+          className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
+          entering={FadeInLeft}
+        >
           ACHIEVEMENTS
-        </Text>
+        </Animated.Text>
       </View>
       <ScrollView
         className="flex-1 relative"
@@ -102,9 +106,12 @@ export const AchievementsPage: React.FC = () => {
                   }}
                 />
               </Canvas>
-              <Text className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]">
+              <Animated.Text
+                className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]"
+                entering={FadeInRight}
+              >
                 {category}
-              </Text>
+              </Animated.Text>
             </View>
             <ScrollView
               className="flex flex-row mx-[12px]"
@@ -112,9 +119,10 @@ export const AchievementsPage: React.FC = () => {
               showsHorizontalScrollIndicator={false}
             >
               {achievements.map((achievement, index) => (
-                <View
+                <Animated.View
                   className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
                   key={index}
+                  entering={FadeInRight}
                 >
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
                     <Image
@@ -175,7 +183,7 @@ export const AchievementsPage: React.FC = () => {
                       />
                     </Canvas>
                   </View>
-                </View>
+                </Animated.View>
               ))}
             </ScrollView>
           </View>

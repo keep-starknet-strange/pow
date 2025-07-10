@@ -6,6 +6,7 @@ import BasicButton from "../../components/buttons/Basic";
 import logo from "../../../assets/logo/pow.png";
 import starknetLogo from "../../../assets/logo/starknet.png";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 
 type LoginMainPageProps = {
   setLoginPage: (page: string) => void;
@@ -27,17 +28,25 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       }}
       className="flex-1 items-center justify-between"
     >
-      <View className="flex items-center justify-center">
+      <Animated.View
+        entering={FadeInUp}
+        className="flex items-center justify-center"
+      >
         <Image
           source={logo}
           style={{ width: 300, height: 300, marginTop: 100 }}
           resizeMode="contain"
         />
-        <Text className="text-[#101119] text-2xl font-Xerxes text-center">
+        <Text
+          className="text-[#101119] text-2xl font-Xerxes text-center"
+        >
           Click. Build. Mine.
         </Text>
-      </View>
-      <View className="flex-1 items-center justify-center gap-2">
+      </Animated.View>
+      <Animated.View
+        entering={FadeInDown}
+        className="flex-1 items-center justify-center gap-2"
+      >
         <BasicButton
           label="Play!"
           onPress={async () => {
@@ -68,11 +77,14 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
             resizeMode="contain"
           />
         </View>
-      </View>
-      <View className="flex flex-row items-center justify-between w-full px-10 py-2">
+      </Animated.View>
+      <Animated.View
+        entering={FadeInDown}
+        className="flex flex-row items-center justify-between w-full px-10 py-2"
+      >
         <Text className="text-[#101119] font-Pixels">Version {version}</Text>
         <Text className="text-[#101119] font-Pixels">We are open source!</Text>
-      </View>
+      </Animated.View>
     </View>
   );
 };

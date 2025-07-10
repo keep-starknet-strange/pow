@@ -73,7 +73,7 @@ export const InAppNotification = () => {
     >
       {activeNotification && (
         <Animated.View
-          className="my-2 py-3 px-2 bg-[#1011198b] border-2 rounded"
+          className="my-2 py-3 px-2 bg-[#101119ff] border-2 rounded"
           style={{
             borderColor:
               inAppNotificationsJson[activeNotification.notificationTypeId]

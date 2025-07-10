@@ -30,6 +30,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { FadeInUp, FadeInDown, SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 type AccountCreationProps = {
   setLoginPage: (page: string) => void;
@@ -94,7 +95,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             behavior="position"
             keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
           >
-            <View
+            <Animated.View
+              entering={FadeInUp}
               style={{
                 alignItems: "center",
               }}
@@ -135,7 +137,11 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 </Text>
                 <TouchableOpacity
                   className="py-1 border-2 border-[#101119] rounded-md px-2"
-                  onPress={() => setAvatar(getRandomNounsAttributes())}
+                  onPress={() => {
+                    const newAvatar = getRandomNounsAttributes();
+                    setAvatar(newAvatar)
+                    setNewAvatar(newAvatar);
+                  }}
                 >
                   <Text className="text-[#101119] text-xl font-Pixels">
                     Roll
@@ -143,14 +149,21 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="py-1 border-2 border-[#101119] rounded-md px-2"
-                  onPress={() => setCreatingAvatar(!creatingAvatar)}
+                  onPress={() => {
+                    setNewAvatar(avatar);
+                    setCreatingAvatar(!creatingAvatar);
+                  }}
                 >
                   <Text className="text-[#101119] text-xl font-Pixels">
                     edit
                   </Text>
                 </TouchableOpacity>
               </View>
-
+            </Animated.View>
+            <Animated.View
+              entering={FadeInDown}
+              className="flex flex-col items-center"
+            >
               <View className="flex flex-col items-start mt-8 w-screen px-8">
                 <Text className="text-[#101119] text-lg font-Pixels">
                   Set up a username
@@ -177,10 +190,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                   </Text>
                 ) : null}
               </View>
-            </View>
+            </Animated.View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
-        <View className="flex-1 items-center justify-center gap-4">
+        <Animated.View
+          entering={FadeInDown}
+          className="flex-1 items-center justify-center gap-4"
+        >
           <BasicButton
             label="Save"
             onPress={async () => {
@@ -210,19 +226,24 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             }}
             style={{ width: 250 }}
           />
-        </View>
+        </Animated.View>
 
-        <View className="flex flex-row items-center justify-between w-full px-10 py-2">
+        <Animated.View
+          entering={FadeInDown}
+          className="flex flex-row items-center justify-between w-full px-10 py-2"
+        >
           <Text className="text-[#101119] text-md font-Pixels">
             Version {version}
           </Text>
           <Text className="text-[#101119] text-md font-Pixels">
             We are open source!
           </Text>
-        </View>
+        </Animated.View>
       </View>
       {creatingAvatar && (
-        <View
+        <Animated.View
+          entering={SlideInDown}
+          exiting={SlideOutDown}
           style={{ paddingBottom: insets.bottom }}
           className="absolute left-0 right-0 bottom-0 bg-[#101119] rounded-t-3xl px-4 py-2 h-[30rem]
                               flex flex-col items-center justify-start gap-1 w-full
@@ -286,28 +307,32 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                     });
                   }}
                 >
-                  <View className="absolute top-0 left-0 h-20 aspect-square">
-                    <Canvas style={{ flex: 1 }} className="w-full h-full">
-                      <SkiaImg
-                        image={
-                          newAvatar[
-                            avatarTab.value as keyof NounsAttributes
-                          ] === index
-                            ? getImage("block.bg.yellow")
-                            : getImage("block.bg.purple")
-                        }
-                        fit="cover"
-                        x={0}
-                        y={0}
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
-                        width={68}
-                        height={68}
-                      />
-                    </Canvas>
-                  </View>
+                  {newAvatar[
+                    avatarTab.value as keyof NounsAttributes
+                  ] === index && (
+                    <View className="absolute top-0 left-0 h-20 aspect-square">
+                      <Canvas style={{ flex: 1 }} className="w-full h-full">
+                        <SkiaImg
+                          image={
+                            newAvatar[
+                              avatarTab.value as keyof NounsAttributes
+                            ] === index
+                              ? getImage("block.bg.yellow")
+                              : getImage("block.bg.purple")
+                          }
+                          fit="cover"
+                          x={0}
+                          y={0}
+                          sampling={{
+                            filter: FilterMode.Nearest,
+                            mipmap: MipmapMode.Nearest,
+                          }}
+                          width={68}
+                          height={68}
+                        />
+                      </Canvas>
+                    </View>
+                  )}
                   <Image
                     source={part}
                     className="w-full h-full p-4"
@@ -329,7 +354,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             }}
             textStyle={{ color: "#fff7ff", fontFamily: "Pixels" }}
           />
-        </View>
+        </Animated.View>
       )}
     </>
   );

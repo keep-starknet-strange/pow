@@ -166,6 +166,8 @@ export function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
+        animation: "shift",
+        popToTopOnBlur: true,
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#101119ff",

@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import { useUpgrades } from "../../context/Upgrades";
-import { shortMoneyString } from "../../utils/helpers";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
-import {
-  Canvas,
-  Image,
-  FilterMode,
-  MipmapMode,
-} from "@shopify/react-native-skia";
-import { useImages } from "../../hooks/useImages";
+import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
 
 export type AutomationViewProps = {
   chainId: number;
@@ -18,8 +11,6 @@ export type AutomationViewProps = {
 };
 
 export const AutomationView: React.FC<AutomationViewProps> = (props) => {
-  const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
   const { automations, upgradeAutomation, getNextAutomationCost } =
     useUpgrades();
 
@@ -125,49 +116,19 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
           description={props.automation.description}
         />
       </View>
-      <TouchableOpacity
-        className="relative"
-        style={{
-          width: width - 32,
-          height: 36,
-        }}
+      <UpgradeButton
+        label={`Upgrade to ${props.automation.levels[level]?.name}`}
+        level={level}
+        maxLevel={props.automation.levels.length}
+        nextCost={getNextAutomationCost(
+          props.chainId,
+          props.automation.id,
+        )}
         onPress={() => {
           upgradeAutomation(props.chainId, props.automation.id);
         }}
-      >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("shop.auto.buy")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={width - 32}
-            height={36}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.None,
-            }}
-          />
-        </Canvas>
-        <View className="flex flex-row absolute left-[8px] top-[6px] gap-2">
-          <Text className="font-Pixels text-xl text-[#fff7ff]">Upgrade to</Text>
-          <Text className="font-Pixels text-xl text-[#c89632]">
-            {props.automation.levels[level]?.name || "Max"}
-          </Text>
-        </View>
-        {level === props.automation.levels.length ? (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">
-            Max
-          </Text>
-        ) : (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
-            Cost:{" "}
-            {shortMoneyString(
-              getNextAutomationCost(props.chainId, props.automation.id),
-            )}
-          </Text>
-        )}
-      </TouchableOpacity>
+        bgImage={"shop.auto.buy"}
+      />
     </View>
   );
 };
