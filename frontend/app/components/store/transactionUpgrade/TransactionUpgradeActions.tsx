@@ -50,6 +50,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
       maxLevel={1}
       nextCost={nextCost}
       onPress={onBuyPress}
+      bgImage={"shop.tx.buy"}
     />
   ) : (
     <View className="flex flex-col gap-1">
@@ -61,6 +62,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
             maxLevel={feeProps.maxLevel}
             nextCost={feeProps.nextCost}
             onPress={feeProps.onPress}
+            bgImage={"shop.tx.buy"}
           />
         </View>
       )}
@@ -72,6 +74,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
             maxLevel={speedProps.maxLevel}
             nextCost={speedProps.nextCost}
             onPress={speedProps.onPress}
+            bgImage={"shop.tx.buy"}
           />
         </View>
       )}

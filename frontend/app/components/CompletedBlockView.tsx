@@ -45,9 +45,13 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
     blockSlideLeftAnim.value = props.placement.left;
     if (workingBlocks[props.chainId]?.blockId) {
       blockSlideLeftAnim.value = withSequence(
-        withSpring(
+        withTiming(
+          props.placement.left,
+          { duration: 400, easing: Easing.inOut(Easing.ease) }
+        ),
+        withTiming(
           props.completedPlacementLeft,
-          { duration: 500 },
+          { duration: 700 },
           () => runOnJS(updateCompletedBlock)(props.chainId)
         ),
         withTiming(

@@ -3,6 +3,7 @@ import { StyleProp, View, ViewStyle } from "react-native";
 import { CompletedBlockView } from "@/app/components/CompletedBlockView";
 import EmptyBlockView from "@/app/components/EmptyBlockView";
 import WorkingBlockView from "@/app/components/WorkingBlockView";
+import WorkingBlockDetails from "@/app/components/WorkingBlockDetails";
 import { useChains } from "@/app/context/Chains";
 
 export type BlockchainViewProps = {
@@ -60,7 +61,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
             height: workingBlockPosition.height,
           }}
           completedPlacementLeft={
-            workingBlockPosition.left - 2 * workingBlockPosition.width - 16
+            workingBlockPosition.left - 2 * workingBlockPosition.width - 32
           }
         />
       )}
@@ -77,6 +78,18 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
           workingBlockPosition.left
         }
       />
+      <EmptyBlockView
+        chainId={props.chainId}
+        placement={{
+          top: workingBlockPosition.top,
+          left: workingBlockPosition.left + 2 * workingBlockPosition.width + 32,
+          width: workingBlockPosition.width,
+          height: workingBlockPosition.height,
+        }}
+        completedPlacementLeft={
+          workingBlockPosition.left + workingBlockPosition.width + 16
+        }
+      />
 
       <WorkingBlockView
         chainId={props.chainId}
@@ -89,6 +102,15 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
         completedPlacementLeft={
           workingBlockPosition.left - workingBlockPosition.width - 16
         }
+      />
+      <WorkingBlockDetails
+        chainId={props.chainId}
+        placement={{
+          top: workingBlockPosition.top,
+          left: workingBlockPosition.left,
+          width: workingBlockPosition.width,
+          height: workingBlockPosition.height,
+        }}
       />
     </View>
   );

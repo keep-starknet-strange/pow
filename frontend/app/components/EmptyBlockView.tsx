@@ -26,37 +26,26 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
   const { workingBlocks } = useGame();
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
-  const blockOpacityAnim = useSharedValue(1);
   useEffect(() => {
     blockSlideLeftAnim.value = props.placement.left;
-    blockOpacityAnim.value = 1;
+    /* TODO: Include empty block animation?
     if (workingBlocks[props.chainId]?.blockId) {
       blockSlideLeftAnim.value = withSequence(
-        withSpring(
+        withTiming(
+          props.placement.left,
+          { duration: 400, easing: Easing.inOut(Easing.ease) }
+        ),
+        withTiming(
           props.completedPlacementLeft,
           { duration: 700 },
         ),
         withTiming(
-          props.completedPlacementLeft,
-          { duration: 500, easing: Easing.inOut(Easing.ease) }
-        ),
-        withTiming(
           props.placement.left,
-          { duration: 100, easing: Easing.inOut(Easing.ease) }
+          { duration: 0, easing: Easing.inOut(Easing.ease) }
         ),
-        withTiming(
-          props.placement.left,
-          { duration: 200, easing: Easing.inOut(Easing.ease) }
-        )
-      );
-      blockOpacityAnim.value = withSequence(
-        withTiming(1, { duration: 700 }),
-        withTiming(1, { duration: 400 }),
-        withTiming(0, { duration: 100 }),
-        withTiming(0, { duration: 500 }),
-        withTiming(1, { duration: 500 })
       );
     }
+    */
   }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
 
   return (
@@ -67,7 +56,6 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
         left: blockSlideLeftAnim,
         width: props.placement.width,
         height: props.placement.height,
-        opacity: blockOpacityAnim,
       }}
     >
       <View className="absolute top-0 left-0 w-full h-full z-[2]">

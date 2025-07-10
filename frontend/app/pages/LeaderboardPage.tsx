@@ -13,6 +13,11 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import Animated, {
+  FadeInLeft,
+  FadeInRight,
+  FadeInDown,
+} from "react-native-reanimated";
 import { PFPView } from "../components/PFPView";
 import prestigeJson from "../configs/prestige.json";
 import { useStarknetConnector } from "../context/StarknetConnector";
@@ -199,20 +204,32 @@ export const LeaderboardPage: React.FC = () => {
             }}
           />
         </Canvas>
-        <Text className="text-[#fff7ff] text-xl absolute right-2 font-Pixels">
+        <Animated.Text
+          className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
+          entering={FadeInLeft}
+        >
           LEADERBOARD
-        </Text>
+        </Animated.Text>
       </View>
       <View className="flex flex-row justify-between items-center px-4 bg-[#101119] mb-[4px]">
-        <Text className="text-lg text-white flex-1 font-Pixels">
+        <Animated.Text
+          className="text-lg text-white flex-1 font-Pixels"
+          entering={FadeInLeft}
+        >
           Leaderboard
-        </Text>
-        <Text className="text-lg text-white w-[5rem] text-center font-Pixels">
+        </Animated.Text>
+        <Animated.Text
+          className="text-lg text-white w-[5rem] text-center font-Pixels"
+          entering={FadeInRight}
+        >
           Prestige
-        </Text>
-        <Text className="text-lg text-white w-[6rem] text-right font-Pixels">
+        </Animated.Text>
+        <Animated.Text
+          className="text-lg text-white w-[6rem] text-right font-Pixels"
+          entering={FadeInRight}
+        >
           Score
-        </Text>
+        </Animated.Text>
       </View>
       <ScrollView className="flex-1">
         {leaderboard.map((user, index) => (
@@ -222,7 +239,10 @@ export const LeaderboardPage: React.FC = () => {
               index % 2 === 0 ? "transparent" : "bg-[#1b1c26]"
             }`}
           >
-            <View className="flex flex-row items-center flex-1">
+            <Animated.View
+              className="flex flex-row items-center flex-1"
+              entering={FadeInLeft}
+            >
               <View
                 className="w-[4rem] aspect-square mr-2 rounded-xl overflow-hidden bg-[#11111160]
                               border-2 border-[#e7e7e740] shadow-lg shadow-black/20"
@@ -232,8 +252,11 @@ export const LeaderboardPage: React.FC = () => {
               <Text className="text-2xl text-white font-Pixels">
                 {user.name}
               </Text>
-            </View>
-            <View className="flex flex-row items-center justify-center w-[4rem]">
+            </Animated.View>
+            <Animated.View
+              className="flex flex-row items-center justify-center w-[4rem]"
+              entering={FadeInRight}
+            >
               <View className="w-[36px] aspect-square">
                 <Canvas style={{ flex: 1 }} className="w-full h-full">
                   <Image
@@ -250,19 +273,23 @@ export const LeaderboardPage: React.FC = () => {
                   />
                 </Canvas>
               </View>
-            </View>
-            <Text className="text-xl text-white w-[6rem] text-right font-Pixels">
+            </Animated.View>
+            <Animated.Text
+              className="text-xl text-white w-[6rem] text-right font-Pixels"
+              entering={FadeInRight}
+            >
               {shortMoneyString(user.balance)}
-            </Text>
+            </Animated.Text>
           </View>
         ))}
         <View className="h-[40px]" />
       </ScrollView>
       {user && (
-        <View
+        <Animated.View
           className={`flex flex-row justify-between items-center px-4 py-2 bg-[#101119] z-10
             border-t-[5px] border-[#1b1c26] shadow-lg shadow-black/20 mx-[4px]
             `}
+          entering={FadeInDown}
         >
           <View className="flex flex-row items-center flex-1">
             <View
@@ -308,7 +335,7 @@ export const LeaderboardPage: React.FC = () => {
           <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
             {shortMoneyString(balance)}
           </Text>
-        </View>
+        </Animated.View>
       )}
     </View>
   );

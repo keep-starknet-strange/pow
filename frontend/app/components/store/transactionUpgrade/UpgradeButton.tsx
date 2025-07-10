@@ -23,6 +23,7 @@ type UpgradeButtonProps = {
   maxLevel: number;
   nextCost: number;
   onPress: () => void;
+  bgImage: string;
 };
 
 export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
@@ -32,6 +33,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   maxLevel,
   nextCost,
   onPress,
+  bgImage,
 }) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
@@ -55,7 +57,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
-          image={getImage("shop.tx.buy")}
+          image={getImage(bgImage)}
           fit="fill"
           x={0}
           y={0}
