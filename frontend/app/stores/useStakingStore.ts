@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import stakingConfig from '../configs/staking.json';
-import { useBalance } from '../context/Balance';
 
 interface SlashingConfig {
   slash_fraction: number    // e.g. 10 means “1/10th slashed per period”
@@ -21,9 +20,9 @@ interface StakingState {
   lastValidation: number;
 
   // actions
-  stakeTokens: () => void;
+  stakeTokens: (amount: number) => void;
   validateStake: () => void;
-  claimStakingRewards: () => void;
+  claimStakingRewards: () => number;
   withdrawStakedTokens: () => void;
 }
 
@@ -62,10 +61,10 @@ export const useStakingStore = create<StakingState>((set, get) => {
       });
     },
 
-    stakeTokens: () => {
+    stakeTokens: (amount) => {
       get().validateStake();
       set((state) => {
-        const newAmount = state.amountStaked + state.stakingIncrement;
+        const newAmount = state.amountStaked + amount;
         return {
           amountStaked: newAmount,
         };
@@ -73,15 +72,25 @@ export const useStakingStore = create<StakingState>((set, get) => {
     },
 
     claimStakingRewards: () => {
+      const { rewards } = get();
+      if (rewards === 0) {
+        return 0;
+      }
       set(() => ({
         rewards: 0,
       }));
+      return rewards;
     },
 
     withdrawStakedTokens: () => {
+      const { amountStaked } = get();
+      if (amountStaked === 0) {
+        return 0;
+      }
       set(() => ({
         amountStaked: 0,
       }));
+      return amountStaked;
     },
   };
 });

@@ -117,7 +117,7 @@ export const StorePage: React.FC = () => {
               />
             </Canvas>
             <Text
-              className={`font-Pixels text-xl font-bold text-center w-full absolute ${
+              className={`font-Pixels text-xl text-center w-full absolute ${
                 activeSubTab === tab ? "text-[#fff7ff]" : "text-[#717171]"
               }`}
               onPress={() => setActiveSubTab(tab)}

@@ -26,11 +26,9 @@ const Tab = createBottomTabNavigator();
 function StoreTabButton({
   isActive,
   onPress,
-  tabsAdded,
 }: {
   isActive: boolean;
   onPress: any;
-  tabsAdded: boolean;
 }) {
   const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
 
@@ -40,7 +38,6 @@ function StoreTabButton({
         tabName="Store"
         isActive={isActive}
         onPress={onPress}
-        tabsAdded={tabsAdded}
       />
     </View>
   );
@@ -50,12 +47,10 @@ function TabBarButton({
   tabName,
   isActive,
   onPress,
-  tabsAdded,
 }: {
   tabName: string;
   isActive: boolean;
   onPress: any;
-  tabsAdded: boolean;
 }) {
   const { getImage } = useImages();
   const buttonRef = useRef<View>(null);
@@ -68,6 +63,10 @@ function TabBarButton({
           return selected
             ? getImage("nav.icon.game.active")
             : getImage("nav.icon.game");
+        case "Staking":
+          return selected
+            ? getImage("nav.icon.staking.active")
+            : getImage("nav.icon.staking");
         case "Store":
           return selected
             ? getImage("nav.icon.shop.active")
@@ -95,7 +94,7 @@ function TabBarButton({
     buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
       setButtonSize({ width: width - 4, height: height - 4 });
     });
-  }, [buttonRef, setButtonSize, tabsAdded]);
+  }, [buttonRef, setButtonSize]);
 
   return (
     <TouchableOpacity
@@ -156,7 +155,6 @@ function TabBarButton({
 export function TabNavigator() {
   const { notify } = useEventManager();
   const insets = useSafeAreaInsets();
-  const stakingUnlocked = true; // Replace with actual logic to determine if staking is unlocked
   const handleTabPress = (routeName: string) => {
     notify("SwitchPage", { name: routeName });
   };
@@ -185,7 +183,6 @@ export function TabNavigator() {
               tabName="Main"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -203,7 +200,6 @@ export function TabNavigator() {
               tabName="Staking"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -220,7 +216,6 @@ export function TabNavigator() {
             <StoreTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -238,7 +233,6 @@ export function TabNavigator() {
               tabName="Leaderboard"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -256,7 +250,6 @@ export function TabNavigator() {
               tabName="Achievements"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -274,7 +267,6 @@ export function TabNavigator() {
               tabName="Settings"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}

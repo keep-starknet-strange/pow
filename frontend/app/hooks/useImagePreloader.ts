@@ -107,6 +107,9 @@ const imagePaths = {
     `${assetsPath}/block/blockchain_grid_chainconnector.png`,
   ),
 
+  // Staking
+  stakingBg: require(`${assetsPath}/staking/staking_bg.png`),
+
   // Navigation Images
   navBg: require(`${assetsPath}/navigation/background.png`),
   navButton: require(`${assetsPath}/navigation/menu_button_normal.png`),
@@ -119,6 +122,8 @@ const imagePaths = {
   navIconGameActive: require(`${assetsPath}/navigation/icon_game_selected.png`),
   navIconShopActive: require(`${assetsPath}/navigation/icon_shop_selected.png`),
   navIconFlagActive: require(`${assetsPath}/navigation/icon_flag_selected.png`),
+  navIconStaking: require(`${assetsPath}/navigation/icon_staking.png`),
+  navIconStakingActive: require(`${assetsPath}/navigation/icon_staking_selected.png`),
   navIconMedalActive: require(
     `${assetsPath}/navigation/icon_medal_selected.png`,
   ),
@@ -285,11 +290,14 @@ export const useImagePreloader = () => {
 
   // Load all images using useImage hook
   const images = {
+    // General Images
     background: useImage(imagePaths.background),
     backgroundGrid: useImage(imagePaths.backgroundGrid),
     balanceL1: useImage(imagePaths.balanceL1),
     balanceL2: useImage(imagePaths.balanceL2),
     unknownImage: useImage(imagePaths.unknownImage),
+
+    // Transaction Images - Backgrounds
     txButtonBlueEmpty: useImage(imagePaths.txButtonBlueEmpty),
     txButtonGreenEmpty: useImage(imagePaths.txButtonGreenEmpty),
     txButtonPinkEmpty: useImage(imagePaths.txButtonPinkEmpty),
@@ -300,6 +308,8 @@ export const useImagePreloader = () => {
     txButtonPinkInner: useImage(imagePaths.txButtonPinkInner),
     txButtonPurpleInner: useImage(imagePaths.txButtonPurpleInner),
     txButtonYellowInner: useImage(imagePaths.txButtonYellowInner),
+
+    // Transaction Images - Icons
     txIconTx: useImage(imagePaths.txIconTx),
     txIconBlob: useImage(imagePaths.txIconBlob),
     txIconNft: useImage(imagePaths.txIconNft),
@@ -314,12 +324,16 @@ export const useImagePreloader = () => {
     txIconDaoSm: useImage(imagePaths.txIconDaoSm),
     txIconIsaSm: useImage(imagePaths.txIconIsaSm),
     txIconRunesSm: useImage(imagePaths.txIconRunesSm),
+
+    // Transaction Images - Nameplates
     txNameplateBlue: useImage(imagePaths.txNameplateBlue),
     txNameplateGreen: useImage(imagePaths.txNameplateGreen),
     txNameplatePink: useImage(imagePaths.txNameplatePink),
     txNameplatePurple: useImage(imagePaths.txNameplatePurple),
     txNameplateYellow: useImage(imagePaths.txNameplateYellow),
     txPlaque: useImage(imagePaths.txPlaque),
+
+    // Block Images
     blockTxBgBlue: useImage(imagePaths.blockTxBgBlue),
     blockTxBgGreen: useImage(imagePaths.blockTxBgGreen),
     blockTxBgPink: useImage(imagePaths.blockTxBgPink),
@@ -332,19 +346,28 @@ export const useImagePreloader = () => {
     blockGrid: useImage(imagePaths.blockGrid),
     blockGridMin: useImage(imagePaths.blockGridMin),
     blockConnector: useImage(imagePaths.blockConnector),
+
+    // Staking
+    stakingBg: useImage(imagePaths.stakingBg),
+
+    // Navigation Images
     navBg: useImage(imagePaths.navBg),
     navButton: useImage(imagePaths.navButton),
     navButtonActive: useImage(imagePaths.navButtonActive),
     navIconGame: useImage(imagePaths.navIconGame),
+    navIconStaking: useImage(imagePaths.navIconStaking),
     navIconShop: useImage(imagePaths.navIconShop),
     navIconFlag: useImage(imagePaths.navIconFlag),
     navIconMedal: useImage(imagePaths.navIconMedal),
     navIconSettings: useImage(imagePaths.navIconSettings),
     navIconGameActive: useImage(imagePaths.navIconGameActive),
+    navIconStakingActive: useImage(imagePaths.navIconStakingActive),
     navIconShopActive: useImage(imagePaths.navIconShopActive),
     navIconFlagActive: useImage(imagePaths.navIconFlagActive),
     navIconMedalActive: useImage(imagePaths.navIconMedalActive),
     navIconSettingsActive: useImage(imagePaths.navIconSettingsActive),
+
+    // Shop Images
     shopBg: useImage(imagePaths.shopBg),
     shopTitle: useImage(imagePaths.shopTitle),
     shopSeparator: useImage(imagePaths.shopSeparator),
@@ -372,6 +395,8 @@ export const useImagePreloader = () => {
     shopAutomationsMinerQuantum: useImage(
       imagePaths.shopAutomationsMinerQuantum,
     ),
+
+    // Achievement Images
     achievmentsBg: useImage(imagePaths.achievmentsBg),
     achievementsTileLocked: useImage(imagePaths.achievementsTileLocked),
     achievementsTileProgress: useImage(imagePaths.achievementsTileProgress),
@@ -400,6 +425,8 @@ export const useImagePreloader = () => {
     achievementsL2Blocks1: useImage(imagePaths.achievementsL2Blocks1),
     achievementsL2Blocks2: useImage(imagePaths.achievementsL2Blocks2),
     achievementsL2Blocks3: useImage(imagePaths.achievementsL2Blocks3),
+
+    // Prestige Icons
     prestige1: useImage(imagePaths.prestige1),
     prestige2: useImage(imagePaths.prestige2),
     prestige3: useImage(imagePaths.prestige3),
@@ -422,6 +449,7 @@ export const useImagePreloader = () => {
         background: images.background,
         "background.grid": images.backgroundGrid,
         "background.shop": images.shopBg,
+        "background.staking": images.stakingBg,
         "balance.l1": images.balanceL1,
         "balance.l2": images.balanceL2,
         unknown: images.unknownImage,
@@ -475,6 +503,7 @@ export const useImagePreloader = () => {
         "nav.icon.flag": images.navIconFlag,
         "nav.icon.medal": images.navIconMedal,
         "nav.icon.settings": images.navIconSettings,
+        "nav.icon.staking": images.navIconStaking, // Assuming this is a placeholder for staking
         "nav.icon.game.active": images.navIconGameActive,
         "nav.icon.shop.active": images.navIconShopActive,
         "nav.icon.flag.active": images.navIconFlagActive,

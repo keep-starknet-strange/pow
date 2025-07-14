@@ -1,5 +1,5 @@
 {
-  "minStake": 1000,
+  "minStake": 1,
   "rewardRate": 0.05,
   "slashingConfig": {
     "slashFraction": 0.1,
