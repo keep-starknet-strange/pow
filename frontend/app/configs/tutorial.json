@@ -1,25 +1,25 @@
 {
   "mineBlock": {
     "title": "Welcome to POW!",
-    "description": "You’re now the operator of your very own blockchain. Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. Start clicking to mine your first block!",
+    "description": "You’re now the operator of your very own blockchain. \nYour mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
     "highlightTargetId": "blockView"
   },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
-    "description": "“Nice work!” Click the transaction to unlock it — that’s how you include it in a block. Transactions fuel your blockchain… and your profits!",
+    "description": "“Nice work!” \nClick the transaction to unlock it — that’s how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "addTransactionsToBlock": {
     "title": "Transactions ready!",
-    "description": "Now load up your block! You can only mine a block once it’s full — so add transactions until it’s packed and ready. Then hit mine to seal it and earn your reward!",
+    "description": "Now load up your block! \nYou can only mine a block once it’s full — so add transactions until it’s packed and ready. Then hit mine to seal it and earn your reward!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "checkStore": {
     "title": "Visit the Shop",
-    "description": "Now let’s put those coins to use. Head to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. Every purchase boosts your blockchain!",
+    "description": "Now let’s put those coins to use. \nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
     "bubbleTargetId": "storeTab",
     "highlightTargetId": "storeTab"
   },
