@@ -1,43 +1,43 @@
 {
   "mineBlock": {
     "title": "Welcome to POW!",
-    "description": "You’re now the operator of your very own blockchain. \nYour mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
+    "description": "Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
     "highlightTargetId": "blockView"
   },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
-    "description": "“Nice work!” \nClick the transaction to unlock it — that’s how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
+    "description": "Click the transaction to unlock it — that’s how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "addTransactionsToBlock": {
-    "title": "Transactions ready!",
-    "description": "Now load up your block! \nYou can only mine a block once it’s full — so add transactions until it’s packed and ready. Then hit mine to seal it and earn your reward!",
+    "title": "Transaction ready!",
+    "description": "You can only mine a block once it’s full of transactions.\nAdd transactions until your block is packed and ready.\nThen hit mine to seal it and earn your reward!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "checkStore": {
     "title": "Visit the Shop",
-    "description": "Now let’s put those coins to use. \nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
+    "description": "Let’s spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
     "bubbleTargetId": "storeTab",
     "highlightTargetId": "storeTab"
   },
   "purchaseFeeUpgrade": {
-    "title": "Purchase Fee Upgrade",
-    "description": "Now click on the fee upgrade to increase your fee per transaction.",
+    "title": "Boost Transaction Value",
+    "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
     "bubbleTargetId": "feeUpgradeButton",
     "highlightTargetId": "feeUpgradeButton"
   },
   "purchaseSpeedUpgrade": {
-    "title": "Transactions automatically added to block",
-    "description": "Now click on the speed upgrade to add transactions to the block fasterr.",
+    "title": "Automate and Accelerate Transaction",
+    "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they’re added to your block.",
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton"
   },
   "L2Upgrade": {
     "title": "Congrats! You now have an L2",
-    "description": "Click here to manage the L2.",
+    "description": "You’ve just unlocked a Layer 2 — a faster, cheaper way to scale your blockchain.\nClick here to manage it and boost your chain’s performance.",
     "bubbleTargetId": "manageL2",
     "highlightTargetId": "manageL2"
   },
