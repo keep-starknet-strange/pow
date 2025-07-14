@@ -1,17 +1,10 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
-
-import { useTransactions } from "../context/Transactions";
 import { useGame } from "../context/Game";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
 import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
-import { DappsUnlock } from "../components/store/DappsUnlock";
-import { L2Unlock } from "../components/store/L2Unlock";
-import { StakingUnlock } from "../components/store/StakingUnlock";
-import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
-import { AlertModal } from "../components/AlertModal";
 
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -26,13 +19,9 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { dappsUnlocked } = useTransactions();
   const { l2 } = useGame();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
-
-  const [insufficientFunds, setInsufficientFunds] = useState(false);
-
   const storeTypes = ["L1", "L2"];
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState(storeTypes[l2 ? 1 : 0]);
@@ -177,16 +166,6 @@ export const StorePage: React.FC = () => {
                 )}
               </View>
             ))}
-          </View>
-        )}
-        {storeType === "L1" ? (
-          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
-            <StakingUnlock />
-            <L2Unlock alwaysShow={true} />
-          </View>
-        ) : (
-          <View className="flex flex-col gap-[1.2rem] mt-[0.5rem]">
-            <PrestigeUnlock />
           </View>
         )}
         <View className="h-[40px]" />

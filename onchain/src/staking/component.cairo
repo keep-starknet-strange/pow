@@ -131,9 +131,9 @@ pub mod StakingComponent {
 
             if time_since_last_validation > config.slashing_config.due_time {
                 // Slash logic
-                let how_late = time_since_last_validation / config.slashing_config.due_time;
+                let periods_late = time_since_last_validation / config.slashing_config.due_time;
                 let slash_amount = user_stake / config.slashing_config.slash_fraction;
-                let scaled_slash = slash_amount * how_late.into();
+                let scaled_slash = slash_amount * periods_late.into();
                 let slashed_amount = if scaled_slash < user_stake {
                     scaled_slash
                 } else {
