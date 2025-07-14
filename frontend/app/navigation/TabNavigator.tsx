@@ -203,7 +203,6 @@ export function TabNavigator() {
           tabPress: () => handleTabPress("Staking"),
         }}
       />
-
       <Tab.Screen
         name="Store"
         component={StorePage}
