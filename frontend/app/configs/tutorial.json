@@ -1,25 +1,25 @@
 {
   "mineBlock": {
-    "title": "Welcome to Click Chain!",
-    "description": "A harrowing omen seared into the very bedrock of the blockchain, proclaiming the imminent collapse of the old financial world. Click the block above to mine it and start building your chain!",
+    "title": "Welcome to POW!",
+    "description": "You’re now the operator of your very own blockchain. Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. Start clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
     "highlightTargetId": "blockView"
   },
   "purchaseTransactions": {
-    "title": "Purchase Transaction",
-    "description": "Now click on transaction to unlock them.",
+    "title": "Unlock a Transaction",
+    "description": "“Nice work!” Click the transaction to unlock it — that’s how you include it in a block. Transactions fuel your blockchain… and your profits!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "addTransactionsToBlock": {
-    "title": "Add Transaction to Block",
-    "description": "Now click on transaction to add them to your mempool until the block is full.",
+    "title": "Transactions ready!",
+    "description": "Now load up your block! You can only mine a block once it’s full — so add transactions until it’s packed and ready. Then hit mine to seal it and earn your reward!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton"
   },
   "checkStore": {
-    "title": "Checkout the store to buy stuff",
-    "description": "Checkout out the store to buy stuff.",
+    "title": "Visit the Shop",
+    "description": "Now let’s put those coins to use. Head to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. Every purchase boosts your blockchain!",
     "bubbleTargetId": "storeTab",
     "highlightTargetId": "storeTab"
   },
