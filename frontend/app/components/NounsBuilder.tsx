@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Dimensions, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView,
+  Image,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, {
-  SlideInDown,
-  SlideOutDown,
-} from "react-native-reanimated";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { Canvas, Image as SkiaImg, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Image as SkiaImg,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 import { useEventManager } from "../context/EventManager";
 import {
@@ -62,7 +71,9 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
       className="absolute left-0 right-0 bottom-0 px-2 pt-2 h-[414px]
                           flex flex-col items-center justify-start gap-1 w-full"
     >
-      <Canvas style={{ width: width, height: 414, position: "absolute", top: 0 }}>
+      <Canvas
+        style={{ width: width, height: 414, position: "absolute", top: 0 }}
+      >
         <SkiaImg
           image={getImage("nouns.creator.bg")}
           fit="fill"
@@ -159,7 +170,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                 image={getImage(
                   avatarTab.value === tab.value
                     ? "nouns.tab.active"
-                    : "nouns.tab.inactive"
+                    : "nouns.tab.inactive",
                 )}
                 fit="fill"
                 x={0}
@@ -198,9 +209,8 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                   });
                 }}
               >
-                {newAvatar[
-                  avatarTab.value as keyof NounsAttributes
-                ] === index && (
+                {newAvatar[avatarTab.value as keyof NounsAttributes] ===
+                  index && (
                   <View className="absolute top-0 left-0 h-20 aspect-square">
                     <Canvas style={{ flex: 1 }} className="w-full h-full">
                       <SkiaImg
@@ -264,4 +274,3 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
 };
 
 export default NounsBuilder;
-

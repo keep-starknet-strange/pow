@@ -10,7 +10,14 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import Animated, { useSharedValue, withSpring, withTiming, withSequence, runOnJS, Easing } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming,
+  withSequence,
+  runOnJS,
+  Easing,
+} from "react-native-reanimated";
 
 export type CompletedBlockViewProps = {
   chainId: number;
@@ -35,7 +42,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
     if (block) {
       setCompletedBlock(block);
     }
-  }
+  };
 
   const [completedBlock, setCompletedBlock] = React.useState(
     getLatestBlock(props.chainId) || null,
@@ -45,22 +52,25 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
     blockSlideLeftAnim.value = props.placement.left;
     if (workingBlocks[props.chainId]?.blockId) {
       blockSlideLeftAnim.value = withSequence(
-        withTiming(
-          props.placement.left,
-          { duration: 400, easing: Easing.inOut(Easing.ease) }
+        withTiming(props.placement.left, {
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
+          runOnJS(updateCompletedBlock)(props.chainId),
         ),
-        withTiming(
-          props.completedPlacementLeft,
-          { duration: 700 },
-          () => runOnJS(updateCompletedBlock)(props.chainId)
-        ),
-        withTiming(
-          props.placement.left,
-          { duration: 100, easing: Easing.inOut(Easing.ease) }
-        ),
+        withTiming(props.placement.left, {
+          duration: 100,
+          easing: Easing.inOut(Easing.ease),
+        }),
       );
     }
-  }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
+  }, [
+    props.chainId,
+    workingBlocks[props.chainId]?.blockId,
+    props.placement.left,
+    props.completedPlacementLeft,
+  ]);
 
   return (
     <Animated.View
@@ -120,7 +130,11 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
           />
         </Canvas>
       </View>
-      <BlockView chainId={props.chainId} block={completedBlock} completed={true} />
+      <BlockView
+        chainId={props.chainId}
+        block={completedBlock}
+        completed={true}
+      />
     </Animated.View>
   );
 };

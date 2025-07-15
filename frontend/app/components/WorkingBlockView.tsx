@@ -6,7 +6,15 @@ import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
-import Animated, { runOnJS, Easing, useSharedValue, withSequence, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  runOnJS,
+  Easing,
+  useSharedValue,
+  withSequence,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
   Canvas,
@@ -44,7 +52,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
     if (block) {
       setWorkingBlock(block);
     }
-  }
+  };
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
   const blockOpacityAnim = useSharedValue(1);
@@ -53,42 +61,44 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
     blockOpacityAnim.value = 1;
     if (workingBlocks[props.chainId]?.blockId) {
       blockSlideLeftAnim.value = withSequence(
-        withTiming(
-          props.placement.left,
-          { duration: 400, easing: Easing.inOut(Easing.ease) }
-        ),
-        withTiming(
-          props.completedPlacementLeft,
-          { duration: 700 }
-        ),
+        withTiming(props.placement.left, {
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(props.completedPlacementLeft, { duration: 700 }),
         withTiming(
           props.completedPlacementLeft,
           { duration: 200, easing: Easing.inOut(Easing.ease) },
           () => {
             runOnJS(updateWorkingBlock)(props.chainId);
-          }
+          },
         ),
-        withTiming(
-          props.placement.left,
-          { duration: 100, easing: Easing.inOut(Easing.ease) }
-        ),
-        withTiming(
-          props.placement.left,
-          { duration: 200, easing: Easing.inOut(Easing.ease) }
-        )
+        withTiming(props.placement.left, {
+          duration: 100,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(props.placement.left, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
       );
       blockOpacityAnim.value = withSequence(
         withTiming(1, { duration: 400 }),
         withTiming(1, { duration: 700 }),
         withTiming(0, { duration: 200 }),
         withTiming(0, { duration: 100 }),
-        withTiming(1, { duration: 200 })
+        withTiming(1, { duration: 200 }),
       );
     }
-  }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
+  }, [
+    props.chainId,
+    workingBlocks[props.chainId]?.blockId,
+    props.placement.left,
+    props.completedPlacementLeft,
+  ]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
-    getWorkingBlock(props.chainId)
+    getWorkingBlock(props.chainId),
   );
   return (
     <Animated.View
@@ -108,7 +118,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
             position: "absolute",
             top: 0,
             width: props.placement.width,
-            height: props.placement.height
+            height: props.placement.height,
           }}
         >
           <Image
@@ -155,7 +165,6 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           {props.chainId === 0 ? <Miner /> : <Sequencer />}
         </View>
       )}
-
     </Animated.View>
   );
 };

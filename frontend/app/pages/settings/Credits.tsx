@@ -18,7 +18,9 @@ export const CreditsSection = () => {
   ];
   return (
     <Animated.View entering={FadeInUp}>
-      <Text className="text-[#101119] text-[40px] font-Xerxes text-right">Credits</Text>
+      <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
+        Credits
+      </Text>
       <View className="mt-2">
         <Text className="text-[#101119] text-[22px] font-Teatime mb-6">
           created by StarkWare Exploration
@@ -28,14 +30,10 @@ export const CreditsSection = () => {
             key={index}
             className="flex-row items-center justify-between mb-2"
           >
-            <Text
-              className="text-[#101119] text-[24px] font-Teatime w-1/3"
-            >
+            <Text className="text-[#101119] text-[24px] font-Teatime w-1/3">
               {person.name}
             </Text>
-            <Text
-              className="text-[#101119] text-[16px] font-Pixels flex-1 text-left"
-            >
+            <Text className="text-[#101119] text-[16px] font-Pixels flex-1 text-left">
               {person.role}
             </Text>
           </View>
@@ -44,18 +42,11 @@ export const CreditsSection = () => {
           Special thanks
         </Text>
         {specialThanks.map((thanks, index) => (
-          <View
-            key={index}
-            className="mb-4"
-          >
-            <Text
-              className="text-[#101119] text-[24px] font-Teatime"
-            >
+          <View key={index} className="mb-4">
+            <Text className="text-[#101119] text-[24px] font-Teatime">
               {thanks.name}
             </Text>
-            <Text
-              className="text-[#101119] text-[16px] font-Pixels ml-4"
-            >
+            <Text className="text-[#101119] text-[16px] font-Pixels ml-4">
               {thanks.reason}
             </Text>
           </View>

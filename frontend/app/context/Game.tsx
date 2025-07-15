@@ -352,10 +352,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       setCanUnlockL2(true);
     };
     checkCanUnlockL2();
-  }, [
-    upgrades,
-    automations,
-  ]);
+  }, [upgrades, automations]);
 
   const initL2 = () => {
     const cost = getL2Cost();

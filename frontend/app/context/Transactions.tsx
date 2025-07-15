@@ -508,7 +508,7 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return true;
     },
-    [transactionFees]
+    [transactionFees],
   );
 
   const unlockDapps = (chainId: number) => {
@@ -617,7 +617,8 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
         return false;
       }
       return lastTxLevel >= 0;
-    }, [transactionFees, dappFees]
+    },
+    [transactionFees, dappFees],
   );
 
   // Can unlock if the previous dapp level is at least 0
@@ -627,7 +628,9 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
       const dappFeesLevels = dappFees[chainId] || {};
       const lastDappLevel = dappFeesLevels[dappId - 1];
       if (lastDappLevel === undefined) {
-        console.warn(`Dapp with ID ${dappId - 1} not found for chain ${chainId}`);
+        console.warn(
+          `Dapp with ID ${dappId - 1} not found for chain ${chainId}`,
+        );
         return false;
       }
       return lastDappLevel >= 0;

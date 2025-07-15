@@ -74,32 +74,32 @@ const BasicButton: React.FC<BasicButtonProps> = ({
             ...style,
           }}
         >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("button.basic")}
-            fit="fill"
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-            x={0}
-            y={0}
-            width={254}
-            height={46}
-          />
-        </Canvas>
-        <Text
-          className={`
+          <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Image
+              image={getImage("button.basic")}
+              fit="fill"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={0}
+              width={254}
+              height={46}
+            />
+          </Canvas>
+          <Text
+            className={`
             absolute top-[6px] left-0 w-full h-full
             font-Teatime text-[36px] text-center
             ${disabled ? "text-gray-400" : "text-[#fff7ff]"}
           `}
-          style={{
-            ...textStyle,
-          }}
-        >
-          {label}
-        </Text>
+            style={{
+              ...textStyle,
+            }}
+          >
+            {label}
+          </Text>
         </View>
       </TouchableWithoutFeedback>
     </Animated.View>

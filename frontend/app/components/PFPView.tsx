@@ -7,7 +7,15 @@ import {
   getNounsAccessories,
   NounsAttributes,
 } from "../configs/nouns";
-import Animated, { BounceInRight, BounceInLeft, useSharedValue, useAnimatedStyle, runOnJS, withTiming, withSequence } from "react-native-reanimated";
+import Animated, {
+  BounceInRight,
+  BounceInLeft,
+  useSharedValue,
+  useAnimatedStyle,
+  runOnJS,
+  withTiming,
+  withSequence,
+} from "react-native-reanimated";
 
 type PFPViewProps = {
   user?: string | undefined;
@@ -32,12 +40,20 @@ export const PFPView: React.FC<PFPViewProps> = ({ user, attributes }) => {
     setNounsAccessories(getNounsAccessories(newAttributes?.accessories || 0));
     setNounsHead(getNounsHead(newAttributes?.head || 0));
     setNounsGlasses(getNounsGlasses(newAttributes?.glasses || 0));
-  }
+  };
 
-  const [nounsBody, setNounsBody] = useState(getNounsBody(nounsAttributes?.body || 0));
-  const [nounsAccessories, setNounsAccessories] = useState(getNounsAccessories(nounsAttributes?.accessories || 0));
-  const [nounsHead, setNounsHead] = useState(getNounsHead(nounsAttributes?.head || 0));
-  const [nounsGlasses, setNounsGlasses] = useState(getNounsGlasses(nounsAttributes?.glasses || 0));
+  const [nounsBody, setNounsBody] = useState(
+    getNounsBody(nounsAttributes?.body || 0),
+  );
+  const [nounsAccessories, setNounsAccessories] = useState(
+    getNounsAccessories(nounsAttributes?.accessories || 0),
+  );
+  const [nounsHead, setNounsHead] = useState(
+    getNounsHead(nounsAttributes?.head || 0),
+  );
+  const [nounsGlasses, setNounsGlasses] = useState(
+    getNounsGlasses(nounsAttributes?.glasses || 0),
+  );
   const bodySlideOutAnim = useSharedValue(0);
   const accessoriesSlideOutAnim = useSharedValue(0);
   const headSlideOutAnim = useSharedValue(0);
@@ -47,19 +63,24 @@ export const PFPView: React.FC<PFPViewProps> = ({ user, attributes }) => {
   const headSlideOutOpacity = useSharedValue(1);
   const glassesSlideOutOpacity = useSharedValue(1);
   const [hasInitialized, setHasInitialized] = useState(false);
-  const doSlideAnim = (slideOutSV: Animated.SharedValue<number>, slideOutOpacitySV: Animated.SharedValue<number>) => {
+  const doSlideAnim = (
+    slideOutSV: Animated.SharedValue<number>,
+    slideOutOpacitySV: Animated.SharedValue<number>,
+  ) => {
     slideOutSV.value = withSequence(
       withTiming(1, { duration: 200 }),
-      withTiming(0, { duration: 50 }, () => runOnJS(updateNouns)(nounsAttributes)),
+      withTiming(0, { duration: 50 }, () =>
+        runOnJS(updateNouns)(nounsAttributes),
+      ),
       withTiming(1, { duration: 50 }),
-      withTiming(0, { duration: 200 })
+      withTiming(0, { duration: 200 }),
     );
     slideOutOpacitySV.value = withSequence(
       withTiming(0, { duration: 200 }),
       withTiming(0, { duration: 100 }),
-      withTiming(1, { duration: 200 })
+      withTiming(1, { duration: 200 }),
     );
-  }
+  };
   useEffect(() => {
     if (!hasInitialized) {
       return;

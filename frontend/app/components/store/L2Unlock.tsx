@@ -54,13 +54,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       }
     }
     setShowUnlock(true);
-  }, [
-    alwaysShow,
-    canUnlockL2,
-    l2,
-    transactionFees,
-    dappFees,
-  ]);
+  }, [alwaysShow, canUnlockL2, l2, transactionFees, dappFees]);
 
   return (
     <View>

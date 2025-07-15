@@ -8,7 +8,14 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 import { useGame } from "../context/Game";
-import Animated, { useSharedValue, withTiming, withSpring, withSequence, runOnJS, Easing } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  withSpring,
+  withSequence,
+  runOnJS,
+  Easing,
+} from "react-native-reanimated";
 
 export type EmptyViewProps = {
   chainId: number;
@@ -46,7 +53,12 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
       );
     }
     */
-  }, [props.chainId, workingBlocks[props.chainId]?.blockId, props.placement.left, props.completedPlacementLeft]);
+  }, [
+    props.chainId,
+    workingBlocks[props.chainId]?.blockId,
+    props.placement.left,
+    props.completedPlacementLeft,
+  ]);
 
   return (
     <Animated.View

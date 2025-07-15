@@ -5,7 +5,15 @@ import { useUpgrades } from "../context/Upgrades";
 import { useImages } from "../hooks/useImages";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
-import Animated, { runOnJS, Easing, useSharedValue, withSequence, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  runOnJS,
+  Easing,
+  useSharedValue,
+  withSequence,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
   Canvas,
@@ -29,7 +37,9 @@ export type WorkingBlockDetailsProps = {
  */
 const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
-export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) => {
+export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
+  props,
+) => {
   const { workingBlocks, getWorkingBlock } = useGame();
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
@@ -42,7 +52,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
     if (block) {
       setWorkingBlock(block);
     }
-  }
+  };
 
   const detailsScaleAnim = useSharedValue(1);
   useEffect(() => {
@@ -50,14 +60,19 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
     if (workingBlocks[props.chainId]?.blockId) {
       detailsScaleAnim.value = withSequence(
         withTiming(1.05, { duration: 300, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1.05, { duration: 900, easing: Easing.inOut(Easing.ease) },
-          () => runOnJS(updateWorkingBlock)(props.chainId)),
-        withSpring(1, { damping: 2, stiffness: 100 })
+        withTiming(
+          1.05,
+          { duration: 900, easing: Easing.inOut(Easing.ease) },
+          () => runOnJS(updateWorkingBlock)(props.chainId),
+        ),
+        withSpring(1, { damping: 2, stiffness: 100 }),
       );
     }
   }, [workingBlocks[props.chainId]?.blockId, props.chainId]);
 
-  const [workingBlock, setWorkingBlock] = React.useState(getWorkingBlock(props.chainId));
+  const [workingBlock, setWorkingBlock] = React.useState(
+    getWorkingBlock(props.chainId),
+  );
 
   return (
     <Animated.View
@@ -67,9 +82,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
         left: props.placement.left,
         width: props.placement.width,
         height: props.placement.height,
-        transform: [
-          { scale: detailsScaleAnim },
-        ],
+        transform: [{ scale: detailsScaleAnim }],
       }}
     >
       <Canvas
@@ -165,7 +178,8 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
         <AnimatedRollingNumber
           value={
             (workingBlock?.fees || 0) +
-            ((workingBlock?.reward || 0) ||
+            (workingBlock?.reward ||
+              0 ||
               getUpgradeValue(props.chainId, "Block Reward"))
           }
           enableCompactNotation

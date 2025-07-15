@@ -23,30 +23,28 @@ const imagePaths = {
   headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.png`),
 
   // Account Creation
-  nounsTitleplate: require(
-    `${assetsPath}/nouns/create_titleplate.png`,
-  ),
+  nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.png`),
   nounsSlots: require(`${assetsPath}/nouns/slot.png`),
   nounsTabInactive: require(`${assetsPath}/nouns/slot_inactive.png`),
   nounsTabActive: require(`${assetsPath}/nouns/slot_active.png`),
   nounsCreatorBg: require(`${assetsPath}/nouns/create_bg.png`),
-  nounsCreatorButton: require(
-    `${assetsPath}/nouns/button.png`,
-  ),
+  nounsCreatorButton: require(`${assetsPath}/nouns/button.png`),
 
   // L2
   l2BarsBg: require(`${assetsPath}/l2/l2_bars_bg.png`),
   l2BarsBar: require(`${assetsPath}/l2/l2_bars_bar.png`),
-  l2BarsPlaque: require(
-    `${assetsPath}/l2/l2_number_plaque.png`,
-  ),
+  l2BarsPlaque: require(`${assetsPath}/l2/l2_number_plaque.png`),
 
   // Transaction Images - Backgrounds
   txBackground: require(`${assetsPath}/transactions/gui_bottom.png`),
   l2TxBackground: require(`${assetsPath}/l2/l2_gui_bottom.png`),
   txsBorder: require(`${assetsPath}/transactions/transactions_border.png`),
-  txTabActive: require(`${assetsPath}/transactions/transactions_tab_active.png`),
-  txTabInactive: require(`${assetsPath}/transactions/transactions_tab_inactive.png`),
+  txTabActive: require(
+    `${assetsPath}/transactions/transactions_tab_active.png`,
+  ),
+  txTabInactive: require(
+    `${assetsPath}/transactions/transactions_tab_inactive.png`,
+  ),
   txButtonBlueEmpty: require(
     `${assetsPath}/transactions/backgrounds/button_blue_empty.png`,
   ),
@@ -153,7 +151,9 @@ const imagePaths = {
   navIconMedal: require(`${assetsPath}/navigation/icon_medal.png`),
   navIconSettings: require(`${assetsPath}/navigation/icon_settings.png`),
   navIconGameActive: require(`${assetsPath}/navigation/icon_game_selected.png`),
-  navIconStakingActive: require(`${assetsPath}/navigation/icon_stake_selected.png`),
+  navIconStakingActive: require(
+    `${assetsPath}/navigation/icon_stake_selected.png`,
+  ),
   navIconShopActive: require(`${assetsPath}/navigation/icon_shop_selected.png`),
   navIconFlagActive: require(`${assetsPath}/navigation/icon_flag_selected.png`),
   navIconMedalActive: require(
@@ -524,9 +524,7 @@ export const useImagePreloader = () => {
     achievmentsAutomationSequencer: useImage(
       imagePaths.achievmentsAutomationSequencer,
     ),
-    achievmentsAutomationMiner: useImage(
-      imagePaths.achievmentsAutomationMiner,
-    ),
+    achievmentsAutomationMiner: useImage(imagePaths.achievmentsAutomationMiner),
     achievementsL1Dapps: useImage(imagePaths.achievementsL1Dapps),
     achievementsL1Transactions: useImage(imagePaths.achievementsL1Transactions),
     achievementsL1Upgrades: useImage(imagePaths.achievementsL1Upgrades),
@@ -577,12 +575,12 @@ export const useImagePreloader = () => {
     if (allImagesLoaded && globalIsLoading) {
       const imagesMap = {
         background: images.background,
-        "logo": images.logo,
+        logo: images.logo,
         "logo.sub": images.sublogo,
         "logo.starknet": images.starknet,
         "background.grid": images.backgroundGrid,
         "background.shop": images.shopBg,
-        "header": images.header,
+        header: images.header,
         "header.switch": images.headerSwitch,
         "header.switch.active": images.headerSwitchActive,
         "header.switch.inactive": images.headerSwitchInactive,
@@ -702,7 +700,8 @@ export const useImagePreloader = () => {
         "achievements.money.4": images.achievmentsMoney4,
         "achievements.automation.da": images.achievementsAutomationDa,
         "achievements.automation.stwo": images.achievementsAutomationStwo,
-        "achievements.automation.sequencer": images.achievmentsAutomationSequencer,
+        "achievements.automation.sequencer":
+          images.achievmentsAutomationSequencer,
         "achievements.automation.miner": images.achievmentsAutomationMiner,
         "achievements.l1.dapps": images.achievementsL1Dapps,
         "achievements.l1.transactions": images.achievementsL1Transactions,

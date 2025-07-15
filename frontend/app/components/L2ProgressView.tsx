@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { View, Text, Dimensions } from "react-native";
-import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import Animated, { Easing } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
 import { useUpgrades } from "../context/Upgrades";
@@ -12,10 +17,16 @@ export const ProgressBar = ({ progress }: { progress: number }) => {
   const width = Dimensions.get("window").width;
 
   const progressAnim = useDerivedValue(() => {
-    return withTiming((progress / 100) * 70, { duration: 500, easing: Easing.cubic });
+    return withTiming((progress / 100) * 70, {
+      duration: 500,
+      easing: Easing.cubic,
+    });
   }, [progress]);
   const progressAnimOffset = useDerivedValue(() => {
-    return withTiming(70 - (progress / 100) * 70, { duration: 500, easing: Easing.cubic });
+    return withTiming(70 - (progress / 100) * 70, {
+      duration: 500,
+      easing: Easing.cubic,
+    });
   }, [progress]);
 
   return (
@@ -34,9 +45,13 @@ export const ProgressBar = ({ progress }: { progress: number }) => {
       />
     </Canvas>
   );
-}
+};
 
-export const L2ProgressView = ({label, value, maxValue}: {
+export const L2ProgressView = ({
+  label,
+  value,
+  maxValue,
+}: {
   label: string;
   value: number;
   maxValue: number;
@@ -50,16 +65,18 @@ export const L2ProgressView = ({label, value, maxValue}: {
     const progress = (value / maxValue) * 100;
     const barCount = Math.floor((value / maxValue) * maxBarCount);
     const remainingProgress = progress - barCount * (100 / maxBarCount);
-    const finalBarProgresss = (remainingProgress / (100 / maxBarCount) * 100);
-    const newProgressBars = Array(maxBarCount).fill(0).map((_, index) => {
-      if (index < barCount) {
-        return 100; // Full bar
-      } else if (index === barCount) {
-        return finalBarProgresss; // Partial bar
-      } else {
-        return 0; // Empty bar
-      }
-    });
+    const finalBarProgresss = (remainingProgress / (100 / maxBarCount)) * 100;
+    const newProgressBars = Array(maxBarCount)
+      .fill(0)
+      .map((_, index) => {
+        if (index < barCount) {
+          return 100; // Full bar
+        } else if (index === barCount) {
+          return finalBarProgresss; // Partial bar
+        } else {
+          return 0; // Empty bar
+        }
+      });
     setProgressBars(newProgressBars);
   }, [value, maxValue]);
 
@@ -88,10 +105,11 @@ export const L2ProgressView = ({label, value, maxValue}: {
         </Canvas>
         <View className="absolute top-0 left-0 flex flex-row justify-start items-end h-[80px] px-[4px] gap-[2px] py-[5px]">
           {progressBars.map((progress: number, index: number) => (
-            <Animated.View key={index} style={{ width: (width / 2 - (14 + (12 - 1) * 2)) / 12 }}>
-              <ProgressBar
-                progress={progress}
-              />
+            <Animated.View
+              key={index}
+              style={{ width: (width / 2 - (14 + (12 - 1) * 2)) / 12 }}
+            >
+              <ProgressBar progress={progress} />
             </Animated.View>
           ))}
         </View>

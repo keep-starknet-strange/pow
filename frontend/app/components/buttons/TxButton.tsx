@@ -404,30 +404,30 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
             </View>
           )}
           {feeLevel !== -1 && (
-          <View
-            className="absolute left-[3px] h-[94px] w-full"
-            style={{
-              width: width * 0.17,
-            }}
-          >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
-              <SkiaImg
-                image={getTxNameplate(props.chainId, props.txType.id, false)}
-                fit="fill"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-                x={0}
-                y={2}
-                width={width * 0.165}
-                height={19}
-              />
-            </Canvas>
-            <Text className="absolute left-0 top-[4px] w-full text-center text-[16px] text-[#fff8ff] font-Pixels">
-              {props.txType.name}
-            </Text>
-          </View>
+            <View
+              className="absolute left-[3px] h-[94px] w-full"
+              style={{
+                width: width * 0.17,
+              }}
+            >
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <SkiaImg
+                  image={getTxNameplate(props.chainId, props.txType.id, false)}
+                  fit="fill"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={2}
+                  width={width * 0.165}
+                  height={19}
+                />
+              </Canvas>
+              <Text className="absolute left-0 top-[4px] w-full text-center text-[16px] text-[#fff8ff] font-Pixels">
+                {props.txType.name}
+              </Text>
+            </View>
           )}
           {feeLevel === -1 ? (
             <View
@@ -438,7 +438,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
                 width: width * 0.18,
               }}
             >
-              <Canvas style={{ flex: 1 }} className="w-full h-full flex justify-center items-center">
+              <Canvas
+                style={{ flex: 1 }}
+                className="w-full h-full flex justify-center items-center"
+              >
                 <SkiaImg
                   image={getImage("shop.lock")}
                   fit="contain"
@@ -486,7 +489,9 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <SkiaImg
-            image={getImage(feeLevel === -1 ? "tx.plaque.minus" : "tx.plaque.plus")}
+            image={getImage(
+              feeLevel === -1 ? "tx.plaque.minus" : "tx.plaque.plus",
+            )}
             fit="fill"
             sampling={{
               filter: FilterMode.Nearest,

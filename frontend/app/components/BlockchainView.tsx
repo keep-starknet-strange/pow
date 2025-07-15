@@ -74,9 +74,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
           width: workingBlockPosition.width,
           height: workingBlockPosition.height,
         }}
-        completedPlacementLeft={
-          workingBlockPosition.left
-        }
+        completedPlacementLeft={workingBlockPosition.left}
       />
       <EmptyBlockView
         chainId={props.chainId}

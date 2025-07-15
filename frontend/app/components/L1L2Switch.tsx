@@ -1,6 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 
 export const L1L2Switch = ({
@@ -36,7 +41,11 @@ export const L1L2Switch = ({
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={getImage(currentView === "L1" ? "header.switch.active" : "header.switch.inactive")}
+            image={getImage(
+              currentView === "L1"
+                ? "header.switch.active"
+                : "header.switch.inactive",
+            )}
             fit="fill"
             x={0}
             y={0}
@@ -48,9 +57,7 @@ export const L1L2Switch = ({
             }}
           />
         </Canvas>
-        <View
-          className="absolute left-0 top-0 w-full h-full flex items-center justify-center text-center"
-        >
+        <View className="absolute left-0 top-0 w-full h-full flex items-center justify-center text-center">
           <Text
             className="text-[18px] font-Pixels"
             style={{ color: currentView === "L1" ? "#fff7ff" : "#7b7b7b" }}
@@ -67,7 +74,11 @@ export const L1L2Switch = ({
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={getImage(currentView === "L2" ? "header.switch.active" : "header.switch.inactive")}
+            image={getImage(
+              currentView === "L2"
+                ? "header.switch.active"
+                : "header.switch.inactive",
+            )}
             fit="fill"
             x={0}
             y={0}
@@ -79,9 +90,7 @@ export const L1L2Switch = ({
             }}
           />
         </Canvas>
-        <View
-          className="absolute left-0 top-0 w-full h-full flex items-center justify-center text-center"
-        >
+        <View className="absolute left-0 top-0 w-full h-full flex items-center justify-center text-center">
           <Text
             className="text-[18px] font-Pixels"
             style={{ color: currentView === "L2" ? "#fff7ff" : "#7b7b7b" }}
@@ -92,4 +101,4 @@ export const L1L2Switch = ({
       </TouchableOpacity>
     </View>
   );
-}
+};

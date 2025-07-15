@@ -9,8 +9,12 @@ import { L1L2Switch } from "../components/L1L2Switch";
 export const MainPage: React.FC = () => {
   const { l2 } = useGame();
 
-  const [currentView, setCurrentView] = React.useState<"L1" | "L2">(l2 ? "L2" : "L1");
-  const [l2HasInitialized, setL2HasInitialized] = React.useState(l2 ? true : false);
+  const [currentView, setCurrentView] = React.useState<"L1" | "L2">(
+    l2 ? "L2" : "L1",
+  );
+  const [l2HasInitialized, setL2HasInitialized] = React.useState(
+    l2 ? true : false,
+  );
   useEffect(() => {
     if (l2 && !l2HasInitialized) {
       setCurrentView("L2");
@@ -24,16 +28,10 @@ export const MainPage: React.FC = () => {
       {l2 && (
         <L1L2Switch
           currentView={currentView}
-          setCurrentView={(view: "L1" | "L2") =>
-            setCurrentView(view)
-          }
+          setCurrentView={(view: "L1" | "L2") => setCurrentView(view)}
         />
       )}
-      {currentView === "L2" ? (
-        <L2Phase />
-      ) : (
-        <L1Phase />
-      )}
+      {currentView === "L2" ? <L2Phase /> : <L1Phase />}
     </View>
   );
 };

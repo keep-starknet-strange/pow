@@ -74,9 +74,12 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
           }}
         />
       </Canvas>
-      <Animated.View className="absolute left-[8px] top-[6px] flex flex-row items-center gap-[4px]" entering={FadeInRight}>
+      <Animated.View
+        className="absolute left-[8px] top-[6px] flex flex-row items-center gap-[4px]"
+        entering={FadeInRight}
+      >
         {icon && (
-          <Canvas style={{ width: 18, height: 18 }} >
+          <Canvas style={{ width: 18, height: 18 }}>
             <Image
               image={getImage(icon)}
               fit="contain"
@@ -91,9 +94,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
             />
           </Canvas>
         )}
-        <Text className="font-Pixels text-xl text-[#fff7ff]">
-          {label}
-        </Text>
+        <Text className="font-Pixels text-xl text-[#fff7ff]">{label}</Text>
         {specialLabel && (
           <Text
             className="font-Pixels text-xl"
@@ -104,11 +105,17 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
         )}
       </Animated.View>
       {level === maxLevel ? (
-        <Animated.Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]" entering={FadeInLeft} >
+        <Animated.Text
+          className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]"
+          entering={FadeInLeft}
+        >
           Max
         </Animated.Text>
       ) : (
-        <Animated.View className="absolute right-[8px] top-[6px] flex-row items-center" entering={FadeInLeft}>
+        <Animated.View
+          className="absolute right-[8px] top-[6px] flex-row items-center"
+          entering={FadeInLeft}
+        >
           <Text className="font-Pixels text-xl text-[#fff7ff]">
             Cost:&nbsp;
           </Text>

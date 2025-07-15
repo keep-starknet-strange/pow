@@ -29,7 +29,8 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } = useTransactions();
+  const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
+    useTransactions();
   const { canUnlockUpgrade } = useUpgrades();
   const { l2 } = useGame();
   const { getImage } = useImages();
@@ -90,9 +91,7 @@ export const StorePage: React.FC = () => {
       {l2 && (
         <L1L2Switch
           currentView={storeType}
-          setCurrentView={(view: "L1" | "L2") =>
-            setStoreType(view)
-          }
+          setCurrentView={(view: "L1" | "L2") => setStoreType(view)}
         />
       )}
       {l2 ? (
@@ -182,127 +181,128 @@ export const StorePage: React.FC = () => {
           </View>
         ))}
       </View>
-      <View style={{ height: 522, marginTop: 2 }} >
-      <ScrollView
-        className="flex-1 relative py-[10px]"
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-      >
-        {activeSubTab === "Transactions" && (
-          <View className="flex flex-col px-[16px]">
-            {storeTransactions.map((item, index) => (
-              canUnlockTx(chainId, index) && (
-                <View key={index}>
-                  <TransactionUpgradeView
-                    chainId={chainId}
-                    txData={item}
-                    isDapp={false}
-                  />
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                </View>
-              )
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
-          <View className="flex flex-col px-[16px]">
-            <View className="w-full relative pb-[16px]">
-              <Canvas style={{ width: width - 32, height: 24}}>
-                <Image
-                  image={getImage("shop.title")}
-                  fit="fill"
-                  x={0}
-                  y={0}
-                  width={width - 32}
-                  height={24}
-                  sampling={{
-                    filter: FilterMode.Nearest,
-                    mipmap: MipmapMode.Nearest,
-                  }}
-                />
-              </Canvas>
-              <Animated.Text
-                className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-                entering={FadeInLeft}
-              >
-                DAPPS
-              </Animated.Text>
+      <View style={{ height: 522, marginTop: 2 }}>
+        <ScrollView
+          className="flex-1 relative py-[10px]"
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {activeSubTab === "Transactions" && (
+            <View className="flex flex-col px-[16px]">
+              {storeTransactions.map(
+                (item, index) =>
+                  canUnlockTx(chainId, index) && (
+                    <View key={index}>
+                      <TransactionUpgradeView
+                        chainId={chainId}
+                        txData={item}
+                        isDapp={false}
+                      />
+                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+                    </View>
+                  ),
+              )}
             </View>
-            {storeDapps.map((item, index) => (
-              canUnlockDapp(chainId, index) && (
-                <View key={index}>
-                  <TransactionUpgradeView
-                    chainId={chainId}
-                    txData={item}
-                    isDapp={true}
+          )}
+          {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
+            <View className="flex flex-col px-[16px]">
+              <View className="w-full relative pb-[16px]">
+                <Canvas style={{ width: width - 32, height: 24 }}>
+                  <Image
+                    image={getImage("shop.title")}
+                    fit="fill"
+                    x={0}
+                    y={0}
+                    width={width - 32}
+                    height={24}
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
                   />
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                </View>
-              )
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Upgrades" && (
-          <View className="flex flex-col px-[16px]">
-            {storeUpgrades.map((item, index) => (
-              canUnlockUpgrade(chainId, index) && (
-                <View key={index}>
-                  <UpgradeView chainId={chainId} upgrade={item} />
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                </View>
-              )
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Automation" && (
-          <View className="flex flex-col px-[16px]">
-            {storeAutomation.map((item, index) => (
-              <View key={index}>
-                <AutomationView chainId={chainId} automation={item} />
-                {index < storeAutomation.length - 1 && (
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                )}
+                </Canvas>
+                <Animated.Text
+                  className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
+                  entering={FadeInLeft}
+                >
+                  DAPPS
+                </Animated.Text>
               </View>
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Transactions" && (
-          <DappsUnlock chainId={chainId} />
-        )}
-        {storeType === "L1" && activeSubTab === "Upgrades" && (
-          <View>
-            <StakingUnlock />
-          </View>
-        )}
-        {storeType === "L1" && activeSubTab === "Automation" && (
-          <View className="flex flex-col px-[16px]">
-            <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-            <L2Unlock />
-          </View>
-        )}
-        {storeType === "L2" && activeSubTab === "Automation" && (
-          <View className="flex flex-col px-[16px]">
-            <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-            <PrestigeUnlock />
-          </View>
-        )}
-        <View className="h-[40px]" />
-      </ScrollView>
-      <LinearGradient
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 200,
-          marginLeft: 8,
-          marginRight: 8,
-          pointerEvents: "none",
-        }}
-        colors={["transparent", "#000000c0"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-      />
+              {storeDapps.map(
+                (item, index) =>
+                  canUnlockDapp(chainId, index) && (
+                    <View key={index}>
+                      <TransactionUpgradeView
+                        chainId={chainId}
+                        txData={item}
+                        isDapp={true}
+                      />
+                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+                    </View>
+                  ),
+              )}
+            </View>
+          )}
+          {activeSubTab === "Upgrades" && (
+            <View className="flex flex-col px-[16px]">
+              {storeUpgrades.map(
+                (item, index) =>
+                  canUnlockUpgrade(chainId, index) && (
+                    <View key={index}>
+                      <UpgradeView chainId={chainId} upgrade={item} />
+                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+                    </View>
+                  ),
+              )}
+            </View>
+          )}
+          {activeSubTab === "Automation" && (
+            <View className="flex flex-col px-[16px]">
+              {storeAutomation.map((item, index) => (
+                <View key={index}>
+                  <AutomationView chainId={chainId} automation={item} />
+                  {index < storeAutomation.length - 1 && (
+                    <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
+          {activeSubTab === "Transactions" && <DappsUnlock chainId={chainId} />}
+          {storeType === "L1" && activeSubTab === "Upgrades" && (
+            <View>
+              <StakingUnlock />
+            </View>
+          )}
+          {storeType === "L1" && activeSubTab === "Automation" && (
+            <View className="flex flex-col px-[16px]">
+              <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+              <L2Unlock />
+            </View>
+          )}
+          {storeType === "L2" && activeSubTab === "Automation" && (
+            <View className="flex flex-col px-[16px]">
+              <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+              <PrestigeUnlock />
+            </View>
+          )}
+          <View className="h-[40px]" />
+        </ScrollView>
+        <LinearGradient
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 200,
+            marginLeft: 8,
+            marginRight: 8,
+            pointerEvents: "none",
+          }}
+          colors={["transparent", "#000000c0"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
       </View>
     </View>
   );

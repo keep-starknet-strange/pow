@@ -27,7 +27,11 @@ export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
     <View>
       {showUnlock && (
         <UnlockView
-          icon={props.chainId === 0 ? "achievements.l1.dapps" : "achievements.l2.dapps"}
+          icon={
+            props.chainId === 0
+              ? "achievements.l1.dapps"
+              : "achievements.l2.dapps"
+          }
           label="Unlock dApps"
           description="Attract users with Apps!"
           cost={getDappUnlockCost(props.chainId)}

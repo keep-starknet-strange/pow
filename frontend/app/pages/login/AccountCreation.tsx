@@ -15,10 +15,7 @@ import { useImages } from "../../hooks/useImages";
 import { PFPView } from "../../components/PFPView";
 import NounsBuilder from "../../components/NounsBuilder";
 import BasicButton from "../../components/buttons/Basic";
-import {
-  getRandomNounsAttributes,
-  NounsAttributes,
-} from "../../configs/nouns";
+import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import {
   Canvas,
   FilterMode,
@@ -238,9 +235,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           label="Save"
           onPress={async () => {
             if (!isUsernameValid(username)) {
-              setUsernameError(
-                `Invalid username:\n${usernameValidationError}`,
-              );
+              setUsernameError(`Invalid username:\n${usernameValidationError}`);
               return;
             }
             if (!(await isUsernameUnique(username))) {
@@ -270,8 +265,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             entering={FadeInDown}
             className="flex flex-row items-center justify-between w-full"
           >
-            <Text className="text-[#fff7ff] font-Pixels text-[16px]">version {version}</Text>
-            <Text className="text-[#fff7ff] font-Pixels text-[16px]">We're open source!</Text>
+            <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+              version {version}
+            </Text>
+            <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+              We're open source!
+            </Text>
           </Animated.View>
         )}
       </View>

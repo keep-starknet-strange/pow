@@ -14,18 +14,14 @@ import {
 } from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
 
-export interface L1PhaseProps {
-}
-
-export const L1Phase: React.FC<L1PhaseProps> = () => {
+export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactions();
   const { getImage } = useImages();
   const window = Dimensions.get("window");
-  const txTabs = [
-    "Transactions",
-    "dApps",
-  ];
-  const [activeTab, setActiveTab] = React.useState(txTabs[dappsUnlocked[0] ? 1 : 0]);
+  const txTabs = ["Transactions", "dApps"];
+  const [activeTab, setActiveTab] = React.useState(
+    txTabs[dappsUnlocked[0] ? 1 : 0],
+  );
   React.useEffect(() => {
     if (dappsUnlocked[0]) {
       setActiveTab("dApps");
@@ -69,9 +65,7 @@ export const L1Phase: React.FC<L1PhaseProps> = () => {
             }}
           />
         </Canvas>
-        <Canvas
-          style={{ position: "absolute", width: "100%", height: "100%" }}
-        >
+        <Canvas style={{ position: "absolute", width: "100%", height: "100%" }}>
           <Image
             image={getImage("tx.border")}
             fit="fill"
@@ -94,12 +88,10 @@ export const L1Phase: React.FC<L1PhaseProps> = () => {
             left: 9,
           }}
         >
-          <TransactionButtonsView chainId={0} isDapps={ activeTab === "dApps"} />
+          <TransactionButtonsView chainId={0} isDapps={activeTab === "dApps"} />
         </View>
         {dappsUnlocked[0] && (
-          <View
-            className="absolute top-[4px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]"
-          >
+          <View className="absolute top-[4px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
             {txTabs.map((tab) => (
               <TouchableOpacity
                 style={{
@@ -109,11 +101,11 @@ export const L1Phase: React.FC<L1PhaseProps> = () => {
                 key={tab}
                 onPress={() => setActiveTab(tab)}
               >
-                <Canvas
-                  style={{ width: "100%", height: "100%" }}
-                >
+                <Canvas style={{ width: "100%", height: "100%" }}>
                   <Image
-                    image={getImage(tab === activeTab ? "tx.tab.active" : "tx.tab.inactive")}
+                    image={getImage(
+                      tab === activeTab ? "tx.tab.active" : "tx.tab.inactive",
+                    )}
                     fit="fill"
                     x={0}
                     y={0}

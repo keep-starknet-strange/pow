@@ -42,14 +42,11 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
         label={`Upgrade to`}
         specialLabel={{
           text: `${props.automation.levels[level]?.name}`,
-          color: "#D7A833"
+          color: "#D7A833",
         }}
         level={level}
         maxLevel={props.automation.levels.length}
-        nextCost={getNextAutomationCost(
-          props.chainId,
-          props.automation.id,
-        )}
+        nextCost={getNextAutomationCost(props.chainId, props.automation.id)}
         onPress={() => {
           upgradeAutomation(props.chainId, props.automation.id);
         }}

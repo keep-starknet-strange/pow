@@ -78,7 +78,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
   const canUnlockStaking = useCallback(() => {
     const upgradeLevels = upgrades[0];
     if (!upgradeLevels) return false;
-    for (const level of  Object.values(upgradeLevels)) {
+    for (const level of Object.values(upgradeLevels)) {
       if (level === -1) return false; // Not all upgrades are owned
     }
     return true;
@@ -101,7 +101,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       notify("StakingPurchased");
     },
-    [tryBuy, notify, getStakingUnlockCost, stakingUnlocked, canUnlockStaking]
+    [tryBuy, notify, getStakingUnlockCost, stakingUnlocked, canUnlockStaking],
   );
 
   const updatePool = (poolIdx: number, fn: (p: any) => any) =>

@@ -109,8 +109,12 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
           entering={FadeInDown}
           className="flex flex-row items-center justify-between w-full"
         >
-          <Text className="text-[#fff7ff] font-Pixels text-[16px]">version {version}</Text>
-          <Text className="text-[#fff7ff] font-Pixels text-[16px]">We're open source!</Text>
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            version {version}
+          </Text>
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            We're open source!
+          </Text>
         </Animated.View>
       </View>
     </View>

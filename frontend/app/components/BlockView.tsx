@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { View, Text, Image, LayoutChangeEvent } from "react-native";
-import Animated, {
-  BounceIn,
-  Easing,
-  FadeOut,
-} from "react-native-reanimated";
+import Animated, { BounceIn, Easing, FadeOut } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
 import { useImages } from "../hooks/useImages";
@@ -130,56 +126,50 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                 </Animated.View>
               ))}
           </View>
-          {props.block?.transactions.map(
-            (tx, index) => (
-                <Animated.View
-                  key={index}
-                  entering={BounceIn
-                    .duration(400)
-                  }
-                  className="absolute"
-                  style={{
-                    width: txSize,
-                    height: txSize,
-                    left: (index % txPerRow) * txSize,
-                    top: Math.floor(index / txPerRow) * txSize,
+          {props.block?.transactions.map((tx, index) => (
+            <Animated.View
+              key={index}
+              entering={BounceIn.duration(400)}
+              className="absolute"
+              style={{
+                width: txSize,
+                height: txSize,
+                left: (index % txPerRow) * txSize,
+                top: Math.floor(index / txPerRow) * txSize,
+              }}
+            >
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <SkiaImg
+                  image={getTxImg(props.chainId, tx.typeId)}
+                  fit="fill"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
                   }}
-                >
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
-                    <SkiaImg
-                      image={getTxImg(props.chainId, tx.typeId)}
-                      fit="fill"
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                      x={0}
-                      y={0}
-                      width={txSize}
-                      height={txSize}
-                    />
-                  </Canvas>
-                  <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
-                    <Canvas
-                      style={{ width: txSize * 0.4, height: txSize * 0.4 }}
-                    >
-                      <SkiaImg
-                        image={getImage(getTxIcon(props.chainId, tx.typeId))}
-                        fit="contain"
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
-                        x={0}
-                        y={0}
-                        width={txSize * 0.4}
-                        height={txSize * 0.4}
-                      />
-                    </Canvas>
-                  </View>
-                </Animated.View>
-              ),
-          )}
+                  x={0}
+                  y={0}
+                  width={txSize}
+                  height={txSize}
+                />
+              </Canvas>
+              <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
+                <Canvas style={{ width: txSize * 0.4, height: txSize * 0.4 }}>
+                  <SkiaImg
+                    image={getImage(getTxIcon(props.chainId, tx.typeId))}
+                    fit="contain"
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                    x={0}
+                    y={0}
+                    width={txSize * 0.4}
+                    height={txSize * 0.4}
+                  />
+                </Canvas>
+              </View>
+            </Animated.View>
+          ))}
         </View>
         {props.block?.blockId === 0 && (
           <View

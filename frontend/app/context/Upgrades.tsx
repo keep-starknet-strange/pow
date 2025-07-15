@@ -356,10 +356,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
       setCanPrestige(true);
     };
     checkCanPrestige();
-  }, [
-    upgrades,
-    automations,
-  ]);
+  }, [upgrades, automations]);
 
   const prestige = () => {
     setCurrentPrestige((prevPrestige) => {
@@ -383,7 +380,8 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         return false;
       }
       return lastUpgradeLevel >= 0;
-    }, [upgrades]
+    },
+    [upgrades],
   );
 
   const getUpgradeValue = useCallback(

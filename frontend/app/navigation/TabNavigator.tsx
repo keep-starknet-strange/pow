@@ -35,11 +35,7 @@ function StoreTabButton({
 
   return (
     <View ref={ref} onLayout={onLayout} className="">
-      <TabBarButton
-        tabName="Store"
-        isActive={isActive}
-        onPress={onPress}
-      />
+      <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
     </View>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import * as StoreReview from 'expo-store-review';
+import * as StoreReview from "expo-store-review";
 
 import BasicButton from "../../components/buttons/Basic";
 
@@ -41,13 +41,15 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Claim Reward", tab: "ClaimReward" },
     {
       label: "Reset Game",
-      onPress: () => { clearPrivateKeys("pow_game"); disconnectAccount(); },
+      onPress: () => {
+        clearPrivateKeys("pow_game");
+        disconnectAccount();
+      },
     },
     {
       label: "Back",
-      onPress: () => 
-        isAuthenticated ? navigate("Main") : goBackToLogin(),
-    }
+      onPress: () => (isAuthenticated ? navigate("Main") : goBackToLogin()),
+    },
   ];
 
   return (

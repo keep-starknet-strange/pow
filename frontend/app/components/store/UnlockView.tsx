@@ -85,13 +85,8 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
               height={92}
             />
           </Canvas>
-          <View
-            className="absolute flex flex-row items-start px-[48px] py-[8px]"
-          >
-            <Canvas
-              style={{ width: 64, height: 92 }}
-              className=""
-            >
+          <View className="absolute flex flex-row items-start px-[48px] py-[8px]">
+            <Canvas style={{ width: 64, height: 92 }} className="">
               <Image
                 image={getImage(props.icon)}
                 fit="contain"
@@ -112,13 +107,15 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
               >
                 {props.label}
               </Text>
-              <Text className="text-[20px] font-Teatime text-[#fff7ff]"
+              <Text
+                className="text-[20px] font-Teatime text-[#fff7ff]"
                 style={props.textStyle}
               >
                 {props.description}
               </Text>
               <View className="flex flex-row items-center justify-start">
-                <Text className="text-[20px] font-Teatime text-[#fff7ff]"
+                <Text
+                  className="text-[20px] font-Teatime text-[#fff7ff]"
                   style={props.textStyle}
                 >
                   {`Cost: ${props.cost}`}
@@ -145,7 +142,7 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
     </Animated.View>
   );
 };
-      /*
+/*
       {props.owned ? (
         <View className="flex flex-row items-center justify-center pr-1">
           <Text className="text-lg font-bold pl-1 text-[#101119]">Owned</Text>

@@ -50,12 +50,12 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
           }}
         />
         {activeTab !== "Main" && (
-          <Animated.View entering={FadeInDown} >
-          <BasicButton
-            label="Back"
-            onPress={() => setActiveTab("Main")}
-            style={{ marginTop: 32 }}
-          />
+          <Animated.View entering={FadeInDown}>
+            <BasicButton
+              label="Back"
+              onPress={() => setActiveTab("Main")}
+              style={{ marginTop: 32 }}
+            />
           </Animated.View>
         )}
       </View>

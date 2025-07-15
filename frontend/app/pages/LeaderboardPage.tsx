@@ -257,9 +257,7 @@ export const LeaderboardPage: React.FC = () => {
               className="flex flex-row items-center flex-1"
               entering={FadeInLeft}
             >
-              <View
-                className="w-[60px] aspect-square mr-2 relative p-[2px]"
-              >
+              <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
                 <PFPView user={user.address} attributes={user.nouns} />
               </View>
               <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
@@ -334,9 +332,7 @@ export const LeaderboardPage: React.FC = () => {
           entering={FadeInDown}
         >
           <View className="flex flex-row items-center flex-1">
-            <View
-              className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]"
-            >
+            <View className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]">
               <PFPView
                 user={user?.account_address}
                 attributes={

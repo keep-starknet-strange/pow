@@ -10,7 +10,7 @@ export const ProverView = () => {
   const { getUpgradeValue } = useUpgrades();
 
   const [proofMaxSize, setProofMaxSize] = useState(
-    (getUpgradeValue(1, "Recursive Proving") || 1),
+    getUpgradeValue(1, "Recursive Proving") || 1,
   );
   useEffect(() => {
     const upgradeValue = getUpgradeValue(1, "Recursive Proving");
