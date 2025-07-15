@@ -6,6 +6,7 @@ import {
   useCallback,
 } from "react";
 import { useEventManager } from "../context/EventManager";
+import { useUpgrades } from "../context/Upgrades";
 import { useBalance } from "../stores/useBalanceStore";
 import { StakingPool, newStakingPool } from "../types/StakingPool";
 import stakingConfig from "../configs/staking.json";
@@ -37,6 +38,7 @@ type StakingContextType = {
   accrueAndCheckSlashingAll: () => void;
   stakingUnlocked: boolean;
   getStakingUnlockCost: (poolIdx: number) => number;
+  canUnlockStaking: () => boolean;
   unlockStaking: (poolIdx: number) => void;
 };
 
@@ -57,6 +59,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
   const { tryBuy, updateBalance } = useBalance();
   const [stakingPools, setStakingPools] = useState<StakingPool[]>([]);
   const [stakingUnlocked, setStakingUnlocked] = useState(false);
+  const { upgrades } = useUpgrades();
 
   const resetStaking = () => {
     setStakingPools([]);
@@ -71,8 +74,23 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
     return stakingConfig[poolIdx].unlockCosts[0];
   }, []);
 
+  // Can unlock if own all upgrades
+  const canUnlockStaking = useCallback(() => {
+    const upgradeLevels = upgrades[0];
+    if (!upgradeLevels) return false;
+    for (const level of Object.values(upgradeLevels)) {
+      if (level === -1) return false; // Not all upgrades are owned
+    }
+    return true;
+  }, [upgrades]);
+
   const unlockStaking = useCallback(
     (poolIdx: number) => {
+      if (stakingUnlocked) return;
+      if (!canUnlockStaking()) {
+        notify("InvalidPurchase");
+        return;
+      }
       const cost = getStakingUnlockCost(poolIdx);
       if (!tryBuy(cost)) return;
       setStakingUnlocked(true);
@@ -83,7 +101,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       notify("StakingPurchased");
     },
-    [tryBuy],
+    [tryBuy, notify, getStakingUnlockCost, stakingUnlocked, canUnlockStaking],
   );
 
   const updatePool = (poolIdx: number, fn: (p: any) => any) =>
@@ -207,6 +225,7 @@ export const StakingProvider: React.FC<{ children: React.ReactNode }> = ({
         stakeTokens,
         claimRewards,
         stakingUnlocked,
+        canUnlockStaking,
         unlockStaking,
         getStakingUnlockCost,
         accrueAndCheckSlashingAll,

@@ -33,6 +33,7 @@ type GameContextType = {
   getDa: () => L2DA | undefined;
   getProver: () => L2Prover | undefined;
   getL2Cost: () => number;
+  canUnlockL2: boolean;
   initL2: () => void;
 
   miningProgress: number;
@@ -68,7 +69,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     getUserMaxChainId,
     initMyGame,
   } = usePowContractConnector();
-  const { getUpgradeValue } = useUpgrades();
+  const { getUpgradeValue, upgrades, automations } = useUpgrades();
   const { addBlock, addChain } = useChains();
 
   const [workingBlocks, setWorkingBlocks] = useState<Block[]>([]);
@@ -304,6 +305,55 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     return defaultL2Cost;
   }, [defaultL2Cost]);
 
+  const [canUnlockL2, setCanUnlockL2] = useState(false);
+  // Can unlock l2 if all L1 txs unlocked, all upgrades, all automations, and staking unlocked
+  useEffect(() => {
+    const checkCanUnlockL2 = () => {
+      /* TODO: Include once switched to zustand
+      if (!stakingUnlocked) {
+        setCanPrestige(false);
+        return;
+      }
+      */
+      const automationlevels = automations[0];
+      if (!automationlevels) {
+        setCanUnlockL2(false);
+        return;
+      }
+      for (const level of Object.values(automationlevels)) {
+        if (level < 0) {
+          setCanUnlockL2(false);
+          return;
+        }
+      }
+      const upgradeLevels = upgrades[0];
+      if (!upgradeLevels) {
+        setCanUnlockL2(false);
+        return;
+      }
+      for (const level of Object.values(upgradeLevels)) {
+        if (level < 0) {
+          setCanUnlockL2(false);
+          return;
+        }
+      }
+      /* TODO: Include once switched to zustand
+      const dappLevels = dappFees[0];
+      if (!dappLevels) {
+        setCanUnlockL2(false);
+        return;
+      }
+      const transactionLevels = transactionFees[0];
+      if (!transactionLevels) {
+        setCanUnlockL2(false);
+        return;
+      }
+      */
+      setCanUnlockL2(true);
+    };
+    checkCanUnlockL2();
+  }, [upgrades, automations]);
+
   const initL2 = () => {
     const cost = getL2Cost();
     if (!tryBuy(cost)) return;
@@ -339,6 +389,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         l2,
         getL2,
         getL2Cost,
+        canUnlockL2,
         initL2,
         getDa,
         getProver,

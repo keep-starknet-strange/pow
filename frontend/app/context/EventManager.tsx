@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 
 export type EventType =
+  | "BasicClick"
   | "MineClicked"
   | "MineDone"
   | "SequenceClicked"
@@ -12,6 +13,7 @@ export type EventType =
   | "BalanceUpdated"
   | "ItemPurchased"
   | "BuyFailed"
+  | "InvalidPurchase"
   | "TxUpgradePurchased"
   | "UpgradePurchased"
   | "AutomationPurchased"

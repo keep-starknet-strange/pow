@@ -21,8 +21,10 @@ type UpgradesContextType = {
   upgrade: (chainId: number, upgradeId: number) => void;
   upgradeAutomation: (chainId: number, upgradeId: number) => void;
   currentPrestige: number;
+  canPrestige: boolean;
   prestige: () => void;
 
+  canUnlockUpgrade: (chainId: number, upgradeId: number) => boolean;
   getUpgradeValue: (chainId: number, upgradeName: string) => number;
   getUpgradeValueAt: (chainId: number, upgradeId: number) => number;
   getNextUpgradeCost: (chainId: number, upgradeId: number) => number;
@@ -230,6 +232,10 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const upgrade = (chainId: number, upgradeId: number) => {
     setUpgrades((prevUpgrades) => {
+      if (!canUnlockUpgrade(chainId, upgradeId)) {
+        notify("InvalidPurchase");
+        return prevUpgrades;
+      }
       const newUpgrades = { ...prevUpgrades };
       if (!newUpgrades[chainId]) {
         newUpgrades[chainId] = {};
@@ -303,6 +309,55 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const [canPrestige, setCanPrestige] = useState<boolean>(false);
+  // Can prestige if all L2 txs unlocked, all upgrades unlocked, all automations unlocked, and staking unlocked
+  useEffect(() => {
+    const checkCanPrestige = () => {
+      /* TODO: Include once switched to zustand
+      if (!stakingUnlocked) {
+        setCanPrestige(false);
+        return;
+      }
+      */
+      const automationlevels = automations[1];
+      if (!automationlevels) {
+        setCanPrestige(false);
+        return;
+      }
+      for (const level of Object.values(automationlevels)) {
+        if (level < 0) {
+          setCanPrestige(false);
+          return;
+        }
+      }
+      const upgradeLevels = upgrades[1];
+      if (!upgradeLevels) {
+        setCanPrestige(false);
+        return;
+      }
+      for (const level of Object.values(upgradeLevels)) {
+        if (level < 0) {
+          setCanPrestige(false);
+          return;
+        }
+      }
+      /* TODO: Include once switched to zustand
+      const dappLevels = dappFees[1];
+      if (!dappLevels) {
+        setCanPrestige(false);
+        return;
+      }
+      const transactionLevels = transactionFees[1];
+      if (!transactionLevels) {
+        setCanPrestige(false);
+        return;
+      }
+      */
+      setCanPrestige(true);
+    };
+    checkCanPrestige();
+  }, [upgrades, automations]);
+
   const prestige = () => {
     setCurrentPrestige((prevPrestige) => {
       const nextPrestige = prevPrestige + 1;
@@ -311,6 +366,23 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
       return nextPrestige;
     });
   };
+
+  // Can unlock if the previous upgrade level is at least 0
+  const canUnlockUpgrade = useCallback(
+    (chainId: number, upgradeId: number): boolean => {
+      if (upgradeId === 0) return true; // Always can unlock the first transaction
+      const upgradeLevels = upgrades[chainId] || {};
+      const lastUpgradeLevel = upgradeLevels[upgradeId - 1];
+      if (lastUpgradeLevel === undefined) {
+        console.warn(
+          `Transaction with ID ${upgradeId - 1} not found for chain ${chainId}`,
+        );
+        return false;
+      }
+      return lastUpgradeLevel >= 0;
+    },
+    [upgrades],
+  );
 
   const getUpgradeValue = useCallback(
     (chainId: number, upgradeName: string): number => {
@@ -462,6 +534,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         automations,
         upgrade,
         upgradeAutomation,
+        canUnlockUpgrade,
         getUpgradeValue,
         getUpgradeValueAt,
         getNextUpgradeCost,
@@ -469,6 +542,7 @@ export const UpgradesProvider: React.FC<{ children: React.ReactNode }> = ({
         getAutomationSpeedAt,
         getNextAutomationCost,
         currentPrestige,
+        canPrestige,
         prestige,
         getNextPrestigeCost,
       }}

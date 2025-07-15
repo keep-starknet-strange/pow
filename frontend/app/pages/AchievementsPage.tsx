@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useAchievement } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -41,16 +42,16 @@ export const AchievementsPage: React.FC = () => {
   }, []);
 
   return (
-    <View className="flex-1 relative">
+    <View className="flex-1 relative bg-[#101119]">
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("achievements.bg")}
             fit="fill"
             x={0}
-            y={-62}
+            y={-55}
             width={width}
-            height={height}
+            height={650}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -73,129 +74,137 @@ export const AchievementsPage: React.FC = () => {
             }}
           />
         </Canvas>
-        <Text className="text-[#fff7ff] text-xl absolute right-2 font-Pixels">
+        <Animated.Text
+          className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
+          entering={FadeInLeft}
+        >
           ACHIEVEMENTS
-        </Text>
+        </Animated.Text>
       </View>
-      <ScrollView
-        className="flex-1 relative"
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-      >
-        {Object.entries(categories).map(([category, achievements], index) => (
-          <View key={index} className="w-full">
-            <View
-              className="relative mx-[16px] my-[8px] z-[10]"
-              style={{ width: width - 32, height: 24 }}
-            >
-              <Canvas style={{ flex: 1 }} className="w-full h-full">
-                <Image
-                  image={getImage(`achievements.title`)}
-                  fit="fill"
-                  x={0}
-                  y={0}
-                  width={width - 32}
-                  height={24}
-                  sampling={{
-                    filter: FilterMode.Nearest,
-                    mipmap: MipmapMode.Nearest,
-                  }}
-                />
-              </Canvas>
-              <Text className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]">
-                {category}
-              </Text>
-            </View>
-            <ScrollView
-              className="flex flex-row mx-[12px]"
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              {achievements.map((achievement, index) => (
-                <View
-                  className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
-                  key={index}
+      <View style={{ height: 558 }}>
+        <ScrollView
+          className="flex-1 relative"
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {Object.entries(categories).map(([category, achievements], index) => (
+            <View key={index} className="w-full">
+              <View
+                className="relative mx-[16px] my-[8px] z-[10]"
+                style={{ width: width - 32, height: 24 }}
+              >
+                <Canvas style={{ flex: 1 }} className="w-full h-full">
+                  <Image
+                    image={getImage(`achievements.title`)}
+                    fit="fill"
+                    x={0}
+                    y={0}
+                    width={width - 32}
+                    height={24}
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                  />
+                </Canvas>
+                <Animated.Text
+                  className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]"
+                  entering={FadeInRight}
                 >
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
-                    <Image
-                      image={getImage("achievements.tile.locked")}
-                      fit="fill"
-                      x={0}
-                      y={0}
-                      width={117}
-                      height={158}
-                    />
-                  </Canvas>
-                  {achievementsProgress[achievement.id] > 0 && (
-                    <View
-                      className="absolute top-0 left-0 h-full"
-                      style={{
-                        backgroundColor: "#6dcd64",
-                        width: `${achievementsProgress[achievement.id]}%`,
-                      }}
-                    />
-                  )}
-                  {achievementsProgress[achievement.id] > 0 && (
-                    <View className="absolute top-0 left-0 w-[117px] h-[158px]">
-                      <Canvas style={{ flex: 1 }} className="w-full h-full">
-                        <Image
-                          image={getImage(
-                            achievementsProgress[achievement.id] === 100
-                              ? "achievements.tile.achieved"
-                              : "achievements.tile.overlay",
-                          )}
-                          fit="fill"
-                          x={0}
-                          y={0}
-                          width={117}
-                          height={158}
-                        />
-                      </Canvas>
-                    </View>
-                  )}
-                  <Text
-                    className="font-Pixels text-[#fff7ff] text-[16px] leading-none
-                      absolute top-[12px] w-full text-center px-[4px]"
+                  {category}
+                </Animated.Text>
+              </View>
+              <ScrollView
+                className="flex flex-row mx-[12px]"
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {achievements.map((achievement, index) => (
+                  <Animated.View
+                    className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
+                    key={index}
+                    entering={FadeInRight}
                   >
-                    {achievement.name}
-                  </Text>
-                  <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
                     <Canvas style={{ flex: 1 }} className="w-full h-full">
                       <Image
-                        image={getImage(achievement.image)}
+                        image={getImage("achievements.tile.locked")}
                         fit="fill"
                         x={0}
                         y={0}
-                        width={50}
-                        height={50}
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
+                        width={117}
+                        height={158}
                       />
                     </Canvas>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        ))}
-        <View className="h-[40px]" />
-        <LinearGradient
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: 120,
-            height: "100%",
-            marginRight: 8,
-            pointerEvents: "none",
-          }}
-          colors={["transparent", "#000000c0"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        />
-      </ScrollView>
+                    {achievementsProgress[achievement.id] > 0 && (
+                      <View
+                        className="absolute top-0 left-0 h-full"
+                        style={{
+                          backgroundColor: "#6dcd64",
+                          width: `${achievementsProgress[achievement.id]}%`,
+                        }}
+                      />
+                    )}
+                    {achievementsProgress[achievement.id] > 0 && (
+                      <View className="absolute top-0 left-0 w-[117px] h-[158px]">
+                        <Canvas style={{ flex: 1 }} className="w-full h-full">
+                          <Image
+                            image={getImage(
+                              achievementsProgress[achievement.id] === 100
+                                ? "achievements.tile.achieved"
+                                : "achievements.tile.overlay",
+                            )}
+                            fit="fill"
+                            x={0}
+                            y={0}
+                            width={117}
+                            height={158}
+                          />
+                        </Canvas>
+                      </View>
+                    )}
+                    <Text
+                      className="font-Pixels text-[#fff7ff] text-[16px] leading-none
+                      absolute top-[12px] w-full text-center px-[4px]"
+                    >
+                      {achievement.name}
+                    </Text>
+                    <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
+                      <Canvas style={{ flex: 1 }} className="w-full h-full">
+                        <Image
+                          image={getImage(achievement.image)}
+                          fit="contain"
+                          x={0}
+                          y={0}
+                          width={50}
+                          height={50}
+                          sampling={{
+                            filter: FilterMode.Nearest,
+                            mipmap: MipmapMode.Nearest,
+                          }}
+                        />
+                      </Canvas>
+                    </View>
+                  </Animated.View>
+                ))}
+              </ScrollView>
+            </View>
+          ))}
+          <LinearGradient
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              width: 120,
+              height: "100%",
+              marginRight: 8,
+              pointerEvents: "none",
+            }}
+            colors={["transparent", "#000000c0"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        </ScrollView>
+      </View>
     </View>
   );
 };

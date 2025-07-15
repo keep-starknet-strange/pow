@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { useUpgrades } from "../../context/Upgrades";
-import { shortMoneyString } from "../../utils/helpers";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
-import {
-  Canvas,
-  Image,
-  FilterMode,
-  MipmapMode,
-} from "@shopify/react-native-skia";
-import { useImages } from "../../hooks/useImages";
+import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -18,8 +11,6 @@ export type UpgradeViewProps = {
 };
 
 export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
-  const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();
 
   const [level, setLevel] = useState(0);
@@ -37,10 +28,19 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
         return "shop.upgrades.blockSize";
       case "MEV Boost":
         return "shop.upgrades.mevBoost";
+      case "Recursive Proving":
+        return "shop.upgrades.recursiveProving";
+      case "DA compression":
+        return "shop.upgrades.daCompression";
       default:
         return "unknown";
     }
   };
+
+  const [nextCost, setNextCost] = useState(0);
+  useEffect(() => {
+    setNextCost(getNextUpgradeCost(props.chainId, props.upgrade.id));
+  }, [props.chainId, props.upgrade.id, getNextUpgradeCost]);
 
   return (
     <View className="flex flex-col w-full">
@@ -54,46 +54,16 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
           description={props.upgrade.description}
         />
       </View>
-      <TouchableOpacity
-        className="relative"
-        style={{
-          width: width - 32,
-          height: 36,
-        }}
+      <UpgradeButton
+        label={`Purchase Upgrade`}
+        level={level}
+        maxLevel={props.upgrade.costs.length}
+        nextCost={nextCost}
         onPress={() => {
           upgrade(props.chainId, props.upgrade.id);
         }}
-      >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("shop.auto.buy")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={width - 32}
-            height={36}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.None,
-            }}
-          />
-        </Canvas>
-        <Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
-          Purchase Upgrade
-        </Text>
-        {level === props.upgrade.costs.length ? (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#ff0000]">
-            Max
-          </Text>
-        ) : (
-          <Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]">
-            Cost:{" "}
-            {shortMoneyString(
-              getNextUpgradeCost(props.chainId, props.upgrade.id),
-            )}
-          </Text>
-        )}
-      </TouchableOpacity>
+        bgImage={"shop.auto.buy"}
+      />
     </View>
   );
 };

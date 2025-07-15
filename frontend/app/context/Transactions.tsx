@@ -37,6 +37,9 @@ type TransactionsContextType = {
   getDappSpeed: (chainId: number, dappId: number) => number;
   getDappUnlockCost: (chainId: number) => number;
 
+  canUnlockDapps: (chainId: number) => boolean;
+  canUnlockTx: (chainId: number, txId: number, isDapp?: boolean) => boolean;
+  canUnlockDapp: (chainId: number, dappId: number) => boolean;
   getNextTxFeeCost: (chainId: number, txId: number) => number;
   getNextTxSpeedCost: (chainId: number, txId: number) => number;
   getNextDappFeeCost: (chainId: number, dappId: number) => number;
@@ -337,6 +340,10 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const txFeeUpgrade = (chainId: number, txId: number) => {
     setTransactionFees((prevFees) => {
+      if (!canUnlockTx(chainId, txId)) {
+        notify("InvalidPurchase");
+        return prevFees;
+      }
       const newFees = { ...prevFees };
       if (!newFees[chainId]) {
         newFees[chainId] = {};
@@ -413,6 +420,10 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const dappFeeUpgrade = (chainId: number, dappId: number) => {
     setDappFees((prevFees) => {
+      if (!canUnlockDapp(chainId, dappId)) {
+        notify("InvalidPurchase");
+        return prevFees;
+      }
       const newFees = { ...prevFees };
       if (!newFees[chainId]) {
         newFees[chainId] = {};
@@ -483,8 +494,29 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  // Can unlock if own all txs
+  const canUnlockDapps = useCallback(
+    (chainId: number) => {
+      const txLevels = transactionFees[chainId];
+      if (!txLevels) {
+        return false;
+      }
+      for (const level of Object.values(txLevels)) {
+        if (level === -1) {
+          return false;
+        }
+      }
+      return true;
+    },
+    [transactionFees],
+  );
+
   const unlockDapps = (chainId: number) => {
     setDappsUnlocked((prevUnlocked) => {
+      if (!canUnlockDapps(chainId)) {
+        notify("InvalidPurchase");
+        return prevUnlocked;
+      }
       const cost = getDappUnlockCost(chainId);
       if (!tryBuy(cost)) return prevUnlocked;
       const newUnlocked = { ...prevUnlocked };
@@ -569,6 +601,43 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
     return dappsJsonCost;
   };
 
+  // Can unlock if the previous tx level is at least 0
+  const canUnlockTx = useCallback(
+    (chainId: number, txId: number, isDapp = false) => {
+      if (isDapp) {
+        return canUnlockDapp(chainId, txId);
+      }
+      if (txId === 0) return true; // Always can unlock the first transaction
+      const txFees = transactionFees[chainId] || {};
+      const lastTxLevel = txFees[txId - 1];
+      if (lastTxLevel === undefined) {
+        console.warn(
+          `Transaction with ID ${txId - 1} not found for chain ${chainId}`,
+        );
+        return false;
+      }
+      return lastTxLevel >= 0;
+    },
+    [transactionFees, dappFees],
+  );
+
+  // Can unlock if the previous dapp level is at least 0
+  const canUnlockDapp = useCallback(
+    (chainId: number, dappId: number) => {
+      if (dappId === 0) return true; // Always can unlock the first dapp
+      const dappFeesLevels = dappFees[chainId] || {};
+      const lastDappLevel = dappFeesLevels[dappId - 1];
+      if (lastDappLevel === undefined) {
+        console.warn(
+          `Dapp with ID ${dappId - 1} not found for chain ${chainId}`,
+        );
+        return false;
+      }
+      return lastDappLevel >= 0;
+    },
+    [dappFees],
+  );
+
   const getNextTxFeeCost = useCallback(
     (chainId: number, txId: number) => {
       const txFees = transactionFees[chainId] || {};
@@ -649,12 +718,15 @@ export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
         dappFeeUpgrade,
         dappSpeedUpgrade,
         dappsUnlocked,
+        canUnlockDapps,
         unlockDapps,
         getDappUnlockCost,
         getTransactionFee,
         getTransactionSpeed,
         getDappFee,
         getDappSpeed,
+        canUnlockTx,
+        canUnlockDapp,
         getNextTxFeeCost,
         getNextTxSpeedCost,
         getNextDappFeeCost,

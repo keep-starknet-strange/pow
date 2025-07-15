@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { View, Text, Image, LayoutChangeEvent } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { BounceIn, Easing, FadeOut } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../context/Upgrades";
 import { useImages } from "../hooks/useImages";
@@ -54,26 +50,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     setTxSize(txSize);
   }, [blockSize, txPerRow]);
 
-  const yOffset = useSharedValue(600);
-
-  const animatedObjectStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          scale: 1 - yOffset.value / 600,
-        },
-      ],
-    };
-  });
-
-  const animate = () => {
-    yOffset.value = withTiming(0, { duration: 300 });
-  };
-
-  useEffect(() => {
-    yOffset.value = 600; // Start off-scren
-    animate();
-  }, [props.block?.transactions.length]);
   const getTxImg = (chainId: number, typeId: number) => {
     switch (chainId) {
       case 0:
@@ -113,19 +89,24 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   return (
     <View className="w-full h-full flex flex-col items-center justify-center relative">
-      <View className="flex-1 bg-[#10111908] aspect-square relative">
+      <View className="flex-1 aspect-square relative">
         <View className="flex flex-wrap w-full aspect-square">
           <View
-            className="absolute top-0 left-0 w-full h-full flex flex-wrap aspect-square"
+            className="absolute top-0 left-0 w-full h-full"
             onLayout={onBlockLayout}
           >
             {props.block?.blockId !== 0 &&
               Array.from({ length: txPerRow ** 2 || 0 }, (_, index) => (
-                <View
+                <Animated.View
                   key={index}
+                  className="absolute"
+                  exiting={FadeOut}
                   style={{
+                    left: (index % txPerRow) * txSize,
+                    top: Math.floor(index / txPerRow) * txSize,
                     width: txSize,
                     height: txSize,
+                    display: props.block?.transactions[index] ? "none" : "flex",
                   }}
                 >
                   <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -142,140 +123,53 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
                       height={txSize}
                     />
                   </Canvas>
-                </View>
+                </Animated.View>
               ))}
           </View>
-          {props.block?.transactions.map(
-            (tx, index) =>
-              index !== (props.block?.transactions.length || 1) - 1 && (
-                <View
-                  key={index}
-                  className="relative"
-                  style={{
-                    width: txSize,
-                    height: txSize,
-                  }}
-                >
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
-                    <SkiaImg
-                      image={getTxImg(props.chainId, tx.typeId)}
-                      fit="fill"
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                      x={0}
-                      y={0}
-                      width={txSize}
-                      height={txSize}
-                    />
-                  </Canvas>
-                  <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
-                    <Canvas
-                      style={{ width: txSize * 0.4, height: txSize * 0.4 }}
-                    >
-                      <SkiaImg
-                        image={getImage(getTxIcon(props.chainId, tx.typeId))}
-                        fit="contain"
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
-                        x={0}
-                        y={0}
-                        width={txSize * 0.4}
-                        height={txSize * 0.4}
-                      />
-                    </Canvas>
-                  </View>
-                </View>
-              ),
-          )}
-          {props.block?.transactions.length !== 0 && (
-            <View
-              className="relative"
+          {props.block?.transactions.map((tx, index) => (
+            <Animated.View
+              key={index}
+              entering={BounceIn.duration(400)}
+              className="absolute"
               style={{
                 width: txSize,
                 height: txSize,
+                left: (index % txPerRow) * txSize,
+                top: Math.floor(index / txPerRow) * txSize,
               }}
             >
-              <Animated.View
-                className="absolute bottom-[-380%] left-0 w-full h-[400%] rounded-b-lg"
-                style={[animatedObjectStyle]}
-              >
-                <View
-                  className="w-full h-full rounded-b-lg"
-                  style={[
-                    {
-                      backgroundImage: `
-                    linear-gradient(
-                      to bottom,
-                      #ffffff20,
-                      #FFFFFFc0,
-                      50%,
-                    )`,
-                      opacity: 0.5,
-                    },
-                  ]}
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <SkiaImg
+                  image={getTxImg(props.chainId, tx.typeId)}
+                  fit="fill"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={0}
+                  width={txSize}
+                  height={txSize}
                 />
-              </Animated.View>
-              <Animated.View
-                style={[
-                  animatedObjectStyle,
-                  {
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                  },
-                ]}
-              >
-                <Canvas style={{ flex: 1 }} className="w-full h-full">
+              </Canvas>
+              <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
+                <Canvas style={{ width: txSize * 0.4, height: txSize * 0.4 }}>
                   <SkiaImg
-                    image={getTxImg(
-                      props.chainId,
-                      props.block?.transactions[
-                        props.block?.transactions.length - 1
-                      ].typeId || 0,
-                    )}
-                    fit="fill"
+                    image={getImage(getTxIcon(props.chainId, tx.typeId))}
+                    fit="contain"
                     sampling={{
                       filter: FilterMode.Nearest,
                       mipmap: MipmapMode.Nearest,
                     }}
                     x={0}
                     y={0}
-                    width={txSize}
-                    height={txSize}
+                    width={txSize * 0.4}
+                    height={txSize * 0.4}
                   />
                 </Canvas>
-                <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
-                  <Canvas style={{ width: txSize * 0.4, height: txSize * 0.4 }}>
-                    <SkiaImg
-                      image={getImage(
-                        getTxIcon(
-                          props.chainId,
-                          props.block?.transactions[
-                            props.block?.transactions.length - 1
-                          ].typeId || 0,
-                        ),
-                      )}
-                      fit="contain"
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                      x={0}
-                      y={0}
-                      width={txSize * 0.4}
-                      height={txSize * 0.4}
-                    />
-                  </Canvas>
-                </View>
-              </Animated.View>
-            </View>
-          )}
+              </View>
+            </Animated.View>
+          ))}
         </View>
         {props.block?.blockId === 0 && (
           <View
@@ -296,7 +190,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           </View>
         )}
         {props.completed && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-[#17171770] rounded-xl">
+          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center rounded-xl">
             <Text className="text-[#fff7ff] text-3xl font-bold font-Xerxes">
               Block {props.block?.blockId}
             </Text>

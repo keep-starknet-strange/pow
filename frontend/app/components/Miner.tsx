@@ -3,12 +3,7 @@ import { View } from "react-native";
 import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
-
-import * as minerImages from "../configs/miners";
-export const getMinerImage = (minerId: number) => {
-  const images = Object.values(minerImages);
-  return images[minerId] || images[0];
-};
+import { getAutomationIcon } from "../utils/upgrades";
 
 import * as miningAnimation from "../configs/mining";
 export const getMiningAnimation = (mineProgress: number) => {
@@ -26,9 +21,9 @@ export const Miner: React.FC = () => {
   const [mineColor, setMineColor] = useState("#CA1F4B");
   const generateRandomHash = (isDone: boolean) => {
     const difficulty = getUpgradeValue(0, "Block Difficulty");
-    const randomPart = Math.floor(Math.random() * 0xffffffffffff)
-      .toString(16)
-      .padStart(16, "0");
+    const randomPart = Math.floor(Math.random() * 0xffffffffff)
+      .toString(14)
+      .padStart(14, "0");
     // Replace first `difficulty` bytes with 00 if done
     return isDone
       ? `0x${"00".repeat(difficulty)}${randomPart}`
@@ -41,10 +36,10 @@ export const Miner: React.FC = () => {
   }, [miningProgress]);
 
   return (
-    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
+    <View className="flex flex-col h-full aspect-square rounded-xl relative">
       <Confirmer
         progress={miningProgress}
-        image={getMinerImage(automations[0][0] + 1)}
+        image={getAutomationIcon(0, "Miner", 0)}
         getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
         renderedBy="miner"

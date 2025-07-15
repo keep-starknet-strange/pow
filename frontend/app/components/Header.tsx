@@ -17,7 +17,6 @@ export const Header: React.FC = () => {
   const { balance } = useBalance();
   const { getImage } = useImages();
   const { l2 } = useGame();
-  const headerBg = l2 ? "balance.l2" : "balance.l1";
   const { width } = Dimensions.get("window");
 
   const insets = useSafeAreaInsets();
@@ -28,7 +27,7 @@ export const Header: React.FC = () => {
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
-          image={getImage(headerBg)}
+          image={getImage("header")}
           fit="fill"
           x={0}
           y={0}

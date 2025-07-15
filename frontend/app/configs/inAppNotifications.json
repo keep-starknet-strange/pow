@@ -11,5 +11,12 @@
     "eventType": "AchievementCompleted",
     "type": "success",
     "color": "#f7f760"
+  },
+  {
+    "id": 2,
+    "eventType": "InvalidPurchase",
+    "message": "Locked item. Continue building to unlock it!",
+    "type": "error",
+    "color": "#f76060"
   }
 ]

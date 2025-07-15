@@ -138,9 +138,16 @@
         },
         {
           "id": 4,
-          "name": "STWO",
+          "name": "Recursive",
           "color": "#f7f760",
           "cost": 480,
+          "speed": 8
+        },
+        {
+          "id": 5,
+          "name": "STWO",
+          "color": "#f7f760",
+          "cost": 960,
           "speed": 10
         }
       ]
@@ -160,14 +167,14 @@
         },
         {
           "id": 1,
-          "name": "Blobs",
+          "name": "Zip",
           "color": "#f7f760",
           "cost": 80,
           "speed": 2
         },
         {
           "id": 2,
-          "name": "Zip",
+          "name": "State Diff",
           "color": "#f7f760",
           "cost": 160,
           "speed": 4

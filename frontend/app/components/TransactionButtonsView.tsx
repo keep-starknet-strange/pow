@@ -29,7 +29,7 @@ export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (
   }, [props.chainId, props.isDapps]);
 
   return (
-    <View className="flex flex-row w-full items-center justify-around pt-2">
+    <View className="flex flex-row w-full h-full items-center justify-around">
       {transactionTypes.map((txType, index) => (
         <View
           className="flex flex-col items-center justify-center relative"

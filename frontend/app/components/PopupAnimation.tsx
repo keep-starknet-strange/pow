@@ -43,6 +43,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
           inputRange: [0, 1, 100],
           outputRange: [0, 1, 0],
         }),
+        zIndex: 10,
       }}
     >
       <Text

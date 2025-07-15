@@ -24,7 +24,7 @@ export const Prover: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
         progress={proverProgress}
-        image={getProverImage(automations[1][1] + 1)}
+        text={"Click to prove!"}
         getAnimation={getProvingAnimation}
         onConfirm={prove}
         renderedBy="prover"
