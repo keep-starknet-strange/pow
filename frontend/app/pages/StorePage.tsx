@@ -308,35 +308,4 @@ export const StorePage: React.FC = () => {
   );
 };
 
-/*
- * TODO
-        {dappsUnlocked[chainId] ? (
-          <View>
-            <View className="flex flex-row justify-between items-center p-2 mt-[1rem]">
-              <Text className="text-[#e7e7e7] text-2xl font-bold">Dapps</Text>
-            </View>
-            <View className="flex flex-col gap-[1.6rem] px-[0.5rem]">
-              {storeDapps.map((item, index) => (
-                <TransactionUpgradeView
-                  key={index}
-                  chainId={chainId}
-                  txData={item}
-                  isDapp={true}
-                />
-              ))}
-            </View>
-          </View>
-        ) : (
-          <DappsUnlock chainId={chainId} />
-        )}
-        <View className="flex flex-row justify-between items-center p-2 mt-[1rem]">
-          <Text className="text-[#e7e7e7] text-2xl font-bold">Scaling</Text>
-        </View>
-        <View className="h-32" />
-      </ScrollView>
-    </View>
-  );
-};
-*/
-
 export default StorePage;

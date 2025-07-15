@@ -142,20 +142,3 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
     </Animated.View>
   );
 };
-/*
-      {props.owned ? (
-        <View className="flex flex-row items-center justify-center pr-1">
-          <Text className="text-lg font-bold pl-1 text-[#101119]">Owned</Text>
-        </View>
-      ) : (
-        <View className="flex flex-row items-center justify-center pr-1">
-          <Image source={coinImg} className="w-[2rem] h-[2rem]" />
-          <Text className="text-lg font-bold pl-1 text-[#101119]">
-            {shortMoneyString(props.cost)}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-};
-*/

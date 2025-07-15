@@ -63,7 +63,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
     if (fetchBalanceDependency) {
       try {
         const balance = await fetchBalanceDependency();
-        setBalance(balance ?? 1000000000);
+        setBalance(balance ?? 0);
       } catch (error) {
         console.error("Error fetching balance:", error);
         setBalance(0);
