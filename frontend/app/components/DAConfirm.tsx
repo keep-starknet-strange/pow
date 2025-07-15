@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
@@ -24,7 +24,7 @@ export const DAConfirm: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
         progress={daProgress}
-        image={getDaIcon(automations[1][2] + 1)}
+        image={getDaIcon((automations[1]?.[2] ?? -1) + 1)}
         getAnimation={getDaAnimation}
         onConfirm={daConfirm}
         renderedBy="da"

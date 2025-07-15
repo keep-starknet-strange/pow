@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useEventManager } from "./EventManager";
 import { useBalance } from "../stores/useBalanceStore";
-import { useUpgrades } from "./Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useChains } from "./Chains";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { useGame } from "../context/Game";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { DAConfirm } from "./DAConfirm";
 
 import feeImg from "../../assets/images/bitcoin.png";

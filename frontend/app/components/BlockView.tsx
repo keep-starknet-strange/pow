@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";

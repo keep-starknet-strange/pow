@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useUpgrades } from "../../context/Upgrades";
+import { useUpgrades } from "../../stores/useUpgradesStore";
 import { UnlockView } from "./UnlockView";
 import prestigeIcon from "../../../assets/images/prestige/0.png";
 

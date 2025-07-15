@@ -9,7 +9,7 @@ import { useEventManager } from "../context/EventManager";
 import { useFocEngine } from "./FocEngineConnector";
 import { usePowContractConnector } from "./PowContractConnector";
 import { useBalance } from "../stores/useBalanceStore";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import transactionJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
 

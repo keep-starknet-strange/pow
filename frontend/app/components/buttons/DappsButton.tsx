@@ -8,7 +8,7 @@ import {
   useAnimatedValue,
 } from "react-native";
 import { useEventManager } from "../../context/EventManager";
-import { useUpgrades } from "../../context/Upgrades";
+import { useUpgrades } from "../../stores/useUpgradesStore";
 import {
   getTxIcon,
   getRandomInscriptionImage,

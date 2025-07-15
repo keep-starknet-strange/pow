@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
@@ -24,7 +24,7 @@ export const Sequencer: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
       <Confirmer
         progress={sequencingProgress}
-        image={getSequencerImage(automations[1][0] + 1)}
+        image={getSequencerImage((automations[1]?.[0] ?? -1) + 1)}
         getAnimation={getSequencingAnimation}
         onConfirm={sequenceBlock}
         renderedBy="sequencer"

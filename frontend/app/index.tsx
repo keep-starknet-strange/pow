@@ -4,7 +4,6 @@ import { EventManagerProvider } from "./context/EventManager";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
-import { UpgradesProvider } from "./context/Upgrades";
 import { TransactionsProvider } from "./context/Transactions";
 import { ChainsProvider } from "./context/Chains";
 import { StakingProvider } from "./context/Staking";
@@ -37,17 +36,15 @@ export default function App() {
       <StarknetConnectorProvider>
         <FocEngineProvider>
           <PowContractProvider>
-            <UpgradesProvider>
-              <ChainsProvider>
-                <StakingProvider>
-                  <GameProvider>
-                    <TransactionsProvider>
-                      <Game />
-                    </TransactionsProvider>
-                  </GameProvider>
-                </StakingProvider>
-              </ChainsProvider>
-            </UpgradesProvider>
+            <ChainsProvider>
+              <StakingProvider>
+                <GameProvider>
+                  <TransactionsProvider>
+                    <Game />
+                  </TransactionsProvider>
+                </GameProvider>
+              </StakingProvider>
+            </ChainsProvider>
           </PowContractProvider>
         </FocEngineProvider>
       </StarknetConnectorProvider>

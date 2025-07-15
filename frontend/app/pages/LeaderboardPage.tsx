@@ -17,7 +17,7 @@ import { PFPView } from "../components/PFPView";
 import prestigeJson from "../configs/prestige.json";
 import { useStarknetConnector } from "../context/StarknetConnector";
 import { useBalance } from "../stores/useBalanceStore";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useImages } from "../hooks/useImages";
 import { usePowContractConnector } from "../context/PowContractConnector";

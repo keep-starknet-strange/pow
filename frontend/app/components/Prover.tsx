@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
@@ -24,7 +24,7 @@ export const Prover: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
         progress={proverProgress}
-        image={getProverImage(automations[1][1] + 1)}
+        image={getProverImage((automations[1]?.[1] ?? -1) + 1)}
         getAnimation={getProvingAnimation}
         onConfirm={prove}
         renderedBy="prover"

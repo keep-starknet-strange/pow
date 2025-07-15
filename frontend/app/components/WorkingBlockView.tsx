@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGame } from "../context/Game";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";

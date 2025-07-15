@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
@@ -44,7 +44,7 @@ export const Miner: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
       <Confirmer
         progress={miningProgress}
-        image={getMinerImage(automations[0][0] + 1)}
+        image={getMinerImage((automations[0]?.[0] ?? -1) + 1)}
         getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
         renderedBy="miner"
