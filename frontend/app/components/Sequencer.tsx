@@ -2,12 +2,7 @@ import { View } from "react-native";
 import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
-
-import * as sequencerImages from "../configs/sequencers";
-export const getSequencerImage = (sequencerId: number) => {
-  const images = Object.values(sequencerImages);
-  return images[sequencerId] || images[0];
-};
+import { getAutomationIcon } from "../utils/upgrades";
 
 import * as SequencingAnimation from "../configs/sequencing";
 export const getSequencingAnimation = (progress: number) => {
@@ -21,10 +16,10 @@ export const Sequencer: React.FC = () => {
   const { sequencingProgress, sequenceBlock } = useGame();
 
   return (
-    <View className="flex flex-col bg-[#27272740] h-full aspect-square rounded-xl relative">
+    <View className="flex flex-col h-full aspect-square relative">
       <Confirmer
         progress={sequencingProgress}
-        image={getSequencerImage(automations[1][0] + 1)}
+        image={getAutomationIcon(1, "Sequencer", 0)}
         getAnimation={getSequencingAnimation}
         onConfirm={sequenceBlock}
         renderedBy="sequencer"

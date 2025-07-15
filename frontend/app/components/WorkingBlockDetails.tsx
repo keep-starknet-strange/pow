@@ -99,7 +99,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
         />
       </Canvas>
       <View
-        className="absolute flex flex-row pl-2 pt-1"
+        className="absolute flex flex-row pl-2 pt-2"
         style={{
           top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         }}
@@ -129,15 +129,15 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
           flexDirection: "row",
           position: "absolute",
           bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-          right: props.placement.width * 0.27,
+          left: props.placement.width * 0.49,
           paddingRight: 4,
-          paddingBottom: 5,
+          paddingBottom: 6,
         }}
       >
         <AnimatedRollingNumber
           value={workingBlock?.transactions.length || 0}
           textStyle={{
-            fontSize: isSmall ? 16 : 20,
+            fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
             fontFamily: "Pixels",
           }}
@@ -145,7 +145,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
         />
         <Text
           style={{
-            fontSize: isSmall ? 16 : 20,
+            fontSize: isSmall ? 16 : 18,
           }}
           className="text-[#c3c3c3] font-Pixels"
         >
@@ -157,9 +157,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
         style={{
           position: "absolute",
           bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-          right: 0,
+          left: props.placement.width * 0.81,
           paddingRight: 4,
-          paddingBottom: 5,
+          paddingBottom: 6,
         }}
       >
         <AnimatedRollingNumber
@@ -171,7 +171,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (props) =
           enableCompactNotation
           compactToFixed={1}
           textStyle={{
-            fontSize: isSmall ? 18 : 20,
+            fontSize: isSmall ? 18 : 18,
             color: "#fff2fdff",
             fontFamily: "Pixels",
           }}

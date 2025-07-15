@@ -22,6 +22,7 @@ export default function App() {
       await Font.loadAsync({
         Xerxes: require("../assets/fonts/Xerxes-10.ttf"),
         Pixels: require("../assets/fonts/04B_03_.ttf"),
+        Teatime: require("../assets/fonts/Teatime7.ttf"),
       });
       setFontLoaded(true);
     }

@@ -69,6 +69,7 @@ export const InAppNotification = () => {
         zIndex: 100,
         width: "100%",
         alignItems: "center",
+        pointerEvents: "box-none",
       }}
     >
       {activeNotification && (

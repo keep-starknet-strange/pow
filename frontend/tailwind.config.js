@@ -9,6 +9,7 @@ module.exports = {
         sans: ["Xerxes", "sans-serif"],
         Xerxes: ["Xerxes", "sans-serif"],
         Pixels: ["Pixels", "sans-serif"],
+        Teatime: ["Teatime", "sans-serif"],
       },
     },
   },

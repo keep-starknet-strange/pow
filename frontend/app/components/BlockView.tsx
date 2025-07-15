@@ -93,7 +93,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   return (
     <View className="w-full h-full flex flex-col items-center justify-center relative">
-      <View className="flex-1 bg-[#10111908] aspect-square relative">
+      <View className="flex-1 aspect-square relative">
         <View className="flex flex-wrap w-full aspect-square">
           <View
             className="absolute top-0 left-0 w-full h-full"
@@ -200,7 +200,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           </View>
         )}
         {props.completed && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-[#17171770] rounded-xl">
+          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center rounded-xl">
             <Text className="text-[#fff7ff] text-3xl font-bold font-Xerxes">
               Block {props.block?.blockId}
             </Text>

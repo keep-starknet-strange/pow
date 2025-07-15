@@ -50,6 +50,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     getDappSpeed,
     txFeeUpgrade,
     dappFeeUpgrade,
+    canUnlockTx,
   } = useTransactions();
   const enabled =
     props.txType.name === transactionConfig.L1[0].name &&
@@ -323,7 +324,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [speed, automationAnimHeight, addNewTransaction]);
 
   return (
-    <View className="relative">
+    <View className="relative flex flex-col gap-[2px] py-[2px]">
       <PopupAnimation
         popupStartTime={lastTxTime}
         popupValue={`${
@@ -375,31 +376,34 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
               />
             </Canvas>
           </View>
-          <View
-            className="absolute bottom-0 h-full"
-            style={{
-              width: width * 0.18,
-            }}
-          >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
-              <Rect
-                x={0}
-                y={automationAnimY}
-                width={width * 0.18}
-                height={automationAnimHeight}
-              >
-                <ImageShader
-                  image={getTxInner(props.chainId, props.txType.id, false)}
-                  fit="fill"
-                  sampling={{
-                    filter: FilterMode.Nearest,
-                    mipmap: MipmapMode.Nearest,
-                  }}
-                  rect={{ x: 0, y: 0, width: width * 0.18, height: 94 }}
-                />
-              </Rect>
-            </Canvas>
-          </View>
+          {feeLevel !== -1 && (
+            <View
+              className="absolute bottom-0 h-full"
+              style={{
+                width: width * 0.18,
+              }}
+            >
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <Rect
+                  x={0}
+                  y={automationAnimY}
+                  width={width * 0.18}
+                  height={automationAnimHeight}
+                >
+                  <ImageShader
+                    image={getTxInner(props.chainId, props.txType.id, false)}
+                    fit="fill"
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                    rect={{ x: 0, y: 0, width: width * 0.18, height: 94 }}
+                  />
+                </Rect>
+              </Canvas>
+            </View>
+          )}
+          {feeLevel !== -1 && (
           <View
             className="absolute left-[3px] h-[94px] w-full"
             style={{
@@ -420,55 +424,69 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
                 height={19}
               />
             </Canvas>
+            <Text className="absolute left-0 top-[4px] w-full text-center text-[16px] text-[#fff8ff] font-Pixels">
+              {props.txType.name}
+            </Text>
           </View>
-          <Text className="absolute left-[2px] top-[4px] w-full text-center text-[1rem] text-[#fff8ff] font-Pixels">
-            {props.txType.name}
-          </Text>
-          <View
-            className="absolute h-[94px]"
-            style={{
-              width: width * 0.18,
-            }}
-          >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
-              <SkiaImg
-                image={getTxIcon(props.chainId, props.txType.id, false)}
-                fit="contain"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-                x={0}
-                y={35}
-                width={width * 0.18}
-                height={40}
-              />
-            </Canvas>
-          </View>
-          {feeLevel === -1 && (
+          )}
+          {feeLevel === -1 ? (
             <View
-              className="absolute w-full h-full bg-[#292929d9]
-                     flex items-center justify-center
+              className="absolute w-full h-full
                      pointer-events-none
                      top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+              style={{
+                width: width * 0.18,
+              }}
             >
-              <Image
-                source={lockImg}
-                className="w-full h-full object-contain p-2 mb-3"
-              />
+              <Canvas style={{ flex: 1 }} className="w-full h-full flex justify-center items-center">
+                <SkiaImg
+                  image={getImage("shop.lock")}
+                  fit="contain"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={30}
+                  width={width * 0.18}
+                  height={40}
+                />
+              </Canvas>
+            </View>
+          ) : (
+            <View
+              className="absolute h-[94px]"
+              style={{
+                width: width * 0.18,
+              }}
+            >
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <SkiaImg
+                  image={getTxIcon(props.chainId, props.txType.id, false)}
+                  fit="contain"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={30}
+                  width={width * 0.18}
+                  height={40}
+                />
+              </Canvas>
             </View>
           )}
         </TouchableOpacity>
       </Animated.View>
       <View
-        className="absolute bottom-[-22px] left-0 h-[20px]"
+        className="h-[20px]"
         style={{
           width: width * 0.18,
         }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <SkiaImg
-            image={getImage("tx.plaque")}
+            image={getImage(feeLevel === -1 ? "tx.plaque.minus" : "tx.plaque.plus")}
             fit="fill"
             sampling={{
               filter: FilterMode.Nearest,
@@ -481,12 +499,27 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
           />
         </Canvas>
       </View>
-      <View className="absolute bottom-[-22px] left-0 w-full h-[20px] justify-center">
-        <Text className="text-[1rem] text-[#fff8ff] font-Pixels text-right pr-1">
-          {feeLevel === -1 ? "-" : "+"}
-          {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
-        </Text>
-      </View>
+      {canUnlockTx(props.chainId, props.txType.id, props.isDapp) && (
+        <View className="absolute bottom-[0px] left-0 w-full h-[20px] justify-end flex flex-row">
+          <Text className="text-[14px] text-[#fff8ff] font-Pixels text-right mt-[1px]">
+            {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
+          </Text>
+          <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+            <SkiaImg
+              image={getImage("shop.btc")}
+              fit="contain"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={1}
+              width={13}
+              height={13}
+            />
+          </Canvas>
+        </View>
+      )}
     </View>
   );
 };

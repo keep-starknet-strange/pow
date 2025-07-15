@@ -1,25 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import { useTransactions } from "../../context/Transactions";
 import { useGame } from "../../context/Game";
 import { UnlockView } from "./UnlockView";
-import l2Icon from "../../../assets/images/transaction/l2Batch.png";
-import { shortMoneyString } from "../../utils/helpers";
 
 export type L2UnlockProps = {
   alwaysShow?: boolean;
-  miniView?: boolean;
 };
 
-export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
+export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { transactionFees, dappFees } = useTransactions();
-  const { l2, getL2Cost, initL2 } = useGame();
+  const { canUnlockL2, l2, getL2Cost, initL2 } = useGame();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
+    if (alwaysShow) {
+      setShowUnlock(true);
+      return;
+    }
+
     if (l2) {
       setShowUnlock(false);
       return;
     }
+
+    if (!canUnlockL2) {
+      setShowUnlock(false);
+      return;
+    }
+
     // Ensure all L1 transactions unlocked
     const txLevels = transactionFees[0];
     if (!txLevels) {
@@ -46,43 +54,27 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow, miniView }) => {
       }
     }
     setShowUnlock(true);
-  }, [l2, transactionFees, dappFees]);
+  }, [
+    alwaysShow,
+    canUnlockL2,
+    l2,
+    transactionFees,
+    dappFees,
+  ]);
 
   return (
     <View>
-      {(alwaysShow || showUnlock) &&
-        (miniView ? (
-          <View
-            className="flex flex-col items-center justify-center w-full
-                       mt-6"
-          >
-            <TouchableOpacity
-              className="flex flex-col items-center justify-center bg-[#60606080] rounded-lg px-8 pb-2
-                         border-2 border-[#f7f760c0] border-t-2 border-l-2"
-              onPress={() => {
-                initL2();
-              }}
-            >
-              <Text className="text-sm text-[#f7f760c0] text-center font-bold">
-                Scale with L2
-              </Text>
-              <Text className="text-sm text-[#f7f760c0] text-center">
-                {shortMoneyString(getL2Cost())}
-              </Text>
-              <View className="w-3 h-3 ml-1 rotate-45 border-[#f7f760c0] border-r-2 border-b-2" />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <UnlockView
-            icon={l2Icon}
-            name="L2"
-            description="Scale your chain with Layer 2"
-            cost={getL2Cost()}
-            onPress={() => {
-              initL2();
-            }}
-          />
-        ))}
+      {showUnlock && (
+        <UnlockView
+          icon={"logo.starknet"}
+          label="Unlock L2"
+          description="New phase of scaling!"
+          cost={getL2Cost()}
+          onPress={() => {
+            initL2();
+          }}
+        />
+      )}
     </View>
   );
 };

@@ -27,11 +27,9 @@ const Tab = createBottomTabNavigator();
 function StoreTabButton({
   isActive,
   onPress,
-  tabsAdded,
 }: {
   isActive: boolean;
   onPress: any;
-  tabsAdded: boolean;
 }) {
   const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
 
@@ -41,7 +39,6 @@ function StoreTabButton({
         tabName="Store"
         isActive={isActive}
         onPress={onPress}
-        tabsAdded={tabsAdded}
       />
     </View>
   );
@@ -51,13 +48,12 @@ function TabBarButton({
   tabName,
   isActive,
   onPress,
-  tabsAdded,
 }: {
   tabName: string;
   isActive: boolean;
   onPress: any;
-  tabsAdded: boolean;
 }) {
+  const { stakingUnlocked } = useStaking();
   const { getImage } = useImages();
   const buttonRef = useRef<View>(null);
   const [buttonSize, setButtonSize] = useState({ width: 0, height: 0 });
@@ -69,6 +65,10 @@ function TabBarButton({
           return selected
             ? getImage("nav.icon.game.active")
             : getImage("nav.icon.game");
+        case "Staking":
+          return selected
+            ? getImage("nav.icon.staking.active")
+            : getImage("nav.icon.staking");
         case "Store":
           return selected
             ? getImage("nav.icon.shop.active")
@@ -94,18 +94,13 @@ function TabBarButton({
 
   useLayoutEffect(() => {
     buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
-      setButtonSize({ width: width - 4, height: height - 4 });
+      setButtonSize({ width: width, height: height });
     });
-  }, [buttonRef, setButtonSize, tabsAdded]);
+  }, [buttonRef, setButtonSize, stakingUnlocked]);
 
   return (
     <TouchableOpacity
-      style={{
-        width: "100%",
-        aspectRatio: "1 / 1",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      className="h-full justify-center items-center mx-[1px]"
       ref={buttonRef}
       onPress={onPress}
     >
@@ -133,8 +128,8 @@ function TabBarButton({
       </Canvas>
       <Canvas
         style={{
-          width: buttonSize.width * 0.7,
-          height: buttonSize.height * 0.7,
+          width: buttonSize.width * 0.8,
+          height: buttonSize.width * 0.8,
         }}
       >
         <Image
@@ -142,8 +137,8 @@ function TabBarButton({
           fit="contain"
           x={0}
           y={0}
-          width={buttonSize.width * 0.7}
-          height={buttonSize.height * 0.7}
+          width={buttonSize.width * 0.8}
+          height={buttonSize.width * 0.8}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -172,10 +167,10 @@ export function TabNavigator() {
         tabBarStyle: {
           backgroundColor: "#101119ff",
           height: 96 + insets.bottom,
-          paddingTop: 8,
+          paddingTop: 6,
           borderTopWidth: 0,
           zIndex: 20,
-          paddingHorizontal: 16,
+          paddingHorizontal: 10,
         },
         tabBarShowLabel: false,
       }}
@@ -189,7 +184,6 @@ export function TabNavigator() {
               tabName="Main"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -208,7 +202,6 @@ export function TabNavigator() {
                 tabName="Staking"
                 isActive={props["aria-selected"] || false}
                 onPress={props.onPress}
-                tabsAdded={stakingUnlocked}
               />
             ),
           }}
@@ -226,7 +219,6 @@ export function TabNavigator() {
             <StoreTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -244,7 +236,6 @@ export function TabNavigator() {
               tabName="Leaderboard"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -262,7 +253,6 @@ export function TabNavigator() {
               tabName="Achievements"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}
@@ -280,7 +270,6 @@ export function TabNavigator() {
               tabName="Settings"
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
-              tabsAdded={stakingUnlocked}
             />
           ),
         }}

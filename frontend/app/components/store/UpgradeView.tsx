@@ -28,6 +28,10 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
         return "shop.upgrades.blockSize";
       case "MEV Boost":
         return "shop.upgrades.mevBoost";
+      case "Recursive Proving":
+        return "shop.upgrades.recursiveProving";
+      case "DA compression":
+        return "shop.upgrades.daCompression";
       default:
         return "unknown";
     }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import background from "../../assets/background.png";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
@@ -8,6 +8,7 @@ import HelpSection from "./settings/Help";
 import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
 import MainBackground from "../components/MainBackground";
+import BasicButton from "../components/buttons/Basic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabs = {
@@ -31,10 +32,11 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
   const isInLoginMode = setLoginPage !== null;
 
   return (
-    <View className="flex-1 relative">
+    <View className="flex-1 relative w-full h-full">
       <MainBackground />
-      <ScrollView
-        contentContainerStyle={{
+      <View
+        className="w-full h-full flex-1 items-center justify-center"
+        style={{
           paddingTop: isInLoginMode ? insets.top + 32 : 32,
           paddingBottom: isInLoginMode ? insets.bottom + 32 : 32,
           paddingHorizontal: 32,
@@ -48,16 +50,15 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
           }}
         />
         {activeTab !== "Main" && (
-          <TouchableOpacity
-            onPress={() => {
-              setActiveTab("Main");
-            }}
-            className="bg-[#f0a030] p-4 rounded-xl border-2 border-[#ffffff80] flex flex-row justify-center items-center"
-          >
-            <Text className="text-4xl">Back to Settings ⚙️</Text>
-          </TouchableOpacity>
+          <Animated.View entering={FadeInDown} >
+          <BasicButton
+            label="Back"
+            onPress={() => setActiveTab("Main")}
+            style={{ marginTop: 32 }}
+          />
+          </Animated.View>
         )}
-      </ScrollView>
+      </View>
     </View>
   );
 };

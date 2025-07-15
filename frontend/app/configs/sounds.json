@@ -49,6 +49,11 @@
     "rate": 1,
     "haptic": "Error"
   },
+  "InvalidPurchase": {
+    "volume": 1,
+    "rate": 1,
+    "haptic": "Error"
+  },
   "TxAdded": {
     "volume": 1,
     "rate": 1,
@@ -62,7 +67,7 @@
   "BasicClick": {
     "volume": 0.5,
     "rate": 1,
-    "haptic": "None"
+    "haptic": "Soft"
   },
   "SwitchPage": {
     "volume": 0.5,

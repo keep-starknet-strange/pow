@@ -18,6 +18,7 @@ import Animated, {
   FadeInRight,
   FadeInDown,
 } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import { PFPView } from "../components/PFPView";
 import prestigeJson from "../configs/prestige.json";
 import { useStarknetConnector } from "../context/StarknetConnector";
@@ -120,6 +121,19 @@ export const LeaderboardPage: React.FC = () => {
       prestige: 0,
       balance: 200,
     },
+    {
+      id: 6,
+      name: "Another User With Long Name",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 1,
+        body: 1,
+        glasses: 1,
+        accessories: 1,
+      },
+      prestige: 2,
+      balance: 5_000,
+    },
   ];
   const [leaderboard, setLeaderboard] = useState(leaderboardMock);
   useEffect(() => {
@@ -176,12 +190,12 @@ export const LeaderboardPage: React.FC = () => {
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={getImage("background.shop")}
+            image={getImage("achievements.bg")}
             fit="fill"
             x={0}
-            y={-62}
+            y={-26}
             width={width}
-            height={height}
+            height={650}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -244,12 +258,11 @@ export const LeaderboardPage: React.FC = () => {
               entering={FadeInLeft}
             >
               <View
-                className="w-[4rem] aspect-square mr-2 rounded-xl overflow-hidden bg-[#11111160]
-                              border-2 border-[#e7e7e740] shadow-lg shadow-black/20"
+                className="w-[60px] aspect-square mr-2 relative p-[2px]"
               >
                 <PFPView user={user.address} attributes={user.nouns} />
               </View>
-              <Text className="text-2xl text-white font-Pixels">
+              <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
                 {user.name}
               </Text>
             </Animated.View>
@@ -261,7 +274,7 @@ export const LeaderboardPage: React.FC = () => {
                 <Canvas style={{ flex: 1 }} className="w-full h-full">
                   <Image
                     image={getImage(getPrestigeIcon(user.prestige))}
-                    fit="fill"
+                    fit="contain"
                     x={0}
                     y={0}
                     width={36}
@@ -280,21 +293,49 @@ export const LeaderboardPage: React.FC = () => {
             >
               {shortMoneyString(user.balance)}
             </Animated.Text>
+            <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+              <Image
+                image={getImage("shop.btc")}
+                fit="contain"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                x={0}
+                y={0}
+                width={13}
+                height={13}
+              />
+            </Canvas>
           </View>
         ))}
-        <View className="h-[40px]" />
       </ScrollView>
+      <LinearGradient
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 200,
+          marginLeft: 8,
+          marginRight: 8,
+          marginBottom: 8,
+          pointerEvents: "none",
+        }}
+        colors={["transparent", "#000000c0"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
       {user && (
         <Animated.View
-          className={`flex flex-row justify-between items-center px-4 py-2 bg-[#101119] z-10
-            border-t-[5px] border-[#1b1c26] shadow-lg shadow-black/20 mx-[4px]
+          className={`flex flex-row justify-between items-center px-4 py-2 z-10
+            border-t-[5px] border-[#1b1c26] mx-[4px] bg-[#101119]
             `}
           entering={FadeInDown}
         >
           <View className="flex flex-row items-center flex-1">
             <View
-              className="w-[4rem] aspect-square mr-2 rounded-xl overflow-hidden bg-[#11111160]
-                           border-2 border-[#e7e7e740] shadow-lg shadow-black/20"
+              className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]"
             >
               <PFPView
                 user={user?.account_address}
@@ -310,7 +351,7 @@ export const LeaderboardPage: React.FC = () => {
                 }
               />
             </View>
-            <Text className="text-2xl font-bold text-white font-Pixels">
+            <Text className="text-[28px] font-bold text-white font-Teatime truncate">
               {user?.account.username}
             </Text>
           </View>
@@ -335,6 +376,20 @@ export const LeaderboardPage: React.FC = () => {
           <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
             {shortMoneyString(balance)}
           </Text>
+          <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+            <Image
+              image={getImage("shop.btc")}
+              fit="contain"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={0}
+              width={13}
+              height={13}
+            />
+          </Canvas>
         </Animated.View>
       )}
     </View>

@@ -1,10 +1,17 @@
 import React from "react";
-import { Image, SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View, BackHandler } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import BasicButton from "../../components/buttons/Basic";
 import logo from "../../../assets/logo/pow.png";
 import starknetLogo from "../../../assets/logo/starknet.png";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
+import { useImages } from "../../hooks/useImages";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 
@@ -15,6 +22,7 @@ type LoginMainPageProps = {
 export const LoginMainPage: React.FC<LoginMainPageProps> = ({
   setLoginPage,
 }) => {
+  const { getImage } = useImages();
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
   const { createGameAccount } = usePowContractConnector();
   const insets = useSafeAreaInsets();
@@ -26,29 +34,53 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
-      className="flex-1 items-center justify-between"
+      className="flex-1 items-center justify-around relative"
     >
       <Animated.View
         entering={FadeInUp}
-        className="flex items-center justify-center"
+        className="relative mt-[80px]"
+        style={{ width: 322, height: 214 }}
       >
-        <Image
-          source={logo}
-          style={{ width: 300, height: 300, marginTop: 100 }}
-          resizeMode="contain"
-        />
-        <Text
-          className="text-[#101119] text-2xl font-Xerxes text-center"
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage("logo")}
+            fit="contain"
+            x={0}
+            y={0}
+            width={322}
+            height={214}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+        </Canvas>
+        <View
+          className="absolute bottom-[-10px] right-[30px]"
+          style={{ width: 182, height: 18 }}
         >
-          Click. Build. Mine.
-        </Text>
+          <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Image
+              image={getImage("logo.sub")}
+              fit="contain"
+              x={0}
+              y={0}
+              width={182}
+              height={18}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+            />
+          </Canvas>
+        </View>
       </Animated.View>
       <Animated.View
         entering={FadeInDown}
-        className="flex-1 items-center justify-center gap-2"
+        className="items-center justify-center gap-3"
       >
         <BasicButton
-          label="Play!"
+          label="PLAY!"
           onPress={async () => {
             const keys = await getAvailableKeys("pow_game");
             if (keys.length > 0) {
@@ -58,33 +90,29 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
             }
             setLoginPage("accountCreation");
           }}
-          style={{ width: 250 }}
         />
         <BasicButton
-          label="Settings"
+          label="SETTINGS"
           onPress={async () => {
             setLoginPage("settings");
           }}
-          style={{ width: 250 }}
         />
-        <View className="flex flex-row items-center justify-between gap-2">
-          <Text className="text-[#101119] text-lg font-Pixels">
-            Powered by Starknet
-          </Text>
-          <Image
-            source={starknetLogo}
-            style={{ width: 30, height: 30 }}
-            resizeMode="contain"
-          />
-        </View>
+        <BasicButton
+          label="CLOSE"
+          onPress={() => {
+            BackHandler.exitApp();
+          }}
+        />
       </Animated.View>
-      <Animated.View
-        entering={FadeInDown}
-        className="flex flex-row items-center justify-between w-full px-10 py-2"
-      >
-        <Text className="text-[#101119] font-Pixels">Version {version}</Text>
-        <Text className="text-[#101119] font-Pixels">We are open source!</Text>
-      </Animated.View>
+      <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">
+        <Animated.View
+          entering={FadeInDown}
+          className="flex flex-row items-center justify-between w-full"
+        >
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">version {version}</Text>
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">We're open source!</Text>
+        </Animated.View>
+      </View>
     </View>
   );
 };

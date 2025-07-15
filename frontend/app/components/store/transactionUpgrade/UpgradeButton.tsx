@@ -17,8 +17,12 @@ import Animated, {
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 
 type UpgradeButtonProps = {
-  icon?: any;
+  icon?: string;
   label: string;
+  specialLabel?: {
+    text: string;
+    color: string;
+  };
   level: number;
   maxLevel: number;
   nextCost: number;
@@ -28,6 +32,7 @@ type UpgradeButtonProps = {
 
 export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   icon,
+  specialLabel,
   label,
   level,
   maxLevel,
@@ -69,15 +74,41 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
           }}
         />
       </Canvas>
-      <Animated.Text className="absolute left-[8px] top-[6px] font-Pixels text-xl text-[#fff7ff]" entering={FadeInRight} >
-        {label}
-      </Animated.Text>
+      <Animated.View className="absolute left-[8px] top-[6px] flex flex-row items-center gap-[4px]" entering={FadeInRight}>
+        {icon && (
+          <Canvas style={{ width: 18, height: 18 }} >
+            <Image
+              image={getImage(icon)}
+              fit="contain"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={0}
+              width={18}
+              height={18}
+            />
+          </Canvas>
+        )}
+        <Text className="font-Pixels text-xl text-[#fff7ff]">
+          {label}
+        </Text>
+        {specialLabel && (
+          <Text
+            className="font-Pixels text-xl"
+            style={{ color: specialLabel.color }}
+          >
+            {specialLabel.text}
+          </Text>
+        )}
+      </Animated.View>
       {level === maxLevel ? (
         <Animated.Text className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]" entering={FadeInLeft} >
           Max
         </Animated.Text>
       ) : (
-        <Animated.View className="absolute right-[8px] top-[6px] flex-row items-center gap-1" entering={FadeInLeft}>
+        <Animated.View className="absolute right-[8px] top-[6px] flex-row items-center" entering={FadeInLeft}>
           <Text className="font-Pixels text-xl text-[#fff7ff]">
             Cost:&nbsp;
           </Text>
@@ -94,6 +125,20 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
             animRange={[0, -30]}
             color={balance < nextCost ? "#CA1F4B" : "#F0E130"}
           />
+          <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+            <Image
+              image={getImage("shop.btc")}
+              fit="contain"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={0}
+              width={13}
+              height={13}
+            />
+          </Canvas>
         </Animated.View>
       )}
     </TouchableOpacity>

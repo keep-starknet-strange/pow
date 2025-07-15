@@ -1,43 +1,67 @@
 import { View, Text } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const CreditsSection = () => {
   const creditedPeople = [
-    { name: "Brandon Roberts", role: "Design & Development" },
-    { name: "Zack Williams", role: "Design & Development" },
-    { name: "Estevan", role: "Team Lead" },
+    { name: "ESTEVAN", role: "Team Lead" },
+    { name: "BRANDON", role: "Design & Development" },
+    { name: "ZACK", role: "Design & Development" },
+    { name: "ALEX", role: "Development" },
+    { name: "MICHAEL", role: "Development" },
+    { name: "MORAN", role: "Design" },
+    { name: "JON", role: "Art & Design" },
   ];
   const specialThanks = [
-    { name: "Satoshi Nakamoto", reason: "Creating a new era" },
-    { name: "Vitalik Buterin", reason: "Innovating the blockchain space" },
+    { name: "SATOSHI NAKAMOTO", reason: "Creating a new era" },
+    { name: "VITALIK BUTERIN", reason: "Creating the World Computer" },
+    { name: "ELI BEN-SASSON", reason: "Creating STARK tech" },
   ];
   return (
-    <View className="">
-      <Text className="text-white text-4xl font-bold mt-4">Credits</Text>
+    <Animated.View entering={FadeInUp}>
+      <Text className="text-[#101119] text-[40px] font-Xerxes text-right">Credits</Text>
       <View className="mt-2">
-        <Text className="text-white text-lg font-bold">
-          This app was created by StarkWare's Exploration Apps team.
+        <Text className="text-[#101119] text-[22px] font-Teatime mb-6">
+          created by StarkWare Exploration
         </Text>
         {creditedPeople.map((person, index) => (
-          <Text
+          <View
             key={index}
-            className="text-white text-md w-full text-center mt-2"
+            className="flex-row items-center justify-between mb-2"
           >
-            {person.name} - {person.role}
-          </Text>
+            <Text
+              className="text-[#101119] text-[24px] font-Teatime w-1/3"
+            >
+              {person.name}
+            </Text>
+            <Text
+              className="text-[#101119] text-[16px] font-Pixels flex-1 text-left"
+            >
+              {person.role}
+            </Text>
+          </View>
         ))}
-        <Text className="text-white text-lg font-bold mt-4">
-          Special thanks to:
+        <Text className="text-[#101119] text-[20px] font-Xerxes mt-6 mb-4 text-right">
+          Special thanks
         </Text>
         {specialThanks.map((thanks, index) => (
-          <Text
+          <View
             key={index}
-            className="text-white text-md w-full text-center mt-2"
+            className="mb-4"
           >
-            {thanks.name} - {thanks.reason}
-          </Text>
+            <Text
+              className="text-[#101119] text-[24px] font-Teatime"
+            >
+              {thanks.name}
+            </Text>
+            <Text
+              className="text-[#101119] text-[16px] font-Pixels ml-4"
+            >
+              {thanks.reason}
+            </Text>
+          </View>
         ))}
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

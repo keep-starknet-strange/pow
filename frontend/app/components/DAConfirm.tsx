@@ -24,7 +24,7 @@ export const DAConfirm: React.FC = () => {
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
         progress={daProgress}
-        image={getDaIcon(automations[1][2] + 1)}
+        text={"Click to store!"}
         getAnimation={getDaAnimation}
         onConfirm={daConfirm}
         renderedBy="da"

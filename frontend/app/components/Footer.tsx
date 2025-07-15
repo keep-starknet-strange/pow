@@ -51,7 +51,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
   return (
     <View
       style={{ paddingBottom: insets.bottom }}
-      className="bg-[#101119ff] flex flex-row justify-center w-full pb-[1.5rem] pt-[0.5rem]
+      className="bg-[#101119ff] flex flex-row justify-center w-full
                      absolute bottom-0 items-center z-[20] gap-2
     "
     >

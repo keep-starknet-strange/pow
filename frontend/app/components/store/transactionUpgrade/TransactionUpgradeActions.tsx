@@ -45,7 +45,8 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
   );
   return locked ? (
     <UpgradeButton
-      label={`Unlock Transaction`}
+      icon={"shop.btc"}
+      label={`Unlock New Tx`}
       level={0}
       maxLevel={1}
       nextCost={nextCost}
@@ -57,6 +58,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
       {feeProps && (
         <View ref={feeRef} onLayout={onLayoutFee} className="">
           <UpgradeButton
+            icon={"shop.btc"}
             label={`Upgrade Value`}
             level={feeProps.level}
             maxLevel={feeProps.maxLevel}
@@ -69,6 +71,7 @@ export const TransactionUpgradeActions: React.FC<ActionsProps> = ({
       {speedProps && (
         <View ref={speedRef} onLayout={onLayoutSpeed} className="">
           <UpgradeButton
+            icon={"shop.clock"}
             label={`Upgrade Speed`}
             level={speedProps.level}
             maxLevel={speedProps.maxLevel}

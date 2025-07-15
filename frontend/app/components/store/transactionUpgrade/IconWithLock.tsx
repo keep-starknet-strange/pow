@@ -5,6 +5,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import Animated, { FadeOut } from "react-native-reanimated";
 import { useImages } from "../../../hooks/useImages";
 
 type IconWithLockProps = {
@@ -51,9 +52,10 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
         </Canvas>
       </View>
       {locked && (
-        <View
+        <Animated.View
           className="absolute top-0 left-0 w-full h-full
                          bg-[#10111970] rounded-sm"
+          exiting={FadeOut}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
@@ -69,7 +71,7 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
               }}
             />
           </Canvas>
-        </View>
+        </Animated.View>
       )}
     </View>
   );

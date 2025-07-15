@@ -42,16 +42,16 @@ export const AchievementsPage: React.FC = () => {
   }, []);
 
   return (
-    <View className="flex-1 relative">
+    <View className="flex-1 relative bg-[#101119]">
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage("achievements.bg")}
             fit="fill"
             x={0}
-            y={-62}
+            y={-55}
             width={width}
-            height={height}
+            height={650}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -81,6 +81,7 @@ export const AchievementsPage: React.FC = () => {
           ACHIEVEMENTS
         </Animated.Text>
       </View>
+      <View style={{ height: 558 }} >
       <ScrollView
         className="flex-1 relative"
         showsVerticalScrollIndicator={false}
@@ -171,7 +172,7 @@ export const AchievementsPage: React.FC = () => {
                     <Canvas style={{ flex: 1 }} className="w-full h-full">
                       <Image
                         image={getImage(achievement.image)}
-                        fit="fill"
+                        fit="contain"
                         x={0}
                         y={0}
                         width={50}
@@ -188,7 +189,6 @@ export const AchievementsPage: React.FC = () => {
             </ScrollView>
           </View>
         ))}
-        <View className="h-[40px]" />
         <LinearGradient
           style={{
             position: "absolute",
@@ -204,6 +204,7 @@ export const AchievementsPage: React.FC = () => {
           end={{ x: 1, y: 0 }}
         />
       </ScrollView>
+      </View>
     </View>
   );
 };

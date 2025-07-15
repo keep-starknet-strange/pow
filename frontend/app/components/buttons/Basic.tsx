@@ -1,5 +1,22 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { View, TouchableWithoutFeedback, Text } from "react-native";
+import { useEventManager } from "../../context/EventManager";
+import { useImages } from "../../hooks/useImages";
+import {
+  Canvas,
+  Image,
+  ImageShader,
+  Rect,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSequence,
+  Easing,
+} from "react-native-reanimated";
 
 type BasicButtonProps = {
   label: string;
@@ -18,44 +35,74 @@ const BasicButton: React.FC<BasicButtonProps> = ({
   icon,
   disabled = false,
 }) => {
+  const { getImage } = useImages();
+  const { notify } = useEventManager();
+
+  const shakeAnim = useSharedValue(8);
+  const shakeAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: withSequence(
+          withTiming(Math.abs(shakeAnim.value), {
+            duration: 100,
+            easing: Easing.linear,
+          }),
+          withTiming(0, {
+            duration: 50,
+            easing: Easing.linear,
+          }),
+        ),
+      },
+    ],
+  }));
+
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={disabled}
-      className={`
-        rounded-full items-center justify-around flex-row p-2
-        border-4 border-[#101119] shadow-lg shadow-[#3093e1]
-        ${disabled ? "border-gray-400 shadow-gray-400" : "border-[#101119] shadow-[#101119]"}
-      `}
-      style={{
-        ...style,
-      }}
-    >
-      <Text
-        className={`
-          font-Xerxes text-4xl
-          ${disabled ? "text-gray-400" : "text-[#101119]"}
-        `}
-        style={{
-          ...textStyle,
+    <Animated.View style={[shakeAnimStyle]}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          notify("BasicClick");
+          onPress?.();
+          shakeAnim.value *= -1; // Toggle the shake direction
         }}
+        disabled={disabled}
       >
-        {label}
-      </Text>
-      {icon && (
+        <View
+          className="relative"
+          style={{
+            width: 254,
+            height: 46,
+            ...style,
+          }}
+        >
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage("button.basic")}
+            fit="fill"
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+            x={0}
+            y={0}
+            width={254}
+            height={46}
+          />
+        </Canvas>
         <Text
           className={`
-            font-bold text-4xl
-            ${disabled ? "text-gray-400" : "text-[#101119]"}
+            absolute top-[6px] left-0 w-full h-full
+            font-Teatime text-[36px] text-center
+            ${disabled ? "text-gray-400" : "text-[#fff7ff]"}
           `}
           style={{
             ...textStyle,
           }}
         >
-          {icon}
+          {label}
         </Text>
-      )}
-    </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
+    </Animated.View>
   );
 };
 

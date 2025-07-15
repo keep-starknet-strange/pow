@@ -20,6 +20,14 @@ export class InAppNotificationsObserver implements Observer {
         this.sendNotification(typeId);
         break;
       }
+      case "InvalidPurchase": {
+        const typeId =
+          inAppNotificationsJson.find(
+            (notification) => notification.eventType === "InvalidPurchase",
+          )?.id || 0;
+        this.sendNotification(typeId);
+        break;
+      }
       default:
         break;
     }

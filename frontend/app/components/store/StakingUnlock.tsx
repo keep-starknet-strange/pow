@@ -1,27 +1,33 @@
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useStaking } from "../../context/Staking";
 import { UnlockView } from "./UnlockView";
 import stakingConfig from "../../configs/staking.json";
-import dappsIcon from "../../../assets/images/transaction/dapp.png";
 
 export const StakingUnlock = () => {
-  const { unlockStaking, stakingPools } = useStaking();
-  const nextIdx = stakingPools.length;
-  const nextCfg = stakingConfig[nextIdx];
-
-  if (!nextCfg) return null;
-
-  const { name, icon, unlockCosts } = nextCfg;
+  const { canUnlockStaking, unlockStaking, stakingUnlocked } = useStaking();
+  const [showUnlock, setShowUnlock] = useState(false);
+  useEffect(() => {
+    if (stakingUnlocked) {
+      setShowUnlock(false);
+      return;
+    }
+    if (!canUnlockStaking()) {
+      setShowUnlock(false);
+      return;
+    }
+    setShowUnlock(true);
+  }, [canUnlockStaking, stakingUnlocked]);
 
   return (
     <View>
-      {nextCfg && (
+      {showUnlock && (
         <UnlockView
-          icon={dappsIcon}
-          name={"Staking on " + name}
+          icon={"nav.icon.staking.active"}
+          label={"Unlock Staking"}
           description="Earn yield with POS!"
-          cost={unlockCosts[0]}
-          onPress={() => unlockStaking(nextIdx)}
+          cost={stakingConfig[0].unlockCosts[0]}
+          onPress={() => unlockStaking(0)}
         />
       )}
     </View>

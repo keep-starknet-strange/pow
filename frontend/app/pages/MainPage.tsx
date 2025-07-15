@@ -1,56 +1,38 @@
 import React, { useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import { useGame } from "../context/Game";
-import { useImages } from "../hooks/useImages";
 import { L1Phase } from "./main/L1Phase";
 import { L2Phase } from "./main/L2Phase";
-import {
-  Canvas,
-  Image,
-  FilterMode,
-  MipmapMode,
-} from "@shopify/react-native-skia";
 import { MainBackground } from "../components/MainBackground";
+import { L1L2Switch } from "../components/L1L2Switch";
 
 export const MainPage: React.FC = () => {
   const { l2 } = useGame();
-  const { getImage } = useImages();
 
-  const [currentView, setCurrentView] = React.useState(l2 ? "L2" : "L1");
+  const [currentView, setCurrentView] = React.useState<"L1" | "L2">(l2 ? "L2" : "L1");
+  const [l2HasInitialized, setL2HasInitialized] = React.useState(l2 ? true : false);
   useEffect(() => {
-    setCurrentView(l2 ? "L2" : "L1");
+    if (l2 && !l2HasInitialized) {
+      setCurrentView("L2");
+      setL2HasInitialized(true);
+    }
   }, [l2]);
 
   return (
     <View className="flex-1 relative">
       <MainBackground />
       {l2 && (
-        <TouchableOpacity
-          onPress={() => {
-            setCurrentView((prev) => (prev === "L1" ? "L2" : "L1"));
-          }}
-          className="absolute right-1 top-1 z-[10] w-[36px] h-[36px]"
-        >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <Image
-              image={getImage("tx.icon.tx")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={36}
-              height={36}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-        </TouchableOpacity>
+        <L1L2Switch
+          currentView={currentView}
+          setCurrentView={(view: "L1" | "L2") =>
+            setCurrentView(view)
+          }
+        />
       )}
-      {l2 && currentView === "L2" ? (
-        <L2Phase setCurrentView={setCurrentView} />
+      {currentView === "L2" ? (
+        <L2Phase />
       ) : (
-        <L1Phase setCurrentView={setCurrentView} />
+        <L1Phase />
       )}
     </View>
   );
