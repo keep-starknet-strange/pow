@@ -41,7 +41,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "pow",
+          "organization": "starkware-industries"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
