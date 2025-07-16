@@ -19,6 +19,9 @@ jobs:
                 cache: npm
                 cache-dependency-path: "./frontend/package.json"
 
+            - name: Install dependencies
+              run: npm ci
+              
             - name: Prebuild app
               working-directory: ./frontend
               run: npx expo prebuild
