@@ -54,7 +54,7 @@
       ],
       "expo-web-browser",
       "expo-audio",
-      "./plugins/signing-release"
+      "./plugins/signing-release.ts"
     ],
     "experiments": {
       "typedRoutes": true
