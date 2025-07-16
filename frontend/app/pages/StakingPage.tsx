@@ -1,10 +1,16 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
+import { Dimensions } from "react-native";
+import { BackGround } from "../components/staking/BackGround";
+import { PageHeader } from "../components/staking/PageHeader";
+import { SectionTitle } from "../components/staking/SectionTitle";
+import { StatsDisplay } from "../components/staking/StatsDisplay";
+import { StakingAction } from "../components/staking/StakingAction";
+import { AmountField } from "../components/staking/AmountField";
 import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { Dimensions } from "react-native";
 
 // You may need to define width, height, and getImage if not already imported:
 const { width, height } = Dimensions.get("window");
@@ -23,16 +29,14 @@ export const StakingPage: React.FC = () => {
     claimStakingRewards,
     withdrawStakedTokens,
   } = useStakingStore();
-  const { tryBuy, updateBalance } = useBalanceStore();
+  const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeInput, setStakeInput] = useState("0");
   const { getImage } = useImages();
 
+
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
-    const id = setInterval(
-      () => setNow(Math.floor(Date.now() / 1000)),
-      SECOND
-    );
+    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
     return () => clearInterval(id);
   }, []);
 
@@ -45,15 +49,14 @@ export const StakingPage: React.FC = () => {
   const seconds = rem % 60;
 
   // APR % = seconds-per-year / reward_rate * 100
-  const apr = ((31 / config.reward_rate)).toFixed(1);
+  const apr = (31 / config.reward_rate).toFixed(1);
 
   const onPressClaim = () => {
     const rewards = claimStakingRewards();
     if (rewards > 0) {
       updateBalance(rewards);
     }
-  }
-
+  };
 
   const onPressStake = () => {
     if (tryBuy(Number(stakeInput))) {
@@ -65,249 +68,137 @@ export const StakingPage: React.FC = () => {
     setStakeInput((stakingIncrement * i).toString());
   };
 
-  return (
-    <View className="flex-1 relative">
-      <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("background.staking")}
-            fit="fill"
-            x={0}
-            y={-62}
-            width={width}
-            height={height}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
-      </View>
+  const onPressWithdraw = () => {
+    const withdrawn = withdrawStakedTokens();
+    if (withdrawn > 0) {
+      updateBalance(withdrawn);
+    }
+  };
 
-          {/* Title */}
-      <View className="w-full relative mb-9">
-        <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
-          <Image
-            image={getImage("shop.title")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={width - 8}
-            height={24}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
-        <Text className="text-[#fff7ff] text-xl font-bold absolute right-2 font-Pixels">
-          STAKING
-        </Text>
-      </View>
+  return (
+    <SafeAreaView className="flex-1 relative">
+      <BackGround width={width} height={height} />
+
+      <PageHeader title="STAKING" width={width} />
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24 }}
+        className="flex-1"
+      >
+
 
       {/** === Claim your Bitcoin === */}
-      <View className="w-full relative">
-        <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
-          <Image
-            image={getImage("shop.title")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={width - 8}
-            height={24}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
-        <Text className="text-[#fff7ff] text-xl font-bold absolute left-2 pl-2 font-Pixels">
-          Claim your Bitcoin
-        </Text>
-      </View>
+      <SectionTitle title="Claim your Bitcoin" width={width} />
 
       <View className="mb-5">
         <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
-          {/* stats */}
           <View className="flex-row space-x-2 mb-3 ">
-            <Text 
-            className="flex-1 font-Pixels px-2 py-6 text-xl text-[#fff7ff] rounded border"
-            style={{ borderColor: "#717171" }}
-            >
-              Staked: {amountStaked} BTC
-            </Text>
-            <View className="flex-1">
-              <Text 
-                className="font-Pixels px-2 py-6 text-xl text-[#fff7ff] rounded border"
-                style={{ borderColor: "#717171" }}
-              >
-                APR: {apr}%
-              </Text>
-            </View>
+            <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
+            <StatsDisplay label="APR" value={`${apr} %`} />
           </View>
 
-            {/* withdraw & boost */}
-            <View className="flex-row mb-3">
-              <TouchableOpacity
-                onPress={withdrawStakedTokens}
-                className="flex-1 py-4 rounded border bg-[#2c2c2e]"
-                style={{ borderColor: "#717171" }}
-              >
-                <Text className="font-Pixels text-3xl text-center text-[#fff7ff]">
-                  WITHDRAW
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {/* your boost APR logic */}}
-                className="flex-1 px-2 py-4 rounded border bg-[#2c2c2e]"
-                style={{ borderColor: "#717171" }}
-              >
-                <Text className="font-Pixels text-3xl text-center text-[#fff7ff]">
-                  BOOST APR
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View className="flex-row space-x-4 mb-3 space-x-2">
+            <StakingAction
+              action={onPressWithdraw}
+              label="WITHDRAW"
+              disabled={amountStaked === 0}
+            />
+            <StakingAction
+              action={() => {}}
+              label="BOOST APR"
+              disabled={true}
+            />
+          </View>
 
-            {/* input + CLAIM */}
-            <View className="flex-row items-center">
-              <View className="flex-row flex-1 space-x-2">
-                <Text
-                  className="flex-1 px-3 py-2 rounded border font-Pixels text-xl"
-                  style={{ borderColor: "#717171", color: "#fff7ff" }}
-                >
-                  {rewards}
-                </Text>
-                <Text
-                  className="px-3 py-2 rounded border font-Pixels text-xl"
-                  style={{ borderColor: "#717171", color: "#fff7ff" }}
-                >
-                BTC
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={onPressClaim}
-                className="ml-2 px-4 py-2 rounded border bg-[#2c2c2e]"
-                style={{ borderColor: "#717171" }}
-              >
-                <Text className="font-Pixels text-xl text-[#fff7ff]">
-                  CLAIM
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View className="flex-row items-center">
+            <AmountField amount={rewards.toString()} />
+            <StakingAction
+              action={onPressClaim}
+              label="CLAIM"
+              disabled={rewards === 0}
+            />
+          </View>
+        </View>
+      </View>
+
+      {/** === Stake your Bitcoin === */}
+      <SectionTitle title="Stake your Bitcoin" width={width} />
+
+      <View className="mb-5">
+        <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
+          {/* input + STAKE */}
+          <View className="flex-row items-center">
+            <AmountField
+              amount={stakeInput}
+            />
+            <StakingAction
+              action={onPressStake}
+              label="STAKE"
+              disabled={Number(stakeInput) <= 0}
+            />
           </View>
         </View>
 
-        {/** === Stake your Bitcoin === */}
-        <View className="w-full relative">
-          <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
+        {/* quick select row */}
+         <View className="relative px-2">
+          {/* TODO: staking.amounts.bg */}
+          {/* Canvas underlay */}
+          {/* <Canvas
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: width - 16,   // matches px-2 (8px on each side)
+              height: 48,          // adjust to your button height + vertical padding
+            }}
+          >
             <Image
-              image={getImage("shop.title")}
+              image={getImage("staking.amounts.bg")}
               fit="fill"
               x={0}
               y={0}
-              width={width - 8}
-              height={24}
+              width={width - 16}
+              height={48}
               sampling={{
                 filter: FilterMode.Nearest,
                 mipmap: MipmapMode.Nearest,
               }}
             />
-          </Canvas>
-          <Text className="text-[#fff7ff] text-xl font-bold absolute left-2 pl-2 font-Pixels">
-            Stake your Bitcoin
-          </Text>
-        </View>
+          </Canvas> */}
 
-        <View className="mb-5">
-          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
-
-            {/* input + STAKE */}
-            <View className="flex-row items-center">
-              <View className="flex-row flex-1 space-x-2">
-                <Text
-                  className="flex-1 px-3 py-2 rounded border font-Pixels text-xl"
-                  style={{ borderColor: "#717171", color: "#fff7ff" }}
-                >
-                  {rewards}
-                </Text>
-                <Text
-                  className="px-3 py-2 rounded border font-Pixels text-xl"
-                  style={{ borderColor: "#717171", color: "#fff7ff" }}
-                >
-                BTC
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={onPressStake}
-                className="ml-2 px-4 py-2 rounded border bg-[#2c2c2e]"
-                style={{ borderColor: "#717171" }}
-              >
-                <Text className="font-Pixels text-xl text-white">
-                  STAKE
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-            {/* quick-percent row */}
-            <View className="flex-row justify-between">
-              {[1,2,3,4,5].map((i) => (
-                <TouchableOpacity
-                  key={i}
-                  onPress={onPressFillStake(i)}
-                  className="flex-1 m-2 px-2 py-1 rounded border bg-[#2c2c2e]"
-                  style={{ borderColor: "#717171" }}
-                >
-                  <Text className="font-Pixels text-xs text-[#fff7ff] text-center">
-                    {i * stakingIncrement}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            </View>
-  
-        {/** === Validate your claim === */}
-
-        <View className="mb-4">
-          <View className="w-full relative">
-            <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
-              <Image
-                image={getImage("shop.title")}
-                fit="fill"
-                x={0}
-                y={0}
-                width={width - 8}
-                height={24}
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-              />
-            </Canvas>
-            <Text className="text-[#fff7ff] text-xl font-bold absolute left-2 pl-2 font-Pixels">
-              Validate your claim
-            </Text>
-          </View>
-          <View
-            className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center"
-          >
-            <Text className="font-Pixels text-xl text-[#fff7ff]">
-              {days.toString().padStart(2, "0")}:
-              {hours.toString().padStart(2, "0")}:
-              {minutes.toString().padStart(2, "0")}:
-              {seconds.toString().padStart(2, "0")}
-            </Text>
-            <TouchableOpacity
-              onPress={validateStake}
-              className="mt-3 w-full px-4 py-2 rounded border bg-[#2c2c2e]"
-              style={{ borderColor: "#717171" }}
-            >
-              <Text className="font-Pixels text-xl text-[#fff7ff] text-center">
-                VALIDATE
-              </Text>
-            </TouchableOpacity>
-          </View>
+        <View className="flex-row space-x-2 px-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <StakingAction
+              key={i}
+              action={() => {onPressFillStake(i)}}
+              label={`${i * stakingIncrement}`}
+              disabled={balance > (i * stakingIncrement)}
+            />
+          ))}
         </View>
       </View>
+      </View>
+
+      {/** === Validate your claim === */}
+
+      <View className="">
+        <SectionTitle title="Validate your claim" width={width} />
+        
+        <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
+          <Text className="font-Pixels text-5xl text-[#fff7ff]">
+            {days.toString().padStart(2, "0")}:
+            {hours.toString().padStart(2, "0")}:
+            {minutes.toString().padStart(2, "0")}:
+            {seconds.toString().padStart(2, "0")}
+          </Text>
+        </View>
+          
+        <StakingAction
+          action={validateStake}
+          label="VALIDATE"
+        />
+      </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };

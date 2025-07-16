@@ -109,6 +109,8 @@ const imagePaths = {
 
   // Staking
   stakingBg: require(`${assetsPath}/staking/staking_bg.png`),
+  stakingButtonBg: require(`${assetsPath}/staking/button.png`),
+  stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.png`),
 
   // Navigation Images
   navBg: require(`${assetsPath}/navigation/background.png`),
@@ -123,7 +125,9 @@ const imagePaths = {
   navIconShopActive: require(`${assetsPath}/navigation/icon_shop_selected.png`),
   navIconFlagActive: require(`${assetsPath}/navigation/icon_flag_selected.png`),
   navIconStaking: require(`${assetsPath}/navigation/icon_staking.png`),
-  navIconStakingActive: require(`${assetsPath}/navigation/icon_staking_selected.png`),
+  navIconStakingActive: require(
+    `${assetsPath}/navigation/icon_staking_selected.png`,
+  ),
   navIconMedalActive: require(
     `${assetsPath}/navigation/icon_medal_selected.png`,
   ),
@@ -349,6 +353,8 @@ export const useImagePreloader = () => {
 
     // Staking
     stakingBg: useImage(imagePaths.stakingBg),
+    stakingButtonBg: useImage(imagePaths.stakingButtonBg),
+    stakingAmountsBg: useImage(imagePaths.stakingAmountsBg),
 
     // Navigation Images
     navBg: useImage(imagePaths.navBg),
@@ -503,7 +509,7 @@ export const useImagePreloader = () => {
         "nav.icon.flag": images.navIconFlag,
         "nav.icon.medal": images.navIconMedal,
         "nav.icon.settings": images.navIconSettings,
-        "nav.icon.staking": images.navIconStaking, // Assuming this is a placeholder for staking
+        "nav.icon.staking": images.navIconStaking,
         "nav.icon.game.active": images.navIconGameActive,
         "nav.icon.shop.active": images.navIconShopActive,
         "nav.icon.flag.active": images.navIconFlagActive,
@@ -524,6 +530,8 @@ export const useImagePreloader = () => {
         "shop.upgrades.daComp": images.shopDaComp,
         "shop.upgrades.mevBoost": images.shopMevBoost,
         "shop.upgrades.recursiveProof": images.shopRecursiveProof,
+        "staking.button.bg": images.stakingButtonBg,
+        "staking.amounts.bg": images.stakingAmountsBg,
         "achievements.bg": images.achievmentsBg,
         "achievements.tile.locked": images.achievementsTileLocked,
         "achievements.tile.progress": images.achievementsTileProgress,

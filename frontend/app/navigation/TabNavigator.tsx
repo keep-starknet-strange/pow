@@ -34,11 +34,7 @@ function StoreTabButton({
 
   return (
     <View ref={ref} onLayout={onLayout} className="">
-      <TabBarButton
-        tabName="Store"
-        isActive={isActive}
-        onPress={onPress}
-      />
+      <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
     </View>
   );
 }
@@ -207,7 +203,7 @@ export function TabNavigator() {
           tabPress: () => handleTabPress("Staking"),
         }}
       />
-      
+
       <Tab.Screen
         name="Store"
         component={StorePage}
