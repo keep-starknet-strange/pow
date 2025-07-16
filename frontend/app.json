@@ -55,7 +55,8 @@
           "project": "pow",
           "organization": "starkware-industries"
         }
-      ]
+      ],
+      "./plugins/signing-release"
     ],
     "experiments": {
       "typedRoutes": true
