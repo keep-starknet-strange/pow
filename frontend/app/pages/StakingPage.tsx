@@ -43,6 +43,7 @@ export const StakingPage: React.FC = () => {
   }
 
 
+
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
     const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
