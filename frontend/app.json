@@ -17,13 +17,15 @@
           "argentmobile",
           "braavos"
         ]
-      }
+      },
+      "bundleIdentifier": "com.starknet.pow"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo/pow.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.starknet.pow"
     },
     "web": {
       "bundler": "metro",
