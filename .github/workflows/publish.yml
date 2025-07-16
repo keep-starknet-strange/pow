@@ -27,5 +27,6 @@ jobs:
               working-directory: ./frontend
               run: npx expo prebuild
 
-            - name: Check result
-              run: find . -type d -not -path './node_modules/*'
+            - name: Build Android (Debug)
+              working-directory: ./frontend/android
+              run: ./gradlew app:assembleDebug
