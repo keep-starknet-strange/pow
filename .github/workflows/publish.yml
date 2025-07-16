@@ -1,0 +1,26 @@
+name: Publish  
+
+on:
+    push:
+        branches:
+            - 'build/firebase'
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout project
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: latest
+                cache: yarn
+
+            - name: Prebuild app
+              working-directory: ./frontend
+              run: npx expo prebuild
+
+            - name: Check result
+              run: find . -type d -not -path './node_modules/*'
