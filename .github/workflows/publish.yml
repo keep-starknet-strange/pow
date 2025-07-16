@@ -17,6 +17,7 @@ jobs:
               with:
                 node-version: latest
                 cache: npm
+                cache-dependency-path: "./frontent/package-lock.json"
 
             - name: Prebuild app
               working-directory: ./frontend
