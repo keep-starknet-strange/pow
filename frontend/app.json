@@ -56,7 +56,7 @@
           "organization": "starkware-industries"
         }
       ],
-      "./plugins/signing-release"
+      "./plugins/signing-release.ts"
     ],
     "experiments": {
       "typedRoutes": true
