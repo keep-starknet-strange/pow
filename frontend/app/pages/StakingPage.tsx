@@ -170,9 +170,9 @@ export const StakingPage: React.FC = () => {
           {[1, 2, 3, 4, 5].map((i) => (
             <StakingAction
               key={i}
-              action={() => {onPressFillStake(i)}}
+              action={onPressFillStake(i)}
               label={`${i * stakingIncrement}`}
-              disabled={balance > (i * stakingIncrement)}
+              disabled={balance < (i * stakingIncrement)}
             />
           ))}
         </View>
