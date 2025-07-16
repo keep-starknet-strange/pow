@@ -42,3 +42,7 @@ app-example
 .idea/
 
 .env.local
+
+# Prebuild
+android/
+ios/
