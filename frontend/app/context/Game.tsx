@@ -160,7 +160,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const addTransaction = (chainId: number, transaction: Transaction) => {
-    if (workingBlocks[chainId]?.isBuilt) notify("BlockFull")
+    if (workingBlocks[chainId]?.isBuilt) notify("BlockFull");
     setWorkingBlocks((prevState) => {
       const newWorkingBlocks = [...prevState];
       if (!newWorkingBlocks[chainId]) {

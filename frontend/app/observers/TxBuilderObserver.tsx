@@ -133,7 +133,7 @@ export class TxBuilderObserver implements Observer {
       }
       return;
     }
-      
+
     switch (eventType) {
       case "TxAdded":
         // Proccessed above in the if statement since this is a special case

@@ -325,7 +325,13 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       5000 / speed + 200 + randomDurationOffset,
     );
     return () => clearInterval(interval);
-  }, [speed, automationAnimHeight, addNewTransaction, workingBlocks, props.chainId]);
+  }, [
+    speed,
+    automationAnimHeight,
+    addNewTransaction,
+    workingBlocks,
+    props.chainId,
+  ]);
 
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">

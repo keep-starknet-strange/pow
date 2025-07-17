@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  ScrollView,
-} from "react-native";
+import { View, Text, Dimensions, ScrollView } from "react-native";
 import {
   Canvas,
   Image,
