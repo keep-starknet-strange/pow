@@ -34,7 +34,7 @@ export const StorePage: React.FC = () => {
   const { l2 } = useGame();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
-  const storeTypes = ["L1", "L2"];
+
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
   const [l2HasInitialized, setL2HasInitialized] = useState(l2 ? true : false);
@@ -180,59 +180,27 @@ export const StorePage: React.FC = () => {
           </View>
         ))}
       </View>
-      <ScrollView className="flex-1 py-[10px]">
-        {activeSubTab === "Transactions" && (
-          <View className="flex flex-col px-[16px]">
-            {storeTransactions.map((item, index) => (
-              <View key={index}>
-                <TransactionUpgradeView
-                  chainId={chainId}
-                  txData={item}
-                  isDapp={false}
-                />
-                {index < storeTransactions.length - 1 && (
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Upgrades" && (
-          <View className="flex flex-col px-[16px]">
-            {storeUpgrades.map((item, index) => (
-              <View key={index}>
-                <UpgradeView chainId={chainId} upgrade={item} />
-                {index < storeUpgrades.length - 1 && (
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-        {activeSubTab === "Automation" && (
-          <View className="flex flex-col px-[16px]">
-            {storeAutomation.map((item, index) => (
-              <View key={index}>
-                <AutomationView chainId={chainId} automation={item} />
-                {index < storeAutomation.length - 1 && (
-                  <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-        <View className="h-[40px]" />
-      </ScrollView>
-    </View>
-  );
-};
-
-/*
- * TODO
-        {dappsUnlocked[chainId] ? (
-          <View>
-            <View className="flex flex-row justify-between items-center p-2 mt-[1rem]">
-              <Text className="text-[#e7e7e7] text-2xl font-bold">Dapps</Text>
+      <View style={{ height: 522, marginTop: 2 }}>
+        <ScrollView
+          className="flex-1 relative py-[10px]"
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {activeSubTab === "Transactions" && (
+            <View className="flex flex-col px-[16px]">
+              {storeTransactions.map(
+                (item, index) =>
+                  canUnlockTx(chainId, index) && (
+                    <View key={index}>
+                      <TransactionUpgradeView
+                        chainId={chainId}
+                        txData={item}
+                        isDapp={false}
+                      />
+                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
+                    </View>
+                  ),
+              )}
             </View>
           )}
           {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
@@ -300,11 +268,6 @@ export const StorePage: React.FC = () => {
             </View>
           )}
           {activeSubTab === "Transactions" && <DappsUnlock chainId={chainId} />}
-          {storeType === "L1" && activeSubTab === "Upgrades" && (
-            <View>
-              <StakingUnlock />
-            </View>
-          )}
           {storeType === "L1" && activeSubTab === "Automation" && (
             <View className="flex flex-col px-[16px]">
               <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
