@@ -45,4 +45,6 @@ jobs:
 
             - name: Build Android
               working-directory: ./frontend/android
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               run: ./gradlew app:assembleRelease
