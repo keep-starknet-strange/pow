@@ -203,10 +203,6 @@ export function TabNavigator() {
           tabPress: () => handleTabPress("Staking"),
         }}
       />
-<<<<<<< HEAD
-=======
-
->>>>>>> 124cec9 (butttons not working)
       <Tab.Screen
         name="Store"
         component={StorePage}
