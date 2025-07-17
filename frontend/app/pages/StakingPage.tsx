@@ -16,7 +16,7 @@ import { AmountField } from "../components/staking/AmountField";
 const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
-const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100]
+const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
 
 export const StakingPage: React.FC = () => {
   const {
@@ -32,7 +32,7 @@ export const StakingPage: React.FC = () => {
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   // const { getImage } = useImages();
-  const balancePercentages = BALANCE_PERCENTAGE
+  const balancePercentages = BALANCE_PERCENTAGE;
   interface GetPercentOfParams {
     percent: number;
     amount: number;
@@ -73,7 +73,7 @@ export const StakingPage: React.FC = () => {
   };
 
   const onPressFillStake = (percent: number) => () => {
-    setStakeAmount(getPercentOf({percent, amount: balance}));
+    setStakeAmount(getPercentOf({ percent, amount: balance }));
   };
 
   const onPressWithdraw = () => {
@@ -93,65 +93,61 @@ export const StakingPage: React.FC = () => {
         contentContainerStyle={{ paddingBottom: 24 }}
         className="flex-1"
       >
+        {/** === Claim your Bitcoin === */}
+        <SectionTitle title="Claim your Bitcoin" width={width} />
 
+        <View className="mb-5">
+          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
+            <View className="flex-row space-x-2 mb-3 ">
+              <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
+              <StatsDisplay label="APR" value={`${apr} %`} />
+            </View>
 
-      {/** === Claim your Bitcoin === */}
-      <SectionTitle title="Claim your Bitcoin" width={width} />
+            <View className="flex-row space-x-4 mb-3 space-x-2">
+              <StakingAction
+                action={onPressWithdraw}
+                label="WITHDRAW"
+                disabled={amountStaked === 0}
+              />
+              <StakingAction
+                action={() => {}}
+                label="BOOST APR"
+                disabled={true}
+              />
+            </View>
 
-      <View className="mb-5">
-        <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
-          <View className="flex-row space-x-2 mb-3 ">
-            <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
-            <StatsDisplay label="APR" value={`${apr} %`} />
-          </View>
-
-          <View className="flex-row space-x-4 mb-3 space-x-2">
-            <StakingAction
-              action={onPressWithdraw}
-              label="WITHDRAW"
-              disabled={amountStaked === 0}
-            />
-            <StakingAction
-              action={() => {}}
-              label="BOOST APR"
-              disabled={true}
-            />
-          </View>
-
-          <View className="flex-row items-center">
-            <AmountField amount={rewards.toString()} />
-            <StakingAction
-              action={onPressClaim}
-              label="CLAIM"
-              disabled={rewards === 0}
-            />
-          </View>
-        </View>
-      </View>
-
-      {/** === Stake your Bitcoin === */}
-      <SectionTitle title="Stake your Bitcoin" width={width} />
-
-      <View className="mb-5">
-        <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
-          {/* input + STAKE */}
-          <View className="flex-row items-center">
-            <AmountField
-              amount={stakeAmount.toString()}
-            />
-            <StakingAction
-              action={onPressStake}
-              label="STAKE"
-              disabled={stakeAmount <= 0}
-            />
+            <View className="flex-row items-center">
+              <AmountField amount={rewards.toString()} />
+              <StakingAction
+                action={onPressClaim}
+                label="CLAIM"
+                disabled={rewards === 0}
+              />
+            </View>
           </View>
         </View>
 
-        {/* quick select row */}
-         <View className="relative px-2">
-          {/* TODO: staking.amounts.bg */}
-          {/* Canvas underlay */}
-          {/* <Canvas
+        {/** === Stake your Bitcoin === */}
+        <SectionTitle title="Stake your Bitcoin" width={width} />
+
+        <View className="mb-5">
+          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
+            {/* input + STAKE */}
+            <View className="flex-row items-center">
+              <AmountField amount={stakeAmount.toString()} />
+              <StakingAction
+                action={onPressStake}
+                label="STAKE"
+                disabled={stakeAmount <= 0}
+              />
+            </View>
+          </View>
+
+          {/* quick select row */}
+          <View className="relative px-2">
+            {/* TODO: staking.amounts.bg */}
+            {/* Canvas underlay */}
+            {/* <Canvas
             style={{
               position: "absolute",
               top: 0,
@@ -174,37 +170,34 @@ export const StakingPage: React.FC = () => {
             />
           </Canvas> */}
 
-        <View className="flex-row space-x-2 px-2">
-          {balancePercentages.map((percent, i) => (
-            <StakingAction
-              key={i}
-              action={onPressFillStake(i)}
-              label={`${percent}%`}
-            />
-          ))}
+            <View className="flex-row space-x-2 px-2">
+              {balancePercentages.map((percent, i) => (
+                <StakingAction
+                  key={i}
+                  action={onPressFillStake(i)}
+                  label={`${percent}%`}
+                />
+              ))}
+            </View>
+          </View>
         </View>
-      </View>
-      </View>
 
-      {/** === Validate your claim === */}
+        {/** === Validate your claim === */}
 
-      <View className="">
-        <SectionTitle title="Validate your claim" width={width} />
-        
-        <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
-          <Text className="font-Pixels text-5xl text-[#fff7ff]">
-            {days.toString().padStart(2, "0")}:
-            {hours.toString().padStart(2, "0")}:
-            {minutes.toString().padStart(2, "0")}:
-            {seconds.toString().padStart(2, "0")}
-          </Text>
+        <View className="">
+          <SectionTitle title="Validate your claim" width={width} />
+
+          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
+            <Text className="font-Pixels text-5xl text-[#fff7ff]">
+              {days.toString().padStart(2, "0")}:
+              {hours.toString().padStart(2, "0")}:
+              {minutes.toString().padStart(2, "0")}:
+              {seconds.toString().padStart(2, "0")}
+            </Text>
+          </View>
+
+          <StakingAction action={validateStake} label="VALIDATE" />
         </View>
-          
-        <StakingAction
-          action={validateStake}
-          label="VALIDATE"
-        />
-      </View>
       </ScrollView>
     </SafeAreaView>
   );
