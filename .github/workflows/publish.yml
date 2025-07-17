@@ -32,11 +32,15 @@ jobs:
                 KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
                 KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
               run: 
-                echo $KEYSTORE_ENCODED | base64 --decode > android/app/${{ secrets.KEYSTORE_FILE_NAME }}
+                echo $KEYSTORE_ENCODED | base64 --decode > ${{ secrets.KEYSTORE_FILE_NAME }}
 
             - name: Prebuild app
               working-directory: ./frontend
               run: npx expo prebuild --platform android
+
+            - name: Move keystore into app folder
+              working-directory: ./frontend
+              run: mv ${{ secrets.KEYSTORE_FILE_NAME }} android/app/${{ secrets.KEYSTORE_FILE_NAME }}
 
             - name: Build Android
               working-directory: ./frontend/android
