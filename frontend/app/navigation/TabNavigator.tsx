@@ -48,7 +48,6 @@ function TabBarButton({
   isActive: boolean;
   onPress: any;
 }) {
-  const { stakingUnlocked } = useStaking();
   const { getImage } = useImages();
   const buttonRef = useRef<View>(null);
   const [buttonSize, setButtonSize] = useState({ width: 0, height: 0 });
@@ -91,7 +90,7 @@ function TabBarButton({
     buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
       setButtonSize({ width: width, height: height });
     });
-  }, [buttonRef, setButtonSize, stakingUnlocked]);
+  }, [buttonRef, setButtonSize]);
 
   return (
     <TouchableOpacity
