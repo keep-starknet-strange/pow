@@ -146,7 +146,7 @@ function TabBarButton({
 export function TabNavigator() {
   const { notify } = useEventManager();
   const insets = useSafeAreaInsets();
-  
+
   const handleTabPress = (routeName: string) => {
     notify("SwitchPage", { name: routeName });
   };

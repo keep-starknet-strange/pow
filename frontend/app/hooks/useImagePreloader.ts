@@ -465,7 +465,6 @@ export const useImagePreloader = () => {
     blockGridMin: useImage(imagePaths.blockGridMin),
     blockConnector: useImage(imagePaths.blockConnector),
 
-
     // Staking
     stakingBg: useImage(imagePaths.stakingBg),
     stakingButtonBg: useImage(imagePaths.stakingButtonBg),
