@@ -3,8 +3,6 @@ import {
   View,
   Text,
   Dimensions,
-  ImageBackground,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import {
@@ -20,21 +18,18 @@ import Animated, {
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { PFPView } from "../components/PFPView";
-import prestigeJson from "../configs/prestige.json";
 import { useStarknetConnector } from "../context/StarknetConnector";
 import { useBalance } from "../stores/useBalanceStore";
 import { useUpgrades } from "../context/Upgrades";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useImages } from "../hooks/useImages";
 import { usePowContractConnector } from "../context/PowContractConnector";
-import background from "../../assets/background.png";
 import { shortMoneyString } from "../utils/helpers";
 import {
   getRandomNounsAttributes,
   createNounsAttributes,
 } from "../configs/nouns";
 
-import * as prestigeImages from "../configs/prestige";
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
     return `shop.lock`;

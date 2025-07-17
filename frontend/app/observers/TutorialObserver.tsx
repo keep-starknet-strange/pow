@@ -41,7 +41,7 @@ export class TutorialObserver implements Observer {
     // …and you can add more here without changing onNotify
   }
 
-  onNotify(eventName: EventType, data?: any): void {
+  async onNotify(eventName: EventType, data?: any): Promise<void> {
     if (data?.name == "Store") {
       eventName = eventName + "-" + data.name;
     }

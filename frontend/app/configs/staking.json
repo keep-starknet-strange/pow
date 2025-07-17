@@ -6,7 +6,7 @@
     "stakingAmount": 100,
     "yieldMultiplier": 25,
     "icon": "🥩",
-    "unlockCosts": [700],
+    "unlockCosts": [508477],
     "slashing": {
       "dueTime": 86400,
       "chance": 0.1,

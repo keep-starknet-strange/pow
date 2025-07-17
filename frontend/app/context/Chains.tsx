@@ -128,7 +128,7 @@ export const ChainsProvider: React.FC<{ children: React.ReactNode }> = ({
       const newChains = [...prevState];
       newChains[chainId] = {
         ...prevState[chainId],
-        blocks: [...prevState[chainId].blocks, block].slice(-3), // Limit to 3 blocks
+        blocks: [...prevState[chainId].blocks, block].slice(-2), // Limit to 2 blocks
       };
       return newChains;
     });
