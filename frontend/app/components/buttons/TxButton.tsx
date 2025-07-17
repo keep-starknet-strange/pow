@@ -296,7 +296,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
   }, [automationAnimHeight]);
   useEffect(() => {
     if (workingBlocks[props.chainId]?.isBuilt) {
-      automationAnimHeight.value = 0;
+      automationAnimHeight.value = 94;
       return;
     }
     let randomDurationOffset = Math.random() * 500;
