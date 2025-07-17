@@ -44,5 +44,5 @@ app-example
 .env.local
 
 # Prebuild
-android/
-ios/
+/android/
+/ios/
