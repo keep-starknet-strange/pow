@@ -515,6 +515,7 @@ export const useImagePreloader = () => {
         "nav.icon.flag.active": images.navIconFlagActive,
         "nav.icon.medal.active": images.navIconMedalActive,
         "nav.icon.settings.active": images.navIconSettingsActive,
+        "nav.icon.staking.active": images.navIconStakingActive,
         "shop.title": images.shopTitle,
         "shop.separator": images.shopSeparator,
         "shop.name.plaque": images.shopNamePlaque,

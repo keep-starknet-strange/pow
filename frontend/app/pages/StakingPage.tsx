@@ -9,13 +9,14 @@ import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
 import { AmountField } from "../components/staking/AmountField";
-import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
-import { useImages } from "../hooks/useImages";
+// import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+// import { useImages } from "../hooks/useImages";
 
 // You may need to define width, height, and getImage if not already imported:
 const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
+const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100]
 
 export const StakingPage: React.FC = () => {
   const {
@@ -23,15 +24,23 @@ export const StakingPage: React.FC = () => {
     rewards,
     config,
     lastValidation,
-    stakingIncrement,
     validateStake,
     stakeTokens,
     claimStakingRewards,
     withdrawStakedTokens,
   } = useStakingStore();
   const { tryBuy, updateBalance, balance } = useBalanceStore();
-  const [stakeInput, setStakeInput] = useState("0");
-  const { getImage } = useImages();
+  const [stakeAmount, setStakeAmount] = useState<number>(0);
+  // const { getImage } = useImages();
+  const balancePercentages = BALANCE_PERCENTAGE
+  interface GetPercentOfParams {
+    percent: number;
+    amount: number;
+  }
+
+  function getPercentOf({ percent, amount }: GetPercentOfParams): number {
+    return (percent / 100) * amount;
+  }
 
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
@@ -59,13 +68,13 @@ export const StakingPage: React.FC = () => {
   };
 
   const onPressStake = () => {
-    if (tryBuy(Number(stakeInput))) {
-      stakeTokens(Number(stakeInput));
+    if (tryBuy(stakeAmount)) {
+      stakeTokens(stakeAmount);
     }
   };
 
-  const onPressFillStake = (i: number) => () => {
-    setStakeInput((stakingIncrement * i).toString());
+  const onPressFillStake = (percent: number) => () => {
+    setStakeAmount(getPercentOf({percent, amount: balance}));
   };
 
   const onPressWithdraw = () => {
@@ -129,12 +138,12 @@ export const StakingPage: React.FC = () => {
           {/* input + STAKE */}
           <View className="flex-row items-center">
             <AmountField
-              amount={stakeInput}
+              amount={stakeAmount.toString()}
             />
             <StakingAction
               action={onPressStake}
               label="STAKE"
-              disabled={Number(stakeInput) <= 0}
+              disabled={stakeAmount <= 0}
             />
           </View>
         </View>
@@ -167,12 +176,11 @@ export const StakingPage: React.FC = () => {
           </Canvas> */}
 
         <View className="flex-row space-x-2 px-2">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {balancePercentages.map((percent, i) => (
             <StakingAction
               key={i}
               action={onPressFillStake(i)}
-              label={`${i * stakingIncrement}`}
-              disabled={balance < (i * stakingIncrement)}
+              label={`${percent}%`}
             />
           ))}
         </View>

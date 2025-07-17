@@ -15,7 +15,6 @@ interface StakingState {
   config: StakingConfig;
   amountStaked: number;
   rewards: number;
-  stakingIncrement: number;
   lastValidation: number;
 
   // actions
@@ -27,7 +26,7 @@ interface StakingState {
 
 export const useStakingStore = create<StakingState>((set, get) => {
   const cfg: StakingConfig = {
-    reward_rate: stakingConfig.rewardRate,
+    reward_rate: stakingConfig.baseRewardRate,
     slashing_config: {
       slash_fraction: stakingConfig.slashingConfig.slashFraction,
       due_time: stakingConfig.slashingConfig.dueTime,
@@ -38,7 +37,6 @@ export const useStakingStore = create<StakingState>((set, get) => {
     config: cfg,
     amountStaked: 0,
     rewards: 0,
-    stakingIncrement: Number(stakingConfig.minStake),
     lastValidation: Math.floor(Date.now() / 1000),
 
     validateStake: () => {

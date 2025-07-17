@@ -7,7 +7,6 @@ import { PowContractProvider } from "./context/PowContractConnector";
 import { UpgradesProvider } from "./context/Upgrades";
 import { TransactionsProvider } from "./context/Transactions";
 import { ChainsProvider } from "./context/Chains";
-import { StakingProvider } from "./context/Staking";
 import { GameProvider } from "./context/Game";
 import { useImagePreloader } from "./hooks/useImagePreloader";
 import Game from "./game";
@@ -39,13 +38,11 @@ export default function App() {
           <PowContractProvider>
             <UpgradesProvider>
               <ChainsProvider>
-                <StakingProvider>
-                  <GameProvider>
-                    <TransactionsProvider>
-                      <Game />
-                    </TransactionsProvider>
-                  </GameProvider>
-                </StakingProvider>
+                <GameProvider>
+                  <TransactionsProvider>
+                    <Game />
+                  </TransactionsProvider>
+                </GameProvider>
               </ChainsProvider>
             </UpgradesProvider>
           </PowContractProvider>
