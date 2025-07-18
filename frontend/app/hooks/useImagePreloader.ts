@@ -769,7 +769,7 @@ export const useImagePreloader = () => {
         "shop.automation.da.3": images.shopAutomationDa3,
         "shop.automation.da.4": images.shopAutomationDa4,
         "tutorial.arrow": images.tutorialArrow,
-        "tutorial.window": images.tutorialWindow
+        "tutorial.window": images.tutorialWindow,
       };
 
       globalImages = imagesMap;

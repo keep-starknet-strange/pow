@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import {
   View,
   StyleSheet,
+  StyleProp,
   ViewStyle,
   LayoutChangeEvent,
 } from "react-native";
@@ -13,53 +14,59 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../../hooks/useImages";
 
-interface WindowProps {
-  style?: ViewStyle | ViewStyle[];
-  onLayout?: (e: LayoutChangeEvent) => void;
+export interface WindowProps {
+  style: StyleProp<ViewStyle>;
+  onMeasured?: (h: number) => void;
   children: React.ReactNode;
 }
 
-export const Window: React.FC<WindowProps> = ({
+const BG_SAMPLING = { filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest };
+
+const WindowComponent: React.FC<WindowProps> = ({
   style,
-  onLayout,
+  onMeasured,
   children,
 }) => {
   const { getImage } = useImages();
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ w: 0, h: 0 });
 
-  const handleLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    setSize({ width, height });
-    onLayout?.(e);
-  };
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      if (width !== size.w || height !== size.h) {
+        setSize({ w: width, h: height });
+        onMeasured?.(height);
+      }
+    },
+    [onMeasured, size.w, size.h],
+  );
 
   return (
     <View style={style} onLayout={handleLayout}>
-      {/* background */}
-      {size.width > 0 && size.height > 0 && (
+      {size.w > 0 && size.h > 0 && (
         <Canvas
+          pointerEvents="none"
           style={[
             StyleSheet.absoluteFillObject,
-            { width: size.width, height: size.height },
+            { width: size.w, height: size.h },
           ]}
         >
           <SkiaImage
             image={getImage("tutorial.window")}
-            x={0}
-            y={0}
-            width={size.width}
-            height={size.height}
+            width={size.w}
+            height={size.h}
             fit="fill"
-            sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+            sampling={BG_SAMPLING}
           />
         </Canvas>
       )}
 
-      {/* content wrapper (NOT absolute) so it drives layout height */}
       <View style={styles.content}>{children}</View>
     </View>
   );
 };
+
+export const Window = memo(WindowComponent);
 
 const styles = StyleSheet.create({
   content: {

@@ -7,8 +7,8 @@ import {
   useHightlightPosition,
 } from "../hooks/useHighlightMasks";
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
-import { Arrow } from "../components/tutorial/Arrow"
-import { Window } from "../components/tutorial/Window"
+import { Arrow } from "../components/tutorial/Arrow";
+import { Window } from "../components/tutorial/Window";
 
 const BUBBLE_WIDTH = 260;
 
@@ -30,12 +30,7 @@ export const TutorialOverlay: React.FC = () => {
   };
 
   const isReady = bubbleLayout.width > 0 && bubbleLayout.height > 0;
-  const {
-    left: bubbleLeft,
-    top: bubbleTop,
-    style: arrowStyle,
-    arrowLeft,
-  } = useBubblePosition(bubbleLayout, bubbleHeight);
+  const position = useBubblePosition(bubbleLayout, bubbleHeight);
 
   const highlightPosition = useHightlightPosition(highlightLayout);
   const masks = useHighlightMasks(highlightPosition);
@@ -70,34 +65,35 @@ export const TutorialOverlay: React.FC = () => {
       />
 
       <Arrow
-       style={[{ position: "absolute", left: arrowLeft }, arrowStyle]}
+        direction={position.direction}
+        style={[
+          { position: "absolute", left: position.arrowLeft },
+          position.arrowStyle,
+        ]}
       />
 
-     <Window
-       style={{
-         position: "absolute",
-         left: bubbleLeft,
-         top: bubbleTop,
-         width: BUBBLE_WIDTH,
-       }}
-       onLayout={(e: LayoutChangeEvent) =>
-         setBubbleHeight(Math.round(e.nativeEvent.layout.height))
-       }
-     >
-       <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
-         {stepConfig.title}
-       </Text>
-       <Text className="text-sm text-gray-300 mb-2 text-center">
-         {stepConfig.description}
-       </Text>
-       <TouchableOpacity
-         onPress={() => setVisible(false)}
-         className="self-center px-4 py-2 rounded"
-       >
-         <Text className="text-sm font-semibold text-black">Got it</Text>
-       </TouchableOpacity>
-     </Window>
-
+      <Window
+        style={{
+          position: "absolute",
+          left: position.bubbleLeft,
+          top: position.bubbleTop,
+          width: BUBBLE_WIDTH,
+        }}
+        onMeasured={setBubbleHeight}
+      >
+        <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
+          {stepConfig.title}
+        </Text>
+        <Text className="text-sm text-gray-300 mb-2 text-center">
+          {stepConfig.description}
+        </Text>
+        <TouchableOpacity
+          onPress={() => setVisible(false)}
+          className="self-center px-4 py-2 rounded"
+        >
+          <Text className="text-sm font-semibold text-black">Got it</Text>
+        </TouchableOpacity>
+      </Window>
     </View>
   );
 };
