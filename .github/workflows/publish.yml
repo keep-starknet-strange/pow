@@ -6,7 +6,7 @@ on:
             - 'build/firebase'
 
 jobs:
-    deploy:
+    deploy-android:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout project
@@ -47,4 +47,36 @@ jobs:
               working-directory: ./frontend/android
               env:
                 SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              run: ./gradlew app:assembleRelease
+              run: ./gradlew app:assembleRelease ## TODO when building for play store assemble aab
+
+            ## TODO 
+            ## 1. Setup keys for firebase and play store
+            ## 2. Deploy the app
+
+    deploy-ios:
+      runs-on: macos-latest
+
+      steps:
+            - name: Checkout project
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: latest
+                cache: npm
+                cache-dependency-path: "./frontend/package.json"
+
+            - name: Install dependencies
+              working-directory: ./frontend
+              run: npm ci
+
+            - name: Prebuild app
+              working-directory: ./frontend
+              run: npx expo prebuild --platform ios
+
+            ## TODO 
+            ## 1. Setup certificate, provisioning profile and ExportOptions.plist
+            ## 2. Build archive
+            ## 3. Export IPA
+            ## 4. Upload application
