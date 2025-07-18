@@ -31,7 +31,8 @@ const config: ExpoConfig = {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.starknet.pow"
+      package: "com.starknet.pow",
+      edgeToEdgeEnabled: true
     },
     web: {
       bundler: "metro",
