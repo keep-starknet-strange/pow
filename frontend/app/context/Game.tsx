@@ -178,9 +178,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
       }
-      notify("TxAdded", { chainId, tx: transaction });
       return newWorkingBlocks;
     });
+    notify("TxAdded", { chainId, tx: transaction });
   };
 
   const onBlockMined = () => {

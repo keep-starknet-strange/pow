@@ -49,7 +49,8 @@
           "project": "pow",
           "organization": "starkware-industries"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
