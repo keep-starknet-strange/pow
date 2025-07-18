@@ -9,7 +9,7 @@ export class SoundObserver implements Observer {
     this.playSound = playSoundEffect;
   }
 
-  onNotify(eventType: EventType, data?: any): void {
+  async onNotify(eventType: EventType, data?: any): Promise<void> {
     switch (eventType) {
       case "TxAdded": {
         const pitchShift = data?.tx.fee ? data.tx.fee / 8 + 1 : 0;

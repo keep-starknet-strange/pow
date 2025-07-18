@@ -10,7 +10,7 @@ export class InAppNotificationsObserver implements Observer {
     this.sendNotification = sendNotification;
   }
 
-  onNotify(eventName: EventType, data?: any): void {
+  async onNotify(eventName: EventType, data?: any): Promise<void> {
     switch (eventName) {
       case "BuyFailed": {
         const typeId =
@@ -24,6 +24,14 @@ export class InAppNotificationsObserver implements Observer {
         const typeId =
           inAppNotificationsJson.find(
             (notification) => notification.eventType === "InvalidPurchase",
+          )?.id || 0;
+        this.sendNotification(typeId);
+        break;
+      }
+      case "BlockFull": {
+        const typeId =
+          inAppNotificationsJson.find(
+            (notification) => notification.eventType === "BlockFull",
           )?.id || 0;
         this.sendNotification(typeId);
         break;

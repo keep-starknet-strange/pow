@@ -207,6 +207,7 @@ const soundEffects: { [key: string]: any } = {
   ItemPurchased: require("../../assets/sounds/purchase.mp3"),
   BuyFailed: require("../../assets/sounds/buy-failed.mp3"),
   InvalidPurchase: require("../../assets/sounds/buy-failed.mp3"),
+  BlockFull: require("../../assets/sounds/buy-failed.mp3"),
   TxAdded: require("../../assets/sounds/tx-clicked.mp3"),
   AchievementCompleted: require("../../assets/sounds/achievement.mp3"),
   BasicClick: require("../../assets/sounds/basic-click.mp3"),

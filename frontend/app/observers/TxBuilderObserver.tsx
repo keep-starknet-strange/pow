@@ -108,30 +108,35 @@ export class TxBuilderObserver implements Observer {
     this.getWorkingBlock = getWorkingBlock;
   }
 
-  onNotify(eventType: EventType, data?: any): void {
+  async onNotify(eventType: EventType, data?: any): Promise<void> {
+    if (eventType === "TxAdded" && data?.tx) {
+      // TODO: Temporary work around
+      if (data.tx.typeId === proofTxTypeId || data.tx.typeId === daTxTypeId) {
+        // Don't add the tx to the multi call if it's a proof or DA tx
+        return;
+      }
+      if (data.tx.isDapp) {
+        // Offset the txId by the number of tx types to get the correct txId for the dapp
+        const txTypes =
+          data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+        const txTypeCount = txTypes.length;
+        this.addAction(
+          createAddTransactionAction(
+            data.chainId,
+            txTypeCount + data.tx.typeId,
+          ),
+        );
+      } else {
+        this.addAction(
+          createAddTransactionAction(data.chainId, data.tx.typeId),
+        );
+      }
+      return;
+    }
+
     switch (eventType) {
       case "TxAdded":
-        // TODO: Temporary work around
-        if (data.tx.typeId === proofTxTypeId || data.tx.typeId === daTxTypeId) {
-          // Don't add the tx to the multi call if it's a proof or DA tx
-          return;
-        }
-        if (data.tx.isDapp) {
-          // Offset the txId by the number of tx types to get the correct txId for the dapp
-          const txTypes =
-            data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-          const txTypeCount = txTypes.length;
-          this.addAction(
-            createAddTransactionAction(
-              data.chainId,
-              txTypeCount + data.tx.typeId,
-            ),
-          );
-        } else {
-          this.addAction(
-            createAddTransactionAction(data.chainId, data.tx.typeId),
-          );
-        }
+        // Proccessed above in the if statement since this is a special case
         break;
       case "MineClicked":
         if (this.getWorkingBlock(0)?.blockId === 0) return;

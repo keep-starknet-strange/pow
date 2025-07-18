@@ -18,5 +18,12 @@
     "message": "Locked item. Continue building to unlock it!",
     "type": "error",
     "color": "#f76060"
+  },
+  {
+    "id": 3,
+    "eventType": "BlockFull",
+    "message": "Block already full. Mine it to continue!",
+    "type": "error",
+    "color": "#f76060"
   }
 ]

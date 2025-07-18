@@ -57,7 +57,7 @@ export class AchievementObserver implements Observer {
     return map;
   }
 
-  onNotify(eventName: EventType, data?: any): void {
+  async onNotify(eventName: EventType, data?: any): Promise<void> {
     const relevantAchievements = this.achievementsByEvent.get(eventName);
     if (!relevantAchievements || !data) return;
 

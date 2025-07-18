@@ -160,7 +160,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const addTransaction = (chainId: number, transaction: Transaction) => {
-    if (workingBlocks[chainId]?.isBuilt) return;
+    if (workingBlocks[chainId]?.isBuilt) notify("BlockFull");
     setWorkingBlocks((prevState) => {
       const newWorkingBlocks = [...prevState];
       if (!newWorkingBlocks[chainId]) {
@@ -300,7 +300,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   const { proverProgress, prove } = useProver(onProverConfirmed, getProver);
 
-  const defaultL2Cost = 1000; // TODO: Config
+  const defaultL2Cost = 316274400; // TODO: Config
   const getL2Cost = useCallback(() => {
     return defaultL2Cost;
   }, [defaultL2Cost]);

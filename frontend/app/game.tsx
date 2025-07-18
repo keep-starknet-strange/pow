@@ -59,6 +59,7 @@ export default function game() {
     );
   }, [updateAchievement]);
 
+  /*
   const { getWorkingBlock } = useGame();
   const { addAction } = usePowContractConnector();
   const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(
@@ -73,6 +74,7 @@ export default function game() {
       registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)),
     );
   }, [addAction, getWorkingBlock]);
+  */
 
   const { playSoundEffect } = useSound();
   const [soundObserver, setSoundObserver] = useState<null | number>(null);

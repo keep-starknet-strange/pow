@@ -5,35 +5,35 @@
       "name": "Block Difficulty",
       "color": "#f760f7a0",
       "description": "Lower block difficulty for faster mining",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80],
+      "costs": [1413, 11349, 92777, 489645, 2237625, 8926758, 32625547, 92632800],
       "values": [7, 6, 5, 4, 3, 2, 1, 0],
       "baseValue": 8
     },
     {
       "id": 1,
-      "name": "Block Size",
+      "name": "Block Reward",
       "color": "#f760f7a0",
-      "description": "Increase the transactions per block",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      "values": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      "description": "Increase the block reward for miners",
+      "costs": [1413, 11349, 92777, 489645, 2237625, 8926758, 32625547, 92632800],
+      "values": [330, 1200, 8400, 21600, 98400, 206400, 734400, 1224000],
       "baseValue": 5
     },
     {
       "id": 2,
-      "name": "Block Reward",
+      "name": "Block Size",
       "color": "#f760f7a0",
-      "description": "Increase the block reward for miners",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      "values": [10, 20, 40, 80, 160, 320, 640, 1280, 2560, 5120],
-      "baseValue": 5
+      "description": "Increase the transactions per block",
+      "costs": [1305, 85640, 2065500, 30115890],
+      "values": [5, 6, 7, 8],
+      "baseValue": 4
     },
     {
       "id": 3,
       "name": "MEV Boost",
       "color": "#f760f7a0",
       "description": "Increase the transaction fee for miners",
-      "costs": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      "values": [11, 12, 14, 18, 25, 35, 50, 70, 100, 150],
+      "costs": [117, 11349, 489645, 8926758, 92632800],
+      "values": [2, 4, 8, 16, 32],
       "baseValue": 1
     }
   ],

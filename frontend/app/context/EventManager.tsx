@@ -14,6 +14,7 @@ export type EventType =
   | "ItemPurchased"
   | "BuyFailed"
   | "InvalidPurchase"
+  | "BlockFull"
   | "TxUpgradePurchased"
   | "UpgradePurchased"
   | "AutomationPurchased"
@@ -26,7 +27,7 @@ export type EventType =
   | "SwitchPage";
 
 export interface Observer {
-  onNotify(eventName: EventType, data?: any): void;
+  onNotify(eventName: EventType, data?: any): Promise<void>;
 }
 
 type EventManagerContextType = {

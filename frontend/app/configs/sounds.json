@@ -54,6 +54,11 @@
     "rate": 1,
     "haptic": "Error"
   },
+  "BlockFull": {
+    "volume": 1,
+    "rate": 1,
+    "haptic": "Error"
+  },
   "TxAdded": {
     "volume": 1,
     "rate": 1,

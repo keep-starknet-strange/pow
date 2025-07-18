@@ -38,7 +38,7 @@ export type TxButtonProps = {
 export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
-  const { addTransaction } = useGame();
+  const { addTransaction, workingBlocks } = useGame();
   const {
     transactionFees,
     dappFees,
@@ -295,6 +295,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     return 94 - automationAnimHeight.value;
   }, [automationAnimHeight]);
   useEffect(() => {
+    if (workingBlocks[props.chainId]?.isBuilt) {
+      automationAnimHeight.value = 94;
+      return;
+    }
     let randomDurationOffset = Math.random() * 500;
     const interval = setInterval(
       () => {
@@ -321,7 +325,13 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       5000 / speed + 200 + randomDurationOffset,
     );
     return () => clearInterval(interval);
-  }, [speed, automationAnimHeight, addNewTransaction]);
+  }, [
+    speed,
+    automationAnimHeight,
+    addNewTransaction,
+    workingBlocks,
+    props.chainId,
+  ]);
 
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">
