@@ -46,9 +46,6 @@ export function useBubblePosition(
         borderLeftWidth: ARROW_SIZE,
         borderRightWidth: ARROW_SIZE,
         borderBottomWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: "#FBBF24",
       }
     : {
         position: "absolute",
@@ -56,9 +53,6 @@ export function useBubblePosition(
         borderLeftWidth: ARROW_SIZE,
         borderRightWidth: ARROW_SIZE,
         borderTopWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderTopColor: "#FBBF24",
       };
 
   return useMemo(

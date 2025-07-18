@@ -174,7 +174,7 @@ export const StakingPage: React.FC = () => {
               {balancePercentages.map((percent, i) => (
                 <StakingAction
                   key={i}
-                  action={onPressFillStake(i)}
+                  action={onPressFillStake(percent)}
                   label={`${percent}%`}
                 />
               ))}
