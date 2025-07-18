@@ -1,68 +1,60 @@
+/** hooks/useBubblePosition.ts */
+import { useWindowDimensions } from "react-native";
 import { useMemo } from "react";
-import { Dimensions, ViewStyle } from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const BUBBLE_MAX_WIDTH = 260;
-const HORIZONTAL_MARGIN = 8;
-const ARROW_SIZE = 8;
-const ARROW_SPACING = 4;
-const BUBBLE_WIDTH = Math.min(SCREEN_WIDTH * 0.8, BUBBLE_MAX_WIDTH);
+const ARROW_W = 18; 
+const ARROW_H = 10;
+const BUBBLE_W = 260;
+const MARGIN = 12;
 
-const clamp = (val: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, val));
+export type BubblePosition = {
+  bubbleLeft: number;
+  bubbleTop: number;
+  arrowLeft: number;
+  arrowStyle: { top: number };
+  direction: "up" | "down";
+};
 
-export function useBubblePosition(
+export const useBubblePosition = (
   target: { x: number; y: number; width: number; height: number },
   bubbleHeight: number,
-) {
-  const { x, y, width, height } = target;
-  const roomBelow = SCREEN_HEIGHT - (y + height);
-  const showBelow = roomBelow >= bubbleHeight + ARROW_SIZE + ARROW_SPACING + 10;
+): BubblePosition => {
+  const { width: SCREEN_W, height: SCREEN_H } = useWindowDimensions();
 
-  let top = showBelow
-    ? y + height + ARROW_SIZE + ARROW_SPACING
-    : y - bubbleHeight - ARROW_SIZE - ARROW_SPACING;
+  return useMemo(() => {
+    const centerX = target.x + target.width / 2;
+    const bubbleLeft = Math.max(
+      MARGIN,
+      Math.min(centerX - BUBBLE_W / 2, SCREEN_W - BUBBLE_W - MARGIN),
+    );
 
-  top = clamp(
-    top,
-    HORIZONTAL_MARGIN,
-    SCREEN_HEIGHT - bubbleHeight - HORIZONTAL_MARGIN,
-  );
-  const left = clamp(
-    x + width / 2 - BUBBLE_WIDTH / 2,
-    HORIZONTAL_MARGIN,
-    SCREEN_WIDTH - BUBBLE_WIDTH - HORIZONTAL_MARGIN,
-  );
+    const spaceAbove = target.y;
+    const spaceBelow = SCREEN_H - (target.y + target.height);
 
-  const arrowLeft = clamp(
-    x + width / 2 - ARROW_SIZE,
-    HORIZONTAL_MARGIN,
-    SCREEN_WIDTH - ARROW_SIZE - HORIZONTAL_MARGIN,
-  );
-  const arrowStyle: ViewStyle = showBelow
-    ? {
-        position: "absolute",
-        top: top - ARROW_SIZE,
-        borderLeftWidth: ARROW_SIZE,
-        borderRightWidth: ARROW_SIZE,
-        borderBottomWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderBottomColor: "#FBBF24",
-      }
-    : {
-        position: "absolute",
-        top: top + bubbleHeight,
-        borderLeftWidth: ARROW_SIZE,
-        borderRightWidth: ARROW_SIZE,
-        borderTopWidth: ARROW_SIZE,
-        borderLeftColor: "transparent",
-        borderRightColor: "transparent",
-        borderTopColor: "#FBBF24",
-      };
+    const showBelow =
+      spaceBelow >= bubbleHeight + ARROW_H + MARGIN || spaceBelow >= spaceAbove;
 
-  return useMemo(
-    () => ({ left, top, style: arrowStyle, arrowLeft }),
-    [left, top, arrowStyle, arrowLeft],
-  );
-}
+    const direction: "up" | "down" = showBelow ? "up" : "down";
+
+    const bubbleTop = showBelow
+      ? target.y + target.height + ARROW_H
+      : target.y - bubbleHeight - ARROW_H;
+
+    const arrowTop = showBelow
+      ? bubbleTop - ARROW_H
+      : bubbleTop + bubbleHeight;
+
+    const arrowLeft = Math.max(
+      bubbleLeft,
+      Math.min(centerX - ARROW_W / 2, bubbleLeft + BUBBLE_W - ARROW_W),
+    );
+
+    return {
+      bubbleLeft,
+      bubbleTop,
+      arrowLeft,
+      arrowStyle: { top: arrowTop },
+      direction,
+    };
+  }, [SCREEN_W, SCREEN_H, target, bubbleHeight]);
+};

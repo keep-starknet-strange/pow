@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: BORDER_RADIUS,
     overflow: "hidden",
-    backgroundColor: "#2c2c2e", // fallback bg while image loads
+    backgroundColor: "#2c2c2e",
     justifyContent: "center",
     alignItems: "center",
   },
