@@ -12,7 +12,6 @@ import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
 import { DappsUnlock } from "../components/store/DappsUnlock";
 import { L2Unlock } from "../components/store/L2Unlock";
-import { StakingUnlock } from "../components/store/StakingUnlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
 
@@ -269,11 +268,6 @@ export const StorePage: React.FC = () => {
             </View>
           )}
           {activeSubTab === "Transactions" && <DappsUnlock chainId={chainId} />}
-          {storeType === "L1" && activeSubTab === "Upgrades" && (
-            <View>
-              <StakingUnlock />
-            </View>
-          )}
           {storeType === "L1" && activeSubTab === "Automation" && (
             <View className="flex flex-col px-[16px]">
               <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />

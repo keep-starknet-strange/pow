@@ -141,6 +141,11 @@ const imagePaths = {
     `${assetsPath}/block/blockchain_grid_chainconnector.png`,
   ),
 
+  // Staking
+  stakingBg: require(`${assetsPath}/staking/staking_bg.png`),
+  stakingButtonBg: require(`${assetsPath}/staking/button.png`),
+  stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.png`),
+
   // Navigation Images
   navButton: require(`${assetsPath}/navigation/menu_button_normal.png`),
   navButtonActive: require(`${assetsPath}/navigation/menu_button_selected.png`),
@@ -459,6 +464,12 @@ export const useImagePreloader = () => {
     blockGrid: useImage(imagePaths.blockGrid),
     blockGridMin: useImage(imagePaths.blockGridMin),
     blockConnector: useImage(imagePaths.blockConnector),
+
+    // Staking
+    stakingBg: useImage(imagePaths.stakingBg),
+    stakingButtonBg: useImage(imagePaths.stakingButtonBg),
+    stakingAmountsBg: useImage(imagePaths.stakingAmountsBg),
+
     txBackground: useImage(imagePaths.txBackground),
     l2TxBackground: useImage(imagePaths.l2TxBackground),
     navButton: useImage(imagePaths.navButton),
@@ -580,6 +591,7 @@ export const useImagePreloader = () => {
         "logo.starknet": images.starknet,
         "background.grid": images.backgroundGrid,
         "background.shop": images.shopBg,
+        "background.staking": images.stakingBg,
         header: images.header,
         "header.switch": images.headerSwitch,
         "header.switch.active": images.headerSwitchActive,
@@ -679,6 +691,8 @@ export const useImagePreloader = () => {
         "shop.upgrades.daCompression": images.shopDaComp,
         "shop.upgrades.mevBoost": images.shopMevBoost,
         "shop.upgrades.recursiveProving": images.shopRecursiveProof,
+        "staking.button.bg": images.stakingButtonBg,
+        "staking.amounts.bg": images.stakingAmountsBg,
         "achievements.bg": images.achievmentsBg,
         "achievements.tile.locked": images.achievementsTileLocked,
         "achievements.tile.progress": images.achievementsTileProgress,
