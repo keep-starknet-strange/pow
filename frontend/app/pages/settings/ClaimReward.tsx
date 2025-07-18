@@ -29,7 +29,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
   const rewardUnlocked = true;
 
   const claimReward = async () => {
-    if (!gameAccount || accountInput.trim() === "") {
+    if (!account || accountInput.trim() === "") {
       console.error("No account connected");
       return;
     }
