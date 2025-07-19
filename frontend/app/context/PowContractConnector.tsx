@@ -8,6 +8,7 @@ import React, {
 import { Call, Contract } from "starknet";
 import { useStarknetConnector } from "./StarknetConnector";
 import { useFocEngine } from "./FocEngineConnector";
+import { useOnchainActions } from "../stores/useOnchainActions";
 
 export type PowAction = {
   contract?: string; // Contract address
@@ -21,7 +22,7 @@ type PowContractContextType = {
 
   createGameAccount: () => Promise<void>;
   initMyGame: () => Promise<void>;
-  addAction: (action: PowAction) => void;
+  addPowAction: (action: PowAction) => void;
 
   getUserBalance: () => Promise<number | undefined>;
   getUserTxFeeLevels: (
@@ -51,8 +52,6 @@ type PowContractContextType = {
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
   getUserProofClicks: (chainId: number) => Promise<number | undefined>;
 };
-
-export const MAX_ACTIONS = Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50;
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(
   undefined,
@@ -84,12 +83,12 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     account,
   } = useStarknetConnector();
   const { getRegisteredContract, mintFunds, connectContract } = useFocEngine();
+  const { addAction } = useOnchainActions();
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<
     string | null
   >(null);
   const [powContract, setPowContract] = useState<Contract | null>(null);
-  const [actionCalls, setActionCalls] = useState<Call[]>([]);
 
   useEffect(() => {
     if (!STARKNET_ENABLED) {
@@ -162,7 +161,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     STARKNET_ENABLED,
   ]);
 
-  const addAction = useCallback(
+  const addPowAction = useCallback(
     (action: PowAction) => {
       if (!STARKNET_ENABLED) {
         return;
@@ -176,9 +175,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         entrypoint: action.action,
         calldata: action.args,
       };
-      setActionCalls((prevCalls) => [...prevCalls, actionCall]);
+      addAction(actionCall);
     },
-    [powGameContractAddress],
+    [
+      addAction,
+      powGameContractAddress,
+      STARKNET_ENABLED,
+    ],
   );
 
   const initMyGame = useCallback(async () => {
@@ -192,7 +195,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (network === "SN_DEVNET") {
       // TODO: Invoke like else statement with account deployment
-      addAction({
+      addPowAction({
         contract: powGameContractAddress,
         action: "init_my_game",
         args: [],
@@ -208,7 +211,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [
     powGameContractAddress,
     invokeWithPaymaster,
-    addAction,
+    addPowAction,
     network,
     STARKNET_ENABLED,
   ]);
@@ -437,33 +440,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
-  useEffect(() => {
-    if (actionCalls.length >= MAX_ACTIONS) {
-      const invokeActions = actionCalls.slice(0, MAX_ACTIONS);
-      const remainingActions = actionCalls.slice(MAX_ACTIONS);
-      console.log("Invoking contract calls:", invokeActions.length);
-      setActionCalls(remainingActions);
-      if (network === "SN_DEVNET") {
-        invokeContractCalls(invokeActions);
-      } else {
-        invokeWithPaymaster(invokeActions);
-      }
-    }
-  }, [
-    actionCalls,
-    invokeWithPaymaster,
-    invokeContractCalls,
-    network,
-    STARKNET_ENABLED,
-  ]);
-
   return (
     <PowContractConnector.Provider
       value={{
         powGameContractAddress,
         createGameAccount,
         initMyGame,
-        addAction,
+        addPowAction,
         getUserBalance,
         powContract,
         getUserTxFeeLevels,

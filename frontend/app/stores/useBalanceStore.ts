@@ -1,76 +1,61 @@
 import { create } from "zustand";
+import { Contract } from "starknet";
+import { useEventManager } from "./useEventManager";
+import { FocAccount } from "../context/FocEngineConnector";
 
 interface BalanceState {
   balance: number;
   setBalance: (balance: number) => void;
   updateBalance: (change: number) => void;
   tryBuy: (cost: number) => boolean;
-  notifyDependency?: (eventName: any, data?: any) => void;
-  setNotifyDependency: (notify: (eventName: any, data?: any) => void) => void;
-  fetchBalanceDependency?: () => Promise<number | undefined>;
-  setFetchBalanceDependency: (
-    fetchBalance: () => Promise<number | undefined>,
-  ) => void;
-  fetchBalance: () => Promise<void>;
+  initializeBalance: (powContract: Contract | null, user: FocAccount | null, getUserBalance: () => Promise<number | undefined>) => Promise<void>;
 }
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({
   balance: 0,
-  notifyDependency: undefined,
-  fetchBalanceDependency: undefined,
-
-  setNotifyDependency: (notify) => set({ notifyDependency: notify }),
-  setFetchBalanceDependency: (fetchBalance) =>
-    set({ fetchBalanceDependency: fetchBalance }),
-
   setBalance: (balance: number) => set({ balance }),
 
   updateBalance: (change: number) => {
     set((state) => {
       const newBalance = state.balance + change;
 
-      if (state.notifyDependency) {
-        state.notifyDependency("BalanceUpdated", {
-          balance: newBalance,
-          change,
-        });
-      }
+      useEventManager.getState().notify("BalanceUpdated", {
+        balance: newBalance,
+        change,
+      });
 
       return { balance: newBalance };
     });
   },
 
   tryBuy: (cost: number) => {
-    const { balance, updateBalance, notifyDependency } = get();
+    const { balance, updateBalance } = get();
 
     if (balance >= cost) {
       updateBalance(-cost);
-      if (notifyDependency) {
-        notifyDependency("ItemPurchased", { cost });
-      }
+      useEventManager.getState().notify("ItemPurchased", { cost });
       return true;
     } else {
-      if (notifyDependency) {
-        notifyDependency("BuyFailed", { cost, balance });
-      }
+      useEventManager.getState().notify("BuyFailed", { cost, balance });
       return false;
     }
   },
 
-  fetchBalance: async () => {
-    const { fetchBalanceDependency, setBalance } = get();
-
-    if (fetchBalanceDependency) {
+  initializeBalance: async (powContract, user, getUserBalance) => {
+    const fetchBalance = async () => {
+      if (!user || !powContract) {
+        set({ balance: 0 });
+        return;
+      }
       try {
-        const balance = await fetchBalanceDependency();
-        setBalance(balance ?? 0);
+        const balance = await getUserBalance();
+        set({ balance });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        setBalance(0);
+        set({ balance: 0 });
       }
-    } else {
-      setBalance(0);
-    }
+    };
+    fetchBalance();
   },
 }));
 

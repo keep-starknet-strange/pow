@@ -1,4 +1,4 @@
-import { Observer, EventType } from "../context/EventManager";
+import { Observer, EventType } from "@/app/stores/useEventManager";
 import { Block } from "../types/Chains";
 import transactionsJson from "../configs/transactions.json";
 import { PowAction } from "../context/PowContractConnector";
@@ -98,14 +98,11 @@ export const createBuyPrestigeAction = (): PowAction => {
 
 export class TxBuilderObserver implements Observer {
   private addAction: (call: PowAction) => void;
-  private getWorkingBlock: (chainId: number) => Block | null;
 
   constructor(
     addAction: (call: PowAction) => void,
-    getWorkingBlock: (chainId: number) => Block | null,
   ) {
     this.addAction = addAction;
-    this.getWorkingBlock = getWorkingBlock;
   }
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
@@ -139,11 +136,11 @@ export class TxBuilderObserver implements Observer {
         // Proccessed above in the if statement since this is a special case
         break;
       case "MineClicked":
-        if (this.getWorkingBlock(0)?.blockId === 0) return;
+        if (data.ignoreAction) return;
         this.addAction(createMineBlockAction(0));
         break;
       case "SequenceClicked":
-        if (this.getWorkingBlock(1)?.blockId === 0) return;
+        if (data.ignoreAction) return;
         this.addAction(createMineBlockAction(1));
         break;
       case "DaClicked":

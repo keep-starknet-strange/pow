@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../context/Upgrades";

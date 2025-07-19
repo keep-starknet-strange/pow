@@ -7,7 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { useGame } from "../context/Game";
+import { useGameStore } from "@/app/stores/useGameStore";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -30,7 +30,6 @@ export type EmptyViewProps = {
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
   const { getImage } = useImages();
-  const { workingBlocks } = useGame();
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
   useEffect(() => {
@@ -55,7 +54,6 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
     */
   }, [
     props.chainId,
-    workingBlocks[props.chainId]?.blockId,
     props.placement.left,
     props.completedPlacementLeft,
   ]);

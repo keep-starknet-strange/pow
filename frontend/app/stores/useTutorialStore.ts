@@ -24,10 +24,6 @@ interface TutorialState {
   registerLayout: (targetId: TargetId, layout: Layout) => void;
   setVisible: (visible: boolean) => void;
   setIsTutorialActive: (active: boolean) => void;
-
-  observerId?: number;
-  setObserverId: (id: number) => void;
-  clearObserverId: () => void;
 }
 
 export const useTutorialStore = create<TutorialState>((set, get) => ({
@@ -36,10 +32,6 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
   stepIndex: 0,
   layouts: {},
   visible: false,
-  observerId: undefined,
-
-  setObserverId: (id: number) => set({ observerId: id }),
-  clearObserverId: () => set({ observerId: undefined }),
 
   advanceStep: () => {
     set((state) => {

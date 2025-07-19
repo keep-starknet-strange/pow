@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
@@ -36,7 +36,7 @@ export const useSequencer = (
   const sequenceBlock = () => {
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      notify("SequenceClicked", { counter: newCounter });
+      notify("SequenceClicked", { counter: newCounter, ignoreAction: getWorkingBlock(1)?.blockId === 0 });
       return newCounter;
     });
   };

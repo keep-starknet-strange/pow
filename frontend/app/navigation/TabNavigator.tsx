@@ -9,7 +9,7 @@ import { AchievementsPage } from "../pages/AchievementsPage";
 import { SettingsPage } from "../pages/SettingsPage";
 import { StakingPage } from "../pages/StakingPage";
 
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";

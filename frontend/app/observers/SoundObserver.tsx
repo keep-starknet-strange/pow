@@ -1,4 +1,4 @@
-import { Observer, EventType } from "../context/EventManager";
+import { Observer, EventType } from "@/app/stores/useEventManager";
 
 export class SoundObserver implements Observer {
   private playSound: (soundType: string, pitchShift?: number) => Promise<void>;

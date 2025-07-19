@@ -1,4 +1,4 @@
-import { Observer, EventType } from "../context/EventManager";
+import { Observer, EventType } from "@/app/stores/useEventManager";
 import { TutorialStep } from "../stores/useTutorialStore";
 
 type Handler = () => void;

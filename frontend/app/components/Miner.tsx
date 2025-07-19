@@ -13,7 +13,7 @@ export const getMiningAnimation = (mineProgress: number) => {
 };
 
 export const Miner: React.FC = () => {
-  const { automations, getUpgradeValue } = useUpgrades();
+  const { getUpgradeValue } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
 
   const [mineStartTime, setMineStartTime] = useState(Date.now());

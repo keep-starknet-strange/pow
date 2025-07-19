@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Observer, EventType } from "../context/EventManager";
+import { Observer, EventType } from "@/app/stores/useEventManager";
 import achievements from "../configs/achievements.json";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";

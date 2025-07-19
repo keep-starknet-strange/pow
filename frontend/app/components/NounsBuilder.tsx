@@ -17,7 +17,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import {
   getNounsAccessoriesList,
   getNounsBodiesList,

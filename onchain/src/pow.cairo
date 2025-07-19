@@ -7,7 +7,6 @@ mod PowGame {
     use pow_game::actions::*;
     use pow_game::interface::{IPowGame, IPowGameRewards, IPowGameValidation};
     use pow_game::store::*;
-    use pow_game::transactions::{DA_TX_TYPE_ID, PROOF_TX_TYPE_ID};
     use pow_game::types::RewardParams;
 
     // --- Game Components ---
@@ -384,11 +383,10 @@ mod PowGame {
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
             if (chain_id != 0) {
                 // Add block to da & proof
-                self.builder.build_proof(chain_id, fees + reward);
-                self.builder.build_da(chain_id, fees + reward);
-            } else {
-                pay_user(ref self, caller, fees + reward);
+                self.builder.build_proof(chain_id, reward);
+                self.builder.build_da(chain_id, reward);
             }
+            pay_user(ref self, caller, fees + reward);
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
             self.builder.reset_block(chain_id);
@@ -412,7 +410,7 @@ mod PowGame {
 
             // Add DA to lower chain
             let total_fees = working_da.fees;
-            do_add_transaction(ref self, chain_id - 1, DA_TX_TYPE_ID, total_fees);
+            pay_user(ref self, caller, total_fees);
             self.emit(DAStored { user: caller, chain_id, fees: total_fees });
 
             self.builder.reset_da(chain_id);
@@ -436,7 +434,7 @@ mod PowGame {
 
             // Add Proof to lower chain
             let total_fees = working_proof.fees;
-            do_add_transaction(ref self, chain_id - 1, PROOF_TX_TYPE_ID, total_fees);
+            pay_user(ref self, caller, total_fees);
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
 
             self.builder.reset_proof(chain_id);

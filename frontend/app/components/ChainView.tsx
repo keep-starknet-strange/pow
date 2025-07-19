@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import { useChains } from "../context/Chains";
+import { useChainsStore } from "../stores/useChainsStore";
 import { BlockView } from "./BlockView";
 
 export type ChainViewProps = {
@@ -8,7 +8,7 @@ export type ChainViewProps = {
 };
 
 export const ChainView: React.FC<ChainViewProps> = (props) => {
-  const { chains } = useChains();
+  const { chains } = useChainsStore();
 
   return (
     <View className="flex flex-row w-full justify-end pr-[0.5rem] min-h-[6rem]">

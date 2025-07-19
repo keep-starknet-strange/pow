@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
@@ -40,6 +40,7 @@ export const useMiner = (
       notify("MineClicked", {
         counter: newCounter,
         difficulty: blockDifficulty,
+        ignoreAction: getWorkingBlock(0)?.blockId === 0,
       });
       return newCounter;
     });

@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
-import { useGame } from "../context/Game";
+import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../context/Upgrades";
 import { useImages } from "../hooks/useImages";
-import { Miner } from "./Miner";
-import { Sequencer } from "./Sequencer";
 import Animated, {
   runOnJS,
   Easing,
@@ -40,7 +38,7 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   props,
 ) => {
-  const { workingBlocks, getWorkingBlock } = useGame();
+  const { getWorkingBlock } = useGameStore();
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
 
@@ -57,18 +55,16 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   const detailsScaleAnim = useSharedValue(1);
   useEffect(() => {
     detailsScaleAnim.value = 1;
-    if (workingBlocks[props.chainId]?.blockId) {
-      detailsScaleAnim.value = withSequence(
-        withTiming(1.05, { duration: 300, easing: Easing.inOut(Easing.ease) }),
-        withTiming(
-          1.05,
-          { duration: 900, easing: Easing.inOut(Easing.ease) },
-          () => runOnJS(updateWorkingBlock)(props.chainId),
-        ),
-        withSpring(1, { damping: 2, stiffness: 100 }),
-      );
-    }
-  }, [workingBlocks[props.chainId]?.blockId, props.chainId]);
+    detailsScaleAnim.value = withSequence(
+      withTiming(1.05, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+      withTiming(
+        1.05,
+        { duration: 900, easing: Easing.inOut(Easing.ease) },
+        () => runOnJS(updateWorkingBlock)(props.chainId),
+      ),
+      withSpring(1, { damping: 2, stiffness: 100 }),
+    );
+  }, [props.chainId]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
     getWorkingBlock(props.chainId),

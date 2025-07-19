@@ -17,7 +17,6 @@ export const getProvingAnimation = (progress: number) => {
 };
 
 export const Prover: React.FC = () => {
-  const { automations } = useUpgrades();
   const { proverProgress, prove } = useGame();
 
   return (
