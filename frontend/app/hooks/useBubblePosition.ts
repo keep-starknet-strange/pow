@@ -2,7 +2,7 @@
 import { useWindowDimensions } from "react-native";
 import { useMemo } from "react";
 
-const ARROW_W = 18; 
+const ARROW_W = 18;
 const ARROW_H = 10;
 const BUBBLE_W = 260;
 const MARGIN = 12;
@@ -40,9 +40,7 @@ export const useBubblePosition = (
       ? target.y + target.height + ARROW_H
       : target.y - bubbleHeight - ARROW_H;
 
-    const arrowTop = showBelow
-      ? bubbleTop - ARROW_H
-      : bubbleTop + bubbleHeight;
+    const arrowTop = showBelow ? bubbleTop - ARROW_H : bubbleTop + bubbleHeight;
 
     const arrowLeft = Math.max(
       bubbleLeft,
