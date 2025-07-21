@@ -117,13 +117,13 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
           style={{
             color: "#c3c3c3",
             fontFamily: "Pixels",
-            fontSize: isSmall ? 16 : 18,
+            fontSize: isSmall ? 16 : 14,
           }}
         >
           Block&nbsp;
         </Text>
         <AnimatedRollingNumber
-          value={workingBlock?.blockId || 0}
+          value={getWorkingBlock(props.chainId)?.blockId || 0}
           textStyle={{
             fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
@@ -144,7 +144,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
         }}
       >
         <AnimatedRollingNumber
-          value={workingBlock?.transactions.length || 0}
+          value={getWorkingBlock(props.chainId)?.transactions.length || 0}
           textStyle={{
             fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
@@ -173,8 +173,8 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
       >
         <AnimatedRollingNumber
           value={
-            (workingBlock?.fees || 0) +
-            (workingBlock?.reward ||
+            (getWorkingBlock(props.chainId)?.fees || 0) +
+            (getWorkingBlock(props.chainId)?.reward ||
               0 ||
               getUpgradeValue(props.chainId, "Block Reward"))
           }

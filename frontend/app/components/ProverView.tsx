@@ -24,6 +24,7 @@ export const ProverView = () => {
       <L2ProgressView
         value={getProver()?.blocks.length || 0}
         maxValue={proofMaxSize}
+        fees={getProver()?.blockFees || 0}
         label="Proving"
       />
       {getProver()?.isBuilt && (

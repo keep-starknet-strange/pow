@@ -169,7 +169,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
       }
-      useEventManager.getState().notify("TxAdded", { chainId, tx: transaction });
+      useEventManager.getState().notify("TxAdded", { chainId, tx: transaction,
+        progress: block.transactions.length / maxBlockSize });
       return { workingBlocks: newWorkingBlocks };
     });
   },

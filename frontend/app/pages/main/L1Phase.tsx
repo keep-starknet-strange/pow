@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Dimensions, View, TouchableOpacity, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -22,6 +22,9 @@ export const L1Phase: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[0] ? 1 : 0],
   );
+  useEffect(() => {
+    setActiveTab(dappsUnlocked[0] ? "dApps" : "Transactions");
+  }, [dappsUnlocked]);
 
   return (
     <View

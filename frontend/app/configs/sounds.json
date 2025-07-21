@@ -5,8 +5,8 @@
     "haptic": "Heavy"
   },
   "MineDone": {
-    "volume": 0.7,
-    "rate": 1.2,
+    "volume": 0.4,
+    "rate": 1,
     "haptic": "Success"
   },
   "SequenceClicked": {
@@ -16,7 +16,7 @@
   },
   "SequenceDone": {
     "volume": 0.4,
-    "rate": 1.2,
+    "rate": 1,
     "haptic": "Success"
   },
   "ProveClicked": {
@@ -35,8 +35,8 @@
     "haptic": "Rigid"
   },
   "DaDone": {
-    "volume": 0.3,
-    "rate": 1.2,
+    "volume": 0.4,
+    "rate": 1,
     "haptic": "Success"
   },
   "ItemPurchased": {
@@ -70,13 +70,23 @@
     "haptic": "Soft"
   },
   "BasicClick": {
-    "volume": 0.5,
+    "volume": 1,
     "rate": 1,
     "haptic": "Soft"
+  },
+  "BasicError": {
+    "volume": 1,
+    "rate": 1,
+    "haptic": "Error"
   },
   "SwitchPage": {
     "volume": 0.5,
     "rate": 1,
     "haptic": "Light"
+  },
+  "DiceRoll": {
+    "volume": 1,
+    "rate": 1,
+    "haptic": "Heavy"
   }
 }

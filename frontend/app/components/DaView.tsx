@@ -21,7 +21,8 @@ export const DaView = () => {
       <L2ProgressView
         value={getDa()?.blocks.length || 0}
         maxValue={daWidth}
-        label="Data Availability"
+        fees={getDa()?.blockFees || 0}
+        label="Data"
       />
       {getDa()?.isBuilt && (
         <View className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]">

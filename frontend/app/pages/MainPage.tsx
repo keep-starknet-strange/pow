@@ -12,6 +12,9 @@ export const MainPage: React.FC = () => {
   const [currentView, setCurrentView] = React.useState<"L1" | "L2">(
     l2 ? "L2" : "L1",
   );
+  useEffect(() => {
+    setCurrentView(l2 ? "L2" : "L1");
+  }, [l2]);
 
   return (
     <View className="flex-1 relative">

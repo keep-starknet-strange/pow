@@ -214,7 +214,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     set((state) => {
       if (!get().canUnlockTx(chainId, txId)) {
         useEventManager.getState().notify("InvalidPurchase");
-        return state.transactionFeeLevels;
+        return { transactionFeeLevels: state.transactionFeeLevels };
       }
       const newFees = { ...state.transactionFeeLevels };
       if (!newFees[chainId]) {
@@ -228,14 +228,14 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         console.warn(
           `Transaction with ID ${txId} not found for chain ${chainId}`,
         );
-        return newFees;
+        return { transactionFeeLevels: newFees };
       }
       const currentLevel = newFees[chainId][txId];
       if (currentLevel >= transactionData.feeCosts.length - 1) {
         console.warn(
           `Transaction fee level already at max for transaction ID ${txId} on chain ${chainId}`,
         );
-        return newFees;
+        return { transactionFeeLevels: newFees };
       }
       const cost = transactionData.feeCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost)) return state.transactionFeeLevels;
@@ -248,7 +248,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         type: "txFee",
         level: currentLevel + 1,
       });
-      return newFees;
+      return { transactionFeeLevels: newFees };
     });
   },
 
@@ -266,14 +266,14 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         console.warn(
           `Transaction with ID ${txId} not found for chain ${chainId}`,
         );
-        return newSpeeds;
+        return { transactionSpeedLevels: newSpeeds };
       }
       const currentLevel = newSpeeds[chainId][txId];
       if (currentLevel >= transactionData.speedCosts.length - 1) {
         console.warn(
           `Transaction speed level already at max for transaction ID ${txId} on chain ${chainId}`,
         );
-        return newSpeeds;
+        return { transactionSpeedLevels: newSpeeds };
       }
       const cost = transactionData.speedCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost)) return state.transactionSpeedLevels;
@@ -286,7 +286,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         type: "txSpeed",
         level: currentLevel + 1,
       });
-      return newSpeeds;
+      return { transactionSpeedLevels: newSpeeds };
     });
   },
 
@@ -294,7 +294,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     set((state) => {
       if (!get().canUnlockDapp(chainId, dappId)) {
         useEventManager.getState().notify("InvalidPurchase");
-        return state.dappFeeLevels;
+        return { dappFeeLevels: state.dappFeeLevels };
       }
       const newFees = { ...state.dappFeeLevels };
       if (!newFees[chainId]) {
@@ -306,14 +306,14 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
         console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-        return newFees;
+        return { dappFeeLevels: newFees };
       }
       const currentLevel = newFees[chainId][dappId];
       if (currentLevel >= dappData.feeCosts.length - 1) {
         console.warn(
           `Dapp fee level already at max for dapp ID ${dappId} on chain ${chainId}`,
         );
-        return newFees;
+        return { dappFeeLevels: newFees };
       }
       const cost = dappData.feeCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost)) return state.dappFeeLevels;
@@ -326,7 +326,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
           type: "dappFee",
           level: currentLevel + 1,
         });
-      return newFees;
+      return { dappFeeLevels: newFees };
     });
   },
 
@@ -342,14 +342,14 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
         console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
-        return newSpeeds;
+        return { dappSpeedLevels: newSpeeds };
       }
       const currentLevel = newSpeeds[chainId][dappId];
       if (currentLevel >= dappData.speedCosts.length - 1) {
         console.warn(
           `Dapp speed level already at max for dapp ID ${dappId} on chain ${chainId}`,
         );
-        return newSpeeds;
+        return { dappSpeedLevels: newSpeeds };
       }
       const cost = dappData.speedCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost)) return state.dappSpeedLevels;
@@ -362,7 +362,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
           type: "dappSpeed",
           level: currentLevel + 1,
         });
-      return newSpeeds;
+      return { dappSpeedLevels: newSpeeds };
     });
   },
 
@@ -370,14 +370,14 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     set((state) => {
       if (!get().canUnlockDapps(chainId)) {
         useEventManager.getState().notify("InvalidPurchase");
-        return state.dappsUnlocked;
+        return { dappsUnlocked: state.dappsUnlocked };
       }
       const cost = get().getDappUnlockCost(chainId);
       if (!useBalanceStore.getState().tryBuy(cost)) return state.dappsUnlocked;
       const newDappsUnlocked = { ...state.dappsUnlocked };
       newDappsUnlocked[chainId] = true;
       useEventManager.getState().notify("DappsPurchased", { chainId });
-      return newDappsUnlocked;
+      return { dappsUnlocked: newDappsUnlocked };
     });
   },
 
