@@ -177,11 +177,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       };
       addAction(actionCall);
     },
-    [
-      addAction,
-      powGameContractAddress,
-      STARKNET_ENABLED,
-    ],
+    [addAction, powGameContractAddress, STARKNET_ENABLED],
   );
 
   const initMyGame = useCallback(async () => {

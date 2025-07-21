@@ -160,7 +160,10 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
         {avatarTabs.map((tab) => (
           <TouchableOpacity
             key={tab.value}
-            onPress={() => { setAvatarTab(tab); notify("BasicClick"); }}
+            onPress={() => {
+              setAvatarTab(tab);
+              notify("BasicClick");
+            }}
             className="relative flex justify-center"
             style={{
               width: (width - 2 * avatarTabs.length - 6) / avatarTabs.length,

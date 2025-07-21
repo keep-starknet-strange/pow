@@ -4,7 +4,7 @@ import { FocAccount } from "../context/FocEngineConnector";
 import { useBalanceStore } from "./useBalanceStore";
 import { useChainsStore } from "./useChainsStore";
 import { useEventManager } from "./useEventManager";
-import { Transaction, Block, newBlock } from "../types/Chains"
+import { Transaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 
 interface GameStore {
@@ -13,11 +13,17 @@ interface GameStore {
   l2: L2 | undefined;
 
   resetGameStore: () => void;
-  initializeGameStore: (powContract: Contract | null, user: FocAccount | null,
-               getUserMaxChainId: () => Promise<number | undefined>,
-               getUserBlockNumber: (chainId: number) => Promise<number | undefined>,
-               getUserBlockState: (chainId: number) => Promise<{ size: number | undefined, fees: number | undefined } | undefined>
-               ) => void;
+  initializeGameStore: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+    getUserMaxChainId: () => Promise<number | undefined>,
+    getUserBlockNumber: (chainId: number) => Promise<number | undefined>,
+    getUserBlockState: (
+      chainId: number,
+    ) => Promise<
+      { size: number | undefined; fees: number | undefined } | undefined
+    >,
+  ) => void;
   getWorkingBlock: (chainId: number) => Block | undefined;
   addTransaction: (chainId: number, transaction: Transaction) => void;
 
@@ -52,7 +58,7 @@ interface GameStore {
   ) => void;
   initMyGameDependency?: () => void;
   setInitMyGameDependency: (initMyGame: () => void) => void;
-};
+}
 
 export const useGameStore = create<GameStore>((set, get) => ({
   genesisBlockReward: 1,
@@ -65,7 +71,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setInitMyGameDependency: (initMyGame) =>
     set({ initMyGameDependency: initMyGame }),
 
-
   resetGameStore: () => {
     const initBlock = newBlock(0, get().genesisBlockReward);
     initBlock.isBuilt = true; // Mark the genesis block as built
@@ -75,7 +80,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  initializeGameStore: (powContract, user, getUserMaxChainId, getUserBlockNumber, getUserBlockState) => {
+  initializeGameStore: (
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserBlockNumber,
+    getUserBlockState,
+  ) => {
     const fetchGameState = async () => {
       if (powContract && user) {
         try {
@@ -115,7 +126,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 isDapp: false,
               })),
               isBuilt: false,
-              reward: l2BlockNumber === 0 ? get().genesisBlockReward : undefined,
+              reward:
+                l2BlockNumber === 0 ? get().genesisBlockReward : undefined,
             };
             const l2Instance: L2 = newL2();
             l2Instance.da = newL2DA();
@@ -137,7 +149,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else {
         get().resetGameStore();
       }
-    }
+    };
     fetchGameState();
   },
 
@@ -159,7 +171,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { workingBlocks: newWorkingBlocks };
       }
       const block = newWorkingBlocks[chainId];
-      const maxBlockSize = getUpgradeValueDependency ? getUpgradeValueDependency(chainId, "Block Size") ** 2 : 4 ** 2;
+      const maxBlockSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(chainId, "Block Size") ** 2
+        : 4 ** 2;
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
         return { workingBlocks: newWorkingBlocks };
@@ -169,8 +183,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
       }
-      useEventManager.getState().notify("TxAdded", { chainId, tx: transaction,
-        progress: block.transactions.length / maxBlockSize });
+      useEventManager.getState().notify("TxAdded", {
+        chainId,
+        tx: transaction,
+        progress: block.transactions.length / maxBlockSize,
+      });
       return { workingBlocks: newWorkingBlocks };
     });
   },
@@ -260,9 +277,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.da) return state;
       newL2Instance.da.blocks.push(block.blockId);
-      const blockReward = block.reward || (getUpgradeValueDependency ? getUpgradeValueDependency(0, "Block Reward") : 1);
+      const blockReward =
+        block.reward ||
+        (getUpgradeValueDependency
+          ? getUpgradeValueDependency(0, "Block Reward")
+          : 1);
       newL2Instance.da.blockFees += blockReward;
-      const daMaxSize = getUpgradeValueDependency ? getUpgradeValueDependency(0, "DA compression") : 1;
+      const daMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(0, "DA compression")
+        : 1;
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return { l2: newL2Instance };
     });
@@ -276,10 +299,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.prover) return state;
       newL2Instance.prover.blocks.push(block.blockId);
-      const blockReward = block.reward || (getUpgradeValueDependency ? getUpgradeValueDependency(1, "Block Reward") : 1);
+      const blockReward =
+        block.reward ||
+        (getUpgradeValueDependency
+          ? getUpgradeValueDependency(1, "Block Reward")
+          : 1);
       newL2Instance.prover.blockFees += blockReward;
-      const proverMaxSize = getUpgradeValueDependency ? getUpgradeValueDependency(1, "Prover compression") : 1;
-      newL2Instance.prover.isBuilt = newL2Instance.prover.blocks.length >= proverMaxSize;
+      const proverMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(1, "Prover compression")
+        : 1;
+      newL2Instance.prover.isBuilt =
+        newL2Instance.prover.blocks.length >= proverMaxSize;
       return { l2: newL2Instance };
     });
   },
@@ -293,7 +323,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     const blockReward =
-      completedBlock.reward || (getUpgradeValueDependency ? getUpgradeValueDependency(0, "Block Reward") : 1);
+      completedBlock.reward ||
+      (getUpgradeValueDependency
+        ? getUpgradeValueDependency(0, "Block Reward")
+        : 1);
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
@@ -310,7 +343,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { getUpgradeValueDependency } = get();
     const completedBlock = get().workingBlocks[1];
     const blockReward =
-      completedBlock.reward || (getUpgradeValueDependency ? getUpgradeValueDependency(1, "Block Reward") : 1);
+      completedBlock.reward ||
+      (getUpgradeValueDependency
+        ? getUpgradeValueDependency(1, "Block Reward")
+        : 1);
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
@@ -318,7 +354,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newWorkingBlocks[1] = newBlockInstance;
       return { workingBlocks: newWorkingBlocks };
     });
-    useEventManager.getState().notify("SequenceDone", { block: completedBlock });
+    useEventManager
+      .getState()
+      .notify("SequenceDone", { block: completedBlock });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
     get().addBlockToDa(completedBlock);
     get().addBlockToProver(completedBlock);

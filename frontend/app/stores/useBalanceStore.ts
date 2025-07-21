@@ -8,7 +8,11 @@ interface BalanceState {
   setBalance: (balance: number) => void;
   updateBalance: (change: number) => void;
   tryBuy: (cost: number) => boolean;
-  initializeBalance: (powContract: Contract | null, user: FocAccount | null, getUserBalance: () => Promise<number | undefined>) => Promise<void>;
+  initializeBalance: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+    getUserBalance: () => Promise<number | undefined>,
+  ) => Promise<void>;
 }
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({

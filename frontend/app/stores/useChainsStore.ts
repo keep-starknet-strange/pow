@@ -7,9 +7,12 @@ interface ChainsState {
   chains: Chain[];
 
   resetChains: () => void;
-  initializeChains: (powContract: Contract | null, user: FocAccount | null,
-               getUserMaxChainId: () => Promise<number | undefined>,
-               getUserBlockNumber: (chainId: number) => Promise<number | undefined>) => void;
+  initializeChains: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+    getUserMaxChainId: () => Promise<number | undefined>,
+    getUserBlockNumber: (chainId: number) => Promise<number | undefined>,
+  ) => void;
   getChain: (chainId: number) => Chain | undefined;
   addChain: () => void;
   getBlock: (chainId: number, blockNumber: number) => Block | undefined;
@@ -22,7 +25,12 @@ export const useChainsStore = create<ChainsState>((set, get) => ({
 
   resetChains: () => set({ chains: [newChain(0)] }),
 
-  initializeChains: (powContract, user, getUserMaxChainId, getUserBlockNumber) => {
+  initializeChains: (
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserBlockNumber,
+  ) => {
     const fetchChainState = async () => {
       if (powContract && user) {
         try {
@@ -112,7 +120,9 @@ export const useChainsStore = create<ChainsState>((set, get) => ({
       // Add the new block to the chain's blocks & truncate to the last 2 blocks
       return {
         chains: state.chains.map((c) =>
-          c.chainId === chainId ? { ...c, blocks: [...c.blocks, block].slice(-2) } : c
+          c.chainId === chainId
+            ? { ...c, blocks: [...c.blocks, block].slice(-2) }
+            : c,
         ),
       };
     });

@@ -29,9 +29,21 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
   } = useTransactionsStore();
 
   const txFeeLevel = getFeeLevel(props.chainId, props.txData.id, props.isDapp);
-  const txSpeedLevel = getSpeedLevel(props.chainId, props.txData.id, props.isDapp);
-  const nextTxFeeCost = getNextFeeCost(props.chainId, props.txData.id, props.isDapp);
-  const nextTxSpeedCost = getNextSpeedCost(props.chainId, props.txData.id, props.isDapp);
+  const txSpeedLevel = getSpeedLevel(
+    props.chainId,
+    props.txData.id,
+    props.isDapp,
+  );
+  const nextTxFeeCost = getNextFeeCost(
+    props.chainId,
+    props.txData.id,
+    props.isDapp,
+  );
+  const nextTxSpeedCost = getNextSpeedCost(
+    props.chainId,
+    props.txData.id,
+    props.isDapp,
+  );
   return (
     <View className="flex flex-col w-full">
       <View className="flex flex-row w-full mb-[4px]">

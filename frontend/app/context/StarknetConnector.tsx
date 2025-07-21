@@ -643,22 +643,20 @@ export const StarknetConnectorProvider: React.FC<{
     [provider, network, account, STARKNET_ENABLED, connectAccount],
   );
 
-  const invokeCalls = useCallback(async (calls: Call[]) => {
-    if (!STARKNET_ENABLED) {
-      return;
-    }
-    console.log("Invoking contract calls:", calls.length);
-    if (network === "SN_DEVNET") {
-      invokeContractCalls(calls);
-    } else {
-      invokeWithPaymaster(calls);
-    }
-  }, [
-    invokeWithPaymaster,
-    invokeContractCalls,
-    network,
-    STARKNET_ENABLED,
-  ]);
+  const invokeCalls = useCallback(
+    async (calls: Call[]) => {
+      if (!STARKNET_ENABLED) {
+        return;
+      }
+      console.log("Invoking contract calls:", calls.length);
+      if (network === "SN_DEVNET") {
+        invokeContractCalls(calls);
+      } else {
+        invokeWithPaymaster(calls);
+      }
+    },
+    [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
+  );
 
   const value = {
     STARKNET_ENABLED,

@@ -1,7 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-} from "react";
+import React, { createContext, useContext } from "react";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
 import { useDAConfirmer } from "../hooks/useDAConfirmer";
@@ -33,9 +30,15 @@ export const useGame = () => {
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { onBlockMined, onBlockSequenced, onDaConfirmed, onProverConfirmed,
-    getWorkingBlock, getDa, getProver } =
-    useGameStore();
+  const {
+    onBlockMined,
+    onBlockSequenced,
+    onDaConfirmed,
+    onProverConfirmed,
+    getWorkingBlock,
+    getDa,
+    getProver,
+  } = useGameStore();
   const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);
   const { sequencingProgress, sequenceBlock } = useSequencer(
     onBlockSequenced,

@@ -52,11 +52,7 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
       );
     }
     */
-  }, [
-    props.chainId,
-    props.placement.left,
-    props.completedPlacementLeft,
-  ]);
+  }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
 
   return (
     <Animated.View

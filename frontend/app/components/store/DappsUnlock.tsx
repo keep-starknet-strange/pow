@@ -10,7 +10,8 @@ export type DappsUnlockProps = {
 export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   const { canUnlockDapps, dappsUnlocked, unlockDapps, getDappUnlockCost } =
     useTransactionsStore();
-  const showUnlock = !dappsUnlocked[props.chainId] && canUnlockDapps(props.chainId);
+  const showUnlock =
+    !dappsUnlocked[props.chainId] && canUnlockDapps(props.chainId);
 
   return (
     <View>

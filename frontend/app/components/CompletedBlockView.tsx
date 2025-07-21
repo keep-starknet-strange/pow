@@ -62,11 +62,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
         easing: Easing.inOut(Easing.ease),
       }),
     );
-  }, [
-    props.chainId,
-    props.placement.left,
-    props.completedPlacementLeft,
-  ]);
+  }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
 
   return (
     <Animated.View

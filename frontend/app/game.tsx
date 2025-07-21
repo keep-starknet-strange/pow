@@ -63,8 +63,14 @@ export default function game() {
   }, [updateAchievement]);
 
   const { invokeCalls } = useStarknetConnector();
-  const { addPowAction, powContract, getUserMaxChainId, getUserBlockNumber,
-    getUserTxFeeLevels, getUserTxSpeedLevels, getUserBlockState
+  const {
+    addPowAction,
+    powContract,
+    getUserMaxChainId,
+    getUserBlockNumber,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+    getUserBlockState,
   } = usePowContractConnector();
   const { onInvokeActions } = useOnchainActions();
   const [txBuilderObserver, setTxBuilderObserver] = useState<null | string>(
@@ -75,9 +81,7 @@ export default function game() {
       // Unregister the previous observer if it exists
       unregisterObserver(txBuilderObserver);
     }
-    setTxBuilderObserver(
-      registerObserver(new TxBuilderObserver(addPowAction)),
-    );
+    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addPowAction)));
   }, [addPowAction]);
   useEffect(() => {
     onInvokeActions(invokeCalls);
@@ -122,25 +126,61 @@ export default function game() {
   const { initializeChains } = useChainsStore();
   useEffect(() => {
     initializeChains(powContract, user, getUserMaxChainId, getUserBlockNumber);
-  }, [initializeChains, powContract, user, getUserMaxChainId, getUserBlockNumber]);
+  }, [
+    initializeChains,
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserBlockNumber,
+  ]);
 
   const { getUpgradeValue } = useUpgrades();
-  const { initializeTransactions, setGetUpgradeValueDependency: setGetUpgradeValueDependencyTxStore } = useTransactionsStore();
+  const {
+    initializeTransactions,
+    setGetUpgradeValueDependency: setGetUpgradeValueDependencyTxStore,
+  } = useTransactionsStore();
   useEffect(() => {
-    initializeTransactions(powContract, user, getUserTxFeeLevels, getUserTxSpeedLevels);
-  }, [initializeTransactions, powContract, user, getUserTxFeeLevels, getUserTxSpeedLevels]);
+    initializeTransactions(
+      powContract,
+      user,
+      getUserTxFeeLevels,
+      getUserTxSpeedLevels,
+    );
+  }, [
+    initializeTransactions,
+    powContract,
+    user,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+  ]);
   useEffect(() => {
     setGetUpgradeValueDependencyTxStore(getUpgradeValue);
   }, [notify, getUpgradeValue, setGetUpgradeValueDependencyTxStore]);
 
-  const { initializeGameStore, setGetUpgradeValueDependency: setGetUpgradeValueDependencyGame, setInitMyGameDependency } = useGameStore();
+  const {
+    initializeGameStore,
+    setGetUpgradeValueDependency: setGetUpgradeValueDependencyGame,
+    setInitMyGameDependency,
+  } = useGameStore();
   useEffect(() => {
-    initializeGameStore(powContract, user, getUserMaxChainId, getUserBlockNumber, getUserBlockState);
+    initializeGameStore(
+      powContract,
+      user,
+      getUserMaxChainId,
+      getUserBlockNumber,
+      getUserBlockState,
+    );
   }, [initializeGameStore, user]);
   useEffect(() => {
     setGetUpgradeValueDependencyGame(getUpgradeValue);
     setInitMyGameDependency(initMyGame);
-  }, [notify, getUpgradeValue, initMyGame, setGetUpgradeValueDependencyGame, setInitMyGameDependency]);
+  }, [
+    notify,
+    getUpgradeValue,
+    initMyGame,
+    setGetUpgradeValueDependencyGame,
+    setInitMyGameDependency,
+  ]);
 
   return <RootNavigator />;
 }

@@ -99,9 +99,7 @@ export const createBuyPrestigeAction = (): PowAction => {
 export class TxBuilderObserver implements Observer {
   private addAction: (call: PowAction) => void;
 
-  constructor(
-    addAction: (call: PowAction) => void,
-  ) {
+  constructor(addAction: (call: PowAction) => void) {
     this.addAction = addAction;
   }
 

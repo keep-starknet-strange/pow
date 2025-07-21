@@ -16,7 +16,10 @@ export class SoundObserver implements Observer {
         const fee = data?.tx.fee || 0;
         const feeDigits = fee.toString().length;
         const feeScaler = Math.min(feeDigits / 7, 1);
-        const pitchShift = Math.min(Math.max(blockProgess, 0.25), 1) * 0.375 + feeScaler * 0.375 + 0.25;
+        const pitchShift =
+          Math.min(Math.max(blockProgess, 0.25), 1) * 0.375 +
+          feeScaler * 0.375 +
+          0.25;
         this.playSound(eventType, pitchShift);
         break;
       }
@@ -26,7 +29,8 @@ export class SoundObserver implements Observer {
           break;
         }
         const progress = data.counter / data.difficulty;
-        const pitchShift = progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
+        const pitchShift =
+          progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
         this.playSound(eventType, pitchShift);
         break;
       }
@@ -36,7 +40,8 @@ export class SoundObserver implements Observer {
           break;
         }
         const progress = data.counter / data.difficulty;
-        const pitchShift = progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
+        const pitchShift =
+          progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
         this.playSound(eventType, pitchShift);
         break;
       }

@@ -88,11 +88,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
       withTiming(0, { duration: 100 }),
       withTiming(1, { duration: 200 }),
     );
-  }, [
-    props.chainId,
-    props.placement.left,
-    props.completedPlacementLeft,
-  ]);
+  }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
     getWorkingBlock(props.chainId),

@@ -34,9 +34,9 @@ export default function App() {
       <FocEngineProvider>
         <PowContractProvider>
           <UpgradesProvider>
-              <GameProvider>
-                <Game />
-              </GameProvider>
+            <GameProvider>
+              <Game />
+            </GameProvider>
           </UpgradesProvider>
         </PowContractProvider>
       </FocEngineProvider>

@@ -19,10 +19,19 @@ interface TransactionsState {
   dappsUnlocked: { [chainId: number]: boolean };
 
   resetTransactions: () => void;
-  initializeTransactions: (powContract: Contract | null, user: FocAccount | null,
-                          getUserTxFeeLevels: (chainId: number, txCount: number) => Promise<number[] | undefined>,
-                          getUserTxSpeedLevels: (chainId: number, txCount: number) => Promise<number[] | undefined>) => void;
-  
+  initializeTransactions: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+    getUserTxFeeLevels: (
+      chainId: number,
+      txCount: number,
+    ) => Promise<number[] | undefined>,
+    getUserTxSpeedLevels: (
+      chainId: number,
+      txCount: number,
+    ) => Promise<number[] | undefined>,
+  ) => void;
+
   txFeeUpgrade: (chainId: number, txId: number) => void;
   txSpeedUpgrade: (chainId: number, txId: number) => void;
   dappFeeUpgrade: (chainId: number, dappId: number) => void;
@@ -53,7 +62,7 @@ interface TransactionsState {
   setGetUpgradeValueDependency: (
     getUpgradeValue: (chainId: number, upgradeName: string) => number,
   ) => void;
-};
+}
 
 export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   transactionFeeLevels: {},
@@ -88,10 +97,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
     // Initialize dapp levels
     const initDappsUnlocked: { [chainId: number]: boolean } = {};
-    const initDappFeeLevels: { [chainId: number]: { [dappId: number]: number } } =
-      {};
-    const initDappSpeedLevels: { [chainId: number]: { [dappId: number]: number } } =
-      {};
+    const initDappFeeLevels: {
+      [chainId: number]: { [dappId: number]: number };
+    } = {};
+    const initDappSpeedLevels: {
+      [chainId: number]: { [dappId: number]: number };
+    } = {};
     for (const chainId in dappsJson) {
       const chainIdInt = chainId === "L1" ? 0 : 1;
       const dappsJsonData =
@@ -117,7 +128,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     });
   },
 
-  initializeTransactions: (powContract, user, getUserTxFeeLevels, getUserTxSpeedLevels) => {
+  initializeTransactions: (
+    powContract,
+    user,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+  ) => {
     const fetchTransactionSpeeds = async () => {
       if (!user || !powContract) return;
       // TODO: Hardcoded chain ids
@@ -210,7 +226,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   txFeeUpgrade: (chainId, txId) => {
-
     set((state) => {
       if (!get().canUnlockTx(chainId, txId)) {
         useEventManager.getState().notify("InvalidPurchase");
@@ -238,7 +253,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         return { transactionFeeLevels: newFees };
       }
       const cost = transactionData.feeCosts[currentLevel + 1];
-      if (!useBalanceStore.getState().tryBuy(cost)) return state.transactionFeeLevels;
+      if (!useBalanceStore.getState().tryBuy(cost))
+        return state.transactionFeeLevels;
       // Upgrade the fee level by 1
       newFees[chainId][txId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -276,7 +292,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         return { transactionSpeedLevels: newSpeeds };
       }
       const cost = transactionData.speedCosts[currentLevel + 1];
-      if (!useBalanceStore.getState().tryBuy(cost)) return state.transactionSpeedLevels;
+      if (!useBalanceStore.getState().tryBuy(cost))
+        return state.transactionSpeedLevels;
       // Upgrade the speed level by 1
       newSpeeds[chainId][txId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -320,12 +337,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       // Upgrade the fee level by 1
       newFees[chainId][dappId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
-          chainId,
-          txId: dappId,
-          isDapp: true,
-          type: "dappFee",
-          level: currentLevel + 1,
-        });
+        chainId,
+        txId: dappId,
+        isDapp: true,
+        type: "dappFee",
+        level: currentLevel + 1,
+      });
       return { dappFeeLevels: newFees };
     });
   },
@@ -352,16 +369,17 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         return { dappSpeedLevels: newSpeeds };
       }
       const cost = dappData.speedCosts[currentLevel + 1];
-      if (!useBalanceStore.getState().tryBuy(cost)) return state.dappSpeedLevels;
+      if (!useBalanceStore.getState().tryBuy(cost))
+        return state.dappSpeedLevels;
       // Upgrade the speed level by 1
       newSpeeds[chainId][dappId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
-          chainId,
-          txId: dappId,
-          isDapp: true,
-          type: "dappSpeed",
-          level: currentLevel + 1,
-        });
+        chainId,
+        txId: dappId,
+        isDapp: true,
+        type: "dappSpeed",
+        level: currentLevel + 1,
+      });
       return { dappSpeedLevels: newSpeeds };
     });
   },
@@ -408,7 +426,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = txLevels[txId];
-    const mevBoost = getUpgradeValueDependency ? getUpgradeValueDependency(chainId, "MEV Boost") : 1;
+    const mevBoost = getUpgradeValueDependency
+      ? getUpgradeValueDependency(chainId, "MEV Boost")
+      : 1;
     return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
   },
 
@@ -438,7 +458,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = dappLevels[dappId];
-    const mevBoost = getUpgradeValueDependency ? getUpgradeValueDependency(chainId, "MEV Boost") : 1;
+    const mevBoost = getUpgradeValueDependency
+      ? getUpgradeValueDependency(chainId, "MEV Boost")
+      : 1;
     return level === -1 ? 0 : dappData.fees[level] * mevBoost;
   },
 
@@ -464,7 +486,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     }
     return true;
   },
-  
+
   canUnlockTx: (chainId, txId, isDapp = false) => {
     if (isDapp) {
       return get().canUnlockDapp(chainId, txId);
@@ -486,9 +508,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const dappFees = get().dappFeeLevels[chainId];
     const lastDappLevel = dappFees[dappId - 1];
     if (lastDappLevel === undefined) {
-      console.warn(
-        `Dapp with ID ${dappId - 1} not found for chain ${chainId}`,
-      );
+      console.warn(`Dapp with ID ${dappId - 1} not found for chain ${chainId}`);
       return false;
     }
     return lastDappLevel >= 0;
@@ -586,4 +606,3 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     return dappData.speedCosts[level + 1] || 0;
   },
 }));
-
