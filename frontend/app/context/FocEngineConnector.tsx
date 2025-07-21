@@ -11,20 +11,13 @@ import { useStarknetConnector } from "./StarknetConnector";
 export const FOC_ENGINE_API =
   process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
 
-type FocAccount = {
+export type FocAccount = {
   account_address: string;
   contract_address: string;
   account: {
     username: string;
     metadata: string[] | null; // Optional metadata field
   };
-};
-
-type FocAccounts = {
-  accounts: {
-    username: string;
-    address: string;
-  }[];
 };
 
 type FocEngineContextType = {

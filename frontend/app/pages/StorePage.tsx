@@ -3,9 +3,9 @@ import { View, Text, ScrollView, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { useTransactions } from "../context/Transactions";
+import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useUpgrades } from "../context/Upgrades";
-import { useGame } from "../context/Game";
+import { useGameStore } from "@/app/stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
 import { UpgradeView } from "../components/store/UpgradeView";
@@ -29,21 +29,14 @@ import {
 
 export const StorePage: React.FC = () => {
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
-    useTransactions();
+    useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
-  const { l2 } = useGame();
+  const { l2 } = useGameStore();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
-  const [l2HasInitialized, setL2HasInitialized] = useState(l2 ? true : false);
-  useEffect(() => {
-    if (l2 && !l2HasInitialized) {
-      setStoreType("L2");
-      setL2HasInitialized(true);
-    }
-  }, [l2]);
   const [storeTransactions, setStoreTransactions] = useState(
     transactionsJson.L1,
   );

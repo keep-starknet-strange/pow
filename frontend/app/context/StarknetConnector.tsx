@@ -73,6 +73,7 @@ type StarknetConnectorContextType = {
   ) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
   invokeWithPaymaster: (calls: Call[], privateKey?: string) => Promise<void>;
+  invokeCalls: (calls: Call[]) => Promise<void>;
 };
 
 const StarknetConnector = createContext<
@@ -642,6 +643,21 @@ export const StarknetConnectorProvider: React.FC<{
     [provider, network, account, STARKNET_ENABLED, connectAccount],
   );
 
+  const invokeCalls = useCallback(
+    async (calls: Call[]) => {
+      if (!STARKNET_ENABLED) {
+        return;
+      }
+      console.log("Invoking contract calls:", calls.length);
+      if (network === "SN_DEVNET") {
+        invokeContractCalls(calls);
+      } else {
+        invokeWithPaymaster(calls);
+      }
+    },
+    [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
+  );
+
   const value = {
     STARKNET_ENABLED,
     network,
@@ -663,6 +679,7 @@ export const StarknetConnectorProvider: React.FC<{
     invokeContract,
     invokeContractCalls,
     invokeWithPaymaster,
+    invokeCalls,
   };
   return (
     <StarknetConnector.Provider value={value}>

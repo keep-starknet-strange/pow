@@ -51,10 +51,12 @@ export const L2ProgressView = ({
   label,
   value,
   maxValue,
+  fees,
 }: {
   label: string;
   value: number;
   maxValue: number;
+  fees: number;
 }) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
@@ -114,9 +116,36 @@ export const L2ProgressView = ({
           ))}
         </View>
       </View>
-      <Text className="text-[#b9b9b9] text-[16px] font-Pixels ml-[3px]">
-        {label}
-      </Text>
+      <View className="flex flex-row items-center justify-between w-full">
+        <Text className="text-[#b9b9b9] text-[16px] font-Pixels ml-[3px]">
+          {label}
+        </Text>
+        <View className="flex flex-row items-center justify-end mr-[3px]">
+          <AnimatedRollingNumber
+            value={fees}
+            textStyle={{
+              fontSize: 16,
+              color: "#b3b3b3",
+              fontFamily: "Pixels",
+            }}
+            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+          />
+          <Canvas style={{ width: 16, height: 16 }}>
+            <Image
+              image={getImage("shop.btc")}
+              fit="fill"
+              x={2}
+              y={1}
+              width={13}
+              height={13}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+            />
+          </Canvas>
+        </View>
+      </View>
       <View className="absolute top-0 left-0 h-[22px] w-[60px]">
         <Canvas style={{ width: 60, height: 22 }}>
           <Image

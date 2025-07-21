@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useTransactions } from "../../context/Transactions";
-import { useGame } from "../../context/Game";
+import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
+import { useGameStore } from "@/app/stores/useGameStore";
 import { UnlockView } from "./UnlockView";
 
 export type L2UnlockProps = {
@@ -9,8 +9,8 @@ export type L2UnlockProps = {
 };
 
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
-  const { transactionFees, dappFees } = useTransactions();
-  const { canUnlockL2, l2, getL2Cost, initL2 } = useGame();
+  const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
+  const { canUnlockL2, l2, getL2Cost, initL2 } = useGameStore();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
     if (alwaysShow) {
@@ -29,7 +29,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
     }
 
     // Ensure all L1 transactions unlocked
-    const txLevels = transactionFees[0];
+    const txLevels = transactionFeeLevels[0];
     if (!txLevels) {
       setShowUnlock(false);
       return;
@@ -42,7 +42,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
     }
 
     // Ensure all L1 dapps unlocked
-    const dappLevels = dappFees[0];
+    const dappLevels = dappFeeLevels[0];
     if (!dappLevels) {
       setShowUnlock(false);
       return;
@@ -54,7 +54,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       }
     }
     setShowUnlock(true);
-  }, [alwaysShow, canUnlockL2, l2, transactionFees, dappFees]);
+  }, [alwaysShow, canUnlockL2, l2, transactionFeeLevels, dappFeeLevels]);
 
   return (
     <View>

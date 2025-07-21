@@ -1,4 +1,4 @@
-import { Observer, EventType } from "../context/EventManager";
+import { Observer, EventType } from "@/app/stores/useEventManager";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
 
 export class InAppNotificationsObserver implements Observer {

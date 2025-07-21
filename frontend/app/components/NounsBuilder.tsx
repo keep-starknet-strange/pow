@@ -17,7 +17,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import {
   getNounsAccessoriesList,
   getNounsBodiesList,
@@ -113,6 +113,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
             onPress={() => {
               const newAvatar = getRandomNounsAttributes();
               setNewAvatar(newAvatar);
+              notify("DiceRoll");
             }}
           >
             <Canvas style={{ width: 30, height: 30 }}>
@@ -134,6 +135,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
             onPress={() => {
               setCreatingAvatar(false);
               setNewAvatar(avatar);
+              notify("BasicClick");
             }}
             className=""
           >
@@ -158,7 +160,10 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
         {avatarTabs.map((tab) => (
           <TouchableOpacity
             key={tab.value}
-            onPress={() => setAvatarTab(tab)}
+            onPress={() => {
+              setAvatarTab(tab);
+              notify("BasicClick");
+            }}
             className="relative flex justify-center"
             style={{
               width: (width - 2 * avatarTabs.length - 6) / avatarTabs.length,
@@ -207,6 +212,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                     ...newAvatar,
                     [avatarTab.value as keyof NounsAttributes]: index,
                   });
+                  notify("BasicClick");
                 }}
               >
                 {newAvatar[avatarTab.value as keyof NounsAttributes] ===

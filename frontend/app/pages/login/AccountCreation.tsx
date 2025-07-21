@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "../../context/FocEngineConnector";
+import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import { PFPView } from "../../components/PFPView";
 import NounsBuilder from "../../components/NounsBuilder";
@@ -35,6 +36,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 }) => {
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
   const { account } = useStarknetConnector();
+  const { notify } = useEventManager();
   const {
     isUsernameUnique,
     isUsernameValid,
@@ -55,10 +57,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const startCreatingAvatar = () => {
     setCreatingAvatar(true);
     setNewAvatar(avatar);
+    notify("BasicClick");
   };
   const applyAvatarCreation = () => {
     setCreatingAvatar(false);
     setAvatar(newAvatar);
+    notify("BasicClick");
   };
 
   const HEADER_HEIGHT = 60;
@@ -169,6 +173,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                   const newAvatar = getRandomNounsAttributes();
                   setAvatar(newAvatar);
                   setNewAvatar(newAvatar);
+                  notify("DiceRoll");
                 }}
               >
                 <Canvas style={{ width: 40, height: 40 }}>
@@ -236,10 +241,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           onPress={async () => {
             if (!isUsernameValid(username)) {
               setUsernameError(`Invalid username:\n${usernameValidationError}`);
+              notify("BasicError");
               return;
             }
             if (!(await isUsernameUnique(username))) {
               setUsernameError("This username is unavailable.");
+              notify("BasicError");
               return;
             }
             await initializeAccount(username, [
@@ -249,14 +256,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               `0x` + avatar.accessories.toString(16),
             ]);
           }}
-          style={{ width: 250 }}
         />
         <BasicButton
           label="Cancel"
           onPress={async () => {
             setLoginPage("login");
           }}
-          style={{ width: 250 }}
         />
       </Animated.View>
       <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">

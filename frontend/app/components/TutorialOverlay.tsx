@@ -81,17 +81,19 @@ export const TutorialOverlay: React.FC = () => {
         }}
         onMeasured={setBubbleHeight}
       >
-        <Text className="text-base font-semibold text-gray-100 mb-1 text-center">
+        <Text className="text-[30px] font-Teatime text-gray-100 mb-1 text-center">
           {stepConfig.title}
         </Text>
-        <Text className="text-sm text-gray-300 mb-2 text-center">
+        <Text className="text-[14px] font-Pixels text-gray-100 text-center">
           {stepConfig.description}
         </Text>
         <TouchableOpacity
           onPress={() => setVisible(false)}
           className="self-center px-4 py-2 rounded"
         >
-          <Text className="text-sm font-semibold text-black">Got it</Text>
+          <Text className="text-[16px] font-Pixles text-gray-100 underline">
+            Got it
+          </Text>
         </TouchableOpacity>
       </Window>
     </View>

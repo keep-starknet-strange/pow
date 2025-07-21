@@ -4,7 +4,7 @@ import { CompletedBlockView } from "@/app/components/CompletedBlockView";
 import EmptyBlockView from "@/app/components/EmptyBlockView";
 import WorkingBlockView from "@/app/components/WorkingBlockView";
 import WorkingBlockDetails from "@/app/components/WorkingBlockDetails";
-import { useChains } from "@/app/context/Chains";
+import { useChainsStore } from "@/app/stores/useChainsStore";
 
 export type BlockchainViewProps = {
   chainId: number;
@@ -19,7 +19,7 @@ const BLOCK_SIZE_PERCENT = 0.7;
 export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
   const parentRef = useRef<View>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
-  const { chains } = useChains();
+  const { chains } = useChainsStore();
 
   const [workingBlockPosition, setWorkingBlockPosition] = useState({
     top: 0,
@@ -51,7 +51,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
 
   return (
     <View ref={parentRef} style={props.style}>
-      {chains[props.chainId].blocks.length > 0 && (
+      {chains[props.chainId]?.blocks.length > 0 && (
         <CompletedBlockView
           chainId={props.chainId}
           placement={{

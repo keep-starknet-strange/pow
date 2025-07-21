@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Image, Text, View, TouchableOpacity } from "react-native";
 import { Dimensions } from "react-native";
-import { useGame } from "../../context/Game";
-import { useTransactions } from "../../context/Transactions";
+import { useGameStore } from "@/app/stores/useGameStore";
+import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
 import { newTransaction } from "../../types/Chains";
-import lockImg from "../../../assets/images/lock.png";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../stores/useTutorialStore";
 import { shortMoneyString } from "../../utils/helpers";
@@ -38,20 +37,16 @@ export type TxButtonProps = {
 export const TxButton: React.FC<TxButtonProps> = (props) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
-  const { addTransaction, workingBlocks } = useGame();
+  const { addTransaction } = useGameStore();
   const {
-    transactionFees,
-    dappFees,
-    getNextTxFeeCost,
-    getNextDappFeeCost,
-    getTransactionFee,
-    getTransactionSpeed,
-    getDappFee,
-    getDappSpeed,
+    getFeeLevel,
+    getNextFeeCost,
+    getFee,
+    getSpeed,
     txFeeUpgrade,
     dappFeeUpgrade,
     canUnlockTx,
-  } = useTransactions();
+  } = useTransactionsStore();
   const enabled =
     props.txType.name === transactionConfig.L1[0].name &&
     props.chainId === 0 &&
@@ -61,53 +56,10 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     enabled,
   );
 
-  const [feeLevel, setFeeLevel] = useState<number>(-1);
-
-  useEffect(() => {
-    const chainId = props.chainId;
-    if (props.isDapp) {
-      setFeeLevel(dappFees[chainId]?.[props.txType.id]);
-    } else {
-      setFeeLevel(transactionFees[chainId]?.[props.txType.id]);
-    }
-  }, [props.chainId, props.txType.id, props.isDapp, transactionFees, dappFees]);
-  const [feeCost, setFeeCost] = useState<number>(0);
-  useEffect(() => {
-    const chainId = props.chainId;
-    if (props.isDapp) {
-      setFeeCost(getNextDappFeeCost(chainId, props.txType.id));
-    } else {
-      setFeeCost(getNextTxFeeCost(chainId, props.txType.id));
-    }
-  }, [
-    props.chainId,
-    props.txType.id,
-    props.isDapp,
-    getNextTxFeeCost,
-    getNextDappFeeCost,
-  ]);
-
-  const [fee, setFee] = useState<number>(0);
-  const [speed, setSpeed] = useState<number>(0);
-  useEffect(() => {
-    const chainId = props.chainId;
-
-    if (props.isDapp) {
-      setFee(getDappFee(chainId, props.txType.id));
-      setSpeed(getDappSpeed(chainId, props.txType.id));
-    } else {
-      setFee(getTransactionFee(chainId, props.txType.id));
-      setSpeed(getTransactionSpeed(chainId, props.txType.id));
-    }
-  }, [
-    props.chainId,
-    props.txType.id,
-    props.isDapp,
-    getTransactionFee,
-    getTransactionSpeed,
-    getDappFee,
-    getDappSpeed,
-  ]);
+  const feeLevel = getFeeLevel(props.chainId, props.txType.id, props.isDapp);
+  const feeCost = getNextFeeCost(props.chainId, props.txType.id, props.isDapp);
+  const fee = getFee(props.chainId, props.txType.id, props.isDapp);
+  const speed = getSpeed(props.chainId, props.txType.id, props.isDapp);
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
@@ -295,10 +247,6 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
     return 94 - automationAnimHeight.value;
   }, [automationAnimHeight]);
   useEffect(() => {
-    if (workingBlocks[props.chainId]?.isBuilt) {
-      automationAnimHeight.value = 94;
-      return;
-    }
     let randomDurationOffset = Math.random() * 500;
     const interval = setInterval(
       () => {
@@ -325,13 +273,7 @@ export const TxButton: React.FC<TxButtonProps> = (props) => {
       5000 / speed + 200 + randomDurationOffset,
     );
     return () => clearInterval(interval);
-  }, [
-    speed,
-    automationAnimHeight,
-    addNewTransaction,
-    workingBlocks,
-    props.chainId,
-  ]);
+  }, [speed, automationAnimHeight, addNewTransaction, props.chainId]);
 
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">

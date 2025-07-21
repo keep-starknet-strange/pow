@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 import { getAutomationIcon } from "../utils/upgrades";
@@ -12,7 +11,6 @@ export const getSequencingAnimation = (progress: number) => {
 };
 
 export const Sequencer: React.FC = () => {
-  const { automations } = useUpgrades();
   const { sequencingProgress, sequenceBlock } = useGame();
 
   return (

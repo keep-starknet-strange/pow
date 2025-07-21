@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
@@ -17,7 +16,6 @@ export const getDaAnimation = (progress: number) => {
 };
 
 export const DAConfirm: React.FC = () => {
-  const { automations } = useUpgrades();
   const { daProgress, daConfirm } = useGame();
 
   return (

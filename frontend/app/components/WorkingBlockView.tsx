@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
-import { useGame } from "../context/Game";
+import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../context/Upgrades";
 import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
@@ -40,7 +40,7 @@ export type WorkingBlockViewProps = {
 const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
-  const { workingBlocks, getWorkingBlock } = useGame();
+  const { getWorkingBlock } = useGameStore();
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
 
@@ -59,43 +59,36 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
   useEffect(() => {
     blockSlideLeftAnim.value = props.placement.left;
     blockOpacityAnim.value = 1;
-    if (workingBlocks[props.chainId]?.blockId) {
-      blockSlideLeftAnim.value = withSequence(
-        withTiming(props.placement.left, {
-          duration: 400,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(props.completedPlacementLeft, { duration: 700 }),
-        withTiming(
-          props.completedPlacementLeft,
-          { duration: 200, easing: Easing.inOut(Easing.ease) },
-          () => {
-            runOnJS(updateWorkingBlock)(props.chainId);
-          },
-        ),
-        withTiming(props.placement.left, {
-          duration: 100,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(props.placement.left, {
-          duration: 200,
-          easing: Easing.inOut(Easing.ease),
-        }),
-      );
-      blockOpacityAnim.value = withSequence(
-        withTiming(1, { duration: 400 }),
-        withTiming(1, { duration: 700 }),
-        withTiming(0, { duration: 200 }),
-        withTiming(0, { duration: 100 }),
-        withTiming(1, { duration: 200 }),
-      );
-    }
-  }, [
-    props.chainId,
-    workingBlocks[props.chainId]?.blockId,
-    props.placement.left,
-    props.completedPlacementLeft,
-  ]);
+    blockSlideLeftAnim.value = withSequence(
+      withTiming(props.placement.left, {
+        duration: 400,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      withTiming(props.completedPlacementLeft, { duration: 700 }),
+      withTiming(
+        props.completedPlacementLeft,
+        { duration: 200, easing: Easing.inOut(Easing.ease) },
+        () => {
+          runOnJS(updateWorkingBlock)(props.chainId);
+        },
+      ),
+      withTiming(props.placement.left, {
+        duration: 100,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      withTiming(props.placement.left, {
+        duration: 200,
+        easing: Easing.inOut(Easing.ease),
+      }),
+    );
+    blockOpacityAnim.value = withSequence(
+      withTiming(1, { duration: 400 }),
+      withTiming(1, { duration: 700 }),
+      withTiming(0, { duration: 200 }),
+      withTiming(0, { duration: 100 }),
+      withTiming(1, { duration: 200 }),
+    );
+  }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
     getWorkingBlock(props.chainId),
@@ -112,7 +105,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
         zIndex: 2,
       }}
     >
-      {workingBlock?.isBuilt && (
+      {getWorkingBlock(props.chainId)?.isBuilt && (
         <Canvas
           style={{
             position: "absolute",
@@ -148,12 +141,12 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
       >
         <BlockView
           chainId={props.chainId}
-          block={workingBlock}
+          block={getWorkingBlock(props.chainId) || null}
           completed={false}
         />
       </View>
 
-      {workingBlock?.isBuilt && (
+      {getWorkingBlock(props.chainId)?.isBuilt && (
         <View
           style={{
             position: "absolute",

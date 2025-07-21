@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useTransactions } from "../../context/Transactions";
+import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { UnlockView } from "./UnlockView";
 
 export type DappsUnlockProps = {
@@ -9,19 +9,9 @@ export type DappsUnlockProps = {
 
 export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   const { canUnlockDapps, dappsUnlocked, unlockDapps, getDappUnlockCost } =
-    useTransactions();
-  const [showUnlock, setShowUnlock] = useState(false);
-  useEffect(() => {
-    if (dappsUnlocked[props.chainId]) {
-      setShowUnlock(false);
-      return;
-    }
-    if (!canUnlockDapps(props.chainId)) {
-      setShowUnlock(false);
-      return;
-    }
-    setShowUnlock(true);
-  }, [props.chainId, canUnlockDapps, dappsUnlocked]);
+    useTransactionsStore();
+  const showUnlock =
+    !dappsUnlocked[props.chainId] && canUnlockDapps(props.chainId);
 
   return (
     <View>

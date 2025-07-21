@@ -5,7 +5,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { useEventManager } from "../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useFocEngine } from "./FocEngineConnector";
 import { usePowContractConnector } from "./PowContractConnector";
 import { useBalance } from "../stores/useBalanceStore";

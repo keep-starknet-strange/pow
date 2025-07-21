@@ -10,13 +10,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Easing } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useBalance } from "../stores/useBalanceStore";
-import { useGame } from "../context/Game";
 import { useImages } from "../hooks/useImages";
 
 export const Header: React.FC = () => {
   const { balance } = useBalance();
   const { getImage } = useImages();
-  const { l2 } = useGame();
   const { width } = Dimensions.get("window");
 
   const insets = useSafeAreaInsets();

@@ -84,7 +84,7 @@ export const InAppNotification = () => {
           }}
         >
           <Text
-            className="text-md font-bold text-nowrap"
+            className="text-[14px] font-Pixels text-nowrap"
             style={{
               color:
                 inAppNotificationsJson[activeNotification.notificationTypeId]

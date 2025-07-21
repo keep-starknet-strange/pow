@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableWithoutFeedback, Text } from "react-native";
-import { useEventManager } from "../../context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import {
   Canvas,
@@ -61,8 +61,8 @@ const BasicButton: React.FC<BasicButtonProps> = ({
       <TouchableWithoutFeedback
         onPress={() => {
           notify("BasicClick");
-          onPress?.();
           shakeAnim.value *= -1; // Toggle the shake direction
+          onPress?.();
         }}
         disabled={disabled}
       >

@@ -4,11 +4,16 @@ import { useState, useEffect } from "react";
 
 import { RootNavigator } from "./navigation/RootNavigator";
 
-import { useEventManager } from "./context/EventManager";
+import { useEventManager } from "@/app/stores/useEventManager";
+import { useStarknetConnector } from "./context/StarknetConnector";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
-import { useGame } from "./context/Game";
+import { useUpgrades } from "./context/Upgrades";
+import { useGameStore } from "./stores/useGameStore";
 import { useBalanceStore } from "./stores/useBalanceStore";
+import { useOnchainActions } from "./stores/useOnchainActions";
+import { useChainsStore } from "./stores/useChainsStore";
+import { useTransactionsStore } from "./stores/useTransactionsStore";
 import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
 import {
   useAchievement,
@@ -25,15 +30,13 @@ import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 export default function game() {
   const { user } = useFocEngine();
   const { notify, registerObserver, unregisterObserver } = useEventManager();
-  const { getUserBalance } = usePowContractConnector();
+  const { getUserBalance, initMyGame } = usePowContractConnector();
   const { setSoundDependency, initializeAchievements } = useAchievementsStore();
   const { initializeSound } = useSoundStore();
-  const { setNotifyDependency, setFetchBalanceDependency, fetchBalance } =
-    useBalanceStore();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
-    null | number
+    null | string
   >(null);
   useEffect(() => {
     if (inAppNotificationObserver !== null) {
@@ -46,7 +49,7 @@ export default function game() {
   }, [sendInAppNotification]);
 
   const { updateAchievement } = useAchievement();
-  const [achievementObserver, setAchievementObserver] = useState<null | number>(
+  const [achievementObserver, setAchievementObserver] = useState<null | string>(
     null,
   );
   useEffect(() => {
@@ -59,10 +62,18 @@ export default function game() {
     );
   }, [updateAchievement]);
 
-  /*
-  const { getWorkingBlock } = useGame();
-  const { addAction } = usePowContractConnector();
-  const [txBuilderObserver, setTxBuilderObserver] = useState<null | number>(
+  const { invokeCalls } = useStarknetConnector();
+  const {
+    addPowAction,
+    powContract,
+    getUserMaxChainId,
+    getUserBlockNumber,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+    getUserBlockState,
+  } = usePowContractConnector();
+  const { onInvokeActions } = useOnchainActions();
+  const [txBuilderObserver, setTxBuilderObserver] = useState<null | string>(
     null,
   );
   useEffect(() => {
@@ -70,14 +81,14 @@ export default function game() {
       // Unregister the previous observer if it exists
       unregisterObserver(txBuilderObserver);
     }
-    setTxBuilderObserver(
-      registerObserver(new TxBuilderObserver(addAction, getWorkingBlock)),
-    );
-  }, [addAction, getWorkingBlock]);
-  */
+    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addPowAction)));
+  }, [addPowAction]);
+  useEffect(() => {
+    onInvokeActions(invokeCalls);
+  }, [invokeCalls, onInvokeActions]);
 
   const { playSoundEffect } = useSound();
-  const [soundObserver, setSoundObserver] = useState<null | number>(null);
+  const [soundObserver, setSoundObserver] = useState<null | string>(null);
   useEffect(() => {
     if (soundObserver !== null) {
       // Unregister the previous observer if it exists
@@ -91,18 +102,15 @@ export default function game() {
   }, [initializeSound]);
 
   const { advanceStep, setVisible, step } = useTutorial();
-  const { setObserverId, clearObserverId } = useTutorialStore();
-  const [tutorialObserver, setTutorialObserver] = useState<null | number>(null);
+  const [tutorialObserver, setTutorialObserver] = useState<null | string>(null);
   useEffect(() => {
     if (tutorialObserver !== null) {
       unregisterObserver(tutorialObserver);
-      clearObserverId();
     }
     const observerId = registerObserver(
       new TutorialObserver(advanceStep, setVisible, step),
     );
     setTutorialObserver(observerId);
-    setObserverId(observerId);
   }, [advanceStep, setVisible, step]);
 
   useEffect(() => {
@@ -110,16 +118,69 @@ export default function game() {
     initializeAchievements(user?.account_address);
   }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
 
+  const { initializeBalance } = useBalanceStore();
   useEffect(() => {
-    setNotifyDependency(notify);
-    setFetchBalanceDependency(getUserBalance);
-  }, [notify, getUserBalance, setNotifyDependency, setFetchBalanceDependency]);
+    initializeBalance(powContract, user, getUserBalance);
+  }, [initializeBalance, getUserBalance, powContract, user]);
 
+  const { initializeChains } = useChainsStore();
   useEffect(() => {
-    if (user) {
-      fetchBalance();
-    }
-  }, [user, fetchBalance]);
+    initializeChains(powContract, user, getUserMaxChainId, getUserBlockNumber);
+  }, [
+    initializeChains,
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserBlockNumber,
+  ]);
+
+  const { getUpgradeValue } = useUpgrades();
+  const {
+    initializeTransactions,
+    setGetUpgradeValueDependency: setGetUpgradeValueDependencyTxStore,
+  } = useTransactionsStore();
+  useEffect(() => {
+    initializeTransactions(
+      powContract,
+      user,
+      getUserTxFeeLevels,
+      getUserTxSpeedLevels,
+    );
+  }, [
+    initializeTransactions,
+    powContract,
+    user,
+    getUserTxFeeLevels,
+    getUserTxSpeedLevels,
+  ]);
+  useEffect(() => {
+    setGetUpgradeValueDependencyTxStore(getUpgradeValue);
+  }, [notify, getUpgradeValue, setGetUpgradeValueDependencyTxStore]);
+
+  const {
+    initializeGameStore,
+    setGetUpgradeValueDependency: setGetUpgradeValueDependencyGame,
+    setInitMyGameDependency,
+  } = useGameStore();
+  useEffect(() => {
+    initializeGameStore(
+      powContract,
+      user,
+      getUserMaxChainId,
+      getUserBlockNumber,
+      getUserBlockState,
+    );
+  }, [initializeGameStore, user]);
+  useEffect(() => {
+    setGetUpgradeValueDependencyGame(getUpgradeValue);
+    setInitMyGameDependency(initMyGame);
+  }, [
+    notify,
+    getUpgradeValue,
+    initMyGame,
+    setGetUpgradeValueDependencyGame,
+    setInitMyGameDependency,
+  ]);
 
   return <RootNavigator />;
 }
