@@ -40,18 +40,19 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
     insets,
   ]);
 
-  const scheduleMeasure = () => {
-    InteractionManager.runAfterInteractions(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(measure);
-      });
+  const scheduleMeasure = useCallback(() => {
+  InteractionManager.runAfterInteractions(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(measure);
     });
-  };
-  const onLayout = scheduleMeasure();
+  });
+}, [measure]);
+
+  const onLayout = scheduleMeasure;
 
   useEffect(() => {
     if (enabled) scheduleMeasure();
-  }, [enabled]);
+  }, [enabled, step]);
 
   return { ref, onLayout };
 }
