@@ -41,12 +41,12 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   ]);
 
   const scheduleMeasure = useCallback(() => {
-  InteractionManager.runAfterInteractions(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(measure);
+    InteractionManager.runAfterInteractions(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(measure);
+      });
     });
-  });
-}, [measure]);
+  }, [measure]);
 
   const onLayout = scheduleMeasure;
 
