@@ -8,7 +8,11 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   const ref = useRef<View>(null);
   const { step, registerLayout, isTutorialActive } = useTutorial();
   const insets = useSafeAreaInsets();
-  const { bubbleTargetId, highlightTargetId } = tutorialConfig[step];
+
+  type TutorialConfigType = typeof tutorialConfig;
+  type StepKey = keyof TutorialConfigType;
+
+  const { bubbleTargetId, highlightTargetId } = tutorialConfig[step as StepKey];
   const stepTargets = [bubbleTargetId, highlightTargetId];
 
   const measure = useCallback(() => {
@@ -36,15 +40,19 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
     insets,
   ]);
 
-  const onLayout = useCallback(() => {
-    measure();
-  }, [measure, step]);
-
-  useEffect(() => {
+  const scheduleMeasure = useCallback(() => {
     InteractionManager.runAfterInteractions(() => {
-      measure();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(measure);
+      });
     });
   }, [measure]);
+
+  const onLayout = scheduleMeasure;
+
+  useEffect(() => {
+    if (enabled) scheduleMeasure();
+  }, [enabled, step]);
 
   return { ref, onLayout };
 }
