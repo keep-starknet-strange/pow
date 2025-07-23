@@ -12,7 +12,6 @@ type ActionsProps = {
     maxLevel: number;
     nextCost: number;
     onPress: () => void;
-    icon: any;
     color: string;
   };
   speedProps?: {
@@ -20,7 +19,6 @@ type ActionsProps = {
     maxLevel: number;
     nextCost: number;
     onPress: () => void;
-    icon: any;
     color: string;
   };
 };
