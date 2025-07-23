@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import moneyImg from "../../../assets/images/money.png";
-import overclockImg from "../../../assets/images/overclock.png";
+import moneyImg from "../../../assets/images/money.webp";
+import overclockImg from "../../../assets/images/overclock.webp";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { getTxIcon } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";

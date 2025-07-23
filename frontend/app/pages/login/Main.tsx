@@ -3,8 +3,8 @@ import { SafeAreaView, Text, View, BackHandler } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import BasicButton from "../../components/buttons/Basic";
-import logo from "../../../assets/logo/pow.png";
-import starknetLogo from "../../../assets/logo/starknet.png";
+import logo from "../../../assets/logo/pow.webp";
+import starknetLogo from "../../../assets/logo/starknet.webp";
 import {
   Canvas,
   Image,
