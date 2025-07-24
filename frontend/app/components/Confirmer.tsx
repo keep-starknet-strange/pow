@@ -23,7 +23,6 @@ export type ConfirmerProps = {
   progress: number;
   image?: string;
   text?: string;
-  getAnimation: (progress: number) => ImageSourcePropType;
   onConfirm: () => void;
   confirmPopup?: {
     startTime: number;
@@ -61,12 +60,6 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
 
   return (
     <View className="w-full h-full relative">
-      {props.progress > 0 && (
-        <Image
-          source={props.getAnimation(props.progress)}
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full"
-        />
-      )}
       {props.confirmPopup && (
         <PopupAnimation
           popupStartTime={props.confirmPopup.startTime}

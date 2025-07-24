@@ -1,30 +1,3 @@
-import blockDifficultyIcon from "../../assets/images/upgrades/blockDifficulty.png";
-import blockSizeIcon from "../../assets/images/upgrades/blockSize.png";
-import blockRewardIcon from "../../assets/images/upgrades/blockReward.png";
-import mevBoostIcon from "../../assets/images/upgrades/mevBoost.png";
-import recursiveProvingIcon from "../../assets/images/upgrades/recursiveProof.png";
-import daCompressionIcon from "../../assets/images/upgrades/daCompression.png";
-
-export const getUpgradeIcons = (chainId: number) => {
-  const layerIcons: any = {
-    0: {
-      "Block Difficulty": blockDifficultyIcon,
-      "Block Size": blockSizeIcon,
-      "Block Reward": blockRewardIcon,
-      "MEV Boost": mevBoostIcon,
-    },
-    1: {
-      "L2 Finality": blockDifficultyIcon,
-      "Block Size": blockSizeIcon,
-      "Block Reward": blockRewardIcon,
-      "MEV Boost": mevBoostIcon,
-      "Recursive Proving": recursiveProvingIcon,
-      "DA compression": daCompressionIcon,
-    },
-  };
-  return layerIcons[chainId];
-};
-
 export const getAutomationIcon = (
   chainId: number,
   automationName: string,
