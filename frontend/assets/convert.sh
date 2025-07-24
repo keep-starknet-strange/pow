@@ -21,7 +21,7 @@ convert_directory() {
         continue
       fi
 
-      if ./cwebp -q 95 -m 6 "$f" -o "${ff}.webp"; then
+      if ./cwebp -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
         echo "  ✓ Successfully converted ${f##*/}"
 
         if rm "$f"; then
