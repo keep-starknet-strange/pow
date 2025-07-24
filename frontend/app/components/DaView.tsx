@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { L2ProgressView } from "./L2ProgressView";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { DAConfirm } from "./DAConfirm";
 
 export const DaView = () => {

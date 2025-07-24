@@ -8,7 +8,7 @@ import { useEventManager } from "@/app/stores/useEventManager";
 import { useStarknetConnector } from "./context/StarknetConnector";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
-import { useUpgrades } from "./context/Upgrades";
+import { useUpgrades } from "./stores/useUpgradesStore";
 import { useGameStore } from "./stores/useGameStore";
 import { useBalanceStore } from "./stores/useBalanceStore";
 import { useOnchainActions } from "./stores/useOnchainActions";
