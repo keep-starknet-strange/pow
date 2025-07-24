@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Dimensions } from "react-native";
-import Animated, { FadeInLeft } from "react-native-reanimated";
+import { useState, useEffect, useRef } from "react";
+import { View, Text, ScrollView, Dimensions, InteractionManager } from "react-native";
+import Animated, { FadeInLeft, runOnJS } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -8,6 +8,7 @@ import { useUpgrades } from "../context/Upgrades";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
+import { ShopTitle } from "../components/store/ShopTitle";
 import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
 import { DappsUnlock } from "../components/store/DappsUnlock";
@@ -34,6 +35,20 @@ export const StorePage: React.FC = () => {
   const { l2 } = useGameStore();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
+  const handleRef = useRef<number | null>(null);
+   if (handleRef.current === null) {
+    handleRef.current = InteractionManager.createInteractionHandle();
+  }
+
+
+  const clearHandle = () => {
+    if (handleRef.current !== null) {
+      InteractionManager.clearInteractionHandle(handleRef.current);
+      handleRef.current = null;        // avoid double-clear
+    }
+  };
+
+
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
@@ -87,51 +102,9 @@ export const StorePage: React.FC = () => {
         />
       )}
       {l2 ? (
-        <View className="w-full relative">
-          <Canvas style={{ width: 290, height: 24, marginLeft: 4 }}>
-            <Image
-              image={getImage("shop.name.plaque")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={290}
-              height={24}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-          <Animated.Text
-            className="text-[#fff7ff] text-xl absolute left-[12px] font-Pixels"
-            entering={FadeInLeft}
-          >
-            SHOP
-          </Animated.Text>
-        </View>
+        <ShopTitle position="left" />
       ) : (
-        <View className="w-full relative">
-          <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
-            <Image
-              image={getImage("shop.title")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={width - 8}
-              height={24}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-          <Animated.Text
-            className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-            entering={FadeInLeft}
-          >
-            SHOP
-          </Animated.Text>
-        </View>
+        <ShopTitle position="right" />
       )}
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
