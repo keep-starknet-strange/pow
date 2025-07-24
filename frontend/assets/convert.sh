@@ -1,23 +1,40 @@
 #!/bin/bash
 
-# Function to convert PNG files to WebP in a directory
+# Check if cwebp binary exists
+if [ ! -f "./cwebp" ]; then
+    echo "Error: cwebp binary not found in current directory"
+    exit 1
+fi
+
 convert_directory() {
   local dir="$1"
   echo "Processing directory: $dir"
-  
-  # Process PNG files in current directory
+
   for f in "$dir"/*.png; do
-    # Check if file exists (handles case where no .png files match)
     if [[ -f "$f" ]]; then
       echo "Converting $f"
-      # Get filename without extension
       ff="${f%.*}"
-      echo "no ext ${ff##*/}"
-      ./cwebp -q 75 -m 6 "$f" -o "${ff}.webp"
+      echo "Output file: ${ff##*/}.webp"
+
+      if [[ -f "${ff}.webp" ]]; then
+        echo "  Skipping - ${ff##*/}.webp already exists"
+        continue
+      fi
+
+      if ./cwebp -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
+        echo "  ✓ Successfully converted ${f##*/}"
+
+        if rm "$f"; then
+          echo "  ✓ Deleted original ${f##*/}"
+        else
+          echo "  ✗ Failed to delete ${f##*/}"
+        fi
+      else
+        echo "  ✗ Failed to convert ${f##*/}"
+      fi
     fi
   done
-  
-  # Recursively process subdirectories
+
   for subdir in "$dir"/*; do
     if [[ -d "$subdir" ]]; then
       convert_directory "$subdir"
@@ -25,5 +42,6 @@ convert_directory() {
   done
 }
 
-# Start conversion from current directory
 convert_directory "$(pwd)"
+
+echo "Conversion complete!"
