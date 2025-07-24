@@ -1,9 +1,9 @@
-import blockDifficultyIcon from "../../assets/images/upgrades/blockDifficulty.png";
-import blockSizeIcon from "../../assets/images/upgrades/blockSize.png";
-import blockRewardIcon from "../../assets/images/upgrades/blockReward.png";
-import mevBoostIcon from "../../assets/images/upgrades/mevBoost.png";
-import recursiveProvingIcon from "../../assets/images/upgrades/recursiveProof.png";
-import daCompressionIcon from "../../assets/images/upgrades/daCompression.png";
+import blockDifficultyIcon from "../../assets/images/upgrades/blockDifficulty.webp";
+import blockSizeIcon from "../../assets/images/upgrades/blockSize.webp";
+import blockRewardIcon from "../../assets/images/upgrades/blockReward.webp";
+import mevBoostIcon from "../../assets/images/upgrades/mevBoost.webp";
+import recursiveProvingIcon from "../../assets/images/upgrades/recursiveProof.webp";
+import daCompressionIcon from "../../assets/images/upgrades/daCompression.webp";
 
 export const getUpgradeIcons = (chainId: number) => {
   const layerIcons: any = {

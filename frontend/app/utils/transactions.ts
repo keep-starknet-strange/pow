@@ -1,6 +1,6 @@
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
-import questionMarkImage from "../../assets/images/questionMark.png";
+import questionMarkImage from "../../assets/images/questionMark.webp";
 export const newEmptyTransaction = () => {
   return {
     type: "",
@@ -135,24 +135,24 @@ export const getTxStyle = (
 };
 
 // Above as import
-import transferIcon from "../../assets/images/transaction/transfer.png";
-import blobIcon from "../../assets/images/transaction/l2Blob.png";
-import segwitIcon from "../../assets/images/transaction/segwit.png";
-import runesIcon from "../../assets/images/transaction/runes.png";
-import dappIcon from "../../assets/images/transaction/dapp.png";
-import l2BatchIcon from "../../assets/images/transaction/l2Batch.png";
-import dojoIcon from "../../assets/images/transaction/dojo.png";
-import powSwapIcon from "../../assets/images/dapps/powswap.png";
-import closedOceanIcon from "../../assets/images/dapps/closedocean.png";
-import paveIcon from "../../assets/images/dapps/pave.png";
-import libraIcon from "../../assets/images/dapps/libra.png";
-import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.png";
-import avnuIcon from "../../assets/images/dapps/avnu.png";
-import artPeaceIcon from "../../assets/images/dapps/artpeace.png";
-import vesuIcon from "../../assets/images/dapps/vesu.png";
-import eternumIcon from "../../assets/images/dapps/eternum.png";
-import oracleIcon from "../../assets/images/transaction/oracle.png";
-import attestationIcon from "../../assets/images/transaction/attestation.png";
+import transferIcon from "../../assets/images/transaction/transfer.webp";
+import blobIcon from "../../assets/images/transaction/l2Blob.webp";
+import segwitIcon from "../../assets/images/transaction/segwit.webp";
+import runesIcon from "../../assets/images/transaction/runes.webp";
+import dappIcon from "../../assets/images/transaction/dapp.webp";
+import l2BatchIcon from "../../assets/images/transaction/l2Batch.webp";
+import dojoIcon from "../../assets/images/transaction/dojo.webp";
+import powSwapIcon from "../../assets/images/dapps/powswap.webp";
+import closedOceanIcon from "../../assets/images/dapps/closedocean.webp";
+import paveIcon from "../../assets/images/dapps/pave.webp";
+import libraIcon from "../../assets/images/dapps/libra.webp";
+import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.webp";
+import avnuIcon from "../../assets/images/dapps/avnu.webp";
+import artPeaceIcon from "../../assets/images/dapps/artpeace.webp";
+import vesuIcon from "../../assets/images/dapps/vesu.webp";
+import eternumIcon from "../../assets/images/dapps/eternum.webp";
+import oracleIcon from "../../assets/images/transaction/oracle.webp";
+import attestationIcon from "../../assets/images/transaction/attestation.webp";
 export const createTx = (
   chain: number,
   txTypeId: number,
