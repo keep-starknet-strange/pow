@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  TouchableOpacity,
-  Image,
+  Pressable,
   ImageSourcePropType,
   Easing,
   Animated,
@@ -57,16 +56,13 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       easing: Easing.bounce,
       useNativeDriver: true,
     }).start();
+    return () => {
+      confirmAnimation.removeAllListeners();
+    }
   }, [confirmTime]);
 
   return (
     <View className="w-full h-full relative">
-      {props.progress > 0 && (
-        <Image
-          source={props.getAnimation(props.progress)}
-          className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-full h-full"
-        />
-      )}
       {props.confirmPopup && (
         <PopupAnimation
           popupStartTime={props.confirmPopup.startTime}
@@ -75,7 +71,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           animRange={[-100, -120]}
         />
       )}
-      <TouchableOpacity
+      <Pressable
         className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
         onPress={() => {
           props.onConfirm();
@@ -132,7 +128,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
             {props.text}
           </Animated.Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

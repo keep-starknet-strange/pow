@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../context/Upgrades";
 import { useAutoClicker } from "./useAutoClicker";
-import { L2Prover } from "../types/L2";
 
 export const useProver = (
   onProve: () => void,
-  getProver: () => L2Prover | undefined,
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
@@ -33,41 +31,24 @@ export const useProver = (
     fetchProofCounter();
   }, [powContract, user, getUserProofClicks]);
 
-  const prove = () => {
+  const prove = useCallback(() => {
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      notify("ProveClicked", { counter: newCounter });
-      return newCounter;
+      const proverDifficulty = getUpgradeValue(1, "Recursive Proving");
+      if (newCounter >= proverDifficulty) {
+        onProve();
+        setProverProgress(0);
+        notify("ProveDone", { counter: newCounter });
+        return 0; // Reset counter after proving
+      } else {
+        setProverProgress(newCounter / proverDifficulty);
+        notify("ProveClicked", { counter: newCounter });
+        return newCounter;
+      }
     });
-  };
-
-  useEffect(() => {
-    if (proverCounter === 0) return;
-    const blockDifficulty = getUpgradeValue(1, "Recursive Proving");
-    setProverProgress(proverCounter / blockDifficulty);
-    if (proverCounter >= blockDifficulty) {
-      onProve();
-      notify("ProveDone", { counter: proverCounter });
-      setProverCounter(0);
-      setProverProgress(0);
-    }
-  }, [proverCounter, getUpgradeValue]);
-
-  const [shouldAutoClick, setShouldAutoClick] = useState(false);
-  useEffect(() => {
-    const prover = getProver();
-    if (!prover) {
-      setShouldAutoClick(false);
-      return;
-    }
-    if (prover?.isBuilt && getAutomationValue(1, "Prover") > 0) {
-      setShouldAutoClick(true);
-    } else {
-      setShouldAutoClick(false);
-    }
-  }, [getProver, getAutomationValue]);
+  }, [onProve, getUpgradeValue, notify]);
   useAutoClicker(
-    shouldAutoClick,
+    getAutomationValue(1, "Prover") > 0,
     5000 / (getAutomationValue(1, "Prover") || 1),
     prove,
   );

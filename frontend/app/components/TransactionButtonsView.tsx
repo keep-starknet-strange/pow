@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { View } from "react-native";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -9,7 +9,7 @@ export type TransactionButtonsViewProps = {
   isDapps: boolean;
 };
 
-export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (
+export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = memo((
   props,
 ) => {
   const [transactionTypes, setTransactionTypes] = useState<any[]>([]);
@@ -37,11 +37,11 @@ export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = (
         >
           <TxButton
             chainId={props.chainId}
-            txType={txType}
+            txId={txType.id}
             isDapp={props.isDapps}
           />
         </View>
       ))}
     </View>
   );
-};
+});

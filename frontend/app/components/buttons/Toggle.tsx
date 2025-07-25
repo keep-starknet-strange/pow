@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 
 type ToggleButtonProps = {
   label: string;
@@ -19,7 +19,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
   onToggle,
 }) => {
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onToggle}
       className="rounded-full items-center justify-around flex-row p-2
                  border-4 border-[#101119] shadow-lg shadow-[#101119]"
@@ -31,7 +31,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
         {label}
       </Text>
       <Text className="font-bold text-4xl">{isOn ? onSymbol : offSymbol}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

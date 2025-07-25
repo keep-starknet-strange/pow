@@ -3,7 +3,6 @@ import {
   View,
   Dimensions,
   Text,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";

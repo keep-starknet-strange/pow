@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
 import {
   Canvas,
@@ -28,7 +28,7 @@ export type EmptyViewProps = {
   completedPlacementLeft: number;
 };
 
-export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
+export const EmptyBlockView: React.FC<EmptyViewProps> = memo((props) => {
   const { getImage } = useImages();
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
@@ -54,6 +54,7 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
     */
   }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
 
+  console.log("Rendering EmptyBlockView", props.chainId, props.placement, props.completedPlacementLeft);
   return (
     <Animated.View
       style={{
@@ -118,6 +119,15 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = (props) => {
       </View>
     </Animated.View>
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.chainId === nextProps.chainId &&
+    prevProps.placement.top === nextProps.placement.top &&
+    prevProps.placement.left === nextProps.placement.left &&
+    prevProps.placement.width === nextProps.placement.width &&
+    prevProps.placement.height === nextProps.placement.height &&
+    prevProps.completedPlacementLeft === nextProps.completedPlacementLeft
+  );
+});
 
 export default EmptyBlockView;

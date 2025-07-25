@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import { View, Text, Pressable, LayoutChangeEvent } from "react-native";
 import { useTutorial } from "../stores/useTutorialStore";
 import { useBubblePosition } from "../hooks/useBubblePosition";
 import {
@@ -87,14 +87,14 @@ export const TutorialOverlay: React.FC = () => {
         <Text className="text-[14px] font-Pixels text-gray-100 text-center">
           {stepConfig.description}
         </Text>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setVisible(false)}
           className="self-center px-4 py-2 rounded"
         >
           <Text className="text-[16px] font-Pixles text-gray-100 underline">
             Got it
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </Window>
     </View>
   );

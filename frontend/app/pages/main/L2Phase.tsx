@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, TouchableOpacity, Text } from "react-native";
+import { Dimensions, View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
@@ -120,7 +120,7 @@ export const L2Phase: React.FC = () => {
         {dappsUnlocked[1] && (
           <View className="absolute top-[104px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
             {txTabs.map((tab) => (
-              <TouchableOpacity
+              <Pressable
                 style={{
                   width: window.width / 2 - 6,
                   height: tab === activeTab ? 28 : 24,
@@ -152,7 +152,7 @@ export const L2Phase: React.FC = () => {
                 >
                   {tab}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         )}

@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from "react-native";
+import { View, Pressable } from "react-native";
 import { TargetId } from "../stores/useTutorialStore";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
@@ -58,7 +58,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
       {props.tabs.map((tab, index) => {
         const tutorialProps = tab.name === "Store" ? { ref, onLayout } : {};
         return (
-          <TouchableOpacity
+          <Pressable
             key={index}
             className="flex flex-row h-[68px] w-[68px] relative"
             onPress={() => props.switchPage(tab.name)}
@@ -104,7 +104,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
                 }}
               />
             </Canvas>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

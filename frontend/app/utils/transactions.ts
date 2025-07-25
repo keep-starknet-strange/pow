@@ -1,12 +1,13 @@
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
-import questionMarkImage from "../../assets/images/questionMark.png";
+// import questionMarkImage from "../../assets/images/questionMark.png";
+
 export const newEmptyTransaction = () => {
   return {
     type: "",
     fee: 0,
     style: { backgroundColor: "#f7f7f7" },
-    image: questionMarkImage,
+    // image: questionMarkImage,
   };
 };
 
@@ -27,145 +28,192 @@ export const getRandomNFTImage = () => {
   return images[randomIndex];
 };
 
-export const getChainIcons = (chain: number) => {
-  const layerIcons: any = {
-    0: {
-      Transfer: transferIcon,
-      Segwit: segwitIcon,
-      Blobs: blobIcon,
-      Inscriptions: getRandomInscriptionImage(),
-      Runes: runesIcon,
-      Dapp: dappIcon,
-      L2: l2BatchIcon,
-      PowSwap: powSwapIcon,
-      ClosedOcean: closedOceanIcon,
-      Pave: paveIcon,
-      Libra: libraIcon,
-      "Crypto Dragons": cryptoDragonsIcon,
-    },
-    1: {
-      Transfer: transferIcon,
-      Bridge: transferIcon,
-      NFTs: getRandomNFTImage(),
-      Oracles: oracleIcon,
-      Attestations: attestationIcon,
-      Dapp: dappIcon,
-      AppChain: dojoIcon,
-      AVNU: avnuIcon,
-      "art/peace": artPeaceIcon,
-      Vesu: vesuIcon,
-      Eternum: eternumIcon,
-    },
-  };
-  return layerIcons[chain];
+export const getTxIcon = (chainId: number, typeId: number, isDapp: boolean, getImage: (name: string) => any) => {
+  return getImage(getTxIconName(chainId, typeId, isDapp));
 };
 
-export const getTxIcon = (
-  chainId: number,
-  txTypeId: number,
-  isDapp?: boolean,
-) => {
+export const getTxIconName = (chainId: number, typeId: number, isDapp?: boolean) => {
   switch (chainId) {
     case 0:
-      switch (txTypeId) {
+      switch (typeId) {
         case 0:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 1:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 2:
-          return "tx.icon.blob";
+          return "block.icon.blob";
         case 3:
-          return "tx.icon.nft";
+          return "block.icon.nft";
         case 4:
-          return "tx.icon.runes";
+          return "block.icon.nft";
         default:
           return "unknown";
       }
     case 1:
-      switch (txTypeId) {
+      switch (typeId) {
         case 0:
-          return "tx.icon.bridge";
+          return "block.icon.tx";
         case 1:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 2:
-          return "tx.icon.nft";
+          return "block.icon.blob";
         case 3:
-          return "tx.icon.isa";
+          return "block.icon.nft";
         case 4:
-          return "tx.icon.dao";
+          return "block.icon.nft";
         default:
           return "unknown";
       }
     default:
       return "unknown";
   }
+}
+
+export const getTxImg = (chainId: number, typeId: number, getImage: (name: string) => any) => {
+  switch (chainId) {
+    case 0:
+      switch (typeId) {
+        case 0:
+          return getImage("block.bg.green");
+        case 1:
+          return getImage("block.bg.yellow");
+        case 2:
+          return getImage("block.bg.blue");
+        case 3:
+          return getImage("block.bg.pink");
+        case 4:
+          return getImage("block.bg.purple");
+        default:
+          return getImage("unknown");
+      }
+    case 1:
+      switch (typeId) {
+        case 0:
+          return getImage("block.bg.blue");
+        case 1:
+          return getImage("block.bg.green");
+        case 2:
+          return getImage("block.bg.pink");
+        case 3:
+          return getImage("block.bg.purple");
+        case 4:
+          return getImage("block.bg.yellow");
+        default:
+          return getImage("unknown");
+      }
+    default:
+      return getImage("unknown");
+  }
 };
 
-export const getTxStyle = (
-  chainId: number,
-  txTypeId: number,
-  isDapp?: boolean,
-) => {
-  // TODO: Hardcoded for now, need to be dynamic
-  if (txTypeId === 101) {
-    return {
-      backgroundColor: "#f7f7f7f0",
-    };
-  } else if (txTypeId === 102) {
-    return {
-      backgroundColor: "#f7f7f7f0",
-    };
+export const getTxBg = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.bg.green");
+        case 1:
+          return getImage("tx.button.bg.yellow");
+        case 2:
+          return getImage("tx.button.bg.blue");
+        case 3:
+          return getImage("tx.button.bg.pink");
+        case 4:
+          return getImage("tx.button.bg.purple");
+        default:
+          return getImage("tx.button.bg.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.bg.purple");
+        case 1:
+          return getImage("tx.button.bg.green");
+        case 2:
+          return getImage("tx.button.bg.yellow");
+        case 3:
+          return getImage("tx.button.bg.blue");
+        case 4:
+          return getImage("tx.button.bg.pink");
+        default:
+          return getImage("tx.button.bg.green");
+      }
+    default:
+      return getImage("tx.button.bg.green");
   }
-  if (isDapp) {
-    const dappMeta =
-      chainId === 0
-        ? dappsJson.L1.transactions[txTypeId]
-        : dappsJson.L2.transactions[txTypeId];
-    return {
-      backgroundColor: dappMeta.color || "#f7f7f7",
-    };
-  }
-  const txMeta =
-    chainId === 0
-      ? transactionsJson.L1[txTypeId]
-      : transactionsJson.L2[txTypeId];
-  return {
-    backgroundColor: txMeta.color || "#f7f7f7",
-  };
 };
 
-// Above as import
-import transferIcon from "../../assets/images/transaction/transfer.png";
-import blobIcon from "../../assets/images/transaction/l2Blob.png";
-import segwitIcon from "../../assets/images/transaction/segwit.png";
-import runesIcon from "../../assets/images/transaction/runes.png";
-import dappIcon from "../../assets/images/transaction/dapp.png";
-import l2BatchIcon from "../../assets/images/transaction/l2Batch.png";
-import dojoIcon from "../../assets/images/transaction/dojo.png";
-import powSwapIcon from "../../assets/images/dapps/powswap.png";
-import closedOceanIcon from "../../assets/images/dapps/closedocean.png";
-import paveIcon from "../../assets/images/dapps/pave.png";
-import libraIcon from "../../assets/images/dapps/libra.png";
-import cryptoDragonsIcon from "../../assets/images/dapps/cryptodragons.png";
-import avnuIcon from "../../assets/images/dapps/avnu.png";
-import artPeaceIcon from "../../assets/images/dapps/artpeace.png";
-import vesuIcon from "../../assets/images/dapps/vesu.png";
-import eternumIcon from "../../assets/images/dapps/eternum.png";
-import oracleIcon from "../../assets/images/transaction/oracle.png";
-import attestationIcon from "../../assets/images/transaction/attestation.png";
-export const createTx = (
-  chain: number,
-  txTypeId: number,
-  txFee: number,
-  txIcon?: string,
-) => {
-  const txMeta =
-    chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
-  const image = txIcon || getTxIcon(chain, txTypeId);
-  return {
-    type: txMeta.name,
-    fee: txFee,
-    style: { backgroundColor: txMeta.color },
-    image: image,
-  };
+// TODO: Change getImage dependency
+export const getTxInner = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.inner.green");
+        case 1:
+          return getImage("tx.button.inner.yellow");
+        case 2:
+          return getImage("tx.button.inner.blue");
+        case 3:
+          return getImage("tx.button.inner.pink");
+        case 4:
+          return getImage("tx.button.inner.purple");
+        default:
+          return getImage("tx.button.inner.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.inner.purple");
+        case 1:
+          return getImage("tx.button.inner.green");
+        case 2:
+          return getImage("tx.button.inner.yellow");
+        case 3:
+          return getImage("tx.button.inner.blue");
+        case 4:
+          return getImage("tx.button.inner.pink");
+        default:
+          return getImage("tx.button.inner.green");
+      }
+    default:
+      return getImage("tx.button.inner.green");
+  }
+};
+
+export const getTxNameplate = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.nameplate.green");
+        case 1:
+          return getImage("tx.nameplate.yellow");
+        case 2:
+          return getImage("tx.nameplate.blue");
+        case 3:
+          return getImage("tx.nameplate.pink");
+        case 4:
+          return getImage("tx.nameplate.purple");
+        default:
+          return getImage("tx.nameplate.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.nameplate.purple");
+        case 1:
+          return getImage("tx.nameplate.green");
+        case 2:
+          return getImage("tx.nameplate.yellow");
+        case 3:
+          return getImage("tx.nameplate.blue");
+        case 4:
+          return getImage("tx.nameplate.pink");
+        default:
+          return getImage("tx.nameplate.green");
+      }
+    default:
+      return getImage("tx.nameplate.green");
+  }
 };

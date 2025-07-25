@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   TouchableWithoutFeedback,
   View,
   Dimensions,
@@ -121,7 +121,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             }}
           >
             <View className="relative">
-              <TouchableOpacity
+              <Pressable
                 className="flex items-center justify-center bg-[#10111910]
                             w-[250px] h-[250px] p-4 mt-8
                             rounded-xl shadow-lg shadow-black/50 relative"
@@ -147,8 +147,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                   user={account?.address}
                   attributes={creatingAvatar ? newAvatar : avatar}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 className="absolute top-[85px] right-[-42px]"
                 onPress={startCreatingAvatar}
               >
@@ -166,8 +166,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                     height={40}
                   />
                 </Canvas>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 className="absolute top-[40px] right-[-42px]"
                 onPress={() => {
                   const newAvatar = getRandomNounsAttributes();
@@ -190,7 +190,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                     height={40}
                   />
                 </Canvas>
-              </TouchableOpacity>
+              </Pressable>
             </View>
             <View className="flex flex-row items-center justify-center mt-1 gap-2">
               <Text className="text-[#101119] text-[18px] font-Pixels">

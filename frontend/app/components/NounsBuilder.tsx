@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
   ScrollView,
   Image,
@@ -108,7 +108,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
           </Text>
         </View>
         <View className="flex flex-row gap-2 items-center">
-          <TouchableOpacity
+          <Pressable
             className="py-1 px-2"
             onPress={() => {
               const newAvatar = getRandomNounsAttributes();
@@ -130,8 +130,8 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                 height={30}
               />
             </Canvas>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() => {
               setCreatingAvatar(false);
               setNewAvatar(avatar);
@@ -153,12 +153,12 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                 height={24}
               />
             </Canvas>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <View className="flex flex-row items-end px-4 gap-[1px] mt-[9px]">
         {avatarTabs.map((tab) => (
-          <TouchableOpacity
+          <Pressable
             key={tab.value}
             onPress={() => {
               setAvatarTab(tab);
@@ -193,7 +193,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
             >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
       <View className="flex-1 w-full relative">
@@ -204,7 +204,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
         >
           <View className="flex flex-row flex-wrap gap-1 w-full pt-1">
             {avatarTab.list.map((part, index) => (
-              <TouchableOpacity
+              <Pressable
                 key={index}
                 className="h-20 aspect-square relative"
                 onPress={() => {
@@ -245,7 +245,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                   className="w-full h-full p-4"
                   resizeMode="contain"
                 />
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </ScrollView>
@@ -264,7 +264,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
           end={{ x: 0, y: 1 }}
         />
       </View>
-      <TouchableOpacity
+      <Pressable
         onPress={() => {
           notify("BasicClick");
           applyAvatarCreation();
@@ -274,7 +274,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
         <Text className="pt-2 text-[36px] font-Teatime text-[#fff7ff] text-center">
           APPLY
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 };

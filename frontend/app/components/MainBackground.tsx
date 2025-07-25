@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Dimensions } from "react-native";
 import { useImages } from "../hooks/useImages";
 import {
@@ -15,7 +15,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 
-export const MainBackground: React.FC = () => {
+export const MainBackground: React.FC = memo(() => {
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
@@ -131,6 +131,6 @@ export const MainBackground: React.FC = () => {
       </View>
     </View>
   );
-};
+});
 
 export default MainBackground;

@@ -18,6 +18,7 @@ const musicAssets = [
 interface SoundState {
   isSoundOn: boolean;
   isMusicOn: boolean;
+  soundEffects: { [key: string]: Sound };
   soundEffectVolume: number;
   musicVolume: number;
   currentMusic: Sound | null;
@@ -39,6 +40,7 @@ interface SoundState {
 export const useSoundStore = create<SoundState>((set, get) => ({
   isSoundOn: false,
   isMusicOn: false,
+  soundEffects: {},
   soundEffectVolume: 1,
   musicVolume: 0.5,
   currentMusic: null,
@@ -165,7 +167,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     if (
       !isSoundOn ||
-      !soundEffects[type] ||
+      !soundEffectsData[type] ||
       !Object.prototype.hasOwnProperty.call(soundsJson, type)
     ) {
       return;
@@ -184,18 +186,31 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     playHaptic(soundConfig.haptic);
 
     try {
-      const { sound } = await Audio.Sound.createAsync(soundEffects[type], {
-        volume: soundEffectVolume * (soundConfig.volume || 1.0),
-        rate: (soundConfig.rate || 1.0) * pitchShift,
-      });
-      await sound.playAsync();
+      if (get().soundEffects[type]) {
+        const sound = get().soundEffects[type];
+        await sound.setVolumeAsync(soundEffectVolume * (soundConfig.volume || 1.0));
+        await sound.setRateAsync((soundConfig.rate || 1.0) * pitchShift, false);
+        await sound.replayAsync();
+      } else {
+        const { sound } = await Audio.Sound.createAsync(soundEffectsData[type], {
+          volume: soundEffectVolume * (soundConfig.volume || 1.0),
+          rate: (soundConfig.rate || 1.0) * pitchShift,
+        });
+        await sound.playAsync();
+        set((state) => ({
+          soundEffects: {
+            ...state.soundEffects,
+            [type]: sound,
+          },
+        }));
+      }
     } catch (error) {
       console.error("Failed to play sound effect:", error);
     }
   },
 }));
 
-const soundEffects: { [key: string]: any } = {
+const soundEffectsData: { [key: string]: any } = {
   MineClicked: require("../../assets/sounds/confirm.wav"),
   MineDone: require("../../assets/sounds/complete.wav"),
   SequenceClicked: require("../../assets/sounds/confirm.wav"),
@@ -254,6 +269,7 @@ export const useSound = () => {
   const {
     isSoundOn,
     isMusicOn,
+    soundEffects,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -270,6 +286,7 @@ export const useSound = () => {
   return {
     isSoundOn,
     isMusicOn,
+    soundEffects,
     soundEffectVolume,
     musicVolume,
     toggleSound,

@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useUpgrades } from "../context/Upgrades";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
-import { Block } from "../types/Chains";
 
 export const useMiner = (
   onBlockMined: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
@@ -33,41 +31,31 @@ export const useMiner = (
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const mineBlock = () => {
+  const mineBlock = useCallback(() => {
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = getUpgradeValue(0, "Block Difficulty");
-      notify("MineClicked", {
-        counter: newCounter,
-        difficulty: blockDifficulty,
-        ignoreAction: getWorkingBlock(0)?.blockId === 0,
-      });
-      return newCounter;
+      if (newCounter >= blockDifficulty) {
+        onBlockMined();
+        setMiningProgress(0);
+        return 0;
+      } else {
+        setMiningProgress(newCounter / blockDifficulty);
+        notify("MineClicked", {
+          counter: newCounter,
+          difficulty: blockDifficulty,
+        });
+        return newCounter;
+      }
     });
-  };
+  }, [
+    getUpgradeValue,
+    notify,
+    onBlockMined,
+  ]);
 
-  useEffect(() => {
-    if (mineCounter === 0) return;
-    const blockDifficulty = getUpgradeValue(0, "Block Difficulty");
-    setMiningProgress(mineCounter / blockDifficulty);
-    if (mineCounter >= blockDifficulty) {
-      onBlockMined();
-      setMineCounter(0);
-      setMiningProgress(0);
-    }
-  }, [mineCounter, getUpgradeValue]);
-
-  const [shouldAutoClick, setShouldAutoClick] = useState(false);
-  useEffect(() => {
-    const workingBlock = getWorkingBlock(0);
-    if (workingBlock?.isBuilt && getAutomationValue(0, "Miner") > 0) {
-      setShouldAutoClick(true);
-    } else {
-      setShouldAutoClick(false);
-    }
-  }, [getWorkingBlock, getAutomationValue]);
   useAutoClicker(
-    shouldAutoClick,
+    getAutomationValue(0, "Miner") > 0,
     5000 / (getAutomationValue(0, "Miner") || 1),
     mineBlock,
   );

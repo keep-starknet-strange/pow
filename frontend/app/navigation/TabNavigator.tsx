@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, memo, useLayoutEffect, useRef, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, TouchableOpacity } from "react-native";
+import { View, Pressable } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
 import { StorePage } from "../pages/StorePage";
@@ -93,7 +93,7 @@ function TabBarButton({
   }, [buttonRef, setButtonSize]);
 
   return (
-    <TouchableOpacity
+    <Pressable
       className="h-full justify-center items-center mx-[1px]"
       ref={buttonRef}
       onPress={onPress}
@@ -139,11 +139,11 @@ function TabBarButton({
           }}
         />
       </Canvas>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
-export function TabNavigator() {
+export const TabNavigator = memo(() => {
   const { notify } = useEventManager();
   const insets = useSafeAreaInsets();
 
@@ -269,4 +269,4 @@ export function TabNavigator() {
       />
     </Tab.Navigator>
   );
-}
+});

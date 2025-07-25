@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../context/Upgrades";
@@ -39,7 +39,7 @@ export type WorkingBlockViewProps = {
  */
 const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
-export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
+export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo((props) => {
   const { getWorkingBlock } = useGameStore();
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
@@ -143,6 +143,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
           chainId={props.chainId}
           block={getWorkingBlock(props.chainId) || null}
           completed={false}
+          showEmptyBlocks={true}
         />
       </View>
 
@@ -160,6 +161,6 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = (props) => {
       )}
     </Animated.View>
   );
-};
+});
 
 export default WorkingBlockView;

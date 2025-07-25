@@ -1,4 +1,4 @@
-import { Dimensions, TouchableOpacity, Text } from "react-native";
+import { Dimensions, Pressable, Text } from "react-native";
 import { PopupAnimation } from "../../PopupAnimation";
 import {
   Canvas,
@@ -47,7 +47,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   const [lastBuyTime, setLastBuyTime] = React.useState<number>(0);
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() => {
         if (level < maxLevel) {
           onPress();
@@ -148,6 +148,6 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
           </Canvas>
         </Animated.View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };

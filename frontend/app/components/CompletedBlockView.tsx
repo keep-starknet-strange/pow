@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { View } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useChainsStore } from "../stores/useChainsStore";
@@ -30,7 +30,7 @@ export type CompletedBlockViewProps = {
   completedPlacementLeft: number;
 };
 
-export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
+export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo((
   props,
 ) => {
   const { getImage } = useImages();
@@ -129,4 +129,14 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = (
       />
     </Animated.View>
   );
-};
+}, (prevProps, nextProps) => {
+  // Only re-render if the chainId or placement changes
+  return (
+    prevProps.chainId === nextProps.chainId &&
+    prevProps.placement.left === nextProps.placement.left &&
+    prevProps.placement.top === nextProps.placement.top &&
+    prevProps.placement.width === nextProps.placement.width &&
+    prevProps.placement.height === nextProps.placement.height &&
+    prevProps.completedPlacementLeft === nextProps.completedPlacementLeft
+  );
+});
