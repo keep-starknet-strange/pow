@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, Dimensions, InteractionManager } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, ScrollView, Dimensions } from "react-native";
 import Animated, { FadeInLeft, runOnJS } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -35,21 +35,6 @@ export const StorePage: React.FC = () => {
   const { l2 } = useGameStore();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
-  const handleRef = useRef<number | null>(null);
-   if (handleRef.current === null) {
-    handleRef.current = InteractionManager.createInteractionHandle();
-  }
-
-
-  const clearHandle = () => {
-    if (handleRef.current !== null) {
-      InteractionManager.clearInteractionHandle(handleRef.current);
-      handleRef.current = null;        // avoid double-clear
-    }
-  };
-
-
-
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
   const [storeTransactions, setStoreTransactions] = useState(
@@ -101,11 +86,7 @@ export const StorePage: React.FC = () => {
           setCurrentView={(view: "L1" | "L2") => setStoreType(view)}
         />
       )}
-      {l2 ? (
-        <ShopTitle position="left" />
-      ) : (
-        <ShopTitle position="right" />
-      )}
+      {l2 ? <ShopTitle position="left" /> : <ShopTitle position="right" />}
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
         style={{ paddingHorizontal: 4, marginTop: 4 }}

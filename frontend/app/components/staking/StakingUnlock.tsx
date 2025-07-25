@@ -9,7 +9,6 @@ export type StakingUnlockProps = {
 };
 
 export const StakingUnlock: React.FC<StakingUnlockProps> = ({ alwaysShow }) => {
-
   return (
     <View>
       <UnlockView

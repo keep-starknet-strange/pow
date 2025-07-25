@@ -16,7 +16,7 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   const stepTargets = [bubbleTargetId, highlightTargetId];
 
   const measure = useCallback(() => {
-    if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) {
+    if (!enabled || !isTutorialActive) {
       return;
     }
     ref.current?.measureInWindow((x, y, width, height) => {
