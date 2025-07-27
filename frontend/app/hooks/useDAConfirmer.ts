@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useAutoClicker } from "./useAutoClicker";
 import { L2DA } from "../types/L2";
 

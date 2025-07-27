@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 import { getAutomationIcon } from "../utils/upgrades";

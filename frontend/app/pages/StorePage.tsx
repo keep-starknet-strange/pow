@@ -4,7 +4,7 @@ import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";

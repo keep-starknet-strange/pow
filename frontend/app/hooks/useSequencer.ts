@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
