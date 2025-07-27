@@ -26,7 +26,6 @@ export function useHightlightPosition(highlightTarget: {
 }) {
   return useMemo(() => {
     const { x, y, width, height } = highlightTarget;
-    const topOffset = y;
 
     return {
       top: y - 4,

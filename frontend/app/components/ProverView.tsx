@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { L2ProgressView } from "./L2ProgressView";
 import { useL2Store } from "@/app/stores/useL2Store";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { Prover } from "./Prover";
 
 export const ProverView = () => {

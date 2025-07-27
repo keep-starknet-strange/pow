@@ -22,7 +22,6 @@ export type ConfirmerProps = {
   progress: number;
   image?: string;
   text?: string;
-  getAnimation: (progress: number) => ImageSourcePropType;
   onConfirm: () => void;
   confirmPopup?: {
     startTime: number;

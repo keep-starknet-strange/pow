@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 import { getAutomationIcon } from "../utils/upgrades";
-
-import * as miningAnimation from "../configs/mining";
-export const getMiningAnimation = (mineProgress: number) => {
-  const animations = Object.values(miningAnimation);
-  const animationIndex = Math.floor(animations.length * mineProgress);
-  return animations[animationIndex] || animations[0];
-};
 
 export const Miner: React.FC = () => {
   const { getUpgradeValue } = useUpgrades();
@@ -40,7 +33,6 @@ export const Miner: React.FC = () => {
       <Confirmer
         progress={miningProgress}
         image={getAutomationIcon(0, "Miner", 0)}
-        getAnimation={getMiningAnimation}
         onConfirm={mineBlock}
         renderedBy="miner"
         confirmPopup={{

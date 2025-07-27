@@ -1,32 +1,15 @@
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
-// import questionMarkImage from "../../assets/images/questionMark.png";
-
 export const newEmptyTransaction = () => {
   return {
     type: "",
     fee: 0,
     style: { backgroundColor: "#f7f7f7" },
-    // image: questionMarkImage,
   };
 };
 
 export const daTxTypeId = 101;
 export const proofTxTypeId = 102;
-
-import * as inscriptionImages from "../configs/inscriptions";
-export const getRandomInscriptionImage = () => {
-  const images = Object.values(inscriptionImages);
-  const randomIndex = Math.floor(Math.random() * images.length);
-  return images[randomIndex];
-};
-
-import * as nftImages from "../configs/nfts";
-export const getRandomNFTImage = () => {
-  const images = Object.values(nftImages);
-  const randomIndex = Math.floor(Math.random() * images.length);
-  return images[randomIndex];
-};
 
 export const getTxIcon = (chainId: number, typeId: number, isDapp: boolean, getImage: (name: string) => any) => {
   return getImage(getTxIconName(chainId, typeId, isDapp));

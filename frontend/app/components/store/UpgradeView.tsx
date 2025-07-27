@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useUpgrades } from "../../context/Upgrades";
+import { useUpgrades } from "../../stores/useUpgradesStore";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
