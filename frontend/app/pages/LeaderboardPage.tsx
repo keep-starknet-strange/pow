@@ -175,6 +175,7 @@ export const LeaderboardPage: React.FC = () => {
     getLeaderboard();
   }, []);
 
+  console.log("Rendering LeaderboardPage with leaderboard:", leaderboard);
   return (
     <View className="flex-1 relative">
       <View className="absolute w-full h-full">

@@ -83,6 +83,7 @@ export const StakingPage: React.FC = () => {
     }
   };
 
+  console.log("Rendering StakingPage with state:");
   return (
     <SafeAreaView className="flex-1 relative">
       <BackGround width={width} height={height} />

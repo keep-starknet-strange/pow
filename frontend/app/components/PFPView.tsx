@@ -68,7 +68,7 @@ export const PFPView: React.FC<PFPViewProps> = ({ user, attributes }) => {
     slideOutOpacitySV: Animated.SharedValue<number>,
   ) => {
     slideOutSV.value = withSequence(
-      withTiming(1, { duration: 200 }),
+      withTiming(1, { duration: 100 }),
       withTiming(0, { duration: 50 }, () =>
         runOnJS(updateNouns)(nounsAttributes),
       ),
@@ -76,7 +76,7 @@ export const PFPView: React.FC<PFPViewProps> = ({ user, attributes }) => {
       withTiming(0, { duration: 200 }),
     );
     slideOutOpacitySV.value = withSequence(
-      withTiming(0, { duration: 200 }),
+      withTiming(0, { duration: 100 }),
       withTiming(0, { duration: 100 }),
       withTiming(1, { duration: 200 }),
     );

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { L2ProgressView } from "./L2ProgressView";
-import { useGameStore } from "@/app/stores/useGameStore";
+import { useL2Store } from "@/app/stores/useL2Store";
 import { useUpgrades } from "../context/Upgrades";
 import { Prover } from "./Prover";
 
 export const ProverView = () => {
-  const { getProver } = useGameStore();
+  const { getProver } = useL2Store();
   const { getUpgradeValue } = useUpgrades();
 
   const [proofMaxSize, setProofMaxSize] = useState(

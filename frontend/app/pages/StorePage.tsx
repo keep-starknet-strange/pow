@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useUpgrades } from "../context/Upgrades";
-import { useGameStore } from "@/app/stores/useGameStore";
+import { useL2Store } from "@/app/stores/useL2Store";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
 import { UpgradeView } from "../components/store/UpgradeView";
@@ -31,7 +31,7 @@ export const StorePage: React.FC = () => {
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
     useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
-  const { l2 } = useGameStore();
+  const { l2 } = useL2Store();
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
@@ -62,6 +62,7 @@ export const StorePage: React.FC = () => {
   const subTabs = ["Transactions", "Upgrades", "Automation"];
   const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
 
+  console.log("Rendering StorePage with chainId:", chainId);
   return (
     <View className="flex-1 relative bg-[#101119]">
       <View className="absolute w-full h-full">
@@ -196,7 +197,7 @@ export const StorePage: React.FC = () => {
               )}
             </View>
           )}
-          {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
+          {activeSubTab === "Transactions" && (
             <View className="flex flex-col px-[16px]">
               <View className="w-full relative pb-[16px]">
                 <Canvas style={{ width: width - 32, height: 24 }}>

@@ -50,7 +50,8 @@
           "organization": "starkware-industries"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true

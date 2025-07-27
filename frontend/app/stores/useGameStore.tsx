@@ -3,14 +3,13 @@ import { Contract } from "starknet";
 import { FocAccount } from "../context/FocEngineConnector";
 import { useBalanceStore } from "./useBalanceStore";
 import { useChainsStore } from "./useChainsStore";
+import { useL2Store } from "./useL2Store";
 import { useEventManager } from "./useEventManager";
 import { Transaction, Block, newBlock } from "../types/Chains";
-import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 
 interface GameStore {
   genesisBlockReward: number;
   workingBlocks: Block[];
-  l2: L2 | undefined;
 
   resetGameStore: () => void;
   initializeGameStore: (
@@ -26,13 +25,7 @@ interface GameStore {
   ) => void;
   getWorkingBlock: (chainId: number) => Block | undefined;
   addTransaction: (chainId: number, transaction: Transaction) => void;
-
-  canUnlockL2: () => boolean;
-  initL2: () => void;
-  getL2Cost: () => number;
-  getL2: () => L2 | undefined;
-  getDa: () => L2DA | undefined;
-  getProver: () => L2Prover | undefined;
+  initL2WorkingBlock: () => void;
 
   /*
    * TODO: Move from context ?
@@ -45,12 +38,8 @@ interface GameStore {
   proverProgress: number;
   prove: () => void;
   */
-  addBlockToDa: (block: Block) => void;
-  addBlockToProver: (block: Block) => void;
   onBlockMined: () => void;
   onBlockSequenced: () => void;
-  onDaConfirmed: () => void;
-  onProverConfirmed: () => void;
 
   getUpgradeValueDependency?: (chainId: number, upgradeName: string) => number;
   setGetUpgradeValueDependency: (
@@ -63,7 +52,6 @@ interface GameStore {
 export const useGameStore = create<GameStore>((set, get) => ({
   genesisBlockReward: 1,
   workingBlocks: [],
-  l2: undefined,
   getUpgradeValueDependency: undefined,
   setGetUpgradeValueDependency: (getUpgradeValue) =>
     set({ getUpgradeValueDependency: getUpgradeValue }),
@@ -76,7 +64,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     initBlock.isBuilt = true; // Mark the genesis block as built
     set({
       workingBlocks: [initBlock],
-      l2: undefined,
     });
   },
 
@@ -129,17 +116,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               reward:
                 l2BlockNumber === 0 ? get().genesisBlockReward : undefined,
             };
-            const l2Instance: L2 = newL2();
-            l2Instance.da = newL2DA();
-            l2Instance.prover = newL2Prover();
             set({
-              l2: l2Instance,
               workingBlocks: [l1WorkingBlock, l2WorkingBlock],
             });
           } else {
             set({
               workingBlocks: [l1WorkingBlock],
-              l2: undefined,
             });
           }
         } catch (error) {
@@ -193,125 +175,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  canUnlockL2: () => {
-    /* TODO: Include once switched to zustand
-    if (!stakingUnlocked) {
-      setCanPrestige(false);
-      return;
-    }
-    */
-    /*
-    const automationlevels = automations[0];
-    if (!automationlevels) {
-      return false;
-    }
-    for (const level of Object.values(automationlevels)) {
-      if (level < 0) {
-        return false;
-      }
-    }
-    const upgradeLevels = upgrades[0];
-    if (!upgradeLevels) {
-      return false;
-    }
-    for (const level of Object.values(upgradeLevels)) {
-      if (level < 0) {
-        return false;
-      }
-    }
-    */
-    /* TODO: Include once switched to zustand
-    const dappLevels = dappFees[0];
-    if (!dappLevels) {
-      setCanUnlockL2(false);
-      return;
-    }
-    const transactionLevels = transactionFees[0];
-    if (!transactionLevels) {
-      setCanUnlockL2(false);
-      return;
-    }
-    */
-    return true;
-  },
-
-  initL2: () => {
-    const cost = get().getL2Cost();
-    if (!useBalanceStore.getState().tryBuy(cost)) return;
-
+  initL2WorkingBlock: () => {
+    const newWorkingBlock = newBlock(0, get().genesisBlockReward);
+    newWorkingBlock.isBuilt = true; // Mark the genesis block as built
     set((state) => {
-      if (state.l2) return state;
-      const newWorkingBlock = newBlock(0, get().genesisBlockReward);
-      newWorkingBlock.isBuilt = true; // Mark the genesis block as built
-      const newL2Instance = newL2();
-      useChainsStore.getState().addChain();
-      useEventManager.getState().notify("L2Purchased");
-      return {
-        workingBlocks: [...state.workingBlocks, newWorkingBlock],
-        l2: newL2Instance,
-      };
-    });
-  },
-
-  getL2Cost: () => {
-    const cost = 316274400; // TODO: Config
-    return cost;
-  },
-
-  getL2: () => {
-    return get().l2;
-  },
-
-  getDa: () => {
-    return get().l2?.da;
-  },
-
-  getProver: () => {
-    return get().l2?.prover;
-  },
-
-  addBlockToDa: (block) => {
-    if (!get().l2) return;
-    const { getUpgradeValueDependency } = get();
-    set((state) => {
-      if (!state.l2) return state;
-      const newL2Instance = { ...state.l2 };
-      if (!newL2Instance.da) return state;
-      newL2Instance.da.blocks.push(block.blockId);
-      const blockReward =
-        block.reward ||
-        (getUpgradeValueDependency
-          ? getUpgradeValueDependency(0, "Block Reward")
-          : 1);
-      newL2Instance.da.blockFees += blockReward;
-      const daMaxSize = getUpgradeValueDependency
-        ? getUpgradeValueDependency(0, "DA compression")
-        : 1;
-      newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
-      return { l2: newL2Instance };
-    });
-  },
-
-  addBlockToProver: (block) => {
-    if (!get().l2) return;
-    const { getUpgradeValueDependency } = get();
-    set((state) => {
-      if (!state.l2) return state;
-      const newL2Instance = { ...state.l2 };
-      if (!newL2Instance.prover) return state;
-      newL2Instance.prover.blocks.push(block.blockId);
-      const blockReward =
-        block.reward ||
-        (getUpgradeValueDependency
-          ? getUpgradeValueDependency(1, "Block Reward")
-          : 1);
-      newL2Instance.prover.blockFees += blockReward;
-      const proverMaxSize = getUpgradeValueDependency
-        ? getUpgradeValueDependency(1, "Prover compression")
-        : 1;
-      newL2Instance.prover.isBuilt =
-        newL2Instance.prover.blocks.length >= proverMaxSize;
-      return { l2: newL2Instance };
+      return { workingBlocks: [...state.workingBlocks, newWorkingBlock] };
     });
   },
 
@@ -359,28 +227,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       .getState()
       .notify("SequenceDone", { block: completedBlock });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
-    get().addBlockToDa(completedBlock);
-    get().addBlockToProver(completedBlock);
+    useL2Store.getState().addBlockToDa(completedBlock);
+    useL2Store.getState().addBlockToProver(completedBlock);
     useChainsStore.getState().addBlock(1, completedBlock);
-  },
-
-  onDaConfirmed: () => {
-    set((state) => {
-      if (!state.l2 || !state.l2.da) return state;
-      useBalanceStore.getState().updateBalance(state.l2.da.blockFees);
-      const newL2Instance = { ...state.l2 };
-      newL2Instance.da = newL2DA();
-      return { l2: newL2Instance };
-    });
-  },
-
-  onProverConfirmed: () => {
-    set((state) => {
-      if (!state.l2 || !state.l2.prover) return state;
-      useBalanceStore.getState().updateBalance(state.l2.prover.blockFees);
-      const newL2Instance = { ...state.l2 };
-      newL2Instance.prover = newL2Prover();
-      return { l2: newL2Instance };
-    });
   },
 }));

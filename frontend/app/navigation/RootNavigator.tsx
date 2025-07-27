@@ -14,11 +14,16 @@ import { useTutorial } from "../stores/useTutorialStore";
 const Stack = createStackNavigator();
 
 export function RootNavigator() {
+  /*
   const { user } = useFocEngine();
   const { isTutorialActive } = useTutorial();
 
   const isAuthenticated = user && user.account.username !== "";
+  */
+  const isAuthenticated = true;
+  const isTutorialActive = false;
 
+  console.log("RootNavigator rendered - isAuthenticated:", isAuthenticated, "isTutorialActive:", isTutorialActive);
   return (
     <View className="flex-1 bg-[#010a12ff] relative">
       {isAuthenticated ? (

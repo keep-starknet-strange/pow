@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { useGameStore } from "@/app/stores/useGameStore";
+import { useL2Store } from "@/app/stores/useL2Store";
 import { UnlockView } from "./UnlockView";
 
 export type L2UnlockProps = {
@@ -10,7 +10,7 @@ export type L2UnlockProps = {
 
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
-  const { canUnlockL2, l2, getL2Cost, initL2 } = useGameStore();
+  const { canUnlockL2, l2, getL2Cost, initL2 } = useL2Store();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
     if (alwaysShow) {

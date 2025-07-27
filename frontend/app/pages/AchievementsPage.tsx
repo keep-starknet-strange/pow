@@ -40,6 +40,7 @@ export const AchievementsPage: React.FC = () => {
     setCategories(cats);
   }, []);
 
+  console.log("Rendering AchievementsPage with categories:", categories);
   return (
     <View className="flex-1 relative bg-[#101119]">
       <View className="absolute w-full h-full">

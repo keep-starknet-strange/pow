@@ -13,6 +13,7 @@ import { useGameStore } from "./stores/useGameStore";
 import { useBalanceStore } from "./stores/useBalanceStore";
 import { useOnchainActions } from "./stores/useOnchainActions";
 import { useChainsStore } from "./stores/useChainsStore";
+import { useL2Store } from "./stores/useL2Store";
 import { useTransactionsStore } from "./stores/useTransactionsStore";
 import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
 import {
@@ -29,10 +30,10 @@ import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
 export default function game() {
   const { user } = useFocEngine();
-  const { notify, registerObserver, unregisterObserver } = useEventManager();
+  const { registerObserver, unregisterObserver } = useEventManager();
   const { getUserBalance, initMyGame } = usePowContractConnector();
   const { setSoundDependency, initializeAchievements } = useAchievementsStore();
-  const { initializeSound } = useSoundStore();
+  const { cleanupSound, initializeSound } = useSoundStore();
 
   const { sendInAppNotification } = useInAppNotifications();
   const [inAppNotificationObserver, setInAppNotificationObserver] = useState<
@@ -46,6 +47,12 @@ export default function game() {
     setInAppNotificationObserver(
       registerObserver(new InAppNotificationsObserver(sendInAppNotification)),
     );
+
+    return () => {
+      if (inAppNotificationObserver !== null) {
+        unregisterObserver(inAppNotificationObserver);
+      }
+    }
   }, [sendInAppNotification]);
 
   const { updateAchievement } = useAchievement();
@@ -60,6 +67,12 @@ export default function game() {
     setAchievementObserver(
       registerObserver(new AchievementObserver(updateAchievement)),
     );
+
+    return () => {
+      if (achievementObserver !== null) {
+        unregisterObserver(achievementObserver);
+      }
+    }
   }, [updateAchievement]);
 
   const { invokeCalls } = useStarknetConnector();
@@ -82,6 +95,12 @@ export default function game() {
       unregisterObserver(txBuilderObserver);
     }
     setTxBuilderObserver(registerObserver(new TxBuilderObserver(addPowAction)));
+
+    return () => {
+      if (txBuilderObserver !== null) {
+        unregisterObserver(txBuilderObserver);
+      }
+    }
   }, [addPowAction]);
   useEffect(() => {
     onInvokeActions(invokeCalls);
@@ -95,10 +114,20 @@ export default function game() {
       unregisterObserver(soundObserver);
     }
     setSoundObserver(registerObserver(new SoundObserver(playSoundEffect)));
+
+    return () => {
+      if (soundObserver !== null) {
+        unregisterObserver(soundObserver);
+      }
+    }
   }, [playSoundEffect]);
 
   useEffect(() => {
     initializeSound();
+
+    return () => {
+      cleanupSound();
+    }
   }, [initializeSound]);
 
   const { advanceStep, setVisible, step } = useTutorial();
@@ -111,6 +140,12 @@ export default function game() {
       new TutorialObserver(advanceStep, setVisible, step),
     );
     setTutorialObserver(observerId);
+
+    return () => {
+      if (tutorialObserver !== null) {
+        unregisterObserver(tutorialObserver);
+      }
+    };
   }, [advanceStep, setVisible, step]);
 
   useEffect(() => {
@@ -155,7 +190,7 @@ export default function game() {
   ]);
   useEffect(() => {
     setGetUpgradeValueDependencyTxStore(getUpgradeValue);
-  }, [notify, getUpgradeValue, setGetUpgradeValueDependencyTxStore]);
+  }, [getUpgradeValue, setGetUpgradeValueDependencyTxStore]);
 
   const {
     initializeGameStore,
@@ -175,12 +210,21 @@ export default function game() {
     setGetUpgradeValueDependencyGame(getUpgradeValue);
     setInitMyGameDependency(initMyGame);
   }, [
-    notify,
     getUpgradeValue,
     initMyGame,
     setGetUpgradeValueDependencyGame,
     setInitMyGameDependency,
   ]);
 
+  const { initializeL2Store, setGetUpgradeValueDependency: setGetUpgradeValueDependencyL2 } = useL2Store();
+  useEffect(() => {
+    initializeL2Store(powContract, user);
+  }, [initializeL2Store, powContract, user]);
+  useEffect(() => {
+    setGetUpgradeValueDependencyL2(getUpgradeValue);
+  }, [
+    getUpgradeValue,
+    setGetUpgradeValueDependencyL2,
+  ]);
   return <RootNavigator />;
 }

@@ -8,7 +8,6 @@ import { Block } from "../types/Chains";
 
 export const useSequencer = (
   onBlockSequenced: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined,
 ) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
@@ -45,7 +44,6 @@ export const useSequencer = (
         setSequencingProgress(newCounter / blockDifficulty);
         notify("SequenceClicked", {
           counter: newCounter,
-          ignoreAction: getWorkingBlock(1)?.blockId === 0,
         });
         return newCounter;
       }

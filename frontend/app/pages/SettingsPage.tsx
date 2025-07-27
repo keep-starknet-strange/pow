@@ -31,6 +31,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
 
   const isInLoginMode = setLoginPage !== null;
 
+  console.log("Rendering SettingsPage with activeTab:", activeTab);
   return (
     <View className="flex-1 relative w-full h-full">
       <MainBackground />
