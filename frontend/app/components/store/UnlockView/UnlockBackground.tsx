@@ -16,7 +16,7 @@ export const UnlockBackground: React.FC = () => {
     <Canvas style={{ width: width - 32, height: 92 }}>
       <Image
         image={getImage("button.secondary")}
-        fit="contain"
+        fit="fill"
         sampling={{
           filter: FilterMode.Nearest,
           mipmap: MipmapMode.Nearest,
