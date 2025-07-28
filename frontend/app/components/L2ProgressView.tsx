@@ -8,7 +8,7 @@ import {
 } from "@shopify/react-native-skia";
 import Animated, { Easing } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useDerivedValue, withTiming } from "react-native-reanimated";
 

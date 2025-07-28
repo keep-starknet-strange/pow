@@ -4,6 +4,7 @@ import { useSequencer } from "../hooks/useSequencer";
 import { useDAConfirmer } from "../hooks/useDAConfirmer";
 import { useProver } from "../hooks/useProver";
 import { useGameStore } from "../stores/useGameStore";
+import { useL2Store } from "../stores/useL2Store";
 
 export const genesisBlockReward = 1;
 type GameContextType = {
@@ -30,22 +31,12 @@ export const useGame = () => {
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const {
-    onBlockMined,
-    onBlockSequenced,
-    onDaConfirmed,
-    onProverConfirmed,
-    getWorkingBlock,
-    getDa,
-    getProver,
-  } = useGameStore();
-  const { miningProgress, mineBlock } = useMiner(onBlockMined, getWorkingBlock);
-  const { sequencingProgress, sequenceBlock } = useSequencer(
-    onBlockSequenced,
-    getWorkingBlock,
-  );
-  const { daProgress, daConfirm } = useDAConfirmer(onDaConfirmed, getDa);
-  const { proverProgress, prove } = useProver(onProverConfirmed, getProver);
+  const { onBlockMined, onBlockSequenced } = useGameStore();
+  const { onDaConfirmed, getDa, onProverConfirmed, getProver } = useL2Store();
+  const { miningProgress, mineBlock } = useMiner(onBlockMined);
+  const { sequencingProgress, sequenceBlock } = useSequencer(onBlockSequenced);
+  const { daProgress, daConfirm } = useDAConfirmer(onDaConfirmed);
+  const { proverProgress, prove } = useProver(onProverConfirmed);
 
   return (
     <GameContext.Provider

@@ -20,7 +20,7 @@ export function RootNavigator() {
   const isAuthenticated = user && user.account.username !== "";
 
   return (
-    <View className="flex-1 bg-[#010a12ff] relative">
+    <View className="flex-1 bg-[#101119ff] relative">
       {isAuthenticated ? (
         <>
           {isTutorialActive && <TutorialOverlay />}

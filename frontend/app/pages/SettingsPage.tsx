@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useIsFocused } from "@react-navigation/native";
 
 import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
-import HelpSection from "./settings/Help";
 import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
 import MainBackground from "../components/MainBackground";
@@ -15,7 +15,6 @@ const tabs = {
   Main: SettingsMainSection,
   About: AboutSection,
   Credits: CreditsSection,
-  Help: HelpSection,
   ClaimReward: ClaimRewardSection,
 };
 
@@ -30,6 +29,11 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
   const ActiveComponent = tabs[activeTab];
 
   const isInLoginMode = setLoginPage !== null;
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+  }
 
   return (
     <View className="flex-1 relative w-full h-full">

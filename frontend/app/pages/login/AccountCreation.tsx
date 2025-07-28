@@ -1,21 +1,20 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   TouchableWithoutFeedback,
   View,
   Dimensions,
 } from "react-native";
-import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "../../context/FocEngineConnector";
 import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
-import { PFPView } from "../../components/PFPView";
 import NounsBuilder from "../../components/NounsBuilder";
 import BasicButton from "../../components/buttons/Basic";
+import AvatarCreator from "./AvatarCreator";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import {
   Canvas,
@@ -35,7 +34,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   setLoginPage,
 }) => {
   const version = process.env.EXPO_APP_VERSION || "0.0.1";
-  const { account } = useStarknetConnector();
   const { notify } = useEventManager();
   const {
     isUsernameUnique,
@@ -65,8 +63,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     notify("BasicClick");
   };
 
-  const HEADER_HEIGHT = 60;
-
   return (
     <View
       style={{
@@ -79,125 +75,20 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         className="absolute top-0 left-0 w-full bg-[#10111A]"
         style={{ height: 60, width: width }}
       />
-      <View
-        className="absolute top-[60px] left-0 w-full"
-        style={{ height: 50, width: width }}
-      >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <SkiaImg
-            image={getImage("bar.top")}
-            fit="fill"
-            x={0}
-            y={0}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-            width={width}
-            height={50}
-          />
-        </Canvas>
-        <View className="absolute top-0 left-0 w-full h-full">
-          <Marquee spacing={0} speed={1}>
-            <View className="flex flex-row items-center justify-center">
-              <Text className="text-[#fff7ff] font-Teatime text-[40px]">
-                CREATE YOUR ACCOUNT
-              </Text>
-              <View className="w-2 aspect-square bg-[#fff7ff] mx-4" />
-            </View>
-          </Marquee>
-        </View>
-      </View>
+      <AccountCreationHeader width={width} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior="position"
           keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
         >
-          <Animated.View
-            entering={FadeInUp}
-            style={{
-              alignItems: "center",
-              marginTop: HEADER_HEIGHT,
-            }}
-          >
-            <View className="relative">
-              <TouchableOpacity
-                className="flex items-center justify-center bg-[#10111910]
-                            w-[250px] h-[250px] p-4 mt-8
-                            rounded-xl shadow-lg shadow-black/50 relative"
-                onPress={startCreatingAvatar}
-              >
-                <View className="absolute top-0 left-0 w-[250px] h-[250px]">
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
-                    <SkiaImg
-                      image={getImage("block.grid.min")}
-                      fit="fill"
-                      x={0}
-                      y={0}
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                      width={246}
-                      height={246}
-                    />
-                  </Canvas>
-                </View>
-                <PFPView
-                  user={account?.address}
-                  attributes={creatingAvatar ? newAvatar : avatar}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="absolute top-[85px] right-[-42px]"
-                onPress={startCreatingAvatar}
-              >
-                <Canvas style={{ width: 40, height: 40 }}>
-                  <SkiaImg
-                    image={getImage("icon.edit")}
-                    fit="contain"
-                    x={0}
-                    y={0}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                    width={40}
-                    height={40}
-                  />
-                </Canvas>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="absolute top-[40px] right-[-42px]"
-                onPress={() => {
-                  const newAvatar = getRandomNounsAttributes();
-                  setAvatar(newAvatar);
-                  setNewAvatar(newAvatar);
-                  notify("DiceRoll");
-                }}
-              >
-                <Canvas style={{ width: 40, height: 40 }}>
-                  <SkiaImg
-                    image={getImage("icon.random")}
-                    fit="contain"
-                    x={0}
-                    y={0}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                    width={40}
-                    height={40}
-                  />
-                </Canvas>
-              </TouchableOpacity>
-            </View>
-            <View className="flex flex-row items-center justify-center mt-1 gap-2">
-              <Text className="text-[#101119] text-[18px] font-Pixels">
-                Create your Noun Avatar
-              </Text>
-            </View>
-          </Animated.View>
+          <AvatarCreator
+            avatar={avatar}
+            setAvatar={setAvatar}
+            newAvatar={newAvatar}
+            setNewAvatar={setNewAvatar}
+            startCreatingAvatar={startCreatingAvatar}
+            creatingAvatar={creatingAvatar}
+          />
           <Animated.View
             entering={FadeInDown}
             className="flex flex-col items-center"
@@ -291,5 +182,40 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     </View>
   );
 };
+
+const AccountCreationHeader: React.FC<{ width: number }> = memo(({ width }) => {
+  const { getImage } = useImages();
+  return (
+    <View
+      className="absolute top-[60px] left-0 w-full"
+      style={{ height: 50, width: width }}
+    >
+      <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <SkiaImg
+          image={getImage("bar.top")}
+          fit="fill"
+          x={0}
+          y={0}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+          width={width}
+          height={50}
+        />
+      </Canvas>
+      <View className="absolute top-0 left-0 w-full h-full">
+        <Marquee spacing={0} speed={1}>
+          <View className="flex flex-row items-center justify-center">
+            <Text className="text-[#fff7ff] font-Teatime text-[40px]">
+              CREATE YOUR ACCOUNT
+            </Text>
+            <View className="w-2 aspect-square bg-[#fff7ff] mx-4" />
+          </View>
+        </Marquee>
+      </View>
+    </View>
+  );
+});
 
 export default AccountCreationPage;

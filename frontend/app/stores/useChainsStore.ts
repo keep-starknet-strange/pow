@@ -117,11 +117,11 @@ export const useChainsStore = create<ChainsState>((set, get) => ({
       const chain = state.getChain(chainId);
       if (!chain) return state;
 
-      // Add the new block to the chain's blocks & truncate to the last 2 blocks
+      // Add the new block to the chain's blocks & truncate to the last 1 block
       return {
         chains: state.chains.map((c) =>
           c.chainId === chainId
-            ? { ...c, blocks: [...c.blocks, block].slice(-2) }
+            ? { ...c, blocks: [...c.blocks, block].slice(-1) }
             : c,
         ),
       };

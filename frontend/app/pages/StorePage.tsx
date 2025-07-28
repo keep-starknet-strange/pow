@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { useIsFocused } from "@react-navigation/native";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { useUpgrades } from "../context/Upgrades";
-import { useGameStore } from "@/app/stores/useGameStore";
+import { useL2Store } from "@/app/stores/useL2Store";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
 import { ShopTitle } from "../components/store/ShopTitle";
@@ -29,9 +30,11 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { dappsUnlocked, canUnlockDapp, canUnlockTx } = useTransactionsStore();
+  const isFocused = useIsFocused();
+  const { dappsUnlocked, canUnlockDapps, canUnlockTx } =
+    useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
-  const { l2 } = useGameStore();
+  const { l2 } = useL2Store();
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
 
@@ -61,6 +64,10 @@ export const StorePage: React.FC = () => {
 
   const subTabs = ["Transactions", "Upgrades", "Automation"];
   const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
+
+  if (!isFocused) {
+    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+  }
 
   return (
     <View className="flex-1 relative bg-[#101119]">
@@ -150,7 +157,7 @@ export const StorePage: React.FC = () => {
               )}
             </View>
           )}
-          {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
+          {activeSubTab === "Transactions" && (
             <View className="flex flex-col px-[16px]">
               <View className="w-full relative pb-[16px]">
                 <Canvas style={{ width: width - 32, height: 24 }}>

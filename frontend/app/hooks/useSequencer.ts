@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
 
-export const useSequencer = (
-  onBlockSequenced: () => void,
-  getWorkingBlock: (chainId: number) => Block | undefined,
-) => {
+export const useSequencer = (onBlockSequenced: () => void) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
@@ -33,43 +30,25 @@ export const useSequencer = (
     fetchSequencerCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const sequenceBlock = () => {
+  const sequenceBlock = useCallback(() => {
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      notify("SequenceClicked", {
-        counter: newCounter,
-        ignoreAction: getWorkingBlock(1)?.blockId === 0,
-      });
-      return newCounter;
+      const blockDifficulty = getUpgradeValue(1, "L2 Finality");
+      if (newCounter >= blockDifficulty) {
+        onBlockSequenced();
+        setSequencingProgress(0);
+        return 0;
+      } else {
+        setSequencingProgress(newCounter / blockDifficulty);
+        notify("SequenceClicked", {
+          counter: newCounter,
+        });
+        return newCounter;
+      }
     });
-  };
-
-  useEffect(() => {
-    if (sequenceCounter === 0) return;
-    const blockDifficulty = getUpgradeValue(1, "L2 Finality");
-    setSequencingProgress(sequenceCounter / blockDifficulty);
-    if (sequenceCounter >= blockDifficulty) {
-      onBlockSequenced();
-      setSequenceCounter(0);
-      setSequencingProgress(0);
-    }
-  }, [sequenceCounter, getUpgradeValue]);
-
-  const [shouldAutoClick, setShouldAutoClick] = useState(false);
-  useEffect(() => {
-    const workingBlock = getWorkingBlock(1);
-    if (!workingBlock) {
-      setShouldAutoClick(false);
-      return;
-    }
-    if (workingBlock?.isBuilt && getAutomationValue(1, "Sequencer") > 0) {
-      setShouldAutoClick(true);
-    } else {
-      setShouldAutoClick(false);
-    }
-  }, [getWorkingBlock, getAutomationValue]);
+  }, [onBlockSequenced, getUpgradeValue, notify]);
   useAutoClicker(
-    shouldAutoClick,
+    getAutomationValue(1, "Sequencer") > 0,
     5000 / (getAutomationValue(1, "Sequencer") || 1),
     sequenceBlock,
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Dimensions } from "react-native";
 import {
   Canvas,
@@ -12,7 +12,7 @@ import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useBalance } from "../stores/useBalanceStore";
 import { useImages } from "../hooks/useImages";
 
-export const Header: React.FC = () => {
+export const Header: React.FC = memo(() => {
   const { balance } = useBalance();
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
@@ -45,6 +45,6 @@ export const Header: React.FC = () => {
       </View>
     </View>
   );
-};
+});
 
 export default Header;

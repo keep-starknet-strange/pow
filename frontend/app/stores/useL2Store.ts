@@ -1,0 +1,212 @@
+import { create } from "zustand";
+import { Contract } from "starknet";
+import { FocAccount } from "../context/FocEngineConnector";
+import { useBalanceStore } from "./useBalanceStore";
+import { useGameStore } from "./useGameStore";
+import { useChainsStore } from "./useChainsStore";
+import { useEventManager } from "./useEventManager";
+import { Transaction, Block, newBlock } from "../types/Chains";
+import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
+
+interface L2Store {
+  l2: L2 | undefined;
+
+  resetL2Store: () => void;
+  initializeL2Store: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+  ) => void;
+
+  canUnlockL2: () => boolean;
+  isL2Unlocked: () => boolean;
+  initL2: () => void;
+  getL2Cost: () => number;
+  getL2: () => L2 | undefined;
+  getDa: () => L2DA | undefined;
+  getProver: () => L2Prover | undefined;
+
+  addBlockToDa: (block: Block) => void;
+  addBlockToProver: (block: Block) => void;
+
+  onDaConfirmed: () => void;
+  onProverConfirmed: () => void;
+
+  getUpgradeValueDependency?: (chainId: number, upgradeName: string) => number;
+  setGetUpgradeValueDependency: (
+    getUpgradeValue: (chainId: number, upgradeName: string) => number,
+  ) => void;
+}
+
+export const useL2Store = create<L2Store>((set, get) => ({
+  l2: undefined,
+
+  getUpgradeValueDependency: undefined,
+  setGetUpgradeValueDependency: (getUpgradeValue) =>
+    set({ getUpgradeValueDependency: getUpgradeValue }),
+
+  resetL2Store: () => set({ l2: undefined }),
+  initializeL2Store: (powContract, user) => {
+    const fetchL2Store = async () => {
+      if (powContract && user) {
+        try {
+          const l2Instance: L2 = newL2();
+          l2Instance.da = newL2DA();
+          l2Instance.prover = newL2Prover();
+
+          set({
+            l2: l2Instance,
+          });
+        } catch (error) {
+          console.error("Error initializing L2 store:", error);
+        }
+      } else {
+        get().resetL2Store();
+      }
+    };
+    fetchL2Store();
+  },
+
+  canUnlockL2: () => {
+    /* TODO: Include once switched to zustand
+    if (!stakingUnlocked) {
+      setCanPrestige(false);
+      return;
+    }
+    */
+    /*
+    const automationlevels = automations[0];
+    if (!automationlevels) {
+      return false;
+    }
+    for (const level of Object.values(automationlevels)) {
+      if (level < 0) {
+        return false;
+      }
+    }
+    const upgradeLevels = upgrades[0];
+    if (!upgradeLevels) {
+      return false;
+    }
+    for (const level of Object.values(upgradeLevels)) {
+      if (level < 0) {
+        return false;
+      }
+    }
+    */
+    /* TODO: Include once switched to zustand
+    const dappLevels = dappFees[0];
+    if (!dappLevels) {
+      setCanUnlockL2(false);
+      return;
+    }
+    const transactionLevels = transactionFees[0];
+    if (!transactionLevels) {
+      setCanUnlockL2(false);
+      return;
+    }
+    */
+    return true;
+  },
+
+  isL2Unlocked: () => {
+    return get().l2 !== undefined;
+  },
+
+  initL2: () => {
+    const cost = get().getL2Cost();
+    if (!useBalanceStore.getState().tryBuy(cost)) return;
+
+    set((state) => {
+      if (state.l2) return state;
+      useGameStore.getState().initL2WorkingBlock();
+      const newL2Instance = newL2();
+      useChainsStore.getState().addChain();
+      useEventManager.getState().notify("L2Purchased");
+      return {
+        l2: newL2Instance,
+      };
+    });
+  },
+
+  getL2Cost: () => {
+    const cost = 316274400; // TODO: Config
+    return cost;
+  },
+
+  getL2: () => {
+    return get().l2;
+  },
+
+  getDa: () => {
+    return get().l2?.da;
+  },
+
+  getProver: () => {
+    return get().l2?.prover;
+  },
+
+  addBlockToDa: (block) => {
+    if (!get().l2) return;
+    const { getUpgradeValueDependency } = get();
+    set((state) => {
+      if (!state.l2) return state;
+      const newL2Instance = { ...state.l2 };
+      if (!newL2Instance.da) return state;
+      newL2Instance.da.blocks.push(block.blockId);
+      const blockReward =
+        block.reward ||
+        (getUpgradeValueDependency
+          ? getUpgradeValueDependency(0, "Block Reward")
+          : 1);
+      newL2Instance.da.blockFees += blockReward;
+      const daMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(0, "DA compression")
+        : 1;
+      newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
+      return { l2: newL2Instance };
+    });
+  },
+
+  addBlockToProver: (block) => {
+    if (!get().l2) return;
+    const { getUpgradeValueDependency } = get();
+    set((state) => {
+      if (!state.l2) return state;
+      const newL2Instance = { ...state.l2 };
+      if (!newL2Instance.prover) return state;
+      newL2Instance.prover.blocks.push(block.blockId);
+      const blockReward =
+        block.reward ||
+        (getUpgradeValueDependency
+          ? getUpgradeValueDependency(1, "Block Reward")
+          : 1);
+      newL2Instance.prover.blockFees += blockReward;
+      const proverMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(1, "Prover compression")
+        : 1;
+      newL2Instance.prover.isBuilt =
+        newL2Instance.prover.blocks.length >= proverMaxSize;
+      return { l2: newL2Instance };
+    });
+  },
+
+  onDaConfirmed: () => {
+    set((state) => {
+      if (!state.l2 || !state.l2.da) return state;
+      useBalanceStore.getState().updateBalance(state.l2.da.blockFees);
+      const newL2Instance = { ...state.l2 };
+      newL2Instance.da = newL2DA();
+      return { l2: newL2Instance };
+    });
+  },
+
+  onProverConfirmed: () => {
+    set((state) => {
+      if (!state.l2 || !state.l2.prover) return state;
+      useBalanceStore.getState().updateBalance(state.l2.prover.blockFees);
+      const newL2Instance = { ...state.l2 };
+      newL2Instance.prover = newL2Prover();
+      return { l2: newL2Instance };
+    });
+  },
+}));

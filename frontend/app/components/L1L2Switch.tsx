@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import {
   Canvas,
   Image,
@@ -33,7 +33,7 @@ export const L1L2Switch = ({
           }}
         />
       </Canvas>
-      <TouchableOpacity
+      <Pressable
         onPress={() => {
           setCurrentView("L1");
         }}
@@ -65,8 +65,8 @@ export const L1L2Switch = ({
             L1
           </Text>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </Pressable>
+      <Pressable
         onPress={() => {
           setCurrentView("L2");
         }}
@@ -98,7 +98,7 @@ export const L1L2Switch = ({
             L2
           </Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
