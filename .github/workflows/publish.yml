@@ -55,7 +55,7 @@ jobs:
                 appId: ${{ secrets.FIREBASE_APP_ID }}
                 serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}
                 groups: internal-testers
-                file: ".frontend/android/app/build/outputs/apk/release/app-release.apk"
+                file: "./frontend/android/app/build/outputs/apk/release/app-release.apk"
             
             ## TODO 
             ## 1. Setup keys play store
