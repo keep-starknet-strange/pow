@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, SafeAreaView, ScrollView, Modal } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -8,6 +8,7 @@ import { PageHeader } from "../components/staking/PageHeader";
 import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
+import { StakingUnlock } from "../components/staking/StakingUnlock";
 import { AmountField } from "../components/staking/AmountField";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
@@ -29,6 +30,7 @@ export const StakingPage: React.FC = () => {
     claimStakingRewards,
     withdrawStakedTokens,
   } = useStakingStore();
+  const stakingUnlocked = false;
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   // const { getImage } = useImages();
@@ -199,6 +201,30 @@ export const StakingPage: React.FC = () => {
           <StakingAction action={validateStake} label="VALIDATE" />
         </View>
       </ScrollView>
+
+      <Modal transparent visible={!stakingUnlocked} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: "85%",
+              backgroundColor: "transparent",
+              borderRadius: 10,
+              padding: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <StakingUnlock alwaysShow />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

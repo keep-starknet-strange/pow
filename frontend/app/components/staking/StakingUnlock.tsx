@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { useGameStore } from "@/app/stores/useGameStore";
 import { UnlockView } from "../store/UnlockView";
 
 export type StakingUnlockProps = {
@@ -14,7 +11,7 @@ export const StakingUnlock: React.FC<StakingUnlockProps> = ({ alwaysShow }) => {
       <UnlockView
         icon={"logo.starknet"}
         label="Unlock Staking"
-        description="Lock up your assets to earn rewards and participate in governance."
+        description="participate in governance."
         cost={42069}
         onPress={() => {
           console.log("med rare steak");
