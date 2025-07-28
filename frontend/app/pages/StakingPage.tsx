@@ -1,4 +1,5 @@
 import { View, Text, SafeAreaView, ScrollView, Modal } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -33,6 +34,8 @@ export const StakingPage: React.FC = () => {
   const stakingUnlocked = false;
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
+  const insets = useSafeAreaInsets();
+  console.log("insets", insets);
   // const { getImage } = useImages();
   const balancePercentages = BALANCE_PERCENTAGE;
   interface GetPercentOfParams {
@@ -202,29 +205,38 @@ export const StakingPage: React.FC = () => {
         </View>
       </ScrollView>
 
-      <Modal transparent visible={!stakingUnlocked} animationType="fade">
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+      <View style={{
+        position: "absolute",
+        top: 0,        // inside the content container
+        bottom: 0,     // stops right at the top of the tab bar
+        left: 0,
+        right: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 100,
+        }}
         >
-          <View
-            style={{
-              width: "85%",
-              backgroundColor: "transparent",
-              borderRadius: 10,
-              padding: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <StakingUnlock alwaysShow />
+          <View style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: "rgba(0,0,0,0.8)",
+          }}/>
+            <View
+              style={{
+                width: "85%",
+                backgroundColor: "transparent",
+                borderRadius: 10,
+                padding: 20,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              >
+                <StakingUnlock alwaysShow />
+            </View>
           </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
