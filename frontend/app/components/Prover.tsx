@@ -1,20 +1,7 @@
 import { View } from "react-native";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
-
-import * as proverImages from "../configs/provers";
-export const getProverImage = (proverId: number) => {
-  const images = Object.values(proverImages);
-  return images[proverId] || images[0];
-};
-
-import * as ProvingAnimation from "../configs/proving";
-export const getProvingAnimation = (progress: number) => {
-  const animations = Object.values(ProvingAnimation);
-  const animationIndex = Math.floor(progress * animations.length);
-  return animations[animationIndex] || animations[0];
-};
 
 export const Prover: React.FC = () => {
   const { proverProgress, prove } = useGame();
@@ -24,7 +11,6 @@ export const Prover: React.FC = () => {
       <Confirmer
         progress={proverProgress}
         text={"Click to prove!"}
-        getAnimation={getProvingAnimation}
         onConfirm={prove}
         renderedBy="prover"
       />

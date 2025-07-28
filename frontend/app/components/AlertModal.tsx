@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Modal, View, Text, Pressable } from "react-native";
 
 interface AlertModalProps {
   visible: boolean;
@@ -23,12 +23,12 @@ export const AlertModal: React.FC<AlertModalProps> = ({
         {message && (
           <Text className="text-center text-[#333] mt-2">{message}</Text>
         )}
-        <TouchableOpacity
+        <Pressable
           onPress={onClose}
           className="mt-4 bg-red-500 px-4 py-2 rounded-xl"
         >
           <Text className="text-white font-semibold">{buttonLabel}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   </Modal>

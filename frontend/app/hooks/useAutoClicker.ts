@@ -1,13 +1,17 @@
 import { useEffect } from "react";
+import { useInterval } from "usehooks-ts";
 
 export const useAutoClicker = (
   isEnabled: boolean,
   intervalMs: number,
   clickFn: () => void,
 ) => {
-  useEffect(() => {
-    if (!isEnabled || intervalMs <= 0) return;
-    const interval = setInterval(clickFn, intervalMs);
-    return () => clearInterval(interval);
-  }, [isEnabled, intervalMs, clickFn]);
+  useInterval(
+    () => {
+      if (isEnabled) {
+        clickFn();
+      }
+    },
+    isEnabled ? intervalMs : null,
+  );
 };

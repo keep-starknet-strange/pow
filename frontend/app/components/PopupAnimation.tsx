@@ -25,6 +25,9 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
       easing: Easing.bounce,
       useNativeDriver: true,
     }).start();
+    return () => {
+      popupAnimation.removeAllListeners();
+    };
   }, [popupStartTime]);
 
   return (

@@ -46,6 +46,11 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
         requestAnimationFrame(measure);
       });
     });
+    return () => {
+      if (ref.current) {
+        ref.current = null; // Clear the ref on unmount
+      }
+    };
   }, [measure]);
 
   const onLayout = scheduleMeasure;

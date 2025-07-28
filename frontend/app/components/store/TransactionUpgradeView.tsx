@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import moneyImg from "../../../assets/images/money.png";
-import overclockImg from "../../../assets/images/overclock.png";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { getTxIcon } from "../../utils/transactions";
+import { useImages } from "@/app/hooks/useImages";
+import { getTxIconName } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { TransactionUpgradeActions } from "./transactionUpgrade/TransactionUpgradeActions";
@@ -48,7 +47,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
     <View className="flex flex-col w-full">
       <View className="flex flex-row w-full mb-[4px]">
         <IconWithLock
-          txIcon={getTxIcon(props.chainId, props.txData.id, props.isDapp)}
+          txIcon={getTxIconName(props.chainId, props.txData.id, props.isDapp)}
           locked={txFeeLevel === -1}
         />
         <TxDetails
@@ -77,7 +76,6 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
               txFeeUpgrade(props.chainId, props.txData.id);
             }
           },
-          icon: moneyImg,
           color: props.txData.color.substring(0, 7) + "f0",
         }}
         speedProps={{
@@ -91,7 +89,6 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
               txSpeedUpgrade(props.chainId, props.txData.id);
             }
           },
-          icon: overclockImg,
           color: props.txData.color.substring(0, 7) + "f0",
         }}
       />

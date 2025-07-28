@@ -2,23 +2,20 @@ import { useCallback, useEffect, useState } from "react";
 import { View, Text, Image, LayoutChangeEvent } from "react-native";
 import Animated, { BounceIn, Easing, FadeOut } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
-import { useUpgrades } from "../context/Upgrades";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
 import { getTxIcon } from "../utils/transactions";
-import {
-  Canvas,
-  Image as SkiaImg,
-  FilterMode,
-  MipmapMode,
-} from "@shopify/react-native-skia";
+import { BlockTx } from "./BlockTx";
+import { BlockTxOutlines } from "./BlockTxOutlines";
 
 export type BlockViewProps = {
   chainId: number;
   block: Block | null;
   completed: boolean;
+  showEmptyBlocks?: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
@@ -50,43 +47,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     setTxSize(txSize);
   }, [blockSize, txPerRow]);
 
-  const getTxImg = (chainId: number, typeId: number) => {
-    switch (chainId) {
-      case 0:
-        switch (typeId) {
-          case 0:
-            return getImage("block.bg.green");
-          case 1:
-            return getImage("block.bg.yellow");
-          case 2:
-            return getImage("block.bg.blue");
-          case 3:
-            return getImage("block.bg.pink");
-          case 4:
-            return getImage("block.bg.purple");
-          default:
-            return getImage("unknown");
-        }
-      case 1:
-        switch (typeId) {
-          case 0:
-            return getImage("block.bg.blue");
-          case 1:
-            return getImage("block.bg.green");
-          case 2:
-            return getImage("block.bg.pink");
-          case 3:
-            return getImage("block.bg.purple");
-          case 4:
-            return getImage("block.bg.yellow");
-          default:
-            return getImage("unknown");
-        }
-      default:
-        return getImage("unknown");
-    }
-  };
-
   return (
     <View className="w-full h-full flex flex-col items-center justify-center relative">
       <View className="flex-1 aspect-square relative">
@@ -95,80 +55,19 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             className="absolute top-0 left-0 w-full h-full"
             onLayout={onBlockLayout}
           >
-            {props.block?.blockId !== 0 &&
-              Array.from({ length: txPerRow ** 2 || 0 }, (_, index) => (
-                <Animated.View
-                  key={index}
-                  className="absolute"
-                  exiting={FadeOut}
-                  style={{
-                    left: (index % txPerRow) * txSize,
-                    top: Math.floor(index / txPerRow) * txSize,
-                    width: txSize,
-                    height: txSize,
-                    display: props.block?.transactions[index] ? "none" : "flex",
-                  }}
-                >
-                  <Canvas style={{ flex: 1 }} className="w-full h-full">
-                    <SkiaImg
-                      image={getImage("block.bg.empty")}
-                      fit="fill"
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                      x={0}
-                      y={0}
-                      width={txSize}
-                      height={txSize}
-                    />
-                  </Canvas>
-                </Animated.View>
-              ))}
+            {props.block?.blockId !== 0 && props.showEmptyBlocks && (
+              <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
+            )}
           </View>
           {props.block?.transactions.map((tx, index) => (
-            <Animated.View
+            <BlockTx
               key={index}
-              entering={BounceIn.duration(400)}
-              className="absolute"
-              style={{
-                width: txSize,
-                height: txSize,
-                left: (index % txPerRow) * txSize,
-                top: Math.floor(index / txPerRow) * txSize,
-              }}
-            >
-              <Canvas style={{ flex: 1 }} className="w-full h-full">
-                <SkiaImg
-                  image={getTxImg(props.chainId, tx.typeId)}
-                  fit="fill"
-                  sampling={{
-                    filter: FilterMode.Nearest,
-                    mipmap: MipmapMode.Nearest,
-                  }}
-                  x={0}
-                  y={0}
-                  width={txSize}
-                  height={txSize}
-                />
-              </Canvas>
-              <View className="absolute top-0 left-0 w-full h-full justify-center items-center">
-                <Canvas style={{ width: txSize * 0.4, height: txSize * 0.4 }}>
-                  <SkiaImg
-                    image={getImage(getTxIcon(props.chainId, tx.typeId))}
-                    fit="contain"
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                    x={0}
-                    y={0}
-                    width={txSize * 0.4}
-                    height={txSize * 0.4}
-                  />
-                </Canvas>
-              </View>
-            </Animated.View>
+              txSize={txSize}
+              chainId={props.chainId}
+              typeId={tx.typeId}
+              index={index}
+              txPerRow={txPerRow}
+            />
           ))}
         </View>
         {props.block?.blockId === 0 && (
