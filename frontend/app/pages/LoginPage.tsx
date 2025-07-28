@@ -19,7 +19,6 @@ export const LoginPage: React.FC = () => {
     setCurrentPage(page as keyof typeof loginPages);
   };
 
-  console.log("Rendering LoginPage with currentPage:", currentPage);
   return (
     <View className="flex-1 items-center">
       <MainBackground />

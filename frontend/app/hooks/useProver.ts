@@ -5,9 +5,7 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useAutoClicker } from "./useAutoClicker";
 
-export const useProver = (
-  onProve: () => void,
-) => {
+export const useProver = (onProve: () => void) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();

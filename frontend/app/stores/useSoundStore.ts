@@ -138,11 +138,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         return;
       }
 
-      const randomSong = musicAssets[
-        Object.keys(musicAssets)[
-          Math.floor(Math.random() * Object.keys(musicAssets).length)
-        ]
-      ];
+      const randomSong =
+        musicAssets[
+          Object.keys(musicAssets)[
+            Math.floor(Math.random() * Object.keys(musicAssets).length)
+          ]
+        ];
       musicPlayer.replace(randomSong);
       musicPlayer.volume = get().musicVolume;
       musicPlayer.seekTo(0);

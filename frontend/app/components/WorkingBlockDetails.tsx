@@ -66,20 +66,17 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
       }
       detailsScaleAnim.value = withSequence(
         withTiming(1, { duration: 400 }),
-        withTiming(
-          1,
-          { duration: 900 },
-          () => runOnJS(updateWorkingBlock)(props.chainId),
+        withTiming(1, { duration: 900 }, () =>
+          runOnJS(updateWorkingBlock)(props.chainId),
         ),
         withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }),
       );
     }
   }, [props.chainId, workingBlocks[props.chainId]?.isBuilt]);
 
-
   const [workingBlock, setWorkingBlock] = React.useState(
     workingBlocks[props.chainId] || null,
-  ); 
+  );
 
   return (
     <Animated.View

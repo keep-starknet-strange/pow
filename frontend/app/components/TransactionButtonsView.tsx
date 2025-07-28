@@ -9,39 +9,38 @@ export type TransactionButtonsViewProps = {
   isDapps: boolean;
 };
 
-export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> = memo((
-  props,
-) => {
-  const [transactionTypes, setTransactionTypes] = useState<any[]>([]);
+export const TransactionButtonsView: React.FC<TransactionButtonsViewProps> =
+  memo((props) => {
+    const [transactionTypes, setTransactionTypes] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (props.isDapps) {
-      const dappTransactions =
-        props.chainId === 0
-          ? dappsJson.L1.transactions
-          : dappsJson.L2.transactions;
-      setTransactionTypes(dappTransactions);
-    } else {
-      const chainTransactions =
-        props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-      setTransactionTypes(chainTransactions);
-    }
-  }, [props.chainId, props.isDapps]);
+    useEffect(() => {
+      if (props.isDapps) {
+        const dappTransactions =
+          props.chainId === 0
+            ? dappsJson.L1.transactions
+            : dappsJson.L2.transactions;
+        setTransactionTypes(dappTransactions);
+      } else {
+        const chainTransactions =
+          props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+        setTransactionTypes(chainTransactions);
+      }
+    }, [props.chainId, props.isDapps]);
 
-  return (
-    <View className="flex flex-row w-full h-full items-center justify-around">
-      {transactionTypes.map((txType, index) => (
-        <View
-          className="flex flex-col items-center justify-center relative"
-          key={index}
-        >
-          <TxButton
-            chainId={props.chainId}
-            txId={txType.id}
-            isDapp={props.isDapps}
-          />
-        </View>
-      ))}
-    </View>
-  );
-});
+    return (
+      <View className="flex flex-row w-full h-full items-center justify-around">
+        {transactionTypes.map((txType, index) => (
+          <View
+            className="flex flex-col items-center justify-center relative"
+            key={index}
+          >
+            <TxButton
+              chainId={props.chainId}
+              txId={txType.id}
+              isDapp={props.isDapps}
+            />
+          </View>
+        ))}
+      </View>
+    );
+  });

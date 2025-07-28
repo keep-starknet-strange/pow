@@ -8,7 +8,11 @@ import {
   Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { SlideInDown, SlideOutDown, FadeInDown } from "react-native-reanimated";
+import Animated, {
+  SlideInDown,
+  SlideOutDown,
+  FadeInDown,
+} from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   Canvas,
@@ -262,13 +266,7 @@ export const AvatarPart: React.FC<{
   selectedPart: keyof NounsAttributes;
   newAvatar: NounsAttributes;
   setNewAvatar: (avatar: NounsAttributes) => void;
-}> = ({
-  index,
-  part,
-  selectedPart,
-  newAvatar,
-  setNewAvatar,
-}) => {
+}> = ({ index, part, selectedPart, newAvatar, setNewAvatar }) => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
 
@@ -283,15 +281,12 @@ export const AvatarPart: React.FC<{
         notify("BasicClick");
       }}
     >
-      {newAvatar[selectedPart] ===
-        index && (
+      {newAvatar[selectedPart] === index && (
         <View className="absolute top-0 left-0 h-20 aspect-square">
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <SkiaImg
               image={
-                newAvatar[
-                  selectedPart
-                ] === index
+                newAvatar[selectedPart] === index
                   ? getImage("nouns.slots")
                   : getImage("nouns.slots")
               }
@@ -308,11 +303,7 @@ export const AvatarPart: React.FC<{
           </Canvas>
         </View>
       )}
-      <Image
-        source={part}
-        className="w-full h-full p-4"
-        resizeMode="contain"
-      />
+      <Image source={part} className="w-full h-full p-4" resizeMode="contain" />
     </Pressable>
   );
 };

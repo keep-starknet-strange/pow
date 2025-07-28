@@ -16,7 +16,6 @@ export const MainPage: React.FC = () => {
     setCurrentView(l2 ? "L2" : "L1");
   }, [l2]);
 
-  console.log("Rendering MainPage with currentView:", currentView);
   return (
     <View className="flex-1 relative">
       <MainBackground />

@@ -56,23 +56,19 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             onLayout={onBlockLayout}
           >
             {props.block?.blockId !== 0 && props.showEmptyBlocks && (
-              <BlockTxOutlines
-                txSize={txSize}
-                txPerRow={txPerRow}
-              />
+              <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
             )}
           </View>
           {props.block?.transactions.map((tx, index) => (
-              <BlockTx
-                key={index}
-                txSize={txSize}
-                chainId={props.chainId}
-                typeId={tx.typeId}
-                index={index}
-                txPerRow={txPerRow}
-              />
-            ),
-          )}
+            <BlockTx
+              key={index}
+              txSize={txSize}
+              chainId={props.chainId}
+              typeId={tx.typeId}
+              index={index}
+              txPerRow={txPerRow}
+            />
+          ))}
         </View>
         {props.block?.blockId === 0 && (
           <View

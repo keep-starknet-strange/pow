@@ -218,5 +218,4 @@ const AccountCreationHeader: React.FC<{ width: number }> = memo(({ width }) => {
   );
 });
 
-
 export default AccountCreationPage;

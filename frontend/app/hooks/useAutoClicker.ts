@@ -6,9 +6,12 @@ export const useAutoClicker = (
   intervalMs: number,
   clickFn: () => void,
 ) => {
-  useInterval(() => {
-    if (isEnabled) {
-      clickFn();
-    }
-  }, isEnabled ? intervalMs : null);
+  useInterval(
+    () => {
+      if (isEnabled) {
+        clickFn();
+      }
+    },
+    isEnabled ? intervalMs : null,
+  );
 };

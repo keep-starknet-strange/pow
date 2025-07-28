@@ -1,5 +1,10 @@
-import React, { useCallback, memo, useLayoutEffect, useRef, useState } from "react";
-import { enableScreens } from "react-native-screens";
+import React, {
+  useCallback,
+  memo,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Pressable } from "react-native";
 
@@ -22,7 +27,6 @@ import {
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-enableScreens();
 const Tab = createBottomTabNavigator();
 
 function StoreTabButton({

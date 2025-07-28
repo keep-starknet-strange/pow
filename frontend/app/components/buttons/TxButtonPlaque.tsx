@@ -1,6 +1,11 @@
 import React, { memo } from "react";
 import { View, Text, Dimensions } from "react-native";
-import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import { useImages } from "@/app/hooks/useImages";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { shortMoneyString } from "../../utils/helpers";

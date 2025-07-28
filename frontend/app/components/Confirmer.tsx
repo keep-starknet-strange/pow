@@ -57,7 +57,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     }).start();
     return () => {
       confirmAnimation.removeAllListeners();
-    }
+    };
   }, [confirmTime]);
 
   return (

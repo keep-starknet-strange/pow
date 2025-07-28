@@ -47,16 +47,11 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     dappFeeUpgrade,
     canUnlockTx,
   } = useTransactionsStore();
-  const enabled =
-    props.txId === 0 &&
-    props.chainId === 0 &&
-    !props.isDapp;
-  /*
+  const enabled = props.txId === 0 && props.chainId === 0 && !props.isDapp;
   const { ref, onLayout } = useTutorialLayout(
     "firstTransactionButton" as TargetId,
     enabled,
   );
-  */
 
   const feeLevel = getFeeLevel(props.chainId, props.txId, props.isDapp);
   const feeCost = getNextFeeCost(props.chainId, props.txId, props.isDapp);
@@ -86,19 +81,11 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     addTransaction(props.chainId, newTx);
     setLastTxTime(Date.now());
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [
-    addTransaction,
-    props.chainId,
-    props.txId,
-    fee,
-    props.isDapp,
-    shakeAnim,
-  ]);
+  }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
-  const transactionsData = props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-  const txType = transactionsData.find(
-    (tx) => tx.id === props.txId,
-  );
+  const transactionsData =
+    props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+  const txType = transactionsData.find((tx) => tx.id === props.txId);
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">
       <PopupAnimation
@@ -112,6 +99,8 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
       />
       <Animated.View style={[shakeAnimStyle]}>
         <Pressable
+          ref={ref}
+          onLayout={onLayout}
           style={{
             width: width * 0.18,
           }}
@@ -133,6 +122,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
             feeLevel={feeLevel}
             chainId={props.chainId}
             txId={props.txId}
+            isDapp={props.isDapp}
             name={txType?.name || "Unknown"}
           />
         </Pressable>

@@ -1,12 +1,7 @@
 import React, { useEffect } from "react";
-import {
-  View,
-  Dimensions,
-  Text,
-  ScrollView,
-} from "react-native";
+import { View, Dimensions, Text, ScrollView } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 import { useAchievement } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -47,7 +42,6 @@ export const AchievementsPage: React.FC = () => {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
   }
 
-  console.log("Rendering AchievementsPage with categories:", categories);
   return (
     <View className="flex-1 relative bg-[#101119ff]">
       <View className="absolute w-full h-full">

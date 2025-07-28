@@ -27,7 +27,7 @@ interface TutorialState {
 }
 
 export const useTutorialStore = create<TutorialState>((set, get) => ({
-  isTutorialActive: false,
+  isTutorialActive: true,
   step: "mineBlock",
   stepIndex: 0,
   layouts: {},

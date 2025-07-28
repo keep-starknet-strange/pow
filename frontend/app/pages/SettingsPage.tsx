@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 import AboutSection from "./settings/About";
 import CreditsSection from "./settings/Credits";
@@ -35,7 +35,6 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
   }
 
-  console.log("Rendering SettingsPage with activeTab:", activeTab);
   return (
     <View className="flex-1 relative w-full h-full">
       <MainBackground />

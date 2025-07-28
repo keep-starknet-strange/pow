@@ -31,16 +31,10 @@ export const useGame = () => {
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const {
-    onBlockMined,
-    onBlockSequenced,
-  } = useGameStore();
-  const { onDaConfirmed, getDa, onProverConfirmed, getProver } =
-    useL2Store();
+  const { onBlockMined, onBlockSequenced } = useGameStore();
+  const { onDaConfirmed, getDa, onProverConfirmed, getProver } = useL2Store();
   const { miningProgress, mineBlock } = useMiner(onBlockMined);
-  const { sequencingProgress, sequenceBlock } = useSequencer(
-    onBlockSequenced,
-  );
+  const { sequencingProgress, sequenceBlock } = useSequencer(onBlockSequenced);
   const { daProgress, daConfirm } = useDAConfirmer(onDaConfirmed);
   const { proverProgress, prove } = useProver(onProverConfirmed);
 

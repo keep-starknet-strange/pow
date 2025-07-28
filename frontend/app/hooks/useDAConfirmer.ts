@@ -5,9 +5,7 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useAutoClicker } from "./useAutoClicker";
 
-export const useDAConfirmer = (
-  onDAConfirm: () => void,
-) => {
+export const useDAConfirmer = (onDAConfirm: () => void) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();

@@ -52,7 +52,7 @@ export default function game() {
       if (inAppNotificationObserver !== null) {
         unregisterObserver(inAppNotificationObserver);
       }
-    }
+    };
   }, [sendInAppNotification]);
 
   const { updateAchievement } = useAchievement();
@@ -72,7 +72,7 @@ export default function game() {
       if (achievementObserver !== null) {
         unregisterObserver(achievementObserver);
       }
-    }
+    };
   }, [updateAchievement]);
 
   const { invokeCalls } = useStarknetConnector();
@@ -100,7 +100,7 @@ export default function game() {
       if (txBuilderObserver !== null) {
         unregisterObserver(txBuilderObserver);
       }
-    }
+    };
   }, [addPowAction]);
   useEffect(() => {
     onInvokeActions(invokeCalls);
@@ -119,7 +119,7 @@ export default function game() {
       if (soundObserver !== null) {
         unregisterObserver(soundObserver);
       }
-    }
+    };
   }, [playSoundEffect]);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function game() {
 
     return () => {
       cleanupSound();
-    }
+    };
   }, [initializeSound]);
 
   const { advanceStep, setVisible, step } = useTutorial();
@@ -216,16 +216,15 @@ export default function game() {
     setInitMyGameDependency,
   ]);
 
-  const { initializeL2Store, setGetUpgradeValueDependency: setGetUpgradeValueDependencyL2 } = useL2Store();
+  const {
+    initializeL2Store,
+    setGetUpgradeValueDependency: setGetUpgradeValueDependencyL2,
+  } = useL2Store();
   useEffect(() => {
     initializeL2Store(powContract, user);
   }, [initializeL2Store, powContract, user]);
   useEffect(() => {
     setGetUpgradeValueDependencyL2(getUpgradeValue);
-    console.log("Triggering setGetUpgradeValueDependencyL2", getUpgradeValue);
-  }, [
-    getUpgradeValue,
-    setGetUpgradeValueDependencyL2,
-  ]);
+  }, [getUpgradeValue, setGetUpgradeValueDependencyL2]);
   return <RootNavigator />;
 }

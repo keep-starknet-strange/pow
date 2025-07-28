@@ -11,11 +11,20 @@ export const newEmptyTransaction = () => {
 export const daTxTypeId = 101;
 export const proofTxTypeId = 102;
 
-export const getTxIcon = (chainId: number, typeId: number, isDapp: boolean, getImage: (name: string) => any) => {
+export const getTxIcon = (
+  chainId: number,
+  typeId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
   return getImage(getTxIconName(chainId, typeId, isDapp));
 };
 
-export const getTxIconName = (chainId: number, typeId: number, isDapp?: boolean) => {
+export const getTxIconName = (
+  chainId: number,
+  typeId: number,
+  isDapp?: boolean,
+) => {
   switch (chainId) {
     case 0:
       switch (typeId) {
@@ -50,9 +59,13 @@ export const getTxIconName = (chainId: number, typeId: number, isDapp?: boolean)
     default:
       return "unknown";
   }
-}
+};
 
-export const getTxImg = (chainId: number, typeId: number, getImage: (name: string) => any) => {
+export const getTxImg = (
+  chainId: number,
+  typeId: number,
+  getImage: (name: string) => any,
+) => {
   switch (chainId) {
     case 0:
       switch (typeId) {
@@ -89,7 +102,12 @@ export const getTxImg = (chainId: number, typeId: number, getImage: (name: strin
   }
 };
 
-export const getTxBg = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+export const getTxBg = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
   switch (chainId) {
     case 0:
       switch (txId) {
@@ -127,7 +145,12 @@ export const getTxBg = (chainId: number, txId: number, isDapp: boolean, getImage
 };
 
 // TODO: Change getImage dependency
-export const getTxInner = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+export const getTxInner = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
   switch (chainId) {
     case 0:
       switch (txId) {
@@ -164,7 +187,12 @@ export const getTxInner = (chainId: number, txId: number, isDapp: boolean, getIm
   }
 };
 
-export const getTxNameplate = (chainId: number, txId: number, isDapp: boolean, getImage: (name: string) => any) => {
+export const getTxNameplate = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
   switch (chainId) {
     case 0:
       switch (txId) {

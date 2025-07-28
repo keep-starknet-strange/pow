@@ -6,9 +6,7 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
 
-export const useSequencer = (
-  onBlockSequenced: () => void,
-) => {
+export const useSequencer = (onBlockSequenced: () => void) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
@@ -48,11 +46,7 @@ export const useSequencer = (
         return newCounter;
       }
     });
-  }, [
-    onBlockSequenced,
-    getUpgradeValue,
-    notify,
-  ]);
+  }, [onBlockSequenced, getUpgradeValue, notify]);
   useAutoClicker(
     getAutomationValue(1, "Sequencer") > 0,
     5000 / (getAutomationValue(1, "Sequencer") || 1),

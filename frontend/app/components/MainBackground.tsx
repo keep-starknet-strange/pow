@@ -64,12 +64,12 @@ export const MainBackground: React.FC = memo(() => {
   };
 
   useEffect(() => {
-    let initialTravelDuration =
+    const initialTravelDuration =
       minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
     updateBackgroundOffsets(initialTravelDuration);
   }, []);
   useInterval(() => {
-    let travelDuration =
+    const travelDuration =
       minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
     updateBackgroundOffsets(travelDuration);
   }, maxTravelTime + 300);

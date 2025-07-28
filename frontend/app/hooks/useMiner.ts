@@ -5,9 +5,7 @@ import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 
-export const useMiner = (
-  onBlockMined: () => void,
-) => {
+export const useMiner = (onBlockMined: () => void) => {
   const { notify } = useEventManager();
   const { getUpgradeValue, getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
@@ -48,11 +46,7 @@ export const useMiner = (
         return newCounter;
       }
     });
-  }, [
-    getUpgradeValue,
-    notify,
-    onBlockMined,
-  ]);
+  }, [getUpgradeValue, notify, onBlockMined]);
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0,

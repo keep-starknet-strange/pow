@@ -24,7 +24,7 @@ import {
   getRandomNounsAttributes,
   createNounsAttributes,
 } from "../configs/nouns";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -179,13 +179,18 @@ export const LeaderboardPage: React.FC = () => {
       setLeaderboard(users);
     };
     getLeaderboard();
-  }, [STARKNET_ENABLED, powGameContractAddress, getAccounts, getUniqueEventsOrdered, isFocused]);
+  }, [
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    getAccounts,
+    getUniqueEventsOrdered,
+    isFocused,
+  ]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
   }
 
-  console.log("Rendering LeaderboardPage with leaderboard:", leaderboard);
   return (
     <View className="flex-1 relative bg-[#101119ff]">
       <View className="absolute w-full h-full">
@@ -355,77 +360,80 @@ export const LeaderboardItem: React.FC<{
     prestige: number;
     balance: number;
   };
-}> = memo(({ index, user }: { index: number; user: any }) => {
-  const { getImage } = useImages();
-  return (
-    <View
-      key={user.id}
-      className={`flex flex-row justify-between items-center px-2 py-2 mx-[9px] ${
-        index % 2 === 0 ? "transparent" : "bg-[#1b1c26]"
-      }`}
-    >
-      <Animated.View
-        className="flex flex-row items-center flex-1"
-        entering={FadeInLeft}
+}> = memo(
+  ({ index, user }: { index: number; user: any }) => {
+    const { getImage } = useImages();
+    return (
+      <View
+        key={user.id}
+        className={`flex flex-row justify-between items-center px-2 py-2 mx-[9px] ${
+          index % 2 === 0 ? "transparent" : "bg-[#1b1c26]"
+        }`}
       >
-        <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
-          <PFPView user={user.address} attributes={user.nouns} />
-        </View>
-        <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
-          {user.name}
-        </Text>
-      </Animated.View>
-      <Animated.View
-        className="flex flex-row items-center justify-center w-[4rem]"
-        entering={FadeInRight}
-      >
-        <View className="w-[36px] aspect-square">
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
-            <Image
-              image={getImage(getPrestigeIcon(user.prestige))}
-              fit="contain"
-              x={0}
-              y={0}
-              width={36}
-              height={36}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.None,
-              }}
-            />
-          </Canvas>
-        </View>
-      </Animated.View>
-      <Animated.Text
-        className="text-xl text-white w-[6rem] text-right font-Pixels"
-        entering={FadeInRight}
-      >
-        {shortMoneyString(user.balance)}
-      </Animated.Text>
-      <Canvas style={{ width: 16, height: 16 }} className="mr-1">
-        <Image
-          image={getImage("shop.btc")}
-          fit="contain"
-          sampling={{
-            filter: FilterMode.Nearest,
-            mipmap: MipmapMode.Nearest,
-          }}
-          x={0}
-          y={0}
-          width={13}
-          height={13}
-        />
-      </Canvas>
-    </View>
-  );
-}, (prevProps: any, nextProps: any) => {
-  // Prevent re-render if the user data hasn't changed
-  return (
-    prevProps.user.id === nextProps.user.id &&
-    prevProps.user.balance === nextProps.user.balance &&
-    prevProps.user.prestige === nextProps.user.prestige &&
-    prevProps.user.name === nextProps.user.name
-  );
-});
+        <Animated.View
+          className="flex flex-row items-center flex-1"
+          entering={FadeInLeft}
+        >
+          <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
+            <PFPView user={user.address} attributes={user.nouns} />
+          </View>
+          <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
+            {user.name}
+          </Text>
+        </Animated.View>
+        <Animated.View
+          className="flex flex-row items-center justify-center w-[4rem]"
+          entering={FadeInRight}
+        >
+          <View className="w-[36px] aspect-square">
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <Image
+                image={getImage(getPrestigeIcon(user.prestige))}
+                fit="contain"
+                x={0}
+                y={0}
+                width={36}
+                height={36}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.None,
+                }}
+              />
+            </Canvas>
+          </View>
+        </Animated.View>
+        <Animated.Text
+          className="text-xl text-white w-[6rem] text-right font-Pixels"
+          entering={FadeInRight}
+        >
+          {shortMoneyString(user.balance)}
+        </Animated.Text>
+        <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+          <Image
+            image={getImage("shop.btc")}
+            fit="contain"
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+            x={0}
+            y={0}
+            width={13}
+            height={13}
+          />
+        </Canvas>
+      </View>
+    );
+  },
+  (prevProps: any, nextProps: any) => {
+    // Prevent re-render if the user data hasn't changed
+    return (
+      prevProps.user.id === nextProps.user.id &&
+      prevProps.user.balance === nextProps.user.balance &&
+      prevProps.user.prestige === nextProps.user.prestige &&
+      prevProps.user.name === nextProps.user.name
+    );
+  },
+);
 
 export default LeaderboardPage;

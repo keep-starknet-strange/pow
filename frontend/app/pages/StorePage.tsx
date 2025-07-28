@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
@@ -68,7 +68,6 @@ export const StorePage: React.FC = () => {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
   }
 
-  console.log("Rendering StorePage with chainId:", chainId);
   return (
     <View className="flex-1 relative bg-[#101119]">
       <View className="absolute w-full h-full">
