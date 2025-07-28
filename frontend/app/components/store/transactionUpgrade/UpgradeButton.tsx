@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Dimensions, Pressable, Text } from "react-native";
 import { PopupAnimation } from "../../PopupAnimation";
 import {
@@ -30,10 +31,10 @@ type UpgradeButtonProps = {
   bgImage: string;
 };
 
-export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
+export const UpgradeButton = memo<UpgradeButtonProps>(({
   icon,
-  specialLabel,
   label,
+  specialLabel,
   level,
   maxLevel,
   nextCost,
@@ -46,6 +47,16 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
 
   const [lastBuyTime, setLastBuyTime] = React.useState<number>(0);
 
+  console.log("Rendering UpgradeButton", {
+    icon,
+    specialLabel,
+    label,
+    level,
+    maxLevel,
+    nextCost,
+    onPress,
+    bgImage,
+  });
   return (
     <Pressable
       onPress={() => {
@@ -150,4 +161,10 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
       )}
     </Pressable>
   );
-};
+}, (prevProps, nextProps) => {
+  // Only re-render if the level or nextCost changes
+  return (
+    prevProps.level === nextProps.level &&
+    prevProps.nextCost === nextProps.nextCost
+  );
+});

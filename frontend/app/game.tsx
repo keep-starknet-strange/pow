@@ -222,6 +222,7 @@ export default function game() {
   }, [initializeL2Store, powContract, user]);
   useEffect(() => {
     setGetUpgradeValueDependencyL2(getUpgradeValue);
+    console.log("Triggering setGetUpgradeValueDependencyL2", getUpgradeValue);
   }, [
     getUpgradeValue,
     setGetUpgradeValueDependencyL2,

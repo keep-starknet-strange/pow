@@ -61,7 +61,14 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   }, [confirmTime]);
 
   return (
-    <View className="w-full h-full relative">
+    <Pressable
+      className="w-full h-full relative"
+      onPress={() => {
+        props.onConfirm();
+        setConfirmTime(Date.now());
+      }}
+      {...tutorialProps}
+    >
       {props.confirmPopup && (
         <PopupAnimation
           popupStartTime={props.confirmPopup.startTime}
@@ -70,64 +77,55 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           animRange={[-100, -120]}
         />
       )}
-      <Pressable
-        className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] flex items-center justify-center"
-        onPress={() => {
-          props.onConfirm();
-          setConfirmTime(Date.now());
-        }}
-        {...tutorialProps}
-      >
-        {props.image && (
-          <Animated.View
-            style={{
-              width: 112,
-              height: 112,
-              transform: [
-                {
-                  translateY: confirmAnimation.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: [0, -20],
-                  }),
-                },
-              ],
-            }}
-            className="w-28 h-28"
-          >
-            <Canvas style={{ width: 112, height: 112 }}>
-              <SkiaImage
-                x={0}
-                y={0}
-                width={112}
-                height={112}
-                image={getImage(props.image)}
-                fit="fill"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-              />
-            </Canvas>
-          </Animated.View>
-        )}
-        {props.text && (
-          <Animated.Text
-            className="text-[#fff7ff] text-[24px] font-Teatime mt-[20px]"
-            style={{
-              transform: [
-                {
-                  translateY: confirmAnimation.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: [0, -20],
-                  }),
-                },
-              ],
-            }}
-          >
-            {props.text}
-          </Animated.Text>
-        )}
-      </Pressable>
-    </View>
+      {props.image && (
+        <Animated.View
+          style={{
+            width: 112,
+            height: 112,
+            transform: [
+              {
+                translateY: confirmAnimation.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [0, -20],
+                }),
+              },
+            ],
+          }}
+          className="w-28 h-28"
+        >
+          <Canvas style={{ width: 112, height: 112 }}>
+            <SkiaImage
+              x={0}
+              y={0}
+              width={112}
+              height={112}
+              image={getImage(props.image)}
+              fit="fill"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+            />
+          </Canvas>
+        </Animated.View>
+      )}
+      {props.text && (
+        <Animated.Text
+          className="text-[#fff7ff] text-[24px] font-Teatime mt-[20px]"
+          style={{
+            transform: [
+              {
+                translateY: confirmAnimation.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [0, -20],
+                }),
+              },
+            ],
+          }}
+        >
+          {props.text}
+        </Animated.Text>
+      )}
+    </Pressable>
   );
 };

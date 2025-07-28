@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { useIsFocused } from '@react-navigation/native';
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
@@ -28,6 +29,7 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
+  const isFocused = useIsFocused();
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
     useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
@@ -61,6 +63,10 @@ export const StorePage: React.FC = () => {
 
   const subTabs = ["Transactions", "Upgrades", "Automation"];
   const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
+
+  if (!isFocused) {
+    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+  }
 
   console.log("Rendering StorePage with chainId:", chainId);
   return (

@@ -6,6 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
+import { useIsFocused } from '@react-navigation/native';
 import { useAchievement } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -18,6 +19,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 
 export const AchievementsPage: React.FC = () => {
+  const isFocused = useIsFocused();
   const { achievementsProgress } = useAchievement();
   const { width, height } = Dimensions.get("window");
   const { getImage } = useImages();
@@ -26,6 +28,7 @@ export const AchievementsPage: React.FC = () => {
     {},
   );
   useEffect(() => {
+    if (!isFocused) return;
     const cats = achievementJson.reduce(
       (acc, achievement) => {
         const category = achievement.category || "General";
@@ -38,11 +41,15 @@ export const AchievementsPage: React.FC = () => {
       {} as { [key: string]: any[] },
     );
     setCategories(cats);
-  }, []);
+  }, [isFocused]);
+
+  if (!isFocused) {
+    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+  }
 
   console.log("Rendering AchievementsPage with categories:", categories);
   return (
-    <View className="flex-1 relative bg-[#101119]">
+    <View className="flex-1 relative bg-[#101119ff]">
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image

@@ -11,7 +11,7 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 
 export type SettingsMainSectionProps = {
-  setSettingTab: (tab: "About" | "Credits" | "Help" | "ClaimReward") => void;
+  setSettingTab: (tab: "About" | "Credits" | "ClaimReward") => void;
   goBackToLogin: () => void;
 };
 

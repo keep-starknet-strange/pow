@@ -1,4 +1,5 @@
 import React, { useCallback, memo, useLayoutEffect, useRef, useState } from "react";
+import { enableScreens } from "react-native-screens";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Pressable } from "react-native";
 
@@ -21,6 +22,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+enableScreens();
 const Tab = createBottomTabNavigator();
 
 function StoreTabButton({
@@ -155,7 +157,6 @@ export const TabNavigator = memo(() => {
     <Tab.Navigator
       screenOptions={{
         animation: "shift",
-        popToTopOnBlur: true,
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#101119ff",
@@ -205,6 +206,7 @@ export const TabNavigator = memo(() => {
         name="Store"
         component={StorePage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <StoreTabButton
               isActive={props["aria-selected"] || false}
@@ -221,6 +223,7 @@ export const TabNavigator = memo(() => {
         name="Leaderboard"
         component={LeaderboardPage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Leaderboard"
@@ -238,6 +241,7 @@ export const TabNavigator = memo(() => {
         name="Achievements"
         component={AchievementsPage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Achievements"
@@ -255,6 +259,7 @@ export const TabNavigator = memo(() => {
         name="Settings"
         children={() => <SettingsPage setLoginPage={null} />}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Settings"

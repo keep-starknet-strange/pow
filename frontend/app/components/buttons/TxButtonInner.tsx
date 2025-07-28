@@ -1,13 +1,19 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useCallback } from "react";
 import { View, Text, Dimensions } from "react-native";
+import { useInterval } from "usehooks-ts";
 import { Canvas, ImageShader, Image, FilterMode, MipmapMode, Rect } from "@shopify/react-native-skia";
 import { useSharedValue, useDerivedValue } from "react-native-reanimated";
 import { useImages } from "../../hooks/useImages";
+import { useTransactionsStore } from "../../stores/useTransactionsStore";
 import { getTxBg, getTxIcon, getTxInner, getTxNameplate } from "../../utils/transactions";
+import { useGameStore } from "../../stores/useGameStore";
+import { newTransaction } from "../../types/Chains";
+import { Easing, runOnJS, withSequence, withTiming } from "react-native-reanimated";
 
 export interface TxButtonInnerProps {
   chainId: number;
   txId: number;
+  isDapp: boolean;
   feeLevel: number;
   name: string;
 }
@@ -16,11 +22,37 @@ export const TxButtonInner = memo(
   (props: TxButtonInnerProps) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
+  const { addTransaction } = useGameStore();
+  const { getFee, getSpeed } = useTransactionsStore();
 
   const automationAnimHeight = useSharedValue(94);
   const automationAnimY = useDerivedValue(() => {
     return 94 - automationAnimHeight.value;
   }, [automationAnimHeight]);
+
+  const fee = getFee(props.chainId, props.txId, props.isDapp);
+  const addNewTransaction = useCallback(async () => {
+    const newTx = newTransaction(props.txId, fee, props.isDapp);
+    addTransaction(props.chainId, newTx);
+  }, [props.chainId, props.txId, props.isDapp]);
+
+  const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+  useInterval(() => {
+    automationAnimHeight.value = withSequence(
+      withTiming(
+        94,
+        {
+          duration: 5000 / speed,
+          easing: Easing.cubic,
+        },
+        () => runOnJS(addNewTransaction)(),
+      ),
+      withTiming(0, {
+        duration: 200,
+        easing: Easing.bounce,
+      }),
+    );
+  }, speed > 0 ? 5000 / speed + 200 : null);
 
   return (
     <View className="w-full h-[94px] relative">

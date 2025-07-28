@@ -10,11 +10,6 @@ import { useImages } from "../hooks/useImages";
 import { useGameStore } from "@/app/stores/useGameStore";
 import Animated, {
   useSharedValue,
-  withTiming,
-  withSpring,
-  withSequence,
-  runOnJS,
-  Easing,
 } from "react-native-reanimated";
 
 export type EmptyViewProps = {
@@ -30,6 +25,7 @@ export type EmptyViewProps = {
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = memo((props) => {
   const { getImage } = useImages();
+  const { workingBlocks } = useGameStore();
 
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
   useEffect(() => {
@@ -53,6 +49,10 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = memo((props) => {
     }
     */
   }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
+
+  if (!workingBlocks[props.chainId]?.blockId) {
+    return null; // No empty block at genesis
+  }
 
   console.log("Rendering EmptyBlockView", props.chainId, props.placement, props.completedPlacementLeft);
   return (

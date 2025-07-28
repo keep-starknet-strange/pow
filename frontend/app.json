@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "click-chain",
-    "slug": "click-chain",
+    "name": "POW!",
+    "slug": "pow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo/pow.png",

@@ -34,6 +34,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo((
   props,
 ) => {
   const { getImage } = useImages();
+  const { workingBlocks } = useGameStore();
   const { getLatestBlock } = useChainsStore();
 
   const updateCompletedBlock = (chainId: number) => {
@@ -48,7 +49,10 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo((
   );
   const blockSlideLeftAnim = useSharedValue(props.placement.left);
   useEffect(() => {
-    // blockSlideLeftAnim.value = props.placement.left;
+    blockSlideLeftAnim.value = props.placement.left;
+    if (!workingBlocks[props.chainId]?.blockId) {
+      return;
+    }
     blockSlideLeftAnim.value = withSequence(
       withTiming(props.placement.left, {
         duration: 400,
@@ -62,8 +66,13 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo((
         easing: Easing.inOut(Easing.ease),
       }),
     );
-  }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
+  }, [props.chainId, props.placement.left, props.completedPlacementLeft, workingBlocks[props.chainId]?.blockId]);
 
+  if (!completedBlock) {
+    return null;
+  }
+
+  console.log("Rendering CompletedBlockView for chainId:", props.chainId);
   return (
     <Animated.View
       style={{
@@ -124,7 +133,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo((
       </View>
       <BlockView
         chainId={props.chainId}
-        block={getLatestBlock(props.chainId) || null}
+        block={completedBlock || null}
         completed={true}
       />
     </Animated.View>

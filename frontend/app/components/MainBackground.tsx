@@ -1,5 +1,6 @@
-import React, { memo } from "react";
+import React, { useEffect, memo } from "react";
 import { View, Dimensions } from "react-native";
+import { useInterval } from "usehooks-ts";
 import { useImages } from "../hooks/useImages";
 import {
   withTiming,
@@ -62,18 +63,16 @@ export const MainBackground: React.FC = memo(() => {
     );
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
+    let initialTravelDuration =
+      minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+    updateBackgroundOffsets(initialTravelDuration);
+  }, []);
+  useInterval(() => {
     let travelDuration =
       minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
     updateBackgroundOffsets(travelDuration);
-
-    const interval = setInterval(() => {
-      travelDuration =
-        minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-      updateBackgroundOffsets(travelDuration);
-    }, travelDuration + 300);
-    return () => clearInterval(interval);
-  }, [bgOffsetX, bgOffsetY, width]);
+  }, maxTravelTime + 300);
 
   const bgRect = useDerivedValue(() => {
     return {

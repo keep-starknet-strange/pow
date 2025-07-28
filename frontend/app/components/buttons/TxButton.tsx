@@ -61,7 +61,6 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const feeLevel = getFeeLevel(props.chainId, props.txId, props.isDapp);
   const feeCost = getNextFeeCost(props.chainId, props.txId, props.isDapp);
   const fee = getFee(props.chainId, props.txId, props.isDapp);
-  const speed = getSpeed(props.chainId, props.txId, props.isDapp);
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
@@ -95,37 +94,6 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     props.isDapp,
     shakeAnim,
   ]);
-
-  /*
-  useEffect(() => {
-    let randomDurationOffset = Math.random() * 500;
-    const interval = setInterval(
-      () => {
-        randomDurationOffset = Math.random() * 500;
-        if (speed > 0) {
-          automationAnimHeight.value = withSequence(
-            withTiming(
-              94,
-              {
-                duration: 5000 / speed + randomDurationOffset,
-                easing: Easing.cubic,
-              },
-              () => runOnJS(addNewTransaction)(),
-            ),
-            withTiming(0, {
-              duration: 200,
-              easing: Easing.bounce,
-            }),
-          );
-        } else {
-          automationAnimHeight.value = 94;
-        }
-      },
-      5000 / speed + 200 + randomDurationOffset,
-    );
-    return () => clearInterval(interval);
-  }, [speed, automationAnimHeight, addNewTransaction, props.chainId]);
-  */
 
   const transactionsData = props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
   const txType = transactionsData.find(
