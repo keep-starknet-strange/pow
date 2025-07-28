@@ -6,7 +6,7 @@ const config: ExpoConfig = {
     slug: "pow",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/logo/pow.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -17,10 +17,6 @@ const config: ExpoConfig = {
           "argent",
           "argentx",
           "argentmobile",
-          "braavos",
-          "argent",
-          "argentx",
-          "argentmobile",
           "braavos"
         ]
       },
@@ -28,7 +24,7 @@ const config: ExpoConfig = {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
+        foregroundImage: "./assets/logo/pow.png",
         backgroundColor: "#ffffff"
       },
       package: "com.starknet.pow",
@@ -37,15 +33,14 @@ const config: ExpoConfig = {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png"
+      favicon: "./assets/logo/pow.png"
     },
     plugins: [
-      "expo-web-browser",
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/logo/pow.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -60,6 +55,8 @@ const config: ExpoConfig = {
           "organization": "starkware-industries"
         }
       ],
+      "expo-web-browser",
+      "expo-audio",
       "./plugins/android/signing.ts"
     ],
     experiments: {

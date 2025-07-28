@@ -43,15 +43,23 @@ jobs:
               working-directory: ./frontend
               run: mv ${{ secrets.KEYSTORE_FILE_NAME }} android/app/${{ secrets.KEYSTORE_FILE_NAME }}
 
-            - name: Build Android
+            - name: Build Android (APK)
               working-directory: ./frontend/android
               env:
                 SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              run: ./gradlew app:assembleRelease ## TODO when building for play store assemble aab
+              run: ./gradlew app:assembleRelease
 
+            - name: Upload to Firebase
+              uses: wzieba/Firebase-Distribution-Github-Action@v1
+              with:
+                appId: ${{ secrets.FIREBASE_APP_ID }}
+                serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}
+                groups: internal-testers
+                file: ".frontend/android/app/build/outputs/apk/release/app-release.apk"
+            
             ## TODO 
-            ## 1. Setup keys for firebase and play store
-            ## 2. Deploy the app
+            ## 1. Setup keys play store
+            ## 2. Deploy the app for play store
 
     deploy-ios:
       runs-on: macos-latest
