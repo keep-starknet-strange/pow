@@ -1,12 +1,27 @@
 name: Publish  
 
 on:
-    push:
-        branches:
-            - 'build/firebase'
+    workflow_call:
+      inputs:
+        deploy_android:
+          description: "Deploy Android application"
+          required: true
+          default: true
+          type: boolean
+        deploy_ios:
+          description: "Deploy iOS application"
+          required: true
+          default: true
+          type: boolean
+        internal_testing:
+          description: "Deploy to internal testing"
+          required: true
+          default: true
+          type: boolean
 
 jobs:
     deploy-android:
+        if: ${{ inputs.deploy_android == true }}
         runs-on: ubuntu-latest
         steps:
             - name: Checkout project
@@ -44,26 +59,42 @@ jobs:
               run: mv ${{ secrets.KEYSTORE_FILE_NAME }} android/app/${{ secrets.KEYSTORE_FILE_NAME }}
 
             - name: Build Android (APK)
+              if: ${{ inputs.internal_testing == true }}
               working-directory: ./frontend/android
               env:
                 SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               run: ./gradlew app:assembleRelease
 
             - name: Upload to Firebase
+              if: ${{ inputs.internal_testing == true }}
               uses: wzieba/Firebase-Distribution-Github-Action@v1
               with:
                 appId: ${{ secrets.FIREBASE_APP_ID }}
-                serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}
+                serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
                 groups: internal-testers
                 file: "./frontend/android/app/build/outputs/apk/release/app-release.apk"
-            
-            ## TODO 
-            ## 1. Setup keys play store
-            ## 2. Deploy the app for play store
+
+            - name: Build Android (AAB)
+              if: ${{ inputs.internal_testing == false }}
+              working-directory: ./frontend/android
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              run: ./gradlew app:bundleRelease
+
+            - name: Upload to Google Play
+              uses: r0adkll/upload-google-play@v1
+              if: ${{ inputs.internal_testing == false }}
+              with:
+                serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+                packageName: com.starknet.pow
+                releaseFiles: ./frontend/android/app/build/outputs/bundle/release/app-release.aab
+                track: production
+                status: draft 
+                debugSymbols: ./frontend/android/app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
 
     deploy-ios:
+      if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-latest
-
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
