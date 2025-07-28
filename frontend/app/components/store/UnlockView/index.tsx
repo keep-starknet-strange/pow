@@ -59,16 +59,14 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
         }}
         disabled={props.disabled}
       >
-        <View 
-          className="relative" 
+        <View
+          className="relative"
           style={{
-              ...props.style,
-            }}
-          >
+            ...props.style,
+          }}
+        >
           <UnlockBackground />
-          <View
-            className="absolute flex flex-row items-start px-[48px] py-[8px]"
-          >
+          <View className="absolute flex flex-row items-start px-[48px] py-[8px]">
             <UnlockIcon icon={props.icon} />
             <UnlockDetails
               label={props.label}

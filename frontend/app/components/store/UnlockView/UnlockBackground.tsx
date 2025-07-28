@@ -13,9 +13,7 @@ export const UnlockBackground: React.FC = () => {
   const { getImage } = useImages();
 
   return (
-    <Canvas
-      style={{ width: width - 32, height: 92 }}
-    >
+    <Canvas style={{ width: width - 32, height: 92 }}>
       <Image
         image={getImage("button.secondary")}
         fit="contain"

@@ -44,10 +44,7 @@ export const UnlockDetails: React.FC<UnlockDetailsProps> = ({
         >
           {`Cost: ${cost}`}
         </Text>
-        <Canvas
-          style={{ width: 16, height: 16}}
-          className="mr-1"
-        >
+        <Canvas style={{ width: 16, height: 16 }} className="mr-1">
           <Image
             image={getImage("shop.btc")}
             fit="contain"

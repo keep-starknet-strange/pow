@@ -12,7 +12,7 @@ export const StakingUnlock: React.FC<StakingUnlockProps> = ({ alwaysShow }) => {
         icon={"logo.starknet"}
         label="Unlock Staking"
         description="participate in governance."
-        cost={42069}
+        cost={42}
         onPress={() => {
           console.log("med rare steak");
         }}

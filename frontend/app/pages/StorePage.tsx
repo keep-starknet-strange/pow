@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
-import Animated, { FadeInLeft, runOnJS } from "react-native-reanimated";
+import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -29,12 +29,12 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
-    useTransactionsStore();
+  const { dappsUnlocked, canUnlockDapp, canUnlockTx } = useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
   const { l2 } = useGameStore();
   const { getImage } = useImages();
-  const { width, height } = Dimensions.get("window");
+  const { width } = Dimensions.get("window");
+
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
   const [storeTransactions, setStoreTransactions] = useState(
