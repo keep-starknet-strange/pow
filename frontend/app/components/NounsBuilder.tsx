@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
-  ScrollView,
+  FlatList,
   Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+import Animated, {
+  SlideInDown,
+  SlideOutDown,
+  FadeInDown,
+} from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   Canvas,
@@ -108,7 +112,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
           </Text>
         </View>
         <View className="flex flex-row gap-2 items-center">
-          <TouchableOpacity
+          <Pressable
             className="py-1 px-2"
             onPress={() => {
               const newAvatar = getRandomNounsAttributes();
@@ -130,8 +134,8 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                 height={30}
               />
             </Canvas>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() => {
               setCreatingAvatar(false);
               setNewAvatar(avatar);
@@ -153,12 +157,12 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
                 height={24}
               />
             </Canvas>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <View className="flex flex-row items-end px-4 gap-[1px] mt-[9px]">
         {avatarTabs.map((tab) => (
-          <TouchableOpacity
+          <Pressable
             key={tab.value}
             onPress={() => {
               setAvatarTab(tab);
@@ -193,62 +197,39 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
             >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
       <View className="flex-1 w-full relative">
-        <ScrollView
-          className="flex-1 w-full"
-          showsHorizontalScrollIndicator={false}
+        <FlatList
+          data={avatarTab.list}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={5}
+          contentContainerStyle={{
+            paddingBottom: 80 + insets.bottom,
+            paddingTop: 8,
+            width: "100%",
+          }}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+          }}
           showsVerticalScrollIndicator={false}
-        >
-          <View className="flex flex-row flex-wrap gap-1 w-full pt-1">
-            {avatarTab.list.map((part, index) => (
-              <TouchableOpacity
-                key={index}
-                className="h-20 aspect-square relative"
-                onPress={() => {
-                  setNewAvatar({
-                    ...newAvatar,
-                    [avatarTab.value as keyof NounsAttributes]: index,
-                  });
-                  notify("BasicClick");
-                }}
-              >
-                {newAvatar[avatarTab.value as keyof NounsAttributes] ===
-                  index && (
-                  <View className="absolute top-0 left-0 h-20 aspect-square">
-                    <Canvas style={{ flex: 1 }} className="w-full h-full">
-                      <SkiaImg
-                        image={
-                          newAvatar[
-                            avatarTab.value as keyof NounsAttributes
-                          ] === index
-                            ? getImage("nouns.slots")
-                            : getImage("nouns.slots")
-                        }
-                        fit="cover"
-                        x={0}
-                        y={0}
-                        sampling={{
-                          filter: FilterMode.Nearest,
-                          mipmap: MipmapMode.Nearest,
-                        }}
-                        width={68}
-                        height={68}
-                      />
-                    </Canvas>
-                  </View>
-                )}
-                <Image
-                  source={part}
-                  className="w-full h-full p-4"
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <AvatarPart
+              index={index}
+              part={item}
+              selectedPart={avatarTab.value as keyof NounsAttributes}
+              newAvatar={newAvatar}
+              setNewAvatar={setNewAvatar}
+            />
+          )}
+          ListEmptyComponent={() => (
+            <Text className="text-center text-[#fff7ff] text-[16px] font-Pixels">
+              No parts available
+            </Text>
+          )}
+        />
         <LinearGradient
           style={{
             position: "absolute",
@@ -264,7 +245,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
           end={{ x: 0, y: 1 }}
         />
       </View>
-      <TouchableOpacity
+      <Pressable
         onPress={() => {
           notify("BasicClick");
           applyAvatarCreation();
@@ -274,8 +255,56 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
         <Text className="pt-2 text-[36px] font-Teatime text-[#fff7ff] text-center">
           APPLY
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
+  );
+};
+
+export const AvatarPart: React.FC<{
+  index: number;
+  part: any;
+  selectedPart: keyof NounsAttributes;
+  newAvatar: NounsAttributes;
+  setNewAvatar: (avatar: NounsAttributes) => void;
+}> = ({ index, part, selectedPart, newAvatar, setNewAvatar }) => {
+  const { getImage } = useImages();
+  const { notify } = useEventManager();
+
+  return (
+    <Pressable
+      className="h-20 aspect-square relative"
+      onPress={() => {
+        setNewAvatar({
+          ...newAvatar,
+          [selectedPart]: index,
+        });
+        notify("BasicClick");
+      }}
+    >
+      {newAvatar[selectedPart] === index && (
+        <View className="absolute top-0 left-0 h-20 aspect-square">
+          <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <SkiaImg
+              image={
+                newAvatar[selectedPart] === index
+                  ? getImage("nouns.slots")
+                  : getImage("nouns.slots")
+              }
+              fit="cover"
+              x={0}
+              y={0}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              width={68}
+              height={68}
+            />
+          </Canvas>
+        </View>
+      )}
+      <Image source={part} className="w-full h-full p-4" resizeMode="contain" />
+    </Pressable>
   );
 };
 

@@ -3,14 +3,17 @@ import { View } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
-import { getAutomationIcon } from "../utils/upgrades";
 
-export const Miner: React.FC = () => {
+interface MinerProps {
+  triggerAnim: () => void;
+}
+
+export const Miner: React.FC<MinerProps> = ({ triggerAnim }) => {
   const { getUpgradeValue } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
 
   const [mineStartTime, setMineStartTime] = useState(Date.now());
-  const [mineHash, setMineHash] = useState("0xdEadBeefDeadBeEf");
+  const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");
   const generateRandomHash = (isDone: boolean) => {
     const difficulty = getUpgradeValue(0, "Block Difficulty");
@@ -32,8 +35,10 @@ export const Miner: React.FC = () => {
     <View className="flex flex-col h-full aspect-square rounded-xl relative">
       <Confirmer
         progress={miningProgress}
-        image={getAutomationIcon(0, "Miner", 0)}
-        onConfirm={mineBlock}
+        onConfirm={() => {
+          triggerAnim();
+          mineBlock();
+        }}
         renderedBy="miner"
         confirmPopup={{
           startTime: mineStartTime,
@@ -44,5 +49,3 @@ export const Miner: React.FC = () => {
     </View>
   );
 };
-
-export default Miner;

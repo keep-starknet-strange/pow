@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, Text, Dimensions, ScrollView } from "react-native";
+import { memo, useState, useEffect } from "react";
+import { View, Text, Dimensions, FlatList } from "react-native";
 import {
   Canvas,
   Image,
@@ -24,6 +24,7 @@ import {
   getRandomNounsAttributes,
   createNounsAttributes,
 } from "../configs/nouns";
+import { useIsFocused } from "@react-navigation/native";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -126,7 +127,12 @@ export const LeaderboardPage: React.FC = () => {
     },
   ];
   const [leaderboard, setLeaderboard] = useState(leaderboardMock);
+  const isFocused = useIsFocused();
+
   useEffect(() => {
+    if (!isFocused) {
+      return; // Don't run if the page is not focused
+    }
     if (!STARKNET_ENABLED || !powGameContractAddress) {
       // If Starknet is not enabled, use mock data
       setLeaderboard(leaderboardMock);
@@ -173,10 +179,20 @@ export const LeaderboardPage: React.FC = () => {
       setLeaderboard(users);
     };
     getLeaderboard();
-  }, []);
+  }, [
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    getAccounts,
+    getUniqueEventsOrdered,
+    isFocused,
+  ]);
+
+  if (!isFocused) {
+    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+  }
 
   return (
-    <View className="flex-1 relative">
+    <View className="flex-1 relative bg-[#101119ff]">
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -235,69 +251,16 @@ export const LeaderboardPage: React.FC = () => {
           Score
         </Animated.Text>
       </View>
-      <ScrollView className="flex-1">
-        {leaderboard.map((user, index) => (
-          <View
-            key={user.id}
-            className={`flex flex-row justify-between items-center px-2 py-2 mx-[9px] ${
-              index % 2 === 0 ? "transparent" : "bg-[#1b1c26]"
-            }`}
-          >
-            <Animated.View
-              className="flex flex-row items-center flex-1"
-              entering={FadeInLeft}
-            >
-              <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
-                <PFPView user={user.address} attributes={user.nouns} />
-              </View>
-              <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
-                {user.name}
-              </Text>
-            </Animated.View>
-            <Animated.View
-              className="flex flex-row items-center justify-center w-[4rem]"
-              entering={FadeInRight}
-            >
-              <View className="w-[36px] aspect-square">
-                <Canvas style={{ flex: 1 }} className="w-full h-full">
-                  <Image
-                    image={getImage(getPrestigeIcon(user.prestige))}
-                    fit="contain"
-                    x={0}
-                    y={0}
-                    width={36}
-                    height={36}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.None,
-                    }}
-                  />
-                </Canvas>
-              </View>
-            </Animated.View>
-            <Animated.Text
-              className="text-xl text-white w-[6rem] text-right font-Pixels"
-              entering={FadeInRight}
-            >
-              {shortMoneyString(user.balance)}
-            </Animated.Text>
-            <Canvas style={{ width: 16, height: 16 }} className="mr-1">
-              <Image
-                image={getImage("shop.btc")}
-                fit="contain"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-                x={0}
-                y={0}
-                width={13}
-                height={13}
-              />
-            </Canvas>
-          </View>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={leaderboard}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, index }) => (
+          <LeaderboardItem index={index} user={item} />
+        )}
+        contentContainerStyle={{ paddingBottom: 200 }}
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+      />
       <LinearGradient
         style={{
           position: "absolute",
@@ -381,5 +344,96 @@ export const LeaderboardPage: React.FC = () => {
     </View>
   );
 };
+
+export const LeaderboardItem: React.FC<{
+  index: number;
+  user: {
+    id: number;
+    name: string;
+    address: string;
+    nouns: {
+      head: number;
+      body: number;
+      glasses: number;
+      accessories: number;
+    };
+    prestige: number;
+    balance: number;
+  };
+}> = memo(
+  ({ index, user }: { index: number; user: any }) => {
+    const { getImage } = useImages();
+    return (
+      <View
+        key={user.id}
+        className={`flex flex-row justify-between items-center px-2 py-2 mx-[9px] ${
+          index % 2 === 0 ? "transparent" : "bg-[#1b1c26]"
+        }`}
+      >
+        <Animated.View
+          className="flex flex-row items-center flex-1"
+          entering={FadeInLeft}
+        >
+          <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
+            <PFPView user={user.address} attributes={user.nouns} />
+          </View>
+          <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
+            {user.name}
+          </Text>
+        </Animated.View>
+        <Animated.View
+          className="flex flex-row items-center justify-center w-[4rem]"
+          entering={FadeInRight}
+        >
+          <View className="w-[36px] aspect-square">
+            <Canvas style={{ flex: 1 }} className="w-full h-full">
+              <Image
+                image={getImage(getPrestigeIcon(user.prestige))}
+                fit="contain"
+                x={0}
+                y={0}
+                width={36}
+                height={36}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.None,
+                }}
+              />
+            </Canvas>
+          </View>
+        </Animated.View>
+        <Animated.Text
+          className="text-xl text-white w-[6rem] text-right font-Pixels"
+          entering={FadeInRight}
+        >
+          {shortMoneyString(user.balance)}
+        </Animated.Text>
+        <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+          <Image
+            image={getImage("shop.btc")}
+            fit="contain"
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+            x={0}
+            y={0}
+            width={13}
+            height={13}
+          />
+        </Canvas>
+      </View>
+    );
+  },
+  (prevProps: any, nextProps: any) => {
+    // Prevent re-render if the user data hasn't changed
+    return (
+      prevProps.user.id === nextProps.user.id &&
+      prevProps.user.balance === nextProps.user.balance &&
+      prevProps.user.prestige === nextProps.user.prestige &&
+      prevProps.user.name === nextProps.user.name
+    );
+  },
+);
 
 export default LeaderboardPage;

@@ -1,6 +1,12 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  memo,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, TouchableOpacity } from "react-native";
+import { View, Pressable } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
 import { StorePage } from "../pages/StorePage";
@@ -93,7 +99,7 @@ function TabBarButton({
   }, [buttonRef, setButtonSize]);
 
   return (
-    <TouchableOpacity
+    <Pressable
       className="h-full justify-center items-center mx-[1px]"
       ref={buttonRef}
       onPress={onPress}
@@ -139,11 +145,11 @@ function TabBarButton({
           }}
         />
       </Canvas>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
-export function TabNavigator() {
+export const TabNavigator = memo(() => {
   const { notify } = useEventManager();
   const insets = useSafeAreaInsets();
 
@@ -155,7 +161,6 @@ export function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         animation: "shift",
-        popToTopOnBlur: true,
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#101119ff",
@@ -205,6 +210,7 @@ export function TabNavigator() {
         name="Store"
         component={StorePage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <StoreTabButton
               isActive={props["aria-selected"] || false}
@@ -221,6 +227,7 @@ export function TabNavigator() {
         name="Leaderboard"
         component={LeaderboardPage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Leaderboard"
@@ -238,6 +245,7 @@ export function TabNavigator() {
         name="Achievements"
         component={AchievementsPage}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Achievements"
@@ -255,6 +263,7 @@ export function TabNavigator() {
         name="Settings"
         children={() => <SettingsPage setLoginPage={null} />}
         options={{
+          freezeOnBlur: true,
           tabBarButton: (props) => (
             <TabBarButton
               tabName="Settings"
@@ -269,4 +278,4 @@ export function TabNavigator() {
       />
     </Tab.Navigator>
   );
-}
+});

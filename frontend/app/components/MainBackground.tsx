@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, memo } from "react";
 import { View, Dimensions } from "react-native";
+import { useInterval } from "usehooks-ts";
 import { useImages } from "../hooks/useImages";
 import {
   withTiming,
@@ -15,7 +16,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 
-export const MainBackground: React.FC = () => {
+export const MainBackground: React.FC = memo(() => {
   const { getImage } = useImages();
   const { width, height } = Dimensions.get("window");
 
@@ -62,18 +63,16 @@ export const MainBackground: React.FC = () => {
     );
   };
 
-  React.useEffect(() => {
-    let travelDuration =
+  useEffect(() => {
+    const initialTravelDuration =
+      minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
+    updateBackgroundOffsets(initialTravelDuration);
+  }, []);
+  useInterval(() => {
+    const travelDuration =
       minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
     updateBackgroundOffsets(travelDuration);
-
-    const interval = setInterval(() => {
-      travelDuration =
-        minTravelTime + Math.random() * (maxTravelTime - minTravelTime);
-      updateBackgroundOffsets(travelDuration);
-    }, travelDuration + 300);
-    return () => clearInterval(interval);
-  }, [bgOffsetX, bgOffsetY, width]);
+  }, maxTravelTime + 300);
 
   const bgRect = useDerivedValue(() => {
     return {
@@ -131,6 +130,6 @@ export const MainBackground: React.FC = () => {
       </View>
     </View>
   );
-};
+});
 
 export default MainBackground;

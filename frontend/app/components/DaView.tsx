@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useGameStore } from "@/app/stores/useGameStore";
+import { useL2Store } from "@/app/stores/useL2Store";
 import { L2ProgressView } from "./L2ProgressView";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { DAConfirm } from "./DAConfirm";
 
 export const DaView = () => {
-  const { getDa } = useGameStore();
+  const { getDa } = useL2Store();
   const { getUpgradeValue } = useUpgrades();
 
   const [daWidth, setDaWidth] = useState(

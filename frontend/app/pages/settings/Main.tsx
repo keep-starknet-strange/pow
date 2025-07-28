@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
@@ -11,7 +11,7 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 
 export type SettingsMainSectionProps = {
-  setSettingTab: (tab: "About" | "Credits" | "Help" | "ClaimReward") => void;
+  setSettingTab: (tab: "About" | "Credits" | "ClaimReward") => void;
   goBackToLogin: () => void;
 };
 

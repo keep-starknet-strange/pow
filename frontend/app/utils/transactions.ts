@@ -11,70 +11,48 @@ export const newEmptyTransaction = () => {
 export const daTxTypeId = 101;
 export const proofTxTypeId = 102;
 
-export const getChainIcons = (chain: number) => {
-  const layerIcons: any = {
-    0: {
-      Transfer: transferIcon,
-      Segwit: segwitIcon,
-      Blobs: blobIcon,
-      Runes: runesIcon,
-      Dapp: dappIcon,
-      L2: l2BatchIcon,
-      PowSwap: powSwapIcon,
-      ClosedOcean: closedOceanIcon,
-      Pave: paveIcon,
-      Libra: libraIcon,
-      "Crypto Dragons": cryptoDragonsIcon,
-    },
-    1: {
-      Transfer: transferIcon,
-      Bridge: transferIcon,
-      Oracles: oracleIcon,
-      Attestations: attestationIcon,
-      Dapp: dappIcon,
-      AppChain: dojoIcon,
-      AVNU: avnuIcon,
-      "art/peace": artPeaceIcon,
-      Vesu: vesuIcon,
-      Eternum: eternumIcon,
-    },
-  };
-  return layerIcons[chain];
-};
-
 export const getTxIcon = (
   chainId: number,
-  txTypeId: number,
+  typeId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
+  return getImage(getTxIconName(chainId, typeId, isDapp));
+};
+
+export const getTxIconName = (
+  chainId: number,
+  typeId: number,
   isDapp?: boolean,
 ) => {
   switch (chainId) {
     case 0:
-      switch (txTypeId) {
+      switch (typeId) {
         case 0:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 1:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 2:
-          return "tx.icon.blob";
+          return "block.icon.blob";
         case 3:
-          return "tx.icon.nft";
+          return "block.icon.nft";
         case 4:
-          return "tx.icon.runes";
+          return "block.icon.nft";
         default:
           return "unknown";
       }
     case 1:
-      switch (txTypeId) {
+      switch (typeId) {
         case 0:
-          return "tx.icon.bridge";
+          return "block.icon.tx";
         case 1:
-          return "tx.icon.tx";
+          return "block.icon.tx";
         case 2:
-          return "tx.icon.nft";
+          return "block.icon.blob";
         case 3:
-          return "tx.icon.isa";
+          return "block.icon.nft";
         case 4:
-          return "tx.icon.dao";
+          return "block.icon.nft";
         default:
           return "unknown";
       }
@@ -83,53 +61,170 @@ export const getTxIcon = (
   }
 };
 
-export const getTxStyle = (
+export const getTxImg = (
   chainId: number,
-  txTypeId: number,
-  isDapp?: boolean,
+  typeId: number,
+  getImage: (name: string) => any,
 ) => {
-  // TODO: Hardcoded for now, need to be dynamic
-  if (txTypeId === 101) {
-    return {
-      backgroundColor: "#f7f7f7f0",
-    };
-  } else if (txTypeId === 102) {
-    return {
-      backgroundColor: "#f7f7f7f0",
-    };
+  switch (chainId) {
+    case 0:
+      switch (typeId) {
+        case 0:
+          return getImage("block.bg.green");
+        case 1:
+          return getImage("block.bg.yellow");
+        case 2:
+          return getImage("block.bg.blue");
+        case 3:
+          return getImage("block.bg.pink");
+        case 4:
+          return getImage("block.bg.purple");
+        default:
+          return getImage("unknown");
+      }
+    case 1:
+      switch (typeId) {
+        case 0:
+          return getImage("block.bg.blue");
+        case 1:
+          return getImage("block.bg.green");
+        case 2:
+          return getImage("block.bg.pink");
+        case 3:
+          return getImage("block.bg.purple");
+        case 4:
+          return getImage("block.bg.yellow");
+        default:
+          return getImage("unknown");
+      }
+    default:
+      return getImage("unknown");
   }
-  if (isDapp) {
-    const dappMeta =
-      chainId === 0
-        ? dappsJson.L1.transactions[txTypeId]
-        : dappsJson.L2.transactions[txTypeId];
-    return {
-      backgroundColor: dappMeta.color || "#f7f7f7",
-    };
-  }
-  const txMeta =
-    chainId === 0
-      ? transactionsJson.L1[txTypeId]
-      : transactionsJson.L2[txTypeId];
-  return {
-    backgroundColor: txMeta.color || "#f7f7f7",
-  };
 };
 
-// Above as import
-export const createTx = (
-  chain: number,
-  txTypeId: number,
-  txFee: number,
-  txIcon?: string,
+export const getTxBg = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
 ) => {
-  const txMeta =
-    chain === 1 ? transactionsJson.L1[txTypeId] : transactionsJson.L2[txTypeId];
-  const image = txIcon || getTxIcon(chain, txTypeId);
-  return {
-    type: txMeta.name,
-    fee: txFee,
-    style: { backgroundColor: txMeta.color },
-    image: image,
-  };
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.bg.green");
+        case 1:
+          return getImage("tx.button.bg.yellow");
+        case 2:
+          return getImage("tx.button.bg.blue");
+        case 3:
+          return getImage("tx.button.bg.pink");
+        case 4:
+          return getImage("tx.button.bg.purple");
+        default:
+          return getImage("tx.button.bg.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.bg.purple");
+        case 1:
+          return getImage("tx.button.bg.green");
+        case 2:
+          return getImage("tx.button.bg.yellow");
+        case 3:
+          return getImage("tx.button.bg.blue");
+        case 4:
+          return getImage("tx.button.bg.pink");
+        default:
+          return getImage("tx.button.bg.green");
+      }
+    default:
+      return getImage("tx.button.bg.green");
+  }
+};
+
+// TODO: Change getImage dependency
+export const getTxInner = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.inner.green");
+        case 1:
+          return getImage("tx.button.inner.yellow");
+        case 2:
+          return getImage("tx.button.inner.blue");
+        case 3:
+          return getImage("tx.button.inner.pink");
+        case 4:
+          return getImage("tx.button.inner.purple");
+        default:
+          return getImage("tx.button.inner.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.button.inner.purple");
+        case 1:
+          return getImage("tx.button.inner.green");
+        case 2:
+          return getImage("tx.button.inner.yellow");
+        case 3:
+          return getImage("tx.button.inner.blue");
+        case 4:
+          return getImage("tx.button.inner.pink");
+        default:
+          return getImage("tx.button.inner.green");
+      }
+    default:
+      return getImage("tx.button.inner.green");
+  }
+};
+
+export const getTxNameplate = (
+  chainId: number,
+  txId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
+  switch (chainId) {
+    case 0:
+      switch (txId) {
+        case 0:
+          return getImage("tx.nameplate.green");
+        case 1:
+          return getImage("tx.nameplate.yellow");
+        case 2:
+          return getImage("tx.nameplate.blue");
+        case 3:
+          return getImage("tx.nameplate.pink");
+        case 4:
+          return getImage("tx.nameplate.purple");
+        default:
+          return getImage("tx.nameplate.green");
+      }
+    case 1:
+      switch (txId) {
+        case 0:
+          return getImage("tx.nameplate.purple");
+        case 1:
+          return getImage("tx.nameplate.green");
+        case 2:
+          return getImage("tx.nameplate.yellow");
+        case 3:
+          return getImage("tx.nameplate.blue");
+        case 4:
+          return getImage("tx.nameplate.pink");
+        default:
+          return getImage("tx.nameplate.green");
+      }
+    default:
+      return getImage("tx.nameplate.green");
+  }
 };

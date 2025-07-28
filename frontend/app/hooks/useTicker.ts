@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import { useInterval } from "usehooks-ts";
 
 export function useTicker(intervalMs: number) {
   const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
+  useInterval(() => {
+    setTick((t) => t + 1);
+  }, intervalMs);
   return tick;
 }

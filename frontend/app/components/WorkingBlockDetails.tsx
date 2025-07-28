@@ -38,7 +38,7 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   props,
 ) => {
-  const { getWorkingBlock } = useGameStore();
+  const { workingBlocks } = useGameStore();
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
 
@@ -46,7 +46,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   const isSmall = props.placement.width < 250;
 
   const updateWorkingBlock = (chainId: number) => {
-    const block = getWorkingBlock(chainId);
+    const block = workingBlocks[chainId];
     if (block) {
       setWorkingBlock(block);
     }
@@ -54,20 +54,28 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
 
   const detailsScaleAnim = useSharedValue(1);
   useEffect(() => {
-    detailsScaleAnim.value = 1;
-    detailsScaleAnim.value = withSequence(
-      withTiming(1.05, { duration: 300, easing: Easing.inOut(Easing.ease) }),
-      withTiming(
-        1.05,
-        { duration: 900, easing: Easing.inOut(Easing.ease) },
-        () => runOnJS(updateWorkingBlock)(props.chainId),
-      ),
-      withSpring(1, { damping: 2, stiffness: 100 }),
-    );
-  }, [props.chainId]);
+    if (workingBlocks[props.chainId]?.isBuilt) {
+      detailsScaleAnim.value = withSpring(1.25, {
+        damping: 4,
+        stiffness: 200,
+      });
+    } else {
+      if (!workingBlocks[props.chainId]?.blockId) {
+        detailsScaleAnim.value = 1;
+        return;
+      }
+      detailsScaleAnim.value = withSequence(
+        withTiming(1, { duration: 400 }),
+        withTiming(1, { duration: 900 }, () =>
+          runOnJS(updateWorkingBlock)(props.chainId),
+        ),
+        withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+      );
+    }
+  }, [props.chainId, workingBlocks[props.chainId]?.isBuilt]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
-    getWorkingBlock(props.chainId),
+    workingBlocks[props.chainId] || null,
   );
 
   return (
@@ -123,7 +131,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
           Block&nbsp;
         </Text>
         <AnimatedRollingNumber
-          value={getWorkingBlock(props.chainId)?.blockId || 0}
+          value={workingBlock?.blockId || 0}
           textStyle={{
             fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
@@ -144,7 +152,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
         }}
       >
         <AnimatedRollingNumber
-          value={getWorkingBlock(props.chainId)?.transactions.length || 0}
+          value={workingBlock?.transactions.length || 0}
           textStyle={{
             fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
@@ -173,8 +181,8 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
       >
         <AnimatedRollingNumber
           value={
-            (getWorkingBlock(props.chainId)?.fees || 0) +
-            (getWorkingBlock(props.chainId)?.reward ||
+            (workingBlock?.fees || 0) +
+            (workingBlock?.reward ||
               0 ||
               getUpgradeValue(props.chainId, "Block Reward"))
           }
