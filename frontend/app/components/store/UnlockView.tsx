@@ -54,7 +54,7 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
   return (
     <Animated.View
       style={[shakeAnimStyle]}
-      className="flex items-center justify-center"
+      className="flex items-center justify-center z-[45]"
       entering={FadeInDown}
     >
       <TouchableWithoutFeedback
