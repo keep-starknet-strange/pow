@@ -12,5 +12,5 @@ jobs:
         with:
             deploy_android: true
             deploy_ios: false ## TEMP
-            internal_testing: ${{ github.event.release.isPrerelease }}
+            internal_testing: ${{ github.event.release.prerelease }}
             ref: ${{ github.event.release.target_commitish }}
