@@ -388,7 +388,8 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     }
 
     // Check all L2 transactions are unlocked
-    const { transactionFeeLevels, transactionSpeedLevels } = useTransactionsStore.getState();
+    const { transactionFeeLevels, transactionSpeedLevels } =
+      useTransactionsStore.getState();
     const transactionLevels = transactionFeeLevels[1];
     if (!transactionLevels) {
       set({ canPrestige: false });
@@ -419,9 +420,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useGameStore.getState().resetGameStore();
     useChainsStore.getState().resetChains();
     useL2Store.getState().resetL2Store();
-    
+
     set({ currentPrestige: nextPrestige, canPrestige: false });
-    
+
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);
   },
 

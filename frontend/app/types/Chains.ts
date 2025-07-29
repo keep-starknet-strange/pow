@@ -27,7 +27,11 @@ export type Block = {
   reward?: number;
 };
 
-export const newBlock = (blockId: number, maxSize: number, reward?: number): Block => {
+export const newBlock = (
+  blockId: number,
+  maxSize: number,
+  reward?: number,
+): Block => {
   return {
     blockId,
     fees: 0,

@@ -39,8 +39,9 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     [setBlockSize],
   );
 
-  // Use the block's static maxSize instead of dynamic upgrade value
-  const txPerRow = props.block?.maxSize ? Math.sqrt(props.block.maxSize) : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
+  const txPerRow = props.block?.maxSize
+    ? Math.sqrt(props.block.maxSize)
+    : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
 
   useEffect(() => {
     const txSize = blockSize / txPerRow - 0.001; // TODO check that with the team
