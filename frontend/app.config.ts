@@ -2,7 +2,7 @@ import 'ts-node/register';
 import { ExpoConfig } from 'expo/config';
 
 const config: ExpoConfig = {
-    name: "POW",
+    name: "POW!",
     slug: "pow",
     version: "1.0.0",
     orientation: "portrait",
@@ -20,7 +20,8 @@ const config: ExpoConfig = {
           "braavos"
         ]
       },
-      bundleIdentifier: "com.starknet.pow"
+      bundleIdentifier: "com.starknet.pow",
+      buildNumber: "1",
     },
     android: {
       adaptiveIcon: {
@@ -28,7 +29,8 @@ const config: ExpoConfig = {
         backgroundColor: "#ffffff"
       },
       package: "com.starknet.pow",
-      edgeToEdgeEnabled: true
+      edgeToEdgeEnabled: true,
+      versionCode: 1,
     },
     web: {
       bundler: "metro",
