@@ -40,7 +40,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
   const [nextCost, setNextCost] = useState(0);
   useEffect(() => {
     setNextCost(getNextUpgradeCost(props.chainId, props.upgrade.id));
-  }, [props.chainId, props.upgrade.id, getNextUpgradeCost]);
+  }, [props.chainId, props.upgrade.id, getNextUpgradeCost, upgrades]);
 
   return (
     <View className="flex flex-col w-full">

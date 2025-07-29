@@ -166,7 +166,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
           }}
           className="text-[#c3c3c3] font-Pixels"
         >
-          /{getUpgradeValue(props.chainId, "Block Size") ** 2}
+          /
+          {workingBlocks[props.chainId]?.maxSize ||
+            getUpgradeValue(props.chainId, "Block Size") ** 2}
         </Text>
       </View>
 

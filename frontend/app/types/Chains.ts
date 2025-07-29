@@ -23,15 +23,21 @@ export type Block = {
   fees: number;
   transactions: Transaction[];
   isBuilt: boolean;
+  maxSize: number; // Static block size set when block is created
   reward?: number;
 };
 
-export const newBlock = (blockId: number, reward?: number): Block => {
+export const newBlock = (
+  blockId: number,
+  maxSize: number,
+  reward?: number,
+): Block => {
   return {
     blockId,
     fees: 0,
     transactions: [],
     isBuilt: false,
+    maxSize,
     reward,
   };
 };

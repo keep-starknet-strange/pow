@@ -6,6 +6,10 @@ import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";
 import { Contract } from "starknet";
 import { FocAccount } from "@/types/contexts";
+import { useL2Store } from "./useL2Store";
+import { useTransactionsStore } from "./useTransactionsStore";
+import { useGameStore } from "./useGameStore";
+import { useChainsStore } from "./useChainsStore";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -325,7 +329,14 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
   // Can prestige if all L2 txs unlocked, all upgrades unlocked, all automations unlocked, and staking unlocked
   checkCanPrestige: () => {
-    const { automations, upgrades } = get();
+    const { upgrades, automations } = get();
+
+    // Check if L2 is unlocked first
+    const l2 = useL2Store.getState().l2;
+    if (!l2) {
+      set({ canPrestige: false });
+      return;
+    }
 
     /* TODO: Include once switched to zustand
     if (!stakingUnlocked) {
@@ -334,19 +345,21 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     }
     */
 
-    const automationlevels = automations[1];
-    if (!automationlevels) {
+    // Check all L2 (chain 1) automations are unlocked
+    const automationLevels = automations[1];
+    if (!automationLevels) {
       set({ canPrestige: false });
       return;
     }
 
-    for (const level of Object.values(automationlevels)) {
+    for (const level of Object.values(automationLevels)) {
       if (level < 0) {
         set({ canPrestige: false });
         return;
       }
     }
 
+    // Check all L2 (chain 1) upgrades are unlocked
     const upgradeLevels = upgrades[1];
     if (!upgradeLevels) {
       set({ canPrestige: false });
@@ -360,31 +373,57 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       }
     }
 
-    /* TODO: Include once switched to zustand
-    const dappLevels = dappFees[1];
+    // Check all L2 dapps are unlocked
+    const { dappFeeLevels, dappSpeedLevels } = useTransactionsStore.getState();
+    const dappLevels = dappFeeLevels[1];
     if (!dappLevels) {
       set({ canPrestige: false });
       return;
     }
-    const transactionLevels = transactionFees[1];
+    for (const level of Object.values(dappLevels)) {
+      if (level < 0) {
+        set({ canPrestige: false });
+        return;
+      }
+    }
+
+    // Check all L2 transactions are unlocked
+    const { transactionFeeLevels, transactionSpeedLevels } =
+      useTransactionsStore.getState();
+    const transactionLevels = transactionFeeLevels[1];
     if (!transactionLevels) {
       set({ canPrestige: false });
       return;
     }
-    */
+    for (const level of Object.values(transactionLevels)) {
+      if (level < 0) {
+        set({ canPrestige: false });
+        return;
+      }
+    }
 
     set({ canPrestige: true });
   },
 
   prestige: () => {
-    const { currentPrestige, resetUpgrades } = get();
+    const { currentPrestige } = get();
     const nextPrestige = currentPrestige + 1;
 
     useEventManager
       .getState()
       .notify("PrestigePurchased", { prestigeLevel: nextPrestige });
-    resetUpgrades();
-    set({ currentPrestige: nextPrestige });
+
+    console.log("Starting prestige reset...");
+    get().resetUpgrades();
+    useBalanceStore.getState().resetBalance();
+    useTransactionsStore.getState().resetTransactions();
+    useGameStore.getState().resetGameStore();
+    useChainsStore.getState().resetChains();
+    useL2Store.getState().resetL2Store();
+
+    set({ currentPrestige: nextPrestige, canPrestige: false });
+
+    console.log(`Prestige complete! New prestige level: ${nextPrestige}`);
   },
 
   // Can unlock if the previous upgrade level is at least 0

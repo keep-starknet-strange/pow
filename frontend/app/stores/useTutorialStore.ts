@@ -24,6 +24,7 @@ interface TutorialState {
   registerLayout: (targetId: TargetId, layout: Layout) => void;
   setVisible: (visible: boolean) => void;
   setIsTutorialActive: (active: boolean) => void;
+  resetTutorial: () => void;
 }
 
 export const useTutorialStore = create<TutorialState>((set, get) => ({
@@ -66,7 +67,19 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
 
   setVisible: (visible: boolean) => set({ visible }),
 
-  setIsTutorialActive: (active: boolean) => set({ isTutorialActive: active }),
+  setIsTutorialActive: (active: boolean) => {
+    set({ isTutorialActive: active });
+  },
+
+  resetTutorial: () => {
+    set({
+      isTutorialActive: true,
+      step: "mineBlock",
+      stepIndex: 0,
+      layouts: {},
+      visible: false,
+    });
+  },
 }));
 
 export const useTutorial = () => {
