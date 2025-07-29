@@ -5,384 +5,392 @@ const assetsPath = "../../assets";
 
 const imagePaths = {
   // General Images
-  logo: require(`${assetsPath}/logo/pow.png`),
-  sublogo: require(`${assetsPath}/logo/sublogo.png`),
-  starknet: require(`${assetsPath}/logo/starknet_pixel.png`),
-  background: require(`${assetsPath}/background.png`),
-  backgroundGrid: require(`${assetsPath}/background-grid.png`),
-  topBar: require(`${assetsPath}/top_bar.png`),
-  iconRandom: require(`${assetsPath}/icons/icon_dice.png`),
-  iconClose: require(`${assetsPath}/icons/icon_cross.png`),
-  iconEdit: require(`${assetsPath}/icons/icon_isa_sm.png`),
-  basicButton: require(`${assetsPath}/basic_button.png`),
-  secondaryButton: require(`${assetsPath}/secondary_button.png`),
-  header: require(`${assetsPath}/gui_top.png`),
-  headerSwitch: require(`${assetsPath}/lSwitch_background.png`),
-  headerSwitchActive: require(`${assetsPath}/lSwitch_active.png`),
-  headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.png`),
+  logo: require(`${assetsPath}/logo/pow.webp`),
+  sublogo: require(`${assetsPath}/logo/sublogo.webp`),
+  starknet: require(`${assetsPath}/logo/starknet_pixel.webp`),
+  background: require(`${assetsPath}/background.webp`),
+  backgroundGrid: require(`${assetsPath}/background-grid.webp`),
+  topBar: require(`${assetsPath}/top_bar.webp`),
+  iconRandom: require(`${assetsPath}/icons/icon_dice.webp`),
+  iconClose: require(`${assetsPath}/icons/icon_cross.webp`),
+  iconEdit: require(`${assetsPath}/icons/icon_isa_sm.webp`),
+  basicButton: require(`${assetsPath}/basic_button.webp`),
+  secondaryButton: require(`${assetsPath}/secondary_button.webp`),
+  header: require(`${assetsPath}/gui_top.webp`),
+  headerSwitch: require(`${assetsPath}/lSwitch_background.webp`),
+  headerSwitchActive: require(`${assetsPath}/lSwitch_active.webp`),
+  headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.webp`),
 
   // Account Creation
-  nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.png`),
-  nounsSlots: require(`${assetsPath}/nouns/slot.png`),
-  nounsTabInactive: require(`${assetsPath}/nouns/slot_inactive.png`),
-  nounsTabActive: require(`${assetsPath}/nouns/slot_active.png`),
-  nounsCreatorBg: require(`${assetsPath}/nouns/create_bg.png`),
-  nounsCreatorButton: require(`${assetsPath}/nouns/button.png`),
+  nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.webp`),
+  nounsSlots: require(`${assetsPath}/nouns/slot.webp`),
+  nounsTabInactive: require(`${assetsPath}/nouns/slot_inactive.webp`),
+  nounsTabActive: require(`${assetsPath}/nouns/slot_active.webp`),
+  nounsCreatorBg: require(`${assetsPath}/nouns/create_bg.webp`),
+  nounsCreatorButton: require(`${assetsPath}/nouns/button.webp`),
 
   // L2
-  l2BarsBg: require(`${assetsPath}/l2/l2_bars_bg.png`),
-  l2BarsBar: require(`${assetsPath}/l2/l2_bars_bar.png`),
-  l2BarsPlaque: require(`${assetsPath}/l2/l2_number_plaque.png`),
+  l2BarsBg: require(`${assetsPath}/l2/l2_bars_bg.webp`),
+  l2BarsBar: require(`${assetsPath}/l2/l2_bars_bar.webp`),
+  l2BarsPlaque: require(`${assetsPath}/l2/l2_number_plaque.webp`),
 
   // Transaction Images - Backgrounds
-  txBackground: require(`${assetsPath}/transactions/gui_bottom.png`),
-  l2TxBackground: require(`${assetsPath}/l2/l2_gui_bottom.png`),
-  txsBorder: require(`${assetsPath}/transactions/transactions_border.png`),
+  txBackground: require(`${assetsPath}/transactions/gui_bottom.webp`),
+  l2TxBackground: require(`${assetsPath}/l2/l2_gui_bottom.webp`),
+  txsBorder: require(`${assetsPath}/transactions/transactions_border.webp`),
   txTabActive: require(
-    `${assetsPath}/transactions/transactions_tab_active.png`,
+    `${assetsPath}/transactions/transactions_tab_active.webp`,
   ),
   txTabInactive: require(
-    `${assetsPath}/transactions/transactions_tab_inactive.png`,
+    `${assetsPath}/transactions/transactions_tab_inactive.webp`,
   ),
   txButtonBlueEmpty: require(
-    `${assetsPath}/transactions/backgrounds/button_blue_empty.png`,
+    `${assetsPath}/transactions/backgrounds/button_blue_empty.webp`,
   ),
   txButtonGreenEmpty: require(
-    `${assetsPath}/transactions/backgrounds/button_green_empty.png`,
+    `${assetsPath}/transactions/backgrounds/button_green_empty.webp`,
   ),
   txButtonPinkEmpty: require(
-    `${assetsPath}/transactions/backgrounds/button_pink_empty.png`,
+    `${assetsPath}/transactions/backgrounds/button_pink_empty.webp`,
   ),
   txButtonPurpleEmpty: require(
-    `${assetsPath}/transactions/backgrounds/button_purple_empty.png`,
+    `${assetsPath}/transactions/backgrounds/button_purple_empty.webp`,
   ),
   txButtonYellowEmpty: require(
-    `${assetsPath}/transactions/backgrounds/button_yellow_empty.png`,
+    `${assetsPath}/transactions/backgrounds/button_yellow_empty.webp`,
   ),
   txButtonBlueInner: require(
-    `${assetsPath}/transactions/backgrounds/button_blue_inner.png`,
+    `${assetsPath}/transactions/backgrounds/button_blue_inner.webp`,
   ),
   txButtonGreenInner: require(
-    `${assetsPath}/transactions/backgrounds/button_green_inner.png`,
+    `${assetsPath}/transactions/backgrounds/button_green_inner.webp`,
   ),
   txButtonPinkInner: require(
-    `${assetsPath}/transactions/backgrounds/button_pink_inner.png`,
+    `${assetsPath}/transactions/backgrounds/button_pink_inner.webp`,
   ),
   txButtonPurpleInner: require(
-    `${assetsPath}/transactions/backgrounds/button_purple_inner.png`,
+    `${assetsPath}/transactions/backgrounds/button_purple_inner.webp`,
   ),
   txButtonYellowInner: require(
-    `${assetsPath}/transactions/backgrounds/button_yellow_inner.png`,
+    `${assetsPath}/transactions/backgrounds/button_yellow_inner.webp`,
   ),
 
   // Transaction Images - Icons
-  txIconTx: require(`${assetsPath}/transactions/icons/icon_tx_lg.png`),
-  txIconBlob: require(`${assetsPath}/transactions/icons/icon_blob_lg.png`),
-  txIconNft: require(`${assetsPath}/transactions/icons/icon_nft_lg.png`),
-  txIconBridge: require(`${assetsPath}/transactions/icons/icon_bridge_lg.png`),
-  txIconDao: require(`${assetsPath}/transactions/icons/icon_dao_lg.png`),
-  txIconIsa: require(`${assetsPath}/transactions/icons/icon_isa_lg.png`),
-  txIconRunes: require(`${assetsPath}/transactions/icons/icon_runes_lg.png`),
-  txIconTxSm: require(`${assetsPath}/transactions/icons/icon_tx_sm.png`),
-  txIconBlobSm: require(`${assetsPath}/transactions/icons/icon_blob_sm.png`),
-  txIconNftSm: require(`${assetsPath}/transactions/icons/icon_nft_sm.png`),
+  txIconTx: require(`${assetsPath}/transactions/icons/icon_tx_lg.webp`),
+  txIconBlob: require(`${assetsPath}/transactions/icons/icon_blob_lg.webp`),
+  txIconNft: require(`${assetsPath}/transactions/icons/icon_nft_lg.webp`),
+  txIconBridge: require(`${assetsPath}/transactions/icons/icon_bridge_lg.webp`),
+  txIconDao: require(`${assetsPath}/transactions/icons/icon_dao_lg.webp`),
+  txIconIsa: require(`${assetsPath}/transactions/icons/icon_isa_lg.webp`),
+  txIconRunes: require(`${assetsPath}/transactions/icons/icon_runes_lg.webp`),
+  txIconTxSm: require(`${assetsPath}/transactions/icons/icon_tx_sm.webp`),
+  txIconBlobSm: require(`${assetsPath}/transactions/icons/icon_blob_sm.webp`),
+  txIconNftSm: require(`${assetsPath}/transactions/icons/icon_nft_sm.webp`),
   txIconBridgeSm: require(
-    `${assetsPath}/transactions/icons/icon_bridge_sm.png`,
+    `${assetsPath}/transactions/icons/icon_bridge_sm.webp`,
   ),
-  txIconDaoSm: require(`${assetsPath}/transactions/icons/icon_dao_sm.png`),
-  txIconIsaSm: require(`${assetsPath}/transactions/icons/icon_isa_sm.png`),
-  txIconRunesSm: require(`${assetsPath}/transactions/icons/icon_runes_sm.png`),
+  txIconDaoSm: require(`${assetsPath}/transactions/icons/icon_dao_sm.webp`),
+  txIconIsaSm: require(`${assetsPath}/transactions/icons/icon_isa_sm.webp`),
+  txIconRunesSm: require(`${assetsPath}/transactions/icons/icon_runes_sm.webp`),
 
   // Transaction Images - Nameplates
   txNameplateBlue: require(
-    `${assetsPath}/transactions/nameplate/nameplate_blue.png`,
+    `${assetsPath}/transactions/nameplate/nameplate_blue.webp`,
   ),
   txNameplateGreen: require(
-    `${assetsPath}/transactions/nameplate/nameplate_green.png`,
+    `${assetsPath}/transactions/nameplate/nameplate_green.webp`,
   ),
   txNameplatePink: require(
-    `${assetsPath}/transactions/nameplate/nameplate_pink.png`,
+    `${assetsPath}/transactions/nameplate/nameplate_pink.webp`,
   ),
   txNameplatePurple: require(
-    `${assetsPath}/transactions/nameplate/nameplate_purple.png`,
+    `${assetsPath}/transactions/nameplate/nameplate_purple.webp`,
   ),
   txNameplateYellow: require(
-    `${assetsPath}/transactions/nameplate/nameplate_yellow.png`,
+    `${assetsPath}/transactions/nameplate/nameplate_yellow.webp`,
   ),
-  txPlaquePlus: require(`${assetsPath}/transactions/value_plaque_plus.png`),
-  txPlaqueMinus: require(`${assetsPath}/transactions/value_plaque_minus.png`),
+  txPlaquePlus: require(`${assetsPath}/transactions/value_plaque_plus.webp`),
+  txPlaqueMinus: require(`${assetsPath}/transactions/value_plaque_minus.webp`),
 
   // Block Images
   blockTxBgBlue: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_blue.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_blue.webp`,
   ),
   blockTxBgGreen: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_green.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_green.webp`,
   ),
   blockTxBgPink: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_pink.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_pink.webp`,
   ),
   blockTxBgPurple: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_purple.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_purple.webp`,
   ),
   blockTxBgYellow: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_yellow.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_yellow.webp`,
   ),
   blockTxBgEmpty: require(
-    `${assetsPath}/block/backgrounds/blockchain_block_empty.png`,
+    `${assetsPath}/block/backgrounds/blockchain_block_empty.webp`,
   ),
-  blockTxIconTx: require(`${assetsPath}/block/icons/icon_tx_sm.png`),
-  blockTxIconBlob: require(`${assetsPath}/block/icons/icon_blob_sm.png`),
-  blockTxIconNft: require(`${assetsPath}/block/icons/icon_nft_sm.png`),
-  blockGrid: require(`${assetsPath}/block/blockchain_grid.png`),
-  blockGridMin: require(`${assetsPath}/block/blockchain_grid_inactive.png`),
+  blockTxIconTx: require(`${assetsPath}/block/icons/icon_tx_sm.webp`),
+  blockTxIconBlob: require(`${assetsPath}/block/icons/icon_blob_sm.webp`),
+  blockTxIconNft: require(`${assetsPath}/block/icons/icon_nft_sm.webp`),
+  blockGrid: require(`${assetsPath}/block/blockchain_grid.webp`),
+  blockGridMin: require(`${assetsPath}/block/blockchain_grid_inactive.webp`),
   blockConnector: require(
-    `${assetsPath}/block/blockchain_grid_chainconnector.png`,
+    `${assetsPath}/block/blockchain_grid_chainconnector.webp`,
   ),
 
   // Staking
-  stakingBg: require(`${assetsPath}/staking/staking_bg.png`),
-  stakingButtonBg: require(`${assetsPath}/staking/button.png`),
-  stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.png`),
+  stakingBg: require(`${assetsPath}/staking/staking_bg.webp`),
+  stakingButtonBg: require(`${assetsPath}/staking/button.webp`),
+  stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.webp`),
 
   // Navigation Images
-  navButton: require(`${assetsPath}/navigation/menu_button_normal.png`),
-  navButtonActive: require(`${assetsPath}/navigation/menu_button_selected.png`),
-  navIconGame: require(`${assetsPath}/navigation/icon_game.png`),
-  navIconStaking: require(`${assetsPath}/navigation/icon_stake.png`),
-  navIconShop: require(`${assetsPath}/navigation/icon_shop.png`),
-  navIconFlag: require(`${assetsPath}/navigation/icon_flag.png`),
-  navIconMedal: require(`${assetsPath}/navigation/icon_medal.png`),
-  navIconSettings: require(`${assetsPath}/navigation/icon_settings.png`),
-  navIconGameActive: require(`${assetsPath}/navigation/icon_game_selected.png`),
-  navIconStakingActive: require(
-    `${assetsPath}/navigation/icon_stake_selected.png`,
+  navButton: require(`${assetsPath}/navigation/menu_button_normal.webp`),
+  navButtonActive: require(
+    `${assetsPath}/navigation/menu_button_selected.webp`,
   ),
-  navIconShopActive: require(`${assetsPath}/navigation/icon_shop_selected.png`),
-  navIconFlagActive: require(`${assetsPath}/navigation/icon_flag_selected.png`),
+  navIconGame: require(`${assetsPath}/navigation/icon_game.webp`),
+  navIconStaking: require(`${assetsPath}/navigation/icon_stake.webp`),
+  navIconShop: require(`${assetsPath}/navigation/icon_shop.webp`),
+  navIconFlag: require(`${assetsPath}/navigation/icon_flag.webp`),
+  navIconMedal: require(`${assetsPath}/navigation/icon_medal.webp`),
+  navIconSettings: require(`${assetsPath}/navigation/icon_settings.webp`),
+  navIconGameActive: require(
+    `${assetsPath}/navigation/icon_game_selected.webp`,
+  ),
+  navIconStakingActive: require(
+    `${assetsPath}/navigation/icon_stake_selected.webp`,
+  ),
+  navIconShopActive: require(
+    `${assetsPath}/navigation/icon_shop_selected.webp`,
+  ),
+  navIconFlagActive: require(
+    `${assetsPath}/navigation/icon_flag_selected.webp`,
+  ),
   navIconMedalActive: require(
-    `${assetsPath}/navigation/icon_medal_selected.png`,
+    `${assetsPath}/navigation/icon_medal_selected.webp`,
   ),
   navIconSettingsActive: require(
-    `${assetsPath}/navigation/icon_settings_selected.png`,
+    `${assetsPath}/navigation/icon_settings_selected.webp`,
   ),
 
   // Shop Images
-  shopBg: require(`${assetsPath}/shop/shop_bg.png`),
-  shopBtc: require(`${assetsPath}/shop/icons/icon_btcSmall.png`),
-  shopClock: require(`${assetsPath}/shop/icons/icon_clockSmall.png`),
-  shopTitle: require(`${assetsPath}/shop/title_bar.png`),
-  shopSeparator: require(`${assetsPath}/shop/shop_line.png`),
-  shopNamePlaque: require(`${assetsPath}/shop/shop_name_plaque.png`),
-  shopTab: require(`${assetsPath}/shop/shop_tab.png`),
-  shopTabActive: require(`${assetsPath}/shop/shop_tab_active.png`),
+  shopBg: require(`${assetsPath}/shop/shop_bg.webp`),
+  shopBtc: require(`${assetsPath}/shop/icons/icon_btcSmall.webp`),
+  shopClock: require(`${assetsPath}/shop/icons/icon_clockSmall.webp`),
+  shopTitle: require(`${assetsPath}/shop/title_bar.webp`),
+  shopSeparator: require(`${assetsPath}/shop/shop_line.webp`),
+  shopNamePlaque: require(`${assetsPath}/shop/shop_name_plaque.webp`),
+  shopTab: require(`${assetsPath}/shop/shop_tab.webp`),
+  shopTabActive: require(`${assetsPath}/shop/shop_tab_active.webp`),
   shopTxBuyButton: require(
-    `${assetsPath}/shop/shop_transactions_buy_button.png`,
+    `${assetsPath}/shop/shop_transactions_buy_button.webp`,
   ),
   shopAutoBuyButton: require(
-    `${assetsPath}/shop/shop_automation_buy_button.png`,
+    `${assetsPath}/shop/shop_automation_buy_button.webp`,
   ),
-  shopIconBg: require(`${assetsPath}/shop/shop_icon_background.png`),
-  shopLock: require(`${assetsPath}/shop/icon_lock.png`),
+  shopIconBg: require(`${assetsPath}/shop/shop_icon_background.webp`),
+  shopLock: require(`${assetsPath}/shop/icon_lock.webp`),
 
   // Shop Upgrades
   shopBlockDifficulty: require(
-    `${assetsPath}/shop/icons/upgrades/icon_blockDifficulty.png`,
+    `${assetsPath}/shop/icons/upgrades/icon_blockDifficulty.webp`,
   ),
   shopBlockSize: require(
-    `${assetsPath}/shop/icons/upgrades/icon_blockSize.png`,
+    `${assetsPath}/shop/icons/upgrades/icon_blockSize.webp`,
   ),
   shopBlockReward: require(
-    `${assetsPath}/shop/icons/upgrades/icon_blockReward.png`,
+    `${assetsPath}/shop/icons/upgrades/icon_blockReward.webp`,
   ),
-  shopDaComp: require(`${assetsPath}/shop/icons/upgrades/icon_daComp.png`),
-  shopMevBoost: require(`${assetsPath}/shop/icons/upgrades/icon_mevBoost.png`),
+  shopDaComp: require(`${assetsPath}/shop/icons/upgrades/icon_daComp.webp`),
+  shopMevBoost: require(`${assetsPath}/shop/icons/upgrades/icon_mevBoost.webp`),
   shopRecursiveProof: require(
-    `${assetsPath}/shop/icons/upgrades/icon_recursiveProof.png`,
+    `${assetsPath}/shop/icons/upgrades/icon_recursiveProof.webp`,
   ),
 
   // Shop Automations
   shopAutomationsMinerBase: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_baseMiner.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_baseMiner.webp`,
   ),
   shopAutomationsMinerCpu: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_cpu.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_cpu.webp`,
   ),
   shopAutomationsMinerGpu: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_mining.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_mining.webp`,
   ),
   shopAutomationsMinerAsic: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_asic.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_asic.webp`,
   ),
   shopAutomationsMinerAnt: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_antMiner.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_antMiner.webp`,
   ),
   shopAutomationsMinerBitmain: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_bitmain.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_bitmain.webp`,
   ),
   shopAutomationsMinerQuantum: require(
-    `${assetsPath}/shop/icons/automations/Miner/icon_quantumMiner.png`,
+    `${assetsPath}/shop/icons/automations/Miner/icon_quantumMiner.webp`,
   ),
 
   // Achievement Images
-  achievmentsBg: require(`${assetsPath}/achievements/achievements_bg.png`),
+  achievmentsBg: require(`${assetsPath}/achievements/achievements_bg.webp`),
   achievementsTileLocked: require(
-    `${assetsPath}/achievements/achievements_tile_locked.png`,
+    `${assetsPath}/achievements/achievements_tile_locked.webp`,
   ),
   achievementsTileProgress: require(
-    `${assetsPath}/achievements/achievements_tile_in_progress.png`,
+    `${assetsPath}/achievements/achievements_tile_in_progress.webp`,
   ),
   achievementsTileAchieved: require(
-    `${assetsPath}/achievements/achievements_achieved.png`,
+    `${assetsPath}/achievements/achievements_achieved.webp`,
   ),
   achievementsTitle: require(
-    `${assetsPath}/achievements/achievements_category_plaque.png`,
+    `${assetsPath}/achievements/achievements_category_plaque.webp`,
   ),
   achievementsTileOverlay: require(
-    `${assetsPath}/achievements/achievements_tile.png`,
+    `${assetsPath}/achievements/achievements_tile.webp`,
   ),
-  achievements100: require(`${assetsPath}/achievements/icons/icon_100.png`),
-  achievements1000: require(`${assetsPath}/achievements/icons/icon_1000.png`),
+  achievements100: require(`${assetsPath}/achievements/icons/icon_100.webp`),
+  achievements1000: require(`${assetsPath}/achievements/icons/icon_1000.webp`),
   achievementsStake: require(
-    `${assetsPath}/achievements/icons/icon_achieveStake.png`,
+    `${assetsPath}/achievements/icons/icon_achieveStake.webp`,
   ),
   achievementsL2: require(
-    `${assetsPath}/achievements/icons/icon_achieveL2.png`,
+    `${assetsPath}/achievements/icons/icon_achieveL2.webp`,
   ),
   achievementsMining: require(
-    `${assetsPath}/achievements/icons/icon_achieveMining.png`,
+    `${assetsPath}/achievements/icons/icon_achieveMining.webp`,
   ),
   achievementsMoney1: require(
-    `${assetsPath}/achievements/icons/Money/icon_100btc.png`,
+    `${assetsPath}/achievements/icons/Money/icon_100btc.webp`,
   ),
   achievementsMoney2: require(
-    `${assetsPath}/achievements/icons/Money/icon_1000btc.png`,
+    `${assetsPath}/achievements/icons/Money/icon_1000btc.webp`,
   ),
   achievementsMoney3: require(
-    `${assetsPath}/achievements/icons/Money/icon_10000btc.png`,
+    `${assetsPath}/achievements/icons/Money/icon_10000btc.webp`,
   ),
   achievmentsMoney4: require(
-    `${assetsPath}/achievements/icons/Money/icon_1000000btc.png`,
+    `${assetsPath}/achievements/icons/Money/icon_1000000btc.webp`,
   ),
   achievementsAutomationDa: require(
-    `${assetsPath}/achievements/icons/Automation/icon_achieveDa.png`,
+    `${assetsPath}/achievements/icons/Automation/icon_achieveDa.webp`,
   ),
   achievementsAutomationStwo: require(
-    `${assetsPath}/achievements/icons/Automation/icon_achieveStwo.png`,
+    `${assetsPath}/achievements/icons/Automation/icon_achieveStwo.webp`,
   ),
   achievmentsAutomationSequencer: require(
-    `${assetsPath}/achievements/icons/Automation/icon_decSeq.png`,
+    `${assetsPath}/achievements/icons/Automation/icon_decSeq.webp`,
   ),
   achievmentsAutomationMiner: require(
-    `${assetsPath}/achievements/icons/Automation/icon_quantumMiner.png`,
+    `${assetsPath}/achievements/icons/Automation/icon_quantumMiner.webp`,
   ),
   achievementsL1Dapps: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l1dapps.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l1dapps.webp`,
   ),
   achievementsL1Transactions: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l1transactions.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l1transactions.webp`,
   ),
   achievementsL1Upgrades: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l1upgrades.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l1upgrades.webp`,
   ),
   achievementsL1Blocks1: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l110blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l110blocks.webp`,
   ),
   achievementsL1Blocks2: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l1100blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l1100blocks.webp`,
   ),
   achievementsL1Blocks3: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l11000blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l11000blocks.webp`,
   ),
   achievementsL1Blocks4: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l110000blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l110000blocks.webp`,
   ),
   achievementsL2Dapps: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l2dapps.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l2dapps.webp`,
   ),
   achievementsL2Transactions: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l2transactions.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l2transactions.webp`,
   ),
   achievementsL2Upgrades: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l2upgrades.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l2upgrades.webp`,
   ),
   achievementsL2Blocks1: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l210blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l210blocks.webp`,
   ),
   achievementsL2Blocks2: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l2100blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l2100blocks.webp`,
   ),
   achievementsL2Blocks3: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l21000blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l21000blocks.webp`,
   ),
   achievementsL2Blocks4: require(
-    `${assetsPath}/achievements/icons/Layer1-2/icon_l210000blocks.png`,
+    `${assetsPath}/achievements/icons/Layer1-2/icon_l210000blocks.webp`,
   ),
 
   shopAutomationsSequencer0: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_base.png`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_base.webp`,
   ),
   shopAutomationsSequencer1: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cloud.png`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_cloud.webp`,
   ),
   shopAutomationsSequencer2: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cairo.png`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_cairo.webp`,
   ),
   shopAutomationsSequencer3: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_parallel.png`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_parallel.webp`,
   ),
   shopAutomationsSequencer4: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_decentralized.png`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_decentralized.webp`,
   ),
   shopAutomationsProver0: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_optimistic.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_optimistic.webp`,
   ),
   shopAutomationsProver1: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_snark.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_snark.webp`,
   ),
   shopAutomationsProver2: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stark.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_stark.webp`,
   ),
   shopAutomationsProver3: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stone.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_stone.webp`,
   ),
   shopAutomationsProver4: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_recursiveProof.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_recursiveProof.webp`,
   ),
   shopAutomationsProver5: require(
-    `${assetsPath}/shop/icons/automations/Prover/icon_stwo.png`,
+    `${assetsPath}/shop/icons/automations/Prover/icon_stwo.webp`,
   ),
   shopAutomationsDa0: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_calldata.png`,
+    `${assetsPath}/shop/icons/automations/DA/icon_calldata.webp`,
   ),
   shopAutomationsDa1: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_daCompression.png`,
+    `${assetsPath}/shop/icons/automations/DA/icon_daCompression.webp`,
   ),
   shopAutomationsDa2: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_daComp.png`,
+    `${assetsPath}/shop/icons/automations/DA/icon_daComp.webp`,
   ),
   shopAutomationsDa3: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_das.png`,
+    `${assetsPath}/shop/icons/automations/DA/icon_das.webp`,
   ),
   shopAutomationsDa4: require(
-    `${assetsPath}/shop/icons/automations/DA/icon_volition.png`,
+    `${assetsPath}/shop/icons/automations/DA/icon_volition.webp`,
   ),
 
   // Tutorial Images
-  tutorialArrow: require(`${assetsPath}/tutorial/arrow.png`),
-  tutorialWindow: require(`${assetsPath}/tutorial/window.png`),
+  tutorialArrow: require(`${assetsPath}/tutorial/arrow.webp`),
+  tutorialWindow: require(`${assetsPath}/tutorial/window.webp`),
 
   // Prestige Icons
-  prestige1: require(`${assetsPath}/prestige/icon_prestige1.png`),
-  prestige2: require(`${assetsPath}/prestige/icon_prestige2.png`),
-  prestige3: require(`${assetsPath}/prestige/icon_prestige3.png`),
-  prestige4: require(`${assetsPath}/prestige/icon_prestige4.png`),
-  prestige5: require(`${assetsPath}/prestige/icon_prestige5.png`),
-  prestige6: require(`${assetsPath}/prestige/icon_prestige6.png`),
-  prestige7: require(`${assetsPath}/prestige/icon_prestige7.png`),
-  prestige8: require(`${assetsPath}/prestige/icon_prestige8.png`),
-  prestige9: require(`${assetsPath}/prestige/icon_prestige9.png`),
-  prestige10: require(`${assetsPath}/prestige/icon_prestige10.png`),
+  prestige1: require(`${assetsPath}/prestige/icon_prestige1.webp`),
+  prestige2: require(`${assetsPath}/prestige/icon_prestige2.webp`),
+  prestige3: require(`${assetsPath}/prestige/icon_prestige3.webp`),
+  prestige4: require(`${assetsPath}/prestige/icon_prestige4.webp`),
+  prestige5: require(`${assetsPath}/prestige/icon_prestige5.webp`),
+  prestige6: require(`${assetsPath}/prestige/icon_prestige6.webp`),
+  prestige7: require(`${assetsPath}/prestige/icon_prestige7.webp`),
+  prestige8: require(`${assetsPath}/prestige/icon_prestige8.webp`),
+  prestige9: require(`${assetsPath}/prestige/icon_prestige9.webp`),
+  prestige10: require(`${assetsPath}/prestige/icon_prestige10.webp`),
 };
 
 // Global state for preloaded images
