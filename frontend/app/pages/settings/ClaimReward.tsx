@@ -8,7 +8,7 @@ import {
   ImageBackground,
   Linking,
 } from "react-native";
-import background from "../../../assets/background.png";
+import background from "../../../assets/background.webp";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import BasicButton from "../../components/buttons/Basic";
