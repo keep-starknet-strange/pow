@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, Text, View, BackHandler } from "react-native";
+import { Text, View, BackHandler } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import Constants from "expo-constants";
@@ -40,7 +40,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       <Animated.View
         entering={FadeInUp}
         className="relative mt-[130px]"
-        style={{ width: 322, height: 214 }}
+        style={{ width: 322, height: 140 }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -49,7 +49,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
             x={0}
             y={0}
             width={322}
-            height={214}
+            height={140}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
