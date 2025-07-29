@@ -96,8 +96,7 @@ jobs:
                 packageName: com.starknet.pow
                 releaseFiles: ./frontend/android/app/build/outputs/bundle/release/app-release.aab
                 track: production
-                status: draft 
-                debugSymbols: ./frontend/android/app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
+                status: draft
 
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
