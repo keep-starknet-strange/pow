@@ -47,6 +47,11 @@ export const StorePage: React.FC = () => {
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
+  useEffect(() => {
+    if (!l2) {
+      setStoreType("L1");
+    }
+  }, [l2]);
   const [storeTransactions, setStoreTransactions] = useState(
     transactionsJson.L1,
   );
