@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, ScrollView, Modal } from "react-native";
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, SafeAreaView, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -14,7 +14,6 @@ import { AmountField } from "../components/staking/AmountField";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
 
-// You may need to define width, height, and getImage if not already imported:
 const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
@@ -22,6 +21,7 @@ const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
 
 export const StakingPage: React.FC = () => {
   const {
+    stakingUnlocked,
     amountStaked,
     rewards,
     config,
@@ -31,11 +31,9 @@ export const StakingPage: React.FC = () => {
     claimStakingRewards,
     withdrawStakedTokens,
   } = useStakingStore();
-  const stakingUnlocked = false;
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   const insets = useSafeAreaInsets();
-  console.log("insets", insets);
   // const { getImage } = useImages();
   const balancePercentages = BALANCE_PERCENTAGE;
   interface GetPercentOfParams {
@@ -49,14 +47,16 @@ export const StakingPage: React.FC = () => {
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
+    if (!stakingUnlocked) {
+      return;
+    }
     const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
     return () => clearInterval(id);
-  }, []);
+  }, [stakingUnlocked]);
 
   // countdown until next validation
   const next = lastValidation + config.slashing_config.due_time;
   const rem = Math.max(next - now, 0);
-  const days = Math.floor(rem / 86400);
   const hours = Math.floor((rem % 86400) / 3600);
   const minutes = Math.floor((rem % 3600) / 60);
   const seconds = rem % 60;
@@ -194,7 +194,6 @@ export const StakingPage: React.FC = () => {
 
           <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
             <Text className="font-Pixels text-5xl text-[#fff7ff]">
-              {days.toString().padStart(2, "0")}:
               {hours.toString().padStart(2, "0")}:
               {minutes.toString().padStart(2, "0")}:
               {seconds.toString().padStart(2, "0")}
@@ -205,38 +204,41 @@ export const StakingPage: React.FC = () => {
         </View>
       </ScrollView>
 
-      <View style={{
-        position: "absolute",
-        top: 0,        // inside the content container
-        bottom: 0,     // stops right at the top of the tab bar
-        left: 0,
-        right: 0,
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 100,
+      <View
+        style={{
+          position: "absolute",
+          top: 0, // inside the content container
+          bottom: 0, // stops right at the top of the tab bar
+          left: 0,
+          right: 0,
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 100,
         }}
-        >
-          <View style={{
+      >
+        <View
+          style={{
             position: "absolute",
             top: 0,
             bottom: 0,
             left: 0,
             right: 0,
             backgroundColor: "rgba(0,0,0,0.8)",
-          }}/>
-            <View
-              style={{
-                width: "85%",
-                backgroundColor: "transparent",
-                borderRadius: 10,
-                padding: 20,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              >
-                <StakingUnlock alwaysShow />
-            </View>
-          </View>
+          }}
+        />
+        <View
+          style={{
+            width: "85%",
+            backgroundColor: "transparent",
+            borderRadius: 10,
+            padding: 20,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <StakingUnlock alwaysShow />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };

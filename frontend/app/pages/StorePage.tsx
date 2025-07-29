@@ -31,8 +31,7 @@ import {
 
 export const StorePage: React.FC = () => {
   const isFocused = useIsFocused();
-  const { dappsUnlocked, canUnlockDapps, canUnlockTx } =
-    useTransactionsStore();
+  const { canUnlockDapp, canUnlockTx } = useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
   const { l2 } = useL2Store();
   const { getImage } = useImages();

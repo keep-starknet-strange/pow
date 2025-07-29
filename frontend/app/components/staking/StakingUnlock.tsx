@@ -14,7 +14,7 @@ export const StakingUnlock: React.FC<StakingUnlockProps> = ({ alwaysShow }) => {
         description="participate in governance."
         cost={42}
         onPress={() => {
-          console.log("med rare steak");
+          console.log("med rare");
         }}
       />
     </View>
