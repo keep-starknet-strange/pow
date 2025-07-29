@@ -77,7 +77,7 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
           />
         </Canvas>
         <Animated.View
-          className="absolute left-[8px] top-[6px] flex flex-row items-center gap-[4px]"
+          className="absolute left-[6px] top-[6px] flex flex-row items-center gap-[4px]"
           entering={FadeInRight}
         >
           {icon && (
@@ -108,14 +108,14 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
         </Animated.View>
         {level === maxLevel ? (
           <Animated.Text
-            className="absolute right-[8px] top-[6px] font-Pixels text-xl text-[#e7e7e7]"
+            className="absolute right-[6px] top-[6px] font-Pixels text-xl text-[#e7e7e7]"
             entering={FadeInLeft}
           >
             Max
           </Animated.Text>
         ) : (
           <Animated.View
-            className="absolute right-[8px] top-[6px] flex-row items-center"
+            className="absolute right-[6px] top-[6px] flex-row items-center"
             entering={FadeInLeft}
           >
             <Text className="font-Pixels text-xl text-[#fff7ff]">
@@ -138,7 +138,7 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
               animRange={[0, -30]}
               color={balance < nextCost ? "#CA1F4B" : "#F0E130"}
             />
-            <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+            <Canvas style={{ width: 16, height: 16 }} className="">
               <Image
                 image={getImage("shop.btc")}
                 fit="contain"

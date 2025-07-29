@@ -40,7 +40,6 @@ export const TutorialOverlay: React.FC = () => {
   }, [step]);
 
   if (!visible || !isReady) return null;
-  console.log("highlightPosition", highlightPosition, "step", step);
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {masks.map((m, i) => (
@@ -56,7 +55,7 @@ export const TutorialOverlay: React.FC = () => {
 
       <View
         pointerEvents="none"
-        className="absolute border-4 border-[#7d7d80] rounded-2xl shadow-lg"
+        className="absolute border-4 border-[#7d7d80] shadow-lg"
         style={{
           top: highlightPosition.top,
           left: highlightPosition.left,
@@ -92,7 +91,7 @@ export const TutorialOverlay: React.FC = () => {
           onPress={() => setVisible(false)}
           className="self-center px-4 py-2 rounded"
         >
-          <Text className="text-[16px] font-Pixles text-gray-100 underline">
+          <Text className="text-[16px] font-Pixels text-gray-100 underline">
             Got it
           </Text>
         </Pressable>

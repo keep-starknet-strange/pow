@@ -8,6 +8,7 @@ import { newTransaction } from "../../types/Chains";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../stores/useTutorialStore";
 import transactionsJson from "../../configs/transactions.json";
+import dappsJson from "../../configs/dapps.json";
 import { shortMoneyString } from "../../utils/helpers";
 import { PopupAnimation } from "../../components/PopupAnimation";
 import { TxButtonInner } from "./TxButtonInner";
@@ -84,7 +85,13 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
   const transactionsData =
-    props.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+    props.chainId === 0
+      ? props.isDapp
+        ? dappsJson.L1.transactions
+        : transactionsJson.L1
+      : props.isDapp
+        ? dappsJson.L2.transactions
+        : transactionsJson.L2;
   const txType = transactionsData.find((tx) => tx.id === props.txId);
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">

@@ -64,8 +64,8 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     <Pressable
       className="w-full h-full relative"
       onPress={() => {
-        props.onConfirm();
         setConfirmTime(Date.now());
+        props.onConfirm();
       }}
       {...tutorialProps}
     >
@@ -111,7 +111,9 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       )}
       {props.text && (
         <Animated.Text
-          className="text-[#fff7ff] text-[24px] font-Teatime mt-[20px]"
+          className="text-[#fff7ff] text-[24px] font-Teatime w-full
+                     absolute top-[50%] translate-y-[-50%] text-center
+          "
           style={{
             transform: [
               {

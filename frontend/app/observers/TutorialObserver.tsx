@@ -30,20 +30,31 @@ export class TutorialObserver implements Observer {
       this.advanceStep(),
     );
     this.handlers.set("TxUpgradePurchased-purchaseSpeedUpgrade", () =>
-      this.setVisible(false),
-    );
-    // TODO: add some steps for the store here?
-    this.handlers.set("L2Purchased-purchaseSpeedUpgrade", () =>
       this.advanceStep(),
     );
+    this.handlers.set("SwitchStore-Upgrades-purchaseChainUpgrade", () =>
+      this.advanceStep(),
+    );
+    this.handlers.set("SwitchStore-Automation-purchaseChainAutomation", () =>
+      this.setVisible(false),
+    );
+    this.handlers.set("DappsPurchased-purchaseChainAutomation", () => {
+      this.advanceStep();
+      this.setVisible(true);
+    });
+    this.handlers.set("L2Purchased-dapps", () => this.advanceStep());
     this.handlers.set("SequenceDone-L2Upgrade", () => this.advanceStep());
+    this.handlers.set("ProveDone-prover", () => this.advanceStep());
     this.handlers.set("DaDone-dataAvailability", () => this.advanceStep());
-    // …and you can add more here without changing onNotify
+    this.handlers.set("SwitchPage-Store-l2Store", () => this.advanceStep());
+    this.handlers.set("SwitchStore-L2-l2StoreTab", () => this.advanceStep());
   }
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
-    if (data?.name == "Store") {
-      eventName = eventName + "-" + data.name;
+    if (eventName === "SwitchPage" || eventName === "SwitchStore") {
+      if (data?.name) {
+        eventName = eventName + "-" + data.name;
+      }
     }
     const handler = this.handlers.get(`${eventName}-${this.step}`);
     if (handler) {

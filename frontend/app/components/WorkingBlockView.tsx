@@ -124,11 +124,18 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     // Block clicked (mine/sequencer) anim sequence
     const triggerBlockShake = () => {
       blockShakeAnim.value = withSequence(
-        withSpring(-3, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
-        withSpring(3, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
-        withSpring(-3, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+        withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+        withSpring(2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+        withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
         withSpring(0, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
       );
+      /*
+      blockScaleAnim.value = withSequence(
+        withSpring(1.22, { duration: 150, dampingRatio: 0.5, stiffness: 100 }),
+        withSpring(1.28, { duration: 150, dampingRatio: 0.5, stiffness: 100 }),
+        withSpring(1.25, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+      );
+      */
     };
     const blockTransformStyle = useAnimatedStyle(() => {
       return {

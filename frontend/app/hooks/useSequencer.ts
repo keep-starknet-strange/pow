@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
@@ -30,25 +31,39 @@ export const useSequencer = (onBlockSequenced: () => void) => {
     fetchSequencerCounter();
   }, [powContract, user, getUserBlockClicks]);
 
+  const { workingBlocks } = useGameStore();
   const sequenceBlock = useCallback(() => {
+    if (!workingBlocks[1]?.isBuilt) {
+      console.warn("Block is not built yet, cannot sequence.");
+      return;
+    }
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = getUpgradeValue(1, "L2 Finality");
-      if (newCounter >= blockDifficulty) {
+      const blockDifficulty = getUpgradeValue(1, "Block Difficulty");
+      if (newCounter == blockDifficulty) {
         onBlockSequenced();
-        setSequencingProgress(0);
-        return 0;
-      } else {
+        setSequencingProgress(1);
+        return newCounter;
+      } else if (newCounter < blockDifficulty) {
         setSequencingProgress(newCounter / blockDifficulty);
         notify("SequenceClicked", {
           counter: newCounter,
         });
         return newCounter;
+      } else {
+        return prevCounter; // Prevent incrementing beyond block difficulty
       }
     });
-  }, [onBlockSequenced, getUpgradeValue, notify]);
+  }, [onBlockSequenced, getUpgradeValue, notify, workingBlocks[1]?.isBuilt]);
+
+  // Reset sequencing progress when block is sequenced
+  useEffect(() => {
+    setSequencingProgress(0);
+    setSequenceCounter(0);
+  }, [workingBlocks[1]?.blockId]);
+
   useAutoClicker(
-    getAutomationValue(1, "Sequencer") > 0,
+    getAutomationValue(1, "Sequencer") > 0 && workingBlocks[0]?.isBuilt,
     5000 / (getAutomationValue(1, "Sequencer") || 1),
     sequenceBlock,
   );
