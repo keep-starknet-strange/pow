@@ -19,8 +19,8 @@ pub mod transactions {
     pub mod interface;
 
     pub use interface::{
-        DA_TX_TYPE_ID, IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
-        PROOF_TX_TYPE_ID, TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
+        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
+        TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
     };
 }
 

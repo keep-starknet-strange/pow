@@ -4,6 +4,7 @@ use starknet::ContractAddress;
 pub struct BuildingState {
     pub size: u32,
     pub fees: u128,
+    pub max_size: u32, // Static block capacity set when block is created
 }
 
 #[starknet::interface]

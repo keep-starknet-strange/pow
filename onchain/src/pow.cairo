@@ -336,9 +336,7 @@ mod PowGame {
         fn check_block_not_full(self: @ContractState, chain_id: u32) {
             let caller = get_caller_address();
             let working_block = self.get_block_building_state(caller, chain_id);
-            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
-            let block_size = block_width * block_width;
-            assert!(working_block.size.into() < block_size, "Block is full");
+            assert!(working_block.size < working_block.max_size, "Block is full");
         }
     }
 
@@ -365,10 +363,8 @@ mod PowGame {
         fn mine_block(ref self: ContractState, chain_id: u32) {
             // Validation
             let caller = get_caller_address();
-            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
-            let block_size = block_width * block_width;
             let working_block = self.get_block_building_state(caller, chain_id);
-            assert!(working_block.size.into() >= block_size, "Block is not full");
+            assert!(working_block.size >= working_block.max_size, "Block is not full");
 
             // Try Mining
             do_click_block(ref self, chain_id);
@@ -389,7 +385,10 @@ mod PowGame {
             pay_user(ref self, caller, fees + reward);
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
-            self.builder.reset_block(chain_id);
+            // Set max_size for the new block based on current upgrade level
+            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
+            let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
+            self.builder.reset_block(chain_id, max_size);
         }
 
         fn store_da(ref self: ContractState, chain_id: u32) {
@@ -577,7 +576,10 @@ mod PowGame {
         } else {
             pay_user(ref self, caller, self.genesis_block_reward.read());
         }
-        self.builder.reset_block(new_chain_id);
+        // Set max_size for the new chain's first block based on current upgrade level
+        let block_width = self.get_my_upgrade(new_chain_id, 'Block Size');
+        let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
+        self.builder.reset_block(new_chain_id, max_size);
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
 
@@ -596,7 +598,10 @@ mod PowGame {
         let mut chain_id = 0;
         let max_chain_id = self.max_chain_id.read();
         while chain_id != max_chain_id {
-            self.builder.reset_block(chain_id);
+            // Set max_size for reset blocks based on current upgrade level
+            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
+            let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
+            self.builder.reset_block(chain_id, max_size);
             self.builder.reset_da(chain_id);
             self.builder.reset_proof(chain_id);
             self.transactions.reset_tx_levels(chain_id);
