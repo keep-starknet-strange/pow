@@ -32,14 +32,10 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { ref: upgradesTabRef, onLayout: upgradesTabOnLayout } = useTutorialLayout(
-    "chainUpgradeTab" as TargetId,
-    true,
-  );
-  const { ref: automationTabRef, onLayout: automationTabOnLayout } = useTutorialLayout(
-    "chainAutomationTab" as TargetId,
-    true,
-  );
+  const { ref: upgradesTabRef, onLayout: upgradesTabOnLayout } =
+    useTutorialLayout("chainUpgradeTab" as TargetId, true);
+  const { ref: automationTabRef, onLayout: automationTabOnLayout } =
+    useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
     useTransactionsStore();
@@ -103,7 +99,7 @@ export const StorePage: React.FC = () => {
           currentView={storeType}
           setCurrentView={(view: "L1" | "L2") => {
             setStoreType(view);
-            notify("SwitchStore", { name: view});
+            notify("SwitchStore", { name: view });
           }}
           isStore={true}
         />
@@ -171,10 +167,16 @@ export const StorePage: React.FC = () => {
               tab === "Upgrades"
                 ? upgradesTabOnLayout
                 : tab === "Automation"
-                ? automationTabOnLayout
-                : undefined
+                  ? automationTabOnLayout
+                  : undefined
             }
-            ref={tab === "Upgrades" ? upgradesTabRef : tab === "Automation" ? automationTabRef : undefined}
+            ref={
+              tab === "Upgrades"
+                ? upgradesTabRef
+                : tab === "Automation"
+                  ? automationTabRef
+                  : undefined
+            }
             onPress={() => {
               setActiveSubTab(tab);
               notify("SwitchStore", { name: tab });

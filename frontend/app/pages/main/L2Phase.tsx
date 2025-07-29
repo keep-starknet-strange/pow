@@ -32,8 +32,12 @@ export const L2Phase: React.FC = () => {
 
   return (
     <View
-      style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start",
-        marginTop: dappsUnlocked[1] ? 10 : 20 }}
+      style={{
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        marginTop: dappsUnlocked[1] ? 10 : 20,
+      }}
     >
       <BlockchainView chainId={1} style={{ flex: 1 }} />
       <DappsUnlock chainId={1} />

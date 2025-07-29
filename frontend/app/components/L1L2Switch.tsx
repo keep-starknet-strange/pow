@@ -22,7 +22,7 @@ export const L1L2Switch = ({
   const { getImage } = useImages();
   const { ref, onLayout } = useTutorialLayout(
     "l2StoreTab" as TargetId,
-    isStore 
+    isStore,
   );
 
   return (

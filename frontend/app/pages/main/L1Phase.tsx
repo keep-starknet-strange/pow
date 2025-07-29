@@ -20,7 +20,7 @@ export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { ref, onLayout } = useTutorialLayout(
     "dappsTab" as TargetId,
-    (dappsUnlocked[0] || false)
+    dappsUnlocked[0] || false,
   );
   const { getImage } = useImages();
   const window = Dimensions.get("window");

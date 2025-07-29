@@ -42,9 +42,7 @@ export class TutorialObserver implements Observer {
       this.advanceStep();
       this.setVisible(true);
     });
-    this.handlers.set("L2Purchased-dapps", () =>
-      this.advanceStep(),
-    );
+    this.handlers.set("L2Purchased-dapps", () => this.advanceStep());
     this.handlers.set("SequenceDone-L2Upgrade", () => this.advanceStep());
     this.handlers.set("ProveDone-prover", () => this.advanceStep());
     this.handlers.set("DaDone-dataAvailability", () => this.advanceStep());

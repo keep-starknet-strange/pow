@@ -57,10 +57,14 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     if (speed > 0) {
       automationAnimHeight.value = 0;
       automationAnimHeight.value = withSequence(
-        withTiming(94, {
-          duration: 5000 / speed,
-          easing: Easing.cubic,
-        }, () => runOnJS(addNewTransaction)()),
+        withTiming(
+          94,
+          {
+            duration: 5000 / speed,
+            easing: Easing.cubic,
+          },
+          () => runOnJS(addNewTransaction)(),
+        ),
         withTiming(0, {
           duration: 200,
           easing: Easing.bounce,
@@ -71,7 +75,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     }
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
-    }
+    };
   }, [speed]);
   useInterval(
     () => {
@@ -131,7 +135,12 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
               height={automationAnimHeight}
             >
               <ImageShader
-                image={getTxInner(props.chainId, props.txId, props.isDapp, getImage)}
+                image={getTxInner(
+                  props.chainId,
+                  props.txId,
+                  props.isDapp,
+                  getImage,
+                )}
                 fit="fill"
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -152,7 +161,12 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxNameplate(props.chainId, props.txId, props.isDapp, getImage)}
+              image={getTxNameplate(
+                props.chainId,
+                props.txId,
+                props.isDapp,
+                getImage,
+              )}
               fit="fill"
               sampling={{
                 filter: FilterMode.Nearest,
@@ -205,7 +219,12 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxIcon(props.chainId, props.txId, props.isDapp, getImage)}
+              image={getTxIcon(
+                props.chainId,
+                props.txId,
+                props.isDapp,
+                getImage,
+              )}
               fit="contain"
               sampling={{
                 filter: FilterMode.Nearest,
