@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Dimensions } from "react-native";
+import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
+import { useEventManager } from "@/app/stores/useEventManager";
+import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
+import { TargetId } from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
@@ -29,12 +32,21 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
+  const { ref: upgradesTabRef, onLayout: upgradesTabOnLayout } = useTutorialLayout(
+    "chainUpgradeTab" as TargetId,
+    true,
+  );
+  const { ref: automationTabRef, onLayout: automationTabOnLayout } = useTutorialLayout(
+    "chainAutomationTab" as TargetId,
+    true,
+  );
   const isFocused = useIsFocused();
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
     useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
   const { l2 } = useL2Store();
   const { getImage } = useImages();
+  const { notify } = useEventManager();
   const { width, height } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
@@ -89,7 +101,11 @@ export const StorePage: React.FC = () => {
       {l2 && (
         <L1L2Switch
           currentView={storeType}
-          setCurrentView={(view: "L1" | "L2") => setStoreType(view)}
+          setCurrentView={(view: "L1" | "L2") => {
+            setStoreType(view);
+            notify("SwitchStore", { name: view});
+          }}
+          isStore={true}
         />
       )}
       {l2 ? (
@@ -144,13 +160,25 @@ export const StorePage: React.FC = () => {
         style={{ paddingHorizontal: 4, marginTop: 4 }}
       >
         {subTabs.map((tab) => (
-          <View
+          <Pressable
             className="relative flex justify-center z-[10]"
             style={{
               width: (width - 2 * subTabs.length - 6) / subTabs.length,
               height: activeSubTab === tab ? 32 : 24,
             }}
             key={tab}
+            onLayout={
+              tab === "Upgrades"
+                ? upgradesTabOnLayout
+                : tab === "Automation"
+                ? automationTabOnLayout
+                : undefined
+            }
+            ref={tab === "Upgrades" ? upgradesTabRef : tab === "Automation" ? automationTabRef : undefined}
+            onPress={() => {
+              setActiveSubTab(tab);
+              notify("SwitchStore", { name: tab });
+            }}
           >
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
@@ -172,11 +200,10 @@ export const StorePage: React.FC = () => {
               className={`font-Pixels text-xl text-center w-full absolute ${
                 activeSubTab === tab ? "text-[#fff7ff]" : "text-[#717171]"
               }`}
-              onPress={() => setActiveSubTab(tab)}
             >
               {tab}
             </Text>
-          </View>
+          </Pressable>
         ))}
       </View>
       <View style={{ height: 522, marginTop: 2 }}>
@@ -202,7 +229,7 @@ export const StorePage: React.FC = () => {
               )}
             </View>
           )}
-          {activeSubTab === "Transactions" && (
+          {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
             <View className="flex flex-col px-[16px]">
               <View className="w-full relative pb-[16px]">
                 <Canvas style={{ width: width - 32, height: 24 }}>

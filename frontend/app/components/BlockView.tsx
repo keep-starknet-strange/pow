@@ -27,9 +27,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   // The size of each one of the transactions
   const [txSize, setTxSize] = useState<number>(0);
 
-  const enabled = props.block?.blockId === 0;
-  const { ref, onLayout } = useTutorialLayout("blockView" as TargetId, enabled);
-
   const onBlockLayout = useCallback(
     (event: LayoutChangeEvent) => {
       const { width } = event.nativeEvent.layout;
@@ -73,8 +70,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         {props.block?.blockId === 0 && (
           <View
             className="absolute top-0 left-0 w-full h-full flex flex-col items-center"
-            ref={ref}
-            onLayout={onLayout}
           >
             <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">
               Genesis Block

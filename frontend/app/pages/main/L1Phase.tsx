@@ -13,9 +13,15 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
+import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
+import { TargetId } from "@/app/stores/useTutorialStore";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
+  const { ref, onLayout } = useTutorialLayout(
+    "dappsTab" as TargetId,
+    (dappsUnlocked[0] || false)
+  );
   const { getImage } = useImages();
   const window = Dimensions.get("window");
   const txTabs = ["Transactions", "dApps"];
@@ -98,6 +104,8 @@ export const L1Phase: React.FC = () => {
                 }}
                 key={tab}
                 onPress={() => setActiveTab(tab)}
+                ref={tab === "dApps" ? ref : undefined}
+                onLayout={tab === "dApps" ? onLayout : undefined}
               >
                 <Canvas style={{ width: "100%", height: "100%" }}>
                   <Image

@@ -150,6 +150,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
     const { getUpgradeValueDependency } = get();
     set((state) => {
       if (!state.l2) return state;
+      const daMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(0, "DA compression")
+        : 1;
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.da) return state;
       newL2Instance.da.blocks.push(block.blockId);
@@ -159,9 +162,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
           ? getUpgradeValueDependency(0, "Block Reward")
           : 1);
       newL2Instance.da.blockFees += blockReward;
-      const daMaxSize = getUpgradeValueDependency
-        ? getUpgradeValueDependency(0, "DA compression")
-        : 1;
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return { l2: newL2Instance };
     });
@@ -173,6 +173,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
     set((state) => {
       if (!state.l2) return state;
       const newL2Instance = { ...state.l2 };
+      const proverMaxSize = getUpgradeValueDependency
+        ? getUpgradeValueDependency(1, "Prover compression")
+        : 1;
       if (!newL2Instance.prover) return state;
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward =
@@ -181,9 +184,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
           ? getUpgradeValueDependency(1, "Block Reward")
           : 1);
       newL2Instance.prover.blockFees += blockReward;
-      const proverMaxSize = getUpgradeValueDependency
-        ? getUpgradeValueDependency(1, "Prover compression")
-        : 1;
       newL2Instance.prover.isBuilt =
         newL2Instance.prover.blocks.length >= proverMaxSize;
       return { l2: newL2Instance };

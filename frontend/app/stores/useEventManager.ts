@@ -27,6 +27,7 @@ export type EventType =
   | "PrestigePurchased"
   | "TxAdded"
   | "AchievementCompleted"
+  | "SwitchStore"
   | "SwitchPage";
 
 export interface Observer {

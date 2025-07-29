@@ -3,7 +3,7 @@
     "title": "Welcome to POW!",
     "description": "Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
-    "highlightTargetId": "blockView"
+    "highlightTargetId": "minerConfirmer"
   },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
@@ -35,11 +35,35 @@
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton"
   },
+  "purchaseChainUpgrade": {
+    "title": "Supercharge Your Chain",
+    "description": "Unlock powerful upgrades to boost your blockchain’s performance.\nClick the upgrade to enhance your chain and maximize your rewards.",
+    "bubbleTargetId": "chainUpgradeTab",
+    "highlightTargetId": "chainUpgradeTab"
+  },
+  "purchaseChainAutomation": {
+    "title": "Automate Your Chain",
+    "description": "Unlock automation so you can chill while your blockchain empire expands.\nClick the automation upgrade to set it up and let your chain run itself.",
+    "bubbleTargetId": "chainAutomationTab",
+    "highlightTargetId": "chainAutomationTab"
+  },
+  "dapps": {
+    "title": "Build Bigger with dApps",
+    "description": "Decentralized applications (dApps) are the future!\nClick here to manage your first dApps.",
+    "bubbleTargetId": "dappsTab",
+    "highlightTargetId": "dappsTab"
+  },
   "L2Upgrade": {
     "title": "Congrats! You now have an L2",
     "description": "You’ve just unlocked a Layer 2 — a faster, cheaper way to scale your blockchain.\nClick here to manage it and boost your chain’s performance.",
-    "bubbleTargetId": "manageL2",
-    "highlightTargetId": "manageL2"
+    "bubbleTargetId": "sequencerConfirmer",
+    "highlightTargetId": "sequencerConfirmer"
+  },
+  "prover": {
+    "title": "Congrats! You now have a prover",
+    "description": "Click here to manage the prover.",
+    "bubbleTargetId": "proverConfirmer",
+    "highlightTargetId": "proverConfirmer"
   },
   "dataAvailability": {
     "title": "Congrats! You now have a data availability layer",
@@ -47,11 +71,17 @@
     "bubbleTargetId": "daConfirmer",
     "highlightTargetId": "daConfirmer"
   },
-  "prover": {
-    "title": "Congrats! You now have a prover",
-    "description": "Click here to manage the prover.",
-    "bubbleTargetId": "proverConfirmer",
-    "highlightTargetId": "proverConfirmer"
+  "l2Store": {
+    "title": "Visit the L2 Shop",
+    "description": "Your L2 has its own shop!\nHead to the Shop to upgrade your L2 and unlock powerful new features.",
+    "bubbleTargetId": "storeTab",
+    "highlightTargetId": "storeTab"
+  },
+  "l2StoreTab": {
+    "title": "Welcome to the L2 Store",
+    "description": "Here you can purchase L2-specific upgrades to enhance your blockchain’s capabilities.\nExplore the options and supercharge your L2!",
+    "bubbleTargetId": "l2StoreTab",
+    "highlightTargetId": "l2StoreTab"
   },
   "completed": {
     "title": "Congratulations!",

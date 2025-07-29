@@ -3,6 +3,7 @@ import { useEventManager } from "@/app/stores/useEventManager";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
 
 export const useDAConfirmer = (onDAConfirm: () => void) => {
@@ -29,24 +30,38 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
     fetchDaCounter();
   }, [powContract, user, getUserDaClicks]);
 
+  const { l2 } = useL2Store();
   const daConfirm = useCallback(() => {
+    if (!l2?.da.isBuilt) {
+      console.warn("Data Availability is not built yet.");
+      return;
+    }
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const daDifficulty = getUpgradeValue(1, "DA compression");
-      if (newCounter >= daDifficulty) {
+      if (newCounter == daDifficulty) {
         onDAConfirm();
-        setDaConfirmProgress(0);
+        setDaConfirmProgress(1);
         notify("DaDone", { counter: newCounter });
-        return 0; // Reset counter after confirmation
-      } else {
+        return newCounter;
+      } else if (newCounter < daDifficulty) {
         setDaConfirmProgress(newCounter / daDifficulty);
         notify("DaClicked", { counter: newCounter });
         return newCounter;
+      } else {
+        return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, getUpgradeValue, notify]);
+  }, [onDAConfirm, getUpgradeValue, notify, l2?.da.isBuilt]);
+
+  // Reset da confirm progress when the DA is built
+  useEffect(() => {
+    setDaConfirmProgress(0);
+    setDaConfirmCounter(0);
+  }, [l2?.da.isBuilt]);
+
   useAutoClicker(
-    getAutomationValue(1, "DA") > 0,
+    getAutomationValue(1, "DA") > 0 && (l2?.da.isBuilt || false),
     5000 / (getAutomationValue(1, "DA") || 1),
     daConfirm,
   );

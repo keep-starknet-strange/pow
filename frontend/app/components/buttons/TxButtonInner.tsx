@@ -53,6 +53,26 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   }, [props.chainId, props.txId, props.isDapp]);
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+  useEffect(() => {
+    if (speed > 0) {
+      automationAnimHeight.value = 0;
+      automationAnimHeight.value = withSequence(
+        withTiming(94, {
+          duration: 5000 / speed,
+          easing: Easing.cubic,
+        }, () => runOnJS(addNewTransaction)()),
+        withTiming(0, {
+          duration: 200,
+          easing: Easing.bounce,
+        }),
+      );
+    } else {
+      automationAnimHeight.value = 94;
+    }
+    return () => {
+      automationAnimHeight.value = 94; // Reset to default height when unmounted
+    }
+  }, [speed]);
   useInterval(
     () => {
       automationAnimHeight.value = withSequence(
@@ -83,7 +103,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={getTxBg(props.chainId, props.txId, false, getImage)}
+            image={getTxBg(props.chainId, props.txId, props.isDapp, getImage)}
             fit="fill"
             sampling={{
               filter: FilterMode.Nearest,
@@ -111,7 +131,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
               height={automationAnimHeight}
             >
               <ImageShader
-                image={getTxInner(props.chainId, props.txId, false, getImage)}
+                image={getTxInner(props.chainId, props.txId, props.isDapp, getImage)}
                 fit="fill"
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -132,7 +152,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxNameplate(props.chainId, props.txId, false, getImage)}
+              image={getTxNameplate(props.chainId, props.txId, props.isDapp, getImage)}
               fit="fill"
               sampling={{
                 filter: FilterMode.Nearest,
@@ -185,7 +205,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxIcon(props.chainId, props.txId, false, getImage)}
+              image={getTxIcon(props.chainId, props.txId, props.isDapp, getImage)}
               fit="contain"
               sampling={{
                 filter: FilterMode.Nearest,
