@@ -18,6 +18,11 @@ on:
           required: true
           default: true
           type: boolean
+        ref:
+          description: "Git reference to deploy"
+          required: true
+          default: "main"
+          type: string
 
 jobs:
     deploy-android:
@@ -26,6 +31,8 @@ jobs:
         steps:
             - name: Checkout project
               uses: actions/checkout@v4
+              with:
+                ref: ${{ inputs.ref }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -98,6 +105,8 @@ jobs:
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
+              with:
+                ref: ${{ inputs.ref }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
