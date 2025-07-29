@@ -3,60 +3,70 @@
     "title": "Welcome to POW!",
     "description": "Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
-    "highlightTargetId": "blockView"
+    "highlightTargetId": "blockView",
+    "canDismiss": false
   },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
-    "description": "Click the transaction to unlock it — that’s how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
+    "description": "Click the transaction to unlock it — that's how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
     "bubbleTargetId": "firstTransactionButton",
-    "highlightTargetId": "firstTransactionButton"
+    "highlightTargetId": "firstTransactionButton",
+    "canDismiss": false
   },
   "addTransactionsToBlock": {
     "title": "Transaction ready!",
-    "description": "You can only mine a block once it’s full of transactions.\nAdd transactions until your block is packed and ready.\nThen hit mine to seal it and earn your reward!",
+    "description": "You can only mine a block once it's full of transactions.\nAdd transactions until your block is packed and ready.\nThen hit mine to seal it and earn your reward!",
     "bubbleTargetId": "firstTransactionButton",
-    "highlightTargetId": "firstTransactionButton"
+    "highlightTargetId": "firstTransactionButton",
+    "canDismiss": false
   },
   "checkStore": {
     "title": "Visit the Shop",
-    "description": "Let’s spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
+    "description": "Let's spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
     "bubbleTargetId": "storeTab",
-    "highlightTargetId": "storeTab"
+    "highlightTargetId": "storeTab",
+    "canDismiss": false
   },
   "purchaseFeeUpgrade": {
     "title": "Boost Transaction Value",
     "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
     "bubbleTargetId": "feeUpgradeButton",
-    "highlightTargetId": "feeUpgradeButton"
+    "highlightTargetId": "feeUpgradeButton",
+    "canDismiss": true
   },
   "purchaseSpeedUpgrade": {
     "title": "Automate and Accelerate Transaction",
-    "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they’re added to your block.",
+    "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they're added to your block.",
     "bubbleTargetId": "speedUpgradeButton",
-    "highlightTargetId": "speedUpgradeButton"
+    "highlightTargetId": "speedUpgradeButton",
+    "canDismiss": true
   },
   "L2Upgrade": {
     "title": "Congrats! You now have an L2",
-    "description": "You’ve just unlocked a Layer 2 — a faster, cheaper way to scale your blockchain.\nClick here to manage it and boost your chain’s performance.",
+    "description": "You've just unlocked a Layer 2 — a faster, cheaper way to scale your blockchain.\nClick here to manage it and boost your chain's performance.",
     "bubbleTargetId": "manageL2",
-    "highlightTargetId": "manageL2"
+    "highlightTargetId": "manageL2",
+    "canDismiss": false
   },
   "dataAvailability": {
     "title": "Congrats! You now have a data availability layer",
     "description": "Click here to manage the data availability layer.",
     "bubbleTargetId": "daConfirmer",
-    "highlightTargetId": "daConfirmer"
+    "highlightTargetId": "daConfirmer",
+    "canDismiss": false
   },
   "prover": {
     "title": "Congrats! You now have a prover",
     "description": "Click here to manage the prover.",
     "bubbleTargetId": "proverConfirmer",
-    "highlightTargetId": "proverConfirmer"
+    "highlightTargetId": "proverConfirmer",
+    "canDismiss": false
   },
   "completed": {
     "title": "Congratulations!",
     "description": "You're done!",
     "bubbleTargetId": "???",
-    "highlightTargetId": "??"
+    "highlightTargetId": "??",
+    "canDismiss": true
   }
 }

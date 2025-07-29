@@ -6,6 +6,7 @@ export function getTutorialStepConfig(step: string): {
   description: string;
   bubbleTargetId: TargetId;
   highlightTargetId: TargetId;
+  canDismiss: boolean;
 } {
   return (
     step in tutorialConfig
@@ -15,6 +16,7 @@ export function getTutorialStepConfig(step: string): {
           description: "",
           bubbleTargetId: "",
           highlightTargetId: "",
+          canDismiss: true,
         }
   ) as any;
 }

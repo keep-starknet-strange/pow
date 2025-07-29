@@ -88,14 +88,16 @@ export const TutorialOverlay: React.FC = () => {
         <Text className="text-[14px] font-Pixels text-gray-100 text-center">
           {stepConfig.description}
         </Text>
-        <Pressable
-          onPress={() => setVisible(false)}
-          className="self-center px-4 py-2 rounded"
-        >
-          <Text className="text-[16px] font-Pixles text-gray-100 underline">
-            Got it
-          </Text>
-        </Pressable>
+        {stepConfig.canDismiss && (
+          <Pressable
+            onPress={() => setVisible(false)}
+            className="self-center px-4 py-2 rounded"
+          >
+            <Text className="text-[16px] font-Pixles text-gray-100 underline">
+              Got it
+            </Text>
+          </Pressable>
+        )}
       </Window>
     </View>
   );
