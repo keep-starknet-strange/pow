@@ -48,7 +48,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   initializeBalance: async (powContract, user, getUserBalance) => {
     const fetchBalance = async () => {
       if (!user || !powContract) {
-        set({ balance: 0 });
+        set({ balance: 1000000000 });
         return;
       }
       try {
@@ -56,7 +56,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
         set({ balance });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        set({ balance: 0 });
+        set({ balance: 1000000000 });
       }
     };
     fetchBalance();
