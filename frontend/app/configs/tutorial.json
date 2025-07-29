@@ -46,21 +46,21 @@
     "description": "Unlock powerful upgrades to boost your blockchain’s performance.\nClick the upgrade to enhance your chain and maximize your rewards.",
     "bubbleTargetId": "chainUpgradeTab",
     "highlightTargetId": "chainUpgradeTab",
-    "canDismiss": true
+    "canDismiss": false
   },
   "purchaseChainAutomation": {
     "title": "Automate Your Chain",
     "description": "Unlock automation so you can chill while your blockchain empire expands.\nClick the automation upgrade to set it up and let your chain run itself.",
     "bubbleTargetId": "chainAutomationTab",
     "highlightTargetId": "chainAutomationTab",
-    "canDismiss": true
+    "canDismiss": false
   },
   "dapps": {
     "title": "Build Bigger with dApps",
     "description": "Decentralized applications (dApps) are the future!\nClick here to manage your first dApps.",
     "bubbleTargetId": "dappsTab",
     "highlightTargetId": "dappsTab",
-    "canDismiss": false
+    "canDismiss": true
   },
   "L2Upgrade": {
     "title": "Congrats! You now have an L2",
