@@ -1,3 +1,4 @@
+import React from "react";
 import { Modal, View, Text, Pressable } from "react-native";
 
 interface AlertModalProps {

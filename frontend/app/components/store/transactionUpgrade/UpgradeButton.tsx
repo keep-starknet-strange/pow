@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { Dimensions, Pressable, Text } from "react-native";
 import { PopupAnimation } from "../../PopupAnimation";
 import {
