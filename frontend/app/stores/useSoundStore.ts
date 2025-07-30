@@ -9,6 +9,9 @@ const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 
+// Maximum number of concurrent sound effects
+const MAX_CONCURRENT_SOUNDS = 10;
+
 const musicAssets: { [key: string]: any } = {
   "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.mp3"),
   "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.mp3"),
@@ -35,22 +38,90 @@ const soundEffectsAssets: { [key: string]: any } = {
   DiceRoll: require("../../assets/sounds/dice.wav"),
 };
 
+// Simple sound pool optimized for high-frequency game sounds
+class SoundPool {
+  private soundPlayers: Map<string, AudioPlayer[]> = new Map();
+  private currentIndex: Map<string, number> = new Map();
+  private readonly poolSize = 3; // 3 instances per sound type
+
+  constructor() {
+    // Pre-create players for each sound type
+    Object.keys(soundEffectsAssets).forEach(soundType => {
+      const players: AudioPlayer[] = [];
+      for (let i = 0; i < this.poolSize; i++) {
+        const player = createAudioPlayer(soundEffectsAssets[soundType]);
+        player.shouldCorrectPitch = true; // Enable pitch correction
+        players.push(player);
+      }
+      this.soundPlayers.set(soundType, players);
+      this.currentIndex.set(soundType, 0);
+    });
+  }
+
+  playSound(type: string, pitchShift: number, soundConfig: any, volume: number): void {
+    const players = this.soundPlayers.get(type);
+    if (!players) return;
+
+    // Get the next player in round-robin fashion
+    const currentIdx = this.currentIndex.get(type) || 0;
+    const player = players[currentIdx];
+    
+    // Update index for next time
+    this.currentIndex.set(type, (currentIdx + 1) % this.poolSize);
+
+    try {
+      // Simple, fast configuration
+      player.volume = volume * (soundConfig.volume || 1.0);
+      player.setPlaybackRate((soundConfig.rate || 1.0) * pitchShift);
+      player.seekTo(0);
+      player.play();
+      
+      // Simple cleanup - no tracking needed
+      setTimeout(() => {
+        try {
+          player.pause();
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+      }, 2000);
+      
+    } catch (error) {
+      // Silently ignore errors to maintain performance
+    }
+  }
+
+  cleanup() {
+    this.soundPlayers.forEach(players => {
+      players.forEach(player => {
+        try {
+          player.pause();
+          player.release();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      });
+    });
+    this.soundPlayers.clear();
+    this.currentIndex.clear();
+  }
+}
+
 interface SoundState {
   isSoundOn: boolean;
   isMusicOn: boolean;
   soundEffectVolume: number;
   musicVolume: number;
   musicPlayer: AudioPlayer | null;
+  soundPool: SoundPool | null;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
-  playSoundEffect: (type: string, pitchShift?: number) => Promise<void>;
+  playSoundEffect: (type: string, pitchShift?: number) => void;
   initializeSound: () => Promise<void>;
   playMusic: () => Promise<void>;
   stopMusic: () => Promise<void>;
-
   cleanupSound: () => void;
 }
 
@@ -60,6 +131,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   soundEffectVolume: 1,
   musicVolume: 0.2,
   musicPlayer: null,
+  soundPool: null,
 
   initializeSound: async () => {
     try {
@@ -79,6 +151,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
         musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
         musicPlayer: musicPlayer,
+        soundPool: new SoundPool(), // Initialize sound pool
       });
 
       if (musicOn) {
@@ -165,57 +238,46 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
   },
 
-  playSoundEffect: async (type: string, pitchShift: number = 1.0) => {
-    const { isSoundOn, soundEffectVolume } = get();
+  playSoundEffect: (type: string, pitchShift: number = 1.0) => {
+    const { isSoundOn, soundEffectVolume, soundPool } = get();
 
-    if (
-      !isSoundOn ||
-      !soundEffectsAssets[type] ||
-      !Object.prototype.hasOwnProperty.call(soundsJson, type)
-    ) {
+    // Fast early returns for performance
+    if (!isSoundOn || !soundPool || !soundEffectsAssets[type]) {
       return;
     }
 
-    const minPitchShift = 0.5;
-    const maxPitchShift = 2.0;
-
-    if (pitchShift < minPitchShift) {
-      pitchShift = minPitchShift;
-    } else if (pitchShift > maxPitchShift) {
-      pitchShift = maxPitchShift;
-    }
-
-    /*
-    const soundConfig = soundsJson[type as keyof typeof soundsJson];
-    playHaptic(soundConfig.haptic);
+    // Clamp pitch shift with minimal overhead
+    pitchShift = Math.max(0.5, Math.min(2.0, pitchShift));
 
     try {
-      const soundPlayer = createAudioPlayer(soundEffectsAssets[type]);
-      soundPlayer.shouldCorrectPitch = true;
-      soundPlayer.volume = soundEffectVolume * (soundConfig.volume || 1.0);
-      soundPlayer.setPlaybackRate((soundConfig.rate || 1.0) * pitchShift);
-      soundPlayer.seekTo(0);
-      soundPlayer.play();
-      setTimeout(() => {
-        soundPlayer.pause();
-        soundPlayer.release();
-      }, 1000);
+      const soundConfig = soundsJson[type as keyof typeof soundsJson];
+      if (!soundConfig) return;
+      
+      // Play haptic feedback
+      playHaptic(soundConfig.haptic);
+
+      // Play sound with minimal overhead
+      soundPool.playSound(type, pitchShift, soundConfig, soundEffectVolume);
+      
     } catch (error) {
-      console.error("Failed to play sound effect:", error);
+      // Silent error handling for performance
     }
-    */
   },
 
   cleanupSound: () => {
-    const { musicPlayer } = get();
+    const { musicPlayer, soundPool } = get();
     if (musicPlayer) {
       try {
         musicPlayer.pause();
         musicPlayer.release();
         set({ musicPlayer: null });
       } catch (error) {
-        console.warn("Failed to cleanup sound:", error);
+        console.warn("Failed to cleanup music player:", error);
       }
+    }
+    if (soundPool) {
+      soundPool.cleanup();
+      set({ soundPool: null });
     }
   },
 }));
