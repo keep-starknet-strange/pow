@@ -32,8 +32,10 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
 
   return (
     <Animated.View
-      className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center"
       style={{
+        position: 'absolute',
+        top: 0,
+        alignSelf: 'center',
         transform: [
           {
             translateY: popupAnimation.interpolate({
@@ -50,13 +52,14 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
       }}
     >
       <Text
-        className="text-3xl text-center font-Pixels"
+        className="text-3xl font-Pixels"
         style={{
           color: color || "black",
           textShadowColor: "black",
           textShadowOffset: { width: 0, height: 2 },
           textShadowRadius: 4,
         }}
+        numberOfLines={1}
       >
         {popupValue}
       </Text>
