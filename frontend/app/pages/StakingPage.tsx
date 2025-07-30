@@ -1,9 +1,10 @@
 import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
 import { Dimensions } from "react-native";
+import { useInterval } from "usehooks-ts";
 import { BackGround } from "../components/staking/BackGround";
 import { PageHeader } from "../components/staking/PageHeader";
 import { SectionTitle } from "../components/staking/SectionTitle";
@@ -46,13 +47,11 @@ export const StakingPage: React.FC = () => {
   }
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-  useEffect(() => {
-    if (!stakingUnlocked) {
-      return;
-    }
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
-    return () => clearInterval(id);
-  }, [stakingUnlocked]);
+
+  // Use useInterval hook instead of custom useEffect with setInterval
+  useInterval(() => {
+    setNow(Math.floor(Date.now() / 1000));
+  }, stakingUnlocked ? SECOND : null); // Only run when staking is unlocked
 
   // countdown until next validation
   const next = lastValidation + config.slashing_config.due_time;
