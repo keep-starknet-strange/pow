@@ -204,41 +204,43 @@ export const StakingPage: React.FC = () => {
         </View>
       </ScrollView>
 
-      <View
-        style={{
-          position: "absolute",
-          top: 0, // inside the content container
-          bottom: 0, // stops right at the top of the tab bar
-          left: 0,
-          right: 0,
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 100,
-        }}
-      >
+      {!stakingUnlocked && (
         <View
           style={{
             position: "absolute",
-            top: 0,
-            bottom: 0,
+            top: 0, // inside the content container
+            bottom: 0, // stops right at the top of the tab bar
             left: 0,
             right: 0,
-            backgroundColor: "rgba(0,0,0,0.8)",
-          }}
-        />
-        <View
-          style={{
-            width: "85%",
-            backgroundColor: "transparent",
-            borderRadius: 10,
-            padding: 20,
-            alignItems: "center",
             justifyContent: "center",
+            alignItems: "center",
+            zIndex: 100,
           }}
         >
-          <StakingUnlock alwaysShow />
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: "rgba(0,0,0,0.8)",
+            }}
+          />
+          <View
+            style={{
+              width: "85%",
+              backgroundColor: "transparent",
+              borderRadius: 10,
+              padding: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <StakingUnlock />
+          </View>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

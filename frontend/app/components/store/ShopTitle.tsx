@@ -10,7 +10,7 @@ import { useRef } from "react";
 import Animated, { FadeInLeft, runOnJS } from "react-native-reanimated";
 import { InteractionManager } from "react-native";
 
-export function ShopTitle({ position }: { position: "left" | "right" }) {
+export const ShopTitle = ({ position }: { position: "left" | "right" }) => {
   const handleRef = useRef<number | null>(null);
   const { getImage } = useImages();
   let { width } = Dimensions.get("window");
@@ -55,4 +55,4 @@ export function ShopTitle({ position }: { position: "left" | "right" }) {
       </Animated.Text>
     </View>
   );
-}
+};
