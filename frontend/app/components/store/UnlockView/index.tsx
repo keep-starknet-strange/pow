@@ -1,4 +1,5 @@
-import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
+import React from "react";
+import { View, TouchableWithoutFeedback } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,7 +24,7 @@ type UnlockViewProps = {
   disabled?: boolean;
 };
 
-export const UnlockView: React.FC<UnlockViewProps> = (props) => {
+export const UnlockView: React.FC<UnlockViewProps> = React.memo((props) => {
   const { notify } = useEventManager();
   const shakeAnim = useSharedValue(8);
 
@@ -78,4 +79,4 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
       </TouchableWithoutFeedback>
     </Animated.View>
   );
-};
+});

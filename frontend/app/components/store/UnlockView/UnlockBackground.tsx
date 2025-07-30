@@ -1,3 +1,4 @@
+import React from "react";
 import { Dimensions } from "react-native";
 import {
   Canvas,
@@ -7,7 +8,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "@/app/hooks/useImages";
 
-export const UnlockBackground: React.FC = () => {
+export const UnlockBackground: React.FC = React.memo(() => {
   const { width } = Dimensions.get("window");
   const { getImage } = useImages();
 
@@ -27,4 +28,4 @@ export const UnlockBackground: React.FC = () => {
       />
     </Canvas>
   );
-};
+});

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Canvas,
   Image,
@@ -10,7 +11,7 @@ type UnlockIconProps = {
   icon: string;
 };
 
-export const UnlockIcon: React.FC<UnlockIconProps> = ({ icon }) => {
+export const UnlockIcon: React.FC<UnlockIconProps> = React.memo(({ icon }) => {
   const { getImage } = useImages();
 
   return (
@@ -29,4 +30,4 @@ export const UnlockIcon: React.FC<UnlockIconProps> = ({ icon }) => {
       />
     </Canvas>
   );
-};
+});
