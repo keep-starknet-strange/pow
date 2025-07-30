@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback } from "react";
+import React, { memo, useEffect, useCallback, useState } from "react";
 import { View, Text, Dimensions } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
@@ -53,30 +53,41 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   }, [props.chainId, props.txId, props.isDapp]);
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+  const [isInitialMount, setIsInitialMount] = useState(true);
+  
   useEffect(() => {
     if (speed > 0) {
       automationAnimHeight.value = 0;
-      automationAnimHeight.value = withSequence(
-        withTiming(
-          94,
-          {
-            duration: 5000 / speed,
-            easing: Easing.cubic,
-          },
-          () => runOnJS(addNewTransaction)(),
-        ),
-        withTiming(0, {
-          duration: 200,
-          easing: Easing.bounce,
-        }),
-      );
+      // Only trigger automation if it's not the initial mount/re-render
+      if (!isInitialMount) {
+        automationAnimHeight.value = withSequence(
+          withTiming(
+            94,
+            {
+              duration: 5000 / speed,
+              easing: Easing.cubic,
+            },
+            () => runOnJS(addNewTransaction)(),
+          ),
+          withTiming(0, {
+            duration: 200,
+            easing: Easing.bounce,
+          }),
+        );
+      }
     } else {
       automationAnimHeight.value = 94;
     }
+    
+    // Mark that initial mount is complete
+    if (isInitialMount) {
+      setIsInitialMount(false);
+    }
+    
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
     };
-  }, [speed]);
+  }, [speed, isInitialMount]);
   useInterval(
     () => {
       automationAnimHeight.value = withSequence(
