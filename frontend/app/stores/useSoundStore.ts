@@ -42,13 +42,15 @@ const soundEffectsAssets: { [key: string]: any } = {
 class SoundPool {
   private soundPlayers: Map<string, AudioPlayer[]> = new Map();
   private currentIndex: Map<string, number> = new Map();
-  private readonly poolSize = 3; // 3 instances per sound type
 
   constructor() {
-    // Pre-create players for each sound type
+    // Pre-create players for each sound type with configurable pool sizes
     Object.keys(soundEffectsAssets).forEach(soundType => {
+      const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
+      const poolSize = soundConfig?.poolSize || 3; // Default to 3 if not specified
+      
       const players: AudioPlayer[] = [];
-      for (let i = 0; i < this.poolSize; i++) {
+      for (let i = 0; i < poolSize; i++) {
         const player = createAudioPlayer(soundEffectsAssets[soundType]);
         player.shouldCorrectPitch = true; // Enable pitch correction
         players.push(player);
@@ -66,8 +68,8 @@ class SoundPool {
     const currentIdx = this.currentIndex.get(type) || 0;
     const player = players[currentIdx];
     
-    // Update index for next time
-    this.currentIndex.set(type, (currentIdx + 1) % this.poolSize);
+    // Update index for next time (round-robin within the pool for this sound type)
+    this.currentIndex.set(type, (currentIdx + 1) % players.length);
 
     try {
       // Simple, fast configuration
