@@ -39,8 +39,8 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
         />
       </View>
       <UpgradeButton
-        label={`Upgrade to`}
-        specialLabel={{
+        label={level >= props.automation.levels.length ? `Upgrade maxxed` : `Upgrade to`}
+        specialLabel={level >= props.automation.levels.length ? undefined : {
           text: `${props.automation.levels[level]?.name}`,
           color: "#D7A833",
         }}

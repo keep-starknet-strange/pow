@@ -66,7 +66,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
           }
         }}
         feeProps={{
-          level: txFeeLevel,
+          level: txFeeLevel + 1, // Pass next level to purchase (current + 1)
           maxLevel: props.txData.feeCosts.length,
           nextCost: nextTxFeeCost,
           onPress: () => {
@@ -79,7 +79,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
           color: props.txData.color.substring(0, 7) + "f0",
         }}
         speedProps={{
-          level: txSpeedLevel,
+          level: txSpeedLevel + 1, // Pass next level to purchase (current + 1)
           maxLevel: props.txData.speedCosts.length,
           nextCost: nextTxSpeedCost,
           onPress: () => {
