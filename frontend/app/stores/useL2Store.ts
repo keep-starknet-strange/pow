@@ -141,7 +141,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
     if (!get().l2) return;
     set((state) => {
       if (!state.l2) return state;
-      const daMaxSize = useUpgradesStore.getState().getUpgradeValue(0, "DA compression");
+      const daMaxSize = useUpgradesStore
+        .getState()
+        .getUpgradeValue(0, "DA compression");
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.da) return state;
       newL2Instance.da.blocks.push(block.blockId);
@@ -159,7 +161,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
     set((state) => {
       if (!state.l2) return state;
       const newL2Instance = { ...state.l2 };
-      const proverMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving");
+      const proverMaxSize = useUpgradesStore
+        .getState()
+        .getUpgradeValue(1, "Recursive Proving");
       if (!newL2Instance.prover) return state;
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward =

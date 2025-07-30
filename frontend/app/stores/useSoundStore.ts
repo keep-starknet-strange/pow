@@ -45,10 +45,10 @@ class SoundPool {
 
   constructor() {
     // Pre-create players for each sound type with configurable pool sizes
-    Object.keys(soundEffectsAssets).forEach(soundType => {
+    Object.keys(soundEffectsAssets).forEach((soundType) => {
       const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
       const poolSize = soundConfig?.poolSize || 3; // Default to 3 if not specified
-      
+
       const players: AudioPlayer[] = [];
       for (let i = 0; i < poolSize; i++) {
         const player = createAudioPlayer(soundEffectsAssets[soundType]);
@@ -60,14 +60,19 @@ class SoundPool {
     });
   }
 
-  playSound(type: string, pitchShift: number, soundConfig: any, volume: number): void {
+  playSound(
+    type: string,
+    pitchShift: number,
+    soundConfig: any,
+    volume: number,
+  ): void {
     const players = this.soundPlayers.get(type);
     if (!players) return;
 
     // Get the next player in round-robin fashion
     const currentIdx = this.currentIndex.get(type) || 0;
     const player = players[currentIdx];
-    
+
     // Update index for next time (round-robin within the pool for this sound type)
     this.currentIndex.set(type, (currentIdx + 1) % players.length);
 
@@ -77,7 +82,7 @@ class SoundPool {
       player.setPlaybackRate((soundConfig.rate || 1.0) * pitchShift);
       player.seekTo(0);
       player.play();
-      
+
       // Simple cleanup - no tracking needed
       setTimeout(() => {
         try {
@@ -86,15 +91,14 @@ class SoundPool {
           // Ignore errors during cleanup
         }
       }, 2000);
-      
     } catch (error) {
       // Silently ignore errors to maintain performance
     }
   }
 
   cleanup() {
-    this.soundPlayers.forEach(players => {
-      players.forEach(player => {
+    this.soundPlayers.forEach((players) => {
+      players.forEach((player) => {
         try {
           player.pause();
           player.release();
@@ -254,13 +258,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     try {
       const soundConfig = soundsJson[type as keyof typeof soundsJson];
       if (!soundConfig) return;
-      
+
       // Play haptic feedback
       playHaptic(soundConfig.haptic);
 
       // Play sound with minimal overhead
       soundPool.playSound(type, pitchShift, soundConfig, soundEffectVolume);
-      
     } catch (error) {
       // Silent error handling for performance
     }

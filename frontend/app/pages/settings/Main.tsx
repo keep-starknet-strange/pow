@@ -53,7 +53,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     },
     {
       label: "Back",
-      onPress: () => (isAuthenticated ? (navigate as any)("Main") : goBackToLogin()),
+      onPress: () =>
+        isAuthenticated ? (navigate as any)("Main") : goBackToLogin(),
     },
   ];
 

@@ -418,7 +418,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = txLevels[txId];
-    const mevBoost = useUpgradesStore.getState().getUpgradeValue(chainId, "MEV Boost");
+    const mevBoost = useUpgradesStore
+      .getState()
+      .getUpgradeValue(chainId, "MEV Boost");
     return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
   },
 
@@ -447,7 +449,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = dappLevels[dappId];
-    const mevBoost = useUpgradesStore.getState().getUpgradeValue(chainId, "MEV Boost");
+    const mevBoost = useUpgradesStore
+      .getState()
+      .getUpgradeValue(chainId, "MEV Boost");
     return level === -1 ? 0 : dappData.fees[level] * mevBoost;
   },
 

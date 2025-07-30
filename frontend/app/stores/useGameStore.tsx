@@ -54,7 +54,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ initMyGameDependency: initMyGame }),
 
   resetGameStore: () => {
-    const blockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(0, "Block Size");
+    const blockSizeUpgrade = useUpgradesStore
+      .getState()
+      .getUpgradeValue(0, "Block Size");
     const maxBlockSize = blockSizeUpgrade ** 2;
     const initBlock = newBlock(0, maxBlockSize, get().genesisBlockReward);
     initBlock.isBuilt = true; // Mark the genesis block as built
@@ -84,7 +86,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const { size: blockSize, fees: blockFees } = (await getUserBlockState(
             0,
           )) || { size: 0, fees: 0 };
-          const blockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(0, "Block Size");
+          const blockSizeUpgrade = useUpgradesStore
+            .getState()
+            .getUpgradeValue(0, "Block Size");
           const maxBlockSize = blockSizeUpgrade ** 2;
           const l1WorkingBlock: Block = {
             blockId: blockNumber,
@@ -103,7 +107,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const l2BlockNumber = (await getUserBlockNumber(1)) || 0;
             const { size: l2BlockSize, fees: l2BlockFees } =
               (await getUserBlockState(1)) || { size: 0, fees: 0 };
-            const l2BlockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(1, "Block Size");
+            const l2BlockSizeUpgrade = useUpgradesStore
+              .getState()
+              .getUpgradeValue(1, "Block Size");
             const l2MaxBlockSize = l2BlockSizeUpgrade ** 2;
             const l2WorkingBlock: Block = {
               blockId: l2BlockNumber,
@@ -175,7 +181,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   initL2WorkingBlock: () => {
-    const blockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(1, "Block Size");
+    const blockSizeUpgrade = useUpgradesStore
+      .getState()
+      .getUpgradeValue(1, "Block Size");
     const maxBlockSize = blockSizeUpgrade ** 2;
     const newWorkingBlock = newBlock(0, maxBlockSize, get().genesisBlockReward);
     newWorkingBlock.isBuilt = true; // Mark the genesis block as built
@@ -198,7 +206,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
-      const blockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(0, "Block Size");
+      const blockSizeUpgrade = useUpgradesStore
+        .getState()
+        .getUpgradeValue(0, "Block Size");
       const maxBlockSize = blockSizeUpgrade ** 2;
       const newBlockInstance = newBlock(
         completedBlock.blockId + 1,
@@ -220,7 +230,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
-      const blockSizeUpgrade = useUpgradesStore.getState().getUpgradeValue(1, "Block Size");
+      const blockSizeUpgrade = useUpgradesStore
+        .getState()
+        .getUpgradeValue(1, "Block Size");
       const maxBlockSize = blockSizeUpgrade ** 2;
       const newBlockInstance = newBlock(
         completedBlock.blockId + 1,

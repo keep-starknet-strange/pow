@@ -34,11 +34,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         entering={FadeIn.duration(200)}
         exiting={FadeOut.duration(200)}
       >
-        <Pressable
-          className="absolute inset-0"
-          onPress={onCancel}
-        />
-        
+        <Pressable className="absolute inset-0" onPress={onCancel} />
+
         <Animated.View
           className="mx-8 max-w-sm"
           entering={FadeIn.delay(100).duration(300)}
@@ -55,17 +52,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               <Text className="font-Pixels text-2xl text-[#fff7ff] text-center mb-3">
                 {title}
               </Text>
-              
+
               {/* Warning Icon for dangerous actions */}
-              {dangerous && (
-                <Text className="text-4xl mb-2">⚠️</Text>
-              )}
-              
+              {dangerous && <Text className="text-4xl mb-2">⚠️</Text>}
+
               {/* Message */}
               <Text className="font-Pixels text-lg text-[#fff7ff] text-center mb-6 leading-6">
                 {message}
               </Text>
-              
+
               {/* Buttons */}
               <View className="flex-row gap-4">
                 <BasicButton
@@ -76,11 +71,11 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 <BasicButton
                   label={confirmLabel}
                   onPress={onConfirm}
-                  style={{ 
+                  style={{
                     width: 100,
-                    ...(dangerous && { backgroundColor: '#dc2626' })
+                    ...(dangerous && { backgroundColor: "#dc2626" }),
                   }}
-                  textStyle={dangerous ? { color: '#fff' } : undefined}
+                  textStyle={dangerous ? { color: "#fff" } : undefined}
                 />
               </View>
             </View>
@@ -89,4 +84,4 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       </Animated.View>
     </Modal>
   );
-}; 
+};

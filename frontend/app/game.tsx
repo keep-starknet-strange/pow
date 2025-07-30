@@ -168,7 +168,6 @@ export default function game() {
     getUserBlockNumber,
   ]);
 
-
   const { initializeTransactions } = useTransactionsStore();
   useEffect(() => {
     initializeTransactions(
