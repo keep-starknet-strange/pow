@@ -47,47 +47,40 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   }, [automationAnimHeight]);
 
   const fee = getFee(props.chainId, props.txId, props.isDapp);
-  const addNewTransaction = useCallback(async () => {
+  const addNewTransaction = useCallback(async (finished: boolean | undefined) => {
+    if (finished === false) return;
     const newTx = newTransaction(props.txId, fee, props.isDapp);
     addTransaction(props.chainId, newTx);
   }, [props.chainId, props.txId, props.isDapp]);
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);
-  const [isInitialMount, setIsInitialMount] = useState(true);
   
   useEffect(() => {
     if (speed > 0) {
       automationAnimHeight.value = 0;
       // Only trigger automation if it's not the initial mount/re-render
-      if (!isInitialMount) {
-        automationAnimHeight.value = withSequence(
-          withTiming(
-            94,
-            {
-              duration: 5000 / speed,
-              easing: Easing.cubic,
-            },
-            () => runOnJS(addNewTransaction)(),
-          ),
-          withTiming(0, {
-            duration: 200,
-            easing: Easing.bounce,
-          }),
-        );
-      }
+      automationAnimHeight.value = withSequence(
+        withTiming(
+          94,
+          {
+            duration: 5000 / speed,
+            easing: Easing.cubic,
+          },
+          (finished) => runOnJS(addNewTransaction)(finished),
+        ),
+        withTiming(0, {
+          duration: 200,
+          easing: Easing.bounce,
+        }),
+      );
     } else {
       automationAnimHeight.value = 94;
-    }
-    
-    // Mark that initial mount is complete
-    if (isInitialMount) {
-      setIsInitialMount(false);
     }
     
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
     };
-  }, [speed, isInitialMount]);
+  }, [speed]);
   useInterval(
     () => {
       automationAnimHeight.value = withSequence(

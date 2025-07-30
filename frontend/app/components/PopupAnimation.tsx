@@ -40,7 +40,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
           {
             translateY: popupAnimation.interpolate({
               inputRange: [0, 100],
-              outputRange: animRange || [-50, -80],
+              outputRange: animRange || [-10, -50],
             }),
           },
         ],
@@ -58,6 +58,8 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
           textShadowColor: "black",
           textShadowOffset: { width: 0, height: 2 },
           textShadowRadius: 4,
+          width: 200,
+          textAlign: 'center',
         }}
         numberOfLines={1}
       >

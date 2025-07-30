@@ -1,8 +1,8 @@
 import React from "react";
-import { Modal, View, Text, Pressable } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { Modal, View, Text } from "react-native";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Window } from "./tutorial/Window";
-import BasicButton from "./buttons/Basic";
+import { ConfirmationButton } from "./buttons/ConfirmationButton";
 
 interface ConfirmationModalProps {
   visible: boolean;
@@ -28,18 +28,24 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   if (!visible) return null;
 
   return (
-    <Modal visible={visible} transparent animationType="none">
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={onCancel}
+    >
       <Animated.View
-        className="flex-1 justify-center items-center bg-black/70"
-        entering={FadeIn.duration(200)}
-        exiting={FadeOut.duration(200)}
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.8)",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        <Pressable className="absolute inset-0" onPress={onCancel} />
-
         <Animated.View
           className="mx-8 max-w-sm"
-          entering={FadeIn.delay(100).duration(300)}
-          exiting={FadeOut.duration(200)}
+          entering={FadeInDown.duration(300)}
+          exiting={FadeOutDown.duration(300)}
         >
           <Window
             style={{
@@ -62,20 +68,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </Text>
 
               {/* Buttons */}
-              <View className="flex-row gap-4">
-                <BasicButton
+              <View className="flex-row gap-4 mb-2">
+                <ConfirmationButton
                   label={cancelLabel}
                   onPress={onCancel}
+                  variant="cancel"
                   style={{ width: 100 }}
                 />
-                <BasicButton
+                <ConfirmationButton
                   label={confirmLabel}
                   onPress={onConfirm}
-                  style={{
-                    width: 100,
-                    ...(dangerous && { backgroundColor: "#dc2626" }),
-                  }}
-                  textStyle={dangerous ? { color: "#fff" } : undefined}
+                  variant={dangerous ? "danger" : "confirm"}
+                  style={{ width: 100 }}
                 />
               </View>
             </View>
