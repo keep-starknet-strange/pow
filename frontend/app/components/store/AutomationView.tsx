@@ -34,7 +34,11 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
           locked={false}
         />
         <TxDetails
-          name={`${props.automation.levels[level]?.name} ${props.automation.name}`}
+          name={
+            level === 0
+              ? props.automation.name
+              : `${props.automation.levels[level-1]?.name} ${props.automation.name}`
+          }
           description={props.automation.description}
         />
       </View>
