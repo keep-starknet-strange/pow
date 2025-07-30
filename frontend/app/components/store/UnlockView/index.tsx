@@ -1,4 +1,3 @@
-import React from "react";
 import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
 import Animated, {
   useSharedValue,

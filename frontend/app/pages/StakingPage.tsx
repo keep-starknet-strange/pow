@@ -49,9 +49,12 @@ export const StakingPage: React.FC = () => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
   // Use useInterval hook instead of custom useEffect with setInterval
-  useInterval(() => {
-    setNow(Math.floor(Date.now() / 1000));
-  }, stakingUnlocked ? SECOND : null); // Only run when staking is unlocked
+  useInterval(
+    () => {
+      setNow(Math.floor(Date.now() / 1000));
+    },
+    stakingUnlocked ? SECOND : null,
+  ); // Only run when staking is unlocked
 
   // countdown until next validation
   const next = lastValidation + config.slashing_config.due_time;

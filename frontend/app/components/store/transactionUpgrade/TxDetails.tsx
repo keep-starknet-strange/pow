@@ -5,7 +5,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import React from "react";
+
 import Animated, { FadeInRight } from "react-native-reanimated";
 import { useImages } from "../../../hooks/useImages";
 
