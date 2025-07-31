@@ -1,0 +1,129 @@
+name: Publish  
+
+on:
+    workflow_call:
+      inputs:
+        deploy_android:
+          description: "Deploy Android application"
+          required: true
+          default: true
+          type: boolean
+        deploy_ios:
+          description: "Deploy iOS application"
+          required: true
+          default: true
+          type: boolean
+        internal_testing:
+          description: "Deploy to internal testing"
+          required: true
+          default: true
+          type: boolean
+        ref:
+          description: "Git reference to deploy"
+          required: true
+          default: "main"
+          type: string
+
+jobs:
+    deploy-android:
+        if: ${{ inputs.deploy_android == true }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout project
+              uses: actions/checkout@v4
+              with:
+                ref: ${{ inputs.ref }}
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: latest
+                cache: npm
+                cache-dependency-path: "./frontend/package.json"
+
+            - name: Install dependencies
+              working-directory: ./frontend
+              run: npm ci
+
+            - name: Decode Keystore
+              working-directory: ./frontend
+              env:
+                KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
+              run: 
+                echo $KEYSTORE_ENCODED | base64 --decode > ${{ secrets.KEYSTORE_FILE_NAME }}
+
+            - name: Prebuild app
+              working-directory: ./frontend
+              env:
+                KEYSTORE_FILE_NAME: ${{ secrets.KEYSTORE_FILE_NAME }}
+                KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+                KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+              run: npx expo prebuild --platform android
+
+            - name: Move keystore into app folder
+              working-directory: ./frontend
+              run: mv ${{ secrets.KEYSTORE_FILE_NAME }} android/app/${{ secrets.KEYSTORE_FILE_NAME }}
+
+            - name: Build Android (APK)
+              if: ${{ inputs.internal_testing == true }}
+              working-directory: ./frontend/android
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              run: ./gradlew app:assembleRelease
+
+            - name: Upload to Firebase
+              if: ${{ inputs.internal_testing == true }}
+              uses: wzieba/Firebase-Distribution-Github-Action@v1
+              with:
+                appId: ${{ secrets.FIREBASE_APP_ID }}
+                serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+                groups: internal-testers
+                file: "./frontend/android/app/build/outputs/apk/release/app-release.apk"
+
+            - name: Build Android (AAB)
+              if: ${{ inputs.internal_testing == false }}
+              working-directory: ./frontend/android
+              env:
+                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              run: ./gradlew app:bundleRelease
+
+            - name: Upload to Google Play
+              uses: r0adkll/upload-google-play@v1
+              if: ${{ inputs.internal_testing == false }}
+              with:
+                serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+                packageName: com.starknet.pow
+                releaseFiles: ./frontend/android/app/build/outputs/bundle/release/app-release.aab
+                track: production
+                status: draft
+
+    deploy-ios:
+      if: ${{ inputs.deploy_ios == true }}
+      runs-on: macos-latest
+      steps:
+            - name: Checkout project
+              uses: actions/checkout@v4
+              with:
+                ref: ${{ inputs.ref }}
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: latest
+                cache: npm
+                cache-dependency-path: "./frontend/package.json"
+
+            - name: Install dependencies
+              working-directory: ./frontend
+              run: npm ci
+
+            - name: Prebuild app
+              working-directory: ./frontend
+              run: npx expo prebuild --platform ios
+
+            ## TODO 
+            ## 1. Setup certificate, provisioning profile and ExportOptions.plist
+            ## 2. Build archive
+            ## 3. Export IPA
+            ## 4. Upload application

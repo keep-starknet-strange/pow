@@ -9,8 +9,8 @@
     "start:mainnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_MAINNET expo start",
     "start:nomock": "EXPO_PUBLIC_USE_MOCK=false expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "test": "jest --watchAll",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix"
@@ -89,6 +89,7 @@
     "jest-expo": "~53.0.9",
     "prettier": "^3.5.3",
     "react-test-renderer": "19.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.0"
   },
