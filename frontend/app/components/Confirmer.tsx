@@ -88,7 +88,10 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       {...tutorialProps}
     >
       {/* Flash Burst Manager */}
-      <FlashBurstManager onFlashRequested={handleFlashRequested} />
+      <FlashBurstManager 
+        renderedBy={props.renderedBy}
+        onFlashRequested={handleFlashRequested} 
+      />
       
       {props.confirmPopup && (
         <PopupAnimation

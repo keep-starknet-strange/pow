@@ -7,13 +7,15 @@ interface FlashInstance {
   x: number;
   y: number;
   trigger: number;
+  renderedBy?: string;
 }
 
 interface FlashBurstManagerProps {
+  renderedBy?: string; // "miner", "sequencer", "da", "prover"
   onFlashRequested?: (callback: (x: number, y: number) => void) => void;
 }
 
-export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ onFlashRequested }) => {
+export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ renderedBy, onFlashRequested }) => {
   const [flashes, setFlashes] = useState<FlashInstance[]>([]);
 
   const triggerFlash = useCallback((x: number, y: number) => {
@@ -22,10 +24,11 @@ export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ onFlashReq
       x,
       y,
       trigger: Date.now(),
+      renderedBy,
     };
 
     setFlashes(prev => [...prev, newFlash]);
-  }, []);
+  }, [renderedBy]);
 
   const removeFlash = useCallback((id: string) => {
     setFlashes(prev => prev.filter(flash => flash.id !== id));
@@ -53,6 +56,7 @@ export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ onFlashReq
           x={flash.x}
           y={flash.y}
           trigger={flash.trigger}
+          renderedBy={flash.renderedBy}
           onComplete={() => removeFlash(flash.id)}
         />
       ))}

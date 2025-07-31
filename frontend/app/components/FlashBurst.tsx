@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -12,6 +12,7 @@ interface FlashBurstProps {
   x: number; // Click position X
   y: number; // Click position Y
   trigger: number; // Timestamp to trigger animation
+  renderedBy?: string; // "miner", "sequencer", "da", "prover"
   onComplete?: () => void;
 }
 
@@ -22,6 +23,17 @@ interface StreakProps {
   x: number;
   y: number;
   trigger: number;
+}
+
+interface TextParticleProps {
+  x: number;
+  y: number;
+  trigger: number;
+  text: string;
+  angle: number;
+  distance: number;
+  delay: number;
+  color: string;
 }
 
 const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) => {
@@ -152,8 +164,114 @@ const FlashCore: React.FC<{ x: number; y: number; trigger: number }> = ({ x, y, 
   );
 };
 
-export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, onComplete }) => {
+const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle, distance, delay, color }) => {
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0);
+  const translateDistance = useSharedValue(0);
+
+  useEffect(() => {
+    if (trigger > 0) {
+      opacity.value = 0;
+      scale.value = 0;
+      translateDistance.value = 0;
+
+      setTimeout(() => {
+        opacity.value = withSequence(
+          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+          withTiming(0.8, { duration: 100, easing: Easing.linear }),
+          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) })
+        );
+        scale.value = withSequence(
+          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+          withTiming(0.8, { duration: 100, easing: Easing.linear }),
+          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) })
+        );
+        translateDistance.value = withTiming(distance, {
+          duration: 400,
+          easing: Easing.out(Easing.quad)
+        });
+      }, delay);
+    }
+  }, [trigger]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const radians = (angle * Math.PI) / 180;
+    const translateX = Math.cos(radians) * translateDistance.value;
+    const translateY = Math.sin(radians) * translateDistance.value;
+
+    return {
+      opacity: opacity.value,
+      transform: [
+        { translateX },
+        { translateY },
+        { scale: scale.value },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          left: x - 15, // Center the text
+          top: y - 8,
+        },
+        animatedStyle,
+      ]}
+    >
+      <Text
+        style={{
+          fontSize: 12,
+          fontFamily: 'Pixels',
+          color: color,
+          textShadowColor: '#000',
+          textShadowOffset: { width: 1, height: 1 },
+          textShadowRadius: 2,
+          fontWeight: 'bold',
+        }}
+      >
+        {text}
+      </Text>
+    </Animated.View>
+  );
+};
+
+export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedBy, onComplete }) => {
   const containerOpacity = useSharedValue(0);
+
+  // Get text and color based on confirmer type
+  const getParticleText = (): string => {
+    switch (renderedBy) {
+      case 'miner':
+      case 'sequencer':
+        return 'POW!';
+      case 'prover':
+        return 'Prove!';
+      case 'da':
+        return 'Store!';
+      default:
+        return 'POW!';
+    }
+  };
+
+  const getParticleColor = (): string => {
+    switch (renderedBy) {
+      case 'miner':
+        return '#20DF20'; // Green for mining
+      case 'sequencer':
+        return '#4A9EFF'; // Blue for sequencing
+      case 'prover':
+        return '#9A4AFF'; // Purple for proving
+      case 'da':
+        return '#FF6B35'; // Orange for data availability
+      default:
+        return '#FFD700'; // Gold default
+    }
+  };
+
+  const particleText = getParticleText();
+  const particleColor = getParticleColor();
 
   useEffect(() => {
     if (trigger > 0) {
@@ -186,6 +304,19 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, onComplet
     });
   }, [trigger]);
 
+  // Generate random text particles
+  const textParticles = React.useMemo(() => {
+    const particleCount = 4 + Math.floor(Math.random() * 3); // 4-6 particles as requested
+    return Array.from({ length: particleCount }, (_, index) => {
+      const angle = Math.random() * 360; // Completely random angles
+      return {
+        angle,
+        distance: 40 + Math.random() * 30, // Random distance 40-70px
+        delay: Math.random() * 100, // Random delay 0-100ms
+      };
+    });
+  }, [trigger]);
+
   if (trigger === 0) return null;
 
   return (
@@ -208,13 +339,28 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, onComplet
       {/* Streaks */}
       {streaks.map((streak, index) => (
         <Streak
-          key={`${trigger}-${index}`}
+          key={`${trigger}-streak-${index}`}
           angle={streak.angle}
           length={streak.length}
           delay={streak.delay}
           x={x}
           y={y}
           trigger={trigger}
+        />
+      ))}
+
+      {/* Text particles */}
+      {textParticles.map((particle, index) => (
+        <TextParticle
+          key={`${trigger}-text-${index}`}
+          x={x}
+          y={y}
+          trigger={trigger}
+          text={particleText}
+          angle={particle.angle}
+          distance={particle.distance}
+          delay={particle.delay}
+          color={particleColor}
         />
       ))}
     </Animated.View>
