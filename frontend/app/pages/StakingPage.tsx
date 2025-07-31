@@ -48,7 +48,6 @@ export const StakingPage: React.FC = () => {
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
-  // Use useInterval hook instead of custom useEffect with setInterval
   useInterval(
     () => {
       setNow(Math.floor(Date.now() / 1000));

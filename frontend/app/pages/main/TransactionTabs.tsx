@@ -9,7 +9,6 @@ import {
 import { useImages } from "@/app/hooks/useImages";
 import { useEventManager } from "@/app/stores/useEventManager";
 
-
 interface TransactionTabsProps {
   tabs: string[];
   activeTab: string;
@@ -41,7 +40,7 @@ export const TransactionTabs: React.FC<TransactionTabsProps> = ({
   if (!show) return null;
 
   return (
-    <View 
+    <View
       className="absolute left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]"
       style={{ top: topPosition }}
     >

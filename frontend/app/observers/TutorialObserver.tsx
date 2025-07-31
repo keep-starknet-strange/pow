@@ -52,7 +52,11 @@ export class TutorialObserver implements Observer {
   }
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
-    if (eventName === "SwitchPage" || eventName === "SwitchStore" || eventName === "SwitchTab") {
+    if (
+      eventName === "SwitchPage" ||
+      eventName === "SwitchStore" ||
+      eventName === "SwitchTab"
+    ) {
       if (data?.name) {
         eventName = eventName + "-" + data.name;
       }
