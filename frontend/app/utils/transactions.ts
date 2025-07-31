@@ -25,12 +25,13 @@ export const getBlockTxIconName = (
   typeId: number,
   isDapp?: boolean,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
-      chainId === 0 ?
-        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[typeId]
+      : dappsJson.L2.transactions[typeId]
+    : chainId === 0
+      ? transactionsJson.L1[typeId]
+      : transactionsJson.L2[typeId];
   if (!txData) return "block.icon.tx";
   return `block.icon.${txData.slug}`;
 };
@@ -41,15 +42,16 @@ export const getTxIcon = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
-      chainId === 0 ?
-        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[typeId]
+      : dappsJson.L2.transactions[typeId]
+    : chainId === 0
+      ? transactionsJson.L1[typeId]
+      : transactionsJson.L2[typeId];
   if (!txData) return getImage("tx.icon.tx");
   return getImage(`tx.icon.${txData.slug}`);
-}
+};
 
 export const getTxImg = (
   chainId: number,
@@ -57,12 +59,13 @@ export const getTxImg = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
-      chainId === 0 ?
-        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[typeId]
+      : dappsJson.L2.transactions[typeId]
+    : chainId === 0
+      ? transactionsJson.L1[typeId]
+      : transactionsJson.L2[typeId];
   if (!txData) return getImage("block.bg.green");
   return getImage(`block.bg.${txData.color}`);
 };
@@ -73,12 +76,13 @@ export const getTxBg = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
-      chainId === 0 ?
-        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[txId]
+      : dappsJson.L2.transactions[txId]
+    : chainId === 0
+      ? transactionsJson.L1[txId]
+      : transactionsJson.L2[txId];
   if (!txData) return getImage("tx.button.bg.green");
   return getImage(`tx.button.bg.${txData.color}`);
 };
@@ -90,12 +94,13 @@ export const getTxInner = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
-      chainId === 0 ?
-        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[txId]
+      : dappsJson.L2.transactions[txId]
+    : chainId === 0
+      ? transactionsJson.L1[txId]
+      : transactionsJson.L2[txId];
   if (!txData) return getImage("tx.button.inner.green");
   return getImage(`tx.button.inner.${txData.color}`);
 };
@@ -106,12 +111,13 @@ export const getTxNameplate = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  const txData =
-    isDapp ?
-      chainId === 0 ?
-        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
-      chainId === 0 ?
-        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  const txData = isDapp
+    ? chainId === 0
+      ? dappsJson.L1.transactions[txId]
+      : dappsJson.L2.transactions[txId]
+    : chainId === 0
+      ? transactionsJson.L1[txId]
+      : transactionsJson.L2[txId];
   if (!txData) return getImage("tx.nameplate.green");
   return getImage(`tx.nameplate.${txData.color}`);
 };

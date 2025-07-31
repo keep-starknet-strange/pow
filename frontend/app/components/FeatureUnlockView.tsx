@@ -81,23 +81,20 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo((props) => {
           />
         </Canvas>
         <View className="absolute top-[4px]" style={{ left: width * 0.13 }}>
-          <Text
-            className="text-[18px] font-Pixels text-[#fff7ff]"
-          >
+          <Text className="text-[18px] font-Pixels text-[#fff7ff]">
             {props.label}
           </Text>
         </View>
         <View className="absolute bottom-[10px]" style={{ left: width * 0.13 }}>
-          <Text
-            className="text-[18px] font-Pixels text-[#fff7ff]"
-          >
+          <Text className="text-[18px] font-Pixels text-[#fff7ff]">
             {props.description}
           </Text>
         </View>
-        <View className="absolute bottom-[10px] flex flex-row" style={{ right: 4 }}>
-          <Text
-            className="text-[18px] font-Pixels text-[#fff7ff]"
-          >
+        <View
+          className="absolute bottom-[10px] flex flex-row"
+          style={{ right: 4 }}
+        >
+          <Text className="text-[18px] font-Pixels text-[#fff7ff]">
             {`Cost: ${shortMoneyString(props.cost)}`}
           </Text>
           <Canvas style={{ width: 16, height: 16 }} className="mr-1">

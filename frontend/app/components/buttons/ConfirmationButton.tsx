@@ -68,11 +68,7 @@ export const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[
-        styles.button,
-        { backgroundColor: getBackgroundColor() },
-        style,
-      ]}
+      style={[styles.button, { backgroundColor: getBackgroundColor() }, style]}
       onLayout={onLayout}
       activeOpacity={disabled ? 1 : 0.8}
     >
@@ -99,10 +95,7 @@ export const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({
       )}
 
       <Text
-        style={[
-          styles.label,
-          { color: getTextColor() },
-        ]}
+        style={[styles.label, { color: getTextColor() }]}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
@@ -130,4 +123,4 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
   },
-}); 
+});

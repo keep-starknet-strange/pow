@@ -81,7 +81,9 @@ const imagePaths = {
   txIconTx: require(`${assetsPath}/transactions/icons/icon_tx_lg.webp`),
   txIconSegwit: require(`${assetsPath}/transactions/icons/icon_segwit_lg.webp`),
   txIconBlob: require(`${assetsPath}/transactions/icons/icon_blob_lg.webp`),
-  txIconOrdinal: require(`${assetsPath}/transactions/icons/icon_ordinal_lg.webp`),
+  txIconOrdinal: require(
+    `${assetsPath}/transactions/icons/icon_ordinal_lg.webp`,
+  ),
   txIconRunes: require(`${assetsPath}/transactions/icons/icon_runes_lg.webp`),
   txIconBridge: require(`${assetsPath}/transactions/icons/icon_bridge_lg.webp`),
   txIconSwap: require(`${assetsPath}/transactions/icons/icon_swap_lg.webp`),
@@ -96,8 +98,12 @@ const imagePaths = {
   txIconUnrug: require(`${assetsPath}/transactions/icons/icon_unrug_lg.webp`),
   txIcon42inch: require(`${assetsPath}/transactions/icons/icon_42inch_lg.webp`),
   txIconLendme: require(`${assetsPath}/transactions/icons/icon_lendme_lg.webp`),
-  txIconGalaxia: require(`${assetsPath}/transactions/icons/icon_galaxia_lg.webp`),
-  txIconJourney: require(`${assetsPath}/transactions/icons/icon_journey_lg.webp`),
+  txIconGalaxia: require(
+    `${assetsPath}/transactions/icons/icon_galaxia_lg.webp`,
+  ),
+  txIconJourney: require(
+    `${assetsPath}/transactions/icons/icon_journey_lg.webp`,
+  ),
 
   // Transaction Images - Nameplates
   txNameplateBlue: require(

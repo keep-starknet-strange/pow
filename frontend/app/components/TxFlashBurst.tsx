@@ -31,14 +31,22 @@ interface TxStreakProps {
 
 // Color mapping from config color names to hex values
 const colorMap: Record<string, string> = {
-  green: '#20DF20',
-  blue: '#4A9EFF',
-  yellow: '#FFD700',
-  pink: '#FF69B4',
-  purple: '#9A4AFF',
+  green: "#20DF20",
+  blue: "#4A9EFF",
+  yellow: "#FFD700",
+  pink: "#FF69B4",
+  purple: "#9A4AFF",
 };
 
-const TxStreak: React.FC<TxStreakProps> = ({ angle, length, delay, x, y, trigger, color }) => {
+const TxStreak: React.FC<TxStreakProps> = ({
+  angle,
+  length,
+  delay,
+  x,
+  y,
+  trigger,
+  color,
+}) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
   const translateDistance = useSharedValue(0);
@@ -55,20 +63,21 @@ const TxStreak: React.FC<TxStreakProps> = ({ angle, length, delay, x, y, trigger
       setTimeout(() => {
         opacity.value = withSequence(
           withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Less intense opacity
-          withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) })
+          withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
         );
         scale.value = withSequence(
           withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Smaller scale
-          withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) })
+          withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) }),
         );
-        translateDistance.value = withTiming(length * 0.7, { // Shorter distance
+        translateDistance.value = withTiming(length * 0.7, {
+          // Shorter distance
           duration: 230,
-          easing: Easing.out(Easing.quad)
+          easing: Easing.out(Easing.quad),
         });
         // Dynamic length scaling - less dramatic
         lengthScale.value = withSequence(
           withTiming(1.3, { duration: 115, easing: Easing.out(Easing.quad) }),
-          withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) })
+          withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) }),
         );
       }, delay);
     }
@@ -95,7 +104,7 @@ const TxStreak: React.FC<TxStreakProps> = ({ angle, length, delay, x, y, trigger
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - 1.5,
           top: y - 10,
           width: 3,
@@ -114,7 +123,12 @@ const TxStreak: React.FC<TxStreakProps> = ({ angle, length, delay, x, y, trigger
   );
 };
 
-const TxFlashCore: React.FC<{ x: number; y: number; trigger: number; color: string }> = ({ x, y, trigger, color }) => {
+const TxFlashCore: React.FC<{
+  x: number;
+  y: number;
+  trigger: number;
+  color: string;
+}> = ({ x, y, trigger, color }) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
 
@@ -127,13 +141,13 @@ const TxFlashCore: React.FC<{ x: number; y: number; trigger: number; color: stri
       opacity.value = withSequence(
         withTiming(0.8, { duration: 30, easing: Easing.out(Easing.quad) }),
         withTiming(0.6, { duration: 70, easing: Easing.linear }),
-        withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) })
+        withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
       );
-      
+
       scale.value = withSequence(
         withTiming(1.2, { duration: 30, easing: Easing.out(Easing.quad) }), // Smaller flash
         withTiming(0.8, { duration: 70, easing: Easing.linear }),
-        withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) })
+        withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
       );
     }
   }, [trigger]);
@@ -147,13 +161,13 @@ const TxFlashCore: React.FC<{ x: number; y: number; trigger: number; color: stri
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - 10,
           top: y - 10,
           width: 20, // Smaller than block flash
           height: 20,
           borderRadius: 10,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: "#FFFFFF",
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.8,
@@ -166,23 +180,33 @@ const TxFlashCore: React.FC<{ x: number; y: number; trigger: number; color: stri
   );
 };
 
-export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({ x, y, trigger, chainId, txId, isDapp, onComplete }) => {
+export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
+  x,
+  y,
+  trigger,
+  chainId,
+  txId,
+  isDapp,
+  onComplete,
+}) => {
   const containerOpacity = useSharedValue(0);
 
   // Get transaction color from config
   const getTransactionColor = (): string => {
     try {
       if (isDapp) {
-        const dappTransactions = chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-        const txType = dappTransactions.find(tx => tx.id === txId);
-        return colorMap[txType?.color || 'blue'] || '#4A9EFF';
+        const dappTransactions =
+          chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
+        const txType = dappTransactions.find((tx) => tx.id === txId);
+        return colorMap[txType?.color || "blue"] || "#4A9EFF";
       } else {
-        const chainTransactions = chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-        const txType = chainTransactions.find(tx => tx.id === txId);
-        return colorMap[txType?.color || 'green'] || '#20DF20';
+        const chainTransactions =
+          chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
+        const txType = chainTransactions.find((tx) => tx.id === txId);
+        return colorMap[txType?.color || "green"] || "#20DF20";
       }
     } catch {
-      return '#20DF20'; // Default green
+      return "#20DF20"; // Default green
     }
   };
 
@@ -191,7 +215,7 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({ x, y, trigger, chain
   useEffect(() => {
     if (trigger > 0) {
       containerOpacity.value = 1;
-      
+
       // Auto-hide after animation completes - shorter than block animation
       setTimeout(() => {
         containerOpacity.value = 0;
@@ -224,19 +248,19 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({ x, y, trigger, chain
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          pointerEvents: 'none',
+          pointerEvents: "none",
         },
         containerStyle,
       ]}
     >
       {/* Central flash */}
       <TxFlashCore x={x} y={y} trigger={trigger} color={transactionColor} />
-      
+
       {/* Streaks */}
       {streaks.map((streak, index) => (
         <TxStreak
@@ -252,4 +276,4 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({ x, y, trigger, chain
       ))}
     </Animated.View>
   );
-}; 
+};

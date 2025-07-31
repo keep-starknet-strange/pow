@@ -1,5 +1,11 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Image, Text, View, Pressable, GestureResponderEvent } from "react-native";
+import {
+  Image,
+  Text,
+  View,
+  Pressable,
+  GestureResponderEvent,
+} from "react-native";
 import { Dimensions } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -49,9 +55,11 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     dappFeeUpgrade,
     canUnlockTx,
   } = useTransactionsStore();
-  
-  const [triggerFlash, setTriggerFlash] = useState<((x: number, y: number) => void) | null>(null);
-  
+
+  const [triggerFlash, setTriggerFlash] = useState<
+    ((x: number, y: number) => void) | null
+  >(null);
+
   const enabled = props.txId === 0 && props.chainId === 0 && !props.isDapp;
   const { ref, onLayout } = useTutorialLayout(
     "firstTransactionButton" as TargetId,
@@ -88,29 +96,44 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     shakeAnim.value *= -1; // Toggle the shake animation value
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
-  const handleFlashRequested = useCallback((callback: (x: number, y: number) => void) => {
-    setTriggerFlash(() => callback);
-  }, []);
+  const handleFlashRequested = useCallback(
+    (callback: (x: number, y: number) => void) => {
+      setTriggerFlash(() => callback);
+    },
+    [],
+  );
 
-  const handlePress = useCallback((event: GestureResponderEvent) => {
-    const { locationX, locationY } = event.nativeEvent;
-    
-    // Trigger flash animation at click position
-    if (triggerFlash) {
-      triggerFlash(locationX, locationY);
-    }
+  const handlePress = useCallback(
+    (event: GestureResponderEvent) => {
+      const { locationX, locationY } = event.nativeEvent;
 
-    if (feeLevel === -1) {
-      setLastTxTime(Date.now());
-      if (props.isDapp) {
-        dappFeeUpgrade(props.chainId, props.txId);
-      } else {
-        txFeeUpgrade(props.chainId, props.txId);
+      // Trigger flash animation at click position
+      if (triggerFlash) {
+        triggerFlash(locationX, locationY);
       }
-      return;
-    }
-    addNewTransaction();
-  }, [triggerFlash, feeLevel, props.isDapp, props.chainId, props.txId, addNewTransaction, dappFeeUpgrade, txFeeUpgrade]);
+
+      if (feeLevel === -1) {
+        setLastTxTime(Date.now());
+        if (props.isDapp) {
+          dappFeeUpgrade(props.chainId, props.txId);
+        } else {
+          txFeeUpgrade(props.chainId, props.txId);
+        }
+        return;
+      }
+      addNewTransaction();
+    },
+    [
+      triggerFlash,
+      feeLevel,
+      props.isDapp,
+      props.chainId,
+      props.txId,
+      addNewTransaction,
+      dappFeeUpgrade,
+      txFeeUpgrade,
+    ],
+  );
 
   const transactionsData =
     props.chainId === 0
@@ -159,13 +182,12 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
         feeCost={feeCost}
         fee={fee}
       />
-      <TxFlashBurstManager 
+      <TxFlashBurstManager
         chainId={props.chainId}
         txId={props.txId}
         isDapp={props.isDapp}
         onFlashRequested={handleFlashRequested}
       />
-      
     </View>
   );
 });

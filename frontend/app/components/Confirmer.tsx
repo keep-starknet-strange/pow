@@ -36,7 +36,9 @@ export type ConfirmerProps = {
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const { getImage } = useImages();
   const pressableRef = useRef<View>(null);
-  const [triggerFlash, setTriggerFlash] = useState<((x: number, y: number) => void) | null>(null);
+  const [triggerFlash, setTriggerFlash] = useState<
+    ((x: number, y: number) => void) | null
+  >(null);
 
   const enabled =
     props.renderedBy !== undefined &&
@@ -64,21 +66,27 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     };
   }, [confirmTime]);
 
-  const handlePress = useCallback((event: GestureResponderEvent) => {
-    const { locationX, locationY } = event.nativeEvent;
-    
-    // Trigger flash animation at click position
-    if (triggerFlash) {
-      triggerFlash(locationX, locationY);
-    }
-    
-    setConfirmTime(Date.now());
-    props.onConfirm();
-  }, [triggerFlash, props.onConfirm]);
+  const handlePress = useCallback(
+    (event: GestureResponderEvent) => {
+      const { locationX, locationY } = event.nativeEvent;
 
-  const handleFlashRequested = useCallback((callback: (x: number, y: number) => void) => {
-    setTriggerFlash(() => callback);
-  }, []);
+      // Trigger flash animation at click position
+      if (triggerFlash) {
+        triggerFlash(locationX, locationY);
+      }
+
+      setConfirmTime(Date.now());
+      props.onConfirm();
+    },
+    [triggerFlash, props.onConfirm],
+  );
+
+  const handleFlashRequested = useCallback(
+    (callback: (x: number, y: number) => void) => {
+      setTriggerFlash(() => callback);
+    },
+    [],
+  );
 
   return (
     <Pressable
@@ -88,11 +96,11 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       {...tutorialProps}
     >
       {/* Flash Burst Manager */}
-      <FlashBurstManager 
+      <FlashBurstManager
         renderedBy={props.renderedBy}
-        onFlashRequested={handleFlashRequested} 
+        onFlashRequested={handleFlashRequested}
       />
-      
+
       {props.confirmPopup && (
         <PopupAnimation
           popupStartTime={props.confirmPopup.startTime}

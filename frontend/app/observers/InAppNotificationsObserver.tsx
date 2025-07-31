@@ -32,7 +32,7 @@ export class InAppNotificationsObserver implements Observer {
       case "BlockFull": {
         // Increment consecutive block full attempts
         this.blockFullAttempts++;
-        
+
         // Only show notification after 3 consecutive attempts
         if (this.blockFullAttempts >= 3) {
           const typeId =

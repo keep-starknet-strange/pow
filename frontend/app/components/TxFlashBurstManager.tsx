@@ -19,30 +19,33 @@ interface TxFlashBurstManagerProps {
   onFlashRequested?: (callback: (x: number, y: number) => void) => void;
 }
 
-export const TxFlashBurstManager: React.FC<TxFlashBurstManagerProps> = ({ 
-  chainId, 
-  txId, 
-  isDapp, 
-  onFlashRequested 
+export const TxFlashBurstManager: React.FC<TxFlashBurstManagerProps> = ({
+  chainId,
+  txId,
+  isDapp,
+  onFlashRequested,
 }) => {
   const [flashes, setFlashes] = useState<TxFlashInstance[]>([]);
 
-  const triggerFlash = useCallback((x: number, y: number) => {
-    const newFlash: TxFlashInstance = {
-      id: `tx-flash-${Date.now()}-${Math.random()}`,
-      x,
-      y,
-      trigger: Date.now(),
-      chainId,
-      txId,
-      isDapp,
-    };
+  const triggerFlash = useCallback(
+    (x: number, y: number) => {
+      const newFlash: TxFlashInstance = {
+        id: `tx-flash-${Date.now()}-${Math.random()}`,
+        x,
+        y,
+        trigger: Date.now(),
+        chainId,
+        txId,
+        isDapp,
+      };
 
-    setFlashes(prev => [...prev, newFlash]);
-  }, [chainId, txId, isDapp]);
+      setFlashes((prev) => [...prev, newFlash]);
+    },
+    [chainId, txId, isDapp],
+  );
 
   const removeFlash = useCallback((id: string) => {
-    setFlashes(prev => prev.filter(flash => flash.id !== id));
+    setFlashes((prev) => prev.filter((flash) => flash.id !== id));
   }, []);
 
   // Expose the triggerFlash function to parent
@@ -53,12 +56,12 @@ export const TxFlashBurstManager: React.FC<TxFlashBurstManagerProps> = ({
   return (
     <View
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        pointerEvents: 'none',
+        pointerEvents: "none",
       }}
     >
       {flashes.map((flash) => (
@@ -75,4 +78,4 @@ export const TxFlashBurstManager: React.FC<TxFlashBurstManagerProps> = ({
       ))}
     </View>
   );
-}; 
+};

@@ -33,9 +33,9 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
   return (
     <Animated.View
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: 0,
-        alignSelf: 'center',
+        alignSelf: "center",
         transform: [
           {
             translateY: popupAnimation.interpolate({
@@ -59,7 +59,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
           textShadowOffset: { width: 0, height: 2 },
           textShadowRadius: 4,
           width: 200,
-          textAlign: 'center',
+          textAlign: "center",
         }}
         numberOfLines={1}
       >

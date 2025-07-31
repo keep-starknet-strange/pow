@@ -15,23 +15,29 @@ interface FlashBurstManagerProps {
   onFlashRequested?: (callback: (x: number, y: number) => void) => void;
 }
 
-export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ renderedBy, onFlashRequested }) => {
+export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({
+  renderedBy,
+  onFlashRequested,
+}) => {
   const [flashes, setFlashes] = useState<FlashInstance[]>([]);
 
-  const triggerFlash = useCallback((x: number, y: number) => {
-    const newFlash: FlashInstance = {
-      id: `flash-${Date.now()}-${Math.random()}`,
-      x,
-      y,
-      trigger: Date.now(),
-      renderedBy,
-    };
+  const triggerFlash = useCallback(
+    (x: number, y: number) => {
+      const newFlash: FlashInstance = {
+        id: `flash-${Date.now()}-${Math.random()}`,
+        x,
+        y,
+        trigger: Date.now(),
+        renderedBy,
+      };
 
-    setFlashes(prev => [...prev, newFlash]);
-  }, [renderedBy]);
+      setFlashes((prev) => [...prev, newFlash]);
+    },
+    [renderedBy],
+  );
 
   const removeFlash = useCallback((id: string) => {
-    setFlashes(prev => prev.filter(flash => flash.id !== id));
+    setFlashes((prev) => prev.filter((flash) => flash.id !== id));
   }, []);
 
   // Expose the triggerFlash function to parent
@@ -42,12 +48,12 @@ export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ renderedBy
   return (
     <View
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        pointerEvents: 'none',
+        pointerEvents: "none",
       }}
     >
       {flashes.map((flash) => (
@@ -62,4 +68,4 @@ export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({ renderedBy
       ))}
     </View>
   );
-}; 
+};

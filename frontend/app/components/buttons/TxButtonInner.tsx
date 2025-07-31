@@ -47,14 +47,17 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   }, [automationAnimHeight]);
 
   const fee = getFee(props.chainId, props.txId, props.isDapp);
-  const addNewTransaction = useCallback(async (finished: boolean | undefined) => {
-    if (finished === false) return;
-    const newTx = newTransaction(props.txId, fee, props.isDapp);
-    addTransaction(props.chainId, newTx);
-  }, [props.chainId, props.txId, props.isDapp]);
+  const addNewTransaction = useCallback(
+    async (finished: boolean | undefined) => {
+      if (finished === false) return;
+      const newTx = newTransaction(props.txId, fee, props.isDapp);
+      addTransaction(props.chainId, newTx);
+    },
+    [props.chainId, props.txId, props.isDapp],
+  );
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);
-  
+
   useEffect(() => {
     if (speed > 0) {
       automationAnimHeight.value = 0;
@@ -76,7 +79,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     } else {
       automationAnimHeight.value = 94;
     }
-    
+
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
     };
@@ -90,7 +93,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
             duration: 5000 / speed,
             easing: Easing.cubic,
           },
-          (finished) => runOnJS(addNewTransaction)(finished)
+          (finished) => runOnJS(addNewTransaction)(finished),
         ),
         withTiming(0, {
           duration: 200,

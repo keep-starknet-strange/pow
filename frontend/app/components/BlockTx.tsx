@@ -32,7 +32,12 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
-          image={getTxImg(props.chainId, props.txTypeId, props.isDapp, getImage)}
+          image={getTxImg(
+            props.chainId,
+            props.txTypeId,
+            props.isDapp,
+            getImage,
+          )}
           fit="fill"
           sampling={{
             filter: FilterMode.Nearest,
@@ -49,7 +54,12 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
           style={{ width: props.txSize * 0.4, height: props.txSize * 0.4 }}
         >
           <Image
-            image={getBlockTxIcon(props.chainId, props.txTypeId, props.isDapp, getImage)}
+            image={getBlockTxIcon(
+              props.chainId,
+              props.txTypeId,
+              props.isDapp,
+              getImage,
+            )}
             fit="contain"
             sampling={{
               filter: FilterMode.Nearest,

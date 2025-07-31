@@ -37,7 +37,15 @@ interface TextParticleProps {
   color: string;
 }
 
-const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger, color }) => {
+const Streak: React.FC<StreakProps> = ({
+  angle,
+  length,
+  delay,
+  x,
+  y,
+  trigger,
+  color,
+}) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
   const translateDistance = useSharedValue(0);
@@ -54,20 +62,20 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger, co
       setTimeout(() => {
         opacity.value = withSequence(
           withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) })
+          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
         );
         scale.value = withSequence(
           withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) })
+          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
         );
         translateDistance.value = withTiming(length, {
           duration: 300,
-          easing: Easing.out(Easing.quad)
+          easing: Easing.out(Easing.quad),
         });
         // Dynamic length scaling - starts normal, grows, then shrinks
         lengthScale.value = withSequence(
           withTiming(1.5, { duration: 150, easing: Easing.out(Easing.quad) }),
-          withTiming(0.8, { duration: 150, easing: Easing.in(Easing.quad) })
+          withTiming(0.8, { duration: 150, easing: Easing.in(Easing.quad) }),
         );
       }, delay);
     }
@@ -94,7 +102,7 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger, co
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - 2, // Center the streak origin
           top: y - 15, // Center the streak origin
           width: 4,
@@ -113,7 +121,12 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger, co
   );
 };
 
-const FlashCore: React.FC<{ x: number; y: number; trigger: number; color: string }> = ({ x, y, trigger, color }) => {
+const FlashCore: React.FC<{
+  x: number;
+  y: number;
+  trigger: number;
+  color: string;
+}> = ({ x, y, trigger, color }) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
 
@@ -126,13 +139,13 @@ const FlashCore: React.FC<{ x: number; y: number; trigger: number; color: string
       opacity.value = withSequence(
         withTiming(1, { duration: 50, easing: Easing.out(Easing.quad) }),
         withTiming(0.8, { duration: 100, easing: Easing.linear }),
-        withTiming(0, { duration: 250, easing: Easing.in(Easing.quad) })
+        withTiming(0, { duration: 250, easing: Easing.in(Easing.quad) }),
       );
-      
+
       scale.value = withSequence(
         withTiming(1.5, { duration: 50, easing: Easing.out(Easing.quad) }),
         withTiming(1, { duration: 100, easing: Easing.linear }),
-        withTiming(0.5, { duration: 250, easing: Easing.in(Easing.quad) })
+        withTiming(0.5, { duration: 250, easing: Easing.in(Easing.quad) }),
       );
     }
   }, [trigger]);
@@ -146,13 +159,13 @@ const FlashCore: React.FC<{ x: number; y: number; trigger: number; color: string
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - 15,
           top: y - 15,
           width: 30,
           height: 30,
           borderRadius: 15,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: "#FFFFFF",
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 1,
@@ -165,7 +178,16 @@ const FlashCore: React.FC<{ x: number; y: number; trigger: number; color: string
   );
 };
 
-const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle, distance, delay, color }) => {
+const TextParticle: React.FC<TextParticleProps> = ({
+  x,
+  y,
+  trigger,
+  text,
+  angle,
+  distance,
+  delay,
+  color,
+}) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
   const translateDistance = useSharedValue(0);
@@ -180,16 +202,16 @@ const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle,
         opacity.value = withSequence(
           withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
           withTiming(0.8, { duration: 100, easing: Easing.linear }),
-          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) })
+          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
         );
         scale.value = withSequence(
           withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
           withTiming(0.8, { duration: 100, easing: Easing.linear }),
-          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) })
+          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
         );
         translateDistance.value = withTiming(distance, {
           duration: 400,
-          easing: Easing.out(Easing.quad)
+          easing: Easing.out(Easing.quad),
         });
       }, delay);
     }
@@ -202,11 +224,7 @@ const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle,
 
     return {
       opacity: opacity.value,
-      transform: [
-        { translateX },
-        { translateY },
-        { scale: scale.value },
-      ],
+      transform: [{ translateX }, { translateY }, { scale: scale.value }],
     };
   });
 
@@ -214,7 +232,7 @@ const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle,
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x - 15, // Center the text
           top: y - 8,
         },
@@ -224,12 +242,12 @@ const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle,
       <Text
         style={{
           fontSize: 12,
-          fontFamily: 'Pixels',
+          fontFamily: "Pixels",
           color: color,
-          textShadowColor: '#000',
+          textShadowColor: "#000",
           textShadowOffset: { width: 1, height: 1 },
           textShadowRadius: 2,
-          fontWeight: 'bold',
+          fontWeight: "bold",
         }}
       >
         {text}
@@ -238,52 +256,58 @@ const TextParticle: React.FC<TextParticleProps> = ({ x, y, trigger, text, angle,
   );
 };
 
-export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedBy, onComplete }) => {
+export const FlashBurst: React.FC<FlashBurstProps> = ({
+  x,
+  y,
+  trigger,
+  renderedBy,
+  onComplete,
+}) => {
   const containerOpacity = useSharedValue(0);
 
   // Get text and color based on confirmer type
   const getParticleText = (): string => {
     switch (renderedBy) {
-      case 'miner':
-      case 'sequencer':
-        return 'POW!';
-      case 'prover':
-        return 'Prove!';
-      case 'da':
-        return 'Store!';
+      case "miner":
+      case "sequencer":
+        return "POW!";
+      case "prover":
+        return "Prove!";
+      case "da":
+        return "Store!";
       default:
-        return 'POW!';
+        return "POW!";
     }
   };
 
   const getParticleColor = (): string => {
     switch (renderedBy) {
-      case 'miner':
-        return '#20DF20'; // Green for mining
-      case 'sequencer':
-        return '#4A9EFF'; // Blue for sequencing
-      case 'prover':
-        return '#B347FF'; // More purple for proving
-      case 'da':
-        return '#8B47FF'; // Deep purple for data availability
+      case "miner":
+        return "#20DF20"; // Green for mining
+      case "sequencer":
+        return "#4A9EFF"; // Blue for sequencing
+      case "prover":
+        return "#B347FF"; // More purple for proving
+      case "da":
+        return "#8B47FF"; // Deep purple for data availability
       default:
-        return '#FFD700'; // Gold default
+        return "#FFD700"; // Gold default
     }
   };
 
   // Get streak and flash colors (slightly different from text for variety)
   const getStreakColor = (): string => {
     switch (renderedBy) {
-      case 'miner':
-        return '#20DF20'; // Green streaks for mining
-      case 'sequencer':
-        return '#4A9EFF'; // Blue streaks for sequencing
-      case 'prover':
-        return '#A347FF'; // Purple streaks for proving
-      case 'da':
-        return '#7A47FF'; // Deep purple streaks for data availability
+      case "miner":
+        return "#20DF20"; // Green streaks for mining
+      case "sequencer":
+        return "#4A9EFF"; // Blue streaks for sequencing
+      case "prover":
+        return "#A347FF"; // Purple streaks for proving
+      case "da":
+        return "#7A47FF"; // Deep purple streaks for data availability
       default:
-        return '#FFD700'; // Gold default
+        return "#FFD700"; // Gold default
     }
   };
 
@@ -294,7 +318,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
   useEffect(() => {
     if (trigger > 0) {
       containerOpacity.value = 1;
-      
+
       // Auto-hide after animation completes
       setTimeout(() => {
         containerOpacity.value = 0;
@@ -341,19 +365,19 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          pointerEvents: 'none',
+          pointerEvents: "none",
         },
         containerStyle,
       ]}
     >
       {/* Central flash */}
       <FlashCore x={x} y={y} trigger={trigger} color={particleColor} />
-      
+
       {/* Streaks */}
       {streaks.map((streak, index) => (
         <Streak
@@ -384,4 +408,4 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
       ))}
     </Animated.View>
   );
-}; 
+};
