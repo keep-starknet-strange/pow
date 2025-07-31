@@ -28,12 +28,14 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
   const translateDistance = useSharedValue(0);
+  const lengthScale = useSharedValue(1);
 
   useEffect(() => {
     if (trigger > 0) {
       opacity.value = 0;
       scale.value = 0;
       translateDistance.value = 0;
+      lengthScale.value = 1;
 
       // Start animation with delay
       setTimeout(() => {
@@ -49,12 +51,17 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
           duration: 300,
           easing: Easing.out(Easing.quad)
         });
+        // Dynamic length scaling - starts normal, grows, then shrinks
+        lengthScale.value = withSequence(
+          withTiming(1.5, { duration: 150, easing: Easing.out(Easing.quad) }),
+          withTiming(0.8, { duration: 150, easing: Easing.in(Easing.quad) })
+        );
       }, delay);
     }
   }, [trigger]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const radians = (angle * Math.PI) / 180;
+    const radians = ((angle + 90) * Math.PI) / 180;
     const translateX = Math.cos(radians) * translateDistance.value;
     const translateY = Math.sin(radians) * translateDistance.value;
 
@@ -63,8 +70,9 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
       transform: [
         { translateX },
         { translateY },
+        { rotate: `${angle}deg` }, // Rotate the streak to point in the direction it's moving
         { scaleX: scale.value },
-        { scaleY: scale.value },
+        { scaleY: scale.value * lengthScale.value }, // Apply dynamic length scaling
       ],
     };
   });
@@ -74,10 +82,10 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
       style={[
         {
           position: 'absolute',
-          left: x,
-          top: y,
-          width: 3,
-          height: 20,
+          left: x - 2, // Center the streak origin
+          top: y - 15, // Center the streak origin
+          width: 4,
+          height: 40, // Made longer as requested
           backgroundColor: '#FFD700',
           borderRadius: 2,
           shadowColor: '#FFD700',
@@ -166,11 +174,16 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, onComplet
   // Generate random streaks
   const streaks = React.useMemo(() => {
     const streakCount = 8 + Math.floor(Math.random() * 4); // 8-12 streaks
-    return Array.from({ length: streakCount }, (_, index) => ({
-      angle: (360 / streakCount) * index + Math.random() * 45 - 22.5, // Random variation
-      length: 40 + Math.random() * 30, // Random length 40-70px
-      delay: Math.random() * 50, // Random delay 0-50ms
-    }));
+    return Array.from({ length: streakCount }, (_, index) => {
+      // Distribute evenly around the circle with some random variation
+      const baseAngle = (360 / streakCount) * index;
+      const randomVariation = (Math.random() - 0.5) * 30; // ±15 degrees variation
+      return {
+        angle: baseAngle + randomVariation,
+        length: 70 + Math.random() * 50, // Random length 70-120
+        delay: Math.random() * 50, // Random delay 0-50ms
+      };
+    });
   }, [trigger]);
 
   if (trigger === 0) return null;
