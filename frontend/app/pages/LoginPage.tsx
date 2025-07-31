@@ -22,7 +22,9 @@ export const LoginPage: React.FC = () => {
   return (
     <View className="flex-1 items-center">
       <MainBackground />
-      <ActivePage setLoginPage={setLoginPage} />
+      <View className="absolute w-full h-full">
+        <ActivePage setLoginPage={setLoginPage} />
+      </View>
     </View>
   );
 };
