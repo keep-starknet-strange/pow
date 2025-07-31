@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
-import { UnlockView } from "./UnlockView";
+import { FeatureUnlockView } from "../FeatureUnlockView";
 
 export const PrestigeUnlock: React.FC = () => {
   const { prestige, getNextPrestigeCost, canPrestige, currentPrestige } =
@@ -18,8 +18,7 @@ export const PrestigeUnlock: React.FC = () => {
   return (
     <View>
       {showUnlock && (
-        <UnlockView
-          icon={`prestige.${currentPrestige + 1}`}
+        <FeatureUnlockView
           label="Prestige"
           description="Reset and build bigger!"
           cost={getNextPrestigeCost()}

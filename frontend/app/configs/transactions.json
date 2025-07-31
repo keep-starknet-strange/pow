@@ -3,8 +3,9 @@
     {
       "id": 0,
       "name": "Tx",
+      "slug": "tx",
       "description": "Send funds between wallets.",
-      "color": "#60f760a0",
+      "color": "green",
       "feeCosts": [1, 20, 31, 90, 277],
       "fees": [1, 2, 4, 8, 16],
       "speedCosts": [1, 43, 117, 255, 521],
@@ -13,8 +14,9 @@
     {
       "id": 1,
       "name": "Segwit",
+      "slug": "segwit",
       "description": "Send funds using Segwit addresses.",
-      "color": "#60f7f7a0",
+      "color": "yellow",
       "feeCosts": [145, 162, 485, 1087, 2090],
       "fees": [10, 20, 35, 55, 80],
       "speedCosts": [761, 845, 1261, 1885, 2717],
@@ -23,8 +25,9 @@
     {
       "id": 2,
       "name": "Blob",
+      "slug": "blob",
       "description": "Stores data on the chain.",
-      "color": "#6060f7a0",
+      "color": "blue",
       "feeCosts": [1542, 1445, 3867, 8730, 17500],
       "fees": [50, 75, 125, 200, 300],
       "speedCosts": [5135, 4810, 6435, 9685, 14560],
@@ -33,8 +36,9 @@
     {
       "id": 3,
       "name": "Ordinal",
+      "slug": "ordinal",
       "description": "Etches images to the chain.",
-      "color": "#f760f7a0",
+      "color": "pink",
       "feeCosts": [11093, 13046, 35859, 71367, 122500],
       "fees": [250, 375, 525, 700, 900],
       "speedCosts": [36920, 43420, 59670, 79170, 101920],
@@ -43,8 +47,9 @@
     {
       "id": 4,
       "name": "Runes",
+      "slug": "runes",
       "description": "Trade runes on the chain.",
-      "color": "#606060a0",
+      "color": "purple",
       "feeCosts": [68850, 76950, 194400, 376650, 631800],
       "fees": [800, 1050, 1400, 1800, 2250],
       "speedCosts": [159120, 177840, 224640, 290160, 365040],
@@ -55,8 +60,9 @@
     {
       "id": 0,
       "name": "Bridge",
+      "slug": "bridge",
       "description": "Send funds to L2.",
-      "color": "#60f760a0",
+      "color": "purple",
       "feeCosts": [
         100, 400, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800
       ],
@@ -69,8 +75,9 @@
     {
       "id": 1,
       "name": "Swap",
+      "slug": "swap",
       "description": "Trade ERC20 assets.",
-      "color": "#60f7f7a0",
+      "color": "green",
       "feeCosts": [
         200, 800, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600
       ],
@@ -83,8 +90,9 @@
     {
       "id": 2,
       "name": "NFTs",
+      "slug": "nfts",
       "description": "Mint images to the chain.",
-      "color": "#f760f7a0",
+      "color": "yellow",
       "feeCosts": [
         300, 1200, 4800, 9600, 19200, 38400, 76800, 153600, 307200, 614400
       ],
@@ -97,8 +105,9 @@
     {
       "id": 3,
       "name": "Oracle",
+      "slug": "oracle",
       "description": "Fetch data from the world.",
-      "color": "#6060f7a0",
+      "color": "blue",
       "feeCosts": [
         400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200
       ],
@@ -111,8 +120,9 @@
     {
       "id": 4,
       "name": "DAO",
+      "slug": "dao",
       "description": "Manage decentralized organizations.",
-      "color": "#f76060a0",
+      "color": "pink",
       "feeCosts": [
         500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000
       ],

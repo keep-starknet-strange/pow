@@ -3,14 +3,17 @@ import { View } from "react-native";
 import { Canvas, Image } from "@shopify/react-native-skia";
 import { FilterMode, MipmapMode } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { getTxImg, getTxIcon } from "../utils/transactions";
+import { getTxImg, getBlockTxIcon } from "../utils/transactions";
 import Animated, { BounceIn } from "react-native-reanimated";
 
 interface BlockTxProps {
-  txSize: number;
+  // Transaction props
+  txTypeId: number;
   chainId: number;
-  typeId: number;
+  isDapp: boolean;
+  // Positioning props
   index: number;
+  txSize: number;
   txPerRow: number;
 }
 
@@ -29,7 +32,7 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
-          image={getTxImg(props.chainId, props.typeId, getImage)}
+          image={getTxImg(props.chainId, props.txTypeId, props.isDapp, getImage)}
           fit="fill"
           sampling={{
             filter: FilterMode.Nearest,
@@ -46,7 +49,7 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
           style={{ width: props.txSize * 0.4, height: props.txSize * 0.4 }}
         >
           <Image
-            image={getTxIcon(props.chainId, props.typeId, false, getImage)}
+            image={getBlockTxIcon(props.chainId, props.txTypeId, props.isDapp, getImage)}
             fit="contain"
             sampling={{
               filter: FilterMode.Nearest,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "@/app/hooks/useImages";
-import { getTxIconName } from "../../utils/transactions";
+import { getBlockTxIconName } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { TransactionUpgradeActions } from "./transactionUpgrade/TransactionUpgradeActions";
@@ -47,7 +47,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
     <View className="flex flex-col w-full">
       <View className="flex flex-row w-full mb-[4px]">
         <IconWithLock
-          txIcon={getTxIconName(props.chainId, props.txData.id, props.isDapp)}
+          txIcon={getBlockTxIconName(props.chainId, props.txData.id, props.isDapp)}
           locked={txFeeLevel === -1}
         />
         <TxDetails

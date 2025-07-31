@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { UnlockView } from "./UnlockView";
+import { useGameStore } from "@/app/stores/useGameStore";
+import { FeatureUnlockView } from "../FeatureUnlockView";
 
 export type DappsUnlockProps = {
   chainId: number;
@@ -10,20 +11,16 @@ export type DappsUnlockProps = {
 export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   const { canUnlockDapps, dappsUnlocked, unlockDapps, getDappUnlockCost } =
     useTransactionsStore();
+  const { workingBlocks } = useGameStore();
   const showUnlock =
-    !dappsUnlocked[props.chainId] && canUnlockDapps(props.chainId);
+    !dappsUnlocked[props.chainId] && canUnlockDapps(props.chainId) && !workingBlocks[props.chainId].isBuilt;
 
   return (
     <View>
       {showUnlock && (
-        <UnlockView
-          icon={
-            props.chainId === 0
-              ? "achievements.l1.dapps"
-              : "achievements.l2.dapps"
-          }
+        <FeatureUnlockView
           label="Unlock dApps"
-          description="Attract users with Apps!"
+          description="Build an Ecosystem!"
           cost={getDappUnlockCost(props.chainId)}
           onPress={() => unlockDapps(props.chainId)}
         />

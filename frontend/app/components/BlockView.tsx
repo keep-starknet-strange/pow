@@ -7,7 +7,6 @@ import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
-import { getTxIcon } from "../utils/transactions";
 import { BlockTx } from "./BlockTx";
 import { BlockTxOutlines } from "./BlockTxOutlines";
 
@@ -61,10 +60,11 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           {props.block?.transactions.map((tx, index) => (
             <BlockTx
               key={index}
-              txSize={txSize}
               chainId={props.chainId}
-              typeId={tx.typeId}
+              txTypeId={tx.typeId}
+              isDapp={tx.isDapp || false}
               index={index}
+              txSize={txSize}
               txPerRow={txPerRow}
             />
           ))}

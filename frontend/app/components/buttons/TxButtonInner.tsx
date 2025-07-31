@@ -90,7 +90,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
             duration: 5000 / speed,
             easing: Easing.cubic,
           },
-          () => runOnJS(addNewTransaction)(),
+          (finished) => runOnJS(addNewTransaction)(finished)
         ),
         withTiming(0, {
           duration: 200,

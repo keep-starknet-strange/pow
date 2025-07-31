@@ -4,9 +4,10 @@
     "transactions": [
       {
         "id": 0,
-        "name": "PowSwap",
+        "name": "GMswap",
+        "slug": "gmswap",
         "description": "Decentralized exchange (DEX) for token swaps!",
-        "color": "#f7f760a0",
+        "color": "blue",
         "feeCosts": [346950, 379350, 920700, 1721250, 2878200],
         "fees": [2000, 2500, 3200, 4100, 5200],
         "speedCosts": [801840, 876720, 1063920, 1326000, 1662960],
@@ -14,9 +15,10 @@
       },
       {
         "id": 1,
-        "name": "Art Sea",
+        "name": "ArtSea",
+        "slug": "artsea",
         "description": "NFT Marketplace for digital art",
-        "color": "#f760f7a0",
+        "color": "pink",
         "feeCosts": [1388537, 1508587, 3737475, 6866737, 10956400],
         "fees": [4500, 5700, 7100, 8600, 10000],
         "speedCosts": [2357680, 2561520, 3173040, 3886480, 4650880],
@@ -24,9 +26,10 @@
       },
       {
         "id": 2,
-        "name": "Pave",
+        "name": "Paave",
+        "slug": "paave",
         "description": "Liquidity & flashloans protocol",
-        "color": "#60f7f7a0",
+        "color": "purple",
         "feeCosts": [5724425, 6084575, 14330050, 25096575, 38984400],
         "fees": [9200, 11000, 13000, 15300, 17800],
         "speedCosts": [
@@ -36,9 +39,10 @@
       },
       {
         "id": 3,
-        "name": "Libra",
-        "description": "Liquid staking protocol",
-        "color": "#6060f7a0",
+        "name": "Hodlee",
+        "slug": "hodlee",
+        "description": "Stake and Hold your crypto.",
+        "color": "green",
         "feeCosts": [16891200, 18120000, 41360000, 71256000, 109344000],
         "fees": [16500, 19000, 22000, 25500, 30000],
         "speedCosts": [
@@ -48,9 +52,10 @@
       },
       {
         "id": 4,
-        "name": "Drag-own",
-        "description": "Collect, breed and battle dragons",
-        "color": "#f76060a0",
+        "name": "Wagmi",
+        "slug": "wagmi",
+        "description": "Censorship fee social DeFi platform",
+        "color": "yellow",
         "feeCosts": [53448000, 58568000, 137616000, 243288000, 381728000],
         "fees": [28000, 33000, 39000, 46000, 55000],
         "speedCosts": [
@@ -65,9 +70,10 @@
     "transactions": [
       {
         "id": 0,
-        "name": "Hermes",
-        "description": "Lightning-fast onchain trading platform",
-        "color": "#f7f7f7a0",
+        "name": "Unrug",
+        "slug": "unrug",
+        "description": "Unruggable memecoins at light speed",
+        "color": "yellow",
         "feeCosts": [
           350, 1400, 5600, 11200, 22400, 44800, 89600, 179200, 358400, 716800
         ],
@@ -79,9 +85,10 @@
       },
       {
         "id": 1,
-        "name": "art/war",
-        "description": "Competitive, Shared Art Canvas",
-        "color": "#f7f7f7a0",
+        "name": "42inch",
+        "slug": "42inch",
+        "description": "Cross-chain DEX aggregator",
+        "color": "blue",
         "feeCosts": [
           400, 1600, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200
         ],
@@ -94,8 +101,9 @@
       {
         "id": 2,
         "name": "lend.me",
+        "slug": "lendme",
         "description": "Permissionless lending protocol",
-        "color": "#f7f7f7a0",
+        "color": "green",
         "feeCosts": [
           450, 1800, 7200, 14400, 28800, 57600, 115200, 230400, 460800, 921600
         ],
@@ -108,8 +116,9 @@
       {
         "id": 3,
         "name": "Galaxia",
+        "slug": "galaxia",
         "description": "Fully-onchain space strategy game",
-        "color": "#f7f7f7a0",
+        "color": "pink",
         "feeCosts": [
           500, 2000, 8000, 16000, 32000, 64000, 128000, 256000, 512000, 1024000
         ],
@@ -122,8 +131,9 @@
       {
         "id": 4,
         "name": "Journey",
+        "slug": "journey",
         "description": "Fractal scale with app-chains!",
-        "color": "#f76060a0",
+        "color": "purple",
         "feeCosts": [
           550, 2200, 8800, 17600, 35200, 70400, 140800, 281600, 563200, 1126400
         ],

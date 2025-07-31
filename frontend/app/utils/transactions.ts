@@ -11,95 +11,60 @@ export const newEmptyTransaction = () => {
 export const daTxTypeId = 101;
 export const proofTxTypeId = 102;
 
+export const getBlockTxIcon = (
+  chainId: number,
+  typeId: number,
+  isDapp: boolean,
+  getImage: (name: string) => any,
+) => {
+  return getImage(getBlockTxIconName(chainId, typeId, isDapp));
+};
+
+export const getBlockTxIconName = (
+  chainId: number,
+  typeId: number,
+  isDapp?: boolean,
+) => {
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
+      chainId === 0 ?
+        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  if (!txData) return "block.icon.tx";
+  return `block.icon.${txData.slug}`;
+};
+
 export const getTxIcon = (
   chainId: number,
   typeId: number,
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  return getImage(getTxIconName(chainId, typeId, isDapp));
-};
-
-export const getTxIconName = (
-  chainId: number,
-  typeId: number,
-  isDapp?: boolean,
-) => {
-  switch (chainId) {
-    case 0:
-      switch (typeId) {
-        case 0:
-          return "block.icon.tx";
-        case 1:
-          return "block.icon.tx";
-        case 2:
-          return "block.icon.blob";
-        case 3:
-          return "block.icon.nft";
-        case 4:
-          return "block.icon.nft";
-        default:
-          return "unknown";
-      }
-    case 1:
-      switch (typeId) {
-        case 0:
-          return "block.icon.tx";
-        case 1:
-          return "block.icon.tx";
-        case 2:
-          return "block.icon.blob";
-        case 3:
-          return "block.icon.nft";
-        case 4:
-          return "block.icon.nft";
-        default:
-          return "unknown";
-      }
-    default:
-      return "unknown";
-  }
-};
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
+      chainId === 0 ?
+        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  if (!txData) return getImage("tx.icon.tx");
+  return getImage(`tx.icon.${txData.slug}`);
+}
 
 export const getTxImg = (
   chainId: number,
   typeId: number,
+  isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  switch (chainId) {
-    case 0:
-      switch (typeId) {
-        case 0:
-          return getImage("block.bg.green");
-        case 1:
-          return getImage("block.bg.yellow");
-        case 2:
-          return getImage("block.bg.blue");
-        case 3:
-          return getImage("block.bg.pink");
-        case 4:
-          return getImage("block.bg.purple");
-        default:
-          return getImage("unknown");
-      }
-    case 1:
-      switch (typeId) {
-        case 0:
-          return getImage("block.bg.blue");
-        case 1:
-          return getImage("block.bg.green");
-        case 2:
-          return getImage("block.bg.pink");
-        case 3:
-          return getImage("block.bg.purple");
-        case 4:
-          return getImage("block.bg.yellow");
-        default:
-          return getImage("unknown");
-      }
-    default:
-      return getImage("unknown");
-  }
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[typeId] : dappsJson.L2.transactions[typeId] :
+      chainId === 0 ?
+        transactionsJson.L1[typeId] : transactionsJson.L2[typeId];
+  if (!txData) return getImage("block.bg.green");
+  return getImage(`block.bg.${txData.color}`);
 };
 
 export const getTxBg = (
@@ -108,40 +73,14 @@ export const getTxBg = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  switch (chainId) {
-    case 0:
-      switch (txId) {
-        case 0:
-          return getImage("tx.button.bg.green");
-        case 1:
-          return getImage("tx.button.bg.yellow");
-        case 2:
-          return getImage("tx.button.bg.blue");
-        case 3:
-          return getImage("tx.button.bg.pink");
-        case 4:
-          return getImage("tx.button.bg.purple");
-        default:
-          return getImage("tx.button.bg.green");
-      }
-    case 1:
-      switch (txId) {
-        case 0:
-          return getImage("tx.button.bg.purple");
-        case 1:
-          return getImage("tx.button.bg.green");
-        case 2:
-          return getImage("tx.button.bg.yellow");
-        case 3:
-          return getImage("tx.button.bg.blue");
-        case 4:
-          return getImage("tx.button.bg.pink");
-        default:
-          return getImage("tx.button.bg.green");
-      }
-    default:
-      return getImage("tx.button.bg.green");
-  }
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
+      chainId === 0 ?
+        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  if (!txData) return getImage("tx.button.bg.green");
+  return getImage(`tx.button.bg.${txData.color}`);
 };
 
 // TODO: Change getImage dependency
@@ -151,40 +90,14 @@ export const getTxInner = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  switch (chainId) {
-    case 0:
-      switch (txId) {
-        case 0:
-          return getImage("tx.button.inner.green");
-        case 1:
-          return getImage("tx.button.inner.yellow");
-        case 2:
-          return getImage("tx.button.inner.blue");
-        case 3:
-          return getImage("tx.button.inner.pink");
-        case 4:
-          return getImage("tx.button.inner.purple");
-        default:
-          return getImage("tx.button.inner.green");
-      }
-    case 1:
-      switch (txId) {
-        case 0:
-          return getImage("tx.button.inner.purple");
-        case 1:
-          return getImage("tx.button.inner.green");
-        case 2:
-          return getImage("tx.button.inner.yellow");
-        case 3:
-          return getImage("tx.button.inner.blue");
-        case 4:
-          return getImage("tx.button.inner.pink");
-        default:
-          return getImage("tx.button.inner.green");
-      }
-    default:
-      return getImage("tx.button.inner.green");
-  }
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
+      chainId === 0 ?
+        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  if (!txData) return getImage("tx.button.inner.green");
+  return getImage(`tx.button.inner.${txData.color}`);
 };
 
 export const getTxNameplate = (
@@ -193,38 +106,12 @@ export const getTxNameplate = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
-  switch (chainId) {
-    case 0:
-      switch (txId) {
-        case 0:
-          return getImage("tx.nameplate.green");
-        case 1:
-          return getImage("tx.nameplate.yellow");
-        case 2:
-          return getImage("tx.nameplate.blue");
-        case 3:
-          return getImage("tx.nameplate.pink");
-        case 4:
-          return getImage("tx.nameplate.purple");
-        default:
-          return getImage("tx.nameplate.green");
-      }
-    case 1:
-      switch (txId) {
-        case 0:
-          return getImage("tx.nameplate.purple");
-        case 1:
-          return getImage("tx.nameplate.green");
-        case 2:
-          return getImage("tx.nameplate.yellow");
-        case 3:
-          return getImage("tx.nameplate.blue");
-        case 4:
-          return getImage("tx.nameplate.pink");
-        default:
-          return getImage("tx.nameplate.green");
-      }
-    default:
-      return getImage("tx.nameplate.green");
-  }
+  const txData =
+    isDapp ?
+      chainId === 0 ?
+        dappsJson.L1.transactions[txId] : dappsJson.L2.transactions[txId] :
+      chainId === 0 ?
+        transactionsJson.L1[txId] : transactionsJson.L2[txId];
+  if (!txData) return getImage("tx.nameplate.green");
+  return getImage(`tx.nameplate.${txData.color}`);
 };
