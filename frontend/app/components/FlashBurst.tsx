@@ -283,7 +283,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
   const getParticleColor = (): string => {
     switch (renderedBy) {
       case "miner":
-        return "#20DF20"; // Green for mining
+        return "#FFD700"; // Gold for mining
       case "sequencer":
         return "#4A9EFF"; // Blue for sequencing
       case "prover":
@@ -299,7 +299,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
   const getStreakColor = (): string => {
     switch (renderedBy) {
       case "miner":
-        return "#20DF20"; // Green streaks for mining
+        return "#FFD700"; // Gold streaks for mining
       case "sequencer":
         return "#4A9EFF"; // Blue streaks for sequencing
       case "prover":

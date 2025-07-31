@@ -158,6 +158,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       
       // Use the stored maxSize instead of dynamically getting upgrade value
       const daMaxSize = newL2Instance.da.maxSize;
+      if (newL2Instance.da.isBuilt || newL2Instance.da.blocks.length >= daMaxSize) return state;
       
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward =
@@ -178,6 +179,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       
       // Use the stored maxSize instead of dynamically getting upgrade value
       const proverMaxSize = newL2Instance.prover.maxSize;
+      if (newL2Instance.prover.isBuilt || newL2Instance.prover.blocks.length >= proverMaxSize) return state;
       
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward =
