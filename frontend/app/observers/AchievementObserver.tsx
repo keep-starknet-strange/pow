@@ -147,6 +147,7 @@ export class AchievementObserver implements Observer {
   private handleMineClicked(achievement: Achievement, data: any) {
     const { counter, difficulty } = data;
     if (achievement.name === "Mine a block 1st try") {
+      // Player successfully mined the block on the first attempt
       if (counter === 1 && counter >= difficulty) {
         this.updateAchievement(achievement.id, 100);
       }
@@ -155,10 +156,10 @@ export class AchievementObserver implements Observer {
 
   private handleSequenceDone(achievement: Achievement, block: Block) {
     const blockTargets: Record<string, number> = {
-      "Reach L2 Block 10": 10,
       "Reach L2 Block 100": 100,
       "Reach L2 Block 1000": 1_000,
       "Reach L2 Block 10K": 10_000,
+      "Reach L2 Block 100K": 100_000,
     };
     const target = blockTargets[achievement.name];
     if (target) {
@@ -171,8 +172,8 @@ export class AchievementObserver implements Observer {
     const { chainId, txId, isDapp, level } = data;
     // Map: achievement.name => [chainId, isDapp]
     const achievementFilter: Record<string, [number, boolean]> = {
-      "Unlock all L1 Transactions": [0, false],
-      "Unlock all L2 Transactions": [1, false],
+      "Unlock all L1 Txs": [0, false],
+      "Unlock all L2 Txs": [1, false],
       "Unlock all L1 Dapps": [0, true],
       "Unlock all L2 Dapps": [1, true],
     };
@@ -234,7 +235,7 @@ export class AchievementObserver implements Observer {
     )?.name;
     // Map: achievement.name => automationName
     const achievementFilter: Record<string, string> = {
-      "Get a Quantum Miner": "Miner",
+      "Achieve Quantum Mining": "Miner",
       "Decentralize the Sequencer": "Sequencer",
       "Achieve STWO Scaling": "Prover",
       "Scale with DA Volition": "DA",
