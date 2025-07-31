@@ -2,6 +2,7 @@ import React from "react";
 import { SafeAreaView, Text, View, BackHandler } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
+import Constants from "expo-constants";
 import BasicButton from "../../components/buttons/Basic";
 import logo from "../../../assets/logo/pow.webp";
 import starknetLogo from "../../../assets/logo/starknet.webp";
@@ -27,7 +28,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
   const { createGameAccount } = usePowContractConnector();
   const insets = useSafeAreaInsets();
 
-  const version = process.env.EXPO_APP_VERSION || "0.0.1";
+  const version = Constants.expoConfig?.version || "0.0.1";
   return (
     <View
       style={{

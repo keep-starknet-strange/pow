@@ -15,6 +15,7 @@ import { useImages } from "../../hooks/useImages";
 import NounsBuilder from "../../components/NounsBuilder";
 import BasicButton from "../../components/buttons/Basic";
 import AvatarCreator from "./AvatarCreator";
+import Constants from "expo-constants";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import {
   Canvas,
@@ -33,7 +34,7 @@ type AccountCreationProps = {
 export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   setLoginPage,
 }) => {
-  const version = process.env.EXPO_APP_VERSION || "0.0.1";
+  const version = Constants.expoConfig?.version || "0.0.1";
   const { notify } = useEventManager();
   const {
     isUsernameUnique,
