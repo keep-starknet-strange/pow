@@ -47,20 +47,73 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   const [usernameError, setUsernameError] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
+  const [isGeneratingUsername, setIsGeneratingUsername] = React.useState<boolean>(false);
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
   );
   const [newAvatar, setNewAvatar] = React.useState<NounsAttributes>(avatar);
   const [creatingAvatar, setCreatingAvatar] = React.useState<boolean>(false);
+  
   const startCreatingAvatar = () => {
     setCreatingAvatar(true);
     setNewAvatar(avatar);
     notify("BasicClick");
   };
+  
   const applyAvatarCreation = () => {
     setCreatingAvatar(false);
     setAvatar(newAvatar);
     notify("BasicClick");
+  };
+
+  // Generate random username using Random Word API
+  const generateRandomUsername = async () => {
+    setIsGeneratingUsername(true);
+    try {
+      // Fetch 2 random words from the API
+      const response = await fetch('https://random-word-api.herokuapp.com/word?number=2');
+      const words = await response.json();
+      
+      if (words && Array.isArray(words) && words.length >= 2) {
+        // Clean words: remove non-alphanumeric characters and capitalize first letter
+        const cleanWord1 = words[0].replace(/[^a-zA-Z0-9]/g, '');
+        const cleanWord2 = words[1].replace(/[^a-zA-Z0-9]/g, '');
+        
+        // Capitalize first letter of each word
+        const word1 = cleanWord1.charAt(0).toUpperCase() + cleanWord1.slice(1).toLowerCase();
+        const word2 = cleanWord2.charAt(0).toUpperCase() + cleanWord2.slice(1).toLowerCase();
+        
+        let combinedUsername = word1 + word2;
+        
+        // Ensure max 31 characters
+        if (combinedUsername.length > 31) {
+          // Try to trim the second word first
+          const maxSecondWordLength = 31 - word1.length;
+          if (maxSecondWordLength > 3) {
+            combinedUsername = word1 + word2.substring(0, maxSecondWordLength);
+          } else {
+            // If still too long, trim both words proportionally
+            const halfLength = Math.floor(31 / 2);
+            combinedUsername = word1.substring(0, halfLength) + word2.substring(0, 31 - halfLength);
+          }
+        }
+        
+        setUsername(combinedUsername);
+        setUsernameError(""); // Clear any previous errors
+        notify("DiceRoll");
+      } else {
+        // Fallback if API fails
+        setUsername("RandomUser" + Math.floor(Math.random() * 1000));
+        notify("BasicError");
+      }
+    } catch (error) {
+      console.error('Error generating random username:', error);
+      // Fallback username if API fails
+      setUsername("RandomUser" + Math.floor(Math.random() * 1000));
+      notify("BasicError");
+    } finally {
+      setIsGeneratingUsername(false);
+    }
   };
 
   return (
@@ -97,20 +150,42 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               <Text className="text-[#101119] text-lg font-Pixels">
                 Set up a username
               </Text>
-              {/* // TODO: fix/keyboard-covers-input-fields */}
-              <TextInput
-                className="bg-[#10111910] w-full mt-1 px-2
-                        pt-1 text-[32px] text-[#101119] border-2 border-[#101119]
-                        shadow-lg shadow-black/50 font-Teatime"
-                selectionColor="#101119"
-                placeholder="Satoshi"
-                placeholderTextColor="#10111980"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoComplete="off"
-                value={username}
-                onChangeText={setUsername}
-              />
+              <View className="flex-row items-center w-full mt-1 gap-2">
+                <TextInput
+                  className="bg-[#10111910] flex-1 px-2
+                          pt-1 text-[32px] text-[#101119] border-2 border-[#101119]
+                          shadow-lg shadow-black/50 font-Teatime"
+                  selectionColor="#101119"
+                  placeholder="Satoshi"
+                  placeholderTextColor="#10111980"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="off"
+                  value={username}
+                  onChangeText={setUsername}
+                />
+                <Pressable
+                  onPress={generateRandomUsername}
+                  disabled={isGeneratingUsername}
+                  className="bg-[#10111910] border-2 border-[#101119] p-3 rounded-sm shadow-lg shadow-black/50"
+                  style={{ opacity: isGeneratingUsername ? 0.6 : 1 }}
+                >
+                  <Canvas style={{ width: 24, height: 24 }}>
+                    <SkiaImg
+                      image={getImage("iconRandom")}
+                      x={0}
+                      y={0}
+                      width={24}
+                      height={24}
+                      fit="contain"
+                      sampling={{
+                        filter: FilterMode.Nearest,
+                        mipmap: MipmapMode.Nearest,
+                      }}
+                    />
+                  </Canvas>
+                </Pressable>
+              </View>
               <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
                 Please notice: your username will be public
               </Text>
