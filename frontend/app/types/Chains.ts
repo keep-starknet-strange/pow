@@ -24,12 +24,14 @@ export type Block = {
   transactions: Transaction[];
   isBuilt: boolean;
   maxSize: number; // Static block size set when block is created
+  difficulty: number;
   reward?: number;
 };
 
 export const newBlock = (
   blockId: number,
   maxSize: number,
+  difficulty: number,
   reward?: number,
 ): Block => {
   return {
@@ -38,6 +40,7 @@ export const newBlock = (
     transactions: [],
     isBuilt: false,
     maxSize,
+    difficulty: difficulty,
     reward,
   };
 };

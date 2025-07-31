@@ -2,24 +2,28 @@ export type L2DA = {
   blocks: number[];
   blockFees: number;
   isBuilt: boolean;
+  maxSize: number;
 };
 
-export const newL2DA = (): L2DA => ({
+export const newL2DA = (maxSize: number = 1): L2DA => ({
   blocks: [],
   blockFees: 0,
   isBuilt: false,
+  maxSize,
 });
 
 export type L2Prover = {
   blocks: number[];
   blockFees: number;
   isBuilt: boolean;
+  maxSize: number;
 };
 
-export const newL2Prover = (): L2Prover => ({
+export const newL2Prover = (maxSize: number = 1): L2Prover => ({
   blocks: [],
   blockFees: 0,
   isBuilt: false,
+  maxSize,
 });
 
 export type L2 = {

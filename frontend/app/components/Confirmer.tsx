@@ -95,12 +95,6 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       onPress={handlePress}
       {...tutorialProps}
     >
-      {/* Flash Burst Manager */}
-      <FlashBurstManager
-        renderedBy={props.renderedBy}
-        onFlashRequested={handleFlashRequested}
-      />
-
       {props.confirmPopup && (
         <PopupAnimation
           popupStartTime={props.confirmPopup.startTime}
@@ -160,6 +154,11 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           {props.text}
         </Animated.Text>
       )}
+      <FlashBurstManager
+        renderedBy={props.renderedBy}
+        onFlashRequested={handleFlashRequested}
+      />
+
     </Pressable>
   );
 };

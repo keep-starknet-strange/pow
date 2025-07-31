@@ -167,16 +167,15 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 <Pressable
                   onPress={generateRandomUsername}
                   disabled={isGeneratingUsername}
-                  className="bg-[#10111910] border-2 border-[#101119] p-3 rounded-sm shadow-lg shadow-black/50"
-                  style={{ opacity: isGeneratingUsername ? 0.6 : 1 }}
+                  className="shadow-lg shadow-black/50"
                 >
-                  <Canvas style={{ width: 24, height: 24 }}>
+                  <Canvas style={{ width: 40, height: 40 }}>
                     <SkiaImg
-                      image={getImage("iconRandom")}
+                      image={getImage("icon.random")}
                       x={0}
                       y={0}
-                      width={24}
-                      height={24}
+                      width={40}
+                      height={40}
                       fit="contain"
                       sampling={{
                         filter: FilterMode.Nearest,
