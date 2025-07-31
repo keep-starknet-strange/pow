@@ -23,6 +23,7 @@ interface StreakProps {
   x: number;
   y: number;
   trigger: number;
+  color: string;
 }
 
 interface TextParticleProps {
@@ -36,7 +37,7 @@ interface TextParticleProps {
   color: string;
 }
 
-const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) => {
+const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger, color }) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
   const translateDistance = useSharedValue(0);
@@ -98,9 +99,9 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
           top: y - 15, // Center the streak origin
           width: 4,
           height: 40, // Made longer as requested
-          backgroundColor: '#FFD700',
+          backgroundColor: color,
           borderRadius: 2,
-          shadowColor: '#FFD700',
+          shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.8,
           shadowRadius: 4,
@@ -112,7 +113,7 @@ const Streak: React.FC<StreakProps> = ({ angle, length, delay, x, y, trigger }) 
   );
 };
 
-const FlashCore: React.FC<{ x: number; y: number; trigger: number }> = ({ x, y, trigger }) => {
+const FlashCore: React.FC<{ x: number; y: number; trigger: number; color: string }> = ({ x, y, trigger, color }) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
 
@@ -152,7 +153,7 @@ const FlashCore: React.FC<{ x: number; y: number; trigger: number }> = ({ x, y, 
           height: 30,
           borderRadius: 15,
           backgroundColor: '#FFFFFF',
-          shadowColor: '#FFD700',
+          shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 1,
           shadowRadius: 8,
@@ -262,9 +263,25 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
       case 'sequencer':
         return '#4A9EFF'; // Blue for sequencing
       case 'prover':
-        return '#9A4AFF'; // Purple for proving
+        return '#B347FF'; // More purple for proving
       case 'da':
-        return '#FF6B35'; // Orange for data availability
+        return '#8B47FF'; // Deep purple for data availability
+      default:
+        return '#FFD700'; // Gold default
+    }
+  };
+
+  // Get streak and flash colors (slightly different from text for variety)
+  const getStreakColor = (): string => {
+    switch (renderedBy) {
+      case 'miner':
+        return '#20DF20'; // Green streaks for mining
+      case 'sequencer':
+        return '#4A9EFF'; // Blue streaks for sequencing
+      case 'prover':
+        return '#A347FF'; // Purple streaks for proving
+      case 'da':
+        return '#7A47FF'; // Deep purple streaks for data availability
       default:
         return '#FFD700'; // Gold default
     }
@@ -272,6 +289,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
 
   const particleText = getParticleText();
   const particleColor = getParticleColor();
+  const streakColor = getStreakColor();
 
   useEffect(() => {
     if (trigger > 0) {
@@ -334,7 +352,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
       ]}
     >
       {/* Central flash */}
-      <FlashCore x={x} y={y} trigger={trigger} />
+      <FlashCore x={x} y={y} trigger={trigger} color={particleColor} />
       
       {/* Streaks */}
       {streaks.map((streak, index) => (
@@ -346,6 +364,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({ x, y, trigger, renderedB
           x={x}
           y={y}
           trigger={trigger}
+          color={streakColor}
         />
       ))}
 
