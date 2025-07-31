@@ -7,14 +7,16 @@ import { DAConfirm } from "./DAConfirm";
 
 export const DaView = () => {
   const { getDa } = useL2Store();
-  const { getUpgradeValue } = useUpgrades();
+  const { getUpgradeValue, upgrades } = useUpgrades();
 
   const [daWidth, setDaWidth] = useState(
-    100 / (getUpgradeValue(1, "DA compression") || 1),
+    getUpgradeValue(1, "DA compression") || 1,
   );
+  
   useEffect(() => {
-    setDaWidth(getUpgradeValue(1, "DA compression") || 1);
-  }, [getUpgradeValue]);
+    const upgradeValue = getUpgradeValue(1, "DA compression") || 1;
+    setDaWidth(upgradeValue);
+  }, [upgrades, getUpgradeValue]); // Now depends on upgrades state
 
   return (
     <View>

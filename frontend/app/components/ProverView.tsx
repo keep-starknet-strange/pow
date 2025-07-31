@@ -7,17 +7,16 @@ import { Prover } from "./Prover";
 
 export const ProverView = () => {
   const { getProver } = useL2Store();
-  const { getUpgradeValue } = useUpgrades();
+  const { getUpgradeValue, upgrades } = useUpgrades();
 
   const [proofMaxSize, setProofMaxSize] = useState(
     getUpgradeValue(1, "Recursive Proving") || 1,
   );
+  
   useEffect(() => {
-    const upgradeValue = getUpgradeValue(1, "Recursive Proving");
-    if (upgradeValue) {
-      setProofMaxSize(upgradeValue);
-    }
-  }, [getUpgradeValue]);
+    const upgradeValue = getUpgradeValue(1, "Recursive Proving") || 1;
+    setProofMaxSize(upgradeValue);
+  }, [upgrades, getUpgradeValue]); // Now depends on upgrades state
 
   return (
     <View>
