@@ -6,6 +6,10 @@ const assetsPath = "../../assets";
 const imagePaths = {
   // General Images
   logo: require(`${assetsPath}/logo/pow.webp`),
+  logoP: require(`${assetsPath}/logo/P.png`),
+  logoO: require(`${assetsPath}/logo/O.png`),
+  logoW: require(`${assetsPath}/logo/W.png`),
+  logoExclamation: require(`${assetsPath}/logo/!.png`),
   sublogo: require(`${assetsPath}/logo/sublogo.webp`),
   starknet: require(`${assetsPath}/logo/starknet_pixel.webp`),
   background: require(`${assetsPath}/background.webp`),
@@ -434,6 +438,10 @@ export const useImagePreloader = () => {
   // Load all images using useImage hook
   const images = {
     logo: useImage(imagePaths.logo),
+    logoP: useImage(imagePaths.logoP),
+    logoO: useImage(imagePaths.logoO),
+    logoW: useImage(imagePaths.logoW),
+    logoExclamation: useImage(imagePaths.logoExclamation),
     sublogo: useImage(imagePaths.sublogo),
     starknet: useImage(imagePaths.starknet),
     background: useImage(imagePaths.background),
@@ -656,7 +664,11 @@ export const useImagePreloader = () => {
       const imagesMap = {
         background: images.background,
         logo: images.logo,
-        "logo.sub": images.sublogo,
+        logoP: images.logoP,
+        logoO: images.logoO,
+        logoW: images.logoW,
+        logoExclamation: images.logoExclamation,
+        sublogo: images.sublogo,
         "logo.starknet": images.starknet,
         "background.grid": images.backgroundGrid,
         "background.shop": images.shopBg,

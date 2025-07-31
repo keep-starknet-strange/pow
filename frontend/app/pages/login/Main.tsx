@@ -35,12 +35,17 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
-      className="flex-1 items-center justify-around relative"
+      className="flex-1 items-center justify-center relative"
     >
       <Animated.View
         entering={FadeInUp}
-        className="relative mt-[130px]"
-        style={{ width: 322, height: 140 }}
+        className="absolute"
+        style={{
+          width: 322,
+          height: 140,
+          top: "45%",
+          transform: [{ translateY: -70 }],
+        }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -62,7 +67,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getImage("logo.sub")}
+              image={getImage("sublogo")}
               fit="contain"
               x={0}
               y={0}
@@ -78,7 +83,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       </Animated.View>
       <Animated.View
         entering={FadeInDown}
-        className="items-center justify-center gap-3"
+        className="absolute bottom-[150px] items-center justify-center gap-3"
       >
         <BasicButton
           label="PLAY!"
