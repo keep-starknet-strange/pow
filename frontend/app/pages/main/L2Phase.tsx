@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Dimensions, View, Pressable, Text } from "react-native";
+import React from "react";
+import { Dimensions, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
@@ -15,6 +15,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
+import TransactionTabs from "./TransactionTabs";
 
 export const L2Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
@@ -124,45 +125,13 @@ export const L2Phase: React.FC = () => {
         >
           <TransactionButtonsView chainId={1} isDapps={activeTab === "dApps"} />
         </View>
-        {dappsUnlocked[1] && (
-          <View className="absolute top-[104px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
-            {txTabs.map((tab) => (
-              <Pressable
-                style={{
-                  width: window.width / 2 - 6,
-                  height: tab === activeTab ? 28 : 24,
-                }}
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-              >
-                <Canvas style={{ width: "100%", height: "100%" }}>
-                  <Image
-                    image={getImage(
-                      tab === activeTab ? "tx.tab.active" : "tx.tab.inactive",
-                    )}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={window.width / 2 - 6}
-                    height={tab === activeTab ? 28 : 24}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-                <Text
-                  className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
-                  style={{
-                    color: tab === activeTab ? "#FFF7FF" : "#a9a9a9",
-                  }}
-                >
-                  {tab}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
+        <TransactionTabs
+          tabs={txTabs}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          show={!!dappsUnlocked[1]}
+          topPosition={104}
+        />
       </Animated.View>
     </View>
   );
