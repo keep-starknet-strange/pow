@@ -6,7 +6,7 @@
       "slug": "tx",
       "description": "Send funds between wallets.",
       "color": "green",
-      "feeCosts": [1, 20, 31, 90, 277],
+      "feeCosts": [1, 62, 105, 228, 543],
       "fees": [1, 2, 4, 8, 16],
       "speedCosts": [1, 43, 117, 255, 521],
       "speeds": [1, 2, 3, 4, 5]
@@ -17,7 +17,7 @@
       "slug": "segwit",
       "description": "Send funds using Segwit addresses.",
       "color": "yellow",
-      "feeCosts": [145, 162, 485, 1087, 2090],
+      "feeCosts": [439, 487, 970, 1812, 3135],
       "fees": [10, 20, 35, 55, 80],
       "speedCosts": [761, 845, 1261, 1885, 2717],
       "speeds": [1, 2, 3, 4, 5]
@@ -28,7 +28,7 @@
       "slug": "blob",
       "description": "Stores data on the chain.",
       "color": "blue",
-      "feeCosts": [1542, 1445, 3867, 8730, 17500],
+      "feeCosts": [4628, 4335, 7734, 14550, 26250],
       "fees": [50, 75, 125, 200, 300],
       "speedCosts": [5135, 4810, 6435, 9685, 14560],
       "speeds": [1, 2, 3, 4, 5]
@@ -39,7 +39,7 @@
       "slug": "ordinal",
       "description": "Etches images to the chain.",
       "color": "pink",
-      "feeCosts": [11093, 13046, 35859, 71367, 122500],
+      "feeCosts": [33281, 39140, 71718, 118945, 183750],
       "fees": [250, 375, 525, 700, 900],
       "speedCosts": [36920, 43420, 59670, 79170, 101920],
       "speeds": [1, 2, 3, 4, 5]
@@ -50,7 +50,7 @@
       "slug": "runes",
       "description": "Trade runes on the chain.",
       "color": "purple",
-      "feeCosts": [68850, 76950, 194400, 376650, 631800],
+      "feeCosts": [206550, 230850, 388800, 627750, 947700],
       "fees": [800, 1050, 1400, 1800, 2250],
       "speedCosts": [159120, 177840, 224640, 290160, 365040],
       "speeds": [1, 2, 3, 4, 5]
