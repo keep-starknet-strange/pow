@@ -38,8 +38,7 @@ export const StorePage: React.FC = () => {
   const { ref: automationTabRef, onLayout: automationTabOnLayout } =
     useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
-  const { dappsUnlocked, canUnlockDapp, canUnlockTx } =
-    useTransactionsStore();
+  const { dappsUnlocked, canUnlockDapp, canUnlockTx } = useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
