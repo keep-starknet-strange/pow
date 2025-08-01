@@ -6,7 +6,7 @@
       "slug": "tx",
       "description": "Send funds between wallets.",
       "color": "green",
-      "feeCosts": [1, 62, 105, 228, 543],
+      "feeCosts": [1, 20, 105, 228, 543],
       "fees": [1, 2, 4, 8, 16],
       "speedCosts": [1, 43, 117, 255, 521],
       "speeds": [1, 2, 3, 4, 5]
