@@ -22,7 +22,7 @@ export type EventType =
   | "UpgradePurchased"
   | "AutomationPurchased"
   | "DappsPurchased"
-  | "StakingPurchased"
+  | "StakingUnlocked"
   | "L2Purchased"
   | "PrestigePurchased"
   | "TxAdded"

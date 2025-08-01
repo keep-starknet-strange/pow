@@ -40,7 +40,7 @@ export const TutorialOverlay: React.FC = () => {
   }, [step]);
 
   if (!visible || !isReady) return null;
-  console.log("highlightPosition", highlightPosition, "step", step);
+
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {masks.map((m, i) => (
