@@ -5,6 +5,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
 
 import BasicButton from "../../components/buttons/Basic";
+import { ConfirmationModal } from "../../components/ConfirmationModal";
 
 import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
@@ -24,10 +25,17 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const { user } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
 
   const toggleNotifs = () => setNotifs(!notifs);
+
+  const handleResetGame = () => {
+    setShowResetConfirmation(false);
+    clearPrivateKeys("pow_game");
+    disconnectAccount();
+  };
 
   const settingsComponents: {
     label: string;
@@ -41,46 +49,57 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Claim Reward", tab: "ClaimReward" },
     {
       label: "Reset Game",
-      onPress: () => {
-        clearPrivateKeys("pow_game");
-        disconnectAccount();
-      },
+      onPress: () => setShowResetConfirmation(true),
     },
     {
       label: "Back",
-      onPress: () => (isAuthenticated ? navigate("Main") : goBackToLogin()),
+      onPress: () =>
+        isAuthenticated ? (navigate as any)("Main") : goBackToLogin(),
     },
   ];
 
   return (
-    <Animated.View
-      className="flex flex-col gap-3 h-full w-full justify-center items-center"
-      entering={FadeInDown}
-    >
-      <BasicButton
-        label={isSoundOn ? "Sound On" : "Sound Off"}
-        onPress={toggleSound}
-      />
-      <BasicButton
-        label={isMusicOn ? "Music On" : "Music Off"}
-        onPress={toggleMusic}
-      />
-      <BasicButton
-        label={notifs ? "Notifs On" : "Notifs Off"}
-        onPress={toggleNotifs}
-      />
-
-      {settingsComponents.map(({ label, tab, onPress }) => (
+    <>
+      <Animated.View
+        className="flex flex-col gap-3 h-full w-full justify-center items-center"
+        entering={FadeInDown}
+      >
         <BasicButton
-          key={label}
-          label={label}
-          onPress={() => {
-            if (tab) setSettingTab(tab);
-            if (onPress) onPress();
-          }}
+          label={isSoundOn ? "Sound On" : "Sound Off"}
+          onPress={toggleSound}
         />
-      ))}
-    </Animated.View>
+        <BasicButton
+          label={isMusicOn ? "Music On" : "Music Off"}
+          onPress={toggleMusic}
+        />
+        <BasicButton
+          label={notifs ? "Notifs On" : "Notifs Off"}
+          onPress={toggleNotifs}
+        />
+
+        {settingsComponents.map(({ label, tab, onPress }) => (
+          <BasicButton
+            key={label}
+            label={label}
+            onPress={() => {
+              if (tab) setSettingTab(tab);
+              if (onPress) onPress();
+            }}
+          />
+        ))}
+      </Animated.View>
+
+      <ConfirmationModal
+        visible={showResetConfirmation}
+        title="Reset Game Data?"
+        message="This will permanently erase all your game progress, including blocks mined, upgrades purchased, and achievements earned. This action cannot be undone."
+        confirmLabel="Reset"
+        cancelLabel="Cancel"
+        onConfirm={handleResetGame}
+        onCancel={() => setShowResetConfirmation(false)}
+        dangerous={true}
+      />
+    </>
   );
 };
 

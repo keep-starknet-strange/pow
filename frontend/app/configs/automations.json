@@ -10,43 +10,43 @@
           "id": 0,
           "name": "CPU",
           "color": "#f7f760",
-          "cost": 10,
-          "speed": 2
+          "cost": 2500,
+          "speed": 1
         },
         {
           "id": 1,
           "name": "GPU",
           "color": "#f7f760",
-          "cost": 20,
-          "speed": 4
+          "cost": 20000,
+          "speed": 2
         },
         {
           "id": 2,
           "name": "ASIC",
           "color": "#f7f760",
-          "cost": 40,
-          "speed": 7
+          "cost": 820000,
+          "speed": 3
         },
         {
           "id": 3,
           "name": "Antminer",
           "color": "#f7f760",
-          "cost": 80,
-          "speed": 10
+          "cost": 3729375,
+          "speed": 5
         },
         {
           "id": 4,
           "name": "Bitmain",
           "color": "#f7f760",
-          "cost": 160,
-          "speed": 14
+          "cost": 14877931,
+          "speed": 7
         },
         {
           "id": 5,
           "name": "Quantum",
           "color": "#f7f760",
-          "cost": 320,
-          "speed": 18
+          "cost": 154388000,
+          "speed": 10
         }
       ]
     }
@@ -62,42 +62,42 @@
           "id": 0,
           "name": "Base",
           "color": "#f7f760",
-          "cost": 20,
+          "cost": 41728395062,
           "speed": 1
         },
         {
           "id": 1,
           "name": "Rust",
           "color": "#f7f760",
-          "cost": 40,
+          "cost": 294666666667,
           "speed": 2
         },
         {
           "id": 2,
           "name": "Cloud",
           "color": "#f7f760",
-          "cost": 80,
+          "cost": 2426666666667,
           "speed": 3
         },
         {
           "id": 3,
           "name": "Cairo",
           "color": "#f7f760",
-          "cost": 160,
-          "speed": 4
+          "cost": 11639012345679,
+          "speed": 5
         },
         {
           "id": 4,
           "name": "Parallel",
           "color": "#f7f760",
-          "cost": 320,
-          "speed": 5
+          "cost": 53193432098765,
+          "speed": 7
         },
         {
           "id": 5,
           "name": "Decentralized",
           "color": "#f7f760",
-          "cost": 640,
+          "cost": 197296987654321,
           "speed": 10
         }
       ]
@@ -112,42 +112,42 @@
           "id": 0,
           "name": "Optimistic",
           "color": "#f7f760",
-          "cost": 30,
+          "cost": 294666666667,
           "speed": 1
         },
         {
           "id": 1,
           "name": "SNARK",
           "color": "#f7f760",
-          "cost": 60,
+          "cost": 2426666666667,
           "speed": 2
         },
         {
           "id": 2,
           "name": "STARK",
           "color": "#f7f760",
-          "cost": 120,
-          "speed": 4
+          "cost": 11639012345679,
+          "speed": 3
         },
         {
           "id": 3,
           "name": "Stone",
           "color": "#f7f760",
-          "cost": 240,
-          "speed": 6
+          "cost": 197296987654321,
+          "speed": 5
         },
         {
           "id": 4,
           "name": "Recursive",
           "color": "#f7f760",
-          "cost": 480,
-          "speed": 8
+          "cost": 721395358024691,
+          "speed": 7
         },
         {
           "id": 5,
           "name": "STWO",
           "color": "#f7f760",
-          "cost": 960,
+          "cost": 1.93284E+15,
           "speed": 10
         }
       ]
@@ -162,35 +162,35 @@
           "id": 0,
           "name": "Calldata",
           "color": "#f7f760",
-          "cost": 40,
+          "cost": 294666666667,
           "speed": 1
         },
         {
           "id": 1,
           "name": "Zip",
           "color": "#f7f760",
-          "cost": 80,
+          "cost": 2426666666667,
           "speed": 2
         },
         {
           "id": 2,
           "name": "State Diff",
           "color": "#f7f760",
-          "cost": 160,
+          "cost": 11639012345679,
           "speed": 4
         },
         {
           "id": 3,
           "name": "DAS",
           "color": "#f7f760",
-          "cost": 320,
-          "speed": 6
+          "cost": 53193432098765,
+          "speed": 7
         },
         {
           "id": 4,
           "name": "Volition",
           "color": "#f7f760",
-          "cost": 640,
+          "cost": 721395358024691,
           "speed": 10
         }
       ]

@@ -3,6 +3,7 @@ import inAppNotificationsJson from "../configs/inAppNotifications.json";
 
 export class InAppNotificationsObserver implements Observer {
   sendNotification: (noticicationTypeId: number, message?: string) => void;
+  private blockFullAttempts: number = 0; // Counter for consecutive BlockFull attempts
 
   constructor(
     sendNotification: (noticicationTypeId: number, message?: string) => void,
@@ -29,11 +30,26 @@ export class InAppNotificationsObserver implements Observer {
         break;
       }
       case "BlockFull": {
-        const typeId =
-          inAppNotificationsJson.find(
-            (notification) => notification.eventType === "BlockFull",
-          )?.id || 0;
-        this.sendNotification(typeId);
+        // Increment consecutive block full attempts
+        this.blockFullAttempts++;
+
+        // Only show notification after 3 consecutive attempts
+        if (this.blockFullAttempts >= 3) {
+          const typeId =
+            inAppNotificationsJson.find(
+              (notification) => notification.eventType === "BlockFull",
+            )?.id || 0;
+          this.sendNotification(typeId);
+          this.blockFullAttempts = 0; // Reset counter after showing notification
+        }
+        break;
+      }
+      case "TxAdded":
+      case "ItemPurchased":
+      case "UpgradePurchased":
+      case "AutomationPurchased": {
+        // Reset block full attempts counter when these successful events occur
+        this.blockFullAttempts = 0;
         break;
       }
       default:

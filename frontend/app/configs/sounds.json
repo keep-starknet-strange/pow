@@ -2,91 +2,109 @@
   "MineClicked": {
     "volume": 0.4,
     "rate": 1.2,
-    "haptic": "Heavy"
+    "haptic": "Heavy",
+    "poolSize": 5
   },
   "MineDone": {
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success"
+    "haptic": "Success",
+    "poolSize": 2
   },
   "SequenceClicked": {
     "volume": 0.5,
     "rate": 1.2,
-    "haptic": "Heavy"
+    "haptic": "Heavy",
+    "poolSize": 5
   },
   "SequenceDone": {
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success"
+    "haptic": "Success",
+    "poolSize": 2
   },
   "ProveClicked": {
     "volume": 0.1,
     "rate": 0.8,
-    "haptic": "Rigid"
+    "haptic": "Rigid",
+    "poolSize": 5
   },
   "ProveDone": {
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success"
+    "haptic": "Success",
+    "poolSize": 2
   },
   "DaClicked": {
     "volume": 0.3,
     "rate": 1.2,
-    "haptic": "Rigid"
+    "haptic": "Rigid",
+    "poolSize": 5
   },
   "DaDone": {
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success"
+    "haptic": "Success",
+    "poolSize": 2
   },
   "ItemPurchased": {
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Soft"
+    "haptic": "Soft",
+    "poolSize": 3
   },
   "BuyFailed": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Error"
+    "haptic": "Error",
+    "poolSize": 2
   },
   "InvalidPurchase": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Error"
+    "haptic": "Error",
+    "poolSize": 2
   },
   "BlockFull": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Error"
+    "haptic": "Error",
+    "poolSize": 2
   },
   "TxAdded": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Medium"
+    "haptic": "Medium",
+    "poolSize": 8
   },
   "AchievementCompleted": {
     "volume": 1,
     "rate": 1.1,
-    "haptic": "Soft"
+    "haptic": "Soft",
+    "poolSize": 2
   },
   "BasicClick": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Soft"
+    "haptic": "Soft",
+    "poolSize": 5
   },
   "BasicError": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Error"
+    "haptic": "Error",
+    "poolSize": 2
   },
   "SwitchPage": {
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Light"
+    "haptic": "Light",
+    "poolSize": 2
   },
   "DiceRoll": {
     "volume": 1,
     "rate": 1,
-    "haptic": "Heavy"
+    "haptic": "Heavy",
+    "poolSize": 2
   }
 }

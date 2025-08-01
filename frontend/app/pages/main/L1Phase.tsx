@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Dimensions, View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
@@ -18,6 +19,7 @@ import { TargetId } from "@/app/stores/useTutorialStore";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
+  const { notify } = useEventManager();
   const { ref, onLayout } = useTutorialLayout(
     "dappsTab" as TargetId,
     dappsUnlocked[0] || false,
@@ -103,7 +105,12 @@ export const L1Phase: React.FC = () => {
                   height: tab === activeTab ? 28 : 24,
                 }}
                 key={tab}
-                onPress={() => setActiveTab(tab)}
+                onPress={() => {
+                  setActiveTab(tab);
+                  if (tab === "dApps") {
+                    notify("SwitchTxTab", { name: tab });
+                  }
+                }}
                 ref={tab === "dApps" ? ref : undefined}
                 onLayout={tab === "dApps" ? onLayout : undefined}
               >

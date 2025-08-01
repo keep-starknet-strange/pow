@@ -40,13 +40,20 @@ export const StorePage: React.FC = () => {
   const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
     useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
-  const { l2 } = useL2Store();
+  const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width, height } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
-  const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
+  const [storeType, setStoreType] = useState<"L1" | "L2">(
+    isL2Unlocked ? "L2" : "L1",
+  );
+  useEffect(() => {
+    if (!isL2Unlocked) {
+      setStoreType("L1");
+    }
+  }, [isL2Unlocked]);
   const [storeTransactions, setStoreTransactions] = useState(
     transactionsJson.L1,
   );
@@ -94,7 +101,7 @@ export const StorePage: React.FC = () => {
           />
         </Canvas>
       </View>
-      {l2 && (
+      {isL2Unlocked && (
         <L1L2Switch
           currentView={storeType}
           setCurrentView={(view: "L1" | "L2") => {
@@ -104,7 +111,7 @@ export const StorePage: React.FC = () => {
           isStore={true}
         />
       )}
-      {l2 ? (
+      {isL2Unlocked ? (
         <View className="w-full relative">
           <Canvas style={{ width: 290, height: 24, marginLeft: 4 }}>
             <Image

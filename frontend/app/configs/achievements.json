@@ -8,49 +8,49 @@
   },
   {
     "id": 1,
-    "name": "Reach L1 Block 100",
+    "name": "Reach L1 Block 42",
     "category": "L1 CHAIN",
     "image": "achievements.l1.blocks.2",
     "updateOn": "MineDone"
   },
   {
     "id": 2,
-    "name": "Reach L1 Block 1000",
+    "name": "Reach L1 Block 100",
     "category": "L1 CHAIN",
     "image": "achievements.l1.blocks.3",
     "updateOn": "MineDone"
   },
   {
     "id": 3,
-    "name": "Reach L1 Block 10K",
+    "name": "Reach L1 Block 420",
     "category": "L1 CHAIN",
     "image": "achievements.l1.blocks.4",
     "updateOn": "MineDone"
   },
   {
     "id": 4,
-    "name": "Reach L2 Block 100",
+    "name": "Reach L2 Block 10",
     "category": "L2 CHAIN",
     "image": "achievements.l2.blocks.1",
     "updateOn": "SequenceDone"
   },
   {
     "id": 5,
-    "name": "Reach L2 Block 1000",
+    "name": "Reach L2 Block 100",
     "category": "L2 CHAIN",
     "image": "achievements.l2.blocks.2",
     "updateOn": "SequenceDone"
   },
   {
     "id": 6,
-    "name": "Reach L2 Block 10K",
+    "name": "Reach L2 Block 314",
     "category": "L2 CHAIN",
     "image": "achievements.l2.blocks.3",
     "updateOn": "SequenceDone"
   },
   {
     "id": 7,
-    "name": "Reach L2 Block 100K",
+    "name": "Reach L2 Block 420",
     "category": "L2 CHAIN",
     "image": "achievements.l2.blocks.4",
     "updateOn": "SequenceDone"
@@ -71,14 +71,14 @@
   },
   {
     "id": 10,
-    "name": "Reach ₿1M",
+    "name": "Reach ₿100M",
     "category": "HODL",
     "image": "achievements.money.3",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 11,
-    "name": "Reach ₿100M",
+    "name": "Reach ₿1T",
     "category": "HODL",
     "image": "achievements.money.4",
     "updateOn": "BalanceUpdated"
@@ -190,7 +190,7 @@
   },
   {
     "id": 27,
-    "name": "Get ₿1K in 1 Transaction",
+    "name": "Get ₿1M in 1 Transaction",
     "category": "MISSIONS",
     "image": "achievements.mission.btc.2",
     "updateOn": "TxAdded"

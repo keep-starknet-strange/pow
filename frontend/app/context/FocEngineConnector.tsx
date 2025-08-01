@@ -516,11 +516,11 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     [STARKNET_ENABLED, accountsContract],
   );
 
-  const usernameValidationError = "3-20 characters, a-z A-Z 0-9 and _ only";
+  const usernameValidationError = "3-31 characters, a-z A-Z 0-9 and _ only";
   const isUsernameValid = (username: string) => {
     // Add your validation logic here
     // For example, check length and allowed characters
-    const regex = /^[a-zA-Z0-9_]{3,20}$/; // Alphanumeric and underscores, 3-20 characters
+    const regex = /^[a-zA-Z0-9_]{3,31}$/; // Alphanumeric and underscores, 3-31 characters
     return regex.test(username);
   };
 

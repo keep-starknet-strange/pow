@@ -34,16 +34,28 @@ export const AutomationView: React.FC<AutomationViewProps> = (props) => {
           locked={false}
         />
         <TxDetails
-          name={`${props.automation.levels[level]?.name} ${props.automation.name}`}
+          name={
+            level === 0
+              ? props.automation.name
+              : `${props.automation.levels[level - 1]?.name} ${props.automation.name}`
+          }
           description={props.automation.description}
         />
       </View>
       <UpgradeButton
-        label={`Upgrade to`}
-        specialLabel={{
-          text: `${props.automation.levels[level]?.name}`,
-          color: "#D7A833",
-        }}
+        label={
+          level >= props.automation.levels.length
+            ? `Upgrade maxxed`
+            : `Upgrade to`
+        }
+        specialLabel={
+          level >= props.automation.levels.length
+            ? undefined
+            : {
+                text: `${props.automation.levels[level]?.name}`,
+                color: "#D7A833",
+              }
+        }
         level={level}
         maxLevel={props.automation.levels.length}
         nextCost={getNextAutomationCost(props.chainId, props.automation.id)}

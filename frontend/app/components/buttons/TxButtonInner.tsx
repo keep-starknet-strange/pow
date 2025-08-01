@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback } from "react";
+import React, { memo, useEffect, useCallback, useState } from "react";
 import { View, Text, Dimensions } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
@@ -47,15 +47,21 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   }, [automationAnimHeight]);
 
   const fee = getFee(props.chainId, props.txId, props.isDapp);
-  const addNewTransaction = useCallback(async () => {
-    const newTx = newTransaction(props.txId, fee, props.isDapp);
-    addTransaction(props.chainId, newTx);
-  }, [props.chainId, props.txId, props.isDapp]);
+  const addNewTransaction = useCallback(
+    async (finished: boolean | undefined) => {
+      if (finished === false) return;
+      const newTx = newTransaction(props.txId, fee, props.isDapp);
+      addTransaction(props.chainId, newTx);
+    },
+    [props.chainId, props.txId, props.isDapp],
+  );
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+
   useEffect(() => {
     if (speed > 0) {
       automationAnimHeight.value = 0;
+      // Only trigger automation if it's not the initial mount/re-render
       automationAnimHeight.value = withSequence(
         withTiming(
           94,
@@ -63,7 +69,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
             duration: 5000 / speed,
             easing: Easing.cubic,
           },
-          () => runOnJS(addNewTransaction)(),
+          (finished) => runOnJS(addNewTransaction)(finished),
         ),
         withTiming(0, {
           duration: 200,
@@ -73,6 +79,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     } else {
       automationAnimHeight.value = 94;
     }
+
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
     };
@@ -86,7 +93,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
             duration: 5000 / speed,
             easing: Easing.cubic,
           },
-          () => runOnJS(addNewTransaction)(),
+          (finished) => runOnJS(addNewTransaction)(finished),
         ),
         withTiming(0, {
           duration: 200,

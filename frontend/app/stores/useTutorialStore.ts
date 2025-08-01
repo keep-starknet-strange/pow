@@ -91,6 +91,7 @@ export const useTutorial = () => {
     layouts,
     visible,
     setVisible,
+    resetTutorial,
   } = useTutorialStore();
 
   return {
@@ -101,5 +102,6 @@ export const useTutorial = () => {
     layouts,
     visible,
     setVisible,
+    resetTutorial,
   };
 };

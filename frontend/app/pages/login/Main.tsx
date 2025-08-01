@@ -39,7 +39,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
     >
       <Animated.View
         entering={FadeInUp}
-        className="relative mt-[80px]"
+        className="relative mt-[130px]"
         style={{ width: 322, height: 214 }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -57,7 +57,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
           />
         </Canvas>
         <View
-          className="absolute bottom-[-10px] right-[30px]"
+          className="absolute bottom-[30px] right-[20px]"
           style={{ width: 182, height: 18 }}
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">

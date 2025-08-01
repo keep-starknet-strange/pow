@@ -26,7 +26,7 @@ export const L1L2Switch = ({
   );
 
   return (
-    <View className="absolute right-0 top-0 z-[10]">
+    <View className="absolute right-0 top-0">
       <Canvas style={{ width: 92, height: 31 }}>
         <Image
           image={getImage("header.switch")}
@@ -45,7 +45,7 @@ export const L1L2Switch = ({
         onPress={() => {
           setCurrentView("L1");
         }}
-        className="absolute left-[6px] top-0 w-[38px] h-[21px] z-[2]"
+        className="absolute left-[6px] top-0 w-[38px] h-[21px]"
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
@@ -80,7 +80,7 @@ export const L1L2Switch = ({
         onPress={() => {
           setCurrentView("L2");
         }}
-        className="absolute right-[6px] top-0 w-[38px] h-[21px] z-[2]"
+        className="absolute right-[6px] top-0 w-[38px] h-[21px]"
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image

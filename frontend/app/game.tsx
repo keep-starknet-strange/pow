@@ -8,7 +8,6 @@ import { useEventManager } from "@/app/stores/useEventManager";
 import { useStarknetConnector } from "./context/StarknetConnector";
 import { useFocEngine } from "./context/FocEngineConnector";
 import { usePowContractConnector } from "./context/PowContractConnector";
-import { useUpgrades } from "./stores/useUpgradesStore";
 import { useGameStore } from "./stores/useGameStore";
 import { useBalanceStore } from "./stores/useBalanceStore";
 import { useOnchainActions } from "./stores/useOnchainActions";
@@ -169,11 +168,7 @@ export default function game() {
     getUserBlockNumber,
   ]);
 
-  const { getUpgradeValue } = useUpgrades();
-  const {
-    initializeTransactions,
-    setGetUpgradeValueDependency: setGetUpgradeValueDependencyTxStore,
-  } = useTransactionsStore();
+  const { initializeTransactions } = useTransactionsStore();
   useEffect(() => {
     initializeTransactions(
       powContract,
@@ -188,15 +183,8 @@ export default function game() {
     getUserTxFeeLevels,
     getUserTxSpeedLevels,
   ]);
-  useEffect(() => {
-    setGetUpgradeValueDependencyTxStore(getUpgradeValue);
-  }, [getUpgradeValue, setGetUpgradeValueDependencyTxStore]);
 
-  const {
-    initializeGameStore,
-    setGetUpgradeValueDependency: setGetUpgradeValueDependencyGame,
-    setInitMyGameDependency,
-  } = useGameStore();
+  const { initializeGameStore, setInitMyGameDependency } = useGameStore();
   useEffect(() => {
     initializeGameStore(
       powContract,
@@ -207,24 +195,12 @@ export default function game() {
     );
   }, [initializeGameStore, user]);
   useEffect(() => {
-    setGetUpgradeValueDependencyGame(getUpgradeValue);
     setInitMyGameDependency(initMyGame);
-  }, [
-    getUpgradeValue,
-    initMyGame,
-    setGetUpgradeValueDependencyGame,
-    setInitMyGameDependency,
-  ]);
+  }, [initMyGame, setInitMyGameDependency]);
 
-  const {
-    initializeL2Store,
-    setGetUpgradeValueDependency: setGetUpgradeValueDependencyL2,
-  } = useL2Store();
+  const { initializeL2Store } = useL2Store();
   useEffect(() => {
     initializeL2Store(powContract, user);
   }, [initializeL2Store, powContract, user]);
-  useEffect(() => {
-    setGetUpgradeValueDependencyL2(getUpgradeValue);
-  }, [getUpgradeValue, setGetUpgradeValueDependencyL2]);
   return <RootNavigator />;
 }
