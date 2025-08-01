@@ -7,19 +7,19 @@ import { MainBackground } from "../components/MainBackground";
 import { L1L2Switch } from "../components/L1L2Switch";
 
 export const MainPage: React.FC = () => {
-  const { l2 } = useL2Store();
+  const { isL2Unlocked } = useL2Store();
 
   const [currentView, setCurrentView] = React.useState<"L1" | "L2">(
-    l2 ? "L2" : "L1",
+    isL2Unlocked ? "L2" : "L1",
   );
   useEffect(() => {
-    setCurrentView(l2 ? "L2" : "L1");
-  }, [l2]);
+    setCurrentView(isL2Unlocked ? "L2" : "L1");
+  }, [isL2Unlocked]);
 
   return (
     <View className="flex-1 relative">
       <MainBackground />
-      {l2 && (
+      {isL2Unlocked && (
         <L1L2Switch
           currentView={currentView}
           setCurrentView={(view: "L1" | "L2") => setCurrentView(view)}

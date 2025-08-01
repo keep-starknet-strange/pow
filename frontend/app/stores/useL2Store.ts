@@ -11,6 +11,7 @@ import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 
 interface L2Store {
   l2: L2 | undefined;
+  isL2Unlocked: boolean;
 
   resetL2Store: () => void;
   initializeL2Store: (
@@ -19,7 +20,6 @@ interface L2Store {
   ) => void;
 
   canUnlockL2: () => boolean;
-  isL2Unlocked: () => boolean;
   initL2: () => void;
   getL2Cost: () => number;
   getL2: () => L2 | undefined;
@@ -35,8 +35,9 @@ interface L2Store {
 
 export const useL2Store = create<L2Store>((set, get) => ({
   l2: undefined,
+  isL2Unlocked: false,
 
-  resetL2Store: () => set({ l2: undefined }),
+  resetL2Store: () => set({ l2: undefined, isL2Unlocked: false }),
   initializeL2Store: (powContract, user) => {
     const fetchL2Store = async () => {
       if (powContract && user) {
@@ -51,6 +52,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
 
           set({
             l2: l2Instance,
+            isL2Unlocked: true,
           });
         } catch (error) {
           console.error("Error initializing L2 store:", error);
@@ -104,10 +106,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
     return true;
   },
 
-  isL2Unlocked: () => {
-    return get().l2 !== undefined;
-  },
-
   initL2: () => {
     const cost = get().getL2Cost();
     if (!useBalanceStore.getState().tryBuy(cost)) return;
@@ -128,6 +126,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       useEventManager.getState().notify("L2Purchased");
       return {
         l2: newL2Instance,
+        isL2Unlocked: true,
       };
     });
   },

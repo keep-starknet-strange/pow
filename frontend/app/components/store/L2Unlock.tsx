@@ -11,7 +11,7 @@ export type L2UnlockProps = {
 
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
-  const { canUnlockL2, l2, getL2Cost, initL2 } = useL2Store();
+  const { canUnlockL2, isL2Unlocked, getL2Cost, initL2 } = useL2Store();
   const { workingBlocks } = useGameStore();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
@@ -25,7 +25,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       return;
     }
 
-    if (l2) {
+    if (isL2Unlocked) {
       setShowUnlock(false);
       return;
     }
