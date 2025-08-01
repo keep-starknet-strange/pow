@@ -111,7 +111,11 @@ export const StorePage: React.FC = () => {
           isStore={true}
         />
       )}
-      {isL2Unlocked ? <ShopTitle position="left" /> : <ShopTitle position="right" />}
+      {isL2Unlocked ? (
+        <ShopTitle position="left" />
+      ) : (
+        <ShopTitle position="right" />
+      )}
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
         style={{ paddingHorizontal: 4, marginTop: 4 }}
