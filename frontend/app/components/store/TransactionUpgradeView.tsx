@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "@/app/hooks/useImages";
-import { getTxIconName } from "../../utils/transactions";
+import { getBlockTxIconName } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { TransactionUpgradeActions } from "./transactionUpgrade/TransactionUpgradeActions";
@@ -47,7 +47,11 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
     <View className="flex flex-col w-full">
       <View className="flex flex-row w-full mb-[4px]">
         <IconWithLock
-          txIcon={getTxIconName(props.chainId, props.txData.id, props.isDapp)}
+          txIcon={getBlockTxIconName(
+            props.chainId,
+            props.txData.id,
+            props.isDapp,
+          )}
           locked={txFeeLevel === -1}
         />
         <TxDetails
@@ -58,6 +62,8 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
       <TransactionUpgradeActions
         locked={txFeeLevel === -1}
         nextCost={nextTxFeeCost}
+        txId={props.txData.id}
+        chainId={props.chainId}
         onBuyPress={() => {
           if (props.isDapp) {
             dappFeeUpgrade(props.chainId, props.txData.id);
@@ -66,7 +72,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
           }
         }}
         feeProps={{
-          level: txFeeLevel,
+          level: txFeeLevel + 1, // Pass next level to purchase (current + 1)
           maxLevel: props.txData.feeCosts.length,
           nextCost: nextTxFeeCost,
           onPress: () => {
@@ -79,7 +85,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
           color: props.txData.color.substring(0, 7) + "f0",
         }}
         speedProps={{
-          level: txSpeedLevel,
+          level: txSpeedLevel + 1, // Pass next level to purchase (current + 1)
           maxLevel: props.txData.speedCosts.length,
           nextCost: nextTxSpeedCost,
           onPress: () => {

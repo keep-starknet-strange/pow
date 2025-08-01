@@ -29,7 +29,7 @@ export type EventType =
   | "AchievementCompleted"
   | "SwitchStore"
   | "SwitchPage"
-  | "SwitchTab";
+  | "SwitchTxTab";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): Promise<void>;

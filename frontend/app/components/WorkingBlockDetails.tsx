@@ -121,24 +121,51 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
           top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         }}
       >
-        <Text
-          style={{
-            color: "#c3c3c3",
-            fontFamily: "Pixels",
-            fontSize: isSmall ? 16 : 14,
-          }}
-        >
-          Block&nbsp;
-        </Text>
-        <AnimatedRollingNumber
-          value={workingBlock?.blockId || 0}
-          textStyle={{
-            fontSize: isSmall ? 16 : 18,
-            color: "#c3c3c3",
-            fontFamily: "Pixels",
-          }}
-          spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
-        />
+        {(workingBlock?.blockId || 0) >= 10 ? (
+          // For multi-digit block numbers, show "#{number}"
+          <>
+            <Text
+              style={{
+                color: "#c3c3c3",
+                fontFamily: "Pixels",
+                fontSize: isSmall ? 16 : 18,
+              }}
+            >
+              #
+            </Text>
+            <AnimatedRollingNumber
+              value={workingBlock?.blockId || 0}
+              textStyle={{
+                fontSize: isSmall ? 16 : 18,
+                color: "#c3c3c3",
+                fontFamily: "Pixels",
+              }}
+              spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+            />
+          </>
+        ) : (
+          // For single-digit block numbers, show "Block {number}"
+          <>
+            <Text
+              style={{
+                color: "#c3c3c3",
+                fontFamily: "Pixels",
+                fontSize: isSmall ? 16 : 18,
+              }}
+            >
+              Block&nbsp;
+            </Text>
+            <AnimatedRollingNumber
+              value={workingBlock?.blockId || 0}
+              textStyle={{
+                fontSize: isSmall ? 16 : 18,
+                color: "#c3c3c3",
+                fontFamily: "Pixels",
+              }}
+              spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+            />
+          </>
+        )}
       </View>
 
       <View

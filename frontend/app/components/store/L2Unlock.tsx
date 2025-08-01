@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
+import { useGameStore } from "@/app/stores/useGameStore";
 import { useL2Store } from "@/app/stores/useL2Store";
-import { UnlockView } from "./UnlockView";
+import { FeatureUnlockView } from "../FeatureUnlockView";
 
 export type L2UnlockProps = {
   alwaysShow?: boolean;
@@ -10,7 +11,8 @@ export type L2UnlockProps = {
 
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
-  const { canUnlockL2, l2, getL2Cost, initL2 } = useL2Store();
+  const { canUnlockL2, isL2Unlocked, getL2Cost, initL2 } = useL2Store();
+  const { workingBlocks } = useGameStore();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
     if (alwaysShow) {
@@ -18,7 +20,12 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       return;
     }
 
-    if (l2) {
+    if (workingBlocks[0]?.isBuilt) {
+      setShowUnlock(false);
+      return;
+    }
+
+    if (isL2Unlocked) {
       setShowUnlock(false);
       return;
     }
@@ -54,15 +61,21 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       }
     }
     setShowUnlock(true);
-  }, [alwaysShow, canUnlockL2, l2, transactionFeeLevels, dappFeeLevels]);
+  }, [
+    alwaysShow,
+    canUnlockL2,
+    isL2Unlocked,
+    transactionFeeLevels,
+    dappFeeLevels,
+    workingBlocks[0]?.isBuilt,
+  ]);
 
   return (
     <View>
       {showUnlock && (
-        <UnlockView
-          icon={"logo.starknet"}
+        <FeatureUnlockView
           label="Unlock L2"
-          description="New phase of scaling!"
+          description="Boundless scaling!"
           cost={getL2Cost()}
           onPress={() => {
             initL2();

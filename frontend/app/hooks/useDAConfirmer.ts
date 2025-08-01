@@ -10,7 +10,7 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
-  const { getUpgradeValue, getAutomationValue } = useUpgrades();
+  const { getAutomationValue } = useUpgrades();
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
   const [daProgress, setDaConfirmProgress] = useState(0);
 
@@ -38,7 +38,7 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
     }
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const daDifficulty = getUpgradeValue(1, "DA compression");
+      const daDifficulty = l2?.da.maxSize || 1;
       if (newCounter == daDifficulty) {
         onDAConfirm();
         setDaConfirmProgress(1);
@@ -52,7 +52,7 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, getUpgradeValue, notify, l2?.da.isBuilt]);
+  }, [onDAConfirm, notify, l2?.da.isBuilt, l2?.da.maxSize]);
 
   // Reset da confirm progress when the DA is built
   useEffect(() => {

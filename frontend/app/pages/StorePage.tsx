@@ -40,12 +40,19 @@ export const StorePage: React.FC = () => {
   const isFocused = useIsFocused();
   const { canUnlockDapp, canUnlockTx, dappsUnlocked } = useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
-  const { l2 } = useL2Store();
+  const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = Dimensions.get("window");
   const [chainId, setChainId] = useState(0);
-  const [storeType, setStoreType] = useState<"L1" | "L2">(l2 ? "L2" : "L1");
+  const [storeType, setStoreType] = useState<"L1" | "L2">(
+    isL2Unlocked ? "L2" : "L1",
+  );
+  useEffect(() => {
+    if (!isL2Unlocked) {
+      setStoreType("L1");
+    }
+  }, [isL2Unlocked]);
   const [storeTransactions, setStoreTransactions] = useState(
     transactionsJson.L1,
   );
@@ -93,7 +100,7 @@ export const StorePage: React.FC = () => {
           />
         </Canvas>
       </View>
-      {l2 && (
+      {isL2Unlocked && (
         <L1L2Switch
           currentView={storeType}
           setCurrentView={(view: "L1" | "L2") => {
@@ -103,7 +110,7 @@ export const StorePage: React.FC = () => {
           isStore={true}
         />
       )}
-      {l2 ? <ShopTitle position="left" /> : <ShopTitle position="right" />}
+      {isL2Unlocked ? <ShopTitle position="left" /> : <ShopTitle position="right" />}
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
         style={{ paddingHorizontal: 4, marginTop: 4 }}

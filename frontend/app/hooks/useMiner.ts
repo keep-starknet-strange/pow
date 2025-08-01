@@ -8,7 +8,7 @@ import { useAutoClicker } from "./useAutoClicker";
 
 export const useMiner = (onBlockMined: () => void) => {
   const { notify } = useEventManager();
-  const { getUpgradeValue, getAutomationValue } = useUpgrades();
+  const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
   const [mineCounter, setMineCounter] = useState(0);
@@ -38,7 +38,7 @@ export const useMiner = (onBlockMined: () => void) => {
     }
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = getUpgradeValue(0, "Block Difficulty");
+      const blockDifficulty = workingBlocks[0]?.difficulty || 4 ** 2; // Default difficulty if not set
       if (newCounter == blockDifficulty) {
         onBlockMined();
         setMiningProgress(1);
@@ -54,7 +54,12 @@ export const useMiner = (onBlockMined: () => void) => {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [getUpgradeValue, notify, onBlockMined, workingBlocks[0]?.isBuilt]);
+  }, [
+    notify,
+    onBlockMined,
+    workingBlocks[0]?.isBuilt,
+    workingBlocks[0]?.difficulty,
+  ]);
 
   // Reset mining progress when a block is mined
   useEffect(() => {

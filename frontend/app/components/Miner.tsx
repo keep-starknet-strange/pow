@@ -9,14 +9,13 @@ interface MinerProps {
 }
 
 export const Miner: React.FC<MinerProps> = ({ triggerAnim }) => {
-  const { getUpgradeValue } = useUpgrades();
   const { miningProgress, mineBlock } = useGame();
 
   const [mineStartTime, setMineStartTime] = useState(Date.now());
   const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");
   const generateRandomHash = (isDone: boolean) => {
-    const difficulty = getUpgradeValue(0, "Block Difficulty");
+    const difficulty = 4; // TODO
     const randomPart = Math.floor(Math.random() * 0xffffffffff)
       .toString(14)
       .padStart(14, "0");

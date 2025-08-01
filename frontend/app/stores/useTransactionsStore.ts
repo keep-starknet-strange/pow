@@ -5,6 +5,7 @@ import { useEventManager } from "./useEventManager";
 import transactionJson from "@/app/configs/transactions.json";
 import dappsJson from "@/app/configs/dapps.json";
 import { useBalanceStore } from "./useBalanceStore";
+import { useUpgradesStore } from "./useUpgradesStore";
 
 interface TransactionsState {
   // Map: chainId -> txId -> Tx Fee Level
@@ -57,11 +58,6 @@ interface TransactionsState {
   getNextTxSpeedCost: (chainId: number, txId: number) => number;
   getNextDappFeeCost: (chainId: number, dappId: number) => number;
   getNextDappSpeedCost: (chainId: number, dappId: number) => number;
-
-  getUpgradeValueDependency?: (chainId: number, upgradeName: string) => number;
-  setGetUpgradeValueDependency: (
-    getUpgradeValue: (chainId: number, upgradeName: string) => number,
-  ) => void;
 }
 
 export const useTransactionsStore = create<TransactionsState>((set, get) => ({
@@ -70,9 +66,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   dappFeeLevels: {},
   dappSpeedLevels: {},
   dappsUnlocked: {},
-  getUpgradeValueDependency: undefined,
-  setGetUpgradeValueDependency: (getUpgradeValue) =>
-    set({ getUpgradeValueDependency: getUpgradeValue }),
 
   resetTransactions: () => {
     // Initialize transaction levels
@@ -429,7 +422,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   getTransactionFee: (chainId, txId) => {
-    const { getUpgradeValueDependency } = get();
     const txLevels = get().transactionFeeLevels[chainId];
     const transactionJsonData =
       chainId === 0 ? transactionJson.L1 : transactionJson.L2;
@@ -441,9 +433,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = txLevels[txId];
-    const mevBoost = getUpgradeValueDependency
-      ? getUpgradeValueDependency(chainId, "MEV Boost")
-      : 1;
+    const mevBoost = useUpgradesStore
+      .getState()
+      .getUpgradeValue(chainId, "MEV Boost");
     return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
   },
 
@@ -463,7 +455,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   getDappFee: (chainId, dappId) => {
-    const { getUpgradeValueDependency } = get();
     const dappLevels = get().dappFeeLevels[chainId];
     const dappsJsonData =
       chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
@@ -473,9 +464,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       return 0;
     }
     const level = dappLevels[dappId];
-    const mevBoost = getUpgradeValueDependency
-      ? getUpgradeValueDependency(chainId, "MEV Boost")
-      : 1;
+    const mevBoost = useUpgradesStore
+      .getState()
+      .getUpgradeValue(chainId, "MEV Boost");
     return level === -1 ? 0 : dappData.fees[level] * mevBoost;
   },
 

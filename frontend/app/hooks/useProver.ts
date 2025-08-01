@@ -8,7 +8,7 @@ import { useAutoClicker } from "./useAutoClicker";
 
 export const useProver = (onProve: () => void) => {
   const { notify } = useEventManager();
-  const { getUpgradeValue, getAutomationValue } = useUpgrades();
+  const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
   const [proverCounter, setProverCounter] = useState(0);
@@ -38,7 +38,7 @@ export const useProver = (onProve: () => void) => {
     }
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const proverDifficulty = getUpgradeValue(1, "Recursive Proving");
+      const proverDifficulty = l2?.prover.maxSize || 1;
       if (newCounter == proverDifficulty) {
         onProve();
         setProverProgress(1);
@@ -52,7 +52,7 @@ export const useProver = (onProve: () => void) => {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, getUpgradeValue, notify, l2?.prover.isBuilt]);
+  }, [onProve, notify, l2?.prover.isBuilt, l2?.prover.maxSize]);
 
   // Reset prover progress when the prover is built
   useEffect(() => {
