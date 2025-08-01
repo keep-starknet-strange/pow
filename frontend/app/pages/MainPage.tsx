@@ -23,6 +23,7 @@ export const MainPage: React.FC = () => {
         <L1L2Switch
           currentView={currentView}
           setCurrentView={(view: "L1" | "L2") => setCurrentView(view)}
+          isStore={false}
         />
       )}
       {currentView === "L2" ? <L2Phase /> : <L1Phase />}

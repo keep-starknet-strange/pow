@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { View, Text, Modal } from "react-native";
 import ToggleButton from "../../components/buttons/Toggle";
+import { useTutorial } from "../../stores/useTutorialStore";
 
 const ResetTutorialButton: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
-
-  // TODO: Create Tuturial Context
+  const { resetTutorial } = useTutorial();
   const [isTutorialReset, setIsTutorialReset] = useState(false);
 
   const handleReset = () => {
     setModalVisible(false);
+    resetTutorial();
     setIsTutorialReset(true);
   };
 

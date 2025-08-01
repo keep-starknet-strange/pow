@@ -62,6 +62,8 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> = (
       <TransactionUpgradeActions
         locked={txFeeLevel === -1}
         nextCost={nextTxFeeCost}
+        txId={props.txData.id}
+        chainId={props.chainId}
         onBuyPress={() => {
           if (props.isDapp) {
             dappFeeUpgrade(props.chainId, props.txData.id);

@@ -43,6 +43,7 @@ export class TutorialObserver implements Observer {
       this.setVisible(true);
     });
     this.handlers.set("L2Purchased-dapps", () => this.advanceStep());
+    this.handlers.set("SwitchTxTab-dApps-dapps", () => this.advanceStep());
     this.handlers.set("SequenceDone-L2Upgrade", () => this.advanceStep());
     this.handlers.set("ProveDone-prover", () => this.advanceStep());
     this.handlers.set("DaDone-dataAvailability", () => this.advanceStep());
@@ -51,7 +52,7 @@ export class TutorialObserver implements Observer {
   }
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
-    if (eventName === "SwitchPage" || eventName === "SwitchStore") {
+    if (eventName === "SwitchPage" || eventName === "SwitchStore" || eventName === "SwitchTxTab") {
       if (data?.name) {
         eventName = eventName + "-" + data.name;
       }

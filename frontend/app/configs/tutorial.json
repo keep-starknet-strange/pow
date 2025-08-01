@@ -60,7 +60,7 @@
     "description": "Decentralized applications (dApps) are the future!\nClick here to manage your first dApps.",
     "bubbleTargetId": "dappsTab",
     "highlightTargetId": "dappsTab",
-    "canDismiss": true
+    "canDismiss": false
   },
   "L2Upgrade": {
     "title": "Congrats! You now have an L2",
@@ -100,8 +100,8 @@
   "completed": {
     "title": "Congratulations!",
     "description": "You're done!",
-    "bubbleTargetId": "???",
-    "highlightTargetId": "??",
+    "bubbleTargetId": "",
+    "highlightTargetId": "",
     "canDismiss": true
   }
 }
