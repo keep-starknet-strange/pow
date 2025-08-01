@@ -22,13 +22,14 @@ export type EventType =
   | "UpgradePurchased"
   | "AutomationPurchased"
   | "DappsPurchased"
-  | "StakingPurchased"
+  | "StakingUnlocked"
   | "L2Purchased"
   | "PrestigePurchased"
   | "TxAdded"
   | "AchievementCompleted"
   | "SwitchStore"
-  | "SwitchPage";
+  | "SwitchPage"
+  | "SwitchTab";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): Promise<void>;
