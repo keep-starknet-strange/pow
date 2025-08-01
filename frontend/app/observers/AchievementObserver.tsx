@@ -119,8 +119,8 @@ export class AchievementObserver implements Observer {
     const balanceTargets: Record<string, number> = {
       "Reach ₿100": 100,
       "Reach ₿10K": 10_000,
-      "Reach ₿1M": 1_000_000,
       "Reach ₿100M": 100_000_000,
+      "Reach ₿1T": 1_000_000_000,
       "STRK Reward Unlocked": 1_000_000_000,
     };
     const target = balanceTargets[achievement.name];
@@ -133,9 +133,9 @@ export class AchievementObserver implements Observer {
   private handleMineDone(achievement: Achievement, block: Block) {
     const blockTargets: Record<string, number> = {
       "Reach L1 Block 10": 10,
+      "Reach L1 Block 42": 42,
       "Reach L1 Block 100": 100,
-      "Reach L1 Block 1000": 1_000,
-      "Reach L1 Block 10K": 10_000,
+      "Reach L1 Block 420": 420,
     };
     const target = blockTargets[achievement.name];
     if (target) {
@@ -156,10 +156,10 @@ export class AchievementObserver implements Observer {
 
   private handleSequenceDone(achievement: Achievement, block: Block) {
     const blockTargets: Record<string, number> = {
+      "Reach L2 Block 10": 10,
       "Reach L2 Block 100": 100,
-      "Reach L2 Block 1000": 1_000,
-      "Reach L2 Block 10K": 10_000,
-      "Reach L2 Block 100K": 100_000,
+      "Reach L2 Block 314": 314,
+      "Reach L2 Block 420": 420,
     };
     const target = blockTargets[achievement.name];
     if (target) {
