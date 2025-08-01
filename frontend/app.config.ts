@@ -6,7 +6,7 @@ const config: ExpoConfig = {
   slug: "pow",
   version: "0.1.0",
   orientation: "portrait",
-  icon: "./assets/logo/pow.png",
+  icon: "./assets/logo/logo.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -25,8 +25,8 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/logo/pow.png",
-      backgroundColor: "#ffffff",
+      foregroundImage: "./assets/logo/logo-foreground.png",
+      backgroundImage: "./assets/logo/logo-background.png",
     },
     package: "com.starknet.pow",
     edgeToEdgeEnabled: true,
@@ -35,17 +35,17 @@ const config: ExpoConfig = {
   web: {
     bundler: "metro",
     output: "static",
-    favicon: "./assets/logo/pow.png",
+    favicon: "./assets/logo/logo-foreground.png",
   },
   plugins: [
     "expo-router",
     [
       "expo-splash-screen",
       {
-        image: "./assets/logo/pow.png",
+        image: "./assets/logo/logo-foreground.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#74c874",
       },
     ],
     "expo-secure-store",
