@@ -54,7 +54,12 @@ export const useMiner = (onBlockMined: () => void) => {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [notify, onBlockMined, workingBlocks[0]?.isBuilt, workingBlocks[0]?.difficulty]);
+  }, [
+    notify,
+    onBlockMined,
+    workingBlocks[0]?.isBuilt,
+    workingBlocks[0]?.difficulty,
+  ]);
 
   // Reset mining progress when a block is mined
   useEffect(() => {

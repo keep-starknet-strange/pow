@@ -46,7 +46,9 @@ export const StorePage: React.FC = () => {
   const { width, height } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
-  const [storeType, setStoreType] = useState<"L1" | "L2">(isL2Unlocked ? "L2" : "L1");
+  const [storeType, setStoreType] = useState<"L1" | "L2">(
+    isL2Unlocked ? "L2" : "L1",
+  );
   useEffect(() => {
     if (!isL2Unlocked) {
       setStoreType("L1");

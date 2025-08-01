@@ -47,19 +47,20 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   const [usernameError, setUsernameError] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
-  const [isGeneratingUsername, setIsGeneratingUsername] = React.useState<boolean>(false);
+  const [isGeneratingUsername, setIsGeneratingUsername] =
+    React.useState<boolean>(false);
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
   );
   const [newAvatar, setNewAvatar] = React.useState<NounsAttributes>(avatar);
   const [creatingAvatar, setCreatingAvatar] = React.useState<boolean>(false);
-  
+
   const startCreatingAvatar = () => {
     setCreatingAvatar(true);
     setNewAvatar(avatar);
     notify("BasicClick");
   };
-  
+
   const applyAvatarCreation = () => {
     setCreatingAvatar(false);
     setAvatar(newAvatar);
@@ -71,20 +72,26 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     setIsGeneratingUsername(true);
     try {
       // Fetch 2 random words from the API
-      const response = await fetch('https://random-word-api.herokuapp.com/word?number=2');
+      const response = await fetch(
+        "https://random-word-api.herokuapp.com/word?number=2",
+      );
       const words = await response.json();
-      
+
       if (words && Array.isArray(words) && words.length >= 2) {
         // Clean words: remove non-alphanumeric characters and capitalize first letter
-        const cleanWord1 = words[0].replace(/[^a-zA-Z0-9]/g, '');
-        const cleanWord2 = words[1].replace(/[^a-zA-Z0-9]/g, '');
-        
+        const cleanWord1 = words[0].replace(/[^a-zA-Z0-9]/g, "");
+        const cleanWord2 = words[1].replace(/[^a-zA-Z0-9]/g, "");
+
         // Capitalize first letter of each word
-        const word1 = cleanWord1.charAt(0).toUpperCase() + cleanWord1.slice(1).toLowerCase();
-        const word2 = cleanWord2.charAt(0).toUpperCase() + cleanWord2.slice(1).toLowerCase();
-        
+        const word1 =
+          cleanWord1.charAt(0).toUpperCase() +
+          cleanWord1.slice(1).toLowerCase();
+        const word2 =
+          cleanWord2.charAt(0).toUpperCase() +
+          cleanWord2.slice(1).toLowerCase();
+
         let combinedUsername = word1 + word2;
-        
+
         // Ensure max 31 characters
         if (combinedUsername.length > 31) {
           // Try to trim the second word first
@@ -94,10 +101,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           } else {
             // If still too long, trim both words proportionally
             const halfLength = Math.floor(31 / 2);
-            combinedUsername = word1.substring(0, halfLength) + word2.substring(0, 31 - halfLength);
+            combinedUsername =
+              word1.substring(0, halfLength) +
+              word2.substring(0, 31 - halfLength);
           }
         }
-        
+
         setUsername(combinedUsername);
         setUsernameError(""); // Clear any previous errors
         notify("DiceRoll");
@@ -107,7 +116,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         notify("BasicError");
       }
     } catch (error) {
-      console.error('Error generating random username:', error);
+      console.error("Error generating random username:", error);
       // Fallback username if API fails
       setUsername("RandomUser" + Math.floor(Math.random() * 1000));
       notify("BasicError");

@@ -43,9 +43,14 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (powContract && user) {
         try {
           // Get upgrade values at initialization time
-          const daMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
-          const proverMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") || 1;
-          
+          const daMaxSize =
+            useUpgradesStore.getState().getUpgradeValue(1, "DA compression") ||
+            1;
+          const proverMaxSize =
+            useUpgradesStore
+              .getState()
+              .getUpgradeValue(1, "Recursive Proving") || 1;
+
           const l2Instance: L2 = newL2();
           l2Instance.da = newL2DA(daMaxSize);
           l2Instance.prover = newL2Prover(proverMaxSize);
@@ -113,15 +118,18 @@ export const useL2Store = create<L2Store>((set, get) => ({
     set((state) => {
       if (state.l2) return state;
       useGameStore.getState().initL2WorkingBlock();
-      
+
       // Get upgrade values at initialization time and store them as maxSize
-      const daMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
-      const proverMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") || 1;
-      
+      const daMaxSize =
+        useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
+      const proverMaxSize =
+        useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
+        1;
+
       const newL2Instance = newL2();
       newL2Instance.da = newL2DA(daMaxSize);
       newL2Instance.prover = newL2Prover(proverMaxSize);
-      
+
       useChainsStore.getState().addChain();
       useEventManager.getState().notify("L2Purchased");
       return {
@@ -154,11 +162,15 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (!state.l2) return state;
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.da) return state;
-      
+
       // Use the stored maxSize instead of dynamically getting upgrade value
       const daMaxSize = newL2Instance.da.maxSize;
-      if (newL2Instance.da.isBuilt || newL2Instance.da.blocks.length >= daMaxSize) return state;
-      
+      if (
+        newL2Instance.da.isBuilt ||
+        newL2Instance.da.blocks.length >= daMaxSize
+      )
+        return state;
+
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward =
         block.reward ||
@@ -175,11 +187,15 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (!state.l2) return state;
       const newL2Instance = { ...state.l2 };
       if (!newL2Instance.prover) return state;
-      
+
       // Use the stored maxSize instead of dynamically getting upgrade value
       const proverMaxSize = newL2Instance.prover.maxSize;
-      if (newL2Instance.prover.isBuilt || newL2Instance.prover.blocks.length >= proverMaxSize) return state;
-      
+      if (
+        newL2Instance.prover.isBuilt ||
+        newL2Instance.prover.blocks.length >= proverMaxSize
+      )
+        return state;
+
       newL2Instance.prover.blocks.push(block.blockId);
       const blockReward =
         block.reward ||
@@ -196,11 +212,12 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (!state.l2 || !state.l2.da) return state;
       useBalanceStore.getState().updateBalance(state.l2.da.blockFees);
       const newL2Instance = { ...state.l2 };
-      
+
       // Get current upgrade value for the new DA instance
-      const daMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
+      const daMaxSize =
+        useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
       newL2Instance.da = newL2DA(daMaxSize);
-      
+
       return { l2: newL2Instance };
     });
   },
@@ -210,11 +227,13 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (!state.l2 || !state.l2.prover) return state;
       useBalanceStore.getState().updateBalance(state.l2.prover.blockFees);
       const newL2Instance = { ...state.l2 };
-      
+
       // Get current upgrade value for the new Prover instance
-      const proverMaxSize = useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") || 1;
+      const proverMaxSize =
+        useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
+        1;
       newL2Instance.prover = newL2Prover(proverMaxSize);
-      
+
       return { l2: newL2Instance };
     });
   },

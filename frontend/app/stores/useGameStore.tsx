@@ -61,7 +61,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const blockDifficulty = useUpgradesStore
       .getState()
       .getUpgradeValue(0, "Block Difficulty");
-    const initBlock = newBlock(0, maxBlockSize, blockDifficulty, get().genesisBlockReward);
+    const initBlock = newBlock(
+      0,
+      maxBlockSize,
+      blockDifficulty,
+      get().genesisBlockReward,
+    );
     initBlock.isBuilt = true; // Mark the genesis block as built
     set({
       workingBlocks: [initBlock],
@@ -199,7 +204,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const blockDifficulty = useUpgradesStore
       .getState()
       .getUpgradeValue(1, "Block Difficulty");
-    const newWorkingBlock = newBlock(0, maxBlockSize, blockDifficulty, get().genesisBlockReward);
+    const newWorkingBlock = newBlock(
+      0,
+      maxBlockSize,
+      blockDifficulty,
+      get().genesisBlockReward,
+    );
     newWorkingBlock.isBuilt = true; // Mark the genesis block as built
     set((state) => {
       return { workingBlocks: [...state.workingBlocks, newWorkingBlock] };

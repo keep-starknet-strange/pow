@@ -158,7 +158,6 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
         renderedBy={props.renderedBy}
         onFlashRequested={handleFlashRequested}
       />
-
     </Pressable>
   );
 };

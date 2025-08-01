@@ -39,7 +39,7 @@ export const useSequencer = (onBlockSequenced: () => void) => {
     }
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = workingBlocks[1]?.difficulty || 4**2;
+      const blockDifficulty = workingBlocks[1]?.difficulty || 4 ** 2;
       if (newCounter == blockDifficulty) {
         onBlockSequenced();
         setSequencingProgress(1);
@@ -54,7 +54,12 @@ export const useSequencer = (onBlockSequenced: () => void) => {
         return prevCounter; // Prevent incrementing beyond block difficulty
       }
     });
-  }, [onBlockSequenced, notify, workingBlocks[1]?.isBuilt, workingBlocks[1]?.difficulty]);
+  }, [
+    onBlockSequenced,
+    notify,
+    workingBlocks[1]?.isBuilt,
+    workingBlocks[1]?.difficulty,
+  ]);
 
   // Reset sequencing progress when block is sequenced
   useEffect(() => {
