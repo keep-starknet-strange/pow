@@ -43,7 +43,7 @@ export const StorePage: React.FC = () => {
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
-  const { width, height } = Dimensions.get("window");
+  const { width } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
