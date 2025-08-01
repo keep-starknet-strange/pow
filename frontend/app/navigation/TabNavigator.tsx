@@ -13,7 +13,7 @@ import { StorePage } from "../pages/StorePage";
 import { LeaderboardPage } from "../pages/LeaderboardPage";
 import { AchievementsPage } from "../pages/AchievementsPage";
 import { SettingsPage } from "../pages/SettingsPage";
-// import { StakingPage } from "../pages/StakingPage";
+import { StakingPage } from "../pages/StakingPage";
 
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
@@ -65,10 +65,10 @@ function TabBarButton({
           return selected
             ? getImage("nav.icon.game.active")
             : getImage("nav.icon.game");
-        // case "Staking":
-        //   return selected
-        //     ? getImage("nav.icon.staking.active")
-        //     : getImage("nav.icon.staking");
+        case "Staking":
+          return selected
+            ? getImage("nav.icon.staking.active")
+            : getImage("nav.icon.staking");
         case "Store":
           return selected
             ? getImage("nav.icon.shop.active")
@@ -190,7 +190,7 @@ export const TabNavigator = memo(() => {
         }}
       />
 
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Staking"
         component={StakingPage}
         options={{
@@ -205,7 +205,7 @@ export const TabNavigator = memo(() => {
         listeners={{
           tabPress: () => handleTabPress("Staking"),
         }}
-      /> */}
+      />
       <Tab.Screen
         name="Store"
         component={StorePage}

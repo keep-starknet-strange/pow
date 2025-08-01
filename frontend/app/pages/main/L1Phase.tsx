@@ -15,7 +15,6 @@ import {
 import BlockchainView from "@/app/components/BlockchainView";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "@/app/stores/useTutorialStore";
-import TransactionTabs from "./TransactionTabs";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
@@ -29,6 +28,12 @@ export const L1Phase: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[0] ? 1 : 0],
   );
+  /*
+  useEffect(() => {
+    setActiveTab(dappsUnlocked[0] ? "dApps" : "Transactions");
+  }, [dappsUnlocked]);
+  */
+
   return (
     <View
       style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
@@ -89,15 +94,47 @@ export const L1Phase: React.FC = () => {
         >
           <TransactionButtonsView chainId={0} isDapps={activeTab === "dApps"} />
         </View>
-        <TransactionTabs
-          tabs={txTabs}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          show={!!dappsUnlocked[0]}
-          topPosition={4}
-          dappsRef={ref}
-          dappsOnLayout={onLayout}
-        />
+        {dappsUnlocked[0] && (
+          <View className="absolute top-[4px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
+            {txTabs.map((tab) => (
+              <Pressable
+                style={{
+                  width: window.width / 2 - 6,
+                  height: tab === activeTab ? 28 : 24,
+                }}
+                key={tab}
+                onPress={() => setActiveTab(tab)}
+                ref={tab === "dApps" ? ref : undefined}
+                onLayout={tab === "dApps" ? onLayout : undefined}
+              >
+                <Canvas style={{ width: "100%", height: "100%" }}>
+                  <Image
+                    image={getImage(
+                      tab === activeTab ? "tx.tab.active" : "tx.tab.inactive",
+                    )}
+                    fit="fill"
+                    x={0}
+                    y={0}
+                    width={window.width / 2 - 6}
+                    height={tab === activeTab ? 28 : 24}
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                  />
+                </Canvas>
+                <Text
+                  className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
+                  style={{
+                    color: tab === activeTab ? "#FFF7FF" : "#a9a9a9",
+                  }}
+                >
+                  {tab}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </Animated.View>
     </View>
   );

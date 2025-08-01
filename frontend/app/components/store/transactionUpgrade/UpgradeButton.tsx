@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { Dimensions, Pressable, Text } from "react-native";
 import { PopupAnimation } from "../../PopupAnimation";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useBalance } from "../../../stores/useBalanceStore";
 import { useImages } from "../../../hooks/useImages";
-
+import React from "react";
 import Animated, {
   Easing,
   FadeInLeft,
