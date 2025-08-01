@@ -89,8 +89,8 @@ export class AchievementObserver implements Observer {
         case "AutomationPurchased":
           this.handleAutomationPurchased(achievement, data);
           break;
-        case "StakingUnlocked":
-          this.handleStakingUnlocked(achievement);
+        case "StakingPurchased":
+          this.handleStakingPurchased(achievement);
           break;
         case "L2Purchased":
           this.handleL2Purchased(achievement);
@@ -253,7 +253,7 @@ export class AchievementObserver implements Observer {
     this.updateAchievement(achievement.id, progress);
   }
 
-  private handleStakingUnlocked(achievement: Achievement) {
+  private handleStakingPurchased(achievement: Achievement) {
     this.updateAchievement(achievement.id, 100);
   }
 

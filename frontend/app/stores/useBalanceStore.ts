@@ -3,8 +3,6 @@ import { Contract } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { FocAccount } from "../context/FocEngineConnector";
 
-const DEFAULT_BALANCE = 99999999999; // Default balance when starting.
-
 interface BalanceState {
   balance: number;
   setBalance: (balance: number) => void;
@@ -19,10 +17,10 @@ interface BalanceState {
 }
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({
-  balance: DEFAULT_BALANCE,
+  balance: 0,
   setBalance: (balance: number) => set({ balance }),
 
-  resetBalance: () => set({ balance: DEFAULT_BALANCE }),
+  resetBalance: () => set({ balance: 0 }),
 
   updateBalance: (change: number) => {
     set((state) => {
@@ -53,7 +51,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   initializeBalance: async (powContract, user, getUserBalance) => {
     const fetchBalance = async () => {
       if (!user || !powContract) {
-        set({ balance: DEFAULT_BALANCE });
+        set({ balance: 100000000000 });
         return;
       }
       try {
@@ -61,7 +59,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
         set({ balance });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        set({ balance: DEFAULT_BALANCE });
+        set({ balance: 100000000000 });
       }
     };
     fetchBalance();

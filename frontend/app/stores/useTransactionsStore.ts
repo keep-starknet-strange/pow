@@ -343,21 +343,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         type: "dappFee",
         level: currentLevel + 1,
       });
-
-      // Check if this is Libra dapp (id: 3) on L1 (chainId: 0) being unlocked for the first time
-      if (chainId === 0 && dappId === 3 && currentLevel === -1) {
-        // Unlock staking when Libra dapp is first purchased
-        // Use dynamic import with proper error handling to prevent memory leaks
-        import("./useStakingStore")
-          .then(({ useStakingStore }) => {
-            useStakingStore.getState().unlockStaking();
-            useEventManager.getState().notify("StakingUnlocked");
-          })
-          .catch((error) => {
-            console.warn("Failed to unlock staking:", error);
-          });
-      }
-
       return { dappFeeLevels: newFees };
     });
   },

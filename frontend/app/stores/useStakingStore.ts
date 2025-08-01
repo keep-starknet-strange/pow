@@ -16,13 +16,12 @@ interface StakingState {
   amountStaked: number;
   rewards: number;
   lastValidation: number;
-  stakingUnlocked: boolean;
+
   // actions
   stakeTokens: (amount: number) => void;
   validateStake: () => void;
   claimStakingRewards: () => number;
   withdrawStakedTokens: () => number;
-  unlockStaking: () => void;
 }
 
 export const useStakingStore = create<StakingState>((set, get) => {
@@ -39,17 +38,10 @@ export const useStakingStore = create<StakingState>((set, get) => {
     amountStaked: 0,
     rewards: 0,
     lastValidation: Math.floor(Date.now() / 1000),
-    stakingUnlocked: false,
-
-    unlockStaking: () => {
-      set(() => ({
-        stakingUnlocked: true,
-      }));
-    },
 
     validateStake: () => {
       const now = Math.floor(Date.now() / 1000);
-      const { amountStaked } = get();
+      const { amountStaked, rewards, lastValidation, config } = get();
       if (amountStaked === 0) {
         set({ lastValidation: now });
         return;
