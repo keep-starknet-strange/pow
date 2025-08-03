@@ -17,10 +17,10 @@ interface BalanceState {
 }
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({
-  balance: 0,
+  balance: 1000000000000,
   setBalance: (balance: number) => set({ balance }),
 
-  resetBalance: () => set({ balance: 0 }),
+  resetBalance: () => set({ balance: 1000000000000 }),
 
   updateBalance: (change: number) => {
     set((state) => {
@@ -51,7 +51,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   initializeBalance: async (powContract, user, getUserBalance) => {
     const fetchBalance = async () => {
       if (!user || !powContract) {
-        set({ balance: 0 });
+        set({ balance: 1000000000000 });
         return;
       }
       try {
@@ -59,7 +59,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
         set({ balance });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        set({ balance: 0 });
+        set({ balance: 1000000000000 });
       }
     };
     fetchBalance();
