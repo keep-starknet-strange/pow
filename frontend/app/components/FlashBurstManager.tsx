@@ -8,32 +8,52 @@ interface FlashInstance {
   y: number;
   trigger: number;
   renderedBy?: string;
+  specialText?: string;
+  specialTextColor?: string;
 }
 
 interface FlashBurstManagerProps {
   renderedBy?: string; // "miner", "sequencer", "da", "prover"
-  onFlashRequested?: (callback: (x: number, y: number) => void) => void;
+  onFlashRequested?: (
+    callback: (
+      x: number,
+      y: number,
+      specialText?: string,
+      specialTextColor?: string,
+    ) => void,
+  ) => void;
+  specialText?: string;
+  specialTextColor?: string;
 }
 
 export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({
   renderedBy,
   onFlashRequested,
+  specialText,
+  specialTextColor,
 }) => {
   const [flashes, setFlashes] = useState<FlashInstance[]>([]);
 
   const triggerFlash = useCallback(
-    (x: number, y: number) => {
+    (
+      x: number,
+      y: number,
+      flashSpecialText?: string,
+      flashSpecialTextColor?: string,
+    ) => {
       const newFlash: FlashInstance = {
         id: `flash-${Date.now()}-${Math.random()}`,
         x,
         y,
         trigger: Date.now(),
         renderedBy,
+        specialText: flashSpecialText || specialText,
+        specialTextColor: flashSpecialTextColor || specialTextColor,
       };
 
       setFlashes((prev) => [...prev, newFlash]);
     },
-    [renderedBy],
+    [renderedBy, specialText, specialTextColor],
   );
 
   const removeFlash = useCallback((id: string) => {
@@ -63,6 +83,8 @@ export const FlashBurstManager: React.FC<FlashBurstManagerProps> = ({
           y={flash.y}
           trigger={flash.trigger}
           renderedBy={flash.renderedBy}
+          specialText={flash.specialText}
+          specialTextColor={flash.specialTextColor}
           onComplete={() => removeFlash(flash.id)}
         />
       ))}

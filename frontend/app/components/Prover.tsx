@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { Confirmer } from "./Confirmer";
@@ -13,6 +14,40 @@ export const Prover: React.FC<ProverProps> = ({
   proverProgress,
   prove,
 }) => {
+  const [proverText, setProverText] = useState("QzPxWr");
+  const [proverColor, setProverColor] = useState("#CA1F4B");
+
+  const generateJumbledText = () => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const getSuccessWord = () => {
+    const words = [
+      "Complete!",
+      "Done!",
+      "You did it!",
+      "Success!",
+      "Verified!",
+    ];
+    return words[Math.floor(Math.random() * words.length)];
+  };
+
+  useEffect(() => {
+    if (proverProgress === 1) {
+      setProverText(getSuccessWord());
+      setProverColor("#20DF20");
+    } else {
+      setProverText(generateJumbledText());
+      setProverColor("#CA1F4B");
+    }
+  }, [proverProgress]);
+
   return (
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
@@ -23,6 +58,8 @@ export const Prover: React.FC<ProverProps> = ({
           prove();
         }}
         renderedBy="prover"
+        specialFlashText={proverText}
+        specialFlashTextColor={proverColor}
       />
     </View>
   );

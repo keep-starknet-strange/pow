@@ -13,6 +13,8 @@ interface FlashBurstProps {
   y: number; // Click position Y
   trigger: number; // Timestamp to trigger animation
   renderedBy?: string; // "miner", "sequencer", "da", "prover"
+  specialText?: string; // Special text to display (hash or success message)
+  specialTextColor?: string; // Color for special text (red/green)
   onComplete?: () => void;
 }
 
@@ -256,11 +258,93 @@ const TextParticle: React.FC<TextParticleProps> = ({
   );
 };
 
+interface SpecialTextParticleProps {
+  x: number;
+  y: number;
+  trigger: number;
+  text: string;
+  color: string;
+}
+
+const SpecialTextParticle: React.FC<SpecialTextParticleProps> = ({
+  x,
+  y,
+  trigger,
+  text,
+  color,
+}) => {
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0);
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    if (trigger > 0) {
+      opacity.value = 0;
+      translateY.value = 0;
+      scale.value = 0;
+
+      // Delayed start for emphasis
+      setTimeout(() => {
+        opacity.value = withSequence(
+          withTiming(1, { duration: 150, easing: Easing.out(Easing.quad) }),
+          withTiming(0.9, { duration: 200, easing: Easing.linear }),
+          withTiming(0, { duration: 300, easing: Easing.in(Easing.quad) }),
+        );
+        scale.value = withSequence(
+          withTiming(1.2, { duration: 150, easing: Easing.out(Easing.back) }),
+          withTiming(1, { duration: 200, easing: Easing.linear }),
+          withTiming(0.8, { duration: 300, easing: Easing.in(Easing.quad) }),
+        );
+        translateY.value = withTiming(-80, {
+          duration: 650,
+          easing: Easing.out(Easing.quad),
+        });
+      }, 100);
+    }
+  }, [trigger]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        {
+          position: "absolute",
+          left: x - 60, // Center the larger text
+          top: y - 15,
+        },
+        animatedStyle,
+      ]}
+    >
+      <Text
+        style={{
+          fontSize: 20, // Larger font size
+          fontFamily: "Pixels",
+          color: color,
+          textShadowColor: "#000",
+          textShadowOffset: { width: 2, height: 2 },
+          textShadowRadius: 3,
+          fontWeight: "bold",
+          textAlign: "center",
+          minWidth: 120, // Ensure text doesn't wrap
+        }}
+      >
+        {text}
+      </Text>
+    </Animated.View>
+  );
+};
+
 export const FlashBurst: React.FC<FlashBurstProps> = ({
   x,
   y,
   trigger,
   renderedBy,
+  specialText,
+  specialTextColor,
   onComplete,
 }) => {
   const containerOpacity = useSharedValue(0);
@@ -406,6 +490,17 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
           color={particleColor}
         />
       ))}
+
+      {/* Special upward text particle */}
+      {specialText && (
+        <SpecialTextParticle
+          x={x}
+          y={y}
+          trigger={trigger}
+          text={specialText}
+          color={specialTextColor || "#FFD700"}
+        />
+      )}
     </Animated.View>
   );
 };

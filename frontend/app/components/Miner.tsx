@@ -47,6 +47,8 @@ export const Miner: React.FC<MinerProps> = ({
           value: mineHash,
           color: mineColor,
         }}
+        specialFlashText={mineHash}
+        specialFlashTextColor={mineColor}
       />
     </View>
   );
