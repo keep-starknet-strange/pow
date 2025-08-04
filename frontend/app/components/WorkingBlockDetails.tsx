@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useShallow } from "zustand/react/shallow";
 import { useImages } from "../hooks/useImages";
 import Animated, {
   runOnJS,
@@ -38,7 +39,10 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   props,
 ) => {
-  const { workingBlocks } = useGameStore();
+  // Shallow state management: only re-render when this specific chainId's block changes
+  const currentWorkingBlock = useGameStore(
+    useShallow((state) => state.workingBlocks[props.chainId]),
+  );
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
 
@@ -46,21 +50,20 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   const isSmall = props.placement.width < 250;
 
   const updateWorkingBlock = (chainId: number) => {
-    const block = workingBlocks[chainId];
-    if (block) {
-      setWorkingBlock(block);
+    if (currentWorkingBlock) {
+      setWorkingBlock(currentWorkingBlock);
     }
   };
 
   const detailsScaleAnim = useSharedValue(1);
   useEffect(() => {
-    if (workingBlocks[props.chainId]?.isBuilt) {
+    if (currentWorkingBlock?.isBuilt) {
       detailsScaleAnim.value = withSpring(1.25, {
         damping: 4,
         stiffness: 200,
       });
     } else {
-      if (!workingBlocks[props.chainId]?.blockId) {
+      if (!currentWorkingBlock?.blockId) {
         detailsScaleAnim.value = 1;
         return;
       }
@@ -72,10 +75,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
         withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }),
       );
     }
-  }, [props.chainId, workingBlocks[props.chainId]?.isBuilt]);
+  }, [props.chainId, currentWorkingBlock?.isBuilt]);
 
   const [workingBlock, setWorkingBlock] = React.useState(
-    workingBlocks[props.chainId] || null,
+    currentWorkingBlock || null,
   );
 
   return (
@@ -194,7 +197,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
           className="text-[#c3c3c3] font-Pixels"
         >
           /
-          {workingBlocks[props.chainId]?.maxSize ||
+          {currentWorkingBlock?.maxSize ||
             getUpgradeValue(props.chainId, "Block Size") ** 2}
         </Text>
       </View>

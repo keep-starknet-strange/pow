@@ -5,6 +5,7 @@ import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
+import { useShallow } from "zustand/react/shallow";
 
 export const useMiner = (onBlockMined: () => void) => {
   const { notify } = useEventManager();
@@ -30,15 +31,18 @@ export const useMiner = (onBlockMined: () => void) => {
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
+  // Shallow state management: only re-render when mining block (index 0) changes
+  const miningBlock = useGameStore(
+    useShallow((state) => state.workingBlocks[0]),
+  );
   const mineBlock = useCallback(() => {
-    if (!workingBlocks[0]?.isBuilt) {
+    if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");
       return;
     }
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = workingBlocks[0]?.difficulty || 4 ** 2; // Default difficulty if not set
+      const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
       if (newCounter == blockDifficulty) {
         onBlockMined();
         setMiningProgress(1);
@@ -54,21 +58,16 @@ export const useMiner = (onBlockMined: () => void) => {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [
-    notify,
-    onBlockMined,
-    workingBlocks[0]?.isBuilt,
-    workingBlocks[0]?.difficulty,
-  ]);
+  }, [notify, onBlockMined, miningBlock?.isBuilt, miningBlock?.difficulty]);
 
   // Reset mining progress when a block is mined
   useEffect(() => {
     setMiningProgress(0);
     setMineCounter(0);
-  }, [workingBlocks[0]?.blockId]);
+  }, [miningBlock?.blockId]);
 
   useAutoClicker(
-    getAutomationValue(0, "Miner") > 0 && workingBlocks[0]?.isBuilt,
+    getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,
     5000 / (getAutomationValue(0, "Miner") || 1),
     mineBlock,
   );

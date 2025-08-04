@@ -6,6 +6,7 @@ import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
+import { useShallow } from "zustand/react/shallow";
 
 export const useSequencer = (onBlockSequenced: () => void) => {
   const { notify } = useEventManager();
@@ -31,15 +32,22 @@ export const useSequencer = (onBlockSequenced: () => void) => {
     fetchSequencerCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
+  // Shallow state management: only re-render when sequencing block (index 1) changes
+  const sequencingBlock = useGameStore(
+    useShallow((state) => state.workingBlocks[1]),
+  );
+  // Also need mining block (index 0) for autoClicker condition
+  const miningBlock = useGameStore(
+    useShallow((state) => state.workingBlocks[0]),
+  );
   const sequenceBlock = useCallback(() => {
-    if (!workingBlocks[1]?.isBuilt) {
+    if (!sequencingBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot sequence.");
       return;
     }
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = workingBlocks[1]?.difficulty || 4 ** 2;
+      const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
       if (newCounter == blockDifficulty) {
         onBlockSequenced();
         setSequencingProgress(1);
@@ -57,18 +65,18 @@ export const useSequencer = (onBlockSequenced: () => void) => {
   }, [
     onBlockSequenced,
     notify,
-    workingBlocks[1]?.isBuilt,
-    workingBlocks[1]?.difficulty,
+    sequencingBlock?.isBuilt,
+    sequencingBlock?.difficulty,
   ]);
 
   // Reset sequencing progress when block is sequenced
   useEffect(() => {
     setSequencingProgress(0);
     setSequenceCounter(0);
-  }, [workingBlocks[1]?.blockId]);
+  }, [sequencingBlock?.blockId]);
 
   useAutoClicker(
-    getAutomationValue(1, "Sequencer") > 0 && workingBlocks[0]?.isBuilt,
+    getAutomationValue(1, "Sequencer") > 0 && miningBlock?.isBuilt,
     5000 / (getAutomationValue(1, "Sequencer") || 1),
     sequenceBlock,
   );
