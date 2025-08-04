@@ -30,6 +30,8 @@ export const Logo: React.FC = () => {
   const wMainY = useSharedValue(-300);
   const exclamationMainY = useSharedValue(-350);
 
+  const sublogoX = useSharedValue(400);
+
   // Fixed X positions for each character
   const pX = 30;
   const oX = 104;
@@ -156,6 +158,18 @@ export const Logo: React.FC = () => {
         damping: 10,
         stiffness: 100,
         mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+
+    sublogoX.value = withDelay(
+      600,
+      withSpring(100, {
+        damping: 12,
+        stiffness: 90,
+        mass: 0.8,
         overshootClamping: false,
         restDisplacementThreshold: 0.01,
         restSpeedThreshold: 0.01,
@@ -406,14 +420,30 @@ export const Logo: React.FC = () => {
         />
       </Canvas>
       <View
-        className="absolute right-[30px]"
-        style={{ width: 182, height: 18, top: 320, zIndex: -1 }}
+        className="absolute"
+        style={{
+          width: 600,
+          height: 18,
+          top: 320,
+          right: 30 - 300,
+          zIndex: -1,
+          overflow: "visible",
+          paddingLeft: 100,
+        }}
       >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <Canvas
+          style={{
+            position: "absolute",
+            left: 0,
+            width: 600,
+            height: "100%",
+            overflow: "visible",
+          }}
+        >
           <Image
             image={getImage("sublogo")}
             fit="contain"
-            x={0}
+            x={sublogoX}
             y={0}
             width={182}
             height={18}
