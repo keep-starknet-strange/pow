@@ -275,11 +275,19 @@ const SpecialTextParticle: React.FC<SpecialTextParticleProps> = ({
 }) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
+  const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+
+  // Generate random angle variance once per trigger
+  const angleVariance = React.useMemo(() => {
+    // Random angle between -25 and +25 degrees for slight variance
+    return (Math.random() - 0.5) * 50;
+  }, [trigger]);
 
   useEffect(() => {
     if (trigger > 0) {
       opacity.value = 0;
+      translateX.value = 0;
       translateY.value = 0;
       scale.value = 0;
 
@@ -295,17 +303,32 @@ const SpecialTextParticle: React.FC<SpecialTextParticleProps> = ({
           withTiming(1, { duration: 200, easing: Easing.linear }),
           withTiming(0.8, { duration: 300, easing: Easing.in(Easing.quad) }),
         );
-        translateY.value = withTiming(-80, {
+
+        // Calculate movement with angle variance
+        const radians = ((270 + angleVariance) * Math.PI) / 180; // 270 degrees is upward
+        const distance = 80;
+        const finalX = Math.cos(radians) * distance;
+        const finalY = Math.sin(radians) * distance;
+
+        translateX.value = withTiming(finalX, {
+          duration: 650,
+          easing: Easing.out(Easing.quad),
+        });
+        translateY.value = withTiming(finalY, {
           duration: 650,
           easing: Easing.out(Easing.quad),
         });
       }, 100);
     }
-  }, [trigger]);
+  }, [trigger, angleVariance]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
   }));
 
   return (

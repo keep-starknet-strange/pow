@@ -48,6 +48,17 @@ export const Prover: React.FC<ProverProps> = ({
     }
   }, [proverProgress]);
 
+  // Generate flash text and color based on whether this will be the final click
+  const getFlashData = () => {
+    const willComplete = proverProgress >= 0.99; // Close to completion
+    return {
+      text: willComplete ? getSuccessWord() : generateJumbledText(),
+      color: willComplete ? "#20DF20" : "#CA1F4B",
+    };
+  };
+
+  const flashData = getFlashData();
+
   return (
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
@@ -58,8 +69,8 @@ export const Prover: React.FC<ProverProps> = ({
           prove();
         }}
         renderedBy="prover"
-        specialFlashText={proverText}
-        specialFlashTextColor={proverColor}
+        specialFlashText={flashData.text}
+        specialFlashTextColor={flashData.color}
       />
     </View>
   );
