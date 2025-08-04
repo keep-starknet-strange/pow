@@ -16,6 +16,9 @@ export class TutorialObserver implements Observer {
       this.advanceStep();
       this.setVisible(true);
     });
+    this.handlers.set(`BalanceTutorialDismissed-balanceExplanation`, () =>
+      this.advanceStep(),
+    );
     this.handlers.set(`TxUpgradePurchased-purchaseTransactions`, () =>
       this.advanceStep(),
     );

@@ -27,6 +27,7 @@ export type EventType =
   | "PrestigePurchased"
   | "TxAdded"
   | "AchievementCompleted"
+  | "BalanceTutorialDismissed"
   | "SwitchStore"
   | "SwitchPage"
   | "SwitchTxTab";

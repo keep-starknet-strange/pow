@@ -6,6 +6,13 @@
     "highlightTargetId": "minerConfirmer",
     "canDismiss": false
   },
+  "balanceExplanation": {
+    "title": "Your Balance Grows!",
+    "description": "Great job! Block fees from mining increase your balance.\nYour balance is displayed here — watch it grow as you mine more blocks and process transactions!",
+    "bubbleTargetId": "headerBalance",
+    "highlightTargetId": "headerBalance",
+    "canDismiss": true
+  },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
     "description": "Click the transaction to unlock it — that's how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
