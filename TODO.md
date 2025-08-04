@@ -1,10 +1,7 @@
-- Add a tutorial that pops up after mining the first block and before buying your first transaction that shows your balance, and explains that block fees increase your balance after mining. Then After clicking "Got it" it will move on to the transaction tutorial section
-- Currently audio is not playing on the phone when running there, but works fine in the iphone simulator on my pc.
-- Change Foc Engine fetchs to get contracts ( Registry, Account, pow, ... ) to environment variables ( Done in focengineconnector mostly I think )
 - Add Bitcoin Maxi easter eggs
 - Add a animation for the auto-miner, where there is a floating pick-axe ( the art should exist and is being used for an achievement currently of a pick-axe ) for each "Speed" in the upgrade. Ie once getting the first auto-miner automation, there will be a pickaxe floating that hits the block ( by quickly going towards the center and triggering a flash animation/... ) every time the miner goes off. If I get the 2nd tier of auto-miner/mining automation, there will be 2 pick-axes that hit back and forth. ...
-- Add shadows to components you feel would benefit from having shadows. For example I like the shadow that was added on the Dice in the username creation section of the account creation page. Keep in not the app uses a pixel art style so there may be issues with weird gaps in shadows if done in a naive-way. 
-- Create a breaking animation that shows when a block is completed ( ie mined or sequenced successfully ). It will play right before the blocks slide left. Use any packages you might find that can help create a performance and nice looking "break" animation. There is very delicate timing done in all the different block components to sequence the current animation, so please make sure to adjust all of their timings to not cause any issues. ( Example components to look at: CompletedBlockView, WorkingBlockView ( the main one that needs the break animation ), and EmptyBlockView
-
+- Last hash on FLashBurst is red, not green like it should be
+- UnlockDapps & UnlockL2 button not showing at appropriate times: ie UnlockDapps button doesn't disappear when a block isBuilt, and the L2Unlock doesn't show on the main/ L1 Page but shows in the store.
+- WorkingBlockDetails Not scaling after initial navigation/tutorial bit
 
 - When switching between Transactions and dApps using the transactionbuttons tabs the transactions should exit by fadeoutleft and dapps should come in by fadeinright. Then vice-versa when going dapps->transactions ( ie transactions fadeinleft and dapps fadeoutright )
