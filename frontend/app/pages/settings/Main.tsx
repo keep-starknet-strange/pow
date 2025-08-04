@@ -10,9 +10,12 @@ import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
+import { useUpgrades } from "../../stores/useUpgradesStore";
 
 export type SettingsMainSectionProps = {
-  setSettingTab: (tab: "About" | "Credits" | "ClaimReward" | "TermsOfUse") => void;
+  setSettingTab: (
+    tab: "About" | "Credits" | "ClaimReward" | "TermsOfUse",
+  ) => void;
   goBackToLogin: () => void;
 };
 
@@ -28,6 +31,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const { user } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
+  const { currentPrestige } = useUpgrades();
 
   const toggleNotifs = () => setNotifs(!notifs);
 
@@ -47,7 +51,9 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Credits", tab: "Credits" },
     { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Review", onPress: () => StoreReview.requestReview() },
-    { label: "Claim Reward", tab: "ClaimReward" },
+    ...(currentPrestige >= 1
+      ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
+      : []),
     {
       label: "Reset Game",
       onPress: () => setShowResetConfirmation(true),
