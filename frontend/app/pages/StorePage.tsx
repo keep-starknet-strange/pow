@@ -18,6 +18,7 @@ import { DappsUnlock } from "../components/store/DappsUnlock";
 import { L2Unlock } from "../components/store/L2Unlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
+import { ShopTitle } from "../components/store/ShopTitle";
 
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -37,13 +38,12 @@ export const StorePage: React.FC = () => {
   const { ref: automationTabRef, onLayout: automationTabOnLayout } =
     useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
-  const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
-    useTransactionsStore();
+  const { dappsUnlocked, canUnlockDapp, canUnlockTx } = useTransactionsStore();
   const { canUnlockUpgrade } = useUpgrades();
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
-  const { width, height } = Dimensions.get("window");
+  const { width } = Dimensions.get("window");
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
@@ -112,51 +112,9 @@ export const StorePage: React.FC = () => {
         />
       )}
       {isL2Unlocked ? (
-        <View className="w-full relative">
-          <Canvas style={{ width: 290, height: 24, marginLeft: 4 }}>
-            <Image
-              image={getImage("shop.name.plaque")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={290}
-              height={24}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-          <Animated.Text
-            className="text-[#fff7ff] text-xl absolute left-[12px] font-Pixels"
-            entering={FadeInLeft}
-          >
-            SHOP
-          </Animated.Text>
-        </View>
+        <ShopTitle position="left" />
       ) : (
-        <View className="w-full relative">
-          <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
-            <Image
-              image={getImage("shop.title")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={width - 8}
-              height={24}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas>
-          <Animated.Text
-            className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-            entering={FadeInLeft}
-          >
-            SHOP
-          </Animated.Text>
-        </View>
+        <ShopTitle position="right" />
       )}
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
