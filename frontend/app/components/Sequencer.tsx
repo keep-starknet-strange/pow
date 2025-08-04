@@ -32,6 +32,17 @@ export const Sequencer: React.FC<SequencerProps> = ({
     setSequenceColor(sequencingProgress === 1 ? "#20DF20" : "#CA1F4B");
   }, [sequencingProgress]);
 
+  // Generate flash text and color based on whether this will be the final click
+  const getFlashData = () => {
+    const willComplete = sequencingProgress >= 0.99; // Close to completion
+    return {
+      text: generateRandomHash(willComplete),
+      color: willComplete ? "#20DF20" : "#CA1F4B",
+    };
+  };
+
+  const flashData = getFlashData();
+
   return (
     <View className="flex flex-col h-full aspect-square relative">
       <Confirmer
@@ -41,8 +52,8 @@ export const Sequencer: React.FC<SequencerProps> = ({
           sequenceBlock();
         }}
         renderedBy="sequencer"
-        specialFlashText={sequenceHash}
-        specialFlashTextColor={sequenceColor}
+        specialFlashText={flashData.text}
+        specialFlashTextColor={flashData.color}
       />
     </View>
   );
