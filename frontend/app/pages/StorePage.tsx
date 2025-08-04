@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, Dimensions } from "react-native";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { View, Text, FlatList, Pressable, Dimensions } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
@@ -37,9 +37,17 @@ export const StorePage: React.FC = () => {
   const { ref: automationTabRef, onLayout: automationTabOnLayout } =
     useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
-  const { dappsUnlocked, canUnlockDapps, canUnlockDapp, canUnlockTx } =
-    useTransactionsStore();
-  const { canUnlockUpgrade } = useUpgrades();
+  const {
+    dappsUnlocked,
+    canUnlockDapps,
+    canUnlockDapp,
+    canUnlockTx,
+    transactionFeeLevels,
+    transactionSpeedLevels,
+    dappFeeLevels,
+    dappSpeedLevels,
+  } = useTransactionsStore();
+  const { canUnlockUpgrade, upgrades, automations } = useUpgrades();
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
@@ -78,6 +86,244 @@ export const StorePage: React.FC = () => {
 
   const subTabs = ["Transactions", "Upgrades", "Automation"];
   const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
+
+  const storeData = useMemo(() => {
+    const data: any[] = [];
+
+    if (activeSubTab === "Transactions") {
+      // Add transactions
+      storeTransactions.forEach((item, index) => {
+        if (canUnlockTx(chainId, index)) {
+          data.push({
+            type: "transaction",
+            data: item,
+            chainId,
+            index,
+            id: `tx-${chainId}-${index}`,
+          });
+          data.push({
+            type: "separator",
+            id: `tx-sep-${chainId}-${index}`,
+          });
+        }
+      });
+
+      // Add dApps section if unlocked
+      if (dappsUnlocked[chainId]) {
+        data.push({
+          type: "dapps-header",
+          id: "dapps-header",
+        });
+
+        storeDapps.forEach((item, index) => {
+          if (canUnlockDapp(chainId, index)) {
+            data.push({
+              type: "dapp",
+              data: item,
+              chainId,
+              index,
+              id: `dapp-${chainId}-${index}`,
+            });
+            data.push({
+              type: "separator",
+              id: `dapp-sep-${chainId}-${index}`,
+            });
+          }
+        });
+      }
+
+      // Add DappsUnlock component
+      data.push({
+        type: "dapps-unlock",
+        chainId,
+        id: "dapps-unlock",
+      });
+    }
+
+    if (activeSubTab === "Upgrades") {
+      storeUpgrades.forEach((item, index) => {
+        if (canUnlockUpgrade(chainId, index)) {
+          data.push({
+            type: "upgrade",
+            data: item,
+            chainId,
+            index,
+            id: `upgrade-${chainId}-${index}`,
+          });
+          data.push({
+            type: "separator",
+            id: `upgrade-sep-${chainId}-${index}`,
+          });
+        }
+      });
+    }
+
+    if (activeSubTab === "Automation") {
+      storeAutomation.forEach((item, index) => {
+        data.push({
+          type: "automation",
+          data: item,
+          chainId,
+          index,
+          id: `automation-${chainId}-${index}`,
+        });
+        if (index < storeAutomation.length - 1) {
+          data.push({
+            type: "separator",
+            id: `automation-sep-${chainId}-${index}`,
+          });
+        }
+      });
+
+      // Add unlock components
+      if (storeType === "L1") {
+        data.push({
+          type: "separator",
+          id: "l2-unlock-sep",
+        });
+        data.push({
+          type: "l2-unlock",
+          id: "l2-unlock",
+        });
+      } else {
+        data.push({
+          type: "separator",
+          id: "prestige-unlock-sep",
+        });
+        data.push({
+          type: "prestige-unlock",
+          id: "prestige-unlock",
+        });
+      }
+    }
+
+    // Add bottom spacer
+    data.push({
+      type: "spacer",
+      id: "bottom-spacer",
+    });
+
+    return data;
+  }, [
+    activeSubTab,
+    storeTransactions,
+    storeDapps,
+    storeUpgrades,
+    storeAutomation,
+    chainId,
+    storeType,
+    canUnlockTx,
+    canUnlockDapp,
+    canUnlockUpgrade,
+    dappsUnlocked,
+    transactionFeeLevels,
+    transactionSpeedLevels,
+    dappFeeLevels,
+    dappSpeedLevels,
+    upgrades,
+    automations,
+  ]);
+
+  const renderStoreItem = useCallback(
+    ({ item }: { item: any }) => {
+      switch (item.type) {
+        case "transaction":
+          return (
+            <View className="px-[16px]">
+              <TransactionUpgradeView
+                chainId={item.chainId}
+                txData={item.data}
+                isDapp={false}
+              />
+            </View>
+          );
+
+        case "dapp":
+          return (
+            <View className="px-[16px]">
+              <TransactionUpgradeView
+                chainId={item.chainId}
+                txData={item.data}
+                isDapp={true}
+              />
+            </View>
+          );
+
+        case "upgrade":
+          return (
+            <View className="px-[16px]">
+              <UpgradeView chainId={item.chainId} upgrade={item.data} />
+            </View>
+          );
+
+        case "automation":
+          return (
+            <View className="px-[16px]">
+              <AutomationView chainId={item.chainId} automation={item.data} />
+            </View>
+          );
+
+        case "separator":
+          return <View className="h-[3px] bg-[#1b1c26] my-[16px] mx-[2%]" />;
+
+        case "dapps-header":
+          return (
+            <View className="flex flex-col px-[16px]">
+              <View className="w-full relative pb-[16px]">
+                <Canvas style={{ width: width - 32, height: 24 }}>
+                  <Image
+                    image={getImage("shop.title")}
+                    fit="fill"
+                    x={0}
+                    y={0}
+                    width={width - 32}
+                    height={24}
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                  />
+                </Canvas>
+                <Animated.Text
+                  className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
+                  entering={FadeInLeft}
+                >
+                  DAPPS
+                </Animated.Text>
+              </View>
+            </View>
+          );
+
+        case "dapps-unlock":
+          return (
+            <View className="px-[16px]">
+              <DappsUnlock chainId={item.chainId} />
+            </View>
+          );
+
+        case "l2-unlock":
+          return (
+            <View className="px-[16px]">
+              <L2Unlock />
+            </View>
+          );
+
+        case "prestige-unlock":
+          return (
+            <View className="px-[16px]">
+              <PrestigeUnlock />
+            </View>
+          );
+
+        case "spacer":
+          return <View className="h-[40px]" />;
+
+        default:
+          return null;
+      }
+    },
+    [chainId, width, getImage],
+  );
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -216,107 +462,18 @@ export const StorePage: React.FC = () => {
         ))}
       </View>
       <View style={{ height: 522, marginTop: 2 }}>
-        <ScrollView
+        <FlatList
+          data={storeData}
           className="flex-1 relative py-[10px]"
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          {activeSubTab === "Transactions" && (
-            <View className="flex flex-col px-[16px]">
-              {storeTransactions.map(
-                (item, index) =>
-                  canUnlockTx(chainId, index) && (
-                    <View key={index}>
-                      <TransactionUpgradeView
-                        chainId={chainId}
-                        txData={item}
-                        isDapp={false}
-                      />
-                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                    </View>
-                  ),
-              )}
-            </View>
-          )}
-          {activeSubTab === "Transactions" && dappsUnlocked[chainId] && (
-            <View className="flex flex-col px-[16px]">
-              <View className="w-full relative pb-[16px]">
-                <Canvas style={{ width: width - 32, height: 24 }}>
-                  <Image
-                    image={getImage("shop.title")}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={width - 32}
-                    height={24}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-                <Animated.Text
-                  className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-                  entering={FadeInLeft}
-                >
-                  DAPPS
-                </Animated.Text>
-              </View>
-              {storeDapps.map(
-                (item, index) =>
-                  canUnlockDapp(chainId, index) && (
-                    <View key={index}>
-                      <TransactionUpgradeView
-                        chainId={chainId}
-                        txData={item}
-                        isDapp={true}
-                      />
-                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                    </View>
-                  ),
-              )}
-            </View>
-          )}
-          {activeSubTab === "Upgrades" && (
-            <View className="flex flex-col px-[16px]">
-              {storeUpgrades.map(
-                (item, index) =>
-                  canUnlockUpgrade(chainId, index) && (
-                    <View key={index}>
-                      <UpgradeView chainId={chainId} upgrade={item} />
-                      <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                    </View>
-                  ),
-              )}
-            </View>
-          )}
-          {activeSubTab === "Automation" && (
-            <View className="flex flex-col px-[16px]">
-              {storeAutomation.map((item, index) => (
-                <View key={index}>
-                  <AutomationView chainId={chainId} automation={item} />
-                  {index < storeAutomation.length - 1 && (
-                    <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-                  )}
-                </View>
-              ))}
-            </View>
-          )}
-          {activeSubTab === "Transactions" && <DappsUnlock chainId={chainId} />}
-          {storeType === "L1" && activeSubTab === "Automation" && (
-            <View className="flex flex-col px-[16px]">
-              <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-              <L2Unlock />
-            </View>
-          )}
-          {storeType === "L2" && activeSubTab === "Automation" && (
-            <View className="flex flex-col px-[16px]">
-              <View className="h-[3px] w-full bg-[#1b1c26] my-[16px]" />
-              <PrestigeUnlock />
-            </View>
-          )}
-          <View className="h-[40px]" />
-        </ScrollView>
+          keyExtractor={(item) => item.id}
+          renderItem={renderStoreItem}
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={15}
+          removeClippedSubviews={false}
+          getItemLayout={undefined}
+        />
         <LinearGradient
           style={{
             position: "absolute",

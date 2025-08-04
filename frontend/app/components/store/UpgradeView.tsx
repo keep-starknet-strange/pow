@@ -4,13 +4,14 @@ import { useUpgrades } from "../../stores/useUpgradesStore";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
+import { getUpgradeIcon } from "../../utils/transactions";
 
 export type UpgradeViewProps = {
   chainId: number;
   upgrade: any; // TODO: define the type of upgrade
 };
 
-export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
+export const UpgradeView: React.FC<UpgradeViewProps> = React.memo((props) => {
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();
 
   const [level, setLevel] = useState(0);
@@ -66,4 +67,4 @@ export const UpgradeView: React.FC<UpgradeViewProps> = (props) => {
       />
     </View>
   );
-};
+});
