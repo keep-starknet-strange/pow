@@ -24,7 +24,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       style={{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
-        overflow: 'visible',
+        overflow: "visible",
       }}
       className="flex-1 items-center justify-around relative bg-transparent"
     >

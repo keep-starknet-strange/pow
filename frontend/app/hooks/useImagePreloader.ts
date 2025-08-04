@@ -6,10 +6,10 @@ const assetsPath = "../../assets";
 const imagePaths = {
   // General Images
   logo: require(`${assetsPath}/logo/pow.webp`),
-  logoP: require(`${assetsPath}/logo/P.png`),
-  logoO: require(`${assetsPath}/logo/O.png`),
-  logoW: require(`${assetsPath}/logo/W.png`),
-  logoExclamation: require(`${assetsPath}/logo/!.png`),
+  logoP: require(`${assetsPath}/logo/P.webp`),
+  logoO: require(`${assetsPath}/logo/O.webp`),
+  logoW: require(`${assetsPath}/logo/W.webp`),
+  logoExclamation: require(`${assetsPath}/logo/!.webp`),
   sublogo: require(`${assetsPath}/logo/sublogo.webp`),
   starknet: require(`${assetsPath}/logo/starknet_pixel.webp`),
   background: require(`${assetsPath}/background.webp`),
