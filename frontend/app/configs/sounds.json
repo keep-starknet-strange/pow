@@ -106,5 +106,17 @@
     "rate": 1,
     "haptic": "Heavy",
     "poolSize": 2
+  },
+  "SwitchStore": {
+    "volume": 0.5,
+    "rate": 1,
+    "haptic": "Light",
+    "poolSize": 2
+  },
+  "SwitchTxTab": {
+    "volume": 0.5,
+    "rate": 1,
+    "haptic": "Light",
+    "poolSize": 2
   }
 }
