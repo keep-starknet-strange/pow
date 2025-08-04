@@ -16,6 +16,7 @@ export type BlockViewProps = {
   completed: boolean;
   showEmptyBlocks?: boolean;
   shouldExplodeTx?: boolean;
+  shouldMiniExplode?: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
@@ -69,6 +70,8 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
               txPerRow={txPerRow}
               shouldExplode={props.shouldExplodeTx}
               explosionDelay={index * 50}
+              shouldMiniExplode={props.shouldMiniExplode}
+              miniExplosionDelay={index * 20}
             />
           ))}
         </View>

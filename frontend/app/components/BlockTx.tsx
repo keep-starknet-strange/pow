@@ -25,6 +25,8 @@ interface BlockTxProps {
   // Animation props
   shouldExplode?: boolean;
   explosionDelay?: number;
+  shouldMiniExplode?: boolean;
+  miniExplosionDelay?: number;
 }
 
 export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
@@ -56,6 +58,11 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
   const explosionDistance = Math.random() * 30 + 30;
   const explosionX = Math.cos(explosionAngle) * explosionDistance;
   const explosionY = Math.sin(explosionAngle) * explosionDistance;
+
+  // Mini explosion for click animation (much subtler)
+  const miniExplosionDistance = Math.random() * 5 + 5; // 5-10 pixels only
+  const miniExplosionX = Math.cos(explosionAngle) * miniExplosionDistance;
+  const miniExplosionY = Math.sin(explosionAngle) * miniExplosionDistance;
 
   useEffect(() => {
     if (props.shouldExplode) {
@@ -91,6 +98,44 @@ export const BlockTx: React.FC<BlockTxProps> = memo((props) => {
     props.explosionDelay,
     explosionX,
     explosionY,
+    translateX,
+    translateY,
+  ]);
+
+  useEffect(() => {
+    if (props.shouldMiniExplode) {
+      const delay = props.miniExplosionDelay || 0;
+
+      // Mini explosion - much faster and smaller
+      setTimeout(() => {
+        translateX.value = withSequence(
+          withTiming(miniExplosionX, {
+            duration: 50,
+            easing: Easing.out(Easing.quad),
+          }),
+          withTiming(0, {
+            duration: 100,
+            easing: Easing.in(Easing.quad),
+          }),
+        );
+
+        translateY.value = withSequence(
+          withTiming(miniExplosionY, {
+            duration: 50,
+            easing: Easing.out(Easing.quad),
+          }),
+          withTiming(0, {
+            duration: 100,
+            easing: Easing.in(Easing.quad),
+          }),
+        );
+      }, delay);
+    }
+  }, [
+    props.shouldMiniExplode,
+    props.miniExplosionDelay,
+    miniExplosionX,
+    miniExplosionY,
     translateX,
     translateY,
   ]);
