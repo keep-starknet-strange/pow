@@ -31,13 +31,21 @@ export type ConfirmerProps = {
     color: string;
   };
   renderedBy?: string;
+  specialFlashText?: string;
+  specialFlashTextColor?: string;
 };
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const { getImage } = useImages();
   const pressableRef = useRef<View>(null);
   const [triggerFlash, setTriggerFlash] = useState<
-    ((x: number, y: number) => void) | null
+    | ((
+        x: number,
+        y: number,
+        specialText?: string,
+        specialTextColor?: string,
+      ) => void)
+    | null
   >(null);
 
   const enabled =
@@ -72,17 +80,29 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
 
       // Trigger flash animation at click position
       if (triggerFlash) {
-        triggerFlash(locationX, locationY);
+        triggerFlash(
+          locationX,
+          locationY,
+          props.specialFlashText,
+          props.specialFlashTextColor,
+        );
       }
 
       setConfirmTime(Date.now());
       props.onConfirm();
     },
-    [triggerFlash, props.onConfirm],
+    [triggerFlash, props],
   );
 
   const handleFlashRequested = useCallback(
-    (callback: (x: number, y: number) => void) => {
+    (
+      callback: (
+        x: number,
+        y: number,
+        specialText?: string,
+        specialTextColor?: string,
+      ) => void,
+    ) => {
       setTriggerFlash(() => callback);
     },
     [],
@@ -157,6 +177,8 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       <FlashBurstManager
         renderedBy={props.renderedBy}
         onFlashRequested={handleFlashRequested}
+        specialText={props.specialFlashText}
+        specialTextColor={props.specialFlashTextColor}
       />
     </Pressable>
   );
