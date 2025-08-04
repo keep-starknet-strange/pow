@@ -3,6 +3,8 @@ import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
+import { useMiner } from "../hooks/useMiner";
+import { useSequencer } from "../hooks/useSequencer";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
@@ -41,7 +43,7 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
   (props) => {
-    const { workingBlocks } = useGameStore();
+    const { workingBlocks, onBlockMined, onBlockSequenced } = useGameStore();
     const { getImage } = useImages();
 
     // Flag that is set on smaller phones where font size should be adjusted
@@ -137,6 +139,16 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
       );
       */
     };
+
+    // Use hooks with animation callbacks for automation
+    const { mineBlock } = useMiner(
+      props.chainId === 0 ? onBlockMined : () => {},
+      props.chainId === 0 ? triggerBlockShake : undefined,
+    );
+    const { sequenceBlock } = useSequencer(
+      props.chainId === 1 ? onBlockSequenced : () => {},
+      props.chainId === 1 ? triggerBlockShake : undefined,
+    );
     const blockTransformStyle = useAnimatedStyle(() => {
       return {
         transform: [

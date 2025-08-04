@@ -7,7 +7,10 @@ import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
 import { useShallow } from "zustand/react/shallow";
 
-export const useDAConfirmer = (onDAConfirm: () => void) => {
+export const useDAConfirmer = (
+  onDAConfirm: () => void,
+  triggerDAAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
@@ -40,6 +43,12 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
       console.warn("Data Availability is not built yet.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerDAAnimation) {
+      triggerDAAnimation();
+    }
+
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const daDifficulty = daMaxSize || 1;
@@ -56,7 +65,7 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, notify, daIsBuilt, daMaxSize]);
+  }, [onDAConfirm, notify, daIsBuilt, daMaxSize, triggerDAAnimation]);
 
   // Reset da confirm progress when the DA is built
   useEffect(() => {

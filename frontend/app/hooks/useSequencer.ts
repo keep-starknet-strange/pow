@@ -8,7 +8,10 @@ import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
 import { useShallow } from "zustand/react/shallow";
 
-export const useSequencer = (onBlockSequenced: () => void) => {
+export const useSequencer = (
+  onBlockSequenced: () => void,
+  triggerSequenceAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
@@ -45,6 +48,12 @@ export const useSequencer = (onBlockSequenced: () => void) => {
       console.warn("Block is not built yet, cannot sequence.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerSequenceAnimation) {
+      triggerSequenceAnimation();
+    }
+
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
@@ -67,6 +76,7 @@ export const useSequencer = (onBlockSequenced: () => void) => {
     notify,
     sequencingBlock?.isBuilt,
     sequencingBlock?.difficulty,
+    triggerSequenceAnimation,
   ]);
 
   // Reset sequencing progress when block is sequenced

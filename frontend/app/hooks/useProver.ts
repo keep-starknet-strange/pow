@@ -7,7 +7,10 @@ import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
 import { useShallow } from "zustand/react/shallow";
 
-export const useProver = (onProve: () => void) => {
+export const useProver = (
+  onProve: () => void,
+  triggerProveAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
@@ -40,6 +43,12 @@ export const useProver = (onProve: () => void) => {
       console.warn("Prover is not built yet.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerProveAnimation) {
+      triggerProveAnimation();
+    }
+
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const proverDifficulty = proverMaxSize || 1;
@@ -56,7 +65,7 @@ export const useProver = (onProve: () => void) => {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, notify, proverIsBuilt, proverMaxSize]);
+  }, [onProve, notify, proverIsBuilt, proverMaxSize, triggerProveAnimation]);
 
   // Reset prover progress when the prover is built
   useEffect(() => {

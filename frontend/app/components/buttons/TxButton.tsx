@@ -108,6 +108,11 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     shakeAnim.value *= -1; // Toggle the shake animation value
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
+  const triggerTxShake = useCallback(() => {
+    setLastTxTime(Date.now());
+    shakeAnim.value *= -1; // Toggle the shake animation value
+  }, [shakeAnim]);
+
   const handleFlashRequested = useCallback(
     (callback: (x: number, y: number) => void) => {
       setTriggerFlash(() => callback);
@@ -183,6 +188,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
             txId={props.txId}
             isDapp={props.isDapp}
             name={txType?.name || "Unknown"}
+            triggerTxAnimation={triggerTxShake}
           />
         </Pressable>
       </Animated.View>

@@ -7,7 +7,10 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { useShallow } from "zustand/react/shallow";
 
-export const useMiner = (onBlockMined: () => void) => {
+export const useMiner = (
+  onBlockMined: () => void,
+  triggerMineAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
@@ -40,6 +43,12 @@ export const useMiner = (onBlockMined: () => void) => {
       console.warn("Block is not built yet, cannot mine.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerMineAnimation) {
+      triggerMineAnimation();
+    }
+
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
@@ -58,7 +67,13 @@ export const useMiner = (onBlockMined: () => void) => {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [notify, onBlockMined, miningBlock?.isBuilt, miningBlock?.difficulty]);
+  }, [
+    notify,
+    onBlockMined,
+    miningBlock?.isBuilt,
+    miningBlock?.difficulty,
+    triggerMineAnimation,
+  ]);
 
   // Reset mining progress when a block is mined
   useEffect(() => {
