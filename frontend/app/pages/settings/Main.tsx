@@ -12,7 +12,7 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 
 export type SettingsMainSectionProps = {
-  setSettingTab: (tab: "About" | "Credits" | "ClaimReward") => void;
+  setSettingTab: (tab: "About" | "Credits" | "ClaimReward" | "TermsOfUse") => void;
   goBackToLogin: () => void;
 };
 
@@ -39,12 +39,13 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "About" | "Credits" | "ClaimReward";
+    tab?: "About" | "Credits" | "ClaimReward" | "TermsOfUse";
     onPress?: () => void;
     icon?: string;
   }[] = [
     { label: "About", tab: "About" },
     { label: "Credits", tab: "Credits" },
+    { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Claim Reward", tab: "ClaimReward" },
     {
