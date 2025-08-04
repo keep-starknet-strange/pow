@@ -5,6 +5,7 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
+import { useShallow } from "zustand/react/shallow";
 
 export const useDAConfirmer = (onDAConfirm: () => void) => {
   const { notify } = useEventManager();
@@ -30,15 +31,18 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
     fetchDaCounter();
   }, [powContract, user, getUserDaClicks]);
 
-  const { l2 } = useL2Store();
+  // Shallow state management: only re-render when DA properties change
+  const [daIsBuilt, daMaxSize] = useL2Store(
+    useShallow((state) => [state.l2?.da.isBuilt, state.l2?.da.maxSize]),
+  );
   const daConfirm = useCallback(() => {
-    if (!l2?.da.isBuilt) {
+    if (!daIsBuilt) {
       console.warn("Data Availability is not built yet.");
       return;
     }
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const daDifficulty = l2?.da.maxSize || 1;
+      const daDifficulty = daMaxSize || 1;
       if (newCounter == daDifficulty) {
         onDAConfirm();
         setDaConfirmProgress(1);
@@ -52,16 +56,16 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, notify, l2?.da.isBuilt, l2?.da.maxSize]);
+  }, [onDAConfirm, notify, daIsBuilt, daMaxSize]);
 
   // Reset da confirm progress when the DA is built
   useEffect(() => {
     setDaConfirmProgress(0);
     setDaConfirmCounter(0);
-  }, [l2?.da.isBuilt]);
+  }, [daIsBuilt]);
 
   useAutoClicker(
-    getAutomationValue(1, "DA") > 0 && (l2?.da.isBuilt || false),
+    getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),
     5000 / (getAutomationValue(1, "DA") || 1),
     daConfirm,
   );

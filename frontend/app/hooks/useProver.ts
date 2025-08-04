@@ -5,6 +5,7 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
+import { useShallow } from "zustand/react/shallow";
 
 export const useProver = (onProve: () => void) => {
   const { notify } = useEventManager();
@@ -30,15 +31,18 @@ export const useProver = (onProve: () => void) => {
     fetchProofCounter();
   }, [powContract, user, getUserProofClicks]);
 
-  const { l2 } = useL2Store();
+  // Shallow state management: only re-render when prover properties change
+  const [proverIsBuilt, proverMaxSize] = useL2Store(
+    useShallow((state) => [state.l2?.prover.isBuilt, state.l2?.prover.maxSize]),
+  );
   const prove = useCallback(() => {
-    if (!l2?.prover.isBuilt) {
+    if (!proverIsBuilt) {
       console.warn("Prover is not built yet.");
       return;
     }
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const proverDifficulty = l2?.prover.maxSize || 1;
+      const proverDifficulty = proverMaxSize || 1;
       if (newCounter == proverDifficulty) {
         onProve();
         setProverProgress(1);
@@ -52,16 +56,16 @@ export const useProver = (onProve: () => void) => {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, notify, l2?.prover.isBuilt, l2?.prover.maxSize]);
+  }, [onProve, notify, proverIsBuilt, proverMaxSize]);
 
   // Reset prover progress when the prover is built
   useEffect(() => {
     setProverProgress(0);
     setProverCounter(0);
-  }, [l2?.prover.isBuilt]);
+  }, [proverIsBuilt]);
 
   useAutoClicker(
-    getAutomationValue(1, "Prover") > 0 && (l2?.prover.isBuilt || false),
+    getAutomationValue(1, "Prover") > 0 && (proverIsBuilt || false),
     5000 / (getAutomationValue(1, "Prover") || 1),
     prove,
   );
