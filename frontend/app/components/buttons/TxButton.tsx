@@ -11,6 +11,7 @@ import { useGameStore } from "@/app/stores/useGameStore";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
 import { newTransaction } from "../../types/Chains";
+import { useShallow } from "zustand/react/shallow";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../stores/useTutorialStore";
 import transactionsJson from "../../configs/transactions.json";
@@ -46,6 +47,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
   const { addTransaction } = useGameStore();
+  // Shallow state management: only re-render when transaction button functions change
   const {
     getFeeLevel,
     getNextFeeCost,
@@ -54,7 +56,17 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     txFeeUpgrade,
     dappFeeUpgrade,
     canUnlockTx,
-  } = useTransactionsStore();
+  } = useTransactionsStore(
+    useShallow((state) => ({
+      getFeeLevel: state.getFeeLevel,
+      getNextFeeCost: state.getNextFeeCost,
+      getFee: state.getFee,
+      getSpeed: state.getSpeed,
+      txFeeUpgrade: state.txFeeUpgrade,
+      dappFeeUpgrade: state.dappFeeUpgrade,
+      canUnlockTx: state.canUnlockTx,
+    })),
+  );
 
   const [triggerFlash, setTriggerFlash] = useState<
     ((x: number, y: number) => void) | null
