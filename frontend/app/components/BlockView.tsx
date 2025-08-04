@@ -47,7 +47,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
   return (
     <View className="w-full h-full flex flex-col items-center justify-center relative">
-      <View className="flex-1 aspect-square relative">
+      <View className="flex-1 aspect-square relative shadow-md shadow-black/30">
         <View className="flex flex-wrap w-full aspect-square">
           <View
             className="absolute top-0 left-0 w-full h-full"

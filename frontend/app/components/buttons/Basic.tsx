@@ -67,7 +67,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({
         disabled={disabled}
       >
         <View
-          className="relative"
+          className="relative shadow-lg shadow-black/50"
           style={{
             width: 254,
             height: 46,
