@@ -53,6 +53,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
       const block = workingBlocks[chainId];
       if (block) {
         setWorkingBlock(block);
+        setShouldExplodeTx(false); // Reset explosion state for new block
       }
     };
 
@@ -61,6 +62,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     const blockSlideLeftAnim = useSharedValue(props.placement.left);
     const blockOpacityAnim = useSharedValue(1);
     const blockShakeAnim = useSharedValue(0);
+    const [shouldExplodeTx, setShouldExplodeTx] = React.useState(false);
     useEffect(() => {
       if (workingBlocks[props.chainId]?.isBuilt) {
         blockSlideLeftAnim.value = props.placement.left;
@@ -75,17 +77,32 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
           blockSlideLeftAnim.value = props.placement.left;
           blockOpacityAnim.value = 1;
           blockShakeAnim.value = 0;
+          setShouldExplodeTx(false);
           return;
         }
+        // Trigger explosion after initial pause, before sliding
+        setTimeout(() => {
+          setShouldExplodeTx(true);
+        }, 400); // After initial 400ms pause
+
         blockScaleAnim.value = withSequence(
-          withTiming(1, { duration: 400 }),
-          withTiming(1, { duration: 700 }),
-          withTiming(1, { duration: 200 }),
+          withTiming(1.25, { duration: 400 }), // Hold at spring scale
+          withTiming(1.25, { duration: 400 }), // Hold during explosion animation (reduced from 600)
+          withTiming(1, { duration: 200 }), // Scale back to original size after explosion
+          withTiming(1, { duration: 700 }), // Hold at normal size while sliding
           withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }),
         );
         blockSlideLeftAnim.value = withSequence(
           withTiming(props.placement.left, {
             duration: 400,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(props.placement.left, {
+            duration: 400, // Stay in place during explosion (reduced from 600)
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(props.placement.left, {
+            duration: 200, // Stay in place during scale down
             easing: Easing.inOut(Easing.ease),
           }),
           withTiming(props.completedPlacementLeft, { duration: 700 }),
@@ -103,17 +120,14 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
             duration: 100,
             easing: Easing.inOut(Easing.ease),
           }),
-          withTiming(props.placement.left, {
-            duration: 200,
-            easing: Easing.inOut(Easing.ease),
-          }),
         );
         blockOpacityAnim.value = withSequence(
           withTiming(1, { duration: 400 }),
-          withTiming(1, { duration: 700 }),
+          withTiming(1, { duration: 400 }), // Stay visible during explosion (reduced from 600)
+          withTiming(1, { duration: 200 }), // Stay visible during scale
+          withTiming(1, { duration: 700 }), // Stay visible during slide
           withTiming(0, { duration: 200 }),
-          withTiming(0, { duration: 100 }),
-          withTiming(1, { duration: 200 }),
+          withTiming(1, { duration: 100 }),
         );
       }
     }, [
@@ -212,6 +226,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
             block={workingBlock || null}
             completed={false}
             showEmptyBlocks={true}
+            shouldExplodeTx={shouldExplodeTx}
           />
         </View>
 

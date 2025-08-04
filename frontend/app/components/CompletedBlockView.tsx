@@ -57,6 +57,14 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           duration: 400,
           easing: Easing.inOut(Easing.ease),
         }),
+        withTiming(props.placement.left, {
+          duration: 400, // Wait for explosion animation (reduced from 600)
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(props.placement.left, {
+          duration: 200, // Wait for scale down
+          easing: Easing.inOut(Easing.ease),
+        }),
         withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
           runOnJS(updateCompletedBlock)(props.chainId),
         ),
