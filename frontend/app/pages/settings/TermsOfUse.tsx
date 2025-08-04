@@ -42,7 +42,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                 fontWeight: "500",
               }}
             >
-              Welcome to POW! Please read these Terms and Conditions carefully before playing.
+              Welcome to POW! Please read these Terms and Conditions carefully
+              before playing.
             </Text>
           </View>
 
@@ -68,7 +69,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                By playing POW!, you confirm that you have read, understood, and agree to these Terms and Conditions. If you do not agree, please do not play the game.
+                By playing POW!, you confirm that you have read, understood, and
+                agree to these Terms and Conditions. If you do not agree, please
+                do not play the game.
               </Text>
             </View>
 
@@ -93,7 +96,10 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginBottom: 12,
                 }}
               >
-                POW! is an educational blockchain-based game on Starknet where players fill blocks with transactions to learn how blockchain works. As part of the gameplay, players can unlock and earn STRK tokens.
+                POW! is an educational blockchain-based game on Starknet where
+                players fill blocks with transactions to learn how blockchain
+                works. As part of the gameplay, players can unlock and earn STRK
+                tokens.
               </Text>
               <Text
                 style={{
@@ -103,7 +109,13 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                You may encounter in-game 'points' referred to as 'Bitcoin' for thematic or illustrative purposes. These in-game Bitcoin points are entirely fictional, do not represent real or actual Bitcoin, and have no monetary value. They are used purely for gameplay mechanics and educational engagement. The only digital item of real-world value that may be earned or transmitted through the game is the STRK token.
+                You may encounter in-game 'points' referred to as 'Bitcoin' for
+                thematic or illustrative purposes. These in-game Bitcoin points
+                are entirely fictional, do not represent real or actual Bitcoin,
+                and have no monetary value. They are used purely for gameplay
+                mechanics and educational engagement. The only digital item of
+                real-world value that may be earned or transmitted through the
+                game is the STRK token.
               </Text>
             </View>
 
@@ -127,7 +139,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                <Text style={{ fontWeight: "600" }}>Login:</Text> You will log in using a username of your choice (the username you choose will be displayed publicly on the leaderboard).
+                <Text style={{ fontWeight: "600" }}>Login:</Text> You will log
+                in using a username of your choice (the username you choose will
+                be displayed publicly on the leaderboard).
               </Text>
               <Text
                 style={{
@@ -138,7 +152,11 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginTop: 8,
                 }}
               >
-                <Text style={{ fontWeight: "600" }}>Automatic Wallet Creation:</Text> When you log in, we automatically create a Starknet wallet for you. This wallet is securely linked to your login.
+                <Text style={{ fontWeight: "600" }}>
+                  Automatic Wallet Creation:
+                </Text>{" "}
+                When you log in, we automatically create a Starknet wallet for
+                you. This wallet is securely linked to your login.
               </Text>
             </View>
 
@@ -162,7 +180,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                • Play fair. Cheating, exploiting bugs, or using bots is strictly prohibited.
+                • Play fair. Cheating, exploiting bugs, or using bots is
+                strictly prohibited.
               </Text>
               <Text
                 style={{
@@ -173,7 +192,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginTop: 4,
                 }}
               >
-                • You are solely responsible for your account and any actions taken with it.
+                • You are solely responsible for your account and any actions
+                taken with it.
               </Text>
             </View>
 
@@ -198,7 +218,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginBottom: 12,
                 }}
               >
-                POW! allows players to unlock and receive STRK tokens as rewards. The amount and conditions will be communicated within the game.
+                POW! allows players to unlock and receive STRK tokens as
+                rewards. The amount and conditions will be communicated within
+                the game.
               </Text>
               <Text
                 style={{
@@ -209,7 +231,11 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginBottom: 12,
                 }}
               >
-                <Text style={{ fontWeight: "600" }}>Onboarding Bonus:</Text> Once you complete the game, you will be eligible to receive 10 STRK to a Starknet Account of your choice. This is a one-time reward intended to help you begin your blockchain onboarding journey.
+                <Text style={{ fontWeight: "600" }}>Onboarding Bonus:</Text>{" "}
+                Once you complete the game, you will be eligible to receive 10
+                STRK to a Starknet Account of your choice. This is a one-time
+                reward intended to help you begin your blockchain onboarding
+                journey.
               </Text>
               <Text
                 style={{
@@ -219,7 +245,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                We are not responsible for fluctuations in the value of STRK or the availability of the token.
+                We are not responsible for fluctuations in the value of STRK or
+                the availability of the token.
               </Text>
             </View>
 
@@ -243,7 +270,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                • We collect your username and game progress data for gameplay purposes and leaderboard ranking.
+                • We collect your username and game progress data for gameplay
+                purposes and leaderboard ranking.
               </Text>
               <Text
                 style={{
@@ -254,7 +282,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginTop: 4,
                 }}
               >
-                • Your data will be processed in accordance with our Privacy Policy.
+                • Your data will be processed in accordance with our Privacy
+                Policy.
               </Text>
             </View>
 
@@ -278,7 +307,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                We may update these Terms and Conditions at any time. When we do, we'll notify you in-game or via our website. Continued use of the game implies acceptance of the revised terms.
+                We may update these Terms and Conditions at any time. When we
+                do, we'll notify you in-game or via our website. Continued use
+                of the game implies acceptance of the revised terms.
               </Text>
             </View>
 
@@ -302,7 +333,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   textAlign: "justify",
                 }}
               >
-                We reserve the right to change, suspend, or discontinue any aspect of the game at any time. We may also suspend or terminate access for violations of these terms.
+                We reserve the right to change, suspend, or discontinue any
+                aspect of the game at any time. We may also suspend or terminate
+                access for violations of these terms.
               </Text>
             </View>
 
@@ -348,7 +381,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                   marginTop: 4,
                 }}
               >
-                • We are not liable for any losses, damages, or issues arising from your use of the game or the STRK tokens.
+                • We are not liable for any losses, damages, or issues arising
+                from your use of the game or the STRK tokens.
               </Text>
             </View>
           </View>
@@ -381,7 +415,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                 marginBottom: 32,
               }}
             >
-              This Privacy Policy outlines how we collect, use, and protect your information when you play POW!.
+              This Privacy Policy outlines how we collect, use, and protect your
+              information when you play POW!.
             </Text>
 
             <View style={{ gap: 28 }}>
@@ -416,7 +451,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Username:</Text> Used for login and public leaderboard.
+                  • <Text style={{ fontWeight: "600" }}>Username:</Text> Used
+                  for login and public leaderboard.
                 </Text>
                 <Text
                   style={{
@@ -427,7 +463,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     marginTop: 4,
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Game Progress Data:</Text> Levels completed, rewards earned, and performance metrics.
+                  •{" "}
+                  <Text style={{ fontWeight: "600" }}>Game Progress Data:</Text>{" "}
+                  Levels completed, rewards earned, and performance metrics.
                 </Text>
                 <Text
                   style={{
@@ -438,7 +476,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     marginTop: 4,
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Wallet Information:</Text> A Starknet wallet is created and managed on your behalf.
+                  •{" "}
+                  <Text style={{ fontWeight: "600" }}>Wallet Information:</Text>{" "}
+                  A Starknet wallet is created and managed on your behalf.
                 </Text>
               </View>
 
@@ -530,7 +570,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Leaderboard:</Text> Your username will be visible to other players.
+                  • <Text style={{ fontWeight: "600" }}>Leaderboard:</Text> Your
+                  username will be visible to other players.
                 </Text>
                 <Text
                   style={{
@@ -541,7 +582,10 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     marginTop: 4,
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Third Parties:</Text> We do not sell your data. We may share it with third-party service providers (e.g., cloud hosting, wallet infrastructure) only to operate the game.
+                  • <Text style={{ fontWeight: "600" }}>Third Parties:</Text> We
+                  do not sell your data. We may share it with third-party
+                  service providers (e.g., cloud hosting, wallet infrastructure)
+                  only to operate the game.
                 </Text>
               </View>
 
@@ -565,7 +609,9 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  We implement industry-standard measures to secure your data. However, no system is completely secure; use the game at your own risk.
+                  We implement industry-standard measures to secure your data.
+                  However, no system is completely secure; use the game at your
+                  own risk.
                 </Text>
               </View>
 
@@ -589,7 +635,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Username:</Text> Choose a username carefully, as it is publicly visible.
+                  • <Text style={{ fontWeight: "600" }}>Username:</Text> Choose
+                  a username carefully, as it is publicly visible.
                 </Text>
                 <Text
                   style={{
@@ -600,7 +647,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     marginTop: 4,
                   }}
                 >
-                  • <Text style={{ fontWeight: "600" }}>Account Deletion:</Text> To delete your account, please contact us at [].
+                  • <Text style={{ fontWeight: "600" }}>Account Deletion:</Text>{" "}
+                  To delete your account, please contact us at [].
                 </Text>
               </View>
 
@@ -624,7 +672,10 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  This game is not intended for children under the age of 16. We do not knowingly collect data from children below this age. If you believe a child's data was collected, please contact us for removal.
+                  This game is not intended for children under the age of 16. We
+                  do not knowingly collect data from children below this age. If
+                  you believe a child's data was collected, please contact us
+                  for removal.
                 </Text>
               </View>
 
@@ -648,7 +699,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  We may update this Privacy Policy. All significant changes will be communicated within the game or via our website.
+                  We may update this Privacy Policy. All significant changes
+                  will be communicated within the game or via our website.
                 </Text>
               </View>
 
@@ -672,7 +724,8 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                     textAlign: "justify",
                   }}
                 >
-                  For any privacy-related questions or requests, please contact us at: Legal@starkware.co.
+                  For any privacy-related questions or requests, please contact
+                  us at: Legal@starkware.co.
                 </Text>
               </View>
             </View>
