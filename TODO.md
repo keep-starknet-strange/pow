@@ -2,7 +2,6 @@
 - Show red incorrect hash on flash animation done when clicking blocks ( miner and sequencer only ), and on the last "successful" mine show a green successful hash ( enough 0s at the start based on difficulty ). Some code ( which is old and probably has bugs now ) already exists in the miner hook to generate hashes I think.
 - When switching between Transactions and dApps using the transactionbuttons tabs the transactions should exit by fadeoutleft and dapps should come in by fadeinright. Then vice-versa when going dapps->transactions ( ie transactions fadeinleft and dapps fadeoutright )
 - Add a tutorial that pops up after mining the first block and before buying your first transaction that shows your balance, and explains that block fees increase your balance after mining. Then After clicking "Got it" it will move on to the transaction tutorial section
-- Refactor all "Can unlock L2" logic from useeffects and spread out checks, to a single function inside the useL2Store zustand store called `canUnlockL2` and use that function as appropriate throughout the code instead
 - Currently audio is not playing on the phone when running there, but works fine in the iphone simulator on my pc.
 - Add a terms of use page that is navigatable to thru a button on the settings page. I will insert the text into a file, so for now just use mock data in a file that I will overwrite later.
 - Only show the "Claim Reward" button on the settings page if the player has reached prestige 1

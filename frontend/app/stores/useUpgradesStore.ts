@@ -333,8 +333,8 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     const { upgrades, automations } = get();
 
     // Check if L2 is unlocked first
-    const l2 = useL2Store.getState().l2;
-    if (!l2) {
+    const { isL2Unlocked } = useL2Store.getState();
+    if (!isL2Unlocked) {
       set({ canPrestige: false });
       return;
     }
