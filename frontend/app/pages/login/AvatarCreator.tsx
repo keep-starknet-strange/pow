@@ -68,7 +68,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
             <PFPView attributes={creatingAvatar ? newAvatar : avatar} />
           </Pressable>
           <Pressable
-            className="absolute top-[85px] right-[-42px]"
+            className="absolute top-[85px] right-[-42px] shadow-lg shadow-black/50"
             onPress={startCreatingAvatar}
           >
             <Canvas style={{ width: 40, height: 40 }}>
@@ -87,7 +87,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
             </Canvas>
           </Pressable>
           <Pressable
-            className="absolute top-[40px] right-[-42px]"
+            className="absolute top-[40px] right-[-42px] shadow-lg shadow-black/50"
             onPress={() => {
               const newAvatar = getRandomNounsAttributes();
               setAvatar(newAvatar);

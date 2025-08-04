@@ -28,7 +28,7 @@ export const Header: React.FC = memo(() => {
     <View
       ref={ref}
       onLayout={onLayout}
-      className="bg-[#101119] h-[76px] p-0 relative"
+      className="bg-[#101119] h-[76px] p-0 relative shadow-md shadow-black/40"
       style={{ width: width, marginTop: insets.top }}
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">

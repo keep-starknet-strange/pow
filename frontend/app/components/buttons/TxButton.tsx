@@ -167,7 +167,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
           style={{
             width: width * 0.18,
           }}
-          className="relative h-[94px]"
+          className="relative h-[94px] shadow-lg shadow-black/50"
           onPress={handlePress}
         >
           <TxButtonInner
