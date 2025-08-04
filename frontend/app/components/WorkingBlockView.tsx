@@ -141,11 +141,11 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     };
 
     // Use hooks with animation callbacks for automation
-    const { mineBlock } = useMiner(
+    const { miningProgress, mineBlock } = useMiner(
       props.chainId === 0 ? onBlockMined : () => {},
       props.chainId === 0 ? triggerBlockShake : undefined,
     );
-    const { sequenceBlock } = useSequencer(
+    const { sequencingProgress, sequenceBlock } = useSequencer(
       props.chainId === 1 ? onBlockSequenced : () => {},
       props.chainId === 1 ? triggerBlockShake : undefined,
     );
@@ -225,9 +225,17 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
             }}
           >
             {props.chainId === 0 ? (
-              <Miner triggerAnim={triggerBlockShake} />
+              <Miner
+                triggerAnim={triggerBlockShake}
+                miningProgress={miningProgress}
+                mineBlock={mineBlock}
+              />
             ) : (
-              <Sequencer triggerAnim={triggerBlockShake} />
+              <Sequencer
+                triggerAnim={triggerBlockShake}
+                sequencingProgress={sequencingProgress}
+                sequenceBlock={sequenceBlock}
+              />
             )}
           </View>
         )}

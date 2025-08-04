@@ -1,14 +1,17 @@
 import { View } from "react-native";
-import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
 interface SequencerProps {
   triggerAnim: () => void;
+  sequencingProgress: number;
+  sequenceBlock: () => void;
 }
 
-export const Sequencer: React.FC<SequencerProps> = ({ triggerAnim }) => {
-  const { sequencingProgress, sequenceBlock } = useGame();
-
+export const Sequencer: React.FC<SequencerProps> = ({
+  triggerAnim,
+  sequencingProgress,
+  sequenceBlock,
+}) => {
   return (
     <View className="flex flex-col h-full aspect-square relative">
       <Confirmer

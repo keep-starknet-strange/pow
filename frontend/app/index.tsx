@@ -3,7 +3,6 @@ import * as Font from "expo-font";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
-import { GameProvider } from "./context/Game";
 import { UpgradesStoreInitializer } from "./components/UpgradesStoreInitializer";
 import { useImagePreloader } from "./hooks/useImagePreloader";
 import Game from "./game";
@@ -34,9 +33,7 @@ export default function App() {
       <FocEngineProvider>
         <PowContractProvider>
           <UpgradesStoreInitializer>
-            <GameProvider>
-              <Game />
-            </GameProvider>
+            <Game />
           </UpgradesStoreInitializer>
         </PowContractProvider>
       </FocEngineProvider>
