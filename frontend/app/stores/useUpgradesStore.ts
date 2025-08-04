@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useShallow } from "zustand/react/shallow";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useBalanceStore } from "./useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
@@ -567,24 +568,26 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   },
 }));
 
-// Export hook for easier migration
+// Export hook for easier migration with shallow state management
 export const useUpgrades = () => {
-  const store = useUpgradesStore();
-  return {
-    upgrades: store.upgrades,
-    automations: store.automations,
-    upgrade: store.upgrade,
-    upgradeAutomation: store.upgradeAutomation,
-    canUnlockUpgrade: store.canUnlockUpgrade,
-    getUpgradeValue: store.getUpgradeValue,
-    getUpgradeValueAt: store.getUpgradeValueAt,
-    getNextUpgradeCost: store.getNextUpgradeCost,
-    getAutomationValue: store.getAutomationValue,
-    getAutomationSpeedAt: store.getAutomationSpeedAt,
-    getNextAutomationCost: store.getNextAutomationCost,
-    currentPrestige: store.currentPrestige,
-    canPrestige: store.canPrestige,
-    prestige: store.prestige,
-    getNextPrestigeCost: store.getNextPrestigeCost,
-  };
+  const store = useUpgradesStore(
+    useShallow((state) => ({
+      upgrades: state.upgrades,
+      automations: state.automations,
+      upgrade: state.upgrade,
+      upgradeAutomation: state.upgradeAutomation,
+      canUnlockUpgrade: state.canUnlockUpgrade,
+      getUpgradeValue: state.getUpgradeValue,
+      getUpgradeValueAt: state.getUpgradeValueAt,
+      getNextUpgradeCost: state.getNextUpgradeCost,
+      getAutomationValue: state.getAutomationValue,
+      getAutomationSpeedAt: state.getAutomationSpeedAt,
+      getNextAutomationCost: state.getNextAutomationCost,
+      currentPrestige: state.currentPrestige,
+      canPrestige: state.canPrestige,
+      prestige: state.prestige,
+      getNextPrestigeCost: state.getNextPrestigeCost,
+    })),
+  );
+  return store;
 };

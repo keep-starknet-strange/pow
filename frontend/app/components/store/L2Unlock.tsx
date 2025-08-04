@@ -4,6 +4,7 @@ import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { FeatureUnlockView } from "../FeatureUnlockView";
+import { useShallow } from "zustand/react/shallow";
 
 export type L2UnlockProps = {
   alwaysShow?: boolean;
@@ -12,7 +13,10 @@ export type L2UnlockProps = {
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
   const { canUnlockL2, isL2Unlocked, getL2Cost, initL2 } = useL2Store();
-  const { workingBlocks } = useGameStore();
+  // Shallow state management: only re-render when mining block (index 0) changes
+  const miningBlock = useGameStore(
+    useShallow((state) => state.workingBlocks[0]),
+  );
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {
     if (alwaysShow) {
@@ -20,7 +24,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
       return;
     }
 
-    if (workingBlocks[0]?.isBuilt) {
+    if (miningBlock?.isBuilt) {
       setShowUnlock(false);
       return;
     }
@@ -67,7 +71,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
     isL2Unlocked,
     transactionFeeLevels,
     dappFeeLevels,
-    workingBlocks[0]?.isBuilt,
+    miningBlock?.isBuilt,
   ]);
 
   return (
