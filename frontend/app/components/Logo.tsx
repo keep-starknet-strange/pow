@@ -10,9 +10,8 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 import Animated, {
-  FadeInUp,
   useSharedValue,
-  withTiming,
+  withSpring,
   withDelay,
   useDerivedValue,
 } from "react-native-reanimated";
@@ -20,61 +19,170 @@ import Animated, {
 export const Logo: React.FC = () => {
   const { getImage } = useImages();
 
-  // Animated values for character positions
-  const pShadowX = useSharedValue(-100);
-  const oShadowX = useSharedValue(-150);
-  const wShadowX = useSharedValue(-200);
-  const exclamationShadowX = useSharedValue(-250);
+  // Animated values for character Y positions (falling from top)
+  const pShadowY = useSharedValue(-200);
+  const oShadowY = useSharedValue(-250);
+  const wShadowY = useSharedValue(-300);
+  const exclamationShadowY = useSharedValue(-350);
 
-  const pMainX = useSharedValue(-100);
-  const oMainX = useSharedValue(-150);
-  const wMainX = useSharedValue(-200);
-  const exclamationMainX = useSharedValue(-250);
+  const pMainY = useSharedValue(-200);
+  const oMainY = useSharedValue(-250);
+  const wMainY = useSharedValue(-300);
+  const exclamationMainY = useSharedValue(-350);
+
+  // Fixed X positions for each character
+  const pX = 30;
+  const oX = 104;
+  const wX = 181;
+  const exclamationX = 310;
+
+  const pShadowX = 42;
+  const oShadowX = 116;
+  const wShadowX = 193;
+  const exclamationShadowX = 322;
 
   // Derived values for white outlines (offset from main letters)
-  const pOutlineXDerived = useDerivedValue(() => pMainX.value - 2);
-  const oOutlineXDerived = useDerivedValue(() => oMainX.value - 2);
-  const wOutlineXDerived = useDerivedValue(() => wMainX.value - 2);
-  const exclamationOutlineXDerived = useDerivedValue(
-    () => exclamationMainX.value - 2,
+  const pOutlineXDerived = pX - 2;
+  const oOutlineXDerived = oX - 2;
+  const wOutlineXDerived = wX - 2;
+  const exclamationOutlineXDerived = exclamationX - 2;
+
+  const pShadowOutlineXDerived = pShadowX - 2;
+  const oShadowOutlineXDerived = oShadowX - 2;
+  const wShadowOutlineXDerived = wShadowX - 2;
+  const exclamationShadowOutlineXDerived = exclamationShadowX - 2;
+
+  // Derived values for Y positions with outline offsets
+  const pShadowOutlineYDerived = useDerivedValue(() => pShadowY.value - 1);
+  const oShadowOutlineYDerived = useDerivedValue(() => oShadowY.value - 1);
+  const wShadowOutlineYDerived = useDerivedValue(() => wShadowY.value - 1);
+  const exclamationShadowOutlineYDerived = useDerivedValue(
+    () => exclamationShadowY.value - 1,
   );
 
-  const pShadowOutlineXDerived = useDerivedValue(() => pShadowX.value - 2);
-  const oShadowOutlineXDerived = useDerivedValue(() => oShadowX.value - 2);
-  const wShadowOutlineXDerived = useDerivedValue(() => wShadowX.value - 2);
-  const exclamationShadowOutlineXDerived = useDerivedValue(
-    () => exclamationShadowX.value - 2,
+  const pOutlineYDerived = useDerivedValue(() => pMainY.value - 2);
+  const oOutlineYDerived = useDerivedValue(() => oMainY.value - 2);
+  const wOutlineYDerived = useDerivedValue(() => wMainY.value - 2);
+  const exclamationOutlineYDerived = useDerivedValue(
+    () => exclamationMainY.value - 2,
   );
 
   useEffect(() => {
-    // Animate characters flying in from left with staggered timing
-    pShadowX.value = withDelay(100, withTiming(42, { duration: 800 }));
-    pMainX.value = withDelay(100, withTiming(30, { duration: 800 }));
-
-    oShadowX.value = withDelay(200, withTiming(116, { duration: 800 }));
-    oMainX.value = withDelay(200, withTiming(104, { duration: 800 }));
-
-    wShadowX.value = withDelay(300, withTiming(193, { duration: 800 }));
-    wMainX.value = withDelay(300, withTiming(181, { duration: 800 }));
-
-    exclamationShadowX.value = withDelay(
-      400,
-      withTiming(322, { duration: 800 }),
+    // Animate characters falling from top with bouncy spring animation
+    // Final positions adjusted for canvas offset (200px down due to marginTop: -200)
+    pShadowY.value = withDelay(
+      100,
+      withSpring(232, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
     );
-    exclamationMainX.value = withDelay(400, withTiming(310, { duration: 800 }));
+    pMainY.value = withDelay(
+      100,
+      withSpring(220, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+
+    oShadowY.value = withDelay(
+      200,
+      withSpring(232, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+    oMainY.value = withDelay(
+      200,
+      withSpring(220, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+
+    wShadowY.value = withDelay(
+      300,
+      withSpring(232, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+    wMainY.value = withDelay(
+      300,
+      withSpring(220, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+
+    exclamationShadowY.value = withDelay(
+      400,
+      withSpring(232, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
+    exclamationMainY.value = withDelay(
+      400,
+      withSpring(220, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }),
+    );
   }, []);
 
   return (
     <Animated.View
-      entering={FadeInUp}
       className="absolute"
       style={{
         width: "90%",
-        height: 140,
+        height: 600,
         top: "35%",
+        marginTop: -200,
+        overflow: "visible",
+        zIndex: 10,
       }}
     >
-      <Canvas style={{ flex: 1 }} className="w-full h-full">
+      <Canvas
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: 600,
+          overflow: "visible",
+        }}
+      >
         {/* White outlines for shadows */}
         <Group>
           <ColorMatrix
@@ -86,7 +194,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoExclamation")}
             fit="contain"
             x={exclamationShadowOutlineXDerived}
-            y={31}
+            y={exclamationShadowOutlineYDerived}
             width={34}
             height={84}
             sampling={{
@@ -98,7 +206,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoW")}
             fit="contain"
             x={wShadowOutlineXDerived}
-            y={31}
+            y={wShadowOutlineYDerived}
             width={140}
             height={84}
             sampling={{
@@ -110,7 +218,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoO")}
             fit="contain"
             x={oShadowOutlineXDerived}
-            y={31}
+            y={oShadowOutlineYDerived}
             width={90}
             height={84}
             sampling={{
@@ -122,7 +230,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoP")}
             fit="contain"
             x={pShadowOutlineXDerived}
-            y={31}
+            y={pShadowOutlineYDerived}
             width={86}
             height={84}
             sampling={{
@@ -143,7 +251,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoExclamation")}
             fit="contain"
             x={exclamationOutlineXDerived}
-            y={18}
+            y={exclamationOutlineYDerived}
             width={34}
             height={84}
             sampling={{
@@ -155,7 +263,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoW")}
             fit="contain"
             x={wOutlineXDerived}
-            y={18}
+            y={wOutlineYDerived}
             width={140}
             height={84}
             sampling={{
@@ -167,7 +275,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoO")}
             fit="contain"
             x={oOutlineXDerived}
-            y={18}
+            y={oOutlineYDerived}
             width={90}
             height={84}
             sampling={{
@@ -179,7 +287,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoP")}
             fit="contain"
             x={pOutlineXDerived}
-            y={18}
+            y={pOutlineYDerived}
             width={86}
             height={84}
             sampling={{
@@ -201,7 +309,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoExclamation")}
             fit="contain"
             x={exclamationShadowX}
-            y={32}
+            y={exclamationShadowY}
             width={30}
             height={80}
             sampling={{
@@ -213,7 +321,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoW")}
             fit="contain"
             x={wShadowX}
-            y={32}
+            y={wShadowY}
             width={136}
             height={80}
             sampling={{
@@ -225,7 +333,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoO")}
             fit="contain"
             x={oShadowX}
-            y={32}
+            y={oShadowY}
             width={86}
             height={80}
             sampling={{
@@ -237,7 +345,7 @@ export const Logo: React.FC = () => {
             image={getImage("logoP")}
             fit="contain"
             x={pShadowX}
-            y={32}
+            y={pShadowY}
             width={82}
             height={80}
             sampling={{
@@ -251,8 +359,8 @@ export const Logo: React.FC = () => {
         <Image
           image={getImage("logoExclamation")}
           fit="contain"
-          x={exclamationMainX}
-          y={20}
+          x={exclamationX}
+          y={exclamationMainY}
           width={30}
           height={80}
           sampling={{
@@ -263,8 +371,8 @@ export const Logo: React.FC = () => {
         <Image
           image={getImage("logoW")}
           fit="contain"
-          x={wMainX}
-          y={20}
+          x={wX}
+          y={wMainY}
           width={136}
           height={80}
           sampling={{
@@ -275,8 +383,8 @@ export const Logo: React.FC = () => {
         <Image
           image={getImage("logoO")}
           fit="contain"
-          x={oMainX}
-          y={20}
+          x={oX}
+          y={oMainY}
           width={86}
           height={80}
           sampling={{
@@ -287,8 +395,8 @@ export const Logo: React.FC = () => {
         <Image
           image={getImage("logoP")}
           fit="contain"
-          x={pMainX}
-          y={20}
+          x={pX}
+          y={pMainY}
           width={82}
           height={80}
           sampling={{
@@ -298,8 +406,8 @@ export const Logo: React.FC = () => {
         />
       </Canvas>
       <View
-        className="absolute bottom-[-10px] right-[30px]"
-        style={{ width: 182, height: 18 }}
+        className="absolute right-[30px]"
+        style={{ width: 182, height: 18, top: 320, zIndex: -1 }}
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
