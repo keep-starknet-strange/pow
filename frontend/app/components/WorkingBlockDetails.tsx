@@ -183,6 +183,8 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
       >
         <AnimatedRollingNumber
           value={workingBlock?.transactions.length || 0}
+          enableCompactNotation
+          compactToFixed={2}
           textStyle={{
             fontSize: isSmall ? 16 : 18,
             color: "#c3c3c3",
