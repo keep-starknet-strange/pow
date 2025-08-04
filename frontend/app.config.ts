@@ -6,7 +6,7 @@ const config: ExpoConfig = {
   slug: "pow",
   version: "0.1.0",
   orientation: "portrait",
-  icon: "./assets/logo/logo.png",
+  icon: "./assets/logo/icon.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -25,7 +25,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/logo/logo-foreground.png",
+      foregroundImage: "./assets/logo/icon.png",
       backgroundImage: "./assets/logo/logo-background.png",
     },
     package: "com.starknet.pow",
@@ -42,9 +42,9 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "./assets/logo/logo-foreground.png",
-        imageWidth: 200,
-        resizeMode: "contain",
+        image: "./assets/logo/logo-background.png",
+        imageWidth: 1000,
+        resizeMode: "native",
         backgroundColor: "#74c874",
       },
     ],
