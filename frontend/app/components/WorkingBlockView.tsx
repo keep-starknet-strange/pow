@@ -63,6 +63,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     const blockOpacityAnim = useSharedValue(1);
     const blockShakeAnim = useSharedValue(0);
     const [shouldExplodeTx, setShouldExplodeTx] = React.useState(false);
+    const [shouldMiniExplode, setShouldMiniExplode] = React.useState(false);
     useEffect(() => {
       if (workingBlocks[props.chainId]?.isBuilt) {
         blockSlideLeftAnim.value = props.placement.left;
@@ -139,6 +140,10 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
 
     // Block clicked (mine/sequencer) anim sequence
     const triggerBlockShake = () => {
+      // Trigger mini explosion
+      setShouldMiniExplode(true);
+      setTimeout(() => setShouldMiniExplode(false), 200); // Reset after animation
+
       blockShakeAnim.value = withSequence(
         withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
         withSpring(2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
@@ -227,6 +232,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
             completed={false}
             showEmptyBlocks={true}
             shouldExplodeTx={shouldExplodeTx}
+            shouldMiniExplode={shouldMiniExplode}
           />
         </View>
 
