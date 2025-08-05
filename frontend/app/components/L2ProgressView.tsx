@@ -123,6 +123,8 @@ export const L2ProgressView = ({
         <View className="flex flex-row items-center justify-end mr-[3px]">
           <AnimatedRollingNumber
             value={fees}
+            enableCompactNotation
+            compactToFixed={2}
             textStyle={{
               fontSize: 16,
               color: "#b3b3b3",
@@ -164,6 +166,8 @@ export const L2ProgressView = ({
         <View className="absolute top-0 left-0 flex flex-row items-center justify-center w-full h-full">
           <AnimatedRollingNumber
             value={value}
+            enableCompactNotation
+            compactToFixed={2}
             textStyle={{
               fontSize: 16,
               color: "#b3b3b3",

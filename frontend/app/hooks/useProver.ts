@@ -6,7 +6,10 @@ import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
 
-export const useProver = (onProve: () => void) => {
+export const useProver = (
+  onProve: () => void,
+  triggerProveAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
@@ -31,14 +34,22 @@ export const useProver = (onProve: () => void) => {
   }, [powContract, user, getUserProofClicks]);
 
   const { l2 } = useL2Store();
+  const proverIsBuilt = l2?.prover.isBuilt;
+  const proverMaxSize = l2?.prover.maxSize;
   const prove = useCallback(() => {
-    if (!l2?.prover.isBuilt) {
+    if (!proverIsBuilt) {
       console.warn("Prover is not built yet.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerProveAnimation) {
+      triggerProveAnimation();
+    }
+
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const proverDifficulty = l2?.prover.maxSize || 1;
+      const proverDifficulty = proverMaxSize || 1;
       if (newCounter == proverDifficulty) {
         onProve();
         setProverProgress(1);
@@ -52,16 +63,16 @@ export const useProver = (onProve: () => void) => {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, notify, l2?.prover.isBuilt, l2?.prover.maxSize]);
+  }, [onProve, notify, proverIsBuilt, proverMaxSize, triggerProveAnimation]);
 
   // Reset prover progress when the prover is built
   useEffect(() => {
     setProverProgress(0);
     setProverCounter(0);
-  }, [l2?.prover.isBuilt]);
+  }, [proverIsBuilt]);
 
   useAutoClicker(
-    getAutomationValue(1, "Prover") > 0 && (l2?.prover.isBuilt || false),
+    getAutomationValue(1, "Prover") > 0 && (proverIsBuilt || false),
     5000 / (getAutomationValue(1, "Prover") || 1),
     prove,
   );

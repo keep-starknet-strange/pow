@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, Dimensions, Text, ScrollView } from "react-native";
+import React, { useEffect, useMemo, useCallback } from "react";
+import { View, Dimensions, Text, FlatList } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 import { useAchievement } from "../stores/useAchievementsStore";
@@ -19,11 +19,8 @@ export const AchievementsPage: React.FC = () => {
   const { width, height } = Dimensions.get("window");
   const { getImage } = useImages();
 
-  const [categories, setCategories] = React.useState<{ [key: string]: any[] }>(
-    {},
-  );
-  useEffect(() => {
-    if (!isFocused) return;
+  const categoriesData = useMemo(() => {
+    if (!isFocused) return [];
     const cats = achievementJson.reduce(
       (acc, achievement) => {
         const category = achievement.category || "General";
@@ -35,8 +32,148 @@ export const AchievementsPage: React.FC = () => {
       },
       {} as { [key: string]: any[] },
     );
-    setCategories(cats);
+
+    return Object.entries(cats).map(([category, achievements]) => ({
+      category,
+      achievements,
+      id: category,
+    }));
   }, [isFocused]);
+
+  const renderCategoryItem = useCallback(
+    ({
+      item,
+      index,
+    }: {
+      item: { category: string; achievements: any[]; id: string };
+      index: number;
+    }) => (
+      <View key={item.id} className="w-full">
+        <View
+          className="relative mx-[16px] my-[8px] z-[10]"
+          style={{ width: width - 32, height: 24 }}
+        >
+          <Canvas
+            key={`category-header-${item.id}`}
+            style={{ flex: 1 }}
+            className="w-full h-full"
+          >
+            <Image
+              image={getImage(`achievements.title`)}
+              fit="fill"
+              x={0}
+              y={0}
+              width={width - 32}
+              height={24}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+            />
+          </Canvas>
+          <Animated.Text
+            className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]"
+            entering={FadeInRight}
+          >
+            {item.category}
+          </Animated.Text>
+        </View>
+        <FlatList
+          data={item.achievements}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="flex mx-[12px]"
+          keyExtractor={(achievement, achievementIndex) =>
+            `${item.id}-${achievementIndex}`
+          }
+          removeClippedSubviews={false}
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={10}
+          renderItem={({ item: achievement, index: achievementIndex }) => (
+            <Animated.View
+              className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
+              key={achievementIndex}
+              entering={FadeInRight}
+            >
+              <Canvas
+                key={`achievement-bg-${item.id}-${achievement.id}`}
+                style={{ flex: 1 }}
+                className="w-full h-full"
+              >
+                <Image
+                  image={getImage("achievements.tile.locked")}
+                  fit="fill"
+                  x={0}
+                  y={0}
+                  width={117}
+                  height={158}
+                />
+              </Canvas>
+              {achievementsProgress[achievement.id] > 0 && (
+                <View
+                  className="absolute top-0 left-0 h-full"
+                  style={{
+                    backgroundColor: "#6dcd64",
+                    width: `${achievementsProgress[achievement.id]}%`,
+                  }}
+                />
+              )}
+              {achievementsProgress[achievement.id] > 0 && (
+                <View className="absolute top-0 left-0 w-[117px] h-[158px]">
+                  <Canvas
+                    key={`achievement-overlay-${item.id}-${achievement.id}-${achievementsProgress[achievement.id]}`}
+                    style={{ flex: 1 }}
+                    className="w-full h-full"
+                  >
+                    <Image
+                      image={getImage(
+                        achievementsProgress[achievement.id] === 100
+                          ? "achievements.tile.achieved"
+                          : "achievements.tile.overlay",
+                      )}
+                      fit="fill"
+                      x={0}
+                      y={0}
+                      width={117}
+                      height={158}
+                    />
+                  </Canvas>
+                </View>
+              )}
+              <Text
+                className="font-Pixels text-[#fff7ff] text-[16px] leading-none
+              absolute top-[12px] w-full text-center px-[4px]"
+              >
+                {achievement.name}
+              </Text>
+              <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
+                <Canvas
+                  key={`achievement-icon-${item.id}-${achievement.id}`}
+                  style={{ flex: 1 }}
+                  className="w-full h-full"
+                >
+                  <Image
+                    image={getImage(achievement.image)}
+                    fit="contain"
+                    x={0}
+                    y={0}
+                    width={50}
+                    height={50}
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                  />
+                </Canvas>
+              </View>
+            </Animated.View>
+          )}
+        />
+      </View>
+    ),
+    [width, getImage, achievementsProgress],
+  );
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -83,128 +220,32 @@ export const AchievementsPage: React.FC = () => {
         </Animated.Text>
       </View>
       <View style={{ height: 558 }}>
-        <ScrollView
+        <FlatList
+          data={categoriesData}
           className="flex-1 relative"
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-        >
-          {Object.entries(categories).map(([category, achievements], index) => (
-            <View key={index} className="w-full">
-              <View
-                className="relative mx-[16px] my-[8px] z-[10]"
-                style={{ width: width - 32, height: 24 }}
-              >
-                <Canvas style={{ flex: 1 }} className="w-full h-full">
-                  <Image
-                    image={getImage(`achievements.title`)}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={width - 32}
-                    height={24}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-                <Animated.Text
-                  className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]"
-                  entering={FadeInRight}
-                >
-                  {category}
-                </Animated.Text>
-              </View>
-              <ScrollView
-                className="flex flex-row mx-[12px]"
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              >
-                {achievements.map((achievement, index) => (
-                  <Animated.View
-                    className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
-                    key={index}
-                    entering={FadeInRight}
-                  >
-                    <Canvas style={{ flex: 1 }} className="w-full h-full">
-                      <Image
-                        image={getImage("achievements.tile.locked")}
-                        fit="fill"
-                        x={0}
-                        y={0}
-                        width={117}
-                        height={158}
-                      />
-                    </Canvas>
-                    {achievementsProgress[achievement.id] > 0 && (
-                      <View
-                        className="absolute top-0 left-0 h-full"
-                        style={{
-                          backgroundColor: "#6dcd64",
-                          width: `${achievementsProgress[achievement.id]}%`,
-                        }}
-                      />
-                    )}
-                    {achievementsProgress[achievement.id] > 0 && (
-                      <View className="absolute top-0 left-0 w-[117px] h-[158px]">
-                        <Canvas style={{ flex: 1 }} className="w-full h-full">
-                          <Image
-                            image={getImage(
-                              achievementsProgress[achievement.id] === 100
-                                ? "achievements.tile.achieved"
-                                : "achievements.tile.overlay",
-                            )}
-                            fit="fill"
-                            x={0}
-                            y={0}
-                            width={117}
-                            height={158}
-                          />
-                        </Canvas>
-                      </View>
-                    )}
-                    <Text
-                      className="font-Pixels text-[#fff7ff] text-[16px] leading-none
-                      absolute top-[12px] w-full text-center px-[4px]"
-                    >
-                      {achievement.name}
-                    </Text>
-                    <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
-                      <Canvas style={{ flex: 1 }} className="w-full h-full">
-                        <Image
-                          image={getImage(achievement.image)}
-                          fit="contain"
-                          x={0}
-                          y={0}
-                          width={50}
-                          height={50}
-                          sampling={{
-                            filter: FilterMode.Nearest,
-                            mipmap: MipmapMode.Nearest,
-                          }}
-                        />
-                      </Canvas>
-                    </View>
-                  </Animated.View>
-                ))}
-              </ScrollView>
-            </View>
-          ))}
-          <LinearGradient
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              width: 120,
-              height: "100%",
-              marginRight: 8,
-              pointerEvents: "none",
-            }}
-            colors={["transparent", "#000000c0"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-        </ScrollView>
+          keyExtractor={(item) => item.id}
+          renderItem={renderCategoryItem}
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
+          windowSize={12}
+          removeClippedSubviews={false}
+          getItemLayout={undefined}
+        />
+        <LinearGradient
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 120,
+            height: "100%",
+            marginRight: 8,
+            pointerEvents: "none",
+          }}
+          colors={["transparent", "#000000c0"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        />
       </View>
     </View>
   );

@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import {
   Canvas,
@@ -13,53 +14,46 @@ type IconWithLockProps = {
   locked: boolean;
 };
 
-export const IconWithLock: React.FC<IconWithLockProps> = ({
-  txIcon,
-  locked,
-}) => {
-  const { getImage } = useImages();
+export const IconWithLock: React.FC<IconWithLockProps> = React.memo(
+  ({ txIcon, locked }) => {
+    const { getImage } = useImages();
 
-  return (
-    <View className="flex flex-col justify-center relative w-[64px] h-[64px] relative">
-      <Canvas style={{ flex: 1 }} className="w-full h-full">
-        <Image
-          image={getImage("shop.tx.bg")}
-          fit="fill"
-          x={0}
-          y={0}
-          width={64}
-          height={64}
-          sampling={{
-            filter: FilterMode.Nearest,
-            mipmap: MipmapMode.None,
-          }}
-        />
-      </Canvas>
-      <View className="absolute top-0 left-0 w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+    // Memoize image references to prevent Canvas re-renders
+    const backgroundImage = useMemo(() => getImage("shop.tx.bg"), [getImage]);
+    const iconImage = useMemo(() => getImage(txIcon), [getImage, txIcon]);
+    const lockImage = useMemo(() => getImage("shop.lock"), [getImage]);
+
+    // Create stable key for Canvas components based on content
+    const canvasKey = `${txIcon}-${locked ? "locked" : "unlocked"}`;
+
+    return (
+      <View className="flex flex-col justify-center relative w-[64px] h-[64px] relative">
+        <Canvas
+          key={`bg-${canvasKey}`}
+          style={{ flex: 1 }}
+          className="w-full h-full"
+        >
           <Image
-            image={getImage(txIcon)}
+            image={backgroundImage}
             fit="fill"
-            x={14}
-            y={14}
-            width={36}
-            height={36}
+            x={0}
+            y={0}
+            width={64}
+            height={64}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.None,
             }}
           />
         </Canvas>
-      </View>
-      {locked && (
-        <Animated.View
-          className="absolute top-0 left-0 w-full h-full
-                         bg-[#10111970] rounded-sm"
-          exiting={FadeOut}
-        >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <View className="absolute top-0 left-0 w-full h-full">
+          <Canvas
+            key={`icon-${canvasKey}`}
+            style={{ flex: 1 }}
+            className="w-full h-full"
+          >
             <Image
-              image={getImage("shop.lock")}
+              image={iconImage}
               fit="fill"
               x={14}
               y={14}
@@ -71,8 +65,34 @@ export const IconWithLock: React.FC<IconWithLockProps> = ({
               }}
             />
           </Canvas>
-        </Animated.View>
-      )}
-    </View>
-  );
-};
+        </View>
+        {locked && (
+          <Animated.View
+            className="absolute top-0 left-0 w-full h-full
+                         bg-[#10111970] rounded-sm"
+            exiting={FadeOut}
+          >
+            <Canvas
+              key={`lock-${canvasKey}`}
+              style={{ flex: 1 }}
+              className="w-full h-full"
+            >
+              <Image
+                image={lockImage}
+                fit="fill"
+                x={14}
+                y={14}
+                width={36}
+                height={36}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.None,
+                }}
+              />
+            </Canvas>
+          </Animated.View>
+        )}
+      </View>
+    );
+  },
+);

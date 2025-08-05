@@ -1,17 +1,27 @@
 import { View } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
-import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
-export const Prover: React.FC = () => {
-  const { proverProgress, prove } = useGame();
+interface ProverProps {
+  triggerAnim: () => void;
+  proverProgress: number;
+  prove: () => void;
+}
 
+export const Prover: React.FC<ProverProps> = ({
+  triggerAnim,
+  proverProgress,
+  prove,
+}) => {
   return (
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
         progress={proverProgress}
         text={"Click to prove!"}
-        onConfirm={prove}
+        onConfirm={() => {
+          triggerAnim();
+          prove();
+        }}
         renderedBy="prover"
       />
     </View>

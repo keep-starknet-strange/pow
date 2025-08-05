@@ -12,10 +12,11 @@ export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   const { canUnlockDapps, dappsUnlocked, unlockDapps, getDappUnlockCost } =
     useTransactionsStore();
   const { workingBlocks } = useGameStore();
+  const currentWorkingBlock = workingBlocks[props.chainId];
   const showUnlock =
     !dappsUnlocked[props.chainId] &&
     canUnlockDapps(props.chainId) &&
-    !workingBlocks[props.chainId].isBuilt;
+    !currentWorkingBlock.isBuilt;
 
   return (
     <View>

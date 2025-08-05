@@ -6,6 +6,13 @@
     "highlightTargetId": "minerConfirmer",
     "canDismiss": false
   },
+  "balanceExplanation": {
+    "title": "Stack Sats!",
+    "description": "Great job! After successfully mining a block it's fees will go to your balance.\nHODL your coins and watch your balance grow!",
+    "bubbleTargetId": "headerBalance",
+    "highlightTargetId": "headerBalance",
+    "canDismiss": true
+  },
   "purchaseTransactions": {
     "title": "Unlock a Transaction",
     "description": "Click the transaction to unlock it — that's how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
@@ -32,14 +39,14 @@
     "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
     "bubbleTargetId": "feeUpgradeButton",
     "highlightTargetId": "feeUpgradeButton",
-    "canDismiss": false
+    "canDismiss": true
   },
   "purchaseSpeedUpgrade": {
     "title": "Automate and Accelerate Transaction",
     "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they're added to your block.",
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton",
-    "canDismiss": false
+    "canDismiss": true
   },
   "purchaseChainUpgrade": {
     "title": "Supercharge Your Chain",

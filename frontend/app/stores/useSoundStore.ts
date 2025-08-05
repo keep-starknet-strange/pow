@@ -35,6 +35,8 @@ const soundEffectsAssets: { [key: string]: any } = {
   BasicClick: require("../../assets/sounds/basic-click.wav"),
   BasicError: require("../../assets/sounds/basic-error.wav"),
   SwitchPage: require("../../assets/sounds/basic-click.wav"),
+  SwitchStore: require("../../assets/sounds/basic-click.wav"),
+  SwitchTxTab: require("../../assets/sounds/basic-click.wav"),
   DiceRoll: require("../../assets/sounds/dice.wav"),
 };
 

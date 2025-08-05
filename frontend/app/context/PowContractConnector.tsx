@@ -98,10 +98,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!provider) {
         return;
       }
-      // await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
-      const contract =
-        process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS ||
-        "0x0349815e9b53e6793fc7bdd5775fe8c723531d020386d23b294984995305b4d3";
+      // TODO: Use foc-engine API to get contract addresses
+      // const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
+      const contract = process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS;
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args

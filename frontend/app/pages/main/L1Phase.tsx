@@ -107,9 +107,7 @@ export const L1Phase: React.FC = () => {
                 key={tab}
                 onPress={() => {
                   setActiveTab(tab);
-                  if (tab === "dApps") {
-                    notify("SwitchTxTab", { name: tab });
-                  }
+                  notify("SwitchTxTab", { name: tab });
                 }}
                 ref={tab === "dApps" ? ref : undefined}
                 onLayout={tab === "dApps" ? onLayout : undefined}

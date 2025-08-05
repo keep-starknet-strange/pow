@@ -6,6 +6,7 @@ import { useGameStore } from "./useGameStore";
 import { useChainsStore } from "./useChainsStore";
 import { useEventManager } from "./useEventManager";
 import { useUpgradesStore } from "./useUpgradesStore";
+import { useTransactionsStore } from "./useTransactionsStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 
@@ -70,44 +71,40 @@ export const useL2Store = create<L2Store>((set, get) => ({
   },
 
   canUnlockL2: () => {
-    /* TODO: Include once switched to zustand
-    if (!stakingUnlocked) {
-      setCanPrestige(false);
-      return;
-    }
-    */
-    /*
-    const automationlevels = automations[0];
-    if (!automationlevels) {
+    // If L2 is already unlocked, return false
+    if (get().isL2Unlocked) {
       return false;
     }
-    for (const level of Object.values(automationlevels)) {
-      if (level < 0) {
+
+    // Get transaction and dapp levels from TransactionsStore
+    const { transactionFeeLevels, dappFeeLevels } =
+      useTransactionsStore.getState();
+
+    // Check all L1 transactions are unlocked
+    const txLevels = transactionFeeLevels[0];
+    if (!txLevels) {
+      return false;
+    }
+    for (const level of Object.values(txLevels)) {
+      if (level === -1) {
         return false;
       }
     }
-    const upgradeLevels = upgrades[0];
-    if (!upgradeLevels) {
-      return false;
-    }
-    for (const level of Object.values(upgradeLevels)) {
-      if (level < 0) {
-        return false;
-      }
-    }
-    */
-    /* TODO: Include once switched to zustand
-    const dappLevels = dappFees[0];
+
+    // Check all L1 dapps are unlocked
+    const dappLevels = dappFeeLevels[0];
     if (!dappLevels) {
-      setCanUnlockL2(false);
-      return;
+      return false;
     }
-    const transactionLevels = transactionFees[0];
-    if (!transactionLevels) {
-      setCanUnlockL2(false);
-      return;
+    for (const level of Object.values(dappLevels)) {
+      if (level === -1) {
+        return false;
+      }
     }
-    */
+
+    // TODO: Add automations and upgrades checks once requirements are clarified
+    // TODO: Add staking check once staking is implemented
+
     return true;
   },
 

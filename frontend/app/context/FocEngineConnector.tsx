@@ -170,16 +170,20 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchRegistryContractAddress = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${FOC_ENGINE_API}/registry/get-registry-contracts`,
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch registry contract address");
-      }
-      const data = await response.json();
+      // TODO: Use foc-engine API to get contract addresses
+      // const response = await fetch(
+      //   `${FOC_ENGINE_API}/registry/get-registry-contracts`,
+      // );
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch registry contract address");
+      // }
+      // const data = await response.json();
       // Example response: {"data": {"registry_contracts":["0x05ed0ed4c048e4e30b0aa68410b4344d7c0b6fd92540f57e06a3c7cc43a0cf1a"]}}
-      if (data.data.registry_contracts[0] && provider) {
-        const contract = data.data.registry_contracts[0];
+      // if (data.data.registry_contracts[0] && provider) {
+      //   const contract = data.data.registry_contracts[0];
+
+      const contract = process.env.EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS;
+      if (contract && provider) {
         setRegistryContractAddress(contract);
         const { abi: registryAbi } = await provider
           .getClassAt(contract)
@@ -203,16 +207,20 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchAccountsContractAddress = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${FOC_ENGINE_API}/accounts/get-accounts-contracts`,
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch accounts contract address");
-      }
-      const data = await response.json();
+      // TODO: Use foc-engine API to get contract addresses
+      // const response = await fetch(
+      //   `${FOC_ENGINE_API}/accounts/get-accounts-contracts`,
+      // );
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch accounts contract address");
+      // }
+      // const data = await response.json();
       // Example response: {"data": {"accounts_contract":"0x23386fe159ca18338f619b0a753e124db2cebd45f23cc992ce693cde465d617"}}
-      if (data.data.accounts_contract && provider) {
-        const contract = data.data.accounts_contract;
+      // if (data.data.accounts_contract && provider) {
+      //   const contract = data.data.accounts_contract;
+
+      const contract = process.env.EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS;
+      if (contract && provider) {
         setAccountsContractAddress(contract);
         const { abi: accountsAbi } = await provider
           .getClassAt(contract)

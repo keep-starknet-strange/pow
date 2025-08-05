@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
-import { useGame } from "../context/Game";
 import { Confirmer } from "./Confirmer";
 
 interface MinerProps {
   triggerAnim: () => void;
+  miningProgress: number;
+  mineBlock: () => void;
 }
 
-export const Miner: React.FC<MinerProps> = ({ triggerAnim }) => {
-  const { miningProgress, mineBlock } = useGame();
-
+export const Miner: React.FC<MinerProps> = ({
+  triggerAnim,
+  miningProgress,
+  mineBlock,
+}) => {
   const [mineStartTime, setMineStartTime] = useState(Date.now());
   const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");

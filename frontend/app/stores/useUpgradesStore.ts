@@ -332,8 +332,8 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     const { upgrades, automations } = get();
 
     // Check if L2 is unlocked first
-    const l2 = useL2Store.getState().l2;
-    if (!l2) {
+    const { isL2Unlocked } = useL2Store.getState();
+    if (!isL2Unlocked) {
       set({ canPrestige: false });
       return;
     }
@@ -569,22 +569,5 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
 // Export hook for easier migration
 export const useUpgrades = () => {
-  const store = useUpgradesStore();
-  return {
-    upgrades: store.upgrades,
-    automations: store.automations,
-    upgrade: store.upgrade,
-    upgradeAutomation: store.upgradeAutomation,
-    canUnlockUpgrade: store.canUnlockUpgrade,
-    getUpgradeValue: store.getUpgradeValue,
-    getUpgradeValueAt: store.getUpgradeValueAt,
-    getNextUpgradeCost: store.getNextUpgradeCost,
-    getAutomationValue: store.getAutomationValue,
-    getAutomationSpeedAt: store.getAutomationSpeedAt,
-    getNextAutomationCost: store.getNextAutomationCost,
-    currentPrestige: store.currentPrestige,
-    canPrestige: store.canPrestige,
-    prestige: store.prestige,
-    getNextPrestigeCost: store.getNextPrestigeCost,
-  };
+  return useUpgradesStore();
 };

@@ -33,6 +33,7 @@ export interface TxButtonInnerProps {
   isDapp: boolean;
   feeLevel: number;
   name: string;
+  triggerTxAnimation?: () => void;
 }
 
 export const TxButtonInner = memo((props: TxButtonInnerProps) => {
@@ -50,10 +51,16 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   const addNewTransaction = useCallback(
     async (finished: boolean | undefined) => {
       if (finished === false) return;
+
+      // Trigger animation if provided
+      if (props.triggerTxAnimation) {
+        props.triggerTxAnimation();
+      }
+
       const newTx = newTransaction(props.txId, fee, props.isDapp);
       addTransaction(props.chainId, newTx);
     },
-    [props.chainId, props.txId, props.isDapp],
+    [props.chainId, props.txId, props.isDapp, props.triggerTxAnimation],
   );
 
   const speed = getSpeed(props.chainId, props.txId, props.isDapp);

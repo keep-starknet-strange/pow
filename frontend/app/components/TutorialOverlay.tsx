@@ -9,11 +9,13 @@ import {
 import { getTutorialStepConfig } from "../utils/getTutorialStepConfig";
 import { Arrow } from "../components/tutorial/Arrow";
 import { Window } from "../components/tutorial/Window";
+import { useEventManager } from "../stores/useEventManager";
 
 const BUBBLE_WIDTH = 260;
 
 export const TutorialOverlay: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
+  const { notify } = useEventManager();
   const [bubbleHeight, setBubbleHeight] = useState(0);
   const stepConfig = getTutorialStepConfig(step);
   const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
@@ -89,7 +91,9 @@ export const TutorialOverlay: React.FC = () => {
         </Text>
         {stepConfig.canDismiss && (
           <Pressable
-            onPress={() => setVisible(false)}
+            onPress={() => {
+              notify("TutorialDismissed");
+            }}
             className="self-center px-4 py-2 rounded"
           >
             <Text className="text-[16px] font-Pixels text-gray-100 underline">

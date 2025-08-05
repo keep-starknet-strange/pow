@@ -6,7 +6,10 @@ import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
 
-export const useDAConfirmer = (onDAConfirm: () => void) => {
+export const useDAConfirmer = (
+  onDAConfirm: () => void,
+  triggerDAAnimation?: () => void,
+) => {
   const { notify } = useEventManager();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
@@ -31,14 +34,22 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
   }, [powContract, user, getUserDaClicks]);
 
   const { l2 } = useL2Store();
+  const daIsBuilt = l2?.da.isBuilt;
+  const daMaxSize = l2?.da.maxSize;
   const daConfirm = useCallback(() => {
-    if (!l2?.da.isBuilt) {
+    if (!daIsBuilt) {
       console.warn("Data Availability is not built yet.");
       return;
     }
+
+    // Trigger animation if provided
+    if (triggerDAAnimation) {
+      triggerDAAnimation();
+    }
+
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const daDifficulty = l2?.da.maxSize || 1;
+      const daDifficulty = daMaxSize || 1;
       if (newCounter == daDifficulty) {
         onDAConfirm();
         setDaConfirmProgress(1);
@@ -52,16 +63,16 @@ export const useDAConfirmer = (onDAConfirm: () => void) => {
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, notify, l2?.da.isBuilt, l2?.da.maxSize]);
+  }, [onDAConfirm, notify, daIsBuilt, daMaxSize, triggerDAAnimation]);
 
   // Reset da confirm progress when the DA is built
   useEffect(() => {
     setDaConfirmProgress(0);
     setDaConfirmCounter(0);
-  }, [l2?.da.isBuilt]);
+  }, [daIsBuilt]);
 
   useAutoClicker(
-    getAutomationValue(1, "DA") > 0 && (l2?.da.isBuilt || false),
+    getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),
     5000 / (getAutomationValue(1, "DA") || 1),
     daConfirm,
   );
