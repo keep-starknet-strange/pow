@@ -5,6 +5,7 @@ import Animated, {
   withSequence,
   useAnimatedStyle,
   Easing,
+  runOnUI,
 } from "react-native-reanimated";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -54,31 +55,35 @@ const TxStreak: React.FC<TxStreakProps> = ({
 
   useEffect(() => {
     if (trigger > 0) {
-      opacity.value = 0;
-      scale.value = 0;
-      translateDistance.value = 0;
-      lengthScale.value = 1;
+      runOnUI(() => {
+        opacity.value = 0;
+        scale.value = 0;
+        translateDistance.value = 0;
+        lengthScale.value = 1;
+      })();
 
       // Start animation with delay - less intense than block animation
       setTimeout(() => {
-        opacity.value = withSequence(
-          withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Less intense opacity
-          withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
-        );
-        scale.value = withSequence(
-          withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Smaller scale
-          withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) }),
-        );
-        translateDistance.value = withTiming(length * 0.7, {
-          // Shorter distance
-          duration: 230,
-          easing: Easing.out(Easing.quad),
-        });
-        // Dynamic length scaling - less dramatic
-        lengthScale.value = withSequence(
-          withTiming(1.3, { duration: 115, easing: Easing.out(Easing.quad) }),
-          withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) }),
-        );
+        runOnUI(() => {
+          opacity.value = withSequence(
+            withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Less intense opacity
+            withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
+          );
+          scale.value = withSequence(
+            withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Smaller scale
+            withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) }),
+          );
+          translateDistance.value = withTiming(length * 0.7, {
+            // Shorter distance
+            duration: 230,
+            easing: Easing.out(Easing.quad),
+          });
+          // Dynamic length scaling - less dramatic
+          lengthScale.value = withSequence(
+            withTiming(1.3, { duration: 115, easing: Easing.out(Easing.quad) }),
+            withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) }),
+          );
+        })();
       }, delay);
     }
   }, [trigger]);
@@ -134,21 +139,23 @@ const TxFlashCore: React.FC<{
 
   useEffect(() => {
     if (trigger > 0) {
-      opacity.value = 0;
-      scale.value = 0;
+      runOnUI(() => {
+        opacity.value = 0;
+        scale.value = 0;
 
-      // Flash sequence: less intense than block flash
-      opacity.value = withSequence(
-        withTiming(0.8, { duration: 30, easing: Easing.out(Easing.quad) }),
-        withTiming(0.6, { duration: 70, easing: Easing.linear }),
-        withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
-      );
+        // Flash sequence: less intense than block flash
+        opacity.value = withSequence(
+          withTiming(0.8, { duration: 30, easing: Easing.out(Easing.quad) }),
+          withTiming(0.6, { duration: 70, easing: Easing.linear }),
+          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
+        );
 
-      scale.value = withSequence(
-        withTiming(1.2, { duration: 30, easing: Easing.out(Easing.quad) }), // Smaller flash
-        withTiming(0.8, { duration: 70, easing: Easing.linear }),
-        withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
-      );
+        scale.value = withSequence(
+          withTiming(1.2, { duration: 30, easing: Easing.out(Easing.quad) }), // Smaller flash
+          withTiming(0.8, { duration: 70, easing: Easing.linear }),
+          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
+        );
+      })();
     }
   }, [trigger]);
 
@@ -214,11 +221,15 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
 
   useEffect(() => {
     if (trigger > 0) {
-      containerOpacity.value = 1;
+      runOnUI(() => {
+        containerOpacity.value = 1;
+      })();
 
       // Auto-hide after animation completes - shorter than block animation
       setTimeout(() => {
-        containerOpacity.value = 0;
+        runOnUI(() => {
+          containerOpacity.value = 0;
+        })();
         onComplete?.();
       }, 350);
     }

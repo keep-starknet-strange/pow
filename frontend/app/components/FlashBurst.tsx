@@ -6,6 +6,7 @@ import Animated, {
   withSequence,
   useAnimatedStyle,
   Easing,
+  runOnUI,
 } from "react-native-reanimated";
 
 interface FlashBurstProps {
@@ -53,30 +54,34 @@ const Streak: React.FC<StreakProps> = ({
 
   useEffect(() => {
     if (trigger > 0) {
-      opacity.value = 0;
-      scale.value = 0;
-      translateDistance.value = 0;
-      lengthScale.value = 1;
+      runOnUI(() => {
+        opacity.value = 0;
+        scale.value = 0;
+        translateDistance.value = 0;
+        lengthScale.value = 1;
+      })();
 
-      // Start animation with delay
+      // Start animation with delay using runOnUI
       setTimeout(() => {
-        opacity.value = withSequence(
-          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-        scale.value = withSequence(
-          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-        translateDistance.value = withTiming(length, {
-          duration: 300,
-          easing: Easing.out(Easing.quad),
-        });
-        // Dynamic length scaling - starts normal, grows, then shrinks
-        lengthScale.value = withSequence(
-          withTiming(1.5, { duration: 150, easing: Easing.out(Easing.quad) }),
-          withTiming(0.8, { duration: 150, easing: Easing.in(Easing.quad) }),
-        );
+        runOnUI(() => {
+          opacity.value = withSequence(
+            withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+            withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
+          );
+          scale.value = withSequence(
+            withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+            withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
+          );
+          translateDistance.value = withTiming(length, {
+            duration: 300,
+            easing: Easing.out(Easing.quad),
+          });
+          // Dynamic length scaling - starts normal, grows, then shrinks
+          lengthScale.value = withSequence(
+            withTiming(1.5, { duration: 150, easing: Easing.out(Easing.quad) }),
+            withTiming(0.8, { duration: 150, easing: Easing.in(Easing.quad) }),
+          );
+        })();
       }, delay);
     }
   }, [trigger]);
@@ -132,21 +137,23 @@ const FlashCore: React.FC<{
 
   useEffect(() => {
     if (trigger > 0) {
-      opacity.value = 0;
-      scale.value = 0;
+      runOnUI(() => {
+        opacity.value = 0;
+        scale.value = 0;
 
-      // Flash sequence: bright flash then fade
-      opacity.value = withSequence(
-        withTiming(1, { duration: 50, easing: Easing.out(Easing.quad) }),
-        withTiming(0.8, { duration: 100, easing: Easing.linear }),
-        withTiming(0, { duration: 250, easing: Easing.in(Easing.quad) }),
-      );
+        // Flash sequence: bright flash then fade
+        opacity.value = withSequence(
+          withTiming(1, { duration: 50, easing: Easing.out(Easing.quad) }),
+          withTiming(0.8, { duration: 100, easing: Easing.linear }),
+          withTiming(0, { duration: 250, easing: Easing.in(Easing.quad) }),
+        );
 
-      scale.value = withSequence(
-        withTiming(1.5, { duration: 50, easing: Easing.out(Easing.quad) }),
-        withTiming(1, { duration: 100, easing: Easing.linear }),
-        withTiming(0.5, { duration: 250, easing: Easing.in(Easing.quad) }),
-      );
+        scale.value = withSequence(
+          withTiming(1.5, { duration: 50, easing: Easing.out(Easing.quad) }),
+          withTiming(1, { duration: 100, easing: Easing.linear }),
+          withTiming(0.5, { duration: 250, easing: Easing.in(Easing.quad) }),
+        );
+      })();
     }
   }, [trigger]);
 
@@ -194,25 +201,29 @@ const TextParticle: React.FC<TextParticleProps> = ({
 
   useEffect(() => {
     if (trigger > 0) {
-      opacity.value = 0;
-      scale.value = 0;
-      translateDistance.value = 0;
+      runOnUI(() => {
+        opacity.value = 0;
+        scale.value = 0;
+        translateDistance.value = 0;
+      })();
 
       setTimeout(() => {
-        opacity.value = withSequence(
-          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0.8, { duration: 100, easing: Easing.linear }),
-          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-        scale.value = withSequence(
-          withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
-          withTiming(0.8, { duration: 100, easing: Easing.linear }),
-          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-        translateDistance.value = withTiming(distance, {
-          duration: 400,
-          easing: Easing.out(Easing.quad),
-        });
+        runOnUI(() => {
+          opacity.value = withSequence(
+            withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+            withTiming(0.8, { duration: 100, easing: Easing.linear }),
+            withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
+          );
+          scale.value = withSequence(
+            withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) }),
+            withTiming(0.8, { duration: 100, easing: Easing.linear }),
+            withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
+          );
+          translateDistance.value = withTiming(distance, {
+            duration: 400,
+            easing: Easing.out(Easing.quad),
+          });
+        })();
       }, delay);
     }
   }, [trigger]);
@@ -317,11 +328,15 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
 
   useEffect(() => {
     if (trigger > 0) {
-      containerOpacity.value = 1;
+      runOnUI(() => {
+        containerOpacity.value = 1;
+      })();
 
       // Auto-hide after animation completes
       setTimeout(() => {
-        containerOpacity.value = 0;
+        runOnUI(() => {
+          containerOpacity.value = 0;
+        })();
         onComplete?.();
       }, 450); // Slightly longer than animation duration for cleanup
     }
