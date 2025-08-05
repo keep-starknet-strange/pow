@@ -16,8 +16,6 @@ import { SettingsPage } from "../pages/SettingsPage";
 
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
-import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../stores/useTutorialStore";
 import {
   Canvas,
   Image,
@@ -35,10 +33,8 @@ function StoreTabButton({
   isActive: boolean;
   onPress: any;
 }) {
-  const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
-
   return (
-    <View ref={ref} onLayout={onLayout} className="">
+    <View className="">
       <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
     </View>
   );
