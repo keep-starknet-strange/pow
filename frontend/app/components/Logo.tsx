@@ -187,7 +187,7 @@ export const Logo: React.FC = () => {
         marginTop: -200,
         overflow: "visible",
         zIndex: 10,
-        pointerEvents: 'none',
+        pointerEvents: "none",
       }}
     >
       <Canvas
