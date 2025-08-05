@@ -39,14 +39,14 @@
     "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
     "bubbleTargetId": "feeUpgradeButton",
     "highlightTargetId": "feeUpgradeButton",
-    "canDismiss": true
+    "canDismiss": false
   },
   "purchaseSpeedUpgrade": {
     "title": "Automate and Accelerate Transaction",
     "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they're added to your block.",
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton",
-    "canDismiss": true
+    "canDismiss": false
   },
   "purchaseChainUpgrade": {
     "title": "Supercharge Your Chain",
@@ -102,7 +102,7 @@
     "description": "Here you can purchase L2-specific upgrades to enhance your blockchain’s capabilities.\nExplore the options and supercharge your L2!",
     "bubbleTargetId": "l2StoreTab",
     "highlightTargetId": "l2StoreTab",
-    "canDismiss": true
+    "canDismiss": false
   },
   "completed": {
     "title": "Congratulations!",
