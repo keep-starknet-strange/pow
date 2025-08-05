@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { View, Text, FlatList, Pressable, Dimensions } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
@@ -19,6 +19,7 @@ import { L2Unlock } from "../components/store/L2Unlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
 import { ShopTitle } from "../components/store/ShopTitle";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -51,7 +52,7 @@ export const StorePage: React.FC = () => {
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();
   const { notify } = useEventManager();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(

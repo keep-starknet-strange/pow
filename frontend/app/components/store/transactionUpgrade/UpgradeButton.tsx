@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Dimensions, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import { PopupAnimation } from "../../PopupAnimation";
 import {
   Canvas,
@@ -9,6 +9,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useBalance } from "../../../stores/useBalanceStore";
 import { useImages } from "../../../hooks/useImages";
+import { useCachedWindowDimensions } from "../../../hooks/useCachedDimensions";
 import { shortMoneyString } from "../../../utils/helpers";
 import React from "react";
 import Animated, {
@@ -44,7 +45,7 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
     bgImage,
   }) => {
     const { getImage } = useImages();
-    const { width } = Dimensions.get("window");
+    const { width } = useCachedWindowDimensions();
     const { balance } = useBalance();
 
     const [lastBuyTime, setLastBuyTime] = React.useState<number>(0);

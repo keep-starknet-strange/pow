@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text } from "react-native";
 import {
   Canvas,
   Image,
@@ -8,13 +8,14 @@ import {
 } from "@shopify/react-native-skia";
 import Animated, { Easing } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useDerivedValue, withTiming } from "react-native-reanimated";
 
 export const ProgressBar = ({ progress }: { progress: number }) => {
   const { getImage } = useImages();
-  const width = Dimensions.get("window").width;
+  const { width } = useCachedWindowDimensions();
 
   const progressAnim = useDerivedValue(() => {
     return withTiming((progress / 100) * 70, {
@@ -59,7 +60,7 @@ export const L2ProgressView = ({
   fees: number;
 }) => {
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
 
   const maxBarCount = 12;
   const [progressBars, setProgressBars] = useState<number[]>([]);

@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
-import { Dimensions } from "react-native";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { BackGround } from "../components/staking/BackGround";
 import { PageHeader } from "../components/staking/PageHeader";
 import { SectionTitle } from "../components/staking/SectionTitle";
@@ -13,12 +13,13 @@ import { AmountField } from "../components/staking/AmountField";
 // import { useImages } from "../hooks/useImages";
 
 // You may need to define width, height, and getImage if not already imported:
-const { width, height } = Dimensions.get("window");
+// const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
 const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
 
 export const StakingPage: React.FC = () => {
+  const { width, height } = useCachedWindowDimensions();
   const {
     amountStaked,
     rewards,

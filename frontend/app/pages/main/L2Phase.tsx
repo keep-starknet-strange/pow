@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, Pressable, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
@@ -15,11 +15,12 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L2Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { getImage } = useImages();
-  const window = Dimensions.get("window");
+  const window = useCachedWindowDimensions();
   const txTabs = ["Transactions", "dApps"];
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[1] ? 1 : 0],

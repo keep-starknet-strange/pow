@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useCallback } from "react";
-import { View, Dimensions, Text, FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { useAchievement } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -16,7 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 export const AchievementsPage: React.FC = () => {
   const isFocused = useIsFocused();
   const { achievementsProgress } = useAchievement();
-  const { width, height } = Dimensions.get("window");
+  const { width, height } = useCachedWindowDimensions();
   const { getImage } = useImages();
 
   const categoriesData = useMemo(() => {

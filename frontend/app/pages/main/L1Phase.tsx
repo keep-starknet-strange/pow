@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, Pressable, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useEventManager } from "@/app/stores/useEventManager";
@@ -16,6 +16,7 @@ import {
 import BlockchainView from "@/app/components/BlockchainView";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "@/app/stores/useTutorialStore";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
@@ -25,7 +26,7 @@ export const L1Phase: React.FC = () => {
     dappsUnlocked[0] || false,
   );
   const { getImage } = useImages();
-  const window = Dimensions.get("window");
+  const window = useCachedWindowDimensions();
   const txTabs = ["Transactions", "dApps"];
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[0] ? 1 : 0],

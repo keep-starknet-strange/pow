@@ -1,7 +1,8 @@
 import React, { memo } from "react";
-import { View, Dimensions, Pressable, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { shortMoneyString } from "../utils/helpers";
 import {
   Canvas,
@@ -30,7 +31,7 @@ export type FeatureUnlockView = {
 export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo((props) => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({

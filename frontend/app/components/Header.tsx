@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View, Dimensions } from "react-native";
+import { View } from "react-native";
 import {
   Canvas,
   FilterMode,
@@ -13,11 +13,12 @@ import { useBalance } from "../stores/useBalanceStore";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { TargetId } from "../stores/useTutorialStore";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 
 export const Header: React.FC = memo(() => {
   const { balance } = useBalance();
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
 
   const { ref, onLayout } = useTutorialLayout(
     "headerBalance" as TargetId,

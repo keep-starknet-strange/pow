@@ -6,10 +6,10 @@ import {
   Pressable,
   GestureResponderEvent,
 } from "react-native";
-import { Dimensions } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
+import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { newTransaction } from "../../types/Chains";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
 import { TargetId } from "../../stores/useTutorialStore";
@@ -44,7 +44,7 @@ export type TxButtonProps = {
 
 export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
   const { addTransaction } = useGameStore();
   const {
     getFeeLevel,
