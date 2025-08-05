@@ -39,14 +39,14 @@
     "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
     "bubbleTargetId": "feeUpgradeButton",
     "highlightTargetId": "feeUpgradeButton",
-    "canDismiss": false
+    "canDismiss": true
   },
   "purchaseSpeedUpgrade": {
     "title": "Automate and Accelerate Transaction",
     "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they're added to your block.",
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton",
-    "canDismiss": false
+    "canDismiss": true
   },
   "purchaseChainUpgrade": {
     "title": "Supercharge Your Chain",

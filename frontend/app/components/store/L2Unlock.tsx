@@ -10,8 +10,7 @@ export type L2UnlockProps = {
 };
 
 export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
-  const { canUnlockL2, isL2Unlocked, getL2Cost, initL2 } = useL2Store();
-  const { transactionFeeLevels, dappFeeLevels } = useTransactionsStore();
+  const { canUnlockL2, getL2Cost, initL2 } = useL2Store();
   const { workingBlocks } = useGameStore();
   const miningBlock = workingBlocks[0];
   const [showUnlock, setShowUnlock] = useState(false);
@@ -29,11 +28,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
     const canUnlock = canUnlockL2();
 
     setShowUnlock(canUnlock);
-  }, [
-    alwaysShow,
-    canUnlockL2,
-    miningBlock?.isBuilt,
-  ]);
+  }, [alwaysShow, canUnlockL2, miningBlock?.isBuilt]);
 
   return (
     <View>

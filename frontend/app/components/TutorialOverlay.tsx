@@ -92,10 +92,7 @@ export const TutorialOverlay: React.FC = () => {
         {stepConfig.canDismiss && (
           <Pressable
             onPress={() => {
-              if (step === "balanceExplanation") {
-                notify("BalanceTutorialDismissed");
-              }
-              setVisible(false);
+              notify("TutorialDismissed");
             }}
             className="self-center px-4 py-2 rounded"
           >

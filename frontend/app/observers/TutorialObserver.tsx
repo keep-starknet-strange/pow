@@ -16,10 +16,16 @@ export class TutorialObserver implements Observer {
       this.advanceStep();
       this.setVisible(true);
     });
-    this.handlers.set(`BalanceTutorialDismissed-balanceExplanation`, () =>
+    this.handlers.set(`TutorialDismissed-balanceExplanation`, () =>
       this.advanceStep(),
     );
     this.handlers.set(`TxUpgradePurchased-purchaseTransactions`, () =>
+      this.advanceStep(),
+    );
+    this.handlers.set(`TutorialDismissed-purchaseFeeUpgrade`, () =>
+      this.advanceStep(),
+    );
+    this.handlers.set(`TutorialDismissed-purchaseSpeedUpgrade`, () =>
       this.advanceStep(),
     );
     this.handlers.set(`TxAdded-addTransactionsToBlock`, () =>
