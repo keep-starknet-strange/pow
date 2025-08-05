@@ -91,9 +91,16 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const [lastTxTime, setLastTxTime] = useState<number>(0);
   const addNewTransaction = useCallback(async () => {
     const newTx = newTransaction(props.txId, fee, props.isDapp);
+    const currentTime = Date.now();
+
+    // Batch state updates to minimize rerenders
     addTransaction(props.chainId, newTx);
-    setLastTxTime(Date.now());
-    shakeAnim.value *= -1; // Toggle the shake animation value
+    setLastTxTime(currentTime);
+
+    // Use requestAnimationFrame to batch animation updates
+    requestAnimationFrame(() => {
+      shakeAnim.value *= -1; // Toggle the shake animation value
+    });
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
   const triggerTxShake = useCallback(() => {
@@ -111,14 +118,19 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const handlePress = useCallback(
     (event: GestureResponderEvent) => {
       const { locationX, locationY } = event.nativeEvent;
+      const currentTime = Date.now();
 
-      // Trigger flash animation at click position
-      if (triggerFlash) {
-        triggerFlash(locationX, locationY);
-      }
+      // Batch visual feedback updates
+      requestAnimationFrame(() => {
+        // Trigger flash animation at click position
+        if (triggerFlash) {
+          triggerFlash(locationX, locationY);
+        }
+      });
 
       if (feeLevel === -1) {
-        setLastTxTime(Date.now());
+        // Batch upgrade operations
+        setLastTxTime(currentTime);
         if (props.isDapp) {
           dappFeeUpgrade(props.chainId, props.txId);
         } else {
