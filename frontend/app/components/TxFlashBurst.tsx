@@ -6,6 +6,8 @@ import Animated, {
   useAnimatedStyle,
   Easing,
   runOnUI,
+  withDelay,
+  runOnJS,
 } from "react-native-reanimated";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -53,42 +55,55 @@ const TxStreak: React.FC<TxStreakProps> = ({
   const translateDistance = useSharedValue(0);
   const lengthScale = useSharedValue(1);
 
+  const startTxStreakAnimation = () => {
+    "worklet";
+    // Reset values
+    opacity.value = 0;
+    scale.value = 0;
+    translateDistance.value = 0;
+    lengthScale.value = 1;
+
+    // Start animations with proper delay using withDelay - less intense than block animation
+    opacity.value = withDelay(
+      delay,
+      withSequence(
+        withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Less intense opacity
+        withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
+      ),
+    );
+    scale.value = withDelay(
+      delay,
+      withSequence(
+        withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Smaller scale
+        withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) }),
+      ),
+    );
+    translateDistance.value = withDelay(
+      delay,
+      withTiming(length * 0.7, {
+        // Shorter distance
+        duration: 230,
+        easing: Easing.out(Easing.quad),
+      }),
+    );
+    // Dynamic length scaling - less dramatic
+    lengthScale.value = withDelay(
+      delay,
+      withSequence(
+        withTiming(1.3, { duration: 115, easing: Easing.out(Easing.quad) }),
+        withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) }),
+      ),
+    );
+  };
+
   useEffect(() => {
     if (trigger > 0) {
-      runOnUI(() => {
-        opacity.value = 0;
-        scale.value = 0;
-        translateDistance.value = 0;
-        lengthScale.value = 1;
-      })();
-
-      // Start animation with delay - less intense than block animation
-      setTimeout(() => {
-        runOnUI(() => {
-          opacity.value = withSequence(
-            withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Less intense opacity
-            withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
-          );
-          scale.value = withSequence(
-            withTiming(0.8, { duration: 80, easing: Easing.out(Easing.quad) }), // Smaller scale
-            withTiming(0.2, { duration: 150, easing: Easing.in(Easing.quad) }),
-          );
-          translateDistance.value = withTiming(length * 0.7, {
-            // Shorter distance
-            duration: 230,
-            easing: Easing.out(Easing.quad),
-          });
-          // Dynamic length scaling - less dramatic
-          lengthScale.value = withSequence(
-            withTiming(1.3, { duration: 115, easing: Easing.out(Easing.quad) }),
-            withTiming(0.6, { duration: 115, easing: Easing.in(Easing.quad) }),
-          );
-        })();
-      }, delay);
+      runOnUI(startTxStreakAnimation)();
     }
   }, [trigger]);
 
   const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
     const radians = ((angle + 90) * Math.PI) / 180;
     const translateX = Math.cos(radians) * translateDistance.value;
     const translateY = Math.sin(radians) * translateDistance.value;
@@ -137,32 +152,39 @@ const TxFlashCore: React.FC<{
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
 
+  const startTxFlashAnimation = () => {
+    "worklet";
+    // Reset values
+    opacity.value = 0;
+    scale.value = 0;
+
+    // Flash sequence: less intense than block flash
+    opacity.value = withSequence(
+      withTiming(0.8, { duration: 30, easing: Easing.out(Easing.quad) }),
+      withTiming(0.6, { duration: 70, easing: Easing.linear }),
+      withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
+    );
+
+    scale.value = withSequence(
+      withTiming(1.2, { duration: 30, easing: Easing.out(Easing.quad) }), // Smaller flash
+      withTiming(0.8, { duration: 70, easing: Easing.linear }),
+      withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
+    );
+  };
+
   useEffect(() => {
     if (trigger > 0) {
-      runOnUI(() => {
-        opacity.value = 0;
-        scale.value = 0;
-
-        // Flash sequence: less intense than block flash
-        opacity.value = withSequence(
-          withTiming(0.8, { duration: 30, easing: Easing.out(Easing.quad) }),
-          withTiming(0.6, { duration: 70, easing: Easing.linear }),
-          withTiming(0, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-
-        scale.value = withSequence(
-          withTiming(1.2, { duration: 30, easing: Easing.out(Easing.quad) }), // Smaller flash
-          withTiming(0.8, { duration: 70, easing: Easing.linear }),
-          withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
-        );
-      })();
+      runOnUI(startTxFlashAnimation)();
     }
   }, [trigger]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    return {
+      opacity: opacity.value,
+      transform: [{ scale: scale.value }],
+    };
+  });
 
   return (
     <Animated.View
@@ -219,25 +241,34 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
 
   const transactionColor = getTransactionColor();
 
+  const startTxContainerAnimation = () => {
+    "worklet";
+    containerOpacity.value = 1;
+
+    // Auto-hide after animation completes using withDelay - shorter than block animation
+    containerOpacity.value = withDelay(
+      350,
+      withTiming(0, { duration: 0 }, (finished) => {
+        if (finished && onComplete) {
+          // Use runOnJS to call the completion callback
+          runOnJS(onComplete)();
+        }
+      }),
+    );
+  };
+
   useEffect(() => {
     if (trigger > 0) {
-      runOnUI(() => {
-        containerOpacity.value = 1;
-      })();
-
-      // Auto-hide after animation completes - shorter than block animation
-      setTimeout(() => {
-        runOnUI(() => {
-          containerOpacity.value = 0;
-        })();
-        onComplete?.();
-      }, 350);
+      runOnUI(startTxContainerAnimation)();
     }
   }, [trigger]);
 
-  const containerStyle = useAnimatedStyle(() => ({
-    opacity: containerOpacity.value,
-  }));
+  const containerStyle = useAnimatedStyle(() => {
+    "worklet";
+    return {
+      opacity: containerOpacity.value,
+    };
+  });
 
   // Generate random streaks - fewer than blocks
   const streaks = React.useMemo(() => {
