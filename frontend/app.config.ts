@@ -25,7 +25,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/logo/icon.png",
+      foregroundImage: "./assets/logo/logo-foreground.png",
       backgroundImage: "./assets/logo/logo-background.png",
     },
     package: "com.starknet.pow",
@@ -42,9 +42,9 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "./assets/logo/logo-background.png",
-        imageWidth: 1000,
-        resizeMode: "native",
+        image: "./assets/logo/logo-foreground.png",
+        imageWidth: 1024,
+        resizeMode: "contain",
         backgroundColor: "#74c874",
       },
     ],
