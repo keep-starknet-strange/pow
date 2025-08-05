@@ -1,4 +1,3 @@
-import React from "react";
 import { SafeAreaView, Text, View, BackHandler } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";

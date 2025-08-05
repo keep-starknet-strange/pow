@@ -57,7 +57,7 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
 
   useEffect(() => {
     if (enabled) scheduleMeasure();
-  }, [enabled, step]);
+  }, [enabled, step, scheduleMeasure]);
 
   return { ref, onLayout };
 }
