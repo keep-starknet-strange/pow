@@ -7,8 +7,8 @@
     "canDismiss": false
   },
   "balanceExplanation": {
-    "title": "Your Balance Grows!",
-    "description": "Great job! Block fees from mining increase your balance.\nYour balance is displayed here — watch it grow as you mine more blocks and process transactions!",
+    "title": "Stack Sats!",
+    "description": "Great job! After successfully mining a block it's fees will go to your balance.\nHODL your coins and watch your balance grow!",
     "bubbleTargetId": "headerBalance",
     "highlightTargetId": "headerBalance",
     "canDismiss": true
