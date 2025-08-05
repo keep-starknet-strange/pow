@@ -1,6 +1,5 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { View } from "react-native";
-import Animated, { FadeOut } from "react-native-reanimated";
 import {
   Canvas,
   Image,
@@ -16,13 +15,12 @@ export type BlockTxOutlinesProps = {
 
 export const BlockTxOutlines: React.FC<BlockTxOutlinesProps> = memo((props) => {
   const { getImage } = useImages();
-  return (
-    <View className="absolute top-0 left-0 w-full h-full">
-      {Array.from({ length: props.txPerRow ** 2 || 0 }, (_, index) => (
-        <Animated.View
+  
+  const txOutlines = useMemo(() => {
+    return Array.from({ length: props.txPerRow ** 2 || 0 }, (_, index) => (
+        <View
           key={index}
           className="absolute"
-          exiting={FadeOut}
           style={{
             left: (index % props.txPerRow) * props.txSize,
             top: Math.floor(index / props.txPerRow) * props.txSize,
@@ -44,8 +42,13 @@ export const BlockTxOutlines: React.FC<BlockTxOutlinesProps> = memo((props) => {
               height={props.txSize}
             />
           </Canvas>
-        </Animated.View>
-      ))}
+        </View>
+      ));
+  }, [props.txPerRow, props.txSize, getImage]);
+
+  return (
+    <View className="absolute top-0 left-0 w-full h-full">
+      {txOutlines}
     </View>
   );
 });
