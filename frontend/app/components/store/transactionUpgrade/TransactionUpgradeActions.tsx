@@ -33,11 +33,9 @@ export const TransactionUpgradeActions: React.FC<
     speedProps !== undefined && !locked && isFirstTransaction;
   const { ref: feeRef, onLayout: onLayoutFee } = useTutorialLayout(
     "feeUpgradeButton" as TargetId,
-    feeEnabled,
   );
   const { ref: speedRef, onLayout: onLayoutSpeed } = useTutorialLayout(
     "speedUpgradeButton" as TargetId,
-    speedEnabled,
   );
   return locked ? (
     <UpgradeButton

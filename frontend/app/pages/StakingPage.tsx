@@ -1,18 +1,20 @@
 import { View, Text, SafeAreaView, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useState, useMemo, useCallback } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
 import { Dimensions } from "react-native";
+import { useInterval } from "usehooks-ts";
 import { BackGround } from "../components/staking/BackGround";
 import { PageHeader } from "../components/staking/PageHeader";
 import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
+import { StakingUnlock } from "../components/staking/StakingUnlock";
 import { AmountField } from "../components/staking/AmountField";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
 
-// You may need to define width, height, and getImage if not already imported:
 const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
@@ -20,6 +22,7 @@ const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
 
 export const StakingPage: React.FC = () => {
   const {
+    stakingUnlocked,
     amountStaked,
     rewards,
     config,
@@ -31,8 +34,9 @@ export const StakingPage: React.FC = () => {
   } = useStakingStore();
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
+  const insets = useSafeAreaInsets();
   // const { getImage } = useImages();
-  const balancePercentages = BALANCE_PERCENTAGE;
+  const balancePercentages = useMemo(() => BALANCE_PERCENTAGE, []);
   interface GetPercentOfParams {
     percent: number;
     amount: number;
@@ -43,45 +47,57 @@ export const StakingPage: React.FC = () => {
   }
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-  useEffect(() => {
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
-    return () => clearInterval(id);
-  }, []);
 
-  // countdown until next validation
-  const next = lastValidation + config.slashing_config.due_time;
-  const rem = Math.max(next - now, 0);
-  const days = Math.floor(rem / 86400);
-  const hours = Math.floor((rem % 86400) / 3600);
-  const minutes = Math.floor((rem % 3600) / 60);
-  const seconds = rem % 60;
+  // Use useInterval hook with optimized timing - only update when needed
+  useInterval(
+    () => {
+      const newNow = Math.floor(Date.now() / 1000);
+      // Only update if the second actually changed to prevent unnecessary re-renders
+      if (newNow !== now) {
+        setNow(newNow);
+      }
+    },
+    stakingUnlocked ? SECOND : null,
+  ); // Only run when staking is unlocked
 
-  // APR % = seconds-per-year / reward_rate * 100
-  const apr = (31 / config.reward_rate).toFixed(1);
+  // Memoize expensive countdown calculations
+  const countdown = useMemo(() => {
+    const next = lastValidation + config.slashing_config.due_time;
+    const rem = Math.max(next - now, 0);
+    const hours = Math.floor((rem % 86400) / 3600);
+    const minutes = Math.floor((rem % 3600) / 60);
+    const seconds = rem % 60;
+    return { hours, minutes, seconds };
+  }, [now, lastValidation, config.slashing_config.due_time]);
 
-  const onPressClaim = () => {
+  // Memoize APR calculation
+  const apr = useMemo(() => {
+    return (31 / config.reward_rate).toFixed(1);
+  }, [config.reward_rate]);
+
+  const onPressClaim = useCallback(() => {
     const rewards = claimStakingRewards();
     if (rewards > 0) {
       updateBalance(rewards);
     }
-  };
+  }, [claimStakingRewards, updateBalance]);
 
-  const onPressStake = () => {
+  const onPressStake = useCallback(() => {
     if (tryBuy(stakeAmount)) {
       stakeTokens(stakeAmount);
     }
-  };
+  }, [tryBuy, stakeAmount, stakeTokens]);
 
-  const onPressFillStake = (percent: number) => () => {
+  const onPressFillStake = useCallback((percent: number) => () => {
     setStakeAmount(getPercentOf({ percent, amount: balance }));
-  };
+  }, [balance]);
 
-  const onPressWithdraw = () => {
+  const onPressWithdraw = useCallback(() => {
     const withdrawn = withdrawStakedTokens();
     if (withdrawn > 0) {
       updateBalance(withdrawn);
     }
-  };
+  }, [withdrawStakedTokens, updateBalance]);
 
   return (
     <SafeAreaView className="flex-1 relative">
@@ -173,7 +189,7 @@ export const StakingPage: React.FC = () => {
             <View className="flex-row space-x-2 px-2">
               {balancePercentages.map((percent, i) => (
                 <StakingAction
-                  key={i}
+                  key={`${percent}%`}
                   action={onPressFillStake(percent)}
                   label={`${percent}%`}
                 />
@@ -189,16 +205,53 @@ export const StakingPage: React.FC = () => {
 
           <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
             <Text className="font-Pixels text-5xl text-[#fff7ff]">
-              {days.toString().padStart(2, "0")}:
-              {hours.toString().padStart(2, "0")}:
-              {minutes.toString().padStart(2, "0")}:
-              {seconds.toString().padStart(2, "0")}
+              {countdown.hours.toString().padStart(2, "0")}:
+              {countdown.minutes.toString().padStart(2, "0")}:
+              {countdown.seconds.toString().padStart(2, "0")}
             </Text>
           </View>
 
           <StakingAction action={validateStake} label="VALIDATE" />
         </View>
       </ScrollView>
+
+      {!stakingUnlocked && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0, // inside the content container
+            bottom: 0, // stops right at the top of the tab bar
+            left: 0,
+            right: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 100,
+          }}
+        >
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: "rgba(0,0,0,0.8)",
+            }}
+          />
+          <View
+            style={{
+              width: "85%",
+              backgroundColor: "transparent",
+              borderRadius: 10,
+              padding: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <StakingUnlock />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

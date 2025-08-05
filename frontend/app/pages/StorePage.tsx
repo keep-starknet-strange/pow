@@ -12,13 +12,13 @@ import { TargetId } from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
+import { ShopTitle } from "../components/store/ShopTitle";
 import { UpgradeView } from "../components/store/UpgradeView";
 import { AutomationView } from "../components/store/AutomationView";
 import { DappsUnlock } from "../components/store/DappsUnlock";
 import { L2Unlock } from "../components/store/L2Unlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
-import { ShopTitle } from "../components/store/ShopTitle";
 
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";

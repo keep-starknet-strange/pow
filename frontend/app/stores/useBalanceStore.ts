@@ -18,6 +18,8 @@ interface BalanceState {
   ) => Promise<void>;
 }
 
+const DEFAULT_BALANCE = 1000000000000000000;
+
 export const useBalanceStore = create<BalanceState>((set, get) => ({
   balance: DEFAULT_BALANCE,
   setBalance: (balance: number) => set({ balance }),

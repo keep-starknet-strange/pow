@@ -42,6 +42,7 @@ export const TutorialOverlay: React.FC = () => {
   }, [step]);
 
   if (!visible || !isReady) return null;
+  
   return (
     <View className="absolute inset-0 z-[50]" pointerEvents="box-none">
       {masks.map((m, i) => (
