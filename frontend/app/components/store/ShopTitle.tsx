@@ -33,7 +33,7 @@ export const ShopTitle: React.FC<{ position: "left" | "right" }> = React.memo(
       <View className="w-full relative">
         <Canvas style={{ width: width, height: 24, marginLeft: 4 }}>
           <Image
-            image={getImage("shop.name.plaque")}
+            image={getImage("shop.title")}
             fit="fill"
             x={0}
             y={0}

@@ -3,7 +3,7 @@ import { Contract } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { FocAccount } from "../context/FocEngineConnector";
 
-const DEFAULT_BALANCE = 0;
+const DEFAULT_BALANCE = 100000000000;
 
 interface BalanceState {
   balance: number;
@@ -61,7 +61,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
         set({ balance });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        set({ balance: 1000000000000 });
+        set({ balance: DEFAULT_BALANCE });
       }
     };
     fetchBalance();
