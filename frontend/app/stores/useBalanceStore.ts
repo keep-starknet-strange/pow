@@ -3,7 +3,7 @@ import { Contract } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { FocAccount } from "../context/FocEngineConnector";
 
-const DEFAULT_BALANCE = 100000000000;
+const DEFAULT_BALANCE = 0;
 
 interface BalanceState {
   balance: number;
