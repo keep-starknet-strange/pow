@@ -8,7 +8,6 @@ import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { useShallow } from "zustand/react/shallow";
 import { TargetId } from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
@@ -38,7 +37,6 @@ export const StorePage: React.FC = () => {
   const { ref: automationTabRef, onLayout: automationTabOnLayout } =
     useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
-  // Shallow state management: only re-render when transaction store properties change
   const {
     dappsUnlocked,
     canUnlockDapps,
@@ -48,18 +46,7 @@ export const StorePage: React.FC = () => {
     transactionSpeedLevels,
     dappFeeLevels,
     dappSpeedLevels,
-  } = useTransactionsStore(
-    useShallow((state) => ({
-      dappsUnlocked: state.dappsUnlocked,
-      canUnlockDapps: state.canUnlockDapps,
-      canUnlockDapp: state.canUnlockDapp,
-      canUnlockTx: state.canUnlockTx,
-      transactionFeeLevels: state.transactionFeeLevels,
-      transactionSpeedLevels: state.transactionSpeedLevels,
-      dappFeeLevels: state.dappFeeLevels,
-      dappSpeedLevels: state.dappSpeedLevels,
-    })),
-  );
+  } = useTransactionsStore();
   const { canUnlockUpgrade, upgrades, automations } = useUpgrades();
   const { isL2Unlocked } = useL2Store();
   const { getImage } = useImages();

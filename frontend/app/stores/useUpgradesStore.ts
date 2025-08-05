@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { useShallow } from "zustand/react/shallow";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useBalanceStore } from "./useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
@@ -568,26 +567,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   },
 }));
 
-// Export hook for easier migration with shallow state management
+// Export hook for easier migration
 export const useUpgrades = () => {
-  const store = useUpgradesStore(
-    useShallow((state) => ({
-      upgrades: state.upgrades,
-      automations: state.automations,
-      upgrade: state.upgrade,
-      upgradeAutomation: state.upgradeAutomation,
-      canUnlockUpgrade: state.canUnlockUpgrade,
-      getUpgradeValue: state.getUpgradeValue,
-      getUpgradeValueAt: state.getUpgradeValueAt,
-      getNextUpgradeCost: state.getNextUpgradeCost,
-      getAutomationValue: state.getAutomationValue,
-      getAutomationSpeedAt: state.getAutomationSpeedAt,
-      getNextAutomationCost: state.getNextAutomationCost,
-      currentPrestige: state.currentPrestige,
-      canPrestige: state.canPrestige,
-      prestige: state.prestige,
-      getNextPrestigeCost: state.getNextPrestigeCost,
-    })),
-  );
-  return store;
+  return useUpgradesStore();
 };

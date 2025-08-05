@@ -6,7 +6,6 @@ import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 import { Block } from "../types/Chains";
-import { useShallow } from "zustand/react/shallow";
 
 export const useSequencer = (
   onBlockSequenced: () => void,
@@ -35,14 +34,9 @@ export const useSequencer = (
     fetchSequencerCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  // Shallow state management: only re-render when sequencing block (index 1) changes
-  const sequencingBlock = useGameStore(
-    useShallow((state) => state.workingBlocks[1]),
-  );
-  // Also need mining block (index 0) for autoClicker condition
-  const miningBlock = useGameStore(
-    useShallow((state) => state.workingBlocks[0]),
-  );
+  const { workingBlocks } = useGameStore();
+  const sequencingBlock = workingBlocks[1];
+  const miningBlock = workingBlocks[0];
   const sequenceBlock = useCallback(() => {
     if (!sequencingBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot sequence.");

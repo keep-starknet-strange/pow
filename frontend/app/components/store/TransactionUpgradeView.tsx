@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "@/app/hooks/useImages";
-import { useShallow } from "zustand/react/shallow";
 import { getBlockTxIconName } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
@@ -16,7 +15,6 @@ export type TransactionUpgradeViewProps = {
 
 export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> =
   React.memo((props) => {
-    // Shallow state management: only re-render when transaction upgrade functions change
     const {
       getFeeLevel,
       getSpeedLevel,
@@ -26,18 +24,7 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> =
       txSpeedUpgrade,
       dappFeeUpgrade,
       dappSpeedUpgrade,
-    } = useTransactionsStore(
-      useShallow((state) => ({
-        getFeeLevel: state.getFeeLevel,
-        getSpeedLevel: state.getSpeedLevel,
-        getNextFeeCost: state.getNextFeeCost,
-        getNextSpeedCost: state.getNextSpeedCost,
-        txFeeUpgrade: state.txFeeUpgrade,
-        txSpeedUpgrade: state.txSpeedUpgrade,
-        dappFeeUpgrade: state.dappFeeUpgrade,
-        dappSpeedUpgrade: state.dappSpeedUpgrade,
-      })),
-    );
+    } = useTransactionsStore();
 
     const txFeeLevel = getFeeLevel(
       props.chainId,

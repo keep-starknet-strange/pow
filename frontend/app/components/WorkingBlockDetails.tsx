@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
-import { useShallow } from "zustand/react/shallow";
 import { useImages } from "../hooks/useImages";
 import Animated, {
   runOnJS,
@@ -39,10 +38,8 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = (
   props,
 ) => {
-  // Shallow state management: only re-render when this specific chainId's block changes
-  const currentWorkingBlock = useGameStore(
-    useShallow((state) => state.workingBlocks[props.chainId]),
-  );
+  const { workingBlocks } = useGameStore();
+  const currentWorkingBlock = workingBlocks[props.chainId];
   const { getUpgradeValue } = useUpgrades();
   const { getImage } = useImages();
 

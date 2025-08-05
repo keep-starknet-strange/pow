@@ -5,7 +5,6 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
-import { useShallow } from "zustand/react/shallow";
 
 export const useDAConfirmer = (
   onDAConfirm: () => void,
@@ -34,10 +33,9 @@ export const useDAConfirmer = (
     fetchDaCounter();
   }, [powContract, user, getUserDaClicks]);
 
-  // Shallow state management: only re-render when DA properties change
-  const [daIsBuilt, daMaxSize] = useL2Store(
-    useShallow((state) => [state.l2?.da.isBuilt, state.l2?.da.maxSize]),
-  );
+  const { l2 } = useL2Store();
+  const daIsBuilt = l2?.da.isBuilt;
+  const daMaxSize = l2?.da.maxSize;
   const daConfirm = useCallback(() => {
     if (!daIsBuilt) {
       console.warn("Data Availability is not built yet.");

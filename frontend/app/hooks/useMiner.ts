@@ -5,7 +5,6 @@ import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
-import { useShallow } from "zustand/react/shallow";
 
 export const useMiner = (
   onBlockMined: () => void,
@@ -34,10 +33,8 @@ export const useMiner = (
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  // Shallow state management: only re-render when mining block (index 0) changes
-  const miningBlock = useGameStore(
-    useShallow((state) => state.workingBlocks[0]),
-  );
+  const { workingBlocks } = useGameStore();
+  const miningBlock = workingBlocks[0];
   const mineBlock = useCallback(() => {
     if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");

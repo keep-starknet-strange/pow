@@ -5,7 +5,6 @@ import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
 import { useAutoClicker } from "./useAutoClicker";
-import { useShallow } from "zustand/react/shallow";
 
 export const useProver = (
   onProve: () => void,
@@ -34,10 +33,9 @@ export const useProver = (
     fetchProofCounter();
   }, [powContract, user, getUserProofClicks]);
 
-  // Shallow state management: only re-render when prover properties change
-  const [proverIsBuilt, proverMaxSize] = useL2Store(
-    useShallow((state) => [state.l2?.prover.isBuilt, state.l2?.prover.maxSize]),
-  );
+  const { l2 } = useL2Store();
+  const proverIsBuilt = l2?.prover.isBuilt;
+  const proverMaxSize = l2?.prover.maxSize;
   const prove = useCallback(() => {
     if (!proverIsBuilt) {
       console.warn("Prover is not built yet.");
