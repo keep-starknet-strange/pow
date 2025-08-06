@@ -32,7 +32,7 @@ export const Miner: React.FC<MinerProps> = ({
     setMineColor(miningProgress === 1 ? "#20DF20" : "#CA1F4B");
     setMineStartTime(Date.now());
   }, [miningProgress]);
-
+  console.log("miningProgress");
   return (
     <View className="flex flex-col h-full aspect-square rounded-xl relative">
       <Confirmer
