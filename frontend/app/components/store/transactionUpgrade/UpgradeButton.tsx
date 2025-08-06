@@ -9,6 +9,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useBalance } from "../../../stores/useBalanceStore";
 import { useImages } from "../../../hooks/useImages";
+import { shortMoneyString } from "../../../utils/helpers";
 import Animated, {
   Easing,
   FadeInLeft,

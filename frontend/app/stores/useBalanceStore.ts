@@ -3,7 +3,7 @@ import { Contract } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { FocAccount } from "../context/FocEngineConnector";
 
-const DEFAULT_BALANCE = 0;
+const DEFAULT_BALANCE = 999999999999999;
 
 interface BalanceState {
   balance: number;
@@ -17,8 +17,6 @@ interface BalanceState {
     getUserBalance: () => Promise<number | undefined>,
   ) => Promise<void>;
 }
-
-const DEFAULT_BALANCE = 1000000000000000000;
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({
   balance: DEFAULT_BALANCE,
