@@ -17,6 +17,7 @@ export const Miner: React.FC<MinerProps> = ({
   const [mineStartTime, setMineStartTime] = useState(Date.now());
   const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");
+
   const generateRandomHash = (isDone: boolean) => {
     const difficulty = 4; // TODO
     const randomPart = Math.floor(Math.random() * 0xffffffffff)
@@ -27,11 +28,23 @@ export const Miner: React.FC<MinerProps> = ({
       ? `0x${"00".repeat(difficulty)}${randomPart}`
       : `0x${randomPart}`;
   };
+
   useEffect(() => {
     setMineHash(generateRandomHash(miningProgress === 1));
     setMineColor(miningProgress === 1 ? "#20DF20" : "#CA1F4B");
     setMineStartTime(Date.now());
   }, [miningProgress]);
+
+  // Generate flash text and color based on whether this will be the final click
+  const getFlashData = () => {
+    const willComplete = miningProgress >= 0.99; // Close to completion
+    return {
+      text: generateRandomHash(willComplete),
+      color: willComplete ? "#20DF20" : "#CA1F4B",
+    };
+  };
+
+  const flashData = getFlashData();
 
   return (
     <View className="flex flex-col h-full aspect-square rounded-xl relative">
@@ -47,6 +60,8 @@ export const Miner: React.FC<MinerProps> = ({
           value: mineHash,
           color: mineColor,
         }}
+        specialFlashText={flashData.text}
+        specialFlashTextColor={flashData.color}
       />
     </View>
   );

@@ -42,7 +42,18 @@ const WindowComponent: React.FC<WindowProps> = ({
   );
 
   return (
-    <View style={style} onLayout={handleLayout}>
+    <View
+      style={[
+        style,
+        {
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.5,
+          shadowRadius: 8,
+          shadowColor: "black",
+        },
+      ]}
+      onLayout={handleLayout}
+    >
       {size.w > 0 && size.h > 0 && (
         <Canvas
           pointerEvents="none"
