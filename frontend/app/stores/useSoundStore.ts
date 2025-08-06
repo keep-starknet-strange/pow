@@ -11,8 +11,8 @@ const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 
 const musicAssets: { [key: string]: any } = {
-  "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.mp3"),
-  "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.mp3"),
+  "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
+  "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.m4a"),
 };
 
 // Sound file assets - one entry per unique sound file
