@@ -1,10 +1,10 @@
 {
-  "confirm.wav": 6,
-  "complete.wav": 5,
+  "confirm.m4a": 6,
+  "complete.m4a": 5,
   "purchase.mp3": 3,
-  "basic-error.wav": 3,
-  "add.wav": 6,
-  "achieve.wav": 2,
-  "basic-click.wav": 3,
-  "dice.wav": 2
+  "basic-error.m4a": 3,
+  "add.m4a": 6,
+  "achieve.m4a": 2,
+  "basic-click.m4a": 3,
+  "dice.m4a": 2
 }

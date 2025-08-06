@@ -17,14 +17,14 @@ const musicAssets: { [key: string]: any } = {
 
 // Sound file assets - one entry per unique sound file
 const soundFileAssets: { [key: string]: any } = {
-  "confirm.wav": require("../../assets/sounds/confirm.wav"),
-  "complete.wav": require("../../assets/sounds/complete.wav"),
+  "confirm.m4a": require("../../assets/sounds/confirm.m4a"),
+  "complete.m4a": require("../../assets/sounds/complete.m4a"),
   "purchase.mp3": require("../../assets/sounds/purchase.mp3"),
-  "basic-error.wav": require("../../assets/sounds/basic-error.wav"),
-  "add.wav": require("../../assets/sounds/add.wav"),
-  "achieve.wav": require("../../assets/sounds/achieve.wav"),
-  "basic-click.wav": require("../../assets/sounds/basic-click.wav"),
-  "dice.wav": require("../../assets/sounds/dice.wav"),
+  "basic-error.m4a": require("../../assets/sounds/basic-error.m4a"),
+  "add.m4a": require("../../assets/sounds/add.m4a"),
+  "achieve.m4a": require("../../assets/sounds/achieve.m4a"),
+  "basic-click.m4a": require("../../assets/sounds/basic-click.m4a"),
+  "dice.m4a": require("../../assets/sounds/dice.m4a"),
 };
 
 // Helper function to get sound file for event type from config
