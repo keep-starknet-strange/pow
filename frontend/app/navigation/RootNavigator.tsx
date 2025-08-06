@@ -20,7 +20,6 @@ export const RootNavigator = memo(() => {
 
   const screenOptions = useMemo(() => ({ headerShown: false }), []);
 
-  console.log("Rendering RootNavigator, isAuthenticated:", isAuthenticated);
   return (
     <View className="flex-1 bg-[#101119ff] relative">
       {isAuthenticated ? (

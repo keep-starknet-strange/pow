@@ -171,7 +171,6 @@ export const TabNavigator = memo(() => {
     [tabBarStyle],
   );
 
-  console.log("TabNavigator rendered");
   return (
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen

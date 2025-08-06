@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 import { View, Text, FlatList } from "react-native";
 import {
   Canvas,
@@ -42,10 +42,8 @@ export const getPrestigeIcon = (prestige: number) => {
 export const LeaderboardPage: React.FC = () => {
   const { STARKNET_ENABLED } = useStarknetConnector();
   const { getImage } = useImages();
-  const { getAccounts, getUniqueEventsOrdered, user } = useFocEngine();
+  const { getAccounts, getUniqueEventsOrdered } = useFocEngine();
   const { width, height } = useCachedWindowDimensions();
-  const { balance } = useBalance();
-  const { currentPrestige } = useUpgrades();
   const { powGameContractAddress } = usePowContractConnector();
   const leaderboardMock = [
     {
@@ -278,73 +276,84 @@ export const LeaderboardPage: React.FC = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
-      {user && (
-        <Animated.View
-          className={`flex flex-row justify-between items-center px-4 py-2 z-10
-            border-t-[5px] border-[#1b1c26] mx-[4px] bg-[#101119]
-            `}
-          entering={FadeInDown}
-        >
-          <View className="flex flex-row items-center flex-1">
-            <View className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]">
-              <PFPView
-                user={user?.account_address}
-                attributes={
-                  user.account.metadata
-                    ? createNounsAttributes(
-                        parseInt(user.account.metadata[0], 16),
-                        parseInt(user.account.metadata[1], 16),
-                        parseInt(user.account.metadata[2], 16),
-                        parseInt(user.account.metadata[3], 16),
-                      )
-                    : getRandomNounsAttributes()
-                }
-              />
-            </View>
-            <Text className="text-[28px] font-bold text-white font-Teatime truncate">
-              {user?.account.username}
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-center w-[4rem]">
-            <View className="w-[36px] aspect-square">
-              <Canvas style={{ flex: 1 }} className="w-full h-full">
-                <Image
-                  image={getImage(getPrestigeIcon(currentPrestige))}
-                  fit="fill"
-                  x={0}
-                  y={0}
-                  width={36}
-                  height={36}
-                  sampling={{
-                    filter: FilterMode.Nearest,
-                    mipmap: MipmapMode.None,
-                  }}
-                />
-              </Canvas>
-            </View>
-          </View>
-          <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
-            {shortMoneyString(balance)}
-          </Text>
-          <Canvas style={{ width: 16, height: 16 }} className="mr-1">
-            <Image
-              image={getImage("shop.btc")}
-              fit="contain"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={0}
-              width={13}
-              height={13}
-            />
-          </Canvas>
-        </Animated.View>
-      )}
+      <UserAccountSection />
     </View>
   );
 };
+
+const UserAccountSection: React.FC = memo(() => {
+  const { getImage } = useImages();
+  const { user } = useFocEngine();
+  const { balance } = useBalance();
+  const { currentPrestige } = useUpgrades();
+
+  const userNouns = useMemo(() => {
+    if (user?.account.metadata) {
+      return createNounsAttributes(
+        parseInt(user.account.metadata[0], 16),
+        parseInt(user.account.metadata[1], 16),
+        parseInt(user.account.metadata[2], 16),
+        parseInt(user.account.metadata[3], 16),
+      );
+    }
+    return getRandomNounsAttributes();
+  }, [user?.account.metadata]);
+
+  if (!user) return null;
+
+  return (
+    <Animated.View
+      className={`flex flex-row justify-between items-center px-4 py-2 z-10
+        border-t-[5px] border-[#1b1c26] mx-[4px] bg-[#101119]
+        `}
+      entering={FadeInDown}
+    >
+      <View className="flex flex-row items-center flex-1">
+        <View className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]">
+          <PFPView user={user?.account_address} attributes={userNouns} />
+        </View>
+        <Text className="text-[28px] font-bold text-white font-Teatime truncate">
+          {user?.account.username}
+        </Text>
+      </View>
+      <View className="flex flex-row items-center justify-center w-[4rem]">
+        <View className="w-[36px] aspect-square">
+          <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Image
+              image={getImage(getPrestigeIcon(currentPrestige))}
+              fit="fill"
+              x={0}
+              y={0}
+              width={36}
+              height={36}
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.None,
+              }}
+            />
+          </Canvas>
+        </View>
+      </View>
+      <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
+        {shortMoneyString(balance)}
+      </Text>
+      <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+        <Image
+          image={getImage("shop.btc")}
+          fit="contain"
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+          x={0}
+          y={0}
+          width={13}
+          height={13}
+        />
+      </Canvas>
+    </Animated.View>
+  );
+});
 
 export const LeaderboardItem: React.FC<{
   index: number;
