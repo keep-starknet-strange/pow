@@ -1,8 +1,0 @@
-{
-  "baseRewardRate": 0.05,
-  "slashingConfig": {
-    "slashFraction": 0.1,
-    "dueTime": 3600,
-    "leanianceMargin": 300
-  }
-}
