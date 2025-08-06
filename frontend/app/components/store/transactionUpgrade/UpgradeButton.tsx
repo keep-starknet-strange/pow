@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Pressable, Text } from "react-native";
-import { PopupAnimation } from "../../PopupAnimation";
+import { PopupAnimation, PopupAnimationRef } from "../../PopupAnimation";
 import {
   Canvas,
   Image,
@@ -48,14 +48,16 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
     const { width } = useCachedWindowDimensions();
     const { balance } = useBalance();
 
-    const [lastBuyTime, setLastBuyTime] = React.useState<number>(0);
+    const popupRef = React.useRef<PopupAnimationRef>(null);
 
     return (
       <Pressable
         onPress={() => {
           if (level < maxLevel) {
             onPress();
-            setLastBuyTime(Date.now());
+            const popupValue = `-${shortMoneyString(nextCost)}`;
+            const popupColor = balance < nextCost ? "#CA1F4B" : "#F0E130";
+            popupRef.current?.showPopup(popupValue, popupColor);
           }
         }}
         className="relative w-full"
@@ -134,12 +136,7 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
               }}
               spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
             />
-            <PopupAnimation
-              popupStartTime={lastBuyTime}
-              popupValue={`-${shortMoneyString(nextCost)}`}
-              animRange={[0, -30]}
-              color={balance < nextCost ? "#CA1F4B" : "#F0E130"}
-            />
+            <PopupAnimation ref={popupRef} animRange={[0, -30]} />
             <Canvas style={{ width: 16, height: 16 }} className="">
               <Image
                 image={getImage("shop.btc")}

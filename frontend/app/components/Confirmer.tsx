@@ -15,7 +15,6 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { PopupAnimation } from "./PopupAnimation";
 import { FlashBurstManager } from "./FlashBurstManager";
 import { TargetId } from "../stores/useTutorialStore";
 import { useImages } from "../hooks/useImages";
@@ -25,11 +24,6 @@ export type ConfirmerProps = {
   image?: string;
   text?: string;
   onConfirm: () => void;
-  confirmPopup?: {
-    startTime: number;
-    value: string;
-    color: string;
-  };
   renderedBy?: string;
 };
 
@@ -53,6 +47,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
 
   const [confirmTime, setConfirmTime] = useState(0);
   const confirmAnimation = useAnimatedValue(0);
+
   useEffect(() => {
     confirmAnimation.setValue(0);
     Animated.timing(confirmAnimation, {
@@ -95,14 +90,6 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       onPress={handlePress}
       {...tutorialProps}
     >
-      {props.confirmPopup && (
-        <PopupAnimation
-          popupStartTime={props.confirmPopup.startTime}
-          popupValue={props.confirmPopup.value}
-          color={props.confirmPopup.color}
-          animRange={[-100, -120]}
-        />
-      )}
       {props.image && (
         <Animated.View
           style={{
