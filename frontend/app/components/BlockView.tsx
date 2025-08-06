@@ -31,7 +31,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
 
       setTxSize(width / txPerRow);
     },
-    [txPerRow]
+    [txPerRow],
   );
 
   return (

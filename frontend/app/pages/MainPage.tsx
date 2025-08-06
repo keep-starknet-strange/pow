@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo, useCallback } from "react";
 import { View } from "react-native";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { L1Phase } from "./main/L1Phase";
@@ -6,7 +6,7 @@ import { L2Phase } from "./main/L2Phase";
 import { MainBackground } from "../components/MainBackground";
 import { L1L2Switch } from "../components/L1L2Switch";
 
-export const MainPage: React.FC = () => {
+export const MainPage: React.FC = memo(() => {
   const { isL2Unlocked } = useL2Store();
 
   const [currentView, setCurrentView] = React.useState<"L1" | "L2">(
@@ -22,13 +22,16 @@ export const MainPage: React.FC = () => {
       {isL2Unlocked && (
         <L1L2Switch
           currentView={currentView}
-          setCurrentView={(view: "L1" | "L2") => setCurrentView(view)}
+          setCurrentView={useCallback(
+            (view: "L1" | "L2") => setCurrentView(view),
+            [],
+          )}
           isStore={false}
         />
       )}
       {currentView === "L2" ? <L2Phase /> : <L1Phase />}
     </View>
   );
-};
+});
 
 export default MainPage;

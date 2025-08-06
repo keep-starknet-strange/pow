@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 
@@ -10,11 +10,17 @@ import { useFocEngine } from "../context/FocEngineConnector";
 
 const Stack = createStackNavigator();
 
-export function RootNavigator() {
+export const RootNavigator = memo(() => {
   const { user } = useFocEngine();
 
-  const isAuthenticated = user && user.account.username !== "";
+  const isAuthenticated = useMemo(
+    () => user && user.account.username !== "",
+    [user],
+  );
 
+  const screenOptions = useMemo(() => ({ headerShown: false }), []);
+
+  console.log("Rendering RootNavigator, isAuthenticated:", isAuthenticated);
   return (
     <View className="flex-1 bg-[#101119ff] relative">
       {isAuthenticated ? (
@@ -24,10 +30,10 @@ export function RootNavigator() {
           <TabNavigator />
         </>
       ) : (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={screenOptions}>
           <Stack.Screen name="Login" component={LoginPage} />
         </Stack.Navigator>
       )}
     </View>
   );
-}
+});
