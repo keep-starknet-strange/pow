@@ -194,6 +194,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
             isDapp={props.isDapp}
             name={txType?.name || "Unknown"}
             triggerTxAnimation={triggerTxShake}
+            addTransaction={addTransaction}
           />
         </Pressable>
       </Animated.View>
