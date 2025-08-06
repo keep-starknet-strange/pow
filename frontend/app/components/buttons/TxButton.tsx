@@ -6,17 +6,18 @@ import {
   Pressable,
   GestureResponderEvent,
 } from "react-native";
-import { Dimensions } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
+import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { newTransaction } from "../../types/Chains";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "../../stores/useTutorialStore";
 import transactionsJson from "../../configs/transactions.json";
 import dappsJson from "../../configs/dapps.json";
 import { shortMoneyString } from "../../utils/helpers";
-import { PopupAnimation } from "../../components/PopupAnimation";
+import {
+  PopupAnimation,
+  PopupAnimationRef,
+} from "../../components/PopupAnimation";
 import { TxFlashBurstManager } from "../TxFlashBurstManager";
 import { TxButtonInner } from "./TxButtonInner";
 import { TxButtonPlaque } from "./TxButtonPlaque";
@@ -44,7 +45,7 @@ export type TxButtonProps = {
 
 export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
   const { addTransaction } = useGameStore();
   const {
     getFeeLevel,
@@ -59,12 +60,6 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const [triggerFlash, setTriggerFlash] = useState<
     ((x: number, y: number) => void) | null
   >(null);
-
-  const enabled = props.txId === 0 && props.chainId === 0 && !props.isDapp;
-  const { ref, onLayout } = useTutorialLayout(
-    "firstTransactionButton" as TargetId,
-    enabled,
-  );
 
   const feeLevel = getFeeLevel(props.chainId, props.txId, props.isDapp);
   const feeCost = getNextFeeCost(props.chainId, props.txId, props.isDapp);
@@ -88,18 +83,41 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     ],
   }));
 
-  const [lastTxTime, setLastTxTime] = useState<number>(0);
+  const popupRef = React.useRef<PopupAnimationRef>(null);
   const addNewTransaction = useCallback(async () => {
     const newTx = newTransaction(props.txId, fee, props.isDapp);
+    const currentTime = Date.now();
+
+    // Batch state updates to minimize rerenders
     addTransaction(props.chainId, newTx);
-    setLastTxTime(Date.now());
-    shakeAnim.value *= -1; // Toggle the shake animation value
+
+    // Show popup animation
+    const popupValue = `${
+      feeLevel === -1
+        ? "-" + shortMoneyString(feeCost)
+        : "+" + shortMoneyString(fee)
+    }`;
+    const popupColor = feeLevel === -1 ? "#CA1F4B" : "#F0E130";
+    popupRef.current?.showPopup(popupValue, popupColor);
+
+    // Use requestAnimationFrame to batch animation updates
+    requestAnimationFrame(() => {
+      shakeAnim.value *= -1; // Toggle the shake animation value
+    });
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
 
   const triggerTxShake = useCallback(() => {
-    setLastTxTime(Date.now());
+    // Show popup animation
+    const popupValue = `${
+      feeLevel === -1
+        ? "-" + shortMoneyString(feeCost)
+        : "+" + shortMoneyString(fee)
+    }`;
+    const popupColor = feeLevel === -1 ? "#CA1F4B" : "#F0E130";
+    popupRef.current?.showPopup(popupValue, popupColor);
+
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [shakeAnim]);
+  }, [shakeAnim, feeLevel, feeCost, fee]);
 
   const handleFlashRequested = useCallback(
     (callback: (x: number, y: number) => void) => {
@@ -111,14 +129,23 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const handlePress = useCallback(
     (event: GestureResponderEvent) => {
       const { locationX, locationY } = event.nativeEvent;
+      const currentTime = Date.now();
 
-      // Trigger flash animation at click position
-      if (triggerFlash) {
-        triggerFlash(locationX, locationY);
-      }
+      // Batch visual feedback updates
+      requestAnimationFrame(() => {
+        // Trigger flash animation at click position
+        if (triggerFlash) {
+          triggerFlash(locationX, locationY);
+        }
+      });
 
       if (feeLevel === -1) {
-        setLastTxTime(Date.now());
+        // Batch upgrade operations
+        // Show popup animation for upgrade
+        const popupValue = "-" + shortMoneyString(feeCost);
+        const popupColor = "#CA1F4B";
+        popupRef.current?.showPopup(popupValue, popupColor);
+
         if (props.isDapp) {
           dappFeeUpgrade(props.chainId, props.txId);
         } else {
@@ -151,19 +178,9 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const txType = transactionsData.find((tx) => tx.id === props.txId);
   return (
     <View className="relative flex flex-col gap-[2px] py-[2px]">
-      <PopupAnimation
-        popupStartTime={lastTxTime}
-        popupValue={`${
-          feeLevel === -1
-            ? "-" + shortMoneyString(feeCost)
-            : "+" + shortMoneyString(fee)
-        }`}
-        color={feeLevel === -1 ? "#CA1F4B" : "#F0E130"}
-      />
+      <PopupAnimation ref={popupRef} />
       <Animated.View style={[shakeAnimStyle]}>
         <Pressable
-          ref={ref}
-          onLayout={onLayout}
           style={{
             width: width * 0.18,
           }}

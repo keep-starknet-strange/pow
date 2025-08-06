@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useCallback, useState } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
   Canvas,
@@ -11,6 +11,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useSharedValue, useDerivedValue } from "react-native-reanimated";
 import { useImages } from "../../hooks/useImages";
+import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { useTransactionsStore } from "../../stores/useTransactionsStore";
 import {
   getTxBg,
@@ -38,7 +39,7 @@ export interface TxButtonInnerProps {
 
 export const TxButtonInner = memo((props: TxButtonInnerProps) => {
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
   const { addTransaction } = useGameStore();
   const { getFee, getSpeed } = useTransactionsStore();
 

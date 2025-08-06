@@ -1,6 +1,6 @@
 /** hooks/useBubblePosition.ts */
-import { useWindowDimensions } from "react-native";
 import { useMemo } from "react";
+import { useCachedWindowDimensions } from "./useCachedDimensions";
 
 const ARROW_W = 18;
 const ARROW_H = 10;
@@ -19,7 +19,7 @@ export const useBubblePosition = (
   target: { x: number; y: number; width: number; height: number },
   bubbleHeight: number,
 ): BubblePosition => {
-  const { width: SCREEN_W, height: SCREEN_H } = useWindowDimensions();
+  const { width: SCREEN_W, height: SCREEN_H } = useCachedWindowDimensions();
 
   return useMemo(() => {
     const centerX = target.x + target.width / 2;

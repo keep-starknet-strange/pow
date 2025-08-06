@@ -4,8 +4,6 @@ import Animated, { BounceIn, Easing, FadeOut } from "react-native-reanimated";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
-import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
 import { BlockTxOutlines } from "./BlockTxOutlines";

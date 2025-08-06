@@ -5,6 +5,7 @@ import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
+import { useBatchedUpdates, useDebounce } from "./useBatchedUpdates";
 
 export const useMiner = (
   onBlockMined: () => void,
@@ -16,6 +17,8 @@ export const useMiner = (
   const { powContract, getUserBlockClicks } = usePowContractConnector();
   const [mineCounter, setMineCounter] = useState(0);
   const [miningProgress, setMiningProgress] = useState(0);
+  const { batchUpdate } = useBatchedUpdates();
+  const debouncedNotify = useDebounce(50); // Debounce notifications by 50ms
 
   useEffect(() => {
     const fetchMineCounter = async () => {
@@ -46,18 +49,32 @@ export const useMiner = (
       triggerMineAnimation();
     }
 
+    // Batch state updates to prevent multiple rerenders
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
+
+      // Use batched updates for better performance
       if (newCounter == blockDifficulty) {
-        onBlockMined();
-        setMiningProgress(1);
+        // Batch critical completion updates
+        batchUpdate(() => {
+          setMiningProgress(1);
+          onBlockMined();
+        });
         return newCounter;
       } else if (newCounter < blockDifficulty) {
-        setMiningProgress(newCounter / blockDifficulty);
-        notify("MineClicked", {
-          counter: newCounter,
-          difficulty: blockDifficulty,
+        const newProgress = newCounter / blockDifficulty;
+        // Batch progress update
+        batchUpdate(() => {
+          setMiningProgress(newProgress);
+        });
+
+        // Debounce event notifications to reduce overhead
+        debouncedNotify(() => {
+          notify("MineClicked", {
+            counter: newCounter,
+            difficulty: blockDifficulty,
+          });
         });
         return newCounter;
       } else {
@@ -70,6 +87,8 @@ export const useMiner = (
     miningBlock?.isBuilt,
     miningBlock?.difficulty,
     triggerMineAnimation,
+    batchUpdate,
+    debouncedNotify,
   ]);
 
   // Reset mining progress when a block is mined

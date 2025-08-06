@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Dimensions } from "react-native";
+import { View } from "react-native";
 import {
   Canvas,
   Image,
@@ -7,6 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "@/app/hooks/useImages";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 import { useRef } from "react";
 import Animated, { FadeInLeft, runOnJS } from "react-native-reanimated";
 import { InteractionManager } from "react-native";
@@ -15,7 +16,7 @@ export const ShopTitle: React.FC<{ position: "left" | "right" }> = React.memo(
   ({ position }) => {
     const handleRef = useRef<number | null>(null);
     const { getImage } = useImages();
-    let { width } = Dimensions.get("window");
+    let { width } = useCachedWindowDimensions();
     width = position === "left" ? 290 : width - 8;
 
     if (handleRef.current === null) {

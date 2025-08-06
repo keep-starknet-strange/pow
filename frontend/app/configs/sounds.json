@@ -1,122 +1,122 @@
 {
   "MineClicked": {
+    "soundFile": "confirm.m4a",
     "volume": 0.4,
     "rate": 1.2,
-    "haptic": "Heavy",
-    "poolSize": 5
+    "haptic": "Heavy"
   },
   "MineDone": {
+    "soundFile": "complete.m4a",
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success",
-    "poolSize": 2
+    "haptic": "Success"
   },
   "SequenceClicked": {
+    "soundFile": "confirm.m4a",
     "volume": 0.5,
     "rate": 1.2,
-    "haptic": "Heavy",
-    "poolSize": 5
+    "haptic": "Heavy"
   },
   "SequenceDone": {
+    "soundFile": "complete.m4a",
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success",
-    "poolSize": 2
+    "haptic": "Success"
   },
   "ProveClicked": {
+    "soundFile": "confirm.m4a",
     "volume": 0.1,
     "rate": 0.8,
-    "haptic": "Rigid",
-    "poolSize": 5
+    "haptic": "Rigid"
   },
   "ProveDone": {
+    "soundFile": "complete.m4a",
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success",
-    "poolSize": 2
+    "haptic": "Success"
   },
   "DaClicked": {
+    "soundFile": "confirm.m4a",
     "volume": 0.3,
     "rate": 1.2,
-    "haptic": "Rigid",
-    "poolSize": 5
+    "haptic": "Rigid"
   },
   "DaDone": {
+    "soundFile": "complete.m4a",
     "volume": 0.4,
     "rate": 1,
-    "haptic": "Success",
-    "poolSize": 2
+    "haptic": "Success"
   },
   "ItemPurchased": {
+    "soundFile": "purchase.mp3",
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Soft",
-    "poolSize": 3
+    "haptic": "Soft"
   },
   "BuyFailed": {
+    "soundFile": "basic-error.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Error",
-    "poolSize": 2
+    "haptic": "Error"
   },
   "InvalidPurchase": {
+    "soundFile": "basic-error.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Error",
-    "poolSize": 2
+    "haptic": "Error"
   },
   "BlockFull": {
+    "soundFile": "basic-error.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Error",
-    "poolSize": 2
+    "haptic": "Error"
   },
   "TxAdded": {
+    "soundFile": "add.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Medium",
-    "poolSize": 8
+    "haptic": "Medium"
   },
   "AchievementCompleted": {
+    "soundFile": "achieve.m4a",
     "volume": 1,
     "rate": 1.1,
-    "haptic": "Soft",
-    "poolSize": 2
+    "haptic": "Soft"
   },
   "BasicClick": {
+    "soundFile": "basic-click.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Soft",
-    "poolSize": 5
+    "haptic": "Soft"
   },
   "BasicError": {
+    "soundFile": "basic-error.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Error",
-    "poolSize": 2
+    "haptic": "Error"
   },
   "SwitchPage": {
+    "soundFile": "basic-click.m4a",
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Light",
-    "poolSize": 2
+    "haptic": "Light"
   },
   "DiceRoll": {
+    "soundFile": "dice.m4a",
     "volume": 1,
     "rate": 1,
-    "haptic": "Heavy",
-    "poolSize": 2
+    "haptic": "Heavy"
   },
   "SwitchStore": {
+    "soundFile": "basic-click.m4a",
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Light",
-    "poolSize": 2
+    "haptic": "Light"
   },
   "SwitchTxTab": {
+    "soundFile": "basic-click.m4a",
     "volume": 0.5,
     "rate": 1,
-    "haptic": "Light",
-    "poolSize": 2
+    "haptic": "Light"
   }
 }

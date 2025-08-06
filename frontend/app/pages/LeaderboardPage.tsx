@@ -1,5 +1,5 @@
 import { memo, useState, useEffect } from "react";
-import { View, Text, Dimensions, FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import {
   Canvas,
   Image,
@@ -25,6 +25,7 @@ import {
   createNounsAttributes,
 } from "../configs/nouns";
 import { useIsFocused } from "@react-navigation/native";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -42,7 +43,7 @@ export const LeaderboardPage: React.FC = () => {
   const { STARKNET_ENABLED } = useStarknetConnector();
   const { getImage } = useImages();
   const { getAccounts, getUniqueEventsOrdered, user } = useFocEngine();
-  const { width, height } = Dimensions.get("window");
+  const { width, height } = useCachedWindowDimensions();
   const { balance } = useBalance();
   const { currentPrestige } = useUpgrades();
   const { powGameContractAddress } = usePowContractConnector();

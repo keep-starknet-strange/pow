@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
-import { Window } from "./tutorial/Window";
+import { Window } from "./Window";
 import { ConfirmationButton } from "./buttons/ConfirmationButton";
 
 interface ConfirmationModalProps {

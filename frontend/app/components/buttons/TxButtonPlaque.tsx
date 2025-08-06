@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text } from "react-native";
 import {
   Canvas,
   Image,
@@ -7,6 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "@/app/hooks/useImages";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { shortMoneyString } from "../../utils/helpers";
 
@@ -21,7 +22,7 @@ export interface TxButtonPlaqueProps {
 }
 
 export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
   const { feeLevel, feeCost, fee } = props;
   const { getImage } = useImages();
   const { canUnlockTx } = useTransactionsStore();

@@ -11,7 +11,6 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "test": "jest --watchAll",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix"
   },

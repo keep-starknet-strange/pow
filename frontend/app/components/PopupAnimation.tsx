@@ -1,34 +1,36 @@
-import React, { useEffect } from "react";
+import React, { useImperativeHandle, forwardRef } from "react";
 import { Text, View, Easing, Animated, useAnimatedValue } from "react-native";
 
+export type PopupAnimationRef = {
+  showPopup: (value: string, color?: string) => void;
+};
+
 export type PopupAnimationProps = {
-  popupStartTime?: number;
-  popupValue: string;
-  color?: string;
   animRange?: [number, number];
 };
 
-export const PopupAnimation: React.FC<PopupAnimationProps> = ({
-  popupStartTime,
-  popupValue,
-  color,
-  animRange,
-}) => {
+export const PopupAnimation = forwardRef<
+  PopupAnimationRef,
+  PopupAnimationProps
+>(({ animRange }, ref) => {
   const popupAnimation = useAnimatedValue(0);
-  useEffect(() => {
-    if (!popupStartTime) return;
-    // Reset the animation value
-    popupAnimation.setValue(0);
-    Animated.timing(popupAnimation, {
-      toValue: 100,
-      duration: 400,
-      easing: Easing.bounce,
-      useNativeDriver: true,
-    }).start();
-    return () => {
-      popupAnimation.removeAllListeners();
-    };
-  }, [popupStartTime]);
+  const [popupValue, setPopupValue] = React.useState("");
+  const [color, setColor] = React.useState<string | undefined>();
+
+  useImperativeHandle(ref, () => ({
+    showPopup: (value: string, color?: string) => {
+      setPopupValue(value);
+      setColor(color);
+      // Reset the animation value
+      popupAnimation.setValue(0);
+      Animated.timing(popupAnimation, {
+        toValue: 100,
+        duration: 400,
+        easing: Easing.bounce,
+        useNativeDriver: true,
+      }).start();
+    },
+  }));
 
   return (
     <Animated.View
@@ -67,6 +69,6 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
       </Text>
     </Animated.View>
   );
-};
+});
 
 export default PopupAnimation;

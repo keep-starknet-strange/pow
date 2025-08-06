@@ -30,62 +30,21 @@ export type CompletedBlockViewProps = {
   completedPlacementLeft: number;
 };
 
-export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
-  (props) => {
+type CompletedBlockContentProps = {
+  chainId: number;
+  placement: {
+    width: number;
+    height: number;
+  };
+  completedBlock: any;
+};
+
+const CompletedBlockContent: React.FC<CompletedBlockContentProps> = memo(
+  ({ chainId, placement, completedBlock }) => {
     const { getImage } = useImages();
-    const { workingBlocks } = useGameStore();
-    const { getLatestBlock } = useChainsStore();
-
-    const updateCompletedBlock = (chainId: number) => {
-      const block = getLatestBlock(chainId);
-      if (block) {
-        setCompletedBlock(block);
-      }
-    };
-
-    const [completedBlock, setCompletedBlock] = React.useState(
-      getLatestBlock(props.chainId) || null,
-    );
-    const blockSlideLeftAnim = useSharedValue(props.placement.left);
-    useEffect(() => {
-      blockSlideLeftAnim.value = props.placement.left;
-      if (!workingBlocks[props.chainId]?.blockId) {
-        return;
-      }
-      blockSlideLeftAnim.value = withSequence(
-        withTiming(props.placement.left, {
-          duration: 400,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
-          runOnJS(updateCompletedBlock)(props.chainId),
-        ),
-        withTiming(props.placement.left, {
-          duration: 100,
-          easing: Easing.inOut(Easing.ease),
-        }),
-      );
-    }, [
-      props.chainId,
-      props.placement.left,
-      props.completedPlacementLeft,
-      workingBlocks[props.chainId]?.blockId,
-    ]);
-
-    if (!completedBlock) {
-      return null;
-    }
 
     return (
-      <Animated.View
-        style={{
-          position: "absolute",
-          top: props.placement.top,
-          left: blockSlideLeftAnim,
-          width: props.placement.width,
-          height: props.placement.height,
-        }}
-      >
+      <>
         <View className="absolute top-0 left-0 w-full h-full z-[2]">
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
@@ -93,8 +52,8 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
               fit="fill"
               x={0}
               y={0}
-              width={props.placement.width}
-              height={props.placement.height}
+              width={placement.width}
+              height={placement.height}
               sampling={{
                 filter: FilterMode.Nearest,
                 mipmap: MipmapMode.Nearest,
@@ -135,15 +94,91 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           </Canvas>
         </View>
         <BlockView
-          chainId={props.chainId}
+          chainId={chainId}
           block={completedBlock || null}
           completed={true}
+        />
+      </>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.chainId === nextProps.chainId &&
+      prevProps.placement.width === nextProps.placement.width &&
+      prevProps.placement.height === nextProps.placement.height &&
+      prevProps.completedBlock === nextProps.completedBlock
+    );
+  }
+);
+
+CompletedBlockContent.displayName = "CompletedBlockContent";
+
+export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
+  (props) => {
+    const workingBlock = useGameStore(
+      (state) => state.workingBlocks[props.chainId]
+    );
+    const { getLatestBlock } = useChainsStore();
+
+    const updateCompletedBlock = (chainId: number) => {
+      const block = getLatestBlock(chainId);
+      if (block) {
+        setCompletedBlock(block);
+      }
+    };
+
+    const [completedBlock, setCompletedBlock] = React.useState(
+      getLatestBlock(props.chainId) || null,
+    );
+    const blockSlideLeftAnim = useSharedValue(props.placement.left);
+    useEffect(() => {
+      blockSlideLeftAnim.value = props.placement.left;
+      if (!workingBlock?.blockId) {
+        return;
+      }
+      blockSlideLeftAnim.value = withSequence(
+        withTiming(props.placement.left, {
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
+          runOnJS(updateCompletedBlock)(props.chainId),
+        ),
+        withTiming(props.placement.left, {
+          duration: 100,
+          easing: Easing.inOut(Easing.ease),
+        }),
+      );
+    }, [
+      props.chainId,
+      props.placement.left,
+      props.completedPlacementLeft,
+      workingBlock?.blockId,
+    ]);
+
+    if (!completedBlock) {
+      return null;
+    }
+
+    return (
+      <Animated.View
+        style={{
+          position: "absolute",
+          top: props.placement.top,
+          left: blockSlideLeftAnim,
+          width: props.placement.width,
+          height: props.placement.height,
+        }}
+      >
+        <CompletedBlockContent
+          chainId={props.chainId}
+          placement={props.placement}
+          completedBlock={completedBlock}
         />
       </Animated.View>
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if the chainId or placement changes
     return (
       prevProps.chainId === nextProps.chainId &&
       prevProps.placement.left === nextProps.placement.left &&
@@ -152,5 +187,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
       prevProps.placement.height === nextProps.placement.height &&
       prevProps.completedPlacementLeft === nextProps.completedPlacementLeft
     );
-  },
+  }
 );
+
+CompletedBlockView.displayName = "CompletedBlockView";
