@@ -213,7 +213,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
             chainId={props.chainId}
             block={workingBlock || null}
             completed={false}
-            showEmptyBlocks={true}
+            showTxOutlines={workingBlock?.blockId !== 0}
           />
         </View>
 

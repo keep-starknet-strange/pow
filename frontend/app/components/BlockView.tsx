@@ -12,36 +12,27 @@ export type BlockViewProps = {
   chainId: number;
   block: Block | null;
   completed: boolean;
-  showEmptyBlocks?: boolean;
+  showTxOutlines?: boolean;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
-  const { getImage } = useImages();
   const { currentPrestige, getUpgradeValue } = useUpgrades();
 
   // The size of the whole block
-  const [blockSize, setBlockSize] = useState<number>(0);
   // The size of each one of the transactions
   const [txSize, setTxSize] = useState<number>(0);
+  const txPerRow = props.block?.maxSize
+    ? Math.sqrt(props.block.maxSize)
+    : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
 
   const onBlockLayout = useCallback(
     (event: LayoutChangeEvent) => {
       const { width } = event.nativeEvent.layout;
 
-      setBlockSize(width);
+      setTxSize(width / txPerRow);
     },
-    [setBlockSize],
+    [txPerRow]
   );
-
-  const txPerRow = props.block?.maxSize
-    ? Math.sqrt(props.block.maxSize)
-    : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
-
-  useEffect(() => {
-    const txSize = blockSize / txPerRow - 0.001; // TODO check that with the team
-
-    setTxSize(txSize);
-  }, [blockSize, txPerRow]);
 
   return (
     <View className="w-full h-full flex flex-col items-center justify-center relative">
@@ -51,7 +42,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             className="absolute top-0 left-0 w-full h-full"
             onLayout={onBlockLayout}
           >
-            {props.block?.blockId !== 0 && props.showEmptyBlocks && (
+            {props.showTxOutlines && (
               <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
             )}
           </View>

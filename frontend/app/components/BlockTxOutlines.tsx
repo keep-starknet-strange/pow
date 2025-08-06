@@ -49,4 +49,9 @@ export const BlockTxOutlines: React.FC<BlockTxOutlinesProps> = memo((props) => {
   return (
     <View className="absolute top-0 left-0 w-full h-full">{txOutlines}</View>
   );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.txPerRow === nextProps.txPerRow &&
+    Math.abs(prevProps.txSize - nextProps.txSize) <= 1
+  );
 });
