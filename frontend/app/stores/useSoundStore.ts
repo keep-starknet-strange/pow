@@ -3,41 +3,34 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AudioPlayer, createAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
+import soundPoolsJson from "../configs/soundpools.json";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 
-// Maximum number of concurrent sound effects
-const MAX_CONCURRENT_SOUNDS = 10;
-
 const musicAssets: { [key: string]: any } = {
   "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.mp3"),
   "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.mp3"),
 };
 
-const soundEffectsAssets: { [key: string]: any } = {
-  MineClicked: require("../../assets/sounds/confirm.wav"),
-  MineDone: require("../../assets/sounds/complete.wav"),
-  SequenceClicked: require("../../assets/sounds/confirm.wav"),
-  SequenceDone: require("../../assets/sounds/complete.wav"),
-  ProveClicked: require("../../assets/sounds/confirm.wav"),
-  ProveDone: require("../../assets/sounds/complete.wav"),
-  DaClicked: require("../../assets/sounds/confirm.wav"),
-  DaDone: require("../../assets/sounds/complete.wav"),
-  ItemPurchased: require("../../assets/sounds/purchase.mp3"),
-  BuyFailed: require("../../assets/sounds/basic-error.wav"),
-  InvalidPurchase: require("../../assets/sounds/basic-error.wav"),
-  BlockFull: require("../../assets/sounds/basic-error.wav"),
-  TxAdded: require("../../assets/sounds/add.wav"),
-  AchievementCompleted: require("../../assets/sounds/achieve.wav"),
-  BasicClick: require("../../assets/sounds/basic-click.wav"),
-  BasicError: require("../../assets/sounds/basic-error.wav"),
-  SwitchPage: require("../../assets/sounds/basic-click.wav"),
-  SwitchStore: require("../../assets/sounds/basic-click.wav"),
-  SwitchTxTab: require("../../assets/sounds/basic-click.wav"),
-  DiceRoll: require("../../assets/sounds/dice.wav"),
+// Sound file assets - one entry per unique sound file
+const soundFileAssets: { [key: string]: any } = {
+  "confirm.wav": require("../../assets/sounds/confirm.wav"),
+  "complete.wav": require("../../assets/sounds/complete.wav"),
+  "purchase.mp3": require("../../assets/sounds/purchase.mp3"),
+  "basic-error.wav": require("../../assets/sounds/basic-error.wav"),
+  "add.wav": require("../../assets/sounds/add.wav"),
+  "achieve.wav": require("../../assets/sounds/achieve.wav"),
+  "basic-click.wav": require("../../assets/sounds/basic-click.wav"),
+  "dice.wav": require("../../assets/sounds/dice.wav"),
+};
+
+// Helper function to get sound file for event type from config
+const getSoundFileForEvent = (eventType: string): string | null => {
+  const eventConfig = soundsJson[eventType as keyof typeof soundsJson];
+  return eventConfig?.soundFile || null;
 };
 
 // Simple sound pool optimized for high-frequency game sounds
@@ -46,37 +39,41 @@ class SoundPool {
   private currentIndex: Map<string, number> = new Map();
 
   constructor() {
-    // Pre-create players for each sound type with configurable pool sizes
-    Object.keys(soundEffectsAssets).forEach((soundType) => {
-      const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
-      const poolSize = soundConfig?.poolSize || 3; // Default to 3 if not specified
+    // Create sound pools per sound file using configured pool sizes from soundpools.json
+    Object.keys(soundFileAssets).forEach((soundFile) => {
+      const poolSize =
+        soundPoolsJson[soundFile as keyof typeof soundPoolsJson] || 3; // Default to 3 if not specified
 
       const players: AudioPlayer[] = [];
       for (let i = 0; i < poolSize; i++) {
-        const player = createAudioPlayer(soundEffectsAssets[soundType]);
+        const player = createAudioPlayer(soundFileAssets[soundFile]);
         player.shouldCorrectPitch = true; // Enable pitch correction
         players.push(player);
       }
-      this.soundPlayers.set(soundType, players);
-      this.currentIndex.set(soundType, 0);
+      this.soundPlayers.set(soundFile, players);
+      this.currentIndex.set(soundFile, 0);
     });
   }
 
   playSound(
-    type: string,
+    eventType: string,
     pitchShift: number,
     soundConfig: any,
     volume: number,
   ): void {
-    const players = this.soundPlayers.get(type);
+    // Get the sound file for this event type
+    const soundFile = getSoundFileForEvent(eventType);
+    if (!soundFile) return;
+
+    const players = this.soundPlayers.get(soundFile);
     if (!players) return;
 
     // Get the next player in round-robin fashion
-    const currentIdx = this.currentIndex.get(type) || 0;
+    const currentIdx = this.currentIndex.get(soundFile) || 0;
     const player = players[currentIdx];
 
-    // Update index for next time (round-robin within the pool for this sound type)
-    this.currentIndex.set(type, (currentIdx + 1) % players.length);
+    // Update index for next time (round-robin within the pool for this sound file)
+    this.currentIndex.set(soundFile, (currentIdx + 1) % players.length);
 
     try {
       // Simple, fast configuration
@@ -250,7 +247,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const { isSoundOn, soundEffectVolume, soundPool } = get();
 
     // Fast early returns for performance
-    if (!isSoundOn || !soundPool || !soundEffectsAssets[type]) {
+    if (!isSoundOn || !soundPool || !getSoundFileForEvent(type)) {
       return;
     }
 
