@@ -6,7 +6,7 @@ const config: ExpoConfig = {
   slug: "pow",
   version: "0.1.0",
   orientation: "portrait",
-  icon: "./assets/logo/logo.png",
+  icon: "./assets/logo/icon.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
       "expo-splash-screen",
       {
         image: "./assets/logo/logo-foreground.png",
-        imageWidth: 200,
+        imageWidth: 1024,
         resizeMode: "contain",
         backgroundColor: "#74c874",
       },
