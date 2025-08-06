@@ -11,8 +11,9 @@ import { CompletedBlockView } from "@/app/components/CompletedBlockView";
 import EmptyBlockView from "@/app/components/EmptyBlockView";
 import WorkingBlockView from "@/app/components/WorkingBlockView";
 import WorkingBlockDetails from "@/app/components/WorkingBlockDetails";
-import { useChainsStore } from "@/app/stores/useChainsStore";
 import { useGameStore } from "@/app/stores/useGameStore";
+import { useChainsStore } from "@/app/stores/useChainsStore";
+import { Block } from "../types/Chains";
 
 export type BlockchainViewProps = {
   chainId: number;
@@ -27,11 +28,22 @@ const BLOCK_SIZE_PERCENT = 0.7;
 export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
   const parentRef = useRef<View>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
-  const chains = useChainsStore((state) => state.chains);
-  const latestBlock = useChainsStore((state) => {
+
+  // Get initial completed block from chains store (for app restart)
+  const initialCompletedBlock = useChainsStore((state) => {
     const chain = state.chains[props.chainId];
-    return chain?.blocks[chain.blocks.length - 1] || null;
+    // Get the last block if it exists
+    if (chain?.blocks.length > 0) {
+      return chain.blocks[chain.blocks.length - 1];
+    }
+    return null;
   });
+
+  // State for the last completed block
+  const [completedBlock, setCompletedBlock] = useState<Block | null>(
+    initialCompletedBlock,
+  );
+  const previousWorkingBlockRef = useRef<Block | undefined>();
 
   const workingBlock = useGameStore(
     (state) => state.workingBlocks[props.chainId],
@@ -50,6 +62,21 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
       maxSize: workingBlock.maxSize,
       reward: workingBlock.reward,
     };
+  }, [workingBlock]);
+
+  // Update completed block when working block changes (new block started)
+  useEffect(() => {
+    // Check if we had a previous working block that was built
+    if (
+      previousWorkingBlockRef.current?.isBuilt &&
+      previousWorkingBlockRef.current.blockId !== workingBlock?.blockId
+    ) {
+      // The previous block was completed, save it as the completed block
+      setCompletedBlock(previousWorkingBlockRef.current);
+    }
+
+    // Update the ref with current working block
+    previousWorkingBlockRef.current = workingBlock;
   }, [workingBlock]);
 
   const [workingBlockPosition, setWorkingBlockPosition] = useState({
@@ -94,7 +121,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
           workingBlockPosition.left - 2 * workingBlockPosition.width - 32
         }
         workingBlockId={workingBlockData?.blockId}
-        latestBlock={latestBlock}
+        completedBlock={completedBlock}
       />
 
       <EmptyBlockView

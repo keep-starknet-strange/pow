@@ -27,7 +27,7 @@ export type CompletedBlockViewProps = {
   };
   completedPlacementLeft: number;
   workingBlockId?: number;
-  latestBlock: any;
+  completedBlock: any;
 };
 
 type CompletedBlockContentProps = {
@@ -115,22 +115,29 @@ CompletedBlockContent.displayName = "CompletedBlockContent";
 
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
   (props) => {
-    const [completedBlock, setCompletedBlock] = React.useState(
-      props.latestBlock || null,
+    const [displayedBlock, setDisplayedBlock] = React.useState(
+      props.completedBlock || null,
     );
+    const hasAnimatedRef = React.useRef(false);
 
-    // Update completedBlock when latestBlock prop changes
+    // Only update immediately on first mount if there's already a completed block
     useEffect(() => {
-      if (props.latestBlock) {
-        setCompletedBlock(props.latestBlock);
+      if (
+        !hasAnimatedRef.current &&
+        props.completedBlock &&
+        !props.workingBlockId
+      ) {
+        // Initial load with completed block but no working block - show immediately
+        setDisplayedBlock(props.completedBlock);
       }
-    }, [props.latestBlock]);
+    }, []); // Intentionally only run on mount
 
-    const updateCompletedBlock = useCallback(() => {
-      if (props.latestBlock) {
-        setCompletedBlock(props.latestBlock);
+    const updateDisplayedBlock = useCallback(() => {
+      if (props.completedBlock) {
+        setDisplayedBlock(props.completedBlock);
+        hasAnimatedRef.current = true;
       }
-    }, [props.latestBlock]);
+    }, [props.completedBlock]);
     const blockSlideLeftAnim = useSharedValue(props.placement.left);
     useEffect(() => {
       blockSlideLeftAnim.value = props.placement.left;
@@ -143,7 +150,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           easing: Easing.inOut(Easing.ease),
         }),
         withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
-          runOnJS(updateCompletedBlock)(),
+          runOnJS(updateDisplayedBlock)(),
         ),
         withTiming(props.placement.left, {
           duration: 100,
@@ -154,7 +161,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
       props.placement.left,
       props.completedPlacementLeft,
       props.workingBlockId,
-      updateCompletedBlock,
+      updateDisplayedBlock,
     ]);
 
     return (
@@ -167,11 +174,11 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           height: props.placement.height,
         }}
       >
-        {completedBlock && (
+        {displayedBlock && (
           <CompletedBlockContent
             chainId={props.chainId}
             placement={props.placement}
-            completedBlock={completedBlock}
+            completedBlock={displayedBlock}
           />
         )}
       </Animated.View>
@@ -186,7 +193,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
       prevProps.placement.height === nextProps.placement.height &&
       prevProps.completedPlacementLeft === nextProps.completedPlacementLeft &&
       prevProps.workingBlockId === nextProps.workingBlockId &&
-      prevProps.latestBlock === nextProps.latestBlock
+      prevProps.completedBlock === nextProps.completedBlock
     );
   },
 );
