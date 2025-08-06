@@ -1,7 +1,6 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useCallback } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
-import { useGameStore } from "@/app/stores/useGameStore";
-import { useUpgrades } from "../stores/useUpgradesStore";
+import { Block } from "../types/Chains";
 import { useImages } from "../hooks/useImages";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
@@ -34,6 +33,9 @@ export type WorkingBlockViewProps = {
     height: number;
   };
   completedPlacementLeft: number;
+  workingBlock: Block | undefined;
+  onBlockMined?: () => void;
+  onBlockSequenced?: () => void;
 };
 
 /*
@@ -43,18 +45,20 @@ const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
 export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
   (props) => {
-    const { workingBlocks, onBlockMined, onBlockSequenced } = useGameStore();
     const { getImage } = useImages();
 
     // Flag that is set on smaller phones where font size should be adjusted
     const isSmall = props.placement.width < 250;
 
-    const updateWorkingBlock = (chainId: number) => {
-      const block = workingBlocks[chainId];
-      if (block) {
-        setWorkingBlock(block);
+    const [workingBlock, setWorkingBlock] = React.useState(
+      props.workingBlock || null,
+    );
+
+    const updateWorkingBlock = useCallback(() => {
+      if (props.workingBlock) {
+        setWorkingBlock(props.workingBlock);
       }
-    };
+    }, [props.workingBlock]);
 
     // Block complete anim sequence
     const blockScaleAnim = useSharedValue(1);
@@ -62,7 +66,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     const blockOpacityAnim = useSharedValue(1);
     const blockShakeAnim = useSharedValue(0);
     useEffect(() => {
-      if (workingBlocks[props.chainId]?.isBuilt) {
+      if (props.workingBlock?.isBuilt) {
         blockSlideLeftAnim.value = props.placement.left;
         blockOpacityAnim.value = 1;
         blockScaleAnim.value = withSpring(1.25, {
@@ -70,7 +74,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
           stiffness: 200,
         });
       } else {
-        if (!workingBlocks[props.chainId]?.blockId) {
+        if (!props.workingBlock?.blockId) {
           blockScaleAnim.value = 1;
           blockSlideLeftAnim.value = props.placement.left;
           blockOpacityAnim.value = 1;
@@ -96,7 +100,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
               easing: Easing.inOut(Easing.ease),
             },
             () => {
-              runOnJS(updateWorkingBlock)(props.chainId);
+              runOnJS(updateWorkingBlock)();
             },
           ),
           withTiming(props.placement.left, {
@@ -117,10 +121,11 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
         );
       }
     }, [
-      props.chainId,
-      workingBlocks[props.chainId]?.isBuilt,
+      props.workingBlock?.isBuilt,
+      props.workingBlock?.blockId,
       props.placement.left,
       props.completedPlacementLeft,
+      updateWorkingBlock,
     ]);
 
     // Block clicked (mine/sequencer) anim sequence
@@ -142,12 +147,12 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
 
     // Use hooks with animation callbacks for automation
     const { miningProgress, mineBlock } = useMiner(
-      props.chainId === 0 ? onBlockMined : () => {},
-      props.chainId === 0 ? triggerBlockShake : undefined,
+      props.onBlockMined || (() => {}),
+      props.onBlockMined ? triggerBlockShake : undefined,
     );
     const { sequencingProgress, sequenceBlock } = useSequencer(
-      props.chainId === 1 ? onBlockSequenced : () => {},
-      props.chainId === 1 ? triggerBlockShake : undefined,
+      props.onBlockSequenced || (() => {}),
+      props.onBlockSequenced ? triggerBlockShake : undefined,
     );
     const blockTransformStyle = useAnimatedStyle(() => {
       return {
@@ -158,9 +163,6 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
       };
     });
 
-    const [workingBlock, setWorkingBlock] = React.useState(
-      workingBlocks[props.chainId] || null,
-    );
     return (
       <Animated.View
         style={[
@@ -224,7 +226,7 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
               height: "100%",
             }}
           >
-            {props.chainId === 0 ? (
+            {props.onBlockMined ? (
               <Miner
                 triggerAnim={triggerBlockShake}
                 miningProgress={miningProgress}
@@ -240,6 +242,21 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
           </View>
         )}
       </Animated.View>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.chainId === nextProps.chainId &&
+      prevProps.placement.top === nextProps.placement.top &&
+      prevProps.placement.left === nextProps.placement.left &&
+      prevProps.placement.width === nextProps.placement.width &&
+      prevProps.placement.height === nextProps.placement.height &&
+      prevProps.completedPlacementLeft === nextProps.completedPlacementLeft &&
+      prevProps.workingBlock?.blockId === nextProps.workingBlock?.blockId &&
+      prevProps.workingBlock?.isBuilt === nextProps.workingBlock?.isBuilt &&
+      prevProps.workingBlock?.transactions.length ===
+        nextProps.workingBlock?.transactions.length &&
+      prevProps.workingBlock?.fees === nextProps.workingBlock?.fees
     );
   },
 );

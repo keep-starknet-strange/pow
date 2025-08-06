@@ -1,7 +1,5 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useCallback } from "react";
 import { View } from "react-native";
-import { useGameStore } from "@/app/stores/useGameStore";
-import { useChainsStore } from "../stores/useChainsStore";
 import { useImages } from "../hooks/useImages";
 import { BlockView } from "./BlockView";
 import {
@@ -28,6 +26,8 @@ export type CompletedBlockViewProps = {
     height: number;
   };
   completedPlacementLeft: number;
+  workingBlockId?: number;
+  latestBlock: any;
 };
 
 type CompletedBlockContentProps = {
@@ -108,32 +108,33 @@ const CompletedBlockContent: React.FC<CompletedBlockContentProps> = memo(
       prevProps.placement.height === nextProps.placement.height &&
       prevProps.completedBlock === nextProps.completedBlock
     );
-  }
+  },
 );
 
 CompletedBlockContent.displayName = "CompletedBlockContent";
 
 export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
   (props) => {
-    const workingBlock = useGameStore(
-      (state) => state.workingBlocks[props.chainId]
-    );
-    const { getLatestBlock } = useChainsStore();
-
-    const updateCompletedBlock = (chainId: number) => {
-      const block = getLatestBlock(chainId);
-      if (block) {
-        setCompletedBlock(block);
-      }
-    };
-
     const [completedBlock, setCompletedBlock] = React.useState(
-      getLatestBlock(props.chainId) || null,
+      props.latestBlock || null,
     );
+
+    // Update completedBlock when latestBlock prop changes
+    useEffect(() => {
+      if (props.latestBlock) {
+        setCompletedBlock(props.latestBlock);
+      }
+    }, [props.latestBlock]);
+
+    const updateCompletedBlock = useCallback(() => {
+      if (props.latestBlock) {
+        setCompletedBlock(props.latestBlock);
+      }
+    }, [props.latestBlock]);
     const blockSlideLeftAnim = useSharedValue(props.placement.left);
     useEffect(() => {
       blockSlideLeftAnim.value = props.placement.left;
-      if (!workingBlock?.blockId) {
+      if (!props.workingBlockId) {
         return;
       }
       blockSlideLeftAnim.value = withSequence(
@@ -142,7 +143,7 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           easing: Easing.inOut(Easing.ease),
         }),
         withTiming(props.completedPlacementLeft, { duration: 700 }, () =>
-          runOnJS(updateCompletedBlock)(props.chainId),
+          runOnJS(updateCompletedBlock)(),
         ),
         withTiming(props.placement.left, {
           duration: 100,
@@ -150,15 +151,11 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
         }),
       );
     }, [
-      props.chainId,
       props.placement.left,
       props.completedPlacementLeft,
-      workingBlock?.blockId,
+      props.workingBlockId,
+      updateCompletedBlock,
     ]);
-
-    if (!completedBlock) {
-      return null;
-    }
 
     return (
       <Animated.View
@@ -170,11 +167,13 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
           height: props.placement.height,
         }}
       >
-        <CompletedBlockContent
-          chainId={props.chainId}
-          placement={props.placement}
-          completedBlock={completedBlock}
-        />
+        {completedBlock && (
+          <CompletedBlockContent
+            chainId={props.chainId}
+            placement={props.placement}
+            completedBlock={completedBlock}
+          />
+        )}
       </Animated.View>
     );
   },
@@ -185,9 +184,11 @@ export const CompletedBlockView: React.FC<CompletedBlockViewProps> = memo(
       prevProps.placement.top === nextProps.placement.top &&
       prevProps.placement.width === nextProps.placement.width &&
       prevProps.placement.height === nextProps.placement.height &&
-      prevProps.completedPlacementLeft === nextProps.completedPlacementLeft
+      prevProps.completedPlacementLeft === nextProps.completedPlacementLeft &&
+      prevProps.workingBlockId === nextProps.workingBlockId &&
+      prevProps.latestBlock === nextProps.latestBlock
     );
-  }
+  },
 );
 
 CompletedBlockView.displayName = "CompletedBlockView";

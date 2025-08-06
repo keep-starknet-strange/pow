@@ -7,7 +7,6 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { useGameStore } from "@/app/stores/useGameStore";
 import Animated, { useSharedValue } from "react-native-reanimated";
 
 export type EmptyViewProps = {
@@ -19,6 +18,7 @@ export type EmptyViewProps = {
     height: number;
   };
   completedPlacementLeft: number;
+  showEmpty: boolean;
 };
 
 type EmptyBlockContentProps = {
@@ -93,17 +93,13 @@ const EmptyBlockContent: React.FC<EmptyBlockContentProps> = memo(
       prevProps.placement.width === nextProps.placement.width &&
       prevProps.placement.height === nextProps.placement.height
     );
-  }
+  },
 );
 
 EmptyBlockContent.displayName = "EmptyBlockContent";
 
 export const EmptyBlockView: React.FC<EmptyViewProps> = memo(
   (props) => {
-    const workingBlock = useGameStore(
-      (state) => state.workingBlocks[props.chainId]
-    );
-
     const blockSlideLeftAnim = useSharedValue(props.placement.left);
     useEffect(() => {
       blockSlideLeftAnim.value = props.placement.left;
@@ -125,9 +121,9 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = memo(
       );
     }
     */
-    }, [props.chainId, props.placement.left, props.completedPlacementLeft]);
+    }, [props.placement.left, props.completedPlacementLeft]);
 
-    if (!workingBlock?.blockId) {
+    if (!props.showEmpty) {
       return null;
     }
 
@@ -152,9 +148,10 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = memo(
       prevProps.placement.left === nextProps.placement.left &&
       prevProps.placement.width === nextProps.placement.width &&
       prevProps.placement.height === nextProps.placement.height &&
-      prevProps.completedPlacementLeft === nextProps.completedPlacementLeft
+      prevProps.completedPlacementLeft === nextProps.completedPlacementLeft &&
+      prevProps.showEmpty === nextProps.showEmpty
     );
-  }
+  },
 );
 
 EmptyBlockView.displayName = "EmptyBlockView";
