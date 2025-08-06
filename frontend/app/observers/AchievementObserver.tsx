@@ -250,7 +250,7 @@ export class AchievementObserver implements Observer {
     const progress = Math.min(((level + 1) / maxLevel) * 100, 100);
     this.updateAchievement(achievement.id, progress);
   }
-  
+
   private handleL2Purchased(achievement: Achievement) {
     this.updateAchievement(achievement.id, 100);
   }
