@@ -14,8 +14,10 @@ export const useMiner = (
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
-  const [mineCounter, setMineCounter] = useState(0);
-  const [miningProgress, setMiningProgress] = useState(0);
+  const { workingBlocks } = useGameStore();
+  const miningBlock = workingBlocks[0];
+  const blockDifficulty = miningBlock?.difficulty || 4 ** 2;
+  const [counterState, setCounterState] = useState(0);
 
   useEffect(() => {
     const fetchMineCounter = async () => {
@@ -23,19 +25,18 @@ export const useMiner = (
         try {
           // TODO: Use foc engine?
           const clicks = await getUserBlockClicks(0);
-          setMineCounter(clicks || 0);
+          setCounterState(clicks || 0);
         } catch (error) {
           console.error("Error fetching mine counter:", error);
-          setMineCounter(0);
+          setCounterState(0);
         }
       }
     };
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
-  const miningBlock = workingBlocks[0];
   const mineBlock = useCallback(() => {
+    console.log("miningBlock", counterState);
     if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");
       return;
@@ -45,25 +46,28 @@ export const useMiner = (
     if (triggerMineAnimation) {
       triggerMineAnimation();
     }
-
-    setMineCounter((prevCounter) => {
-      const newCounter = prevCounter + 1;
+    setCounterState((prevCount) => {
+      const newCounter = prevCount + 1;
       const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
-      if (newCounter == blockDifficulty) {
-        onBlockMined();
-        setMiningProgress(1);
-        return newCounter;
-      } else if (newCounter < blockDifficulty) {
-        setMiningProgress(newCounter / blockDifficulty);
-        notify("MineClicked", {
-          counter: newCounter,
-          difficulty: blockDifficulty,
-        });
+      if (newCounter <= blockDifficulty) {
         return newCounter;
       } else {
-        return prevCounter; // Prevent incrementing beyond difficulty
+        return prevCount; // Prevent incrementing beyond difficulty
       }
     });
+  }, [triggerMineAnimation, miningBlock?.isBuilt, counterState]);
+
+  useEffect(() => {
+    if (counterState > 0) {
+      notify("MineClicked", {
+        counter: counterState,
+        difficulty: blockDifficulty,
+      });
+    }
+
+    if (counterState == blockDifficulty) {
+      onBlockMined();
+    }
   }, [
     notify,
     onBlockMined,
@@ -74,8 +78,7 @@ export const useMiner = (
 
   // Reset mining progress when a block is mined
   useEffect(() => {
-    setMiningProgress(0);
-    setMineCounter(0);
+    setCounterState(0);
   }, [miningBlock?.blockId]);
 
   useAutoClicker(
@@ -85,8 +88,7 @@ export const useMiner = (
   );
 
   return {
-    mineCounter,
-    miningProgress,
+    mineCounter: counterState,
     mineBlock,
   };
 };
