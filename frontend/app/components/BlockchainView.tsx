@@ -12,7 +12,6 @@ import EmptyBlockView from "@/app/components/EmptyBlockView";
 import WorkingBlockView from "@/app/components/WorkingBlockView";
 import WorkingBlockDetails from "@/app/components/WorkingBlockDetails";
 import { useGameStore } from "@/app/stores/useGameStore";
-import { useChainsStore } from "@/app/stores/useChainsStore";
 import { Block } from "../types/Chains";
 
 export type BlockchainViewProps = {
@@ -29,21 +28,9 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
   const parentRef = useRef<View>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
 
-  // Get initial completed block from chains store (for app restart)
-  const initialCompletedBlock = useChainsStore((state) => {
-    const chain = state.chains[props.chainId];
-    // Get the last block if it exists
-    if (chain?.blocks.length > 0) {
-      return chain.blocks[chain.blocks.length - 1];
-    }
-    return null;
-  });
-
   // State for the last completed block
-  const [completedBlock, setCompletedBlock] = useState<Block | null>(
-    initialCompletedBlock,
-  );
-  const previousWorkingBlockRef = useRef<Block | undefined>();
+  const [completedBlock, setCompletedBlock] = useState<Block | null>(null);
+  const previousWorkingBlockRef = useRef<Block | undefined>(undefined);
 
   const workingBlock = useGameStore(
     (state) => state.workingBlocks[props.chainId],

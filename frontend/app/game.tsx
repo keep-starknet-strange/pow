@@ -11,7 +11,6 @@ import { usePowContractConnector } from "./context/PowContractConnector";
 import { useGameStore } from "./stores/useGameStore";
 import { useBalanceStore } from "./stores/useBalanceStore";
 import { useOnchainActions } from "./stores/useOnchainActions";
-import { useChainsStore } from "./stores/useChainsStore";
 import { useL2Store } from "./stores/useL2Store";
 import { useTransactionsStore } from "./stores/useTransactionsStore";
 import { useInAppNotifications } from "./stores/useInAppNotificationsStore";
@@ -136,17 +135,6 @@ export default function game() {
   useEffect(() => {
     initializeBalance(powContract, user, getUserBalance);
   }, [initializeBalance, getUserBalance, powContract, user]);
-
-  const { initializeChains } = useChainsStore();
-  useEffect(() => {
-    initializeChains(powContract, user, getUserMaxChainId, getUserBlockNumber);
-  }, [
-    initializeChains,
-    powContract,
-    user,
-    getUserMaxChainId,
-    getUserBlockNumber,
-  ]);
 
   const { initializeTransactions } = useTransactionsStore();
   useEffect(() => {

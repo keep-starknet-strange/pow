@@ -116,4 +116,11 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo((props) => {
       </Pressable>
     </Animated.View>
   );
+}, (prevProps, nextProps) => {
+  // Prevent re-render if props haven't changed
+  return (
+    prevProps.label === nextProps.label &&
+    prevProps.cost === nextProps.cost &&
+    prevProps.disabled === nextProps.disabled
+  );
 });

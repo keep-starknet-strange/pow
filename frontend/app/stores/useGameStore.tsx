@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { Contract } from "starknet";
 import { FocAccount } from "../context/FocEngineConnector";
 import { useBalanceStore } from "./useBalanceStore";
-import { useChainsStore } from "./useChainsStore";
 import { useL2Store } from "./useL2Store";
 import { useEventManager } from "./useEventManager";
 import { useUpgradesStore } from "./useUpgradesStore";
@@ -247,7 +246,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     useEventManager.getState().notify("MineDone", { block: completedBlock });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
-    useChainsStore.getState().addBlock(0, completedBlock);
   },
 
   onBlockSequenced: () => {
@@ -279,6 +277,5 @@ export const useGameStore = create<GameStore>((set, get) => ({
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
     useL2Store.getState().addBlockToDa(completedBlock);
     useL2Store.getState().addBlockToProver(completedBlock);
-    useChainsStore.getState().addBlock(1, completedBlock);
   },
 }));
