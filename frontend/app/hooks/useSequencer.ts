@@ -50,17 +50,13 @@ export const useSequencer = (
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
-      if (newCounter == blockDifficulty) {
-        onBlockSequenced();
-        return newCounter;
-      } else if (newCounter < blockDifficulty) {
+      if (newCounter <= blockDifficulty) {
         return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond block difficulty
       }
     });
   }, [
-    onBlockSequenced,
     notify,
     sequencingBlock?.isBuilt,
     sequencingBlock?.difficulty,
@@ -68,13 +64,12 @@ export const useSequencer = (
   ]);
 
   useEffect(() => {
-    if (sequenceCounter > 0) {
+    if (sequenceCounter == sequencingBlock?.difficulty) {
+      onBlockSequenced();
+    } else if (sequenceCounter > 0) {
       notify("SequenceClicked", {
         counter: sequenceCounter,
       });
-    }
-    if (sequenceCounter == sequencingBlock?.difficulty) {
-      onBlockSequenced();
     }
   }, [sequenceCounter]);
 

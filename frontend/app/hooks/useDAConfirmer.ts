@@ -55,22 +55,17 @@ export const useDAConfirmer = (
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, notify, daIsBuilt, daMaxSize, triggerDAAnimation]);
+  }, [daIsBuilt, daMaxSize, triggerDAAnimation]);
 
   useEffect(() => {
-    if (daConfirmCounter > 0) {
-      notify("DaClicked", { counter: daConfirmCounter });
-    }
-    if (daConfirmCounter == daMaxSize) {
+    if (daConfirmCounter === daMaxSize) {
       onDAConfirm();
       notify("DaDone", { counter: daConfirmCounter });
+      setDaConfirmCounter(0);
+    } else if (daConfirmCounter > 0) {
+      notify("DaClicked", { counter: daConfirmCounter });
     }
-  }, [daConfirmCounter, daMaxSize, onDAConfirm, notify]);
-
-  // Reset da confirm progress when the DA is built
-  useEffect(() => {
-    setDaConfirmCounter(0);
-  }, [daIsBuilt]);
+  }, [daConfirmCounter, daMaxSize]);
 
   useAutoClicker(
     getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),

@@ -9,9 +9,9 @@ interface MinerProps {
 }
 
 export const Miner: React.FC<MinerProps> = ({ triggerAnim, mineBlock }) => {
+  const [mineStartTime, setMineStartTime] = useState(Date.now());
   const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");
-  const [mineStartTime, setMineStartTime] = useState(Date.now());
   const generateRandomHash = (isDone: boolean) => {
     const difficulty = 4; // TODO
     const randomPart = Math.floor(Math.random() * 0xffffffffff)

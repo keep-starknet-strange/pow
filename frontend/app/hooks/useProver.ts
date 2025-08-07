@@ -50,20 +50,19 @@ export const useProver = (
       const newCounter = prevCounter + 1;
       const proverDifficulty = proverMaxSize || 1;
       if (newCounter <= proverDifficulty) {
-        return 0; // Reset counter after proving
+        return newCounter; // Reset counter after proving
       } else {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, notify, proverIsBuilt, proverMaxSize, triggerProveAnimation]);
+  }, [proverIsBuilt, proverMaxSize, triggerProveAnimation]);
 
   useEffect(() => {
-    if (proverCounter > 0) {
-      notify("ProveClicked", { counter: proverCounter });
-    }
     if (proverCounter == proverMaxSize) {
       onProve();
       notify("ProveDone", { counter: proverCounter });
+    } else if (proverCounter > 0) {
+      notify("ProveClicked", { counter: proverCounter });
     }
   }, [proverCounter, proverMaxSize, onProve, notify]);
 
