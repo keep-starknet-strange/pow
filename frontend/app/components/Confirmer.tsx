@@ -18,7 +18,6 @@ import { FlashBurstManager } from "./FlashBurstManager";
 import { useImages } from "../hooks/useImages";
 
 export type ConfirmerProps = {
-  progress: number;
   image?: string;
   text?: string;
   onConfirm: () => void;

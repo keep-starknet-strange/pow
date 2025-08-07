@@ -32,7 +32,7 @@ export const DaView = () => {
   }));
 
   // Use DA hook with animation callback for automation
-  const { daProgress, daConfirm } = useDAConfirmer(
+  const { daConfirm } = useDAConfirmer(
     onDaConfirmed,
     triggerDAShake,
   );
@@ -52,7 +52,6 @@ export const DaView = () => {
         >
           <DAConfirm
             triggerAnim={triggerDAShake}
-            daProgress={daProgress}
             daConfirm={daConfirm}
           />
         </Animated.View>

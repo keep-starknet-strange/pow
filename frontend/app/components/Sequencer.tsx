@@ -15,7 +15,6 @@ export const Sequencer: React.FC<SequencerProps> = ({
   return (
     <View className="flex flex-col h-full aspect-square relative">
       <Confirmer
-        progress={sequencingProgress}
         onConfirm={() => {
           triggerAnim();
           sequenceBlock();

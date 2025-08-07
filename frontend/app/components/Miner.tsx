@@ -17,7 +17,6 @@ export const Miner: React.FC<MinerProps> = ({
   return (
     <View className="flex flex-col h-full aspect-square rounded-xl relative">
       <Confirmer
-        progress={miningProgress}
         onConfirm={() => {
           triggerAnim();
           mineBlock();
