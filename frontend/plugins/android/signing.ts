@@ -1,5 +1,4 @@
 import configPlugins from "@expo/config-plugins";
-import { Properties } from "@expo/config-plugins/build/android";
 import { ConfigPlugin } from "expo/config-plugins";
 
 const FILE_NAME = "KEYSTORE_FILE_NAME";
