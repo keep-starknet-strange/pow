@@ -10,6 +10,7 @@ import { Transaction, Block, newBlock } from "../types/Chains";
 interface GameStore {
   genesisBlockReward: number;
   workingBlocks: Block[];
+  blockHeights: Record<number, number>; // ChainId -> Block Height
 
   resetGameStore: () => void;
   initializeGameStore: (
@@ -48,6 +49,7 @@ interface GameStore {
 export const useGameStore = create<GameStore>((set, get) => ({
   genesisBlockReward: 1,
   workingBlocks: [],
+  blockHeights: {},
   initMyGameDependency: undefined,
   setInitMyGameDependency: (initMyGame) =>
     set({ initMyGameDependency: initMyGame }),
@@ -69,6 +71,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     initBlock.isBuilt = true; // Mark the genesis block as built
     set({
       workingBlocks: [initBlock],
+      blockHeights: {0: initBlock.blockId},
     });
   },
 
@@ -141,10 +144,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
             set({
               workingBlocks: [l1WorkingBlock, l2WorkingBlock],
+              blockHeights: {
+                0: l1WorkingBlock.blockId,
+                1: l2WorkingBlock.blockId,
+              },
             });
           } else {
             set({
               workingBlocks: [l1WorkingBlock],
+              blockHeights: { 0: l1WorkingBlock.blockId },
             });
           }
         } catch (error) {
@@ -211,7 +219,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     newWorkingBlock.isBuilt = true; // Mark the genesis block as built
     set((state) => {
-      return { workingBlocks: [...state.workingBlocks, newWorkingBlock] };
+      return {
+        workingBlocks: [...state.workingBlocks, newWorkingBlock],
+        blockHeights: { ...state.blockHeights, 1: newWorkingBlock.blockId }
+      };
     });
   },
 
@@ -242,7 +253,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         blockDifficulty,
       );
       newWorkingBlocks[0] = newBlockInstance;
-      return { workingBlocks: newWorkingBlocks };
+      const newBlockHeights = { ...state.blockHeights };
+      newBlockHeights[0] = newBlockInstance.blockId;
+      return { workingBlocks: newWorkingBlocks, blockHeights: newBlockHeights };
     });
     useEventManager.getState().notify("MineDone", { block: completedBlock });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
@@ -269,7 +282,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         blockDifficulty,
       );
       newWorkingBlocks[1] = newBlockInstance;
-      return { workingBlocks: newWorkingBlocks };
+      const newBlockHeights = { ...state.blockHeights };
+      newBlockHeights[1] = newBlockInstance.blockId;
+      return { workingBlocks: newWorkingBlocks, blockHeights: newBlockHeights };
     });
     useEventManager
       .getState()

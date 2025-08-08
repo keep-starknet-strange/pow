@@ -6,7 +6,7 @@ import { L2Phase } from "./main/L2Phase";
 import { MainBackground } from "../components/MainBackground";
 import { L1L2Switch } from "../components/L1L2Switch";
 
-export const MainPage: React.FC = memo(() => {
+const MainPageComponent: React.FC = () => {
   const { isL2Unlocked } = useL2Store();
 
   const [currentView, setCurrentView] = React.useState<"L1" | "L2">(
@@ -32,6 +32,10 @@ export const MainPage: React.FC = memo(() => {
       {currentView === "L2" ? <L2Phase /> : <L1Phase />}
     </View>
   );
-});
+};
+
+MainPageComponent.displayName = "MainPage";
+
+export const MainPage = memo(MainPageComponent);
 
 export default MainPage;

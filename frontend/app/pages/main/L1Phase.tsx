@@ -13,7 +13,7 @@ import {
   Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import BlockchainView from "@/app/components/BlockchainView";
+import { BlockchainView2 } from "@/app/components/BlockchainView2";
 import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L1Phase: React.FC = () => {
@@ -35,7 +35,7 @@ export const L1Phase: React.FC = () => {
     <View
       style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
     >
-      <BlockchainView chainId={0} style={{ flex: 1 }} />
+      <BlockchainView2 chainId={0} style={{ flex: 1 }} />
       <DappsUnlock chainId={0} />
       <L2Unlock />
       <Animated.View
