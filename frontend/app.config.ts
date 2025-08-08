@@ -61,6 +61,7 @@ const config: ExpoConfig = {
     "expo-audio",
     "./plugins/android/signing.ts",
     "./plugins/ios/sentry.ts",
+    "./plugins/ios/encryption.ts",
   ],
   experiments: {
     typedRoutes: true,
