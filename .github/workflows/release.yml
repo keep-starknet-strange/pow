@@ -1,8 +1,12 @@
 name: Release
 
-on: 
-    release:
-        types: [published]
+# on: 
+#     release:
+#         types: [published]
+on:
+    push:
+        branches:
+            - cd/ios
             
 
 jobs:
@@ -10,7 +14,7 @@ jobs:
         uses: ./.github/workflows/deploy-mobile.yml
         secrets: inherit
         with:
-            deploy_android: true
-            deploy_ios: false ## TEMP
+            deploy_android: false
+            deploy_ios: true
             internal_testing: ${{ github.event.release.prerelease }}
             ref: ${{ github.event.release.target_commitish }}
