@@ -169,16 +169,12 @@ jobs:
                 -resultBundlePath $RUNNER_TEMP/result \
                 clean archive
 
-            - name: List files (when failed)
-              if: ${{ failure() }}
-              run: ls -laR $RUNNER_TEMP
-
             - name: Upload result (when failed)
               if: ${{ failure() }}
               uses: actions/upload-artifact@v4
               with:
                 name: POW-build-result
-                path: $RUNNER_TEMP/result/result.xcresult
+                path: "${{ runner.temp }}/result/result.xcresult"
             
             - name: Upload IPA
               env:
