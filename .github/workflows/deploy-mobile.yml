@@ -102,6 +102,9 @@ jobs:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
       steps:
+            - name: Check Xcode version
+              run: /usr/bin/xcodebuild -version
+
             - name: Checkout project
               uses: actions/checkout@v4
               with:
