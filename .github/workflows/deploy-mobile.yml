@@ -166,7 +166,7 @@ jobs:
                 -configuration Release \
                 -destination generic/platform=iOS \
                 -allowProvisioningUpdates DEVELOPMENT_TEAM=$IOS_DEVELOPMENT_TEAM \
-                -resultBundlePath $RUNNER_TEMP \
+                -resultBundlePath $RUNNER_TEMP/result \
                 clean archive
 
             - name: Upload result (when failed)
@@ -174,7 +174,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: POW-build-result
-                path: $RUNNER_TEMP/result.xcresult
+                path: $RUNNER_TEMP/result/result.xcresult
             
             - name: Upload IPA
               env:
