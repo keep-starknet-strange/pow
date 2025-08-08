@@ -5,15 +5,10 @@ import { Confirmer } from "./Confirmer";
 
 interface MinerProps {
   triggerAnim: () => void;
-  miningProgress: number;
   mineBlock: () => void;
 }
 
-export const Miner: React.FC<MinerProps> = ({
-  triggerAnim,
-  miningProgress,
-  mineBlock,
-}) => {
+export const Miner: React.FC<MinerProps> = ({ triggerAnim, mineBlock }) => {
   const [mineStartTime, setMineStartTime] = useState(Date.now());
   const [mineHash, setMineHash] = useState("0xdEadBeefDeadbE");
   const [mineColor, setMineColor] = useState("#CA1F4B");
@@ -27,16 +22,9 @@ export const Miner: React.FC<MinerProps> = ({
       ? `0x${"00".repeat(difficulty)}${randomPart}`
       : `0x${randomPart}`;
   };
-  useEffect(() => {
-    setMineHash(generateRandomHash(miningProgress === 1));
-    setMineColor(miningProgress === 1 ? "#20DF20" : "#CA1F4B");
-    setMineStartTime(Date.now());
-  }, [miningProgress]);
-
   return (
     <View className="flex flex-col h-full aspect-square rounded-xl relative">
       <Confirmer
-        progress={miningProgress}
         onConfirm={() => {
           triggerAnim();
           mineBlock();

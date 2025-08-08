@@ -15,7 +15,6 @@ export const useProver = (
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
   const [proverCounter, setProverCounter] = useState(0);
-  const [proverProgress, setProverProgress] = useState(0);
 
   useEffect(() => {
     const fetchProofCounter = async () => {
@@ -50,24 +49,25 @@ export const useProver = (
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const proverDifficulty = proverMaxSize || 1;
-      if (newCounter == proverDifficulty) {
-        onProve();
-        setProverProgress(1);
-        notify("ProveDone", { counter: newCounter });
-        return 0; // Reset counter after proving
-      } else if (newCounter < proverDifficulty) {
-        setProverProgress(newCounter / proverDifficulty);
-        notify("ProveClicked", { counter: newCounter });
-        return newCounter;
+      if (newCounter <= proverDifficulty) {
+        return newCounter; // Reset counter after proving
       } else {
         return prevCounter; // Do not increment beyond difficulty
       }
     });
-  }, [onProve, notify, proverIsBuilt, proverMaxSize, triggerProveAnimation]);
+  }, [proverIsBuilt, proverMaxSize, triggerProveAnimation]);
+
+  useEffect(() => {
+    if (proverCounter == proverMaxSize) {
+      onProve();
+      notify("ProveDone", { counter: proverCounter });
+    } else if (proverCounter > 0) {
+      notify("ProveClicked", { counter: proverCounter });
+    }
+  }, [proverCounter, proverMaxSize, onProve, notify]);
 
   // Reset prover progress when the prover is built
   useEffect(() => {
-    setProverProgress(0);
     setProverCounter(0);
   }, [proverIsBuilt]);
 
@@ -79,7 +79,6 @@ export const useProver = (
 
   return {
     proverCounter,
-    proverProgress,
     prove,
   };
 };
