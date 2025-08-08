@@ -36,7 +36,6 @@ export const useMiner = (
   }, [powContract, user, getUserBlockClicks]);
 
   const mineBlock = useCallback(() => {
-    console.log("miningBlock", mineCounter);
     if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");
       return;

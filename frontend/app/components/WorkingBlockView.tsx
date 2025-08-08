@@ -161,7 +161,6 @@ export const WorkingBlockView: React.FC<WorkingBlockViewProps> = memo(
     const [workingBlock, setWorkingBlock] = React.useState(
       workingBlocks[props.chainId] || null,
     );
-    console.log("workingBlock");
     return (
       <Animated.View
         style={[
