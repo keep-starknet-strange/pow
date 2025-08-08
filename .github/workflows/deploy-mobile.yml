@@ -169,6 +169,10 @@ jobs:
                 -resultBundlePath $RUNNER_TEMP/result \
                 clean archive
 
+            - name: List files (when failed)
+              if: ${{ failure() }}
+              run: ls -laR $RUNNER_TEMP
+
             - name: Upload result (when failed)
               if: ${{ failure() }}
               uses: actions/upload-artifact@v4
