@@ -68,7 +68,6 @@ export const useMiner = (
 
   // Reset mining progress when a block is mined
 
-
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,
     5000 / (getAutomationValue(0, "Miner") || 1),
