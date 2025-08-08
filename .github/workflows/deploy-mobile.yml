@@ -100,7 +100,7 @@ jobs:
 
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
-      runs-on: macos-latest
+      runs-on: macos-15
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
