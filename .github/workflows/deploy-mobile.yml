@@ -156,12 +156,16 @@ jobs:
             
             - name: Build archive
               working-directory: ./frontend/ios
+              env:
+                IOS_DEVELOPMENT_TEAM: ${{ secrets.IOS_DEVELOPMENT_TEAM }}
               run: |
-                xcodebuild -scheme "POW" \
+                xcodebuild -workspace POW.xcworkspace \
+                -scheme "POW" \
                 -archivePath $RUNNER_TEMP/POW.xcarchive \
                 -sdk iphoneos \
                 -configuration Release \
                 -destination generic/platform=iOS \
+                -allowProvisioningUpdates DEVELOPMENT_TEAM=$IOS_DEVELOPMENT_TEAM \
                 clean archive
             
             - name: Upload IPA
