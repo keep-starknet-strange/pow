@@ -102,8 +102,11 @@ jobs:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
       steps:
+            - name: Select Xcode 16.4
+              run: sudo xcode-select --switch /Applications/Xcode_16.4.app
+
             - name: Check Xcode version
-              run: /usr/bin/xcodebuild -version
+              run: xcodebuild -version
 
             - name: Checkout project
               uses: actions/checkout@v4
