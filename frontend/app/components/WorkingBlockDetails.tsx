@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useCallback } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useGameStore } from "../stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import Animated, {
   runOnJS,
@@ -27,14 +28,6 @@ export type WorkingBlockDetailsProps = {
     width: number;
     height: number;
   };
-  workingBlockData: {
-    blockId: number;
-    isBuilt: boolean;
-    transactions: any[];
-    fees: number;
-    maxSize: number;
-    reward?: number;
-  } | null;
 };
 
 /*
@@ -46,29 +39,31 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
   (props) => {
     const { getUpgradeValue } = useUpgrades();
     const { getImage } = useImages();
+    const { workingBlocks } = useGameStore();
+    const workingBlockData = workingBlocks[props.chainId];
 
     // Flag that is set on smaller phones where font size should be adjusted
     const isSmall = props.placement.width < 250;
 
     const [workingBlock, setWorkingBlock] = React.useState(
-      props.workingBlockData,
+      workingBlockData,
     );
 
     const updateWorkingBlock = useCallback(() => {
-      if (props.workingBlockData) {
-        setWorkingBlock(props.workingBlockData);
+      if (workingBlockData) {
+        setWorkingBlock(workingBlockData);
       }
-    }, [props.workingBlockData]);
+    }, [workingBlockData]);
 
     const detailsScaleAnim = useSharedValue(1);
     useEffect(() => {
-      if (props.workingBlockData?.isBuilt) {
+      if (workingBlockData?.isBuilt) {
         detailsScaleAnim.value = withSpring(1.25, {
           damping: 4,
           stiffness: 200,
         });
       } else {
-        if (!props.workingBlockData?.blockId) {
+        if (!workingBlockData?.blockId) {
           detailsScaleAnim.value = 1;
           return;
         }
@@ -79,8 +74,8 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         );
       }
     }, [
-      props.workingBlockData?.isBuilt,
-      props.workingBlockData?.blockId,
+      workingBlockData?.isBuilt,
+      workingBlockData?.blockId,
       updateWorkingBlock,
     ]);
 
@@ -208,7 +203,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
             className="text-[#c3c3c3] font-Pixels"
           >
             /
-            {props.workingBlockData?.maxSize ||
+            {workingBlockData?.maxSize ||
               getUpgradeValue(props.chainId, "Block Size") ** 2}
           </Text>
         </View>
@@ -248,17 +243,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       prevProps.placement.top === nextProps.placement.top &&
       prevProps.placement.left === nextProps.placement.left &&
       prevProps.placement.width === nextProps.placement.width &&
-      prevProps.placement.height === nextProps.placement.height &&
-      prevProps.workingBlockData?.blockId ===
-        nextProps.workingBlockData?.blockId &&
-      prevProps.workingBlockData?.isBuilt ===
-        nextProps.workingBlockData?.isBuilt &&
-      prevProps.workingBlockData?.transactions.length ===
-        nextProps.workingBlockData?.transactions.length &&
-      prevProps.workingBlockData?.fees === nextProps.workingBlockData?.fees &&
-      prevProps.workingBlockData?.maxSize ===
-        nextProps.workingBlockData?.maxSize &&
-      prevProps.workingBlockData?.reward === nextProps.workingBlockData?.reward
+      prevProps.placement.height === nextProps.placement.height
     );
   },
 );

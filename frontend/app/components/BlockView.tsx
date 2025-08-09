@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, Text, Image, LayoutChangeEvent } from "react-native";
-import Animated, { BounceIn, Easing, FadeOut } from "react-native-reanimated";
+import { useCallback, useEffect, useState, memo } from "react";
+import { View, Text, LayoutChangeEvent } from "react-native";
+import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useGameStore } from "../stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
@@ -11,8 +12,8 @@ import { BlockTxOutlines } from "./BlockTxOutlines";
 export type BlockViewProps = {
   chainId: number;
   block: Block | null;
-  completed: boolean;
-  showTxOutlines?: boolean;
+  width: number;
+  height: number;
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
@@ -35,53 +36,117 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   );
 
   return (
-    <View className="w-full h-full flex flex-col items-center justify-center relative">
-      <View className="flex-1 aspect-square relative">
-        <View className="flex flex-wrap w-full aspect-square">
-          <View
-            className="absolute top-0 left-0 w-full h-full"
-            onLayout={onBlockLayout}
-          >
-            {props.showTxOutlines && (
-              <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
-            )}
-          </View>
-          {props.block?.transactions.map((tx, index) => (
-            <BlockTx
-              key={index}
-              chainId={props.chainId}
-              txTypeId={tx.typeId}
-              isDapp={tx.isDapp || false}
-              index={index}
-              txSize={txSize}
-              txPerRow={txPerRow}
-            />
-          ))}
-        </View>
-        {props.block?.blockId === 0 && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
-            <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">
-              Genesis Block
-            </Text>
-            <Text
-              className={`text-[#101119ff] text-center font-Pixels mt-[0.5rem] text-2xl`}
-            >
-              {props.chainId === 0
-                ? messagesJson.genesis.L1[currentPrestige]
-                : messagesJson.genesis.L2[currentPrestige]}
-            </Text>
-          </View>
-        )}
-        {props.completed && (
-          <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center rounded-xl">
-            <Text className="text-[#fff7ff] text-3xl font-bold font-Xerxes">
-              Block {props.block?.blockId}
-            </Text>
-          </View>
+    <View className="w-full h-full relative flex-1 aspect-square">
+      {props.block?.isBuilt && (
+        <BlockBorder
+          width={props.width}
+          height={props.height}
+        />
+      )}
+      {props.block?.isBuilt && <BlockConnectors />}
+      <View
+        className="absolute top-0 left-0 w-full h-full"
+        onLayout={onBlockLayout}
+      >
+        {props.block?.blockId !== 0 && !props.block?.isBuilt && (
+          <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
         )}
       </View>
+      {props.block?.transactions.map((tx, index) => (
+        <BlockTx
+          key={index}
+          chainId={props.chainId}
+          txTypeId={tx.typeId}
+          isDapp={tx.isDapp || false}
+          index={index}
+          txSize={txSize}
+          txPerRow={txPerRow}
+        />
+      ))}
+      {props.block?.blockId === 0 && (
+        <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
+          <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">
+            Genesis Block
+          </Text>
+          <Text
+            className={`text-[#101119ff] text-center font-Pixels mt-[0.5rem] text-2xl`}
+          >
+            {props.chainId === 0
+              ? messagesJson.genesis.L1[currentPrestige]
+              : messagesJson.genesis.L2[currentPrestige]}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
+
+export const BlockBorder: React.FC<{width: number; height: number}> = memo(({ width, height }) => {
+  const { getImage } = useImages();
+
+  return (
+    <View
+      className="absolute top-0 left-0"
+    >
+      <Canvas style={{ width, height }}>
+        <Image
+          image={getImage("block.grid.min")}
+          fit="fill"
+          x={0}
+          y={0}
+          width={width}
+          height={height}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+        />
+      </Canvas>
+    </View>
+  );
+});
+
+export const BlockConnectors: React.FC = memo(() => {
+  const { getImage } = useImages();
+
+  return (
+    <View
+      className="absolute top-0 left-0 w-full h-full"
+    >
+      <View className="absolute top-[30%] right-[-16px] w-[16px] h-[20px]">
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage("block.connector")}
+            fit="fill"
+            x={0}
+            y={0}
+            width={16}
+            height={20}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+        </Canvas>
+      </View>
+      <View className="absolute bottom-[30%] right-[-16px] w-[16px] h-[20px]">
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Image
+            image={getImage("block.connector")}
+            fit="fill"
+            x={0}
+            y={0}
+            width={16}
+            height={20}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+        </Canvas>
+      </View>
+    </View>
+  );
+});
 
 export default BlockView;

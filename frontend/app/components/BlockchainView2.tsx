@@ -10,8 +10,11 @@ import { View, StyleProp, ViewStyle } from 'react-native';
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { useMiner } from "../hooks/useMiner";
+import { useImages } from "../hooks/useImages";
 import { useGameStore } from "../stores/useGameStore";
 import { Block } from "../types/Chains";
+import { WorkingBlockDetails } from "./WorkingBlockDetails";
+import { EmptyBlockView } from "./EmptyBlockView";
 
 /*
  * The size of the block proportional to the smallest available dimension.
@@ -88,6 +91,10 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
 
   return (
     <View ref={parentRef} style={props.style}>
+      <WorkingBlockDetails
+        chainId={props.chainId}
+        placement={newBlockInitPosition}
+      />
       {block0}
       {block1}
       {block2}
@@ -108,6 +115,17 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
           />
         </View>
       )}
+      <EmptyBlockView
+        chainId={props.chainId}
+        placement={{
+          top: newBlockInitPosition.top,
+          left: newBlockInitPosition.left + newBlockInitPosition.width + 16,
+          width: newBlockInitPosition.width,
+          height: newBlockInitPosition.height,
+        }}
+        completedPlacementLeft={newBlockInitPosition.left}
+        showEmpty={!!workingBlock?.blockId}
+      />
     </View>
   );
 };
@@ -124,6 +142,7 @@ export type BlockchainBlockViewProps = {
 };
 
 export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) => {
+  const { getImage } = useImages();
   const { workingBlocks } = useGameStore();
   const [thisBlock, setThisBlock] = useState<Block | null>(null);
   useEffect(() => {
@@ -173,8 +192,8 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
       <BlockView
         chainId={props.chainId}
         block={thisBlock}
-        completed={false}
-        showTxOutlines={props.blockId !== 0}
+        width={props.placement.width}
+        height={props.placement.height}
       />
     </Animated.View>
   );
