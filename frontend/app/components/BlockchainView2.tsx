@@ -3,6 +3,8 @@ import Animated, {
   useSharedValue,
   withTiming,
   withSequence,
+  withSpring,
+  useAnimatedStyle,
   runOnJS,
   Easing,
 } from 'react-native-reanimated';
@@ -58,9 +60,21 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
   }, [parentSize, BLOCK_SIZE_PERCENT]);
 
   const onBlockMined = useGameStore((state) => state.onBlockMined);
+  
+  const blockShakeAnim = useSharedValue(0);
+  
+  const triggerBlockShake = useCallback(() => {
+    blockShakeAnim.value = withSequence(
+      withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+      withSpring(2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+      withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+      withSpring(0, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
+    );
+  }, [blockShakeAnim]);
+  
   const { miningProgress, mineBlock } = useMiner(
     onBlockMined,
-    undefined
+    triggerBlockShake
   );
   const createNewBlockchainBlockView = useCallback(() => {
     return (
@@ -73,9 +87,10 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
           width: newBlockInitPosition.width,
           height: newBlockInitPosition.height,
         }}
+        blockShakeAnim={blockShakeAnim}
       />
     );
-  }, [props.chainId, workingBlock?.blockId, newBlockInitPosition]);
+  }, [props.chainId, workingBlock?.blockId, newBlockInitPosition, blockShakeAnim]);
   const [block0, setBlock0] = useState(createNewBlockchainBlockView());
   const [block1, setBlock1] = useState<JSX.Element | null>(null);
   const [block2, setBlock2] = useState<JSX.Element | null>(null);
@@ -109,7 +124,7 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
           }}
         >
           <Miner
-            triggerAnim={() => {}}
+            triggerAnim={triggerBlockShake}
             miningProgress={miningProgress}
             mineBlock={mineBlock}
           />
@@ -139,6 +154,7 @@ export type BlockchainBlockViewProps = {
     width: number;
     height: number;
   };
+  blockShakeAnim: Animated.SharedValue<number>;
 };
 
 export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) => {
@@ -179,15 +195,34 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
     }
   }, [blockHeight, props.blockId, triggerBlockSlide]);
 
+  const isCurrentWorkingBlock = blockHeight === props.blockId;
+  
+  const blockTransformStyle = useAnimatedStyle(() => {
+    // Only apply shake animation if this is the current working block
+    if (!isCurrentWorkingBlock) {
+      return {
+        transform: [],
+      };
+    }
+    return {
+      transform: [
+        { rotate: `${props.blockShakeAnim.value}deg` },
+      ],
+    };
+  });
+
   return (
     <Animated.View
-      style={{
-        position: 'absolute',
-        top: props.placement.top,
-        left: blockSlideLeftAnim,
-        width: props.placement.width,
-        height: props.placement.height,
-      }}
+      style={[
+        blockTransformStyle,
+        {
+          position: 'absolute',
+          top: props.placement.top,
+          left: blockSlideLeftAnim,
+          width: props.placement.width,
+          height: props.placement.height,
+        }
+      ]}
     >
       <BlockView
         chainId={props.chainId}
