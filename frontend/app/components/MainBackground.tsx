@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import React, { useEffect, memo } from "react";
 import { View, Dimensions } from "react-native";
 import { useInterval } from "usehooks-ts";

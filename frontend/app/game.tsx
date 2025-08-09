@@ -27,7 +27,7 @@ import { TxBuilderObserver } from "./observers/TxBuilderObserver";
 import { TutorialObserver } from "./observers/TutorialObserver";
 import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
-export default function game() {
+export default function Game() {
   const { user } = useFocEngine();
   const { registerObserver, unregisterObserver } = useEventManager();
   const { getUserBalance, initMyGame } = usePowContractConnector();

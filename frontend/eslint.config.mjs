@@ -19,7 +19,7 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-var-requires": 0,
       "@typescript-eslint/no-require-imports": "off",
-      'react-hooks/react-compiler': 'error',
+      "react-hooks/react-compiler": "error",
     },
     ignores: [".expo/**"],
   },

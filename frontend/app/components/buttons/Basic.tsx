@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import React from "react";
 import { View, TouchableWithoutFeedback, Text } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";

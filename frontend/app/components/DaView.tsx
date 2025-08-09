@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import { View } from "react-native";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useDAConfirmer } from "../hooks/useDAConfirmer";

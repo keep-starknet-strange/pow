@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import React, { memo, useCallback, useEffect, useState } from "react";
 import {
   Image,

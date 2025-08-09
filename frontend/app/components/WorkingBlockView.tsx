@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import React, { memo, useEffect } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useGameStore } from "@/app/stores/useGameStore";

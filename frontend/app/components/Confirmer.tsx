@@ -40,16 +40,14 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     ((x: number, y: number) => void) | null
   >(null);
 
+  const { renderedBy, onConfirm, image, text, confirmPopup } = props;
   const enabled =
-    props.renderedBy !== undefined &&
-    ["miner", "sequencer", "da", "prover"].includes(props.renderedBy);
-  let tutorialProps = {};
-  let ref, onLayout;
-  if (enabled) {
-    const targetId = `${props.renderedBy}Confirmer` as TargetId;
-    ({ ref, onLayout } = useTutorialLayout(targetId, enabled));
-    tutorialProps = { ref, onLayout };
-  }
+    renderedBy !== undefined && ["miner", "sequencer", "da", "prover"].includes(renderedBy);
+  const targetId = (
+    renderedBy ? `${renderedBy}Confirmer` : "minerConfirmer"
+  ) as TargetId;
+  const { ref, onLayout } = useTutorialLayout(targetId, enabled);
+  const tutorialProps = enabled ? { ref, onLayout } : {};
 
   const [confirmTime, setConfirmTime] = useState(0);
   const confirmAnimation = useAnimatedValue(0);
@@ -64,7 +62,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     return () => {
       confirmAnimation.removeAllListeners();
     };
-  }, [confirmTime]);
+  }, [confirmTime, confirmAnimation]);
 
   const handlePress = useCallback(
     (event: GestureResponderEvent) => {
@@ -76,9 +74,9 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       }
 
       setConfirmTime(Date.now());
-      props.onConfirm();
+      onConfirm();
     },
-    [triggerFlash, props.onConfirm],
+    [triggerFlash, onConfirm],
   );
 
   const handleFlashRequested = useCallback(
@@ -95,15 +93,15 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       onPress={handlePress}
       {...tutorialProps}
     >
-      {props.confirmPopup && (
+      {confirmPopup && (
         <PopupAnimation
-          popupStartTime={props.confirmPopup.startTime}
-          popupValue={props.confirmPopup.value}
-          color={props.confirmPopup.color}
+          popupStartTime={confirmPopup.startTime}
+          popupValue={confirmPopup.value}
+          color={confirmPopup.color}
           animRange={[-100, -120]}
         />
       )}
-      {props.image && (
+      {image && (
         <Animated.View
           style={{
             width: 112,
@@ -125,7 +123,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
               y={0}
               width={112}
               height={112}
-              image={getImage(props.image)}
+              image={getImage(image)}
               fit="fill"
               sampling={{
                 filter: FilterMode.Nearest,
@@ -135,7 +133,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           </Canvas>
         </Animated.View>
       )}
-      {props.text && (
+      {text && (
         <Animated.Text
           className="text-[#fff7ff] text-[24px] font-Teatime w-full
                      absolute top-[50%] translate-y-[-50%] text-center
@@ -151,7 +149,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
             ],
           }}
         >
-          {props.text}
+          {text}
         </Animated.Text>
       )}
       <FlashBurstManager

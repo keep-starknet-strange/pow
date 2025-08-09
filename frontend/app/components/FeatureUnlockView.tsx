@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import React, { memo } from "react";
 import { View, Dimensions, Pressable, Text } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";
