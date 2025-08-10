@@ -33,13 +33,31 @@ export const MemoizedBlockContainer = memo(
     const workingBlockId = useGameStore(
       (state) => state.workingBlocks[chainId]?.blockId,
     );
-    const [block0, setBlock0] = useState<JSX.Element | null>(
-      createNewBlockchainBlockView(),
-    );
+    const [block0, setBlock0] = useState<JSX.Element | null>(null);
     const [block1, setBlock1] = useState<JSX.Element | null>(null);
     const [block2, setBlock2] = useState<JSX.Element | null>(null);
+    const [previousBlockId, setPreviousBlockId] = useState<number | undefined>(
+      undefined,
+    );
 
     useEffect(() => {
+      // For initial render or when blockId is undefined/0, render immediately
+      if (previousBlockId === undefined || workingBlockId === 0) {
+        if (workingBlockId % 3 === 0) {
+          setBlock0(createNewBlockchainBlockView());
+          setBlock1(null);
+        } else if (workingBlockId % 3 === 1) {
+          setBlock1(createNewBlockchainBlockView());
+          setBlock2(null);
+        } else if (workingBlockId % 3 === 2) {
+          setBlock2(createNewBlockchainBlockView());
+          setBlock0(null);
+        }
+        setPreviousBlockId(workingBlockId);
+        return;
+      }
+
+      // For subsequent block changes, use the animation delay
       const updateBlockViews = setTimeout(() => {
         if (workingBlockId % 3 === 0) {
           setBlock0(createNewBlockchainBlockView());
@@ -51,6 +69,7 @@ export const MemoizedBlockContainer = memo(
           setBlock2(createNewBlockchainBlockView());
           setBlock0(null);
         }
+        setPreviousBlockId(workingBlockId);
       }, 1100);
       return () => clearTimeout(updateBlockViews);
     }, [createNewBlockchainBlockView, workingBlockId]);
