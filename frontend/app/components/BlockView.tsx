@@ -59,12 +59,12 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         ))}
       </View>
       {props.block?.blockId === 0 && (
-        <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
-          <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">
+        <View className="absolute top-0 left-0 flex flex-col items-center">
+          <Text className="text-[#101119ff] text-[32px] font-bold underline text-center pt-2 font-Xerxes px-2">
             Genesis Block
           </Text>
           <Text
-            className={`text-[#101119ff] text-center font-Pixels mt-[0.5rem] text-2xl`}
+            className={`text-[#101119ff] text-center font-Pixels mt-[16px] text-[24px] px-2`}
           >
             {props.chainId === 0
               ? messagesJson.genesis.L1[currentPrestige]
