@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback } from "react";
+import React, { memo, useEffect, useCallback, useMemo } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "../stores/useGameStore";
@@ -7,10 +7,10 @@ import Animated, {
   runOnJS,
   Easing,
   useSharedValue,
-  withSequence,
   useAnimatedStyle,
   withSpring,
   withTiming,
+  withSequence,
 } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
@@ -35,15 +35,155 @@ export type WorkingBlockDetailsProps = {
  */
 const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
+const BlockCanvas = memo(({ placement }: { placement: { width: number; height: number } }) => {
+  const { getImage } = useImages();
+  
+  const canvasStyle = useMemo(() => ({
+    position: "absolute" as const,
+    top: -(placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+    width: placement.width,
+    height: placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+  }), [placement.width, placement.height]);
+
+  const imageHeight = useMemo(() => 
+    placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT), 
+    [placement.height]
+  );
+
+  return (
+    <Canvas style={canvasStyle}>
+      <Image
+        image={getImage("block.grid")}
+        fit="fill"
+        x={0}
+        y={0}
+        width={placement.width}
+        height={imageHeight}
+        sampling={{
+          filter: FilterMode.Nearest,
+          mipmap: MipmapMode.Nearest,
+        }}
+      />
+    </Canvas>
+  );
+});
+
+BlockCanvas.displayName = 'BlockCanvas';
+
+const BlockIdLabel = memo(({ blockId, isSmall }: { blockId: number; isSmall: boolean }) => {
+  const textStyle = useMemo(() => ({
+    color: "#c3c3c3",
+    fontFamily: "Pixels" as const,
+    fontSize: isSmall ? 16 : 18,
+  }), [isSmall]);
+
+  const animConfig = useMemo(() => ({
+    duration: 400,
+    easing: Easing.bounce,
+  }), []);
+
+  if (blockId >= 10) {
+    return (
+      <>
+        <Text style={textStyle}>#</Text>
+        <AnimatedRollingNumber
+          value={blockId}
+          textStyle={textStyle}
+          spinningAnimationConfig={animConfig}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Text style={textStyle}>Block&nbsp;</Text>
+      <AnimatedRollingNumber
+        value={blockId}
+        textStyle={textStyle}
+        spinningAnimationConfig={animConfig}
+      />
+    </>
+  );
+});
+
+BlockIdLabel.displayName = 'BlockIdLabel';
+
+const TransactionCount = memo(({ 
+  transactionCount, 
+  maxSize, 
+  isSmall 
+}: { 
+  transactionCount: number; 
+  maxSize: number; 
+  isSmall: boolean; 
+}) => {
+  const textStyle = useMemo(() => ({
+    fontSize: isSmall ? 16 : 18,
+    color: "#c3c3c3",
+    fontFamily: "Pixels" as const,
+  }), [isSmall]);
+
+  const animConfig = useMemo(() => ({
+    duration: 400,
+    easing: Easing.bounce,
+  }), []);
+
+  return (
+    <>
+      <AnimatedRollingNumber
+        value={transactionCount}
+        enableCompactNotation
+        compactToFixed={2}
+        textStyle={textStyle}
+        spinningAnimationConfig={animConfig}
+      />
+      <Text
+        style={{
+          fontSize: isSmall ? 16 : 18,
+        }}
+        className="text-[#c3c3c3] font-Pixels"
+      >
+        /{maxSize}
+      </Text>
+    </>
+  );
+});
+
+TransactionCount.displayName = 'TransactionCount';
+
+const BlockReward = memo(({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
+  const textStyle = useMemo(() => ({
+    fontSize: isSmall ? 18 : 18,
+    color: "#fff2fdff",
+    fontFamily: "Pixels" as const,
+  }), [isSmall]);
+
+  const animConfig = useMemo(() => ({
+    duration: 400,
+    easing: Easing.bounce,
+  }), []);
+
+  return (
+    <AnimatedRollingNumber
+      value={reward}
+      enableCompactNotation
+      compactToFixed={1}
+      textStyle={textStyle}
+      spinningAnimationConfig={animConfig}
+    />
+  );
+});
+
+BlockReward.displayName = 'BlockReward';
+
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
   (props) => {
     const { getUpgradeValue } = useUpgrades();
-    const { getImage } = useImages();
     const { workingBlocks } = useGameStore();
     const workingBlockData = workingBlocks[props.chainId];
 
-    // Flag that is set on smaller phones where font size should be adjusted
-    const isSmall = props.placement.width < 250;
+    const isSmall = useMemo(() => props.placement.width < 250, [props.placement.width]);
 
     const [workingBlock, setWorkingBlock] = React.useState(
       workingBlockData,
@@ -79,160 +219,67 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       updateWorkingBlock,
     ]);
 
+    const containerStyle = useMemo(() => ({
+      position: "absolute" as const,
+      top: props.placement.top,
+      left: props.placement.left,
+      width: props.placement.width,
+      height: props.placement.height,
+      transform: [{ scale: detailsScaleAnim }],
+    }), [props.placement.top, props.placement.left, props.placement.width, props.placement.height, detailsScaleAnim]);
+
+    const blockIdLabelStyle = useMemo(() => ({
+      top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+    }), [props.placement.height]);
+
+    const transactionCountStyle = useMemo(() => ({
+      flexDirection: "row" as const,
+      position: "absolute" as const,
+      bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+      left: props.placement.width * 0.49,
+      paddingRight: 4,
+      paddingBottom: 6,
+    }), [props.placement.height, props.placement.width]);
+
+    const rewardStyle = useMemo(() => ({
+      position: "absolute" as const,
+      bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+      left: props.placement.width * 0.81,
+      paddingRight: 4,
+      paddingBottom: 6,
+    }), [props.placement.height, props.placement.width]);
+
+    const maxSize = useMemo(() => 
+      workingBlockData?.maxSize || getUpgradeValue(props.chainId, "Block Size") ** 2,
+      [workingBlockData?.maxSize, getUpgradeValue, props.chainId]
+    );
+
+    const totalReward = useMemo(() => 
+      (workingBlock?.fees || 0) + (workingBlock?.reward || 0 || getUpgradeValue(props.chainId, "Block Reward")),
+      [workingBlock?.fees, workingBlock?.reward, getUpgradeValue, props.chainId]
+    );
+
     return (
-      <Animated.View
-        style={{
-          position: "absolute",
-          top: props.placement.top,
-          left: props.placement.left,
-          width: props.placement.width,
-          height: props.placement.height,
-          transform: [{ scale: detailsScaleAnim }],
-        }}
-      >
-        <Canvas
-          style={{
-            position: "absolute",
-            top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT), // Need to draw outside of view bounds
-            width: props.placement.width,
-            height:
-              props.placement.height +
-              2 * (props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-          }}
-        >
-          <Image
-            image={getImage("block.grid")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={props.placement.width}
-            height={
-              props.placement.height +
-              2 * (props.placement.height * BLOCK_IMAGE_LABEL_PERCENT)
-            }
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
+      <Animated.View style={containerStyle}>
+        <BlockCanvas placement={props.placement} />
+        
         <View
           className="absolute flex flex-row pl-2 pt-2"
-          style={{
-            top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-          }}
+          style={blockIdLabelStyle}
         >
-          {(workingBlock?.blockId || 0) >= 10 ? (
-            // For multi-digit block numbers, show "#{number}"
-            <>
-              <Text
-                style={{
-                  color: "#c3c3c3",
-                  fontFamily: "Pixels",
-                  fontSize: isSmall ? 16 : 18,
-                }}
-              >
-                #
-              </Text>
-              <AnimatedRollingNumber
-                value={workingBlock?.blockId || 0}
-                textStyle={{
-                  fontSize: isSmall ? 16 : 18,
-                  color: "#c3c3c3",
-                  fontFamily: "Pixels",
-                }}
-                spinningAnimationConfig={{
-                  duration: 400,
-                  easing: Easing.bounce,
-                }}
-              />
-            </>
-          ) : (
-            // For single-digit block numbers, show "Block {number}"
-            <>
-              <Text
-                style={{
-                  color: "#c3c3c3",
-                  fontFamily: "Pixels",
-                  fontSize: isSmall ? 16 : 18,
-                }}
-              >
-                Block&nbsp;
-              </Text>
-              <AnimatedRollingNumber
-                value={workingBlock?.blockId || 0}
-                textStyle={{
-                  fontSize: isSmall ? 16 : 18,
-                  color: "#c3c3c3",
-                  fontFamily: "Pixels",
-                }}
-                spinningAnimationConfig={{
-                  duration: 400,
-                  easing: Easing.bounce,
-                }}
-              />
-            </>
-          )}
+          <BlockIdLabel blockId={workingBlock?.blockId || 0} isSmall={isSmall} />
         </View>
 
-        <View
-          style={{
-            flexDirection: "row",
-            position: "absolute",
-            bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-            left: props.placement.width * 0.49,
-            paddingRight: 4,
-            paddingBottom: 6,
-          }}
-        >
-          <AnimatedRollingNumber
-            value={workingBlock?.transactions.length || 0}
-            enableCompactNotation
-            compactToFixed={2}
-            textStyle={{
-              fontSize: isSmall ? 16 : 18,
-              color: "#c3c3c3",
-              fontFamily: "Pixels",
-            }}
-            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+        <View style={transactionCountStyle}>
+          <TransactionCount
+            transactionCount={workingBlock?.transactions.length || 0}
+            maxSize={maxSize}
+            isSmall={isSmall}
           />
-          <Text
-            style={{
-              fontSize: isSmall ? 16 : 18,
-            }}
-            className="text-[#c3c3c3] font-Pixels"
-          >
-            /
-            {workingBlockData?.maxSize ||
-              getUpgradeValue(props.chainId, "Block Size") ** 2}
-          </Text>
         </View>
 
-        <View
-          style={{
-            position: "absolute",
-            bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-            left: props.placement.width * 0.81,
-            paddingRight: 4,
-            paddingBottom: 6,
-          }}
-        >
-          <AnimatedRollingNumber
-            value={
-              (workingBlock?.fees || 0) +
-              (workingBlock?.reward ||
-                0 ||
-                getUpgradeValue(props.chainId, "Block Reward"))
-            }
-            enableCompactNotation
-            compactToFixed={1}
-            textStyle={{
-              fontSize: isSmall ? 18 : 18,
-              color: "#fff2fdff",
-              fontFamily: "Pixels",
-            }}
-            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
-          />
+        <View style={rewardStyle}>
+          <BlockReward reward={totalReward} isSmall={isSmall} />
         </View>
       </Animated.View>
     );
