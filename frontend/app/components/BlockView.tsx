@@ -27,7 +27,9 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
 
   useEffect(() => {
-    setTxSize(props.width / txPerRow);
+    // Account for 4px inset on each side
+    const insetWidth = props.width - 8;
+    setTxSize(insetWidth / txPerRow);
   }, [props.width, txPerRow]);
 
   return (
@@ -38,17 +40,19 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           height={props.height}
         />
       )}
-      {props.block?.transactions.map((tx, index) => (
-        <BlockTx
-          key={index}
-          chainId={props.chainId}
-          txTypeId={tx.typeId}
-          isDapp={tx.isDapp || false}
-          index={index}
-          txSize={txSize}
-          txPerRow={txPerRow}
-        />
-      ))}
+      <View className="absolute" style={{ top: 4, left: 4, right: 4, bottom: 4 }}>
+        {props.block?.transactions.map((tx, index) => (
+          <BlockTx
+            key={index}
+            chainId={props.chainId}
+            txTypeId={tx.typeId}
+            isDapp={tx.isDapp || false}
+            index={index}
+            txSize={txSize}
+            txPerRow={txPerRow}
+          />
+        ))}
+      </View>
       {props.block?.blockId === 0 && (
         <View className="absolute top-0 left-0 w-full h-full flex flex-col items-center">
           <Text className="text-[#101119ff] text-4xl font-bold underline text-center pt-2 font-Xerxes">

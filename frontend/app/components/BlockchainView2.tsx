@@ -118,7 +118,9 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
     ? Math.sqrt(workingBlock.maxSize) : 4 ** 2;
 
   useEffect(() => {
-    setTxSize(newBlockInitPosition.width / txPerRow);
+    // Account for 4px inset on each side
+    const insetWidth = newBlockInitPosition.width - 8;
+    setTxSize(insetWidth / txPerRow);
   }, [newBlockInitPosition.width, txPerRow]);
 
   return (
@@ -130,10 +132,10 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
       <View
         style={{
           position: "absolute",
-          top: newBlockInitPosition.top,
-          left: newBlockInitPosition.left,
-          width: newBlockInitPosition.width,
-          height: newBlockInitPosition.height,
+          top: newBlockInitPosition.top + 4,
+          left: newBlockInitPosition.left + 4,
+          width: newBlockInitPosition.width - 8,
+          height: newBlockInitPosition.height - 8,
         }}
       >
         {workingBlock?.blockId !== 0 && (
