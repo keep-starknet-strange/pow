@@ -200,6 +200,8 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
   const slideOffset = props.placement.width + 16;
   
   const [thisBlock, setThisBlock] = useState<Block | null>(null);
+  const [isCurrentWorkingBlock, setIsCurrentWorkingBlock] = useState(blockHeight === props.blockId);
+  
   useEffect(() => {
     const block = workingBlocks[props.chainId];
     if (block?.blockId !== props.blockId) {
@@ -232,7 +234,12 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
       withTiming(currLeft, { // Wait 400ms
         duration: 400
       }),
-      withTiming(newLeft, { duration: 700 })
+      withTiming(newLeft, { 
+        duration: 700 
+      }, () => {
+        // After slide animation completes, update isCurrentWorkingBlock
+        runOnJS(setIsCurrentWorkingBlock)(false);
+      })
     );
   }, [blockHeight, props.blockId, props.placement.baseLeft, slideOffset, blockSlideLeftAnim]);
 
@@ -243,8 +250,6 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
     }
   }, [blockHeight, props.blockId, triggerBlockSlide]);
 
-  const isCurrentWorkingBlock = blockHeight === props.blockId;
-  
   const blockTransformStyle = useAnimatedStyle(() => {
     const transforms: any[] = [
       { scale: blockScaleAnim.value }
