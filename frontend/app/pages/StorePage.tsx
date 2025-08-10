@@ -43,7 +43,7 @@ export const StorePage: React.FC = () => {
     dappSpeedLevels,
   } = useTransactionsStore();
   const { canUnlockUpgrade, upgrades, automations } = useUpgrades();
-  const { isL2Unlocked } = useL2Store();
+  const isL2Unlocked = useL2Store((state) => state.isL2Unlocked);
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
@@ -52,6 +52,11 @@ export const StorePage: React.FC = () => {
   const [storeType, setStoreType] = useState<"L1" | "L2">(
     isL2Unlocked ? "L2" : "L1",
   );
+
+  const handleStoreViewChange = useCallback((view: "L1" | "L2") => {
+    setStoreType(view);
+    notify("SwitchStore", { name: view });
+  }, [notify]);
   useEffect(() => {
     if (!isL2Unlocked) {
       setStoreType("L1");
@@ -345,10 +350,7 @@ export const StorePage: React.FC = () => {
       {isL2Unlocked && (
         <L1L2Switch
           currentView={storeType}
-          setCurrentView={(view: "L1" | "L2") => {
-            setStoreType(view);
-            notify("SwitchStore", { name: view });
-          }}
+          setCurrentView={handleStoreViewChange}
           isStore={true}
         />
       )}
