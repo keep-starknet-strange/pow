@@ -26,14 +26,9 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
     ? Math.sqrt(props.block.maxSize)
     : Math.sqrt(getUpgradeValue(props.chainId, "Block Size") ** 2);
 
-  const onBlockLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      const { width } = event.nativeEvent.layout;
-
-      setTxSize(width / txPerRow);
-    },
-    [txPerRow],
-  );
+  useEffect(() => {
+    setTxSize(props.width / txPerRow);
+  }, [props.width, txPerRow]);
 
   return (
     <View className="w-full h-full relative flex-1 aspect-square">
@@ -43,15 +38,6 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           height={props.height}
         />
       )}
-      {props.block?.isBuilt && <BlockConnectors />}
-      <View
-        className="absolute top-0 left-0 w-full h-full"
-        onLayout={onBlockLayout}
-      >
-        {props.block?.blockId !== 0 && !props.block?.isBuilt && (
-          <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
-        )}
-      </View>
       {props.block?.transactions.map((tx, index) => (
         <BlockTx
           key={index}
@@ -102,49 +88,6 @@ export const BlockBorder: React.FC<{width: number; height: number}> = memo(({ wi
           }}
         />
       </Canvas>
-    </View>
-  );
-});
-
-export const BlockConnectors: React.FC = memo(() => {
-  const { getImage } = useImages();
-
-  return (
-    <View
-      className="absolute top-0 left-0 w-full h-full"
-    >
-      <View className="absolute top-[30%] right-[-16px] w-[16px] h-[20px]">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("block.connector")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={16}
-            height={20}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
-      </View>
-      <View className="absolute bottom-[30%] right-[-16px] w-[16px] h-[20px]">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
-          <Image
-            image={getImage("block.connector")}
-            fit="fill"
-            x={0}
-            y={0}
-            width={16}
-            height={20}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
-      </View>
     </View>
   );
 });
