@@ -13,6 +13,8 @@ import { View, StyleProp, ViewStyle } from 'react-native';
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { useMiner } from "../hooks/useMiner";
+import { Sequencer } from "./Sequencer";
+import { useSequencer } from "../hooks/useSequencer";
 import { useImages } from "../hooks/useImages";
 import { useGameStore } from "../stores/useGameStore";
 import { Block } from "../types/Chains";
@@ -62,6 +64,7 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
   }, [parentSize, BLOCK_SIZE_PERCENT]);
 
   const onBlockMined = useGameStore((state) => state.onBlockMined);
+  const onBlockSequenced = useGameStore((state) => state.onBlockSequenced);
   
   const blockShakeAnim = useSharedValue(0);
   
@@ -76,6 +79,10 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
   
   const { miningProgress, mineBlock } = useMiner(
     onBlockMined,
+    triggerBlockShake
+  );
+  const { sequencingProgress, sequenceBlock } = useSequencer(
+    onBlockSequenced,
     triggerBlockShake
   );
   const createNewBlockchainBlockView = useCallback(() => {
@@ -157,11 +164,19 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
             transform: [{ scale: 1.25 }], // Miner always used when block scaled
           }}
         >
-          <Miner
-            triggerAnim={triggerBlockShake}
-            miningProgress={miningProgress}
-            mineBlock={mineBlock}
-          />
+          {props.chainId === 0 ? (
+            <Miner
+              triggerAnim={triggerBlockShake}
+              miningProgress={miningProgress}
+              mineBlock={mineBlock}
+            />
+          ) : (
+            <Sequencer
+              triggerAnim={triggerBlockShake}
+              sequencingProgress={sequencingProgress}
+              sequenceBlock={sequenceBlock}
+            />
+          )}
         </View>
       )}
       <EmptyBlockView

@@ -22,10 +22,7 @@ const MainPageComponent: React.FC = () => {
       {isL2Unlocked && (
         <L1L2Switch
           currentView={currentView}
-          setCurrentView={useCallback(
-            (view: "L1" | "L2") => setCurrentView(view),
-            [],
-          )}
+          setCurrentView={(view: "L1" | "L2") => setCurrentView(view)}
           isStore={false}
         />
       )}

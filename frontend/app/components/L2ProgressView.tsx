@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { View, Text } from "react-native";
 import {
   Canvas,
@@ -13,7 +13,7 @@ import { useUpgrades } from "../stores/useUpgradesStore";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useDerivedValue, withTiming } from "react-native-reanimated";
 
-export const ProgressBar = ({ progress }: { progress: number }) => {
+export const ProgressBar = memo(({ progress }: { progress: number }) => {
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
 
@@ -46,7 +46,7 @@ export const ProgressBar = ({ progress }: { progress: number }) => {
       />
     </Canvas>
   );
-};
+});
 
 export const L2ProgressView = ({
   label,
