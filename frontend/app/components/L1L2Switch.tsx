@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, Pressable } from "react-native";
 import {
   Canvas,
@@ -8,7 +8,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 
-export const L1L2Switch = ({
+export const L1L2Switch = memo(({
   currentView,
   setCurrentView,
   isStore = false, // Default to false if not provided
@@ -103,4 +103,10 @@ export const L1L2Switch = ({
       </Pressable>
     </View>
   );
-};
+}, (prevProps, nextProps) => {
+  // Only re-render if currentView or isStore changes
+  return (
+    prevProps.currentView === nextProps.currentView &&
+    prevProps.isStore === nextProps.isStore
+  );
+});
