@@ -53,10 +53,13 @@ export const StorePage: React.FC = () => {
     isL2Unlocked ? "L2" : "L1",
   );
 
-  const handleStoreViewChange = useCallback((view: "L1" | "L2") => {
-    setStoreType(view);
-    notify("SwitchStore", { name: view });
-  }, [notify]);
+  const handleStoreViewChange = useCallback(
+    (view: "L1" | "L2") => {
+      setStoreType(view);
+      notify("SwitchStore", { name: view });
+    },
+    [notify],
+  );
   useEffect(() => {
     if (!isL2Unlocked) {
       setStoreType("L1");

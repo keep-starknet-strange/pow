@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState, memo } from "react";
 import { View, Text, LayoutChangeEvent } from "react-native";
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "../stores/useGameStore";
@@ -35,12 +40,12 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   return (
     <View className="w-full h-full relative flex-1 aspect-square">
       {props.block?.isBuilt && (
-        <BlockBorder
-          width={props.width}
-          height={props.height}
-        />
+        <BlockBorder width={props.width} height={props.height} />
       )}
-      <View className="absolute" style={{ top: 4, left: 4, right: 4, bottom: 4 }}>
+      <View
+        className="absolute"
+        style={{ top: 4, left: 4, right: 4, bottom: 4 }}
+      >
         {props.block?.transactions.map((tx, index) => (
           <BlockTx
             key={index}
@@ -71,29 +76,29 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
   );
 };
 
-export const BlockBorder: React.FC<{width: number; height: number}> = memo(({ width, height }) => {
-  const { getImage } = useImages();
+export const BlockBorder: React.FC<{ width: number; height: number }> = memo(
+  ({ width, height }) => {
+    const { getImage } = useImages();
 
-  return (
-    <View
-      className="absolute top-0 left-0"
-    >
-      <Canvas style={{ width, height }}>
-        <Image
-          image={getImage("block.grid.min")}
-          fit="fill"
-          x={0}
-          y={0}
-          width={width}
-          height={height}
-          sampling={{
-            filter: FilterMode.Nearest,
-            mipmap: MipmapMode.Nearest,
-          }}
-        />
-      </Canvas>
-    </View>
-  );
-});
+    return (
+      <View className="absolute top-0 left-0">
+        <Canvas style={{ width, height }}>
+          <Image
+            image={getImage("block.grid.min")}
+            fit="fill"
+            x={0}
+            y={0}
+            width={width}
+            height={height}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+        </Canvas>
+      </View>
+    );
+  },
+);
 
 export default BlockView;

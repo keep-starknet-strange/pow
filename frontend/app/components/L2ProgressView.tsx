@@ -48,12 +48,12 @@ const ProgressBar = memo(({ progress }: { progress: number }) => {
   );
 });
 
-ProgressBar.displayName = 'ProgressBar';
+ProgressBar.displayName = "ProgressBar";
 
 const BackgroundCanvas = memo(() => {
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
-  
+
   return (
     <Canvas style={{ width: "100%", height: 80 }}>
       <Image
@@ -72,11 +72,11 @@ const BackgroundCanvas = memo(() => {
   );
 });
 
-BackgroundCanvas.displayName = 'BackgroundCanvas';
+BackgroundCanvas.displayName = "BackgroundCanvas";
 
 const PlaqueCanvas = memo(() => {
   const { getImage } = useImages();
-  
+
   return (
     <Canvas style={{ width: 60, height: 22 }}>
       <Image
@@ -95,42 +95,44 @@ const PlaqueCanvas = memo(() => {
   );
 });
 
-PlaqueCanvas.displayName = 'PlaqueCanvas';
+PlaqueCanvas.displayName = "PlaqueCanvas";
 
-const PlaqueDisplay = memo(({ value, maxValue }: { value: number; maxValue: number }) => {
-  return (
-    <View className="absolute top-0 left-0 h-[22px] w-[60px]">
-      <PlaqueCanvas />
-      <View className="absolute top-0 left-0 flex flex-row items-center justify-center w-full h-full">
-        <AnimatedRollingNumber
-          value={value}
-          enableCompactNotation
-          compactToFixed={2}
-          textStyle={{
-            fontSize: 16,
-            color: "#b3b3b3",
-            fontFamily: "Pixels",
-          }}
-          spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
-        />
-        <Text
-          style={{
-            fontSize: 16,
-          }}
-          className="text-[#b3b3b3] font-Pixels"
-        >
-          /{maxValue}
-        </Text>
+const PlaqueDisplay = memo(
+  ({ value, maxValue }: { value: number; maxValue: number }) => {
+    return (
+      <View className="absolute top-0 left-0 h-[22px] w-[60px]">
+        <PlaqueCanvas />
+        <View className="absolute top-0 left-0 flex flex-row items-center justify-center w-full h-full">
+          <AnimatedRollingNumber
+            value={value}
+            enableCompactNotation
+            compactToFixed={2}
+            textStyle={{
+              fontSize: 16,
+              color: "#b3b3b3",
+              fontFamily: "Pixels",
+            }}
+            spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
+          />
+          <Text
+            style={{
+              fontSize: 16,
+            }}
+            className="text-[#b3b3b3] font-Pixels"
+          >
+            /{maxValue}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
-});
+    );
+  },
+);
 
-PlaqueDisplay.displayName = 'PlaqueDisplay';
+PlaqueDisplay.displayName = "PlaqueDisplay";
 
 const CoinIcon = memo(() => {
   const { getImage } = useImages();
-  
+
   return (
     <Canvas style={{ width: 16, height: 16 }}>
       <Image
@@ -149,7 +151,7 @@ const CoinIcon = memo(() => {
   );
 });
 
-CoinIcon.displayName = 'CoinIcon';
+CoinIcon.displayName = "CoinIcon";
 
 const BottomInfo = memo(({ label, fees }: { label: string; fees: number }) => {
   return (
@@ -175,76 +177,83 @@ const BottomInfo = memo(({ label, fees }: { label: string; fees: number }) => {
   );
 });
 
-BottomInfo.displayName = 'BottomInfo';
+BottomInfo.displayName = "BottomInfo";
 
-const ProgressBarsContainer = memo(({ progressBars }: { progressBars: number[] }) => {
-  const { width } = useCachedWindowDimensions();
-  
-  return (
-    <View className="absolute top-0 left-0 flex flex-row justify-start items-end h-[80px] px-[4px] gap-[2px] py-[5px]">
-      {progressBars.map((progress: number, index: number) => (
-        <Animated.View
-          key={index}
-          style={{ width: (width / 2 - (14 + (12 - 1) * 2)) / 12 }}
-        >
-          <ProgressBar progress={progress} />
-        </Animated.View>
-      ))}
-    </View>
-  );
-});
+const ProgressBarsContainer = memo(
+  ({ progressBars }: { progressBars: number[] }) => {
+    const { width } = useCachedWindowDimensions();
 
-ProgressBarsContainer.displayName = 'ProgressBarsContainer';
-
-export const L2ProgressView = memo(({
-  label,
-  value,
-  maxValue,
-  fees,
-}: {
-  label: string;
-  value: number;
-  maxValue: number;
-  fees: number;
-}) => {
-  const { width } = useCachedWindowDimensions();
-
-  const maxBarCount = 12;
-  
-  const progressBars = useMemo(() => {
-    const progress = (value / maxValue) * 100;
-    const barCount = Math.floor((value / maxValue) * maxBarCount);
-    const remainingProgress = progress - barCount * (100 / maxBarCount);
-    const finalBarProgress = (remainingProgress / (100 / maxBarCount)) * 100;
-    
-    return Array(maxBarCount)
-      .fill(0)
-      .map((_, index) => {
-        if (index < barCount) {
-          return 100;
-        } else if (index === barCount) {
-          return finalBarProgress;
-        } else {
-          return 0;
-        }
-      });
-  }, [value, maxValue]);
-
-  const containerStyle = useMemo(() => ({
-    width: width / 2 - 6,
-    height: "100%",
-  }), [width]);
-
-  return (
-    <View className="relative" style={containerStyle}>
-      <View className="w-full relative">
-        <BackgroundCanvas />
-        <ProgressBarsContainer progressBars={progressBars} />
+    return (
+      <View className="absolute top-0 left-0 flex flex-row justify-start items-end h-[80px] px-[4px] gap-[2px] py-[5px]">
+        {progressBars.map((progress: number, index: number) => (
+          <Animated.View
+            key={index}
+            style={{ width: (width / 2 - (14 + (12 - 1) * 2)) / 12 }}
+          >
+            <ProgressBar progress={progress} />
+          </Animated.View>
+        ))}
       </View>
-      <BottomInfo label={label} fees={fees} />
-      <PlaqueDisplay value={value} maxValue={maxValue} />
-    </View>
-  );
-});
+    );
+  },
+);
 
-L2ProgressView.displayName = 'L2ProgressView';
+ProgressBarsContainer.displayName = "ProgressBarsContainer";
+
+export const L2ProgressView = memo(
+  ({
+    label,
+    value,
+    maxValue,
+    fees,
+  }: {
+    label: string;
+    value: number;
+    maxValue: number;
+    fees: number;
+  }) => {
+    const { width } = useCachedWindowDimensions();
+
+    const maxBarCount = 12;
+
+    const progressBars = useMemo(() => {
+      const progress = (value / maxValue) * 100;
+      const barCount = Math.floor((value / maxValue) * maxBarCount);
+      const remainingProgress = progress - barCount * (100 / maxBarCount);
+      const finalBarProgress = (remainingProgress / (100 / maxBarCount)) * 100;
+
+      return Array(maxBarCount)
+        .fill(0)
+        .map((_, index) => {
+          if (index < barCount) {
+            return 100;
+          } else if (index === barCount) {
+            return finalBarProgress;
+          } else {
+            return 0;
+          }
+        });
+    }, [value, maxValue]);
+
+    const containerStyle = useMemo(
+      () => ({
+        width: width / 2 - 6,
+        height: "100%",
+      }),
+      [width],
+    );
+
+    return (
+      <View className="relative" style={containerStyle}>
+        <View className="w-full relative">
+          <BackgroundCanvas />
+          <ProgressBarsContainer progressBars={progressBars} />
+        </View>
+        <BottomInfo label={label} fees={fees} />
+        <PlaqueDisplay value={value} maxValue={maxValue} />
+      </View>
+    );
+  },
+);
+
+L2ProgressView.displayName = "L2ProgressView";

@@ -1,4 +1,12 @@
-import React, { JSX, useEffect, useLayoutEffect, memo, useRef, useState, useCallback } from 'react';
+import React, {
+  JSX,
+  useEffect,
+  useLayoutEffect,
+  memo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -7,9 +15,14 @@ import Animated, {
   useAnimatedStyle,
   runOnJS,
   Easing,
-} from 'react-native-reanimated';
-import { Canvas, Image, FilterMode, MipmapMode } from '@shopify/react-native-skia';
-import { View, StyleProp, ViewStyle } from 'react-native';
+} from "react-native-reanimated";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
+import { View, StyleProp, ViewStyle } from "react-native";
 import { BlockView } from "./BlockView";
 import { Miner } from "./Miner";
 import { useMiner } from "../hooks/useMiner";
@@ -33,7 +46,9 @@ export type BlockchainView2Props = {
 };
 
 export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
-  const workingBlock = useGameStore((state => state.workingBlocks[props.chainId]));
+  const workingBlock = useGameStore(
+    (state) => state.workingBlocks[props.chainId],
+  );
   const parentRef = useRef<View>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
 
@@ -65,9 +80,9 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
 
   const onBlockMined = useGameStore((state) => state.onBlockMined);
   const onBlockSequenced = useGameStore((state) => state.onBlockSequenced);
-  
+
   const blockShakeAnim = useSharedValue(0);
-  
+
   const triggerBlockShake = useCallback(() => {
     blockShakeAnim.value = withSequence(
       withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
@@ -76,14 +91,14 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
       withSpring(0, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
     );
   }, []);
-  
+
   const { miningProgress, mineBlock } = useMiner(
     onBlockMined,
-    triggerBlockShake
+    triggerBlockShake,
   );
   const { sequencingProgress, sequenceBlock } = useSequencer(
     onBlockSequenced,
-    triggerBlockShake
+    triggerBlockShake,
   );
   const createNewBlockchainBlockView = useCallback(() => {
     return (
@@ -100,7 +115,9 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
       />
     );
   }, [props.chainId, workingBlock?.blockId, newBlockInitPosition]);
-  const [block0, setBlock0] = useState<JSX.Element | null>(createNewBlockchainBlockView());
+  const [block0, setBlock0] = useState<JSX.Element | null>(
+    createNewBlockchainBlockView(),
+  );
   const [block1, setBlock1] = useState<JSX.Element | null>(null);
   const [block2, setBlock2] = useState<JSX.Element | null>(null);
   useEffect(() => {
@@ -122,7 +139,8 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
 
   const [txSize, setTxSize] = useState<number>(0);
   const txPerRow = workingBlock?.maxSize
-    ? Math.sqrt(workingBlock.maxSize) : 4 ** 2;
+    ? Math.sqrt(workingBlock.maxSize)
+    : 4 ** 2;
 
   useEffect(() => {
     // Account for 4px inset on each side
@@ -206,17 +224,23 @@ export type BlockchainBlockViewProps = {
   blockShakeAnim: Animated.SharedValue<number>;
 };
 
-export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) => {
+export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (
+  props,
+) => {
   const { getImage } = useImages();
   const { workingBlocks } = useGameStore();
-  const blockHeight = useGameStore((state) => state.blockHeights[props.chainId]);
+  const blockHeight = useGameStore(
+    (state) => state.blockHeights[props.chainId],
+  );
   const blockSlideLeftAnim = useSharedValue(props.placement.baseLeft);
   const blockScaleAnim = useSharedValue(1);
   const slideOffset = props.placement.width + 16;
-  
+
   const [thisBlock, setThisBlock] = useState<Block | null>(null);
-  const [isCurrentWorkingBlock, setIsCurrentWorkingBlock] = useState(blockHeight === props.blockId);
-  
+  const [isCurrentWorkingBlock, setIsCurrentWorkingBlock] = useState(
+    blockHeight === props.blockId,
+  );
+
   useEffect(() => {
     const block = workingBlocks[props.chainId];
     if (block?.blockId !== props.blockId) {
@@ -224,7 +248,7 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
     }
     setThisBlock(workingBlocks[props.chainId]);
   }, [props.chainId, workingBlocks, props.blockId]);
-  
+
   // Track if block is built and trigger scale animation
   useEffect(() => {
     if (thisBlock?.isBuilt && props.blockId === blockHeight) {
@@ -238,23 +262,30 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
   }, [thisBlock?.isBuilt, blockHeight, props.blockId]);
   useEffect(() => {
     const position = blockHeight - (props.blockId || 0);
-    blockSlideLeftAnim.value = props.placement.baseLeft - (position * slideOffset);
+    blockSlideLeftAnim.value =
+      props.placement.baseLeft - position * slideOffset;
   }, [props.blockId, props.placement.baseLeft, slideOffset]);
 
   const triggerBlockSlide = useCallback(() => {
     const position = blockHeight - (props.blockId || 0);
-    const currLeft = props.placement.baseLeft - (Math.max(position - 1, 0) * slideOffset);
-    const newLeft = props.placement.baseLeft - (position * slideOffset);
+    const currLeft =
+      props.placement.baseLeft - Math.max(position - 1, 0) * slideOffset;
+    const newLeft = props.placement.baseLeft - position * slideOffset;
     blockSlideLeftAnim.value = withSequence(
-      withTiming(currLeft, { // Wait 400ms
-        duration: 400
+      withTiming(currLeft, {
+        // Wait 400ms
+        duration: 400,
       }),
-      withTiming(newLeft, { 
-        duration: 700 
-      }, () => {
-        // After slide animation completes, update isCurrentWorkingBlock
-        runOnJS(setIsCurrentWorkingBlock)(false);
-      })
+      withTiming(
+        newLeft,
+        {
+          duration: 700,
+        },
+        () => {
+          // After slide animation completes, update isCurrentWorkingBlock
+          runOnJS(setIsCurrentWorkingBlock)(false);
+        },
+      ),
     );
   }, [blockHeight, props.blockId, props.placement.baseLeft, slideOffset]);
 
@@ -266,15 +297,13 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
   }, [blockHeight, props.blockId, triggerBlockSlide]);
 
   const blockTransformStyle = useAnimatedStyle(() => {
-    const transforms: any[] = [
-      { scale: blockScaleAnim.value }
-    ];
-    
+    const transforms: any[] = [{ scale: blockScaleAnim.value }];
+
     // Only apply shake animation if this is the current working block
     if (isCurrentWorkingBlock) {
       transforms.push({ rotate: `${props.blockShakeAnim.value}deg` });
     }
-    
+
     return {
       transform: transforms,
     };
@@ -285,13 +314,13 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
       style={[
         blockTransformStyle,
         {
-          position: 'absolute',
+          position: "absolute",
           top: props.placement.top,
           left: blockSlideLeftAnim,
           width: props.placement.width,
           height: props.placement.height,
           zIndex: isCurrentWorkingBlock ? 5 : 1,
-        }
+        },
       ]}
     >
       <BlockView
@@ -309,9 +338,7 @@ export const BlockConnectors: React.FC = memo(() => {
   const { getImage } = useImages();
 
   return (
-    <View
-      className="absolute top-0 left-0 w-full h-full"
-    >
+    <View className="absolute top-0 left-0 w-full h-full">
       <View className="absolute top-[30%] right-[-16px] w-[16px] h-[20px]">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image

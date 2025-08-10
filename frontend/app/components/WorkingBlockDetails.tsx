@@ -35,57 +35,83 @@ export type WorkingBlockDetailsProps = {
  */
 const BLOCK_IMAGE_LABEL_PERCENT = 0.09;
 
-const BlockCanvas = memo(({ placement }: { placement: { width: number; height: number } }) => {
-  const { getImage } = useImages();
-  
-  const canvasStyle = useMemo(() => ({
-    position: "absolute" as const,
-    top: -(placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-    width: placement.width,
-    height: placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-  }), [placement.width, placement.height]);
+const BlockCanvas = memo(
+  ({ placement }: { placement: { width: number; height: number } }) => {
+    const { getImage } = useImages();
 
-  const imageHeight = useMemo(() => 
-    placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT), 
-    [placement.height]
-  );
+    const canvasStyle = useMemo(
+      () => ({
+        position: "absolute" as const,
+        top: -(placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+        width: placement.width,
+        height:
+          placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+      }),
+      [placement.width, placement.height],
+    );
 
-  return (
-    <Canvas style={canvasStyle}>
-      <Image
-        image={getImage("block.grid")}
-        fit="fill"
-        x={0}
-        y={0}
-        width={placement.width}
-        height={imageHeight}
-        sampling={{
-          filter: FilterMode.Nearest,
-          mipmap: MipmapMode.Nearest,
-        }}
-      />
-    </Canvas>
-  );
-});
+    const imageHeight = useMemo(
+      () =>
+        placement.height + 2 * (placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+      [placement.height],
+    );
 
-BlockCanvas.displayName = 'BlockCanvas';
+    return (
+      <Canvas style={canvasStyle}>
+        <Image
+          image={getImage("block.grid")}
+          fit="fill"
+          x={0}
+          y={0}
+          width={placement.width}
+          height={imageHeight}
+          sampling={{
+            filter: FilterMode.Nearest,
+            mipmap: MipmapMode.Nearest,
+          }}
+        />
+      </Canvas>
+    );
+  },
+);
 
-const BlockIdLabel = memo(({ blockId, isSmall }: { blockId: number; isSmall: boolean }) => {
-  const textStyle = useMemo(() => ({
-    color: "#c3c3c3",
-    fontFamily: "Pixels" as const,
-    fontSize: isSmall ? 16 : 18,
-  }), [isSmall]);
+BlockCanvas.displayName = "BlockCanvas";
 
-  const animConfig = useMemo(() => ({
-    duration: 400,
-    easing: Easing.bounce,
-  }), []);
+const BlockIdLabel = memo(
+  ({ blockId, isSmall }: { blockId: number; isSmall: boolean }) => {
+    const textStyle = useMemo(
+      () => ({
+        color: "#c3c3c3",
+        fontFamily: "Pixels" as const,
+        fontSize: isSmall ? 16 : 18,
+      }),
+      [isSmall],
+    );
 
-  if (blockId >= 10) {
+    const animConfig = useMemo(
+      () => ({
+        duration: 400,
+        easing: Easing.bounce,
+      }),
+      [],
+    );
+
+    if (blockId >= 10) {
+      return (
+        <>
+          <Text style={textStyle}>#</Text>
+          <AnimatedRollingNumber
+            value={blockId}
+            textStyle={textStyle}
+            spinningAnimationConfig={animConfig}
+          />
+        </>
+      );
+    }
+
     return (
       <>
-        <Text style={textStyle}>#</Text>
+        <Text style={textStyle}>Block&nbsp;</Text>
         <AnimatedRollingNumber
           value={blockId}
           textStyle={textStyle}
@@ -93,89 +119,94 @@ const BlockIdLabel = memo(({ blockId, isSmall }: { blockId: number; isSmall: boo
         />
       </>
     );
-  }
+  },
+);
 
-  return (
-    <>
-      <Text style={textStyle}>Block&nbsp;</Text>
+BlockIdLabel.displayName = "BlockIdLabel";
+
+const TransactionCount = memo(
+  ({
+    transactionCount,
+    maxSize,
+    isSmall,
+  }: {
+    transactionCount: number;
+    maxSize: number;
+    isSmall: boolean;
+  }) => {
+    const textStyle = useMemo(
+      () => ({
+        fontSize: isSmall ? 16 : 18,
+        color: "#c3c3c3",
+        fontFamily: "Pixels" as const,
+      }),
+      [isSmall],
+    );
+
+    const animConfig = useMemo(
+      () => ({
+        duration: 400,
+        easing: Easing.bounce,
+      }),
+      [],
+    );
+
+    return (
+      <>
+        <AnimatedRollingNumber
+          value={transactionCount}
+          enableCompactNotation
+          compactToFixed={2}
+          textStyle={textStyle}
+          spinningAnimationConfig={animConfig}
+        />
+        <Text
+          style={{
+            fontSize: isSmall ? 16 : 18,
+          }}
+          className="text-[#c3c3c3] font-Pixels"
+        >
+          /{maxSize}
+        </Text>
+      </>
+    );
+  },
+);
+
+TransactionCount.displayName = "TransactionCount";
+
+const BlockReward = memo(
+  ({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
+    const textStyle = useMemo(
+      () => ({
+        fontSize: isSmall ? 18 : 18,
+        color: "#fff2fdff",
+        fontFamily: "Pixels" as const,
+      }),
+      [isSmall],
+    );
+
+    const animConfig = useMemo(
+      () => ({
+        duration: 400,
+        easing: Easing.bounce,
+      }),
+      [],
+    );
+
+    return (
       <AnimatedRollingNumber
-        value={blockId}
-        textStyle={textStyle}
-        spinningAnimationConfig={animConfig}
-      />
-    </>
-  );
-});
-
-BlockIdLabel.displayName = 'BlockIdLabel';
-
-const TransactionCount = memo(({ 
-  transactionCount, 
-  maxSize, 
-  isSmall 
-}: { 
-  transactionCount: number; 
-  maxSize: number; 
-  isSmall: boolean; 
-}) => {
-  const textStyle = useMemo(() => ({
-    fontSize: isSmall ? 16 : 18,
-    color: "#c3c3c3",
-    fontFamily: "Pixels" as const,
-  }), [isSmall]);
-
-  const animConfig = useMemo(() => ({
-    duration: 400,
-    easing: Easing.bounce,
-  }), []);
-
-  return (
-    <>
-      <AnimatedRollingNumber
-        value={transactionCount}
+        value={reward}
         enableCompactNotation
-        compactToFixed={2}
+        compactToFixed={1}
         textStyle={textStyle}
         spinningAnimationConfig={animConfig}
       />
-      <Text
-        style={{
-          fontSize: isSmall ? 16 : 18,
-        }}
-        className="text-[#c3c3c3] font-Pixels"
-      >
-        /{maxSize}
-      </Text>
-    </>
-  );
-});
+    );
+  },
+);
 
-TransactionCount.displayName = 'TransactionCount';
-
-const BlockReward = memo(({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
-  const textStyle = useMemo(() => ({
-    fontSize: isSmall ? 18 : 18,
-    color: "#fff2fdff",
-    fontFamily: "Pixels" as const,
-  }), [isSmall]);
-
-  const animConfig = useMemo(() => ({
-    duration: 400,
-    easing: Easing.bounce,
-  }), []);
-
-  return (
-    <AnimatedRollingNumber
-      value={reward}
-      enableCompactNotation
-      compactToFixed={1}
-      textStyle={textStyle}
-      spinningAnimationConfig={animConfig}
-    />
-  );
-});
-
-BlockReward.displayName = 'BlockReward';
+BlockReward.displayName = "BlockReward";
 
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
   (props) => {
@@ -183,11 +214,12 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
     const { workingBlocks } = useGameStore();
     const workingBlockData = workingBlocks[props.chainId];
 
-    const isSmall = useMemo(() => props.placement.width < 250, [props.placement.width]);
-
-    const [workingBlock, setWorkingBlock] = React.useState(
-      workingBlockData,
+    const isSmall = useMemo(
+      () => props.placement.width < 250,
+      [props.placement.width],
     );
+
+    const [workingBlock, setWorkingBlock] = React.useState(workingBlockData);
 
     const updateWorkingBlock = useCallback(() => {
       if (workingBlockData) {
@@ -219,55 +251,86 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       updateWorkingBlock,
     ]);
 
-    const containerStyle = useMemo(() => ({
-      position: "absolute" as const,
-      top: props.placement.top,
-      left: props.placement.left,
-      width: props.placement.width,
-      height: props.placement.height,
-      transform: [{ scale: detailsScaleAnim }],
-    }), [props.placement.top, props.placement.left, props.placement.width, props.placement.height]);
-
-    const blockIdLabelStyle = useMemo(() => ({
-      top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-    }), [props.placement.height]);
-
-    const transactionCountStyle = useMemo(() => ({
-      flexDirection: "row" as const,
-      position: "absolute" as const,
-      bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-      left: props.placement.width * 0.49,
-      paddingRight: 4,
-      paddingBottom: 6,
-    }), [props.placement.height, props.placement.width]);
-
-    const rewardStyle = useMemo(() => ({
-      position: "absolute" as const,
-      bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-      left: props.placement.width * 0.81,
-      paddingRight: 4,
-      paddingBottom: 6,
-    }), [props.placement.height, props.placement.width]);
-
-    const maxSize = useMemo(() => 
-      workingBlockData?.maxSize || getUpgradeValue(props.chainId, "Block Size") ** 2,
-      [workingBlockData?.maxSize, getUpgradeValue, props.chainId]
+    const containerStyle = useMemo(
+      () => ({
+        position: "absolute" as const,
+        top: props.placement.top,
+        left: props.placement.left,
+        width: props.placement.width,
+        height: props.placement.height,
+        transform: [{ scale: detailsScaleAnim }],
+      }),
+      [
+        props.placement.top,
+        props.placement.left,
+        props.placement.width,
+        props.placement.height,
+      ],
     );
 
-    const totalReward = useMemo(() => 
-      (workingBlock?.fees || 0) + (workingBlock?.reward || 0 || getUpgradeValue(props.chainId, "Block Reward")),
-      [workingBlock?.fees, workingBlock?.reward, getUpgradeValue, props.chainId]
+    const blockIdLabelStyle = useMemo(
+      () => ({
+        top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+      }),
+      [props.placement.height],
+    );
+
+    const transactionCountStyle = useMemo(
+      () => ({
+        flexDirection: "row" as const,
+        position: "absolute" as const,
+        bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+        left: props.placement.width * 0.49,
+        paddingRight: 4,
+        paddingBottom: 6,
+      }),
+      [props.placement.height, props.placement.width],
+    );
+
+    const rewardStyle = useMemo(
+      () => ({
+        position: "absolute" as const,
+        bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
+        left: props.placement.width * 0.81,
+        paddingRight: 4,
+        paddingBottom: 6,
+      }),
+      [props.placement.height, props.placement.width],
+    );
+
+    const maxSize = useMemo(
+      () =>
+        workingBlockData?.maxSize ||
+        getUpgradeValue(props.chainId, "Block Size") ** 2,
+      [workingBlockData?.maxSize, getUpgradeValue, props.chainId],
+    );
+
+    const totalReward = useMemo(
+      () =>
+        (workingBlock?.fees || 0) +
+        (workingBlock?.reward ||
+          0 ||
+          getUpgradeValue(props.chainId, "Block Reward")),
+      [
+        workingBlock?.fees,
+        workingBlock?.reward,
+        getUpgradeValue,
+        props.chainId,
+      ],
     );
 
     return (
       <Animated.View style={containerStyle}>
         <BlockCanvas placement={props.placement} />
-        
+
         <View
           className="absolute flex flex-row pl-2 pt-2"
           style={blockIdLabelStyle}
         >
-          <BlockIdLabel blockId={workingBlock?.blockId || 0} isSmall={isSmall} />
+          <BlockIdLabel
+            blockId={workingBlock?.blockId || 0}
+            isSmall={isSmall}
+          />
         </View>
 
         <View style={transactionCountStyle}>

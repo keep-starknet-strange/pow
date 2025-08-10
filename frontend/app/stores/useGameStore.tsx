@@ -71,7 +71,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     initBlock.isBuilt = true; // Mark the genesis block as built
     set({
       workingBlocks: [initBlock],
-      blockHeights: {0: initBlock.blockId},
+      blockHeights: { 0: initBlock.blockId },
     });
   },
 
@@ -226,7 +226,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((state) => {
       return {
         workingBlocks: [...state.workingBlocks, newWorkingBlock],
-        blockHeights: { ...state.blockHeights, 1: newWorkingBlock.blockId }
+        blockHeights: { ...state.blockHeights, 1: newWorkingBlock.blockId },
       };
     });
   },
