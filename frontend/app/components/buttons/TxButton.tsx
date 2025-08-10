@@ -104,7 +104,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     requestAnimationFrame(() => {
       shakeAnim.value *= -1; // Toggle the shake animation value
     });
-  }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
+  }, [addTransaction, props.chainId, props.txId, fee, props.isDapp]);
 
   const triggerTxShake = useCallback(() => {
     // Show popup animation
@@ -117,7 +117,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     popupRef.current?.showPopup(popupValue, popupColor);
 
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [shakeAnim, feeLevel, feeCost, fee]);
+  }, [feeLevel, feeCost, fee]);
 
   const handleFlashRequested = useCallback(
     (callback: (x: number, y: number) => void) => {

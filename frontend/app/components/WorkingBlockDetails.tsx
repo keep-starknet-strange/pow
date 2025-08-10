@@ -226,7 +226,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       width: props.placement.width,
       height: props.placement.height,
       transform: [{ scale: detailsScaleAnim }],
-    }), [props.placement.top, props.placement.left, props.placement.width, props.placement.height, detailsScaleAnim]);
+    }), [props.placement.top, props.placement.left, props.placement.width, props.placement.height]);
 
     const blockIdLabelStyle = useMemo(() => ({
       top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),

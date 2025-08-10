@@ -75,7 +75,7 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
       withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
       withSpring(0, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
     );
-  }, [blockShakeAnim]);
+  }, []);
   
   const { miningProgress, mineBlock } = useMiner(
     onBlockMined,
@@ -99,7 +99,7 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = (props) => {
         blockShakeAnim={blockShakeAnim}
       />
     );
-  }, [props.chainId, workingBlock?.blockId, newBlockInitPosition, blockShakeAnim]);
+  }, [props.chainId, workingBlock?.blockId, newBlockInitPosition]);
   const [block0, setBlock0] = useState<JSX.Element | null>(createNewBlockchainBlockView());
   const [block1, setBlock1] = useState<JSX.Element | null>(null);
   const [block2, setBlock2] = useState<JSX.Element | null>(null);
@@ -235,7 +235,7 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
     } else {
       blockScaleAnim.value = withTiming(1, { duration: 400 });
     }
-  }, [thisBlock?.isBuilt, blockScaleAnim, blockHeight, props.blockId]);
+  }, [thisBlock?.isBuilt, blockHeight, props.blockId]);
   useEffect(() => {
     const position = blockHeight - (props.blockId || 0);
     blockSlideLeftAnim.value = props.placement.baseLeft - (position * slideOffset);
@@ -256,7 +256,7 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (props) =
         runOnJS(setIsCurrentWorkingBlock)(false);
       })
     );
-  }, [blockHeight, props.blockId, props.placement.baseLeft, slideOffset, blockSlideLeftAnim]);
+  }, [blockHeight, props.blockId, props.placement.baseLeft, slideOffset]);
 
   useEffect(() => {
     const position = blockHeight - (props.blockId || 0);

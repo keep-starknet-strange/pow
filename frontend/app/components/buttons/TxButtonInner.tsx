@@ -46,7 +46,7 @@ export const TxButtonInner = memo(
     const automationAnimHeight = useSharedValue(94);
     const automationAnimY = useDerivedValue(() => {
       return 94 - automationAnimHeight.value;
-    }, [automationAnimHeight]);
+    }, []);
 
     const fee = getFee(props.chainId, props.txId, props.isDapp);
     const addNewTransaction = useCallback(
