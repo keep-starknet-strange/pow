@@ -246,7 +246,10 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
   },
 
-  playSoundEffect: async (soundType: string, pitchShift: number = 1.0): Promise<void> => {
+  playSoundEffect: async (
+    soundType: string,
+    pitchShift: number = 1.0,
+  ): Promise<void> => {
     const { isSoundOn, soundEffectVolume, soundPool } = get();
 
     // Fast early returns for performance
@@ -265,7 +268,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       playHaptic(soundConfig.haptic);
 
       // Play sound with minimal overhead
-      soundPool.playSound(soundType, pitchShift, soundConfig, soundEffectVolume);
+      soundPool.playSound(
+        soundType,
+        pitchShift,
+        soundConfig,
+        soundEffectVolume,
+      );
     } catch (error) {
       // Silent error handling for performance
     }
