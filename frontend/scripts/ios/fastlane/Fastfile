@@ -6,6 +6,14 @@ platform :ios do
   end
 
   private_lane :build_and_sign_release do
+    create_keychain(
+      name: "temp",
+      password: ENV['KEYCHAIN_PASSWORD'],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+    )
+    
     app_store_connect_api_key(
       key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
       issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
