@@ -18,8 +18,8 @@ import Animated, {
 
 export const Logo: React.FC = () => {
   const { getImage } = useImages();
-  const { width: screenWidth } = Dimensions.get('window');
-  
+  const { width: screenWidth } = Dimensions.get("window");
+
   // Scale factor based on screen width (iPhone SE width is 375)
   const scaleFactor = Math.min(screenWidth / 400, 1);
 
@@ -59,16 +59,28 @@ export const Logo: React.FC = () => {
   const exclamationShadowOutlineXDerived = exclamationShadowX - 2 * scaleFactor;
 
   // Derived values for Y positions with outline offsets
-  const pShadowOutlineYDerived = useDerivedValue(() => pShadowY.value - 1 * scaleFactor);
-  const oShadowOutlineYDerived = useDerivedValue(() => oShadowY.value - 1 * scaleFactor);
-  const wShadowOutlineYDerived = useDerivedValue(() => wShadowY.value - 1 * scaleFactor);
+  const pShadowOutlineYDerived = useDerivedValue(
+    () => pShadowY.value - 1 * scaleFactor,
+  );
+  const oShadowOutlineYDerived = useDerivedValue(
+    () => oShadowY.value - 1 * scaleFactor,
+  );
+  const wShadowOutlineYDerived = useDerivedValue(
+    () => wShadowY.value - 1 * scaleFactor,
+  );
   const exclamationShadowOutlineYDerived = useDerivedValue(
     () => exclamationShadowY.value - 1 * scaleFactor,
   );
 
-  const pOutlineYDerived = useDerivedValue(() => pMainY.value - 2 * scaleFactor);
-  const oOutlineYDerived = useDerivedValue(() => oMainY.value - 2 * scaleFactor);
-  const wOutlineYDerived = useDerivedValue(() => wMainY.value - 2 * scaleFactor);
+  const pOutlineYDerived = useDerivedValue(
+    () => pMainY.value - 2 * scaleFactor,
+  );
+  const oOutlineYDerived = useDerivedValue(
+    () => oMainY.value - 2 * scaleFactor,
+  );
+  const wOutlineYDerived = useDerivedValue(
+    () => wMainY.value - 2 * scaleFactor,
+  );
   const exclamationOutlineYDerived = useDerivedValue(
     () => exclamationMainY.value - 2 * scaleFactor,
   );
@@ -78,7 +90,7 @@ export const Logo: React.FC = () => {
     // Final positions adjusted for canvas offset (200px down due to marginTop: -200)
     const finalY = 232 * scaleFactor;
     const mainFinalY = 220 * scaleFactor;
-    
+
     pShadowY.value = withDelay(
       100,
       withSpring(finalY, {
