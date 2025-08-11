@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { View, Dimensions } from "react-native";
 import {
   Canvas,
   Image,
@@ -18,6 +18,10 @@ import Animated, {
 
 export const Logo: React.FC = () => {
   const { getImage } = useImages();
+  const { width: screenWidth } = Dimensions.get('window');
+  
+  // Scale factor based on screen width (iPhone SE width is 375)
+  const scaleFactor = Math.min(screenWidth / 400, 1);
 
   // Animated values for character Y positions (falling from top)
   const pShadowY = useSharedValue(-200);
@@ -32,49 +36,52 @@ export const Logo: React.FC = () => {
 
   const sublogoX = useSharedValue(400);
 
-  // Fixed X positions for each character
-  const pX = 30;
-  const oX = 104;
-  const wX = 181;
-  const exclamationX = 310;
+  // Fixed X positions for each character (scaled)
+  const pX = 30 * scaleFactor;
+  const oX = 104 * scaleFactor;
+  const wX = 181 * scaleFactor;
+  const exclamationX = 310 * scaleFactor;
 
-  const pShadowX = 42;
-  const oShadowX = 116;
-  const wShadowX = 193;
-  const exclamationShadowX = 322;
+  const pShadowX = 42 * scaleFactor;
+  const oShadowX = 116 * scaleFactor;
+  const wShadowX = 193 * scaleFactor;
+  const exclamationShadowX = 322 * scaleFactor;
 
   // Derived values for white outlines (offset from main letters)
-  const pOutlineXDerived = pX - 2;
-  const oOutlineXDerived = oX - 2;
-  const wOutlineXDerived = wX - 2;
-  const exclamationOutlineXDerived = exclamationX - 2;
+  const pOutlineXDerived = pX - 2 * scaleFactor;
+  const oOutlineXDerived = oX - 2 * scaleFactor;
+  const wOutlineXDerived = wX - 2 * scaleFactor;
+  const exclamationOutlineXDerived = exclamationX - 2 * scaleFactor;
 
-  const pShadowOutlineXDerived = pShadowX - 2;
-  const oShadowOutlineXDerived = oShadowX - 2;
-  const wShadowOutlineXDerived = wShadowX - 2;
-  const exclamationShadowOutlineXDerived = exclamationShadowX - 2;
+  const pShadowOutlineXDerived = pShadowX - 2 * scaleFactor;
+  const oShadowOutlineXDerived = oShadowX - 2 * scaleFactor;
+  const wShadowOutlineXDerived = wShadowX - 2 * scaleFactor;
+  const exclamationShadowOutlineXDerived = exclamationShadowX - 2 * scaleFactor;
 
   // Derived values for Y positions with outline offsets
-  const pShadowOutlineYDerived = useDerivedValue(() => pShadowY.value - 1);
-  const oShadowOutlineYDerived = useDerivedValue(() => oShadowY.value - 1);
-  const wShadowOutlineYDerived = useDerivedValue(() => wShadowY.value - 1);
+  const pShadowOutlineYDerived = useDerivedValue(() => pShadowY.value - 1 * scaleFactor);
+  const oShadowOutlineYDerived = useDerivedValue(() => oShadowY.value - 1 * scaleFactor);
+  const wShadowOutlineYDerived = useDerivedValue(() => wShadowY.value - 1 * scaleFactor);
   const exclamationShadowOutlineYDerived = useDerivedValue(
-    () => exclamationShadowY.value - 1,
+    () => exclamationShadowY.value - 1 * scaleFactor,
   );
 
-  const pOutlineYDerived = useDerivedValue(() => pMainY.value - 2);
-  const oOutlineYDerived = useDerivedValue(() => oMainY.value - 2);
-  const wOutlineYDerived = useDerivedValue(() => wMainY.value - 2);
+  const pOutlineYDerived = useDerivedValue(() => pMainY.value - 2 * scaleFactor);
+  const oOutlineYDerived = useDerivedValue(() => oMainY.value - 2 * scaleFactor);
+  const wOutlineYDerived = useDerivedValue(() => wMainY.value - 2 * scaleFactor);
   const exclamationOutlineYDerived = useDerivedValue(
-    () => exclamationMainY.value - 2,
+    () => exclamationMainY.value - 2 * scaleFactor,
   );
 
   useEffect(() => {
     // Animate characters falling from top with bouncy spring animation
     // Final positions adjusted for canvas offset (200px down due to marginTop: -200)
+    const finalY = 232 * scaleFactor;
+    const mainFinalY = 220 * scaleFactor;
+    
     pShadowY.value = withDelay(
       100,
-      withSpring(232, {
+      withSpring(finalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -85,7 +92,7 @@ export const Logo: React.FC = () => {
     );
     pMainY.value = withDelay(
       100,
-      withSpring(220, {
+      withSpring(mainFinalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -97,7 +104,7 @@ export const Logo: React.FC = () => {
 
     oShadowY.value = withDelay(
       200,
-      withSpring(232, {
+      withSpring(finalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -108,7 +115,7 @@ export const Logo: React.FC = () => {
     );
     oMainY.value = withDelay(
       200,
-      withSpring(220, {
+      withSpring(mainFinalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -120,7 +127,7 @@ export const Logo: React.FC = () => {
 
     wShadowY.value = withDelay(
       300,
-      withSpring(232, {
+      withSpring(finalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -131,7 +138,7 @@ export const Logo: React.FC = () => {
     );
     wMainY.value = withDelay(
       300,
-      withSpring(220, {
+      withSpring(mainFinalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -143,7 +150,7 @@ export const Logo: React.FC = () => {
 
     exclamationShadowY.value = withDelay(
       400,
-      withSpring(232, {
+      withSpring(finalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -154,7 +161,7 @@ export const Logo: React.FC = () => {
     );
     exclamationMainY.value = withDelay(
       400,
-      withSpring(220, {
+      withSpring(mainFinalY, {
         damping: 10,
         stiffness: 100,
         mass: 1,
@@ -166,7 +173,7 @@ export const Logo: React.FC = () => {
 
     sublogoX.value = withDelay(
       600,
-      withSpring(100, {
+      withSpring(100 * scaleFactor, {
         damping: 12,
         stiffness: 90,
         mass: 0.8,
@@ -182,9 +189,10 @@ export const Logo: React.FC = () => {
       className="absolute"
       style={{
         width: "90%",
-        height: 600,
-        top: "35%",
-        marginTop: -200,
+        maxWidth: 360 * scaleFactor,
+        height: 600 * scaleFactor,
+        top: "30%",
+        marginTop: -200 * scaleFactor,
         overflow: "visible",
         zIndex: 10,
         pointerEvents: "none",
@@ -194,7 +202,7 @@ export const Logo: React.FC = () => {
         style={{
           position: "absolute",
           width: "100%",
-          height: 600,
+          height: 600 * scaleFactor,
           overflow: "visible",
         }}
       >
@@ -210,8 +218,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={exclamationShadowOutlineXDerived}
             y={exclamationShadowOutlineYDerived}
-            width={34}
-            height={84}
+            width={34 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -222,8 +230,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={wShadowOutlineXDerived}
             y={wShadowOutlineYDerived}
-            width={140}
-            height={84}
+            width={140 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -234,8 +242,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={oShadowOutlineXDerived}
             y={oShadowOutlineYDerived}
-            width={90}
-            height={84}
+            width={90 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -246,8 +254,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={pShadowOutlineXDerived}
             y={pShadowOutlineYDerived}
-            width={86}
-            height={84}
+            width={86 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -267,8 +275,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={exclamationOutlineXDerived}
             y={exclamationOutlineYDerived}
-            width={34}
-            height={84}
+            width={34 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -279,8 +287,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={wOutlineXDerived}
             y={wOutlineYDerived}
-            width={140}
-            height={84}
+            width={140 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -291,8 +299,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={oOutlineXDerived}
             y={oOutlineYDerived}
-            width={90}
-            height={84}
+            width={90 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -303,8 +311,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={pOutlineXDerived}
             y={pOutlineYDerived}
-            width={86}
-            height={84}
+            width={86 * scaleFactor}
+            height={84 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -325,8 +333,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={exclamationShadowX}
             y={exclamationShadowY}
-            width={30}
-            height={80}
+            width={30 * scaleFactor}
+            height={80 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -337,8 +345,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={wShadowX}
             y={wShadowY}
-            width={136}
-            height={80}
+            width={136 * scaleFactor}
+            height={80 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -349,8 +357,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={oShadowX}
             y={oShadowY}
-            width={86}
-            height={80}
+            width={86 * scaleFactor}
+            height={80 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -361,8 +369,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={pShadowX}
             y={pShadowY}
-            width={82}
-            height={80}
+            width={82 * scaleFactor}
+            height={80 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -423,20 +431,20 @@ export const Logo: React.FC = () => {
       <View
         className="absolute"
         style={{
-          width: 600,
-          height: 18,
-          top: 320,
-          right: 30 - 300,
+          width: 600 * scaleFactor,
+          height: 18 * scaleFactor,
+          top: 320 * scaleFactor,
+          right: (30 - 300) * scaleFactor,
           zIndex: -1,
           overflow: "visible",
-          paddingLeft: 100,
+          paddingLeft: 100 * scaleFactor,
         }}
       >
         <Canvas
           style={{
             position: "absolute",
             left: 0,
-            width: 600,
+            width: 600 * scaleFactor,
             height: "100%",
             overflow: "visible",
           }}
@@ -446,8 +454,8 @@ export const Logo: React.FC = () => {
             fit="contain"
             x={sublogoX}
             y={0}
-            width={182}
-            height={18}
+            width={182 * scaleFactor}
+            height={18 * scaleFactor}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
