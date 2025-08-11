@@ -129,11 +129,9 @@ jobs:
               run: |
                 mv ./scripts/ios/* ./ios/
 
-            - name: Setup Ruby
-              uses: ruby/setup-ruby@v1
-              with:
-                ruby-version: '2.7'
-                bundler-cache: true
+            - name: Update Gems
+              working-directory: ./frontend/ios
+              run: bundle update
 
             - name: Decode App Store Connect Key
               working-directory: ./frontend/ios
