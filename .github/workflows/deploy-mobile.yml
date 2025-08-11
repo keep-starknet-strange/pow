@@ -129,9 +129,9 @@ jobs:
               run: |
                 mv ./scripts/ios/* ./ios/
 
-            - name: Install Fastlane
-              working-directory: ./frontend/ios
-              run: bundle install
+            # - name: Install Fastlane
+            #   working-directory: ./frontend/ios
+            #   run: bundle install
 
             - name: Decode App Store Connect Key
               working-directory: ./frontend/ios
