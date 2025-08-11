@@ -13,7 +13,7 @@ platform :ios do
       unlock: true,
       timeout: 3600,
     )
-    
+
     app_store_connect_api_key(
       key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
       issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
@@ -26,6 +26,7 @@ platform :ios do
       development: false,
       output_path: "./certificates",
       generate_apple_certs: false,
+      keychain_path: lane_context[SharedValues::KEYCHAIN_PATH],
       keychain_password: ENV['KEYCHAIN_PASSWORD']
     )
 
