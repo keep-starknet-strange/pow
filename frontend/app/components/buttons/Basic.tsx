@@ -61,6 +61,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({
       <TouchableWithoutFeedback
         onPress={() => {
           notify("BasicClick");
+          // eslint-disable-next-line react-hooks/react-compiler
           shakeAnim.value *= -1; // Toggle the shake direction
           onPress?.();
         }}
