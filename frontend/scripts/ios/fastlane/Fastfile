@@ -18,9 +18,7 @@ platform :ios do
       development: false,
     )
 
-    get_provisioning_profile(
-      provisioning_name: "Release"
-    )
+    get_provisioning_profile
 
     gym(clean: true)
   end

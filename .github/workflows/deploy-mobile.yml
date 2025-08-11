@@ -129,9 +129,11 @@ jobs:
               run: |
                 mv ./scripts/ios/* ./ios/
 
-            - name: Install Fastlane
-              working-directory: ./frontend/ios
-              run: bundle update
+            - name: Setup Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                ruby-version: '2.7'
+                bundler-cache: true
 
             - name: Decode App Store Connect Key
               working-directory: ./frontend/ios
