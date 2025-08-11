@@ -5,7 +5,7 @@ import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
 import { UpgradesStoreInitializer } from "./components/UpgradesStoreInitializer";
 import { useImagePreloader } from "./hooks/useImagePreloader";
-import Game from "./game";
+import Game from "./Game";
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);

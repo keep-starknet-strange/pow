@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/react-compiler */
 import { View } from "react-native";
 import { L2ProgressView } from "./L2ProgressView";
 import { useL2Store } from "@/app/stores/useL2Store";

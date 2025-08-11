@@ -41,7 +41,7 @@ export const BlockchainView: React.FC<BlockchainViewProps> = (props) => {
     };
 
     setWorkingBlockPosition(blockSize);
-  }, [parentSize, BLOCK_SIZE_PERCENT]);
+  }, [parentSize]);
 
   useLayoutEffect(() => {
     parentRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {

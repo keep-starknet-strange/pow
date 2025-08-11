@@ -81,7 +81,7 @@ const TxStreak: React.FC<TxStreakProps> = ({
         );
       }, delay);
     }
-  }, [trigger]);
+  }, [trigger, delay, length, lengthScale, opacity, scale, translateDistance]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const radians = ((angle + 90) * Math.PI) / 180;
@@ -150,7 +150,7 @@ const TxFlashCore: React.FC<{
         withTiming(0.3, { duration: 200, easing: Easing.in(Easing.quad) }),
       );
     }
-  }, [trigger]);
+  }, [trigger, opacity, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
