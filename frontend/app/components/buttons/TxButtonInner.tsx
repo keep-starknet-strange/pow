@@ -38,6 +38,7 @@ export interface TxButtonInnerProps {
 }
 
 export const TxButtonInner = memo((props: TxButtonInnerProps) => {
+  const { chainId, txId, isDapp, feeLevel, name, triggerTxAnimation } = props;
   const { getImage } = useImages();
   const { width } = Dimensions.get("window");
   const { addTransaction } = useGameStore();
@@ -48,23 +49,23 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     return 94 - automationAnimHeight.value;
   }, [automationAnimHeight]);
 
-  const fee = getFee(props.chainId, props.txId, props.isDapp);
+  const fee = getFee(chainId, txId, isDapp);
   const addNewTransaction = useCallback(
     async (finished: boolean | undefined) => {
       if (finished === false) return;
 
       // Trigger animation if provided
-      if (props.triggerTxAnimation) {
-        props.triggerTxAnimation();
+      if (triggerTxAnimation) {
+        triggerTxAnimation();
       }
 
-      const newTx = newTransaction(props.txId, fee, props.isDapp);
-      addTransaction(props.chainId, newTx);
+      const newTx = newTransaction(txId, fee, isDapp);
+      addTransaction(chainId, newTx);
     },
-    [props.chainId, props.txId, props.isDapp, props.triggerTxAnimation],
+    [chainId, txId, isDapp, triggerTxAnimation, addTransaction, fee],
   );
 
-  const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+  const speed = getSpeed(chainId, txId, isDapp);
 
   useEffect(() => {
     if (speed > 0) {
@@ -91,7 +92,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
     return () => {
       automationAnimHeight.value = 94; // Reset to default height when unmounted
     };
-  }, [speed]);
+  }, [speed, addNewTransaction, automationAnimHeight]);
   useInterval(
     () => {
       automationAnimHeight.value = withSequence(
@@ -122,7 +123,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
       >
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
-            image={getTxBg(props.chainId, props.txId, props.isDapp, getImage)}
+            image={getTxBg(chainId, txId, isDapp, getImage)}
             fit="fill"
             sampling={{
               filter: FilterMode.Nearest,
@@ -135,7 +136,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
           />
         </Canvas>
       </View>
-      {props.feeLevel !== -1 && (
+      {feeLevel !== -1 && (
         <View
           className="absolute bottom-0 h-full"
           style={{
@@ -150,12 +151,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
               height={automationAnimHeight}
             >
               <ImageShader
-                image={getTxInner(
-                  props.chainId,
-                  props.txId,
-                  props.isDapp,
-                  getImage,
-                )}
+                image={getTxInner(chainId, txId, isDapp, getImage)}
                 fit="fill"
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -167,7 +163,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
           </Canvas>
         </View>
       )}
-      {props.feeLevel !== -1 && (
+      {feeLevel !== -1 && (
         <View
           className="absolute left-[3px] h-[94px] w-full"
           style={{
@@ -176,12 +172,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxNameplate(
-                props.chainId,
-                props.txId,
-                props.isDapp,
-                getImage,
-              )}
+              image={getTxNameplate(chainId, txId, isDapp, getImage)}
               fit="fill"
               sampling={{
                 filter: FilterMode.Nearest,
@@ -194,11 +185,11 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
             />
           </Canvas>
           <Text className="absolute left-0 top-[4px] w-full text-center text-[16px] text-[#fff8ff] font-Pixels">
-            {props.name}
+            {name}
           </Text>
         </View>
       )}
-      {props.feeLevel === -1 ? (
+      {feeLevel === -1 ? (
         <View
           className="absolute w-full h-full
                pointer-events-none
@@ -234,12 +225,7 @@ export const TxButtonInner = memo((props: TxButtonInnerProps) => {
         >
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
-              image={getTxIcon(
-                props.chainId,
-                props.txId,
-                props.isDapp,
-                getImage,
-              )}
+              image={getTxIcon(chainId, txId, isDapp, getImage)}
               fit="contain"
               sampling={{
                 filter: FilterMode.Nearest,

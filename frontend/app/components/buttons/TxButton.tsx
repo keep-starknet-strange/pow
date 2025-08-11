@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/react-compiler */
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
 import {
   Image,
   Text,
@@ -90,56 +90,40 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   }));
 
   const [lastTxTime, setLastTxTime] = useState<number>(0);
-  const addNewTransaction = useCallback(async () => {
+  const addNewTransaction = async () => {
     const newTx = newTransaction(props.txId, fee, props.isDapp);
     addTransaction(props.chainId, newTx);
     setLastTxTime(Date.now());
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [addTransaction, props.chainId, props.txId, fee, props.isDapp, shakeAnim]);
+  };
 
-  const triggerTxShake = useCallback(() => {
+  const triggerTxShake = () => {
     setLastTxTime(Date.now());
     shakeAnim.value *= -1; // Toggle the shake animation value
-  }, [shakeAnim]);
+  };
 
-  const handleFlashRequested = useCallback(
-    (callback: (x: number, y: number) => void) => {
-      setTriggerFlash(() => callback);
-    },
-    [],
-  );
+  const handleFlashRequested = (callback: (x: number, y: number) => void) => {
+    setTriggerFlash(() => callback);
+  };
 
-  const handlePress = useCallback(
-    (event: GestureResponderEvent) => {
-      const { locationX, locationY } = event.nativeEvent;
+  const handlePress = (event: GestureResponderEvent) => {
+    const { locationX, locationY } = event.nativeEvent;
 
-      // Trigger flash animation at click position
-      if (triggerFlash) {
-        triggerFlash(locationX, locationY);
+    if (triggerFlash) {
+      triggerFlash(locationX, locationY);
+    }
+
+    if (feeLevel === -1) {
+      setLastTxTime(Date.now());
+      if (props.isDapp) {
+        dappFeeUpgrade(props.chainId, props.txId);
+      } else {
+        txFeeUpgrade(props.chainId, props.txId);
       }
-
-      if (feeLevel === -1) {
-        setLastTxTime(Date.now());
-        if (props.isDapp) {
-          dappFeeUpgrade(props.chainId, props.txId);
-        } else {
-          txFeeUpgrade(props.chainId, props.txId);
-        }
-        return;
-      }
-      addNewTransaction();
-    },
-    [
-      triggerFlash,
-      feeLevel,
-      props.isDapp,
-      props.chainId,
-      props.txId,
-      addNewTransaction,
-      dappFeeUpgrade,
-      txFeeUpgrade,
-    ],
-  );
+      return;
+    }
+    addNewTransaction();
+  };
 
   const transactionsData =
     props.chainId === 0

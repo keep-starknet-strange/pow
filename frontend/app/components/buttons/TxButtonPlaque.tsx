@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { View, Text, Dimensions } from "react-native";
 import {
   Canvas,
@@ -20,7 +20,7 @@ export interface TxButtonPlaqueProps {
   isDapp?: boolean;
 }
 
-export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
+export const TxButtonPlaque = (props: TxButtonPlaqueProps) => {
   const { width } = Dimensions.get("window");
   const { feeLevel, feeCost, fee } = props;
   const { getImage } = useImages();
@@ -74,4 +74,4 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
       )}
     </View>
   );
-});
+};

@@ -42,10 +42,9 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
 
   const { renderedBy, onConfirm, image, text, confirmPopup } = props;
   const enabled =
-    renderedBy !== undefined && ["miner", "sequencer", "da", "prover"].includes(renderedBy);
-  const targetId = (
-    renderedBy ? `${renderedBy}Confirmer` : "minerConfirmer"
-  ) as TargetId;
+    renderedBy !== undefined &&
+    ["miner", "sequencer", "da", "prover"].includes(renderedBy);
+  const targetId = (renderedBy ? `${renderedBy}Confirmer` : "") as TargetId;
   const { ref, onLayout } = useTutorialLayout(targetId, enabled);
   const tutorialProps = enabled ? { ref, onLayout } : {};
 

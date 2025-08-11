@@ -28,7 +28,7 @@ export const PopupAnimation: React.FC<PopupAnimationProps> = ({
     return () => {
       popupAnimation.removeAllListeners();
     };
-  }, [popupStartTime]);
+  }, [popupStartTime, popupAnimation]);
 
   return (
     <Animated.View
