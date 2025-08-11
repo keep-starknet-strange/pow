@@ -1,0 +1,46 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    Dotenv.load "../../.env"
+  end
+
+  private_lane :build_and_sign_release do
+    app_store_connect_api_key(
+      key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
+      key_filepath: ENV['APPSTORE_CONNECT_KEY_FILE_PATH'],
+      duration: 1200, #optional
+      in_house: false,
+    )
+
+    get_certificates(
+      development: false,
+    )
+
+    get_provisioning_profile(
+      provisioning_name: "Release"
+    )
+
+    gym(clean: true)
+  end
+
+  lane :deploy_testflight do
+    build_and_sign_release
+
+    upload_to_testflight(
+      skip_submission: true, # TEMP
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+    )
+  end
+
+  lane :deploy do
+    build_and_sign_release
+
+    upload_to_app_store(
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+end

@@ -1,0 +1,4 @@
+workspace("POW.xcworkspace")
+scheme("POW")
+archive_path("./build/POW.xcarchive")
+output_directory("./build") 
