@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -16,10 +16,12 @@ import {
 import { BlockchainView } from "@/app/components/BlockchainView";
 import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
 import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
+import { useTutorial } from "@/app/stores/useTutorialStore";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { notify } = useEventManager();
+  const { step } = useTutorial();
   const { getImage } = useImages();
   const window = useCachedWindowDimensions();
   const txTabs = ["Transactions", "dApps"];
@@ -31,7 +33,6 @@ export const L1Phase: React.FC = () => {
     setActiveTab(dappsUnlocked[0] ? "dApps" : "Transactions");
   }, [dappsUnlocked]);
   */
-
   return (
     <View
       style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
@@ -115,7 +116,7 @@ export const L1Phase: React.FC = () => {
                 <Canvas style={{ width: "100%", height: "100%" }}>
                   <Image
                     image={getImage(
-                      tab === activeTab ? "tx.tab.active" : "tx.tab.inactive",
+                      tab === activeTab || step == "dapps" ? "tx.tab.active" : "tx.tab.inactive",
                     )}
                     fit="fill"
                     x={0}
@@ -131,7 +132,7 @@ export const L1Phase: React.FC = () => {
                 <Text
                   className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
                   style={{
-                    color: tab === activeTab ? "#FFF7FF" : "#a9a9a9",
+                    color: tab === activeTab || step == "dapps" ? "#FFF7FF" : "#a9a9a9",
                   }}
                 >
                   {tab}

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState, memo } from "react";
-import { View, Text, LayoutChangeEvent } from "react-native";
+import { useEffect, useState, memo } from "react";
+import { View, Text } from "react-native";
 import {
   Canvas,
   Image,
@@ -8,11 +8,9 @@ import {
 } from "@shopify/react-native-skia";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
-import { useGameStore } from "../stores/useGameStore";
 import { useImages } from "../hooks/useImages";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
-import { BlockTxOutlines } from "./BlockTxOutlines";
 
 export type BlockViewProps = {
   chainId: number;
