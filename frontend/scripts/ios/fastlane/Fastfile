@@ -16,6 +16,9 @@ platform :ios do
 
     get_certificates(
       development: false,
+      output_path: "./certificates",
+      generate_apple_certs: false,
+      keychain_password: ENV['KEYCHAIN_PASSWORD']
     )
 
     get_provisioning_profile
