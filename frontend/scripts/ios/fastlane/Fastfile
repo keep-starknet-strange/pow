@@ -16,6 +16,11 @@ platform :ios do
       in_house: false,
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "POW.xcodeproj"
+    )
+
     match(
       api_key: api_key, 
       type: 'appstore',
