@@ -11,7 +11,7 @@ import { useSequencer } from "../hooks/useSequencer";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
 import { BlockTxOutlines } from "./BlockTxOutlines";
-import { BlockchainBlockView } from "./BlockchainView2";
+import { BlockchainBlockView } from "./BlockchainView";
 
 type BlockPlacement = {
   top: number;

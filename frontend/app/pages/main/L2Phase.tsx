@@ -14,7 +14,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { BlockchainView2 } from "@/app/components/BlockchainView2";
+import { BlockchainView } from "@/app/components/BlockchainView";
 import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L2Phase: React.FC = () => {
@@ -40,7 +40,7 @@ export const L2Phase: React.FC = () => {
         marginTop: dappsUnlocked[1] ? 10 : 20,
       }}
     >
-      <BlockchainView2 chainId={1} style={{ flex: 1 }} />
+      <BlockchainView chainId={1} style={{ flex: 1 }} />
       <DappsUnlock chainId={1} />
       <PrestigeUnlock />
       <Animated.View
