@@ -8,12 +8,21 @@ export interface TutorialRefViewProps {
   enabled: boolean;
 }
 
-export const TutorialRefView: React.FC<TutorialRefViewProps> = memo((props) => {
-  const { ref, onLayout } = useTutorialLayout(
-    props.targetId as TargetId,
-    props.enabled,
-  );
-  return (
-    <View className="w-full h-full absolute" ref={ref} onLayout={onLayout} />
-  );
-});
+export const TutorialRefView: React.FC<TutorialRefViewProps> = memo(
+  (props) => {
+    const { ref, onLayout } = useTutorialLayout(
+      props.targetId as TargetId,
+      props.enabled,
+    );
+    return (
+      <View className="w-full h-full absolute" ref={ref} onLayout={onLayout} />
+    );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if targetId or enabled changes
+    return (
+      prevProps.targetId === nextProps.targetId &&
+      prevProps.enabled === nextProps.enabled
+    );
+  },
+);
