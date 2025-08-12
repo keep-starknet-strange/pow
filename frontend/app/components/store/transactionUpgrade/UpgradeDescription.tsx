@@ -8,7 +8,6 @@ import {
 } from "@shopify/react-native-skia";
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 import { useImages } from "../../../hooks/useImages";
-import { useUpgrades } from "../../../stores/useUpgradesStore";
 
 type UpgradeDescriptionProps = {
   chainId: number;
@@ -17,38 +16,60 @@ type UpgradeDescriptionProps = {
   subDescription: string;
   maxSubDescription: string;
   currentLevel: number;
-  values: number[];
-  baseValue: number;
+  values?: number[];
+  baseValue?: number;
+  speeds?: number[];
+  baseSpeed?: number;
 };
 
 export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
-  chainId,
-  upgradeId,
   description,
   subDescription,
   maxSubDescription,
   currentLevel,
   values,
   baseValue,
+  speeds,
+  baseSpeed,
 }) => {
   const { getImage } = useImages();
 
-  const currVal = currentLevel === -1 ? baseValue : values[currentLevel];
-  const upgradeVal =
-    currentLevel + 1 < values.length
-      ? values[currentLevel + 1]
-      : values[currentLevel];
+  // Handle both upgrade values and automation speeds
+  const isAutomation = speeds !== undefined;
+  const dataArray = isAutomation ? speeds : values;
+  const baseData = isAutomation ? baseSpeed : baseValue;
+
+  // For automations, convert speed to actual rate per second (speed / 5)
+  // Since the formula is 5000ms / speed, the actual rate is speed / 5 per second
+  const rawCurrVal = currentLevel === -1 ? baseData : dataArray?.[currentLevel];
+  const rawUpgradeVal =
+    currentLevel + 1 < (dataArray?.length || 0)
+      ? dataArray?.[currentLevel + 1]
+      : dataArray?.[currentLevel];
+
+  const currVal = isAutomation ? (rawCurrVal || 0) / 5 : rawCurrVal;
+  const upgradeVal = isAutomation ? (rawUpgradeVal || 0) / 5 : rawUpgradeVal;
 
   // Check if we're at max level
-  const isMaxLevel = currentLevel + 1 >= values.length;
+  const isMaxLevel = currentLevel + 1 >= (dataArray?.length || 0);
 
   // Use the appropriate sub-description based on max level
   const activeSubDescription = isMaxLevel ? maxSubDescription : subDescription;
 
-  // Process the sub-description with values
-  const processedSubDescription = activeSubDescription
-    .replace(/\${currVal}/g, `__CURR_VAL__${currVal}__`)
-    .replace(/\${upgradeVal}/g, `__UPGRADE_VAL__${upgradeVal}__`);
+  // Process the sub-description with values/speeds
+  let processedSubDescription = activeSubDescription;
+
+  if (isAutomation) {
+    // For automations, replace speed placeholders
+    processedSubDescription = processedSubDescription
+      .replace(/\${currSpeed}/g, `__CURR_VAL__${currVal || 0}__`)
+      .replace(/\${upgradeSpeed}/g, `__UPGRADE_VAL__${upgradeVal || 0}__`);
+  } else {
+    // For upgrades, replace value placeholders
+    processedSubDescription = processedSubDescription
+      .replace(/\${currVal}/g, `__CURR_VAL__${currVal || 0}__`)
+      .replace(/\${upgradeVal}/g, `__UPGRADE_VAL__${upgradeVal || 0}__`);
+  }
 
   const lines = [description, processedSubDescription];
 
@@ -56,8 +77,9 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
     const textColor = isSecondLine ? "#fff7ff" : "#717171";
 
     // Split by our value markers and BTC icons
+    // Updated regex to handle decimal numbers (e.g., 0.2, 1.5)
     const parts = text.split(
-      /(__CURR_VAL__\d+__|__UPGRADE_VAL__\d+__|\{BTC\})/g,
+      /(__CURR_VAL__[\d.]+__|__UPGRADE_VAL__[\d.]+__|\{BTC\})/g,
     );
 
     return parts.map((part, partIndex) => {
@@ -91,7 +113,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
 
       // Handle current value numbers
       if (part.startsWith("__CURR_VAL__")) {
-        const value = parseInt(
+        const value = parseFloat(
           part.replace("__CURR_VAL__", "").replace("__", ""),
         );
         return (
@@ -99,7 +121,8 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
             <AnimatedRollingNumber
               value={value}
               enableCompactNotation
-              compactToFixed={2}
+              compactToFixed={1}
+              fixedOnlyForCompact={false}
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",
@@ -113,7 +136,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
 
       // Handle upgrade value numbers
       if (part.startsWith("__UPGRADE_VAL__")) {
-        const value = parseInt(
+        const value = parseFloat(
           part.replace("__UPGRADE_VAL__", "").replace("__", ""),
         );
         return (
@@ -121,7 +144,8 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
             <AnimatedRollingNumber
               value={value}
               enableCompactNotation
-              compactToFixed={2}
+              compactToFixed={1}
+              fixedOnlyForCompact={false}
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",
@@ -152,10 +176,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
         const isSecondLine = lineIndex === 1;
 
         return (
-          <View
-            key={lineIndex}
-            className="flex-row flex-wrap items-center"
-          >
+          <View key={lineIndex} className="flex-row flex-wrap items-center">
             {renderTextWithNumbers(line, isSecondLine)}
           </View>
         );

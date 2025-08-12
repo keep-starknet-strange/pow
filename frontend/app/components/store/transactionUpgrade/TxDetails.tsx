@@ -18,6 +18,8 @@ type TxDetailsProps = {
   currentLevel?: number;
   values?: number[];
   baseValue?: number;
+  speeds?: number[];
+  baseSpeed?: number;
   subDescription?: string;
   maxSubDescription?: string;
 };
@@ -30,6 +32,8 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
   currentLevel,
   values,
   baseValue,
+  speeds,
+  baseSpeed,
   subDescription,
   maxSubDescription,
 }) => {
@@ -63,8 +67,8 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
         {chainId !== undefined &&
         upgradeId !== undefined &&
         currentLevel !== undefined &&
-        values &&
-        baseValue !== undefined &&
+        ((values && baseValue !== undefined) ||
+          (speeds && baseSpeed !== undefined)) &&
         subDescription &&
         maxSubDescription ? (
           <UpgradeDescription
@@ -76,6 +80,8 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
             currentLevel={currentLevel}
             values={values}
             baseValue={baseValue}
+            speeds={speeds}
+            baseSpeed={baseSpeed}
           />
         ) : (
           <Text className="text-[#717171] text-lg font-Pixels leading-none">
