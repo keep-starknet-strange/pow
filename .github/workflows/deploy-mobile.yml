@@ -103,7 +103,7 @@ jobs:
       runs-on: macos-15
       env:
           KEYCHAIN_NAME: "temp.keychain"
-          KEYCHAIN_PATH: "$HOME/Library/Keychains/$KEYCHAIN_NAME-db"
+          KEYCHAIN_PATH: $HOME/Library/Keychains/$KEYCHAIN_NAME-db
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       steps:
             - name: Checkout project
@@ -120,7 +120,9 @@ jobs:
 
             - name: Install dependencies
               working-directory: ./frontend
-              run: npm ci
+              run: |
+                echo $KEYCHAIN_PATH
+                npm ci
 
             - name: Prebuild app
               working-directory: ./frontend
