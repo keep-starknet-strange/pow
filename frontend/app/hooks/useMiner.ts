@@ -5,7 +5,6 @@ import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
-import { useBatchedUpdates, useDebounce } from "./useBatchedUpdates";
 
 export const useMiner = (
   onBlockMined: () => void,
@@ -19,9 +18,6 @@ export const useMiner = (
   const miningBlock = workingBlocks[0];
   const blockDifficulty = miningBlock?.difficulty || 4 ** 2;
   const [mineCounter, setMineCounter] = useState(0);
-  const [miningProgress, setMiningProgress] = useState(0);
-  const { batchUpdate } = useBatchedUpdates();
-  const debouncedNotify = useDebounce(50); // Debounce notifications by 50ms
 
   useEffect(() => {
     const fetchMineCounter = async () => {
@@ -52,14 +48,8 @@ export const useMiner = (
     // Batch state updates to prevent multiple rerenders
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
 
       if (newCounter <= blockDifficulty) {
-        const newProgress = newCounter / blockDifficulty;
-        // Batch progress update
-        batchUpdate(() => {
-          setMiningProgress(newProgress);
-        });
         return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond difficulty
@@ -68,24 +58,17 @@ export const useMiner = (
   }, [
     triggerMineAnimation,
     miningBlock?.isBuilt,
-    miningBlock?.difficulty,
-    batchUpdate,
+    blockDifficulty,
   ]);
 
   useEffect(() => {
     if (mineCounter === blockDifficulty) {
-      batchUpdate(() => {
-        setMiningProgress(1);
-        onBlockMined();
-        setMineCounter(0);
-      });
+      onBlockMined();
+      setMineCounter(0);
     } else if (mineCounter > 0) {
-      // Debounce event notifications to reduce overhead
-      debouncedNotify(() => {
-        notify("MineClicked", {
-          counter: mineCounter,
-          difficulty: blockDifficulty,
-        });
+      notify("MineClicked", {
+        counter: mineCounter,
+        difficulty: blockDifficulty,
       });
     }
   }, [
@@ -93,8 +76,6 @@ export const useMiner = (
     blockDifficulty,
     notify,
     onBlockMined,
-    batchUpdate,
-    debouncedNotify,
   ]);
 
   // Reset mining progress when a block is mined
@@ -107,7 +88,6 @@ export const useMiner = (
 
   return {
     mineCounter,
-    miningProgress,
     mineBlock,
   };
 };
