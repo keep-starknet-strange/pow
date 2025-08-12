@@ -6,7 +6,6 @@ export const useImages = () => {
 
   const getImage = useCallback(
     (key: string) => {
-      console.log("getImage", key);
       if (preloadedImages) {
         const image = preloadedImages[key as keyof typeof preloadedImages];
         return image || preloadedImages.unknown || null;

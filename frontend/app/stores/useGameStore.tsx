@@ -218,11 +218,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().genesisBlockReward,
     );
     newWorkingBlock.isBuilt = true; // Mark the genesis block as built
-    console.log("Initializing L2 working block:", newWorkingBlock);
-    console.log("New state", {
-      workingBlocks: [...get().workingBlocks, newWorkingBlock],
-      blockHeights: { ...get().blockHeights, 1: newWorkingBlock.blockId },
-    });
     set((state) => {
       return {
         workingBlocks: [...state.workingBlocks, newWorkingBlock],

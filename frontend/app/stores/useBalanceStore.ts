@@ -7,7 +7,7 @@ import { FocAccount } from "../context/FocEngineConnector";
 let balanceUpdateQueue: number[] = [];
 let balanceUpdateTimeout: NodeJS.Timeout | null = null;
 
-const DEFAULT_BALANCE = 100000000000;
+const DEFAULT_BALANCE = Number(process.env.EXPO_PUBLIC_DEFAULT_BALANCE) || 0;
 
 interface BalanceState {
   balance: number;

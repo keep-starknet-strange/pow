@@ -90,8 +90,6 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = memo(
       );
     }, []);
 
-    console.log("Rendering BlockchainView2", `chainId: ${props.chainId}`);
-
     const createNewBlockchainBlockView = useCallback(() => {
       const workingBlockId =
         useGameStore.getState().workingBlocks[props.chainId]?.blockId || 0;
