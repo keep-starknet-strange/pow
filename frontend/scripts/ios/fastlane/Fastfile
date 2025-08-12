@@ -21,7 +21,11 @@ platform :ios do
       type: 'appstore',
       readonly: false
     )
-    gym(clean: true)
+    gym(
+      clean: true,
+      export_xcargs: '-allowProvisioningUpdates',
+      xcargs: '-allowProvisioningUpdates'
+    )
   end
 
   lane :deploy_testflight do
