@@ -3,13 +3,11 @@ import { Confirmer } from "./Confirmer";
 
 interface SequencerProps {
   triggerAnim: () => void;
-  sequencingProgress: number;
   sequenceBlock: () => void;
 }
 
 export const Sequencer: React.FC<SequencerProps> = ({
   triggerAnim,
-  sequencingProgress,
   sequenceBlock,
 }) => {
   return (

@@ -15,6 +15,9 @@ export const useMiner = (
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
+  const { workingBlocks } = useGameStore();
+  const miningBlock = workingBlocks[0];
+  const blockDifficulty = miningBlock?.difficulty || 4 ** 2;
   const [mineCounter, setMineCounter] = useState(0);
   const [miningProgress, setMiningProgress] = useState(0);
   const { batchUpdate } = useBatchedUpdates();
@@ -36,8 +39,6 @@ export const useMiner = (
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
-  const miningBlock = workingBlocks[0];
   const mineBlock = useCallback(() => {
     if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");
@@ -48,33 +49,16 @@ export const useMiner = (
     if (triggerMineAnimation) {
       triggerMineAnimation();
     }
-
     // Batch state updates to prevent multiple rerenders
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
 
-      // Use batched updates for better performance
-      if (newCounter == blockDifficulty) {
-        // Batch critical completion updates
-        batchUpdate(() => {
-          setMiningProgress(1);
-          onBlockMined();
-        });
-        return newCounter;
-      } else if (newCounter < blockDifficulty) {
+      if (newCounter <= blockDifficulty) {
         const newProgress = newCounter / blockDifficulty;
         // Batch progress update
         batchUpdate(() => {
           setMiningProgress(newProgress);
-        });
-
-        // Debounce event notifications to reduce overhead
-        debouncedNotify(() => {
-          notify("MineClicked", {
-            counter: newCounter,
-            difficulty: blockDifficulty,
-          });
         });
         return newCounter;
       } else {
@@ -82,20 +66,31 @@ export const useMiner = (
       }
     });
   }, [
-    notify,
-    onBlockMined,
+    triggerMineAnimation,
     miningBlock?.isBuilt,
     miningBlock?.difficulty,
-    triggerMineAnimation,
     batchUpdate,
-    debouncedNotify,
   ]);
 
-  // Reset mining progress when a block is mined
   useEffect(() => {
-    setMiningProgress(0);
-    setMineCounter(0);
-  }, [miningBlock?.blockId]);
+    if (mineCounter === blockDifficulty) {
+      batchUpdate(() => {
+        setMiningProgress(1);
+        onBlockMined();
+        setMineCounter(0);
+      });
+    } else if (mineCounter > 0) {
+      // Debounce event notifications to reduce overhead
+      debouncedNotify(() => {
+        notify("MineClicked", {
+          counter: mineCounter,
+          difficulty: blockDifficulty,
+        });
+      });
+    }
+  }, [mineCounter, blockDifficulty, notify, onBlockMined, batchUpdate, debouncedNotify]);
+
+  // Reset mining progress when a block is mined
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,
