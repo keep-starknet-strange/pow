@@ -18,6 +18,8 @@ type TxDetailsProps = {
   currentLevel?: number;
   values?: number[];
   baseValue?: number;
+  subDescription?: string;
+  maxSubDescription?: string;
 };
 
 export const TxDetails: React.FC<TxDetailsProps> = ({
@@ -28,6 +30,8 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
   currentLevel,
   values,
   baseValue,
+  subDescription,
+  maxSubDescription,
 }) => {
   const { getImage } = useImages();
 
@@ -60,11 +64,15 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
         upgradeId !== undefined &&
         currentLevel !== undefined &&
         values &&
-        baseValue !== undefined ? (
+        baseValue !== undefined &&
+        subDescription &&
+        maxSubDescription ? (
           <UpgradeDescription
             chainId={chainId}
             upgradeId={upgradeId}
             description={description}
+            subDescription={subDescription}
+            maxSubDescription={maxSubDescription}
             currentLevel={currentLevel}
             values={values}
             baseValue={baseValue}

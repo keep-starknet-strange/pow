@@ -64,6 +64,8 @@ export const UpgradeView: React.FC<UpgradeViewProps> = React.memo((props) => {
           currentLevel={currentLevel}
           values={props.upgrade.values}
           baseValue={props.upgrade.baseValue}
+          subDescription={props.upgrade.subDescription}
+          maxSubDescription={props.upgrade.maxSubDescription}
         />
       </View>
       <UpgradeButton
