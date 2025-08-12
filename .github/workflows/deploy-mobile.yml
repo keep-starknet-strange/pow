@@ -160,3 +160,10 @@ jobs:
               if: ${{ inputs.internal_testing == false }}
               working-directory: ./frontend/ios
               run: bundle exec fastlane deploy
+
+            - name: Upload logs
+              uses: actions/upload-artifact@v4
+              if: ${{ failure() }}
+              with:
+                name: Pow.log
+                path: /Users/runner/Library/Logs/gym/POW-POW.log
