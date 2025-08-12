@@ -8,6 +8,7 @@ import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
+import { TargetId, useIsTutorialTargetActive } from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
@@ -48,7 +49,6 @@ export const StorePage: React.FC = () => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
-
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
     isL2Unlocked ? "L2" : "L1",
@@ -88,8 +88,26 @@ export const StorePage: React.FC = () => {
     }
   }, [storeType]);
 
-  const subTabs = ["Transactions", "Upgrades", "Automation"];
-  const [activeSubTab, setActiveSubTab] = useState(subTabs[0]);
+  const subTabs = useMemo(() => ["Transactions", "Upgrades", "Automation"] as const, []);
+  type SubTab = (typeof subTabs)[number];
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>(subTabs[0]);
+  
+  const isChainUpgradeTabActive = useIsTutorialTargetActive("chainUpgradeTab" as TargetId);
+  const isChainAutomationTabActive = useIsTutorialTargetActive("chainAutomationTab" as TargetId);
+  const stepTabOverrides = useMemo(
+    () =>
+      ({
+        Transactions: false,
+        Upgrades: isChainUpgradeTabActive,
+        Automation: isChainAutomationTabActive,
+      } as const),
+    [isChainUpgradeTabActive, isChainAutomationTabActive],
+  );
+
+  const isTabActive = useCallback(
+    (tab: SubTab) => Boolean(stepTabOverrides[tab]) || activeSubTab === tab,
+    [activeSubTab, stepTabOverrides],
+  );
 
   const storeData = useMemo(() => {
     const data: any[] = [];
@@ -363,12 +381,15 @@ export const StorePage: React.FC = () => {
         className="flex flex-row items-end h-[32px] gap-[2px]"
         style={{ paddingHorizontal: 4, marginTop: 4 }}
       >
-        {subTabs.map((tab) => (
+        {subTabs.map((tab) => {
+          const active = isTabActive(tab);
+          const tabWidth = (width - 2 * subTabs.length - 6) / subTabs.length;
+          return (
           <Pressable
             className="relative flex justify-center z-[10]"
             style={{
-              width: (width - 2 * subTabs.length - 6) / subTabs.length,
-              height: activeSubTab === tab ? 32 : 24,
+              width: tabWidth,
+              height: active ? 32 : 24,
             }}
             key={tab}
             onPress={() => {
@@ -385,13 +406,13 @@ export const StorePage: React.FC = () => {
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
                 image={getImage(
-                  activeSubTab === tab ? "shop.tab.active" : "shop.tab",
+                  active ? "shop.tab.active" : "shop.tab",
                 )}
                 fit="fill"
                 x={0}
                 y={0}
                 width={(width - 2 * subTabs.length - 6) / subTabs.length}
-                height={activeSubTab === tab ? 32 : 24}
+                height={active ? 32 : 24}
                 sampling={{
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.Nearest,
@@ -400,13 +421,13 @@ export const StorePage: React.FC = () => {
             </Canvas>
             <Text
               className={`font-Pixels text-xl text-center w-full absolute ${
-                activeSubTab === tab ? "text-[#fff7ff]" : "text-[#717171]"
+                active ? "text-[#fff7ff]" : "text-[#717171]"
               }`}
             >
               {tab}
             </Text>
           </Pressable>
-        ))}
+        )})}
       </View>
       <View style={{ height: 522, marginTop: 2 }}>
         <FlatList
