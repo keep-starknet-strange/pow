@@ -23,6 +23,8 @@ import { InAppNotificationsObserver } from "./observers/InAppNotificationsObserv
 import { AchievementObserver } from "./observers/AchievementObserver";
 import { SoundObserver } from "./observers/SoundObserver";
 import { TxBuilderObserver } from "./observers/TxBuilderObserver";
+import { TutorialObserver } from "./observers/TutorialObserver";
+import { useTutorial, useTutorialStore } from "./stores/useTutorialStore";
 
 export default function game() {
   const { user } = useFocEngine();
@@ -125,6 +127,24 @@ export default function game() {
       cleanupSound();
     };
   }, [initializeSound]);
+
+  const { advanceStep, setVisible, step } = useTutorial();
+  const [tutorialObserver, setTutorialObserver] = useState<null | string>(null);
+  useEffect(() => {
+    if (tutorialObserver !== null) {
+      unregisterObserver(tutorialObserver);
+    }
+    const observerId = registerObserver(
+      new TutorialObserver(advanceStep, setVisible, step),
+    );
+    setTutorialObserver(observerId);
+
+    return () => {
+      if (tutorialObserver !== null) {
+        unregisterObserver(tutorialObserver);
+      }
+    };
+  }, [advanceStep, setVisible, step]);
 
   useEffect(() => {
     setSoundDependency(playSoundEffect);

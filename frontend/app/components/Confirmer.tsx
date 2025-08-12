@@ -14,7 +14,9 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import { FlashBurstManager } from "./FlashBurstManager";
+import { TargetId } from "../stores/useTutorialStore";
 import { useImages } from "../hooks/useImages";
 
 export type ConfirmerProps = {
@@ -30,6 +32,17 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const [triggerFlash, setTriggerFlash] = useState<
     ((x: number, y: number) => void) | null
   >(null);
+
+  const enabled =
+    props.renderedBy !== undefined &&
+    ["miner", "sequencer", "da", "prover"].includes(props.renderedBy);
+  let tutorialProps = {};
+  let ref, onLayout;
+  if (enabled) {
+    const targetId = `${props.renderedBy}Confirmer` as TargetId;
+    ({ ref, onLayout } = useTutorialLayout(targetId, enabled));
+    tutorialProps = { ref, onLayout };
+  }
 
   const [confirmTime, setConfirmTime] = useState(0);
   const confirmAnimation = useAnimatedValue(0);
@@ -74,6 +87,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
       ref={pressableRef}
       className="w-full h-full relative"
       onPress={handlePress}
+      {...tutorialProps}
     >
       {props.image && (
         <Animated.View

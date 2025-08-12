@@ -11,6 +11,8 @@ import { Easing } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useBalance } from "../stores/useBalanceStore";
 import { useImages } from "../hooks/useImages";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
+import { TargetId } from "../stores/useTutorialStore";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 
 export const Header: React.FC = memo(() => {
@@ -18,9 +20,15 @@ export const Header: React.FC = memo(() => {
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
 
+  const { ref, onLayout } = useTutorialLayout(
+    "headerBalance" as TargetId,
+    true,
+  );
   const insets = useSafeAreaInsets();
   return (
     <View
+      ref={ref}
+      onLayout={onLayout}
       className="bg-[#101119] h-[76px] p-0 relative"
       style={{ width: width, marginTop: insets.top }}
     >

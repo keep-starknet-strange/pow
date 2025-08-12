@@ -405,6 +405,10 @@ const imagePaths = {
     `${assetsPath}/shop/icons/automations/DA/icon_volition.webp`,
   ),
 
+  // Tutorial Images
+  tutorialArrow: require(`${assetsPath}/tutorial/arrow.webp`),
+  tutorialWindow: require(`${assetsPath}/tutorial/window.webp`),
+
   // Prestige Icons
   prestige1: require(`${assetsPath}/prestige/icon_prestige1.webp`),
   prestige2: require(`${assetsPath}/prestige/icon_prestige2.webp`),
@@ -627,6 +631,10 @@ export const useImagePreloader = () => {
     shopAutomationDa3: useImage(imagePaths.shopAutomationsDa3),
     shopAutomationDa4: useImage(imagePaths.shopAutomationsDa4),
 
+    // tutorial
+    tutorialArrow: useImage(imagePaths.tutorialArrow),
+    tutorialWindow: useImage(imagePaths.tutorialWindow),
+
     prestige1: useImage(imagePaths.prestige1),
     prestige2: useImage(imagePaths.prestige2),
     prestige3: useImage(imagePaths.prestige3),
@@ -844,6 +852,8 @@ export const useImagePreloader = () => {
         "shop.automation.da.2": images.shopAutomationDa2,
         "shop.automation.da.3": images.shopAutomationDa3,
         "shop.automation.da.4": images.shopAutomationDa4,
+        "tutorial.arrow": images.tutorialArrow,
+        "tutorial.window": images.tutorialWindow,
       };
 
       globalImages = imagesMap;

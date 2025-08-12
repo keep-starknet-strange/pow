@@ -1,5 +1,7 @@
 import { View, Pressable } from "react-native";
+import { TargetId } from "../stores/useTutorialStore";
 import { useImages } from "../hooks/useImages";
+import { useTutorialLayout } from "../hooks/useTutorialLayout";
 import {
   Canvas,
   Image,
@@ -15,6 +17,7 @@ export type FooterProps = {
 };
 
 export const Footer: React.FC<FooterProps> = (props) => {
+  const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
 
@@ -53,11 +56,13 @@ export const Footer: React.FC<FooterProps> = (props) => {
     "
     >
       {props.tabs.map((tab, index) => {
+        const tutorialProps = tab.name === "Store" ? { ref, onLayout } : {};
         return (
           <Pressable
             key={index}
             className="flex flex-row h-[68px] w-[68px] relative"
             onPress={() => props.switchPage(tab.name)}
+            {...tutorialProps}
           >
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
