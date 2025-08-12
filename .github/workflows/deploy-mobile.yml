@@ -101,10 +101,6 @@ jobs:
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
-      env:
-          KEYCHAIN_NAME: "temp.keychain"
-          KEYCHAIN_PATH: "/Users/runner/Library/Keychains/temp.keychain-db"
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
@@ -143,13 +139,6 @@ jobs:
                 APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
               run: |
                 echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
-
-            - name: Import Certificate
-              working-directory: ./frontend/ios
-              env:
-                APPSTORE_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_CERTIFICATE_BASE64 }}
-                APPSTORE_CERTIFICATE_PASSWORD: ${{ secrets.APPSTORE_CERTIFICATE_PASSWORD }}
-              run: ./import-certificate.sh
 
             - name: Deploy to Testflight
               if: ${{ inputs.internal_testing == true }}

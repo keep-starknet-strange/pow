@@ -6,6 +6,8 @@ platform :ios do
   end
 
   private_lane :build_and_sign_release do
+    setup_ci if ENV['CI']
+
     app_store_connect_api_key(
       key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
       issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
@@ -14,16 +16,7 @@ platform :ios do
       in_house: false,
     )
 
-    get_certificates(
-      development: false,
-      output_path: "./certificates",
-      generate_apple_certs: false,
-      keychain_path: ENV['KEYCHAIN_PATH'],
-      keychain_password: ENV['KEYCHAIN_PASSWORD']
-    )
-
-    get_provisioning_profile
-
+    match(type: 'appstore')
     gym(clean: true)
   end
 
