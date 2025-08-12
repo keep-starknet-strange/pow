@@ -107,6 +107,10 @@ jobs:
               with:
                 ref: ${{ inputs.ref }}
 
+            - uses: webfactory/ssh-agent@v0.6.0
+              with:
+                ssh-private-key: ${{ secrets.MATCH_KEY }}
+
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
