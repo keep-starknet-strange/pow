@@ -15,13 +15,13 @@ import {
 } from "@shopify/react-native-skia";
 import BlockchainView from "@/app/components/BlockchainView";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { useTutorial } from "@/app/stores/useTutorialStore";
+import { useIsTutorialTargetActive } from "@/app/stores/useTutorialStore";
 import { TargetId } from "@/app/stores/useTutorialStore";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { notify } = useEventManager();
-  const { step } = useTutorial();
+  const isDappsTabActive = useIsTutorialTargetActive("dappsTab" as TargetId);
   const { ref, onLayout } = useTutorialLayout(
     "dappsTab" as TargetId,
     dappsUnlocked[0] || false,
@@ -99,11 +99,14 @@ export const L1Phase: React.FC = () => {
         </View>
         {dappsUnlocked[0] && (
           <View className="absolute top-[4px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
-            {txTabs.map((tab) => (
+            {txTabs.map((tab) => {
+              const isActiveTab = tab === activeTab || isDappsTabActive;
+              const height = isActiveTab ? 28 : 24;
+              return (
               <Pressable
                 style={{
                   width: window.width / 2 - 6,
-                  height: tab === activeTab ? 28 : 24,
+                  height: height,
                 }}
                 key={tab}
                 onPress={() => {
@@ -116,13 +119,13 @@ export const L1Phase: React.FC = () => {
                 <Canvas style={{ width: "100%", height: "100%" }}>
                   <Image
                     image={getImage(
-                      tab === activeTab || step == "dapps" ? "tx.tab.active" : "tx.tab.inactive",
+                      isActiveTab ? "tx.tab.active" : "tx.tab.inactive",
                     )}
                     fit="fill"
                     x={0}
                     y={0}
                     width={window.width / 2 - 6}
-                    height={tab === activeTab ? 28 : 24}
+                    height={height}
                     sampling={{
                       filter: FilterMode.Nearest,
                       mipmap: MipmapMode.Nearest,
@@ -132,13 +135,13 @@ export const L1Phase: React.FC = () => {
                 <Text
                   className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
                   style={{
-                    color: tab === activeTab || step == "dapps" ? "#FFF7FF" : "#a9a9a9",
+                    color: isActiveTab ? "#FFF7FF" : "#a9a9a9",
                   }}
                 >
                   {tab}
                 </Text>
               </Pressable>
-            ))}
+            )})}
           </View>
         )}
       </Animated.View>

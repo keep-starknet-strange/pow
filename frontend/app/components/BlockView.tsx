@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { View, Text, LayoutChangeEvent } from "react-native";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
-import { useImages } from "../hooks/useImages";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
 import { BlockTxOutlines } from "./BlockTxOutlines";
@@ -15,7 +14,6 @@ export type BlockViewProps = {
 };
 
 export const BlockView: React.FC<BlockViewProps> = (props) => {
-  const { getImage } = useImages();
   const { currentPrestige, getUpgradeValue } = useUpgrades();
 
   // The size of the whole block

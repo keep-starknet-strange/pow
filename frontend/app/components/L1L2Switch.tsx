@@ -8,7 +8,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { TargetId, useIsTutorialTargetActive } from "@/app/stores/useTutorialStore";
 
 export const L1L2Switch = ({
   currentView,
@@ -24,7 +24,8 @@ export const L1L2Switch = ({
     "l2StoreTab" as TargetId,
     isStore,
   );
-
+  const isL2StoreTabActive = useIsTutorialTargetActive("l2StoreTab" as TargetId);
+  const isL2TabActive = currentView === "L2" && isL2StoreTabActive;
   return (
     <View className="absolute right-0 top-0">
       <Canvas style={{ width: 92, height: 31 }}>
@@ -85,7 +86,7 @@ export const L1L2Switch = ({
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Image
             image={getImage(
-              currentView === "L2"
+                isL2TabActive
                 ? "header.switch.active"
                 : "header.switch.inactive",
             )}
@@ -103,7 +104,7 @@ export const L1L2Switch = ({
         <View className="absolute left-0 top-0 w-full h-full flex items-center justify-center text-center">
           <Text
             className="text-[18px] font-Pixels"
-            style={{ color: currentView === "L2" ? "#fff7ff" : "#7b7b7b" }}
+            style={{ color: isL2TabActive ? "#fff7ff" : "#7b7b7b" }}
           >
             L2
           </Text>
