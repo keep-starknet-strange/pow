@@ -139,7 +139,16 @@ jobs:
                 APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
               run: |
                 echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
-                
+
+            - name: Import Certificate
+              working-directory: ./frontend/ios
+              env:
+                APPSTORE_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_CERTIFICATE_BASE64 }}
+                APPSTORE_CERTIFICATE_PASSWORD: ${{ secrets.APPSTORE_CERTIFICATE_PASSWORD }}
+                KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+                KEYCHAIN_PATH: "temp.keychain-db"
+              run: import-certificate.sh
+
             - name: Deploy to Testflight
               if: ${{ inputs.internal_testing == true }}
               working-directory: ./frontend/ios
@@ -147,6 +156,7 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
+                KEYCHAIN_PATH: "temp.keychain-db"
                 KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
               run: bundle exec fastlane deploy_testflight
 
@@ -157,5 +167,6 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
+                KEYCHAIN_PATH: "temp.keychain-db"
                 KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
               run: bundle exec fastlane deploy
