@@ -16,7 +16,6 @@ export const useSequencer = (
   const { powContract, getUserBlockClicks } = usePowContractConnector();
   const { getAutomationValue } = useUpgrades();
   const [sequenceCounter, setSequenceCounter] = useState(0);
-  const [sequencingProgress, setSequencingProgress] = useState(0);
 
   useEffect(() => {
     const fetchSequencerCounter = async () => {
@@ -51,31 +50,31 @@ export const useSequencer = (
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
-      if (newCounter == blockDifficulty) {
-        onBlockSequenced();
-        setSequencingProgress(1);
-        return newCounter;
-      } else if (newCounter < blockDifficulty) {
-        setSequencingProgress(newCounter / blockDifficulty);
-        notify("SequenceClicked", {
-          counter: newCounter,
-        });
+      if (newCounter <= blockDifficulty) {
         return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond block difficulty
       }
     });
   }, [
-    onBlockSequenced,
     notify,
     sequencingBlock?.isBuilt,
     sequencingBlock?.difficulty,
     triggerSequenceAnimation,
   ]);
 
+  useEffect(() => {
+    if (sequenceCounter == sequencingBlock?.difficulty) {
+      onBlockSequenced();
+    } else if (sequenceCounter > 0) {
+      notify("SequenceClicked", {
+        counter: sequenceCounter,
+      });
+    }
+  }, [sequenceCounter]);
+
   // Reset sequencing progress when block is sequenced
   useEffect(() => {
-    setSequencingProgress(0);
     setSequenceCounter(0);
   }, [sequencingBlock?.blockId]);
 
@@ -87,7 +86,6 @@ export const useSequencer = (
 
   return {
     sequenceCounter,
-    sequencingProgress,
     sequenceBlock,
   };
 };

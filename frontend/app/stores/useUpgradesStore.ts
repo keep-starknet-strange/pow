@@ -9,7 +9,6 @@ import { FocAccount } from "@/types/contexts";
 import { useL2Store } from "./useL2Store";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useGameStore } from "./useGameStore";
-import { useChainsStore } from "./useChainsStore";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -418,7 +417,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useBalanceStore.getState().resetBalance();
     useTransactionsStore.getState().resetTransactions();
     useGameStore.getState().resetGameStore();
-    useChainsStore.getState().resetChains();
     useL2Store.getState().resetL2Store();
 
     set({ currentPrestige: nextPrestige, canPrestige: false });

@@ -14,8 +14,10 @@ export const useMiner = (
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
+  const { workingBlocks } = useGameStore();
+  const miningBlock = workingBlocks[0];
+  const blockDifficulty = miningBlock?.difficulty || 4 ** 2;
   const [mineCounter, setMineCounter] = useState(0);
-  const [miningProgress, setMiningProgress] = useState(0);
 
   useEffect(() => {
     const fetchMineCounter = async () => {
@@ -33,8 +35,6 @@ export const useMiner = (
     fetchMineCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
-  const miningBlock = workingBlocks[0];
   const mineBlock = useCallback(() => {
     if (!miningBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot mine.");
@@ -45,38 +45,31 @@ export const useMiner = (
     if (triggerMineAnimation) {
       triggerMineAnimation();
     }
-
+    // Batch state updates to prevent multiple rerenders
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = miningBlock?.difficulty || 4 ** 2; // Default difficulty if not set
-      if (newCounter == blockDifficulty) {
-        onBlockMined();
-        setMiningProgress(1);
-        return newCounter;
-      } else if (newCounter < blockDifficulty) {
-        setMiningProgress(newCounter / blockDifficulty);
-        notify("MineClicked", {
-          counter: newCounter,
-          difficulty: blockDifficulty,
-        });
+
+      if (newCounter <= blockDifficulty) {
         return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [
-    notify,
-    onBlockMined,
-    miningBlock?.isBuilt,
-    miningBlock?.difficulty,
-    triggerMineAnimation,
-  ]);
+  }, [triggerMineAnimation, miningBlock?.isBuilt, blockDifficulty]);
+
+  useEffect(() => {
+    if (mineCounter === blockDifficulty) {
+      onBlockMined();
+      setMineCounter(0);
+    } else if (mineCounter > 0) {
+      notify("MineClicked", {
+        counter: mineCounter,
+        difficulty: blockDifficulty,
+      });
+    }
+  }, [mineCounter, blockDifficulty, notify, onBlockMined]);
 
   // Reset mining progress when a block is mined
-  useEffect(() => {
-    setMiningProgress(0);
-    setMineCounter(0);
-  }, [miningBlock?.blockId]);
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,
@@ -86,7 +79,6 @@ export const useMiner = (
 
   return {
     mineCounter,
-    miningProgress,
     mineBlock,
   };
 };

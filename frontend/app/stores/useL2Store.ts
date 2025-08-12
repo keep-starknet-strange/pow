@@ -3,7 +3,6 @@ import { Contract } from "starknet";
 import { FocAccount } from "../context/FocEngineConnector";
 import { useBalanceStore } from "./useBalanceStore";
 import { useGameStore } from "./useGameStore";
-import { useChainsStore } from "./useChainsStore";
 import { useEventManager } from "./useEventManager";
 import { useUpgradesStore } from "./useUpgradesStore";
 import { useTransactionsStore } from "./useTransactionsStore";
@@ -127,7 +126,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
       newL2Instance.da = newL2DA(daMaxSize);
       newL2Instance.prover = newL2Prover(proverMaxSize);
 
-      useChainsStore.getState().addChain();
       useEventManager.getState().notify("L2Purchased");
       return {
         l2: newL2Instance,

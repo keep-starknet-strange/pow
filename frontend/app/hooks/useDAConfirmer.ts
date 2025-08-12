@@ -15,7 +15,6 @@ export const useDAConfirmer = (
   const { powContract, getUserDaClicks } = usePowContractConnector();
   const { getAutomationValue } = useUpgrades();
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
-  const [daProgress, setDaConfirmProgress] = useState(0);
 
   useEffect(() => {
     const fetchDaCounter = async () => {
@@ -50,24 +49,26 @@ export const useDAConfirmer = (
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
       const daDifficulty = daMaxSize || 1;
-      if (newCounter == daDifficulty) {
-        onDAConfirm();
-        setDaConfirmProgress(1);
-        notify("DaDone", { counter: newCounter });
-        return newCounter;
-      } else if (newCounter < daDifficulty) {
-        setDaConfirmProgress(newCounter / daDifficulty);
-        notify("DaClicked", { counter: newCounter });
+      if (newCounter <= daDifficulty) {
         return newCounter;
       } else {
         return prevCounter; // Prevent counter from exceeding difficulty
       }
     });
-  }, [onDAConfirm, notify, daIsBuilt, daMaxSize, triggerDAAnimation]);
+  }, [daIsBuilt, daMaxSize, triggerDAAnimation]);
 
-  // Reset da confirm progress when the DA is built
   useEffect(() => {
-    setDaConfirmProgress(0);
+    if (daConfirmCounter === daMaxSize) {
+      onDAConfirm();
+      notify("DaDone", { counter: daConfirmCounter });
+      setDaConfirmCounter(0);
+    } else if (daConfirmCounter > 0) {
+      notify("DaClicked", { counter: daConfirmCounter });
+    }
+  }, [daConfirmCounter, daMaxSize, onDAConfirm, notify]);
+
+  // Reset da confirm counter when the DA is built
+  useEffect(() => {
     setDaConfirmCounter(0);
   }, [daIsBuilt]);
 
@@ -79,7 +80,6 @@ export const useDAConfirmer = (
 
   return {
     daConfirmCounter,
-    daProgress,
     daConfirm,
   };
 };

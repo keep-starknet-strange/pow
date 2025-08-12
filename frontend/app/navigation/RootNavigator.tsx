@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 
@@ -13,11 +13,16 @@ import { useTutorial } from "../stores/useTutorialStore";
 
 const Stack = createStackNavigator();
 
-export function RootNavigator() {
+export const RootNavigator = memo(() => {
   const { user } = useFocEngine();
   const { isTutorialActive } = useTutorial();
 
-  const isAuthenticated = user && user.account.username !== "";
+  const isAuthenticated = useMemo(
+    () => user && user.account.username !== "",
+    [user],
+  );
+
+  const screenOptions = useMemo(() => ({ headerShown: false }), []);
 
   return (
     <View className="flex-1 bg-[#101119ff] relative">
@@ -29,10 +34,10 @@ export function RootNavigator() {
           <TabNavigator />
         </>
       ) : (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={screenOptions}>
           <Stack.Screen name="Login" component={LoginPage} />
         </Stack.Navigator>
       )}
     </View>
   );
-}
+});
