@@ -101,6 +101,10 @@ jobs:
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
+      env:
+          KEYCHAIN_NAME: "temp.keychain"
+          KEYCHAIN_PATH: "$HOME/Library/Keychains/$KEYCHAIN_NAME-db"
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
@@ -145,19 +149,18 @@ jobs:
               env:
                 APPSTORE_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_CERTIFICATE_BASE64 }}
                 APPSTORE_CERTIFICATE_PASSWORD: ${{ secrets.APPSTORE_CERTIFICATE_PASSWORD }}
-                KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-                KEYCHAIN_PATH: ./temp.keychain-db
               run: |
-                CERTIFICATE_PATH=certificate.p12
+                echo $KEYCHAIN_PATH
+                CERTIFICATE_PATH=./certificate.p12
                 echo "$APPSTORE_CERTIFICATE_BASE64" | base64 --decode > $CERTIFICATE_PATH
 
                 # create temporary keychain
-                security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-                security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-                security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+                security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_NAME
+                security set-keychain-settings -lut 21600 $KEYCHAIN_NAME
+                security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_NAME
 
-                security import $CERTIFICATE_PATH -P $APPSTORE_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-                security list-keychain -d user -s $KEYCHAIN_PATH
+                security import $CERTIFICATE_PATH -P $APPSTORE_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_NAME
+                security list-keychain -d user -s $KEYCHAIN_NAME
 
                 rm $CERTIFICATE_PATH
 
@@ -168,8 +171,6 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
-                KEYCHAIN_PATH: "./temp.keychain-db"
-                KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
               run: bundle exec fastlane deploy_testflight
 
             - name: Deploy to App Store
@@ -179,6 +180,4 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
-                KEYCHAIN_PATH: "temp.keychain-db"
-                KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
               run: bundle exec fastlane deploy
