@@ -1,1 +1,4 @@
-app_identifier "com.starknet.pow"
+app_identifier("com.starknet.pow")
+apple_id("michael.b@starkware.co")
+team_id("UCK2QYV4D2")
+itc_team_id("127175126")
