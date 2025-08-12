@@ -13,8 +13,18 @@ export function useHighlightMasks(highlightPosition: {
     return [
       { top: 0, left: 0, right: 0, height: Math.floor(top) }, // top mask
       { top: Math.ceil(top + height), left: 0, right: 0, bottom: 0 }, // bottom mask
-      { top: Math.floor(top), left: 0, width: Math.floor(left), height: Math.ceil(height) }, // left mask
-      { top: Math.floor(top), left: Math.ceil(left + width), right: 0, height: Math.ceil(height) }, // right mask
+      {
+        top: Math.floor(top),
+        left: 0,
+        width: Math.floor(left),
+        height: Math.ceil(height),
+      }, // left mask
+      {
+        top: Math.floor(top),
+        left: Math.ceil(left + width),
+        right: 0,
+        height: Math.ceil(height),
+      }, // right mask
     ];
   }, [highlightPosition]);
 }
