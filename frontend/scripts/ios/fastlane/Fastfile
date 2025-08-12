@@ -24,9 +24,9 @@ platform :ios do
     match(
       api_key: api_key, 
       type: 'appstore',
-      readonly: false
     )
     gym(
+      api_key: api_key, 
       clean: true,
       configuration: "Release"
     )

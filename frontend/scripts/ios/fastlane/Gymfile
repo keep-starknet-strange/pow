@@ -1,4 +1,10 @@
 workspace("POW.xcworkspace")
 scheme("POW")
 archive_path("./build/POW.xcarchive")
+export_options({    
+    method: "app-store",    
+    provisioningProfiles: {
+        "com.starknet.pow" => "match AppStore com.starknet.pow",
+    }
+})
 output_directory("./build") 
