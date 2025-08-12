@@ -75,7 +75,7 @@ export default function game() {
 
   const { invokeCalls } = useStarknetConnector();
   const {
-    addPowAction,
+    powGameContractAddress,
     powContract,
     getUserMaxChainId,
     getUserBlockNumber,
@@ -83,23 +83,40 @@ export default function game() {
     getUserTxSpeedLevels,
     getUserBlockState,
   } = usePowContractConnector();
-  const { onInvokeActions } = useOnchainActions();
-  const [txBuilderObserver, setTxBuilderObserver] = useState<null | string>(
+  const { onInvokeActions, addAction } = useOnchainActions();
+  const [txBuilderObserver, setTxBuilderObserver] =
+    useState<TxBuilderObserver | null>(null);
+  const [txBuilderObserverId, setTxBuilderObserverId] = useState<string | null>(
     null,
   );
-  useEffect(() => {
-    if (txBuilderObserver !== null) {
-      // Unregister the previous observer if it exists
-      unregisterObserver(txBuilderObserver);
-    }
-    setTxBuilderObserver(registerObserver(new TxBuilderObserver(addPowAction)));
 
-    return () => {
-      if (txBuilderObserver !== null) {
-        unregisterObserver(txBuilderObserver);
-      }
-    };
-  }, [addPowAction]);
+  useEffect(() => {
+    // Clean up previous observer if it exists
+    if (txBuilderObserverId !== null) {
+      unregisterObserver(txBuilderObserverId);
+    }
+
+    // Only create observer if we have a contract address
+    if (powGameContractAddress) {
+      const observer = new TxBuilderObserver(addAction, powGameContractAddress);
+      const observerId = registerObserver(observer);
+      setTxBuilderObserver(observer);
+      setTxBuilderObserverId(observerId);
+
+      return () => {
+        if (observerId) {
+          unregisterObserver(observerId);
+        }
+      };
+    }
+  }, [addAction, powGameContractAddress]);
+
+  // Update the observer's contract address when it changes
+  useEffect(() => {
+    if (txBuilderObserver && powGameContractAddress) {
+      txBuilderObserver.setContractAddress(powGameContractAddress);
+    }
+  }, [txBuilderObserver, powGameContractAddress]);
   useEffect(() => {
     onInvokeActions(invokeCalls);
   }, [invokeCalls, onInvokeActions]);
