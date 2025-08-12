@@ -25,8 +25,8 @@ platform :ios do
       api_key: api_key, 
       type: 'appstore',
     )
+    
     gym(
-      api_key: api_key, 
       clean: true,
       configuration: "Release"
     )
