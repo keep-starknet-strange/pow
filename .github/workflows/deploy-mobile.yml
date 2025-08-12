@@ -120,9 +120,7 @@ jobs:
 
             - name: Install dependencies
               working-directory: ./frontend
-              run: |
-                echo $KEYCHAIN_PATH
-                npm ci
+              run: npm ci
 
             - name: Prebuild app
               working-directory: ./frontend
@@ -152,9 +150,9 @@ jobs:
                 APPSTORE_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_CERTIFICATE_BASE64 }}
                 APPSTORE_CERTIFICATE_PASSWORD: ${{ secrets.APPSTORE_CERTIFICATE_PASSWORD }}
               run: |
-                echo $KEYCHAIN_PATH
+                set -e
                 CERTIFICATE_PATH=./certificate.p12
-                echo "$APPSTORE_CERTIFICATE_BASE64" | base64 --decode > $CERTIFICATE_PATH
+                echo -n "$APPSTORE_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
 
                 # create temporary keychain
                 security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_NAME
