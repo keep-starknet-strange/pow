@@ -28,8 +28,7 @@ platform :ios do
     )
     gym(
       clean: true,
-      export_xcargs: '-allowProvisioningUpdates',
-      xcargs: '-allowProvisioningUpdates'
+      configuration: "Release"
     )
   end
 
