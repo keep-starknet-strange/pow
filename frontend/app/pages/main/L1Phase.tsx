@@ -132,17 +132,16 @@ export const L1Phase: React.FC = () => {
                     }}
                   />
                 </Canvas>
-                  <Text
-                    className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
-                    style={{
-                      color: isActiveTab ? "#FFF7FF" : "#a9a9a9",
-                    }}
-                  >
-                    {tab}
-                  </Text>
-                </Pressable>
-              );
-            })}
+                <Text
+                  className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
+                  style={{
+                    color: isActiveTab ? "#FFF7FF" : "#a9a9a9",
+                  }}
+                >
+                  {tab}
+                </Text>
+              </Pressable>
+            )})}
           </View>
         )}
       </Animated.View>
