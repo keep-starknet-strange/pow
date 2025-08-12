@@ -108,20 +108,6 @@ export const BlockchainView: React.FC<BlockchainViewProps> = memo(
       );
     }, [props.chainId, newBlockInitPosition, blockShakeAnim]);
 
-    const txSize = useMemo(() => {
-      const insetWidth = newBlockInitPosition.width - 8;
-      const workingBlock = useGameStore.getState().workingBlocks[props.chainId];
-      const txPerRow = workingBlock?.maxSize
-        ? Math.sqrt(workingBlock.maxSize)
-        : 4;
-      return insetWidth / txPerRow;
-    }, [newBlockInitPosition.width, props.chainId]);
-
-    const txPerRow = useMemo(() => {
-      const workingBlock = useGameStore.getState().workingBlocks[props.chainId];
-      return workingBlock?.maxSize ? Math.sqrt(workingBlock.maxSize) : 4;
-    }, [props.chainId]);
-
     const showEmpty = useGameStore(
       (state) => !!state.workingBlocks[props.chainId]?.blockId,
     );
@@ -135,8 +121,6 @@ export const BlockchainView: React.FC<BlockchainViewProps> = memo(
         <MemoizedBlockTxContainer
           chainId={props.chainId}
           placement={newBlockInitPosition}
-          txSize={txSize}
-          txPerRow={txPerRow}
         />
         <MemoizedBlockContainer
           chainId={props.chainId}

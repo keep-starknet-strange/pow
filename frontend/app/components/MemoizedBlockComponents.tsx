@@ -1,4 +1,11 @@
-import React, { memo, useState, useEffect, useCallback, JSX } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  JSX,
+  useMemo,
+} from "react";
 import { View } from "react-native";
 import Animated, {
   useSharedValue,
@@ -6,6 +13,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useGameStore } from "../stores/useGameStore";
+import { useUpgrades } from "../stores/useUpgradesStore";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
 import { Miner } from "./Miner";
@@ -164,20 +172,22 @@ export const MemoizedMinerSequencer = memo(
 MemoizedMinerSequencer.displayName = "MemoizedMinerSequencer";
 
 export const MemoizedBlockTxContainer = memo(
-  ({
-    chainId,
-    placement,
-    txSize,
-    txPerRow,
-  }: {
-    chainId: number;
-    placement: BlockPlacement;
-    txSize: number;
-    txPerRow: number;
-  }) => {
+  ({ chainId, placement }: { chainId: number; placement: BlockPlacement }) => {
     const blockId = useGameStore(
       (state) => state.workingBlocks[chainId]?.blockId,
     );
+    const maxBlockSize = useGameStore(
+      (state) => state.workingBlocks[chainId]?.maxSize,
+    );
+
+    const txPerRow = useMemo(() => {
+      return Math.sqrt(maxBlockSize || 4 ** 2);
+    }, [chainId, maxBlockSize]);
+
+    const txSize = useMemo(() => {
+      const insetWidth = placement.width - 8;
+      return insetWidth / txPerRow;
+    }, [placement.width, txPerRow]);
 
     if (blockId === 0) return null;
 
@@ -201,9 +211,7 @@ export const MemoizedBlockTxContainer = memo(
       prevProps.placement.top === nextProps.placement.top &&
       prevProps.placement.left === nextProps.placement.left &&
       prevProps.placement.width === nextProps.placement.width &&
-      prevProps.placement.height === nextProps.placement.height &&
-      Math.abs(prevProps.txSize - nextProps.txSize) <= 1 &&
-      prevProps.txPerRow === nextProps.txPerRow
+      prevProps.placement.height === nextProps.placement.height
     );
   },
 );
