@@ -55,11 +55,7 @@ export const useMiner = (
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [
-    triggerMineAnimation,
-    miningBlock?.isBuilt,
-    blockDifficulty,
-  ]);
+  }, [triggerMineAnimation, miningBlock?.isBuilt, blockDifficulty]);
 
   useEffect(() => {
     if (mineCounter === blockDifficulty) {
@@ -71,12 +67,7 @@ export const useMiner = (
         difficulty: blockDifficulty,
       });
     }
-  }, [
-    mineCounter,
-    blockDifficulty,
-    notify,
-    onBlockMined,
-  ]);
+  }, [mineCounter, blockDifficulty, notify, onBlockMined]);
 
   // Reset mining progress when a block is mined
 
