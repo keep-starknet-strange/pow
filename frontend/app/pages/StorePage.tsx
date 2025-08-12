@@ -7,8 +7,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
@@ -34,10 +33,6 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { ref: upgradesTabRef, onLayout: upgradesTabOnLayout } =
-    useTutorialLayout("chainUpgradeTab" as TargetId, true);
-  const { ref: automationTabRef, onLayout: automationTabOnLayout } =
-    useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
   const {
     dappsUnlocked,
@@ -376,25 +371,17 @@ export const StorePage: React.FC = () => {
               height: activeSubTab === tab ? 32 : 24,
             }}
             key={tab}
-            onLayout={
-              tab === "Upgrades"
-                ? upgradesTabOnLayout
-                : tab === "Automation"
-                  ? automationTabOnLayout
-                  : undefined
-            }
-            ref={
-              tab === "Upgrades"
-                ? upgradesTabRef
-                : tab === "Automation"
-                  ? automationTabRef
-                  : undefined
-            }
             onPress={() => {
               setActiveSubTab(tab);
               notify("SwitchStore", { name: tab });
             }}
           >
+            {tab === "Upgrades" && (
+              <TutorialRefView targetId="chainUpgradeTab" enabled={true} />
+            )}
+            {tab === "Automation" && (
+              <TutorialRefView targetId="chainAutomationTab" enabled={true} />
+            )}
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
                 image={getImage(

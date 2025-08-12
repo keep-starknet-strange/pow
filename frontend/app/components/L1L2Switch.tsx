@@ -7,8 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { TutorialRefView } from "./tutorial/TutorialRefView";
 
 export const L1L2Switch = memo(
   ({
@@ -21,10 +20,6 @@ export const L1L2Switch = memo(
     isStore?: boolean; // Optional prop for store tab
   }) => {
     const { getImage } = useImages();
-    const { ref, onLayout } = useTutorialLayout(
-      "l2StoreTab" as TargetId,
-      isStore,
-    );
 
     return (
       <View className="absolute right-0 top-0">
@@ -76,13 +71,12 @@ export const L1L2Switch = memo(
           </View>
         </Pressable>
         <Pressable
-          ref={ref}
-          onLayout={onLayout}
           onPress={() => {
             setCurrentView("L2");
           }}
           className="absolute right-[6px] top-0 w-[38px] h-[21px]"
         >
+          {isStore && <TutorialRefView targetId="l2StoreTab" enabled={true} />}
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
               image={getImage(

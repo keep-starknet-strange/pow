@@ -10,8 +10,6 @@ import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "../stores/useGameStore";
 import { useImages } from "../hooks/useImages";
-import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../stores/useTutorialStore";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
 import { BlockTxOutlines } from "./BlockTxOutlines";

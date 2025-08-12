@@ -17,8 +17,7 @@ import { SettingsPage } from "../pages/SettingsPage";
 
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
-import { useTutorialLayout } from "../hooks/useTutorialLayout";
-import { TargetId } from "../stores/useTutorialStore";
+import { TutorialRefView } from "../components/tutorial/TutorialRefView";
 import {
   Canvas,
   Image,
@@ -31,10 +30,9 @@ const Tab = createBottomTabNavigator();
 
 const StoreTabButton = memo(
   ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
-    const { ref, onLayout } = useTutorialLayout("storeTab" as TargetId);
-
     return (
-      <View ref={ref} onLayout={onLayout} className="">
+      <View className="relative">
+        <TutorialRefView targetId="storeTab" enabled={true} />
         <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
       </View>
     );

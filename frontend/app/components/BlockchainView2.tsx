@@ -125,7 +125,7 @@ export const BlockchainView2: React.FC<BlockchainView2Props> = memo(
     }, [props.chainId]);
 
     const showEmpty = useGameStore(
-      (state) => !!state.workingBlocks[props.chainId]?.blockId
+      (state) => !!state.workingBlocks[props.chainId]?.blockId,
     );
 
     return (

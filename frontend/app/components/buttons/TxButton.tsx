@@ -11,8 +11,7 @@ import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { newTransaction } from "../../types/Chains";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "../../stores/useTutorialStore";
+import { TutorialRefView } from "../tutorial/TutorialRefView";
 import transactionsJson from "../../configs/transactions.json";
 import dappsJson from "../../configs/dapps.json";
 import { shortMoneyString } from "../../utils/helpers";
@@ -64,10 +63,6 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   >(null);
 
   const enabled = props.txId === 0 && props.chainId === 0 && !props.isDapp;
-  const { ref, onLayout } = useTutorialLayout(
-    "firstTransactionButton" as TargetId,
-    enabled,
-  );
 
   const feeLevel = getFeeLevel(props.chainId, props.txId, props.isDapp);
   const feeCost = getNextFeeCost(props.chainId, props.txId, props.isDapp);
@@ -189,14 +184,15 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
       <PopupAnimation ref={popupRef} />
       <Animated.View style={[shakeAnimStyle]}>
         <Pressable
-          ref={ref}
-          onLayout={onLayout}
           style={{
             width: width * 0.18,
           }}
           className="relative h-[94px]"
           onPress={handlePress}
         >
+          {enabled && (
+            <TutorialRefView targetId="firstTransactionButton" enabled={true} />
+          )}
           <TxButtonInner
             feeLevel={feeLevel}
             chainId={props.chainId}
