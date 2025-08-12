@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useMemo } from "react";
 import { View, InteractionManager, Platform } from "react-native";
 import { useTutorial, TargetId } from "../stores/useTutorialStore";
 import tutorialConfig from "../configs/tutorial.json";
@@ -12,11 +12,19 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
   type TutorialConfigType = typeof tutorialConfig;
   type StepKey = keyof TutorialConfigType;
 
-  const { bubbleTargetId, highlightTargetId } = tutorialConfig[step as StepKey];
-  const stepTargets = [bubbleTargetId, highlightTargetId];
+  const stepTargets = useMemo(() => {
+    const { bubbleTargetId, highlightTargetId } =
+      tutorialConfig[step as StepKey];
+    return [bubbleTargetId, highlightTargetId];
+  }, [step]);
+
+  const isTargetForCurrentStep = useMemo(
+    () => stepTargets.includes(id.toString()),
+    [stepTargets, id],
+  );
 
   const measure = useCallback(() => {
-    if (!enabled || !isTutorialActive || !stepTargets.includes(id.toString())) {
+    if (!enabled || !isTutorialActive || !isTargetForCurrentStep) {
       return;
     }
     ref.current?.measureInWindow((x, y, width, height) => {
@@ -34,9 +42,8 @@ export function useTutorialLayout(id: TargetId, enabled: boolean = true) {
     enabled,
     isTutorialActive,
     registerLayout,
-    step,
     id,
-    stepTargets,
+    isTargetForCurrentStep,
     insets,
   ]);
 

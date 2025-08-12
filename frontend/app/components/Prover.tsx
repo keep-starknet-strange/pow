@@ -16,7 +16,6 @@ export const Prover: React.FC<ProverProps> = ({
   return (
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
-        progress={proverProgress}
         text={"Click to prove!"}
         onConfirm={() => {
           triggerAnim();

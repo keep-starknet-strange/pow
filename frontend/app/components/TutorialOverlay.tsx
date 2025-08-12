@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, memo, useCallback } from "react";
 import { View, Text, Pressable, LayoutChangeEvent } from "react-native";
 import { useTutorial } from "../stores/useTutorialStore";
 import { useBubblePosition } from "../hooks/useBubblePosition";
@@ -13,29 +13,51 @@ import { useEventManager } from "../stores/useEventManager";
 
 const BUBBLE_WIDTH = 260;
 
-export const TutorialOverlay: React.FC = () => {
+const TutorialOverlayComponent: React.FC = () => {
   const { step, layouts, visible, setVisible } = useTutorial();
   const { notify } = useEventManager();
   const [bubbleHeight, setBubbleHeight] = useState(0);
-  const stepConfig = getTutorialStepConfig(step);
-  const bubbleLayout = layouts?.[stepConfig.bubbleTargetId] ?? {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  };
-  const highlightLayout = layouts?.[stepConfig.highlightTargetId] ?? {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  };
 
-  const isReady = bubbleLayout.width > 0 && bubbleLayout.height > 0;
+  const stepConfig = useMemo(() => getTutorialStepConfig(step), [step]);
+
+  const bubbleLayout = useMemo(
+    () =>
+      layouts?.[stepConfig.bubbleTargetId] ?? {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      },
+    [layouts, stepConfig.bubbleTargetId],
+  );
+
+  const highlightLayout = useMemo(
+    () =>
+      layouts?.[stepConfig.highlightTargetId] ?? {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      },
+    [layouts, stepConfig.highlightTargetId],
+  );
+
+  const isReady = useMemo(
+    () => bubbleLayout.width > 0 && bubbleLayout.height > 0,
+    [bubbleLayout.width, bubbleLayout.height],
+  );
+
   const position = useBubblePosition(bubbleLayout, bubbleHeight);
-
   const highlightPosition = useHightlightPosition(highlightLayout);
   const masks = useHighlightMasks(highlightPosition);
+
+  const handleDismiss = useCallback(() => {
+    notify("TutorialDismissed");
+  }, [notify]);
+
+  const handleMeasured = useCallback((height: number) => {
+    setBubbleHeight(height);
+  }, []);
 
   useEffect(() => {
     if (step !== "completed") setVisible(true);
@@ -81,7 +103,7 @@ export const TutorialOverlay: React.FC = () => {
           top: position.bubbleTop,
           width: BUBBLE_WIDTH,
         }}
-        onMeasured={setBubbleHeight}
+        onMeasured={handleMeasured}
       >
         <Text className="text-[30px] font-Teatime text-gray-100 mb-1 text-center">
           {stepConfig.title}
@@ -91,9 +113,7 @@ export const TutorialOverlay: React.FC = () => {
         </Text>
         {stepConfig.canDismiss && (
           <Pressable
-            onPress={() => {
-              notify("TutorialDismissed");
-            }}
+            onPress={handleDismiss}
             className="self-center px-4 py-2 rounded"
           >
             <Text className="text-[16px] font-Pixels text-gray-100 underline">
@@ -105,3 +125,5 @@ export const TutorialOverlay: React.FC = () => {
     </View>
   );
 };
+
+export const TutorialOverlay = memo(TutorialOverlayComponent);

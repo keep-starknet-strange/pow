@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { View, Text, FlatList, Pressable, Dimensions } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
@@ -7,8 +7,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
@@ -19,6 +18,7 @@ import { L2Unlock } from "../components/store/L2Unlock";
 import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
 import { L1L2Switch } from "../components/L1L2Switch";
 import { ShopTitle } from "../components/store/ShopTitle";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -33,10 +33,6 @@ import {
 } from "@shopify/react-native-skia";
 
 export const StorePage: React.FC = () => {
-  const { ref: upgradesTabRef, onLayout: upgradesTabOnLayout } =
-    useTutorialLayout("chainUpgradeTab" as TargetId, true);
-  const { ref: automationTabRef, onLayout: automationTabOnLayout } =
-    useTutorialLayout("chainAutomationTab" as TargetId, true);
   const isFocused = useIsFocused();
   const {
     dappsUnlocked,
@@ -48,14 +44,22 @@ export const StorePage: React.FC = () => {
     dappSpeedLevels,
   } = useTransactionsStore();
   const { canUnlockUpgrade, upgrades, automations } = useUpgrades();
-  const { isL2Unlocked } = useL2Store();
+  const isL2Unlocked = useL2Store((state) => state.isL2Unlocked);
   const { getImage } = useImages();
   const { notify } = useEventManager();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
     isL2Unlocked ? "L2" : "L1",
+  );
+
+  const handleStoreViewChange = useCallback(
+    (view: "L1" | "L2") => {
+      setStoreType(view);
+      notify("SwitchStore", { name: view });
+    },
+    [notify],
   );
   useEffect(() => {
     if (!isL2Unlocked) {
@@ -350,18 +354,11 @@ export const StorePage: React.FC = () => {
       {isL2Unlocked && (
         <L1L2Switch
           currentView={storeType}
-          setCurrentView={(view: "L1" | "L2") => {
-            setStoreType(view);
-            notify("SwitchStore", { name: view });
-          }}
+          setCurrentView={handleStoreViewChange}
           isStore={true}
         />
       )}
-      {isL2Unlocked ? (
-        <ShopTitle position="left" />
-      ) : (
-        <ShopTitle position="right" />
-      )}
+      <ShopTitle position={isL2Unlocked ? "left" : "right"} />
       <View
         className="flex flex-row items-end h-[32px] gap-[2px]"
         style={{ paddingHorizontal: 4, marginTop: 4 }}
@@ -374,25 +371,17 @@ export const StorePage: React.FC = () => {
               height: activeSubTab === tab ? 32 : 24,
             }}
             key={tab}
-            onLayout={
-              tab === "Upgrades"
-                ? upgradesTabOnLayout
-                : tab === "Automation"
-                  ? automationTabOnLayout
-                  : undefined
-            }
-            ref={
-              tab === "Upgrades"
-                ? upgradesTabRef
-                : tab === "Automation"
-                  ? automationTabRef
-                  : undefined
-            }
             onPress={() => {
               setActiveSubTab(tab);
               notify("SwitchStore", { name: tab });
             }}
           >
+            {tab === "Upgrades" && (
+              <TutorialRefView targetId="chainUpgradeTab" enabled={true} />
+            )}
+            {tab === "Automation" && (
+              <TutorialRefView targetId="chainAutomationTab" enabled={true} />
+            )}
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
                 image={getImage(

@@ -65,7 +65,12 @@ export const useDAConfirmer = (
     } else if (daConfirmCounter > 0) {
       notify("DaClicked", { counter: daConfirmCounter });
     }
-  }, [daConfirmCounter, daMaxSize]);
+  }, [daConfirmCounter, daMaxSize, onDAConfirm, notify]);
+
+  // Reset da confirm counter when the DA is built
+  useEffect(() => {
+    setDaConfirmCounter(0);
+  }, [daIsBuilt]);
 
   useAutoClicker(
     getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),

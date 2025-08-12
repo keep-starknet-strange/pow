@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, View, Pressable, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useEventManager } from "@/app/stores/useEventManager";
@@ -13,19 +13,15 @@ import {
   Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import BlockchainView from "@/app/components/BlockchainView";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { BlockchainView } from "@/app/components/BlockchainView";
+import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { notify } = useEventManager();
-  const { ref, onLayout } = useTutorialLayout(
-    "dappsTab" as TargetId,
-    dappsUnlocked[0] || false,
-  );
   const { getImage } = useImages();
-  const window = Dimensions.get("window");
+  const window = useCachedWindowDimensions();
   const txTabs = ["Transactions", "dApps"];
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[0] ? 1 : 0],
@@ -109,9 +105,13 @@ export const L1Phase: React.FC = () => {
                   setActiveTab(tab);
                   notify("SwitchTxTab", { name: tab });
                 }}
-                ref={tab === "dApps" ? ref : undefined}
-                onLayout={tab === "dApps" ? onLayout : undefined}
               >
+                {tab === "dApps" && (
+                  <TutorialRefView
+                    targetId="dappsTab"
+                    enabled={dappsUnlocked[0] || false}
+                  />
+                )}
                 <Canvas style={{ width: "100%", height: "100%" }}>
                   <Image
                     image={getImage(

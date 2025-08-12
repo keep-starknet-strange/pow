@@ -45,17 +45,20 @@ export const useMiner = (
     if (triggerMineAnimation) {
       triggerMineAnimation();
     }
-    setMineCounter((prevCount) => {
-      const newCounter = prevCount + 1;
+    // Batch state updates to prevent multiple rerenders
+    setMineCounter((prevCounter) => {
+      const newCounter = prevCounter + 1;
+
       if (newCounter <= blockDifficulty) {
         return newCounter;
+      } else {
+        return prevCounter; // Prevent incrementing beyond difficulty
       }
-      return prevCount; // Prevent incrementing beyond difficulty
     });
   }, [triggerMineAnimation, miningBlock?.isBuilt, blockDifficulty]);
 
   useEffect(() => {
-    if (mineCounter == blockDifficulty) {
+    if (mineCounter === blockDifficulty) {
       onBlockMined();
       setMineCounter(0);
     } else if (mineCounter > 0) {
@@ -64,7 +67,7 @@ export const useMiner = (
         difficulty: blockDifficulty,
       });
     }
-  }, [mineCounter, blockDifficulty, notify]);
+  }, [mineCounter, blockDifficulty, notify, onBlockMined]);
 
   // Reset mining progress when a block is mined
 

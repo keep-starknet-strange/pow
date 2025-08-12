@@ -58,7 +58,7 @@ export const InAppNotification = () => {
         }
       });
     }
-  }, [opacityAnimation, activeNotification]);
+  }, [activeNotification]);
 
   // TODO: Improve flow when multiple notifications are present
   return (

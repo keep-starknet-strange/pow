@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import { UpgradeButton } from "./UpgradeButton";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
 
 type ActionsProps = {
   locked: boolean;
@@ -31,14 +30,6 @@ export const TransactionUpgradeActions: React.FC<
   const feeEnabled = feeProps !== undefined && !locked && isFirstTransaction;
   const speedEnabled =
     speedProps !== undefined && !locked && isFirstTransaction;
-  const { ref: feeRef, onLayout: onLayoutFee } = useTutorialLayout(
-    "feeUpgradeButton" as TargetId,
-    feeEnabled,
-  );
-  const { ref: speedRef, onLayout: onLayoutSpeed } = useTutorialLayout(
-    "speedUpgradeButton" as TargetId,
-    speedEnabled,
-  );
   return locked ? (
     <UpgradeButton
       icon={"shop.btc"}
@@ -52,7 +43,10 @@ export const TransactionUpgradeActions: React.FC<
   ) : (
     <View className="flex flex-col gap-1">
       {feeProps && (
-        <View ref={feeRef} onLayout={onLayoutFee} className="">
+        <View className="relative">
+          {feeEnabled && (
+            <TutorialRefView targetId="feeUpgradeButton" enabled={true} />
+          )}
           <UpgradeButton
             icon={"shop.btc"}
             label={`Upgrade Value`}
@@ -65,7 +59,10 @@ export const TransactionUpgradeActions: React.FC<
         </View>
       )}
       {speedProps && (
-        <View ref={speedRef} onLayout={onLayoutSpeed} className="">
+        <View className="relative">
+          {speedEnabled && (
+            <TutorialRefView targetId="speedUpgradeButton" enabled={true} />
+          )}
           <UpgradeButton
             icon={"shop.clock"}
             label={`Upgrade Speed`}
