@@ -123,7 +123,7 @@ interface SoundState {
   toggleMusic: () => Promise<void>;
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
-  playSoundEffect: (type: string, pitchShift?: number) => void;
+  playSoundEffect: (soundType: string, pitchShift?: number) => Promise<void>;
   initializeSound: () => Promise<void>;
   playMusic: () => Promise<void>;
   stopMusic: () => Promise<void>;
@@ -243,11 +243,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
   },
 
-  playSoundEffect: (type: string, pitchShift: number = 1.0) => {
+  playSoundEffect: async (
+    soundType: string,
+    pitchShift: number = 1.0,
+  ): Promise<void> => {
     const { isSoundOn, soundEffectVolume, soundPool } = get();
 
     // Fast early returns for performance
-    if (!isSoundOn || !soundPool || !getSoundFileForEvent(type)) {
+    if (!isSoundOn || !soundPool || !getSoundFileForEvent(soundType)) {
       return;
     }
 
@@ -255,14 +258,19 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     pitchShift = Math.max(0.5, Math.min(2.0, pitchShift));
 
     try {
-      const soundConfig = soundsJson[type as keyof typeof soundsJson];
+      const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
       if (!soundConfig) return;
 
       // Play haptic feedback
       playHaptic(soundConfig.haptic);
 
       // Play sound with minimal overhead
-      soundPool.playSound(type, pitchShift, soundConfig, soundEffectVolume);
+      soundPool.playSound(
+        soundType,
+        pitchShift,
+        soundConfig,
+        soundEffectVolume,
+      );
     } catch (error) {
       // Silent error handling for performance
     }
