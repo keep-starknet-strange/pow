@@ -88,7 +88,10 @@ export const StorePage: React.FC = () => {
     }
   }, [storeType]);
 
-  const subTabs = useMemo(() => ["Transactions", "Upgrades", "Automation"] as const, []);
+  const subTabs = useMemo(
+    () => ["Transactions", "Upgrades", "Automation"] as const,
+    [],
+  );
   type SubTab = (typeof subTabs)[number];
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(subTabs[0]);
   
@@ -100,7 +103,7 @@ export const StorePage: React.FC = () => {
         Transactions: false,
         Upgrades: isChainUpgradeTabActive,
         Automation: isChainAutomationTabActive,
-      } as const),
+      }) as const,
     [isChainUpgradeTabActive, isChainAutomationTabActive],
   );
 
@@ -424,10 +427,11 @@ export const StorePage: React.FC = () => {
                 active ? "text-[#fff7ff]" : "text-[#717171]"
               }`}
             >
-              {tab}
-            </Text>
-          </Pressable>
-        )})}
+                {tab}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
       <View style={{ height: 522, marginTop: 2 }}>
         <FlatList
