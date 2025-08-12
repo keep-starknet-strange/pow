@@ -17,7 +17,7 @@ platform :ios do
     )
 
     update_code_signing_settings(
-      use_automatic_signing: true,
+      use_automatic_signing: false,
       path: "POW.xcodeproj"
     )
 
