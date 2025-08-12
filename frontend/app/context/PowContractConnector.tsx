@@ -153,7 +153,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     STARKNET_ENABLED,
   ]);
 
-
   const initMyGame = useCallback(async () => {
     if (!STARKNET_ENABLED) {
       return;

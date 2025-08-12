@@ -8,13 +8,27 @@ import {
 import React from "react";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import { useImages } from "../../../hooks/useImages";
+import { UpgradeDescription } from "./UpgradeDescription";
 
 type TxDetailsProps = {
   name: string;
   description: string;
+  chainId?: number;
+  upgradeId?: number;
+  currentLevel?: number;
+  values?: number[];
+  baseValue?: number;
 };
 
-export const TxDetails: React.FC<TxDetailsProps> = ({ name, description }) => {
+export const TxDetails: React.FC<TxDetailsProps> = ({
+  name,
+  description,
+  chainId,
+  upgradeId,
+  currentLevel,
+  values,
+  baseValue,
+}) => {
   const { getImage } = useImages();
 
   return (
@@ -41,12 +55,26 @@ export const TxDetails: React.FC<TxDetailsProps> = ({ name, description }) => {
           {name}
         </Animated.Text>
       </View>
-      <Animated.Text
-        className="text-[#717171] text-lg font-Pixels leading-none mt-[2px]"
-        entering={FadeInRight}
-      >
-        {description}
-      </Animated.Text>
+      <Animated.View entering={FadeInRight} className="mt-[2px]">
+        {chainId !== undefined &&
+        upgradeId !== undefined &&
+        currentLevel !== undefined &&
+        values &&
+        baseValue !== undefined ? (
+          <UpgradeDescription
+            chainId={chainId}
+            upgradeId={upgradeId}
+            description={description}
+            currentLevel={currentLevel}
+            values={values}
+            baseValue={baseValue}
+          />
+        ) : (
+          <Text className="text-[#717171] text-lg font-Pixels leading-none">
+            {description}
+          </Text>
+        )}
+      </Animated.View>
     </View>
   );
 };
