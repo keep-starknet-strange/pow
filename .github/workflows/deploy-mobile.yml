@@ -102,8 +102,8 @@ jobs:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
       env:
-          KEYCHAIN_NAME: "temp.keychain"
-          KEYCHAIN_PATH: $HOME/Library/Keychains/$KEYCHAIN_NAME-db
+          KEYCHAIN_NAME: temp.keychain
+          KEYCHAIN_PATH: ~/Library/Keychains/temp.keychain-db
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       steps:
             - name: Checkout project
