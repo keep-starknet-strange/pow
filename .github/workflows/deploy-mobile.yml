@@ -151,6 +151,7 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
+                MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
               run: bundle exec fastlane deploy_testflight
 
             - name: Deploy to App Store
@@ -160,4 +161,5 @@ jobs:
                 APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
                 APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
                 APPSTORE_CONNECT_KEY_FILE_PATH: ${{ secrets.APPSTORE_CONNECT_KEY_FILE_PATH }}
+                MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
               run: bundle exec fastlane deploy
