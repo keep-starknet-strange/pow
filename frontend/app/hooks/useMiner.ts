@@ -88,7 +88,14 @@ export const useMiner = (
         });
       });
     }
-  }, [mineCounter, blockDifficulty, notify, onBlockMined, batchUpdate, debouncedNotify]);
+  }, [
+    mineCounter,
+    blockDifficulty,
+    notify,
+    onBlockMined,
+    batchUpdate,
+    debouncedNotify,
+  ]);
 
   // Reset mining progress when a block is mined
 
