@@ -8,7 +8,10 @@ import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
-import { TargetId, useIsTutorialTargetActive } from "@/app/stores/useTutorialStore";
+import {
+  TargetId,
+  useIsTutorialTargetActive,
+} from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
 import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
@@ -94,9 +97,13 @@ export const StorePage: React.FC = () => {
   );
   type SubTab = (typeof subTabs)[number];
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(subTabs[0]);
-  
-  const isChainUpgradeTabActive = useIsTutorialTargetActive("chainUpgradeTab" as TargetId);
-  const isChainAutomationTabActive = useIsTutorialTargetActive("chainAutomationTab" as TargetId);
+
+  const isChainUpgradeTabActive = useIsTutorialTargetActive(
+    "chainUpgradeTab" as TargetId,
+  );
+  const isChainAutomationTabActive = useIsTutorialTargetActive(
+    "chainAutomationTab" as TargetId,
+  );
   const stepTabOverrides = useMemo(
     () =>
       ({
@@ -388,45 +395,43 @@ export const StorePage: React.FC = () => {
           const active = isTabActive(tab);
           const tabWidth = (width - 2 * subTabs.length - 6) / subTabs.length;
           return (
-          <Pressable
-            className="relative flex justify-center z-[10]"
-            style={{
-              width: tabWidth,
-              height: active ? 32 : 24,
-            }}
-            key={tab}
-            onPress={() => {
-              setActiveSubTab(tab);
-              notify("SwitchStore", { name: tab });
-            }}
-          >
-            {tab === "Upgrades" && (
-              <TutorialRefView targetId="chainUpgradeTab" enabled={true} />
-            )}
-            {tab === "Automation" && (
-              <TutorialRefView targetId="chainAutomationTab" enabled={true} />
-            )}
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
-              <Image
-                image={getImage(
-                  active ? "shop.tab.active" : "shop.tab",
-                )}
-                fit="fill"
-                x={0}
-                y={0}
-                width={(width - 2 * subTabs.length - 6) / subTabs.length}
-                height={active ? 32 : 24}
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-              />
-            </Canvas>
-            <Text
-              className={`font-Pixels text-xl text-center w-full absolute ${
-                active ? "text-[#fff7ff]" : "text-[#717171]"
-              }`}
+            <Pressable
+              className="relative flex justify-center z-[10]"
+              style={{
+                width: tabWidth,
+                height: active ? 32 : 24,
+              }}
+              key={tab}
+              onPress={() => {
+                setActiveSubTab(tab);
+                notify("SwitchStore", { name: tab });
+              }}
             >
+              {tab === "Upgrades" && (
+                <TutorialRefView targetId="chainUpgradeTab" enabled={true} />
+              )}
+              {tab === "Automation" && (
+                <TutorialRefView targetId="chainAutomationTab" enabled={true} />
+              )}
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <Image
+                  image={getImage(active ? "shop.tab.active" : "shop.tab")}
+                  fit="fill"
+                  x={0}
+                  y={0}
+                  width={(width - 2 * subTabs.length - 6) / subTabs.length}
+                  height={active ? 32 : 24}
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                />
+              </Canvas>
+              <Text
+                className={`font-Pixels text-xl text-center w-full absolute ${
+                  active ? "text-[#fff7ff]" : "text-[#717171]"
+                }`}
+              >
                 {tab}
               </Text>
             </Pressable>

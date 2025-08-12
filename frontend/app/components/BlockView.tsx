@@ -8,6 +8,7 @@ import {
 } from "@shopify/react-native-skia";
 import messagesJson from "../configs/messages.json";
 import { useUpgrades } from "../stores/useUpgradesStore";
+import { useImages } from "../hooks/useImages";
 import { Block } from "../types/Chains";
 import { BlockTx } from "./BlockTx";
 

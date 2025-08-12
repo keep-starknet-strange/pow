@@ -8,7 +8,10 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
 import { TutorialRefView } from "./tutorial/TutorialRefView";
-import { TargetId, useIsTutorialTargetActive } from "@/app/stores/useTutorialStore";
+import {
+  TargetId,
+  useIsTutorialTargetActive,
+} from "@/app/stores/useTutorialStore";
 
 export const L1L2Switch = memo(
   ({
@@ -21,7 +24,9 @@ export const L1L2Switch = memo(
     isStore?: boolean; // Optional prop for store tab
   }) => {
     const { getImage } = useImages();
-    const isL2StoreTabActive = useIsTutorialTargetActive("l2StoreTab" as TargetId);
+    const isL2StoreTabActive = useIsTutorialTargetActive(
+      "l2StoreTab" as TargetId,
+    );
     const isL2TabActive = currentView === "L2" && isL2StoreTabActive;
 
     return (
