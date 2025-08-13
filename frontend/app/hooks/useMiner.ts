@@ -65,6 +65,7 @@ export const useMiner = (
       notify("MineClicked", {
         counter: mineCounter,
         difficulty: blockDifficulty,
+        ignoreAction: miningBlock?.blockId === 0,
       });
     }
   }, [mineCounter, blockDifficulty, notify, onBlockMined]);

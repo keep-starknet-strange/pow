@@ -28,17 +28,6 @@ interface GameStore {
   addTransaction: (chainId: number, transaction: Transaction) => void;
   initL2WorkingBlock: () => void;
 
-  /*
-   * TODO: Move from context ?
-  miningProgress: number;
-  mineBlock: () => void;
-  sequencingProgress: number;
-  sequenceBlock: () => void;
-  daProgress: number;
-  daConfirm: () => void;
-  proverProgress: number;
-  prove: () => void;
-  */
   onBlockMined: () => void;
   onBlockSequenced: () => void;
 

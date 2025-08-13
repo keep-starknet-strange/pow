@@ -188,7 +188,7 @@ export default function game() {
 
   const { initializeL2Store } = useL2Store();
   useEffect(() => {
-    initializeL2Store(powContract, user);
-  }, [initializeL2Store, powContract, user]);
+    initializeL2Store(powContract, user, getUserMaxChainId);
+  }, [initializeL2Store, powContract, user, getUserMaxChainId]);
   return <RootNavigator />;
 }

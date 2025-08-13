@@ -11,7 +11,7 @@ interface OnchainActionsState {
 
 export const useOnchainActions = create<OnchainActionsState>((set) => ({
   actions: [],
-  maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 50,
+  maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 5,
   addAction: (action: Call) =>
     set((state) => {
       const updatedActions = [...state.actions, action];
@@ -22,6 +22,7 @@ export const useOnchainActions = create<OnchainActionsState>((set) => ({
           state.invokeActions(toInvoke);
         }
       }
+      console.log("Updated Actions:", updatedActions);
       return { actions: updatedActions };
     }),
   invokeActions: async (actions: Call[]) => {},

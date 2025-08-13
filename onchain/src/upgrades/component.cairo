@@ -12,10 +12,14 @@ pub mod PowUpgradesComponent {
         upgrade_ids: Map<felt252, u32>,
         // Maps: (chain_id, upgrade id, level) -> upgrade config
         upgrades: Map<(u32, u32, u32), UpgradeConfig>,
+        // Maps: (chain_id, upgrade id) -> max level
+        max_upgrade_levels: Map<(u32, u32), u32>,
         // Maps: short automation name -> automation id
         automation_ids: Map<felt252, u32>,
         // Maps: (chain_id, automation id, level) -> automation config
         automations: Map<(u32, u32, u32), AutomationConfig>,
+        // Maps: (chain_id, automation id) -> max level
+        max_automation_levels: Map<(u32, u32), u32>,
         // Maps: (user address, chain id, upgrade id) -> upgrade level
         upgrade_levels: Map<(ContractAddress, u32, u32), u32>,
         // Maps: (user address, chain id, automation id) -> automation level
@@ -205,6 +209,7 @@ pub mod PowUpgradesComponent {
                 idx += 1;
             }
             self.upgrade_ids.write(params.name, upgrade_id);
+            self.max_upgrade_levels.write((chain_id, upgrade_id), maxLevel);
             self.emit(UpgradeConfigUpdated { chain_id, upgrade_id, new_config: params });
         }
 
@@ -221,6 +226,7 @@ pub mod PowUpgradesComponent {
                 idx += 1;
             }
             self.automation_ids.write(params.name, automation_id);
+            self.max_automation_levels.write((chain_id, automation_id), maxLevel);
             self.emit(AutomationConfigUpdated { chain_id, automation_id, new_config: params });
         }
 

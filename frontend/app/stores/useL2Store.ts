@@ -17,6 +17,7 @@ interface L2Store {
   initializeL2Store: (
     powContract: Contract | null,
     user: FocAccount | null,
+    getUserMaxChainId: () => Promise<number | undefined>,
   ) => void;
 
   canUnlockL2: () => boolean;
@@ -38,10 +39,14 @@ export const useL2Store = create<L2Store>((set, get) => ({
   isL2Unlocked: false,
 
   resetL2Store: () => set({ l2: undefined, isL2Unlocked: false }),
-  initializeL2Store: (powContract, user) => {
+  initializeL2Store: (powContract, user, getUserMaxChainId) => {
     const fetchL2Store = async () => {
       if (powContract && user) {
         try {
+          const maxChainId = (await getUserMaxChainId()) || 0;
+          if (maxChainId < 1) {
+            return;
+          }
           // Get upgrade values at initialization time
           const daMaxSize =
             useUpgradesStore.getState().getUpgradeValue(1, "DA compression") ||
