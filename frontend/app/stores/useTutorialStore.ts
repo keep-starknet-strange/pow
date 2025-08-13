@@ -61,7 +61,8 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
       const savedIndex = tutorialStepIndex
         ? parseInt(tutorialStepIndex, 10)
         : 0;
-      const savedVisible = tutorialVisible === null ? isActive : tutorialVisible === "true";
+      const savedVisible =
+        tutorialVisible === null ? isActive : tutorialVisible === "true";
 
       // Validate saved step exists in config
       const validStep =
@@ -92,10 +93,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
           TUTORIAL_STEP_INDEX_KEY,
           state.stepIndex.toString(),
         ),
-        AsyncStorage.setItem(
-          TUTORIAL_VISIBLE_KEY,
-          state.visible.toString(),
-        ),
+        AsyncStorage.setItem(TUTORIAL_VISIBLE_KEY, state.visible.toString()),
       ]);
     } catch (error) {
       console.error("Failed to save tutorial progress:", error);

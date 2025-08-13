@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { v4 as uuidv4 } from "uuid";
 
 export type EventType =
   | "BasicClick"
@@ -38,26 +37,24 @@ export interface Observer {
 
 export type EventManager = {
   observers: Map<string, Observer>;
-  registerObserver(observer: Observer): string;
-  unregisterObserver(observerId: string): void;
+  registerObserver(key: string, observer: Observer): void;
+  unregisterObserver(key: string): void;
   notify(eventType: EventType, data?: any): void;
 };
 
 export const useEventManager = create<EventManager>((set, get) => ({
   observers: new Map<string, Observer>(),
 
-  registerObserver(observer: Observer): string {
-    const observerId = uuidv4();
+  registerObserver(key: string, observer: Observer): void {
     set((state) => ({
-      observers: new Map(state.observers).set(observerId, observer),
+      observers: new Map(state.observers).set(key, observer),
     }));
-    return observerId;
   },
 
-  unregisterObserver(observerId: string): void {
+  unregisterObserver(key: string): void {
     set((state) => {
       const newObservers = new Map(state.observers);
-      newObservers.delete(observerId);
+      newObservers.delete(key);
       return { observers: newObservers };
     });
   },

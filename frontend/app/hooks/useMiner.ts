@@ -63,7 +63,14 @@ export const useMiner = (
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [triggerMineAnimation, miningBlock?.isBuilt, blockDifficulty, mineCounter, notify, onBlockMined]);
+  }, [
+    triggerMineAnimation,
+    miningBlock?.isBuilt,
+    blockDifficulty,
+    mineCounter,
+    notify,
+    onBlockMined,
+  ]);
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,
