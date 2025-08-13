@@ -20,8 +20,10 @@ const config: ExpoConfig = {
         "braavos",
       ],
     },
+    config: {
+      usesNonExemptEncryption: false,
+    },
     bundleIdentifier: "com.starknet.pow",
-    buildNumber: "1",
   },
   android: {
     adaptiveIcon: {
@@ -30,7 +32,6 @@ const config: ExpoConfig = {
     },
     package: "com.starknet.pow",
     edgeToEdgeEnabled: true,
-    versionCode: 1,
   },
   web: {
     bundler: "metro",
@@ -60,8 +61,7 @@ const config: ExpoConfig = {
     "expo-web-browser",
     "expo-audio",
     "./plugins/android/signing.ts",
-    "./plugins/ios/sentry.ts",
-    "./plugins/ios/encryption.ts",
+    "./plugins/ios/sentry.ts"
   ],
   experiments: {
     typedRoutes: true,

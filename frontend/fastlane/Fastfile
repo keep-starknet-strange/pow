@@ -1,0 +1,108 @@
+default_platform(:ios)
+
+platform :ios do
+
+  before_all do
+    setup_ci if ENV['CI']
+
+    setup_api_key
+  end
+
+  # Used to authenticate with App Store Connect
+  private_lane :setup_api_key do 
+    app_store_connect_api_key(
+      key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
+      key_filepath: ENV['APPSTORE_CONNECT_KEY_FILE_PATH'],
+      duration: 1200, #optional
+      in_house: false,
+    )
+  end
+
+  # Used to update the build number to the highest build number 
+  # found in Testflight or App Store
+  private_lane :update_build_number do 
+    current_build_num = 1
+
+    begin
+      testflight_build_num = app_store_build_number(live: false)
+
+      if testflight_build_num > current_build_num 
+        current_build_num = testflight_build_num
+      end
+    rescue => e
+      UI.error(e)
+    end
+
+    begin
+      live_build_num = app_store_build_number(live: true)
+
+      if live_build_num > current_build_num 
+        current_build_num = live_build_num
+      end
+    rescue => e
+      UI.error(e)
+    end
+    
+    increment_build_number(
+      build_number: current_build_num + 1,
+      xcodeproj: "ios/POW.xcodeproj"
+    )
+  end
+
+  # Used to build the app and sign it with the 
+  # correct certificates and provisioning profiles
+  private_lane :build_and_sign_release do
+    # Since the ios project is dynamically generated, we need to update the 
+    # code signing settings. This is similar to opening the project in Xcode and
+    # 1. Click POW on the project navigator
+    # 2. Then in TARGETS click on POW
+    # 3. Then click Signing & Capabilities tab
+    # 4. Then click on Release tab
+    # 5. The uncheck the "Automatically manage signing" checkbox
+    # 6. Select the profile "match AppStore com.starknet.pow"
+    # Since this script is run in CI those settings can be changed with the follwing lane.
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/POW.xcodeproj",
+      team_id: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+      bundle_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      code_sign_identity: "iPhone Distribution",
+      sdk: "iphoneos*",
+      profile_name: "match AppStore com.starknet.pow"
+    )
+
+    # Setup certificates and provisioning profiles (Check the Matchfile)
+    match(
+      type: 'appstore',
+      readonly: true
+    )
+
+    # Build the app (Check the Gymfile)
+    gym(
+      clean: true,
+      configuration: "Release"
+    )
+  end
+
+  lane :deploy_testflight do
+    update_build_number
+    build_and_sign_release
+
+    upload_to_testflight(
+      skip_submission: true, # TEMP
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+    )
+  end
+
+  lane :deploy do
+    update_build_number
+    build_and_sign_release
+
+    upload_to_app_store(
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+end

@@ -134,18 +134,13 @@ jobs:
               env:
                 SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               run: npx expo prebuild --platform ios
-            
-            - name: Setup Fastlane scripts
-              working-directory: ./frontend
-              run: |
-                mv ./scripts/ios/* ./ios/
 
             - name: Update Gems
-              working-directory: ./frontend/ios
+              working-directory: ./frontend
               run: bundle update
 
             - name: Decode App Store Connect Key
-              working-directory: ./frontend/ios
+              working-directory: ./frontend
               env:
                 APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
               run: |
@@ -153,12 +148,12 @@ jobs:
 
             - name: Deploy to Testflight
               if: ${{ inputs.internal_testing == true }}
-              working-directory: ./frontend/ios
+              working-directory: ./frontend
               run: bundle exec fastlane deploy_testflight
 
             - name: Deploy to App Store
               if: ${{ inputs.internal_testing == false }}
-              working-directory: ./frontend/ios
+              working-directory: ./frontend
               run: bundle exec fastlane deploy
 
             - name: Upload logs
