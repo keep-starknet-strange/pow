@@ -129,7 +129,14 @@ export default function game() {
   }, [initializeSound]);
 
   const { advanceStep, setVisible, step } = useTutorial();
+  const { initializeTutorial } = useTutorialStore();
   const [tutorialObserver, setTutorialObserver] = useState<null | string>(null);
+  
+  // Initialize tutorial on app start
+  useEffect(() => {
+    initializeTutorial();
+  }, [initializeTutorial]);
+  
   useEffect(() => {
     if (tutorialObserver !== null) {
       unregisterObserver(tutorialObserver);

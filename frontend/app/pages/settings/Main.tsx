@@ -11,6 +11,7 @@ import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
+import { useTutorialStore } from "../../stores/useTutorialStore";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
@@ -32,6 +33,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const { user } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
+  const { resetTutorial } = useTutorialStore();
 
   const toggleNotifs = () => setNotifs(!notifs);
 
@@ -39,6 +41,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     setShowResetConfirmation(false);
     clearPrivateKeys("pow_game");
     disconnectAccount();
+    resetTutorial(); // Reset tutorial progress when game is reset
   };
 
   const settingsComponents: {
