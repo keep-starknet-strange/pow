@@ -5,6 +5,7 @@ import tutorialConfig from "../configs/tutorial.json";
 const TUTORIAL_ACTIVE_KEY = "tutorial_active";
 const TUTORIAL_STEP_KEY = "tutorial_step";
 const TUTORIAL_STEP_INDEX_KEY = "tutorial_step_index";
+const TUTORIAL_VISIBLE_KEY = "tutorial_visible";
 
 export type TutorialStep = keyof typeof tutorialConfig;
 export type TargetId =
@@ -43,11 +44,12 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
 
   initializeTutorial: async () => {
     try {
-      const [tutorialActive, tutorialStep, tutorialStepIndex] =
+      const [tutorialActive, tutorialStep, tutorialStepIndex, tutorialVisible] =
         await Promise.all([
           AsyncStorage.getItem(TUTORIAL_ACTIVE_KEY),
           AsyncStorage.getItem(TUTORIAL_STEP_KEY),
           AsyncStorage.getItem(TUTORIAL_STEP_INDEX_KEY),
+          AsyncStorage.getItem(TUTORIAL_VISIBLE_KEY),
         ]);
 
       const keys = Object.keys(tutorialConfig) as TutorialStep[];
@@ -59,6 +61,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
       const savedIndex = tutorialStepIndex
         ? parseInt(tutorialStepIndex, 10)
         : 0;
+      const savedVisible = tutorialVisible === null ? isActive : tutorialVisible === "true";
 
       // Validate saved step exists in config
       const validStep =
@@ -69,7 +72,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         isTutorialActive: isActive,
         step: validStep,
         stepIndex: validIndex,
-        visible: isActive,
+        visible: savedVisible,
       });
     } catch (error) {
       console.error("Failed to load tutorial progress:", error);
@@ -88,6 +91,10 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         AsyncStorage.setItem(
           TUTORIAL_STEP_INDEX_KEY,
           state.stepIndex.toString(),
+        ),
+        AsyncStorage.setItem(
+          TUTORIAL_VISIBLE_KEY,
+          state.visible.toString(),
         ),
       ]);
     } catch (error) {
@@ -135,7 +142,11 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
     });
   },
 
-  setVisible: (visible: boolean) => set({ visible }),
+  setVisible: (visible: boolean) => {
+    set({ visible });
+    console.log("Set tutorial visible:", visible);
+    get().saveTutorialProgress();
+  },
 
   setIsTutorialActive: (active: boolean) => {
     set({ isTutorialActive: active });
@@ -149,7 +160,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
       step: "mineBlock",
       stepIndex: 0,
       layouts: {},
-      visible: false,
+      visible: true,
     });
 
     // Clear saved progress
@@ -157,6 +168,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
       AsyncStorage.removeItem(TUTORIAL_ACTIVE_KEY),
       AsyncStorage.removeItem(TUTORIAL_STEP_KEY),
       AsyncStorage.removeItem(TUTORIAL_STEP_INDEX_KEY),
+      AsyncStorage.removeItem(TUTORIAL_VISIBLE_KEY),
     ]).catch((error) => {
       console.error("Failed to clear tutorial progress:", error);
     });

@@ -44,7 +44,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (powContract && user) {
         try {
           const maxChainId = (await getUserMaxChainId()) || 0;
-          if (maxChainId < 1) {
+          if (maxChainId < 2) {
             return;
           }
           // Get upgrade values at initialization time
