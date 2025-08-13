@@ -12,65 +12,71 @@ import { useSoundStore, useSound } from "@/app/stores/useSoundStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 
-export const StoreInitializer = memo(() => {
-  console.log("StoreInitializer rendered");
-  const { user, getUniqueEventsWith } = useFocEngine();
+const OnchainActionsInitializer = memo(() => {
   const { invokeCalls } = useStarknetConnector();
-  const {
-    powContract,
-    getUserBalance,
-    initMyGame,
-    getUserMaxChainId,
-    getUserBlockNumber,
-    getUserTxFeeLevels,
-    getUserTxSpeedLevels,
-    getUserBlockState,
-    getUserUpgradeLevels,
-    getUserAutomationLevels,
-  } = usePowContractConnector();
-
-  const { setSoundDependency, initializeAchievements } = useAchievementsStore();
-  const { cleanupSound, initializeSound } = useSoundStore();
-  const { playSoundEffect } = useSound();
   const { onInvokeActions } = useOnchainActions();
-  const { initializeBalance } = useBalanceStore();
-  const { initializeTransactions } = useTransactionsStore();
-  const { initializeGameStore, setInitMyGameDependency } = useGameStore();
-  const { initializeL2Store } = useL2Store();
-  const { initializeTutorial } = useTutorialStore();
-  const { initializeUpgrades } = useUpgradesStore();
 
   useEffect(() => {
-    console.log("onInvokeActions called with invokeCalls:", invokeCalls);
     onInvokeActions(invokeCalls);
   }, [invokeCalls, onInvokeActions]);
 
+  return null;
+});
+
+const SoundInitializer = memo(() => {
+  const { cleanupSound, initializeSound } = useSoundStore();
+
   useEffect(() => {
-    console.log("Initializing sound");
     initializeSound();
     return () => {
       cleanupSound();
     };
   }, [initializeSound, cleanupSound]);
 
+  return null;
+});
+
+const TutorialInitializer = memo(() => {
+  const { initializeTutorial } = useTutorialStore();
+
   useEffect(() => {
-    console.log("Initializing tutorial");
     initializeTutorial();
   }, [initializeTutorial]);
 
+  return null;
+});
+
+const AchievementsInitializer = memo(() => {
+  const { user } = useFocEngine();
+  const { setSoundDependency, initializeAchievements } = useAchievementsStore();
+  const { playSoundEffect } = useSound();
+
   useEffect(() => {
-    console.log("Setting sound dependency");
     setSoundDependency(playSoundEffect);
     initializeAchievements(user?.account_address);
   }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
 
+  return null;
+});
+
+const BalanceInitializer = memo(() => {
+  const { user } = useFocEngine();
+  const { powContract, getUserBalance } = usePowContractConnector();
+  const { initializeBalance } = useBalanceStore();
+
   useEffect(() => {
-    console.log("Initializing balance for user:", user);
     initializeBalance(powContract, user, getUserBalance);
   }, [initializeBalance, getUserBalance, powContract, user]);
 
+  return null;
+});
+
+const TransactionsInitializer = memo(() => {
+  const { user } = useFocEngine();
+  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } = usePowContractConnector();
+  const { initializeTransactions } = useTransactionsStore();
+
   useEffect(() => {
-    console.log("Initializing transactions for user:", user);
     initializeTransactions(
       powContract,
       user,
@@ -85,8 +91,15 @@ export const StoreInitializer = memo(() => {
     getUserTxSpeedLevels,
   ]);
 
+  return null;
+});
+
+const GameStoreInitializer = memo(() => {
+  const { user } = useFocEngine();
+  const { powContract, initMyGame, getUserMaxChainId, getUserBlockNumber, getUserBlockState } = usePowContractConnector();
+  const { initializeGameStore, setInitMyGameDependency } = useGameStore();
+
   useEffect(() => {
-    console.log("Initializing game store for user:", user);
     initializeGameStore(
       powContract,
       user,
@@ -104,17 +117,30 @@ export const StoreInitializer = memo(() => {
   ]);
 
   useEffect(() => {
-    console.log("Setting initMyGame dependency");
     setInitMyGameDependency(initMyGame);
   }, [initMyGame, setInitMyGameDependency]);
 
+  return null;
+});
+
+const L2Initializer = memo(() => {
+  const { user } = useFocEngine();
+  const { powContract, getUserMaxChainId } = usePowContractConnector();
+  const { initializeL2Store } = useL2Store();
+
   useEffect(() => {
-    console.log("Initializing L2 store for user:", user);
     initializeL2Store(powContract, user, getUserMaxChainId);
   }, [initializeL2Store, powContract, user, getUserMaxChainId]);
 
+  return null;
+});
+
+const UpgradesInitializer = memo(() => {
+  const { user, getUniqueEventsWith } = useFocEngine();
+  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } = usePowContractConnector();
+  const { initializeUpgrades } = useUpgradesStore();
+
   useEffect(() => {
-    console.log("Initializing upgrades for user:", user);
     initializeUpgrades(
       user,
       powContract,
@@ -132,6 +158,22 @@ export const StoreInitializer = memo(() => {
   ]);
 
   return null;
+});
+
+export const StoreInitializer = memo(() => {
+  return (
+    <>
+      <OnchainActionsInitializer />
+      <SoundInitializer />
+      <TutorialInitializer />
+      <AchievementsInitializer />
+      <BalanceInitializer />
+      <TransactionsInitializer />
+      <GameStoreInitializer />
+      <L2Initializer />
+      <UpgradesInitializer />
+    </>
+  );
 });
 
 StoreInitializer.displayName = "StoreInitializer";
