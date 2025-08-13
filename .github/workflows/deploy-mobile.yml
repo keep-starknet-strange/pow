@@ -117,7 +117,7 @@ jobs:
 
             - uses: webfactory/ssh-agent@v0.6.0
               with:
-                ssh-private-key: ${{ secrets.MATCH_KEY }}
+                ssh-private-key: ${{ secrets.APPSTORE_CERTIFICATES_SSH_KEY }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -156,10 +156,3 @@ jobs:
               if: ${{ inputs.internal_testing == false }}
               working-directory: ./frontend
               run: bundle exec fastlane deploy
-
-            - name: Upload logs
-              uses: actions/upload-artifact@v4
-              if: ${{ failure() }}
-              with:
-                name: Pow.log
-                path: /Users/runner/Library/Logs/gym/POW-POW.log
