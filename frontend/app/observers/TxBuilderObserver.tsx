@@ -1,8 +1,8 @@
 import { Observer, EventType } from "@/app/stores/useEventManager";
-import { Block } from "../types/Chains";
 import transactionsJson from "../configs/transactions.json";
 import { Call } from "starknet";
 import { daTxTypeId, proofTxTypeId } from "../utils/transactions";
+import { useOnchainActions } from "@/app/stores/useOnchainActions";
 
 export const createAddTransactionCall = (
   contractAddress: string,
@@ -125,11 +125,9 @@ export const createBuyPrestigeCall = (contractAddress: string): Call => {
 };
 
 export class TxBuilderObserver implements Observer {
-  private addAction: (call: Call) => void;
   private contractAddress: string;
 
-  constructor(addAction: (call: Call) => void, contractAddress: string) {
-    this.addAction = addAction;
+  constructor(contractAddress: string) {
     this.contractAddress = contractAddress;
   }
 
@@ -138,8 +136,8 @@ export class TxBuilderObserver implements Observer {
   }
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
+    const { addAction } = useOnchainActions.getState();
     if (!this.contractAddress) {
-      console.warn("TxBuilderObserver: No contract address set");
       return;
     }
 
@@ -154,7 +152,7 @@ export class TxBuilderObserver implements Observer {
         const txTypes =
           data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
         const txTypeCount = txTypes.length;
-        this.addAction(
+        addAction(
           createAddTransactionCall(
             this.contractAddress,
             data.chainId,
@@ -162,7 +160,7 @@ export class TxBuilderObserver implements Observer {
           ),
         );
       } else {
-        this.addAction(
+        addAction(
           createAddTransactionCall(
             this.contractAddress,
             data.chainId,
@@ -179,25 +177,25 @@ export class TxBuilderObserver implements Observer {
         break;
       case "MineClicked":
         if (data.ignoreAction) return;
-        this.addAction(createMineBlockCall(this.contractAddress, 0));
+        addAction(createMineBlockCall(this.contractAddress, 0));
         break;
       case "SequenceClicked":
         if (data.ignoreAction) return;
-        this.addAction(createMineBlockCall(this.contractAddress, 1));
+        addAction(createMineBlockCall(this.contractAddress, 1));
         break;
       case "DaClicked":
-        this.addAction(createStoreDaCall(this.contractAddress, 1));
+        addAction(createStoreDaCall(this.contractAddress, 1));
         break;
       case "ProveClicked":
-        this.addAction(createProveCall(this.contractAddress, 1));
+        addAction(createProveCall(this.contractAddress, 1));
         break;
       case "TxUpgradePurchased":
         if (data.type === "txFee") {
-          this.addAction(
+          addAction(
             createBuyTxFeeCall(this.contractAddress, data.chainId, data.txId),
           );
         } else if (data.type === "txSpeed") {
-          this.addAction(
+          addAction(
             createBuyTxSpeedCall(this.contractAddress, data.chainId, data.txId),
           );
         } else if (data.type === "dappFee") {
@@ -205,7 +203,7 @@ export class TxBuilderObserver implements Observer {
           const txTypes =
             data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
           const txTypeCount = txTypes.length;
-          this.addAction(
+          addAction(
             createBuyTxFeeCall(
               this.contractAddress,
               data.chainId,
@@ -216,7 +214,7 @@ export class TxBuilderObserver implements Observer {
           const txTypes =
             data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
           const txTypeCount = txTypes.length;
-          this.addAction(
+          addAction(
             createBuyTxSpeedCall(
               this.contractAddress,
               data.chainId,
@@ -228,7 +226,7 @@ export class TxBuilderObserver implements Observer {
         }
         break;
       case "UpgradePurchased":
-        this.addAction(
+        addAction(
           createBuyUpgradeCall(
             this.contractAddress,
             data.chainId,
@@ -237,7 +235,7 @@ export class TxBuilderObserver implements Observer {
         );
         break;
       case "AutomationPurchased":
-        this.addAction(
+        addAction(
           createBuyAutomationCall(
             this.contractAddress,
             data.chainId,
@@ -246,13 +244,13 @@ export class TxBuilderObserver implements Observer {
         );
         break;
       case "DappsPurchased":
-        this.addAction(createBuyDappsCall(this.contractAddress, data.chainId));
+        addAction(createBuyDappsCall(this.contractAddress, data.chainId));
         break;
       case "L2Purchased":
-        this.addAction(createBuyNextChainCall(this.contractAddress));
+        addAction(createBuyNextChainCall(this.contractAddress));
         break;
       case "PrestigePurchased":
-        this.addAction(createBuyPrestigeCall(this.contractAddress));
+        addAction(createBuyPrestigeCall(this.contractAddress));
         break;
       default:
         break;

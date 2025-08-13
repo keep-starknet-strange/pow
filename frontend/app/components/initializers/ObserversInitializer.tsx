@@ -9,10 +9,10 @@ import { usePowContractConnector } from "@/app/context/PowContractConnector";
 
 export const ObserversInitializer = memo(() => {
   console.log("ObserversInitializer rendered");
+  const { powGameContractAddress } = usePowContractConnector();
 
   const { registerObserver, unregisterObserver } = useEventManager();
   const registeredKeys = useRef<Set<string>>(new Set());
-  const { addPowAction } = usePowContractConnector();
 
   useEffect(() => {
     // Create observers without any dependencies - they access stores directly
@@ -31,7 +31,7 @@ export const ObserversInitializer = memo(() => {
       },
       {
         key: "txBuilder",
-        instance: new TxBuilderObserver(addPowAction),
+        instance: new TxBuilderObserver(powGameContractAddress || "")
       },
       {
         key: "tutorial",
@@ -53,7 +53,7 @@ export const ObserversInitializer = memo(() => {
       });
       registeredKeys.current.clear();
     };
-  }, [addPowAction]); // Re-register TxBuilderObserver when addPowAction changes
+  }, [powGameContractAddress]);
 
   return null;
 });

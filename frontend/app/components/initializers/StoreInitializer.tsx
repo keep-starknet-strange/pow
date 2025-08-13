@@ -41,10 +41,12 @@ export const StoreInitializer = memo(() => {
   const { initializeUpgrades } = useUpgradesStore();
 
   useEffect(() => {
+    console.log("onInvokeActions called with invokeCalls:", invokeCalls);
     onInvokeActions(invokeCalls);
   }, [invokeCalls, onInvokeActions]);
 
   useEffect(() => {
+    console.log("Initializing sound");
     initializeSound();
     return () => {
       cleanupSound();
@@ -52,19 +54,23 @@ export const StoreInitializer = memo(() => {
   }, [initializeSound, cleanupSound]);
 
   useEffect(() => {
+    console.log("Initializing tutorial");
     initializeTutorial();
   }, [initializeTutorial]);
 
   useEffect(() => {
+    console.log("Setting sound dependency");
     setSoundDependency(playSoundEffect);
     initializeAchievements(user?.account_address);
   }, [playSoundEffect, setSoundDependency, initializeAchievements, user]);
 
   useEffect(() => {
+    console.log("Initializing balance for user:", user);
     initializeBalance(powContract, user, getUserBalance);
   }, [initializeBalance, getUserBalance, powContract, user]);
 
   useEffect(() => {
+    console.log("Initializing transactions for user:", user);
     initializeTransactions(
       powContract,
       user,
@@ -80,6 +86,7 @@ export const StoreInitializer = memo(() => {
   ]);
 
   useEffect(() => {
+    console.log("Initializing game store for user:", user);
     initializeGameStore(
       powContract,
       user,
@@ -97,14 +104,17 @@ export const StoreInitializer = memo(() => {
   ]);
 
   useEffect(() => {
+    console.log("Setting initMyGame dependency");
     setInitMyGameDependency(initMyGame);
   }, [initMyGame, setInitMyGameDependency]);
 
   useEffect(() => {
+    console.log("Initializing L2 store for user:", user);
     initializeL2Store(powContract, user, getUserMaxChainId);
   }, [initializeL2Store, powContract, user, getUserMaxChainId]);
 
   useEffect(() => {
+    console.log("Initializing upgrades for user:", user);
     initializeUpgrades(
       user,
       powContract,
