@@ -27,7 +27,7 @@ export const L1L2Switch = memo(
     const isL2StoreTabActive = useIsTutorialTargetActive(
       "l2StoreTab" as TargetId,
     );
-    const isL2TabActive = currentView === "L2" && isL2StoreTabActive;
+    const isL2TabActive = currentView === "L2" || isL2StoreTabActive;
 
     return (
       <View className="absolute right-0 top-0">
