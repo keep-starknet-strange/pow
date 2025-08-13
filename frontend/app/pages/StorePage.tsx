@@ -1,5 +1,10 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
+import type {
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutChangeEvent,
+} from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
@@ -48,6 +53,17 @@ export const StorePage: React.FC = () => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
+
+  const [listViewportHeight, setListViewportHeight] = useState(0);
+  const [showBottomFade, setShowBottomFade] = useState(true);
+  const SCROLL_BOTTOM_THRESHOLD = 16;
+  const prevFadeRef = useRef(showBottomFade);
+  const setFadeIfChanged = useCallback((next: boolean) => {
+    if (prevFadeRef.current !== next) {
+      prevFadeRef.current = next;
+      setShowBottomFade(next);
+    }
+  }, []);
 
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
@@ -329,6 +345,24 @@ export const StorePage: React.FC = () => {
     [chainId, width, getImage],
   );
 
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      const isAtBottom =
+        contentOffset.y + layoutMeasurement.height >=
+        contentSize.height - SCROLL_BOTTOM_THRESHOLD;
+      setFadeIfChanged(
+        !isAtBottom && contentSize.height > layoutMeasurement.height,
+      );
+    },
+    [setFadeIfChanged],
+  );
+
+  const handleListLayout = useCallback((e: LayoutChangeEvent) => {
+    const height = e.nativeEvent.layout.height;
+    setListViewportHeight(height);
+  }, []);
+
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
   }
@@ -408,7 +442,7 @@ export const StorePage: React.FC = () => {
           </Pressable>
         ))}
       </View>
-      <View style={{ height: 522, marginTop: 2 }}>
+      <View style={{ height: 522, marginTop: 2 }} onLayout={handleListLayout}>
         <FlatList
           data={storeData}
           className="flex-1 relative py-[10px]"
@@ -420,6 +454,15 @@ export const StorePage: React.FC = () => {
           windowSize={15}
           removeClippedSubviews={false}
           getItemLayout={undefined}
+          onScroll={handleScroll}
+          scrollEventThrottle={32}
+          onContentSizeChange={(_, h) => {
+            if (listViewportHeight > 0) {
+              setFadeIfChanged(
+                h > listViewportHeight + SCROLL_BOTTOM_THRESHOLD,
+              );
+            }
+          }}
         />
         <LinearGradient
           style={{
@@ -431,6 +474,7 @@ export const StorePage: React.FC = () => {
             marginLeft: 8,
             marginRight: 8,
             pointerEvents: "none",
+            opacity: showBottomFade ? 1 : 0,
           }}
           colors={["transparent", "#000000c0"]}
           start={{ x: 0, y: 0 }}
