@@ -5,7 +5,6 @@ import type {
   NativeScrollEvent,
   LayoutChangeEvent,
 } from "react-native";
-import Animated, { FadeInLeft } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
 
@@ -356,7 +355,8 @@ export const StorePage: React.FC = () => {
         />
         <LinearGradient
           style={{ ...GradientBaseStyle, opacity: showBottomFade ? 1 : 0 }}
-          colors={["transparent", "#000000c0"]}
+          colors={["transparent", "#000000c0", "#000000c0"]}
+          locations={[0, 0.995, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
         />
