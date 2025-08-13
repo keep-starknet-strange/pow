@@ -1,7 +1,12 @@
 import { memo } from "react";
 import { View } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
-import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 
 import { TransactionUpgradeView } from "./TransactionUpgradeView";
 import { UpgradeView } from "./UpgradeView";
