@@ -1,15 +1,16 @@
 import "./global.css";
 
 import { RootNavigator } from "./navigation/RootNavigator";
-import { ObserversProvider } from "./components/providers/ObserversProvider";
-import { StoreInitializer } from "./components/providers/StoreInitializer";
+import { ObserversInitializer } from "./components/initializers/ObserversInitializer";
+import { StoreInitializer } from "./components/initializers/StoreInitializer";
 
 export default function game() {
   console.log("Game started");
   return (
-    <ObserversProvider>
+    <>
+      <ObserversInitializer />
       <StoreInitializer />
       <RootNavigator />
-    </ObserversProvider>
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { InAppNotificationsObserver } from "@/app/observers/InAppNotificationsObserver";
 import { AchievementObserver } from "@/app/observers/AchievementObserver";
@@ -11,7 +11,9 @@ import { useSound } from "@/app/stores/useSoundStore";
 import { usePowContractConnector } from "@/app/context/PowContractConnector";
 import { useTutorial } from "@/app/stores/useTutorialStore";
 
-export function useObserversSetup() {
+export const ObserversInitializer = memo(() => {
+  console.log("ObserversInitializer rendered");
+
   const { registerObserver, unregisterObserver } = useEventManager();
   const registeredKeys = useRef<Set<string>>(new Set());
 
@@ -68,4 +70,8 @@ export function useObserversSetup() {
     registerObserver,
     unregisterObserver,
   ]);
-}
+
+  return null;
+});
+
+ObserversInitializer.displayName = "ObserversInitializer";
