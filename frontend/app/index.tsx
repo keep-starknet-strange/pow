@@ -27,7 +27,6 @@ export default function App() {
     return null; // or a loading screen
   }
 
-  console.log("App started");
   return (
     <StarknetConnectorProvider>
       <FocEngineProvider>

@@ -8,7 +8,6 @@ import { TutorialObserver } from "@/app/observers/TutorialObserver";
 import { usePowContractConnector } from "@/app/context/PowContractConnector";
 
 export const ObserversInitializer = memo(() => {
-  console.log("ObserversInitializer rendered");
   const { powGameContractAddress } = usePowContractConnector();
 
   const { registerObserver, unregisterObserver } = useEventManager();

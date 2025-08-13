@@ -60,8 +60,11 @@ export const useEventManager = create<EventManager>((set, get) => ({
   },
 
   notify(eventType: EventType, data?: any): void {
-    get().observers.forEach((observer, _) => {
-      observer.onNotify(eventType, data);
-    });
+    // Defer all observer calls to next tick to avoid render-time state updates
+    setTimeout(() => {
+      get().observers.forEach((observer, _) => {
+        observer.onNotify(eventType, data);
+      });
+    }, 0);
   },
 }));

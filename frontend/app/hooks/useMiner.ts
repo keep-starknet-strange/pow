@@ -57,8 +57,7 @@ export const useMiner = (
         });
         return newCounter;
       } else if (newCounter === blockDifficulty) {
-        onBlockMined();
-        return 0;
+        return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
@@ -71,6 +70,13 @@ export const useMiner = (
     notify,
     onBlockMined,
   ]);
+
+  useEffect(() => {
+    if (mineCounter === blockDifficulty) {
+      onBlockMined();
+      setMineCounter(0);
+    }
+  }, [blockDifficulty, mineCounter, onBlockMined]);
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,

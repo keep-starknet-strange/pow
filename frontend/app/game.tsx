@@ -5,7 +5,6 @@ import { ObserversInitializer } from "./components/initializers/ObserversInitial
 import { StoreInitializer } from "./components/initializers/StoreInitializer";
 
 export default function game() {
-  console.log("Game started");
   return (
     <>
       <ObserversInitializer />
