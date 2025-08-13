@@ -1,16 +1,19 @@
 import { Observer, EventType } from "@/app/stores/useEventManager";
+import { useSoundStore } from "@/app/stores/useSoundStore";
 
 export class SoundObserver implements Observer {
-  private playSound: (soundType: string, pitchShift?: number) => Promise<void>;
   private blockFullAttempts: number = 0; // Counter for consecutive BlockFull attempts
 
-  constructor(
-    playSoundEffect: (soundType: string, pitchShift?: number) => Promise<void>,
-  ) {
-    this.playSound = playSoundEffect;
+  constructor() {
+    // No dependencies needed - will access store directly
   }
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
+    // Get fresh state and actions directly from store
+    const { isSoundOn, playSoundEffect } = useSoundStore.getState();
+
+    if (!isSoundOn) return; // Early exit if sound is disabled
+
     switch (eventType) {
       case "TxAdded": {
         const blockProgess = data?.progress || 0;
@@ -21,30 +24,30 @@ export class SoundObserver implements Observer {
           Math.min(Math.max(blockProgess, 0.25), 1) * 0.375 +
           feeScaler * 0.375 +
           0.25;
-        this.playSound(eventType, pitchShift);
+        playSoundEffect(eventType, pitchShift);
         this.blockFullAttempts = 0; // Reset counter after a successful transaction
         break;
       }
       case "MineClicked": {
         if (!data.counter || !data.difficulty) {
-          this.playSound(eventType);
+          playSoundEffect(eventType);
           break;
         }
         const progress = data.counter / data.difficulty;
         const pitchShift =
           progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
-        this.playSound(eventType, pitchShift);
+        playSoundEffect(eventType, pitchShift);
         break;
       }
       case "SequenceClicked": {
         if (!data.counter || !data.difficulty) {
-          this.playSound(eventType);
+          playSoundEffect(eventType);
           break;
         }
         const progress = data.counter / data.difficulty;
         const pitchShift =
           progress > 0.35 ? Math.min(progress, 0.75) + 0.25 : 0.25;
-        this.playSound(eventType, pitchShift);
+        playSoundEffect(eventType, pitchShift);
         break;
       }
       case "BlockFull": {
@@ -53,13 +56,13 @@ export class SoundObserver implements Observer {
 
         // Only show notification after 3 consecutive attempts
         if (this.blockFullAttempts >= 3) {
-          this.playSound(eventType);
+          playSoundEffect(eventType);
           this.blockFullAttempts = 0; // Reset counter after showing notification
         }
         break;
       }
       default: {
-        this.playSound(eventType, data?.pitchShift);
+        playSoundEffect(eventType, data?.pitchShift);
         break;
       }
     }

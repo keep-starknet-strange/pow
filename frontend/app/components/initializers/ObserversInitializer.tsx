@@ -5,37 +5,29 @@ import { AchievementObserver } from "@/app/observers/AchievementObserver";
 import { SoundObserver } from "@/app/observers/SoundObserver";
 import { TxBuilderObserver } from "@/app/observers/TxBuilderObserver";
 import { TutorialObserver } from "@/app/observers/TutorialObserver";
-import { useInAppNotifications } from "@/app/stores/useInAppNotificationsStore";
-import { useAchievement } from "@/app/stores/useAchievementsStore";
-import { useSound } from "@/app/stores/useSoundStore";
 import { usePowContractConnector } from "@/app/context/PowContractConnector";
-import { useTutorial } from "@/app/stores/useTutorialStore";
 
 export const ObserversInitializer = memo(() => {
   console.log("ObserversInitializer rendered");
 
   const { registerObserver, unregisterObserver } = useEventManager();
   const registeredKeys = useRef<Set<string>>(new Set());
-
-  const { sendInAppNotification } = useInAppNotifications();
-  const { updateAchievement } = useAchievement();
-  const { playSoundEffect } = useSound();
   const { addPowAction } = usePowContractConnector();
-  const { advanceStep, setVisible, step } = useTutorial();
 
   useEffect(() => {
+    // Create observers without any dependencies - they access stores directly
     const observers = [
       {
         key: "inAppNotifications",
-        instance: new InAppNotificationsObserver(sendInAppNotification),
+        instance: new InAppNotificationsObserver(),
       },
       {
         key: "achievement",
-        instance: new AchievementObserver(updateAchievement),
+        instance: new AchievementObserver(),
       },
       {
         key: "sound",
-        instance: new SoundObserver(playSoundEffect),
+        instance: new SoundObserver(),
       },
       {
         key: "txBuilder",
@@ -43,33 +35,25 @@ export const ObserversInitializer = memo(() => {
       },
       {
         key: "tutorial",
-        instance: new TutorialObserver(advanceStep, setVisible, step),
+        instance: new TutorialObserver(),
       },
     ];
 
+    // Register all observers once
     observers.forEach(({ key, instance }) => {
-      unregisterObserver(key);
+      unregisterObserver(key); // Clean up any existing observer
       registerObserver(key, instance);
       registeredKeys.current.add(key);
     });
 
+    // Cleanup on unmount
     return () => {
       registeredKeys.current.forEach((key) => {
         unregisterObserver(key);
       });
       registeredKeys.current.clear();
     };
-  }, [
-    sendInAppNotification,
-    updateAchievement,
-    playSoundEffect,
-    addPowAction,
-    advanceStep,
-    setVisible,
-    step,
-    registerObserver,
-    unregisterObserver,
-  ]);
+  }, [addPowAction]); // Re-register TxBuilderObserver when addPowAction changes
 
   return null;
 });

@@ -1,24 +1,25 @@
 import { Observer, EventType } from "@/app/stores/useEventManager";
+import { useInAppNotificationsStore } from "@/app/stores/useInAppNotificationsStore";
 import inAppNotificationsJson from "../configs/inAppNotifications.json";
 
 export class InAppNotificationsObserver implements Observer {
-  sendNotification: (noticicationTypeId: number, message?: string) => void;
   private blockFullAttempts: number = 0; // Counter for consecutive BlockFull attempts
 
-  constructor(
-    sendNotification: (noticicationTypeId: number, message?: string) => void,
-  ) {
-    this.sendNotification = sendNotification;
+  constructor() {
+    // No dependencies needed - will access store directly
   }
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
+    // Get fresh sendInAppNotification function from store
+    const { sendInAppNotification } = useInAppNotificationsStore.getState();
+
     switch (eventName) {
       case "BuyFailed": {
         const typeId =
           inAppNotificationsJson.find(
             (notification) => notification.eventType === "BuyFailed",
           )?.id || 0;
-        this.sendNotification(typeId);
+        sendInAppNotification(typeId);
         break;
       }
       case "InvalidPurchase": {
@@ -26,7 +27,7 @@ export class InAppNotificationsObserver implements Observer {
           inAppNotificationsJson.find(
             (notification) => notification.eventType === "InvalidPurchase",
           )?.id || 0;
-        this.sendNotification(typeId);
+        sendInAppNotification(typeId);
         break;
       }
       case "BlockFull": {
@@ -39,7 +40,7 @@ export class InAppNotificationsObserver implements Observer {
             inAppNotificationsJson.find(
               (notification) => notification.eventType === "BlockFull",
             )?.id || 0;
-          this.sendNotification(typeId);
+          sendInAppNotification(typeId);
           this.blockFullAttempts = 0; // Reset counter after showing notification
         }
         break;
