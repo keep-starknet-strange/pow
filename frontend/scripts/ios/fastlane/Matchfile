@@ -1,8 +1,7 @@
-git_url("git@github.com:micbakos/fastlane-secrets.git")
+git_url("git@github.com:keep-starknet-strange/apple-certificates.git")
 
 storage_mode("git")
 
 type("development") # The default type, can be: appstore, adhoc, enterprise or development
 
 app_identifier(["com.starknet.pow"])
-username("michael.b@starkware.co") # Your Apple Developer Portal username
