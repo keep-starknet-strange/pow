@@ -17,8 +17,13 @@ platform :ios do
     )
 
     update_code_signing_settings(
-      use_automatic_signing: true,
-      path: "POW.xcodeproj"
+      use_automatic_signing: false,
+      path: "POW.xcodeproj",
+      team_id: ENV['TEAM_ID'],
+      bundle_identifier: "com.starknet.pow",
+      code_sign_identity: "iPhone Distribution",
+      sdk: "iphoneos*",
+      profile_name: "match AppStore com.starknet.pow"
     )
 
     match(
