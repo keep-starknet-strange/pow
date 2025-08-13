@@ -102,6 +102,7 @@ jobs:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
       env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
         APPSTORE_CONNECT_TEAM_ID: ${{ secrets.APPSTORE_CONNECT_TEAM_ID }}
         APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
