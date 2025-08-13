@@ -100,7 +100,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               fee: 0,
               isDapp: false,
             })),
-            isBuilt: false,
+            isBuilt: (blockSize || 0) >= maxBlockSize,
             maxSize: maxBlockSize,
             difficulty: blockDifficulty,
             reward: blockNumber === 0 ? get().genesisBlockReward : undefined,
@@ -125,7 +125,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 fee: 0,
                 isDapp: false,
               })),
-              isBuilt: false,
+              isBuilt: (l2BlockSize || 0) >= l2MaxBlockSize,
               maxSize: l2MaxBlockSize,
               difficulty: l2BlockDifficulty,
               reward:

@@ -103,6 +103,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
   },
 
   advanceStep: () => {
+    /*
     set((state) => {
       const keys = Object.keys(tutorialConfig) as TutorialStep[];
       const next = Math.min(state.stepIndex + 1, keys.length - 1);
@@ -117,6 +118,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         isTutorialActive: !isCompleted, // Deactivate tutorial when completed
       };
     });
+    */
 
     // Save progress after advancing
     get().saveTutorialProgress();
@@ -143,8 +145,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
   },
 
   setVisible: (visible: boolean) => {
-    set({ visible });
-    console.log("Set tutorial visible:", visible);
+    // set({ visible });
     get().saveTutorialProgress();
   },
 

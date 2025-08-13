@@ -137,6 +137,7 @@ export default function game() {
     initializeTutorial();
   }, [initializeTutorial]);
   
+  console.log("Rendering game component, current tutorial step:", step);
   useEffect(() => {
     if (tutorialObserver !== null) {
       unregisterObserver(tutorialObserver);
