@@ -13,9 +13,8 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set(`MineDone-mineBlock`, () => {
-      const { advanceStep, setVisible } = useTutorialStore.getState();
+      const { advanceStep } = useTutorialStore.getState();
       advanceStep();
-      setVisible(true);
     });
     this.handlers.set(`TutorialDismissed-balanceExplanation`, () => {
       const { advanceStep } = useTutorialStore.getState();
@@ -62,9 +61,8 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set("DappsPurchased-purchaseChainAutomation", () => {
-      const { advanceStep, setVisible } = useTutorialStore.getState();
+      const { advanceStep } = useTutorialStore.getState();
       advanceStep();
-      setVisible(true);
     });
     this.handlers.set("L2Purchased-dapps", () => {
       const { advanceStep } = useTutorialStore.getState();

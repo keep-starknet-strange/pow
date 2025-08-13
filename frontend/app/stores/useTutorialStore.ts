@@ -113,6 +113,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         stepIndex: next,
         step: keys[next],
         isTutorialActive: !isCompleted, // Deactivate tutorial when completed
+        visible: !isCompleted, // Hide tutorial when completed
       };
     });
 
