@@ -90,8 +90,9 @@ platform :ios do
     build_and_sign_release
 
     upload_to_testflight(
-      skip_submission: true, # TEMP
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      submit_beta_review: false,
+      skip_waiting_for_build_processing: true
     )
   end
 
