@@ -204,8 +204,11 @@ platform :ios do
     )
   end
 
-  lane :deploy_testflight do
-    prebuild
+  lane :deploy_testflight do |options|
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+    
     update_build_number
     build_and_sign_release
 
@@ -218,8 +221,11 @@ platform :ios do
     )
   end
 
-  lane :deploy_app_store do
-    prebuild
+  lane :deploy_app_store do |options|
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+    
     update_build_number
     build_and_sign_release
 

@@ -144,16 +144,17 @@ jobs:
                 echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > AppStoreConnectKey.p8
                 echo "APPSTORE_CONNECT_KEY_FILE=$(realpath AppStoreConnectKey.p8)" >> $GITHUB_ENV
 
-            # - name: Prebuild iOS app
-            #   working-directory: ./frontend
-            #   run: npx expo prebuild --platform ios
+              # For some reason, prebuild from fastlane fails. We need to prebuild manually.
+            - name: Prebuild iOS app
+              working-directory: ./frontend
+              run: npx expo prebuild --platform ios
 
             - name: Deploy to Testflight
               if: ${{ inputs.internal_testing == true }}
               working-directory: ./frontend
-              run: bundle exec fastlane ios deploy_testflight
+              run: bundle exec fastlane ios deploy_testflight skip_prebuild:true
 
             - name: Deploy to App Store
               if: ${{ inputs.internal_testing == false }}
               working-directory: ./frontend
-              run: bundle exec fastlane ios deploy_app_store
+              run: bundle exec fastlane ios deploy_app_store skip_prebuild:true
