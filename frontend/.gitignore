@@ -48,4 +48,4 @@ app-example
 /ios/
 
 # Fastlane
-fastlane/report.xml
+/fastlane/report.xml
