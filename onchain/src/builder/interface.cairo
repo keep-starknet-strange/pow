@@ -5,6 +5,7 @@ pub struct BuildingState {
     pub size: u32,
     pub fees: u128,
     pub max_size: u32, // Static block capacity set when block is created
+    pub difficulty: u128, // Static difficulty set when block is created
 }
 
 #[starknet::interface]

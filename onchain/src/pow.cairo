@@ -370,7 +370,8 @@ mod PowGame {
             // Try Mining
             do_click_block(ref self, chain_id);
             let current_clicks = self.get_block_clicks(caller, chain_id);
-            let block_hp = self.get_my_upgrade(chain_id, 'Block Difficulty');
+            // Use the difficulty stored in the block at creation time
+            let block_hp = working_block.difficulty;
             if current_clicks < block_hp {
                 return;
             }
@@ -386,10 +387,11 @@ mod PowGame {
             pay_user(ref self, caller, fees + reward);
             self.emit(BlockMined { user: caller, chain_id, fees, reward });
 
-            // Set max_size for the new block based on current upgrade level
+            // Set max_size and difficulty for the new block based on current upgrade level
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
-            self.builder.reset_block(chain_id, max_size);
+            let block_difficulty = self.get_my_upgrade(chain_id, 'Block Difficulty');
+            self.builder.reset_block(chain_id, max_size, block_difficulty);
         }
 
         fn store_da(ref self: ContractState, chain_id: u32) {
@@ -403,7 +405,8 @@ mod PowGame {
             // Try Storing
             do_click_da(ref self, chain_id);
             let current_clicks = self.get_da_clicks(caller, chain_id);
-            let da_hp = self.get_my_upgrade(chain_id, 'DA compression');
+            // Use the difficulty stored in the DA at creation time
+            let da_hp = working_da.difficulty;
             if current_clicks < da_hp {
                 return;
             }
@@ -412,8 +415,11 @@ mod PowGame {
             let total_fees = working_da.fees;
             pay_user(ref self, caller, total_fees);
             self.emit(DAStored { user: caller, chain_id, fees: total_fees });
-
-            self.builder.reset_da(chain_id);
+            // Set max_size and difficulty for the new DA based on current upgrade level
+            let da_size = self.get_my_upgrade(chain_id, 'DA compression');
+            let da_max_size: u32 = da_size.try_into().unwrap_or(1);
+            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            self.builder.reset_da(chain_id, da_max_size, da_difficulty);
         }
 
         fn prove(ref self: ContractState, chain_id: u32) {
@@ -427,7 +433,8 @@ mod PowGame {
             // Try Proving
             do_click_proof(ref self, chain_id);
             let current_clicks = self.get_proof_clicks(caller, chain_id);
-            let proof_hp = self.get_my_upgrade(chain_id, 'Recursive Proving');
+            // Use the difficulty stored in the proof at creation time
+            let proof_hp = working_proof.difficulty;
             if current_clicks < proof_hp {
                 return;
             }
@@ -436,8 +443,11 @@ mod PowGame {
             let total_fees = working_proof.fees;
             pay_user(ref self, caller, total_fees);
             self.emit(ProofStored { user: caller, chain_id, fees: total_fees });
-
-            self.builder.reset_proof(chain_id);
+            // Set max_size and difficulty for the new proof based on current upgrade level
+            let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
+            let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
+            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
         }
     }
 
@@ -466,6 +476,14 @@ mod PowGame {
     //         pay_user(ref self, caller, withdrawal);
     //     }
     // }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn get_next_chain_cost(self: @ContractState) -> u128 {
+            // TODO: Make this configurable based on chain number
+            316274400 // Hardcoded cost matching frontend L2 cost
+        }
+    }
 
     #[abi(embed_v0)]
     impl PowStoreImpl of IPowStore<ContractState> {
@@ -580,10 +598,27 @@ mod PowGame {
         } else {
             pay_user(ref self, caller, self.genesis_block_reward.read());
         }
-        // Set max_size for the new chain's first block based on current upgrade level
+        // Set max_size and difficulty for the new chain's first block based on current upgrade level
         let block_width = self.get_my_upgrade(new_chain_id, 'Block Size');
         let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
-        self.builder.reset_block(new_chain_id, max_size);
+        let block_difficulty = self.get_my_upgrade(new_chain_id, 'Block Difficulty');
+        self.builder.reset_block(new_chain_id, max_size, block_difficulty);
+        
+        // Initialize DA and Proof for new chains (L2+)
+        if (new_chain_id != 0) {
+            // Set max_size and difficulty for initial DA based on current upgrade level
+            let da_size = self.get_my_upgrade(new_chain_id, 'DA compression');
+            let da_max_size: u32 = da_size.try_into().unwrap_or(1);
+            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            self.builder.reset_da(new_chain_id, da_max_size, da_difficulty);
+            
+            // Set max_size and difficulty for initial proof based on current upgrade level
+            let proof_size = self.get_my_upgrade(new_chain_id, 'Recursive Proving');
+            let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
+            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            self.builder.reset_proof(new_chain_id, proof_max_size, proof_difficulty);
+        }
+        
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
 
@@ -602,15 +637,24 @@ mod PowGame {
         let mut chain_id = 0;
         let max_chain_id = self.max_chain_id.read();
         while chain_id != max_chain_id {
-            // Set max_size for reset blocks based on current upgrade level
+            // Set max_size and difficulty for reset blocks based on current upgrade level
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
-            self.builder.reset_block(chain_id, max_size);
-            self.builder.reset_da(chain_id);
-            self.builder.reset_proof(chain_id);
+            let block_difficulty = self.get_my_upgrade(chain_id, 'Block Difficulty');
+            self.builder.reset_block(chain_id, max_size, block_difficulty);
+            // Set max_size and difficulty for reset DA based on current upgrade level
+            let da_size = self.get_my_upgrade(chain_id, 'DA compression');
+            let da_max_size: u32 = da_size.try_into().unwrap_or(1);
+            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            self.builder.reset_da(chain_id, da_max_size, da_difficulty);
+            // Set max_size and difficulty for reset proof based on current upgrade level
+            let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
+            let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
+            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
             self.transactions.reset_tx_levels(chain_id);
             self.upgrades.reset_upgrade_levels(chain_id);
             chain_id += 1;
         }
     }
-
+}
