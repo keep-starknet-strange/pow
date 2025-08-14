@@ -213,7 +213,7 @@ platform :ios do
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
       submit_beta_review: false,
       skip_waiting_for_build_processing: true,
-      changelog: "POW",
+      # changelog: "", Only add this when publishing to external testers. The log should not be too short
       groups: ["Internal Testers"]
     )
   end
