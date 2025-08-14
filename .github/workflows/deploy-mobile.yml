@@ -70,9 +70,16 @@ jobs:
                 echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > AppStoreConnectKey.p8
                 echo "APPSTORE_CONNECT_KEY_FILE=$(realpath AppStoreConnectKey.p8)" >> $GITHUB_ENV
 
-            - name: Update Gems
-              working-directory: ./frontend
-              run: bundle update
+            - name: Setup Ruby
+              uses: actions/setup-ruby@v1
+              with:
+                ruby-version: '2.6'
+
+            - name: Install bundler & Fastlane
+              run: |
+                gem install bundler:2.2.27
+                bundle config path vendor/bundle
+                bundle update
 
             - name: Upload to Firebase
               if: ${{ inputs.internal_testing == true }}
