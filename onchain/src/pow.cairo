@@ -77,6 +77,7 @@ mod PowGame {
 
     #[storage]
     struct Storage {
+        hosts: Map<ContractAddress, bool>,
         game_masters: Map<ContractAddress, bool>,
         reward_token_address: ContractAddress,
         reward_prestige_threshold: u32,
@@ -162,6 +163,7 @@ mod PowGame {
         self.game_chain_count.write(2);
         self.next_chain_cost.write(316274400); // Default matching frontend L2 cost
         self.dapps_unlock_cost.write(100000000); // Default dapps unlock cost
+        self.hosts.write(host, true);
         self.game_masters.write(host, true);
         self.reward_token_address.write(reward_params.reward_token_address);
         self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
@@ -171,7 +173,7 @@ mod PowGame {
     #[abi(embed_v0)]
     impl UpgradeableImpl of IUpgradeable<ContractState> {
         fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.upgradeable.upgrade(new_class_hash);
         }
     }
@@ -214,14 +216,24 @@ mod PowGame {
             self.dapps_unlock_cost.write(cost);
         }
 
+        fn add_host(ref self: ContractState, user: ContractAddress) {
+            self.check_valid_host(get_caller_address());
+            self.hosts.write(user, true);
+            self.game_masters.write(user, true);
+        }
+
+        fn remove_host(ref self: ContractState, user: ContractAddress) {
+            self.check_valid_host(get_caller_address());
+            self.hosts.write(user, false);
+        }
+
         fn add_game_master(ref self: ContractState, user: ContractAddress) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.game_masters.write(user, true);
         }
 
         fn remove_game_master(ref self: ContractState, user: ContractAddress) {
-            // TODO: Add host that cannot be removed?
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.game_masters.write(user, false);
         }
 
@@ -262,7 +274,7 @@ mod PowGame {
     #[abi(embed_v0)]
     impl PowGameRewardsImpl of IPowGameRewards<ContractState> {
         fn set_reward_params(ref self: ContractState, reward_params: RewardParams) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.reward_token_address.write(reward_params.reward_token_address);
             self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
             self.reward_amount.write(reward_params.reward_amount);
@@ -291,7 +303,7 @@ mod PowGame {
         fn game_master_give_reward(
             ref self: ContractState, user: ContractAddress, recipient: ContractAddress,
         ) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             let claimed = self.reward_claimed.read(user);
             assert!(!claimed, "Reward already claimed");
 
@@ -321,7 +333,7 @@ mod PowGame {
             value: u256,
         ) {
             let caller = get_caller_address();
-            self.check_valid_game_master(caller);
+            self.check_valid_host(caller);
             let success: bool = IERC20Dispatcher { contract_address: token_address }
                 .transfer(recipient, value);
 
@@ -329,12 +341,12 @@ mod PowGame {
         }
 
         fn pause_rewards(ref self: ContractState) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.pausable.pause();
         }
 
         fn unpause_rewards(ref self: ContractState) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_host(get_caller_address());
             self.pausable.unpause();
         }
     }
@@ -350,6 +362,10 @@ mod PowGame {
             let caller = get_caller_address();
             let game_chain_count = self.user_chain_count.read(caller);
             assert!(chain_id < game_chain_count, "Chain not unlocked");
+        }
+
+        fn check_valid_host(self: @ContractState, user: ContractAddress) {
+            assert!(self.hosts.read(user), "Invalid host");
         }
 
         fn check_valid_game_master(self: @ContractState, user: ContractAddress) {

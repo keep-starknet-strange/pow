@@ -1,5 +1,4 @@
 use pow_game::prestige::PrestigeSetupParams;
-use pow_game::staking::StakingConfig;
 use pow_game::transactions::TransactionSetupParams;
 use pow_game::types::RewardParams;
 use pow_game::upgrades::{AutomationSetupParams, UpgradeSetupParams};
@@ -16,6 +15,8 @@ pub trait IPowGame<TContractState> {
     fn set_next_chain_cost(ref self: TContractState, cost: u128);
     fn get_dapps_unlock_cost(self: @TContractState) -> u128;
     fn set_dapps_unlock_cost(ref self: TContractState, cost: u128);
+    fn add_host(ref self: TContractState, user: ContractAddress);
+    fn remove_host(ref self: TContractState, user: ContractAddress);
     fn add_game_master(ref self: TContractState, user: ContractAddress);
     fn remove_game_master(ref self: TContractState, user: ContractAddress);
     fn get_user_chain_count(self: @TContractState, user: ContractAddress) -> u32;
@@ -52,6 +53,7 @@ pub trait IPowGameRewards<TContractState> {
 pub trait IPowGameValidation<TContractState> {
     fn check_valid_chain_id(self: @TContractState, chain_id: u32);
     fn check_user_valid_chain(self: @TContractState, chain_id: u32);
+    fn check_valid_host(self: @TContractState, user: ContractAddress);
     fn check_valid_game_master(self: @TContractState, user: ContractAddress);
     fn check_block_not_full(self: @TContractState, chain_id: u32);
 }
