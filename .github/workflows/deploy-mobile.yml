@@ -38,6 +38,7 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
+          BUNDLE_GEMFILE: ./frontend/Gemfile
         steps:
             - name: Checkout project
               uses: actions/checkout@v4
@@ -99,6 +100,7 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
+        BUNDLE_GEMFILE: ./frontend/Gemfile
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
