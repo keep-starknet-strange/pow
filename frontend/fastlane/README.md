@@ -15,6 +15,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## Android
 
+### android prebuild
+
+```sh
+[bundle exec] fastlane android prebuild
+```
+
+
+
 ### android deploy_firebase
 
 ```sh
@@ -44,10 +52,10 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 
 
-### ios deploy
+### ios deploy_app_store
 
 ```sh
-[bundle exec] fastlane ios deploy
+[bundle exec] fastlane ios deploy_app_store
 ```
 
 

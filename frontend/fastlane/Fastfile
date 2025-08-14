@@ -56,7 +56,7 @@ def setup_appstore_connect_api_key
   app_store_connect_api_key(
     key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
     issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
-    key_filepath: ENV['APPSTORE_CONNECT_KEY_FILE_PATH'],
+    key_filepath: ENV['APPSTORE_CONNECT_KEY_FILE'],
     duration: 1200,
     in_house: false,
   )
@@ -67,6 +67,10 @@ platform :android do
     setup_ci if ENV['CI']
 
     setup_appstore_connect_api_key()
+  end
+
+  lane :prebuild do
+    sh("npx", "expo", "prebuild", "--platform", "android", "--clean")
   end
 
   lane :deploy_firebase do
@@ -82,7 +86,7 @@ platform :android do
       task: "assemble",
       build_type: "Release",
       properties: {
-        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE_PATH'],
+        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE'],
         "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
         "android.injected.signing.key.alias" => ENV['KEYSTORE_KEY_ALIAS'],
         "android.injected.signing.key.password" => ENV['KEYSTORE_KEY_PASSWORD'],
@@ -96,7 +100,7 @@ platform :android do
       app: ENV['FIREBASE_APP_ID'],
       service_credentials_file: ENV['FIREBASE_SERVICE_CREDENTIALS_FILE'],
       android_artifact_type: "APK",
-      testers: "michael.b@starkware.com" ## TODO change to groups,
+      groups: "test-1, test-2"
     )
   end
 
@@ -113,7 +117,7 @@ platform :android do
       task: "bundle",
       build_type: "Release",
       properties: {
-        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE_PATH'],
+        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE'],
         "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
         "android.injected.signing.key.alias" => ENV['KEYSTORE_KEY_ALIAS'],
         "android.injected.signing.key.password" => ENV['KEYSTORE_KEY_PASSWORD'],
@@ -198,13 +202,12 @@ platform :ios do
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
       submit_beta_review: false,
       skip_waiting_for_build_processing: true,
-      distribute_external: true,
       changelog: "POW",
-      groups: ["Internal Testers", "External Testers"]
+      groups: ["Internal Testers"]
     )
   end
 
-  lane :deploy do
+  lane :deploy_app_store do
     update_build_number
     build_and_sign_release
 
