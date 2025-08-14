@@ -74,11 +74,9 @@ jobs:
               with:
                 ruby-version: '2.6'
 
-            - name: Install bundler & Fastlane
-              run: |
-                gem install bundler:2.2.27
-                bundle config path vendor/bundle
-                bundle install --jobs 4 --retry 3
+            - name: Update Gems
+              working-directory: ./frontend
+              run: bundle update
 
             - name: Upload to Firebase
               if: ${{ inputs.internal_testing == true }}
