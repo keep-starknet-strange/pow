@@ -103,7 +103,8 @@ platform :android do
       app: ENV['FIREBASE_APP_ID'],
       service_credentials_file: ENV['FIREBASE_SERVICE_CREDENTIALS_FILE'],
       android_artifact_type: "APK",
-      groups: "internal-testers, external-testers"
+      # groups: "internal-testers, external-testers"
+      groups: "test-1, test-2"
     )
   end
 
