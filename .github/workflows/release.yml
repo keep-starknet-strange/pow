@@ -12,4 +12,5 @@ jobs:
             deploy_android: true
             deploy_ios: true
             internal_testing: ${{ github.event.release.prerelease }}
+            version: ${{ github.event.release.name }}
             ref: ${{ github.ref }}

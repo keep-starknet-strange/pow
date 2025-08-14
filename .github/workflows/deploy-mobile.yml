@@ -18,6 +18,11 @@ on:
           required: true
           default: true
           type: boolean
+        version:
+          description: "Version to deploy (e.g. 0.1.0)"
+          required: true
+          default: "0.1.0"
+          type: string
         ref:
           description: "Git reference to deploy"
           required: true
@@ -29,6 +34,7 @@ jobs:
         if: ${{ inputs.deploy_android == true }}
         runs-on: ubuntu-latest
         env:
+          EXPO_APP_VERSION: ${{ inputs.version }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -98,6 +104,7 @@ jobs:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
       env:
+        EXPO_APP_VERSION: ${{ inputs.version }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
         APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
