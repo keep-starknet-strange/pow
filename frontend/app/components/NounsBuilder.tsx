@@ -1,12 +1,5 @@
 import React, { memo, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  Dimensions,
-  FlatList,
-  Image,
-} from "react-native";
+import { View, Text, Pressable, FlatList, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   SlideInDown,
@@ -21,6 +14,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { useEventManager } from "@/app/stores/useEventManager";
 import {
   getNounsAccessoriesList,
@@ -47,7 +41,7 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
   setNewAvatar,
 }) => {
   const { getImage } = useImages();
-  const { width } = Dimensions.get("window");
+  const { width } = useCachedWindowDimensions();
   const insets = useSafeAreaInsets();
   const { notify } = useEventManager();
 

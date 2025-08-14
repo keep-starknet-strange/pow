@@ -1,7 +1,8 @@
 import React, { useEffect, memo } from "react";
-import { View, Dimensions } from "react-native";
+import { View } from "react-native";
 import { useInterval } from "usehooks-ts";
 import { useImages } from "../hooks/useImages";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import {
   withTiming,
   Easing,
@@ -18,7 +19,7 @@ import {
 
 export const MainBackground: React.FC = memo(() => {
   const { getImage } = useImages();
-  const { width, height } = Dimensions.get("window");
+  const { width, height } = useCachedWindowDimensions();
 
   const bgOffsetX = useSharedValue(0);
   const bgOffsetY = useSharedValue(0);

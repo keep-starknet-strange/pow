@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Dimensions, View, Pressable, Text } from "react-native";
+import React from "react";
+import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useEventManager } from "@/app/stores/useEventManager";
@@ -13,29 +13,29 @@ import {
   Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import BlockchainView from "@/app/components/BlockchainView";
-import { useTutorialLayout } from "@/app/hooks/useTutorialLayout";
-import { TargetId } from "@/app/stores/useTutorialStore";
+import { BlockchainView } from "@/app/components/BlockchainView";
+import { TutorialRefView } from "@/app/components/tutorial/TutorialRefView";
+import {
+  TargetId,
+  useIsTutorialTargetActive,
+} from "@/app/stores/useTutorialStore";
+import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 
 export const L1Phase: React.FC = () => {
   const { dappsUnlocked } = useTransactionsStore();
   const { notify } = useEventManager();
-  const { ref, onLayout } = useTutorialLayout(
-    "dappsTab" as TargetId,
-    dappsUnlocked[0] || false,
-  );
   const { getImage } = useImages();
-  const window = Dimensions.get("window");
+  const window = useCachedWindowDimensions();
   const txTabs = ["Transactions", "dApps"];
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[0] ? 1 : 0],
   );
+  const isDappsTabActive = useIsTutorialTargetActive("dappsTab" as TargetId);
   /*
   useEffect(() => {
     setActiveTab(dappsUnlocked[0] ? "dApps" : "Transactions");
   }, [dappsUnlocked]);
   */
-
   return (
     <View
       style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
@@ -98,46 +98,54 @@ export const L1Phase: React.FC = () => {
         </View>
         {dappsUnlocked[0] && (
           <View className="absolute top-[4px] left-0 px-[4px] h-[28px] flex flex-row items-end justify-between gap-[4px]">
-            {txTabs.map((tab) => (
-              <Pressable
-                style={{
-                  width: window.width / 2 - 6,
-                  height: tab === activeTab ? 28 : 24,
-                }}
-                key={tab}
-                onPress={() => {
-                  setActiveTab(tab);
-                  notify("SwitchTxTab", { name: tab });
-                }}
-                ref={tab === "dApps" ? ref : undefined}
-                onLayout={tab === "dApps" ? onLayout : undefined}
-              >
-                <Canvas style={{ width: "100%", height: "100%" }}>
-                  <Image
-                    image={getImage(
-                      tab === activeTab ? "tx.tab.active" : "tx.tab.inactive",
-                    )}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={window.width / 2 - 6}
-                    height={tab === activeTab ? 28 : 24}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-                <Text
-                  className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
+            {txTabs.map((tab) => {
+              const isActiveTab = tab === activeTab || isDappsTabActive;
+              const height = isActiveTab ? 28 : 24;
+              return (
+                <Pressable
                   style={{
-                    color: tab === activeTab ? "#FFF7FF" : "#a9a9a9",
+                    width: window.width / 2 - 6,
+                    height: height,
+                  }}
+                  key={tab}
+                  onPress={() => {
+                    setActiveTab(tab);
+                    notify("SwitchTxTab", { name: tab });
                   }}
                 >
-                  {tab}
-                </Text>
-              </Pressable>
-            ))}
+                  {tab === "dApps" && (
+                    <TutorialRefView
+                      targetId="dappsTab"
+                      enabled={dappsUnlocked[0] || false}
+                    />
+                  )}
+                  <Canvas style={{ width: "100%", height: "100%" }}>
+                    <Image
+                      image={getImage(
+                        isActiveTab ? "tx.tab.active" : "tx.tab.inactive",
+                      )}
+                      fit="fill"
+                      x={0}
+                      y={0}
+                      width={window.width / 2 - 6}
+                      height={height}
+                      sampling={{
+                        filter: FilterMode.Nearest,
+                        mipmap: MipmapMode.Nearest,
+                      }}
+                    />
+                  </Canvas>
+                  <Text
+                    className="absolute top-[6px] left-0 right-0 text-[16px] font-Pixels text-center w-full"
+                    style={{
+                      color: isActiveTab ? "#FFF7FF" : "#a9a9a9",
+                    }}
+                  >
+                    {tab}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         )}
       </Animated.View>

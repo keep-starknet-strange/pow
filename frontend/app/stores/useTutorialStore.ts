@@ -105,3 +105,12 @@ export const useTutorial = () => {
     resetTutorial,
   };
 };
+
+export function useIsTutorialTargetActive(targetId: TargetId): boolean {
+  return useTutorialStore((s) => {
+    const cfg = tutorialConfig[s.step];
+    return (
+      cfg?.highlightTargetId === targetId || cfg?.bubbleTargetId === targetId
+    );
+  });
+}
