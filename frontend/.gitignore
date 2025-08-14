@@ -46,3 +46,6 @@ app-example
 # Prebuild
 /android/
 /ios/
+
+# Fastlane
+/fastlane/report.xml
