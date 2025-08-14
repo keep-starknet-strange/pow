@@ -47,7 +47,7 @@ We implement industry-standard measures to secure your data. However, no system 
 
 ## 6. Children’s Privacy
 
-This game is not intended for children under the age of 16. We do not knowingly collect data from children below this age. If you believe a child’s data was collected, please contact us for removal.
+This game is not intended for children under the age of 18. We do not knowingly collect data from children below this age. If you believe a child’s data was collected, please contact us for removal.
 
 ---
 
