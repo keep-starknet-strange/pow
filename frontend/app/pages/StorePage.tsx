@@ -1,6 +1,10 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
-import Animated, { FadeInLeft } from "react-native-reanimated";
+import type {
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutChangeEvent,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
 
@@ -14,12 +18,8 @@ import {
 } from "@/app/stores/useTutorialStore";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
-import { TransactionUpgradeView } from "../components/store/TransactionUpgradeView";
-import { UpgradeView } from "../components/store/UpgradeView";
-import { AutomationView } from "../components/store/AutomationView";
-import { DappsUnlock } from "../components/store/DappsUnlock";
-import { L2Unlock } from "../components/store/L2Unlock";
-import { PrestigeUnlock } from "../components/store/PrestigeUnlock";
+import { StoreListItem } from "../components/store/StoreListItem";
+
 import { L1L2Switch } from "../components/L1L2Switch";
 import { ShopTitle } from "../components/store/ShopTitle";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
@@ -35,6 +35,24 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+
+const GradientBaseStyle = {
+  position: "absolute" as const,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 200,
+  marginLeft: 8,
+  marginRight: 8,
+  pointerEvents: "none" as const,
+};
+
+const Separator = memo(({ leadingItem }: { leadingItem?: any }) => {
+  if (leadingItem?.type === "dapps-header") return null;
+  return <View className="h-[3px] bg-[#1b1c26] my-[16px] mx-[2%]" />;
+});
+
+const ListFooter = memo(() => <View className="h-[40px]" />);
 
 export const StorePage: React.FC = () => {
   const isFocused = useIsFocused();
@@ -52,6 +70,16 @@ export const StorePage: React.FC = () => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
+  const [listViewportHeight, setListViewportHeight] = useState(0);
+  const [showBottomFade, setShowBottomFade] = useState(true);
+  const SCROLL_BOTTOM_THRESHOLD = 16;
+  const prevFadeRef = useRef(showBottomFade);
+  const setFadeIfChanged = useCallback((next: boolean) => {
+    if (prevFadeRef.current !== next) {
+      prevFadeRef.current = next;
+      setShowBottomFade(next);
+    }
+  }, []);
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
     isL2Unlocked ? "L2" : "L1",
@@ -133,10 +161,6 @@ export const StorePage: React.FC = () => {
             index,
             id: `tx-${chainId}-${index}`,
           });
-          data.push({
-            type: "separator",
-            id: `tx-sep-${chainId}-${index}`,
-          });
         }
       });
 
@@ -155,10 +179,6 @@ export const StorePage: React.FC = () => {
               chainId,
               index,
               id: `dapp-${chainId}-${index}`,
-            });
-            data.push({
-              type: "separator",
-              id: `dapp-sep-${chainId}-${index}`,
             });
           }
         });
@@ -182,10 +202,6 @@ export const StorePage: React.FC = () => {
             index,
             id: `upgrade-${chainId}-${index}`,
           });
-          data.push({
-            type: "separator",
-            id: `upgrade-sep-${chainId}-${index}`,
-          });
         }
       });
     }
@@ -199,41 +215,21 @@ export const StorePage: React.FC = () => {
           index,
           id: `automation-${chainId}-${index}`,
         });
-        if (index < storeAutomation.length - 1) {
-          data.push({
-            type: "separator",
-            id: `automation-sep-${chainId}-${index}`,
-          });
-        }
       });
 
       // Add unlock components
       if (storeType === "L1") {
-        data.push({
-          type: "separator",
-          id: "l2-unlock-sep",
-        });
         data.push({
           type: "l2-unlock",
           id: "l2-unlock",
         });
       } else {
         data.push({
-          type: "separator",
-          id: "prestige-unlock-sep",
-        });
-        data.push({
           type: "prestige-unlock",
           id: "prestige-unlock",
         });
       }
     }
-
-    // Add bottom spacer
-    data.push({
-      type: "spacer",
-      id: "bottom-spacer",
-    });
 
     return data;
   }, [
@@ -257,105 +253,29 @@ export const StorePage: React.FC = () => {
   ]);
 
   const renderStoreItem = useCallback(
-    ({ item }: { item: any }) => {
-      switch (item.type) {
-        case "transaction":
-          return (
-            <View className="px-[16px]">
-              <TransactionUpgradeView
-                chainId={item.chainId}
-                txData={item.data}
-                isDapp={false}
-              />
-            </View>
-          );
-
-        case "dapp":
-          return (
-            <View className="px-[16px]">
-              <TransactionUpgradeView
-                chainId={item.chainId}
-                txData={item.data}
-                isDapp={true}
-              />
-            </View>
-          );
-
-        case "upgrade":
-          return (
-            <View className="px-[16px]">
-              <UpgradeView chainId={item.chainId} upgrade={item.data} />
-            </View>
-          );
-
-        case "automation":
-          return (
-            <View className="px-[16px]">
-              <AutomationView chainId={item.chainId} automation={item.data} />
-            </View>
-          );
-
-        case "separator":
-          return <View className="h-[3px] bg-[#1b1c26] my-[16px] mx-[2%]" />;
-
-        case "dapps-header":
-          return (
-            <View className="flex flex-col px-[16px]">
-              <View className="w-full relative pb-[16px]">
-                <Canvas style={{ width: width - 32, height: 24 }}>
-                  <Image
-                    image={getImage("shop.title")}
-                    fit="fill"
-                    x={0}
-                    y={0}
-                    width={width - 32}
-                    height={24}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-                <Animated.Text
-                  className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-                  entering={FadeInLeft}
-                >
-                  DAPPS
-                </Animated.Text>
-              </View>
-            </View>
-          );
-
-        case "dapps-unlock":
-          return (
-            <View className="px-[16px]">
-              <DappsUnlock chainId={item.chainId} />
-            </View>
-          );
-
-        case "l2-unlock":
-          return (
-            <View className="px-[16px]">
-              <L2Unlock />
-            </View>
-          );
-
-        case "prestige-unlock":
-          return (
-            <View className="px-[16px]">
-              <PrestigeUnlock />
-            </View>
-          );
-
-        case "spacer":
-          return <View className="h-[40px]" />;
-
-        default:
-          return null;
-      }
-    },
-    [chainId, width, getImage],
+    ({ item }: { item: any }) => (
+      <StoreListItem item={item} width={width} getImage={getImage} />
+    ),
+    [width, getImage],
   );
+
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      const isAtBottom =
+        contentOffset.y + layoutMeasurement.height >=
+        contentSize.height - SCROLL_BOTTOM_THRESHOLD;
+      setFadeIfChanged(
+        !isAtBottom && contentSize.height > layoutMeasurement.height,
+      );
+    },
+    [setFadeIfChanged],
+  );
+
+  const handleListLayout = useCallback((e: LayoutChangeEvent) => {
+    const height = e.nativeEvent.layout.height;
+    setListViewportHeight(height);
+  }, []);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -438,31 +358,34 @@ export const StorePage: React.FC = () => {
           );
         })}
       </View>
-      <View style={{ height: 522, marginTop: 2 }}>
+      <View style={{ height: 522, marginTop: 2 }} onLayout={handleListLayout}>
         <FlatList
           data={storeData}
           className="flex-1 relative py-[10px]"
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           renderItem={renderStoreItem}
+          ItemSeparatorComponent={Separator}
+          ListFooterComponent={ListFooter}
           initialNumToRender={8}
           maxToRenderPerBatch={8}
           windowSize={15}
           removeClippedSubviews={false}
           getItemLayout={undefined}
+          onScroll={handleScroll}
+          scrollEventThrottle={32}
+          onContentSizeChange={(_, h) => {
+            if (listViewportHeight > 0) {
+              setFadeIfChanged(
+                h > listViewportHeight + SCROLL_BOTTOM_THRESHOLD,
+              );
+            }
+          }}
         />
         <LinearGradient
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-            marginLeft: 8,
-            marginRight: 8,
-            pointerEvents: "none",
-          }}
-          colors={["transparent", "#000000c0"]}
+          style={{ ...GradientBaseStyle, opacity: showBottomFade ? 1 : 0 }}
+          colors={["transparent", "#000000c0", "#000000c0"]}
+          locations={[0, 0.995, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
         />
