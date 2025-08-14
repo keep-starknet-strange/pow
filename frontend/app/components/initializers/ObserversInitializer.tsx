@@ -30,7 +30,7 @@ export const ObserversInitializer = memo(() => {
       },
       {
         key: "txBuilder",
-        instance: new TxBuilderObserver(powGameContractAddress || "")
+        instance: new TxBuilderObserver(powGameContractAddress || ""),
       },
       {
         key: "tutorial",

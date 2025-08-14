@@ -73,7 +73,8 @@ const BalanceInitializer = memo(() => {
 
 const TransactionsInitializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } = usePowContractConnector();
+  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } =
+    usePowContractConnector();
   const { initializeTransactions } = useTransactionsStore();
 
   useEffect(() => {
@@ -96,7 +97,13 @@ const TransactionsInitializer = memo(() => {
 
 const GameStoreInitializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, initMyGame, getUserMaxChainId, getUserBlockNumber, getUserBlockState } = usePowContractConnector();
+  const {
+    powContract,
+    initMyGame,
+    getUserMaxChainId,
+    getUserBlockNumber,
+    getUserBlockState,
+  } = usePowContractConnector();
   const { initializeGameStore, setInitMyGameDependency } = useGameStore();
 
   useEffect(() => {
@@ -137,7 +144,8 @@ const L2Initializer = memo(() => {
 
 const UpgradesInitializer = memo(() => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } = usePowContractConnector();
+  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } =
+    usePowContractConnector();
   const { initializeUpgrades } = useUpgradesStore();
 
   useEffect(() => {
