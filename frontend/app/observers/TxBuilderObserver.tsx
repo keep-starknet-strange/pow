@@ -176,17 +176,21 @@ export class TxBuilderObserver implements Observer {
         // Proccessed above in the if statement since this is a special case
         break;
       case "MineClicked":
+      case "MineDone":
         if (data.ignoreAction) return;
         addAction(createMineBlockCall(this.contractAddress, 0));
         break;
       case "SequenceClicked":
+      case "SequenceDone":
         if (data.ignoreAction) return;
         addAction(createMineBlockCall(this.contractAddress, 1));
         break;
       case "DaClicked":
+      case "DaDone":
         addAction(createStoreDaCall(this.contractAddress, 1));
         break;
       case "ProveClicked":
+      case "ProveDone":
         addAction(createProveCall(this.contractAddress, 1));
         break;
       case "TxUpgradePurchased":

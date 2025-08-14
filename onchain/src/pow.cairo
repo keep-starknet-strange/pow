@@ -52,14 +52,15 @@ mod PowGame {
     #[abi(embed_v0)]
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
     impl BuilderInternalImpl = BuilderComponent::InternalImpl<ContractState>;
-    use pow_game::staking::StakingConfig;
 
+    // TODO: Re-enable
     // Staking
-    use pow_game::staking::component::StakingComponent;
-    component!(path: StakingComponent, storage: staking, event: StakingEvent);
-    #[abi(embed_v0)]
-    impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
-    impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
+    // use pow_game::staking::StakingConfig;
+    // use pow_game::staking::component::StakingComponent;
+    // component!(path: StakingComponent, storage: staking, event: StakingEvent);
+    // #[abi(embed_v0)]
+    // impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
+    // impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
 
     // -- Admin Components --
 
@@ -96,8 +97,8 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
-        #[substorage(v0)]
-        staking: StakingComponent::Storage,
+        // #[substorage(v0)]
+        // staking: StakingComponent::Storage,
         #[substorage(v0)]
         upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
@@ -145,8 +146,8 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
-        #[flat]
-        StakingEvent: StakingComponent::Event,
+        // #[flat]
+        // StakingEvent: StakingComponent::Event,
         #[flat]
         UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
@@ -230,10 +231,10 @@ mod PowGame {
             self.prestige.setup_prestige(config);
         }
 
-        fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
-            self.check_valid_game_master(get_caller_address());
-            self.staking.setup_staking(config);
-        }
+        // fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
+        //     self.check_valid_game_master(get_caller_address());
+        //     self.staking.setup_staking(config);
+        // }
     }
 
     #[abi(embed_v0)]
@@ -266,13 +267,13 @@ mod PowGame {
         }
 
         fn game_master_give_reward(
-            ref self: ContractState, game_address: ContractAddress, recipient: ContractAddress,
+            ref self: ContractState, user: ContractAddress, recipient: ContractAddress,
         ) {
             self.check_valid_game_master(get_caller_address());
-            let claimed = self.reward_claimed.read(game_address);
+            let claimed = self.reward_claimed.read(user);
             assert!(!claimed, "Reward already claimed");
 
-            self.reward_claimed.write(game_address, true);
+            self.reward_claimed.write(user, true);
 
             let success: bool = IERC20Dispatcher {
                 contract_address: self.reward_token_address.read(),
@@ -280,7 +281,7 @@ mod PowGame {
                 .transfer(recipient, self.reward_amount.read());
 
             assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed { user: game_address, recipient });
+            self.emit(RewardClaimed { user: user, recipient });
         }
 
         fn get_reward_params(self: @ContractState) -> RewardParams {
@@ -438,30 +439,33 @@ mod PowGame {
 
             self.builder.reset_proof(chain_id);
         }
-
-        fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
-            let caller = get_caller_address();
-            debit_user(ref self, caller, amount);
-            self.staking.stake(caller, amount, now);
-        }
-
-        fn claim_staking_rewards(ref self: ContractState) {
-            let caller = get_caller_address();
-            let reward = self.staking.claim_rewards(caller);
-            pay_user(ref self, caller, reward);
-        }
-
-        fn validate_stake(ref self: ContractState, now: u64) {
-            let caller = get_caller_address();
-            self.staking.validate(caller, now);
-        }
-
-        fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
-            let caller = get_caller_address();
-            let withdrawal = self.staking.withdraw_stake(caller, now);
-            pay_user(ref self, caller, withdrawal);
-        }
     }
+
+    // #[abi(embed_v0)]
+    // impl PowGameStakingActionsImpl of IPowGameStakingActions<ContractState> {
+    //     fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
+    //         let caller = get_caller_address();
+    //         debit_user(ref self, caller, amount);
+    //         self.staking.stake(caller, amount, now);
+    //     }
+
+    //     fn claim_staking_rewards(ref self: ContractState) {
+    //         let caller = get_caller_address();
+    //         let reward = self.staking.claim_rewards(caller);
+    //         pay_user(ref self, caller, reward);
+    //     }
+
+    //     fn validate_stake(ref self: ContractState, now: u64) {
+    //         let caller = get_caller_address();
+    //         self.staking.validate(caller, now);
+    //     }
+
+    //     fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
+    //         let caller = get_caller_address();
+    //         let withdrawal = self.staking.withdraw_stake(caller, now);
+    //         pay_user(ref self, caller, withdrawal);
+    //     }
+    // }
 
     #[abi(embed_v0)]
     impl PowStoreImpl of IPowStore<ContractState> {
@@ -494,14 +498,14 @@ mod PowGame {
         }
 
         fn buy_dapps(ref self: ContractState, chain_id: u32) {
-            let cost = 100; // TODO: get from config
+            let cost = self.get_unlock_dapps_cost(chain_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
             self.transactions.unlock_dapps(chain_id);
         }
 
         fn buy_next_chain(ref self: ContractState) {
-            let cost = 1000; // TODO: get from config
+            let cost = self.get_next_chain_cost();
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
             unlock_next_chain(ref self);
@@ -609,4 +613,4 @@ mod PowGame {
             chain_id += 1;
         }
     }
-}
+

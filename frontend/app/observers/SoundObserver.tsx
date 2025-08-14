@@ -4,9 +4,7 @@ import { useSoundStore } from "@/app/stores/useSoundStore";
 export class SoundObserver implements Observer {
   private blockFullAttempts: number = 0; // Counter for consecutive BlockFull attempts
 
-  constructor() {
-    // No dependencies needed - will access store directly
-  }
+  constructor() {}
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
     // Get fresh state and actions directly from store

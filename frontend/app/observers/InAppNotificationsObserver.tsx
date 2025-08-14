@@ -5,9 +5,7 @@ import inAppNotificationsJson from "../configs/inAppNotifications.json";
 export class InAppNotificationsObserver implements Observer {
   private blockFullAttempts: number = 0; // Counter for consecutive BlockFull attempts
 
-  constructor() {
-    // No dependencies needed - will access store directly
-  }
+  constructor() {}
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
     // Get fresh sendInAppNotification function from store
