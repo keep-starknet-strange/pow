@@ -188,11 +188,6 @@ pub mod PowTransactionsComponent {
                 .read((get_caller_address(), chain_id, tx_type_id));
             assert!(level != 0, "Tx Type Locked");
         }
-        
-        fn get_unlock_dapps_cost(self: @ComponentState<TContractState>, chain_id: u32) -> u128 {
-            // TODO: Make this configurable
-            100000000 // Hardcoded cost for unlocking dapps
-        }
 
         fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
             self.dapps.read((chain_id, tx_type_id))

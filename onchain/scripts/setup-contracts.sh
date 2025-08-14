@@ -325,4 +325,20 @@ sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wai
 echo
 echo "Done setting up prestige!"
 echo
+echo "6. Setting up chain and dapps unlock costs"
+echo
+
+# Set next chain cost (L2 unlock cost)
+NEXT_CHAIN_COST=316274400
+echo "Setting next chain cost to $NEXT_CHAIN_COST"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_next_chain_cost --calldata $NEXT_CHAIN_COST
+
+# Set dapps unlock cost
+DAPPS_UNLOCK_COST=100000000
+echo "Setting dapps unlock cost to $DAPPS_UNLOCK_COST"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata $DAPPS_UNLOCK_COST
+
+echo
+echo "Done setting up costs!"
+echo
 echo "Completed setting up POW! contracts!"

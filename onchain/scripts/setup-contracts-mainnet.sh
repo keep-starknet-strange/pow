@@ -378,4 +378,20 @@ starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKN
 echo
 echo "Done setting up prestige!"
 echo
+echo "6. Setting up chain and dapps unlock costs"
+echo
+
+# Set next chain cost (L2 unlock cost)
+NEXT_CHAIN_COST=316274400
+echo "Setting next chain cost to $NEXT_CHAIN_COST"
+starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS set_next_chain_cost $NEXT_CHAIN_COST
+
+# Set dapps unlock cost
+DAPPS_UNLOCK_COST=100000000
+echo "Setting dapps unlock cost to $DAPPS_UNLOCK_COST"
+starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_CONTRACT_ADDRESS set_dapps_unlock_cost $DAPPS_UNLOCK_COST
+
+echo
+echo "Done setting up costs!"
+echo
 echo "Completed setting up POW! contracts!"

@@ -83,6 +83,8 @@ mod PowGame {
         reward_amount: u256,
         genesis_block_reward: u128,
         max_chain_id: u32,
+        next_chain_cost: u128,
+        dapps_unlock_cost: u128,
         // Maps: user address -> user max chain unlocked
         user_max_chains: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
@@ -158,6 +160,8 @@ mod PowGame {
     fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams) {
         self.genesis_block_reward.write(1);
         self.max_chain_id.write(2);
+        self.next_chain_cost.write(316274400); // Default matching frontend L2 cost
+        self.dapps_unlock_cost.write(100000000); // Default dapps unlock cost
         self.game_masters.write(host, true);
         self.reward_token_address.write(reward_params.reward_token_address);
         self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
@@ -190,6 +194,24 @@ mod PowGame {
         fn set_max_chain_id(ref self: ContractState, chain_id: u32) {
             self.check_valid_game_master(get_caller_address());
             self.max_chain_id.write(chain_id);
+        }
+
+        fn get_next_chain_cost(self: @ContractState) -> u128 {
+            self.next_chain_cost.read()
+        }
+
+        fn set_next_chain_cost(ref self: ContractState, cost: u128) {
+            self.check_valid_game_master(get_caller_address());
+            self.next_chain_cost.write(cost);
+        }
+
+        fn get_dapps_unlock_cost(self: @ContractState) -> u128 {
+            self.dapps_unlock_cost.read()
+        }
+
+        fn set_dapps_unlock_cost(ref self: ContractState, cost: u128) {
+            self.check_valid_game_master(get_caller_address());
+            self.dapps_unlock_cost.write(cost);
         }
 
         fn add_game_master(ref self: ContractState, user: ContractAddress) {
@@ -477,13 +499,6 @@ mod PowGame {
     //     }
     // }
 
-    #[generate_trait]
-    impl InternalImpl of InternalTrait {
-        fn get_next_chain_cost(self: @ContractState) -> u128 {
-            // TODO: Make this configurable based on chain number
-            316274400 // Hardcoded cost matching frontend L2 cost
-        }
-    }
 
     #[abi(embed_v0)]
     impl PowStoreImpl of IPowStore<ContractState> {
@@ -516,14 +531,14 @@ mod PowGame {
         }
 
         fn buy_dapps(ref self: ContractState, chain_id: u32) {
-            let cost = self.get_unlock_dapps_cost(chain_id);
+            let cost = self.dapps_unlock_cost.read();
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
             self.transactions.unlock_dapps(chain_id);
         }
 
         fn buy_next_chain(ref self: ContractState) {
-            let cost = self.get_next_chain_cost();
+            let cost = self.next_chain_cost.read();
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
             unlock_next_chain(ref self);
