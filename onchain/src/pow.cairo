@@ -8,6 +8,7 @@ mod PowGame {
     use pow_game::interface::{IPowGame, IPowGameRewards, IPowGameValidation};
     use pow_game::store::*;
     use pow_game::types::RewardParams;
+    use pow_game::cheat_codes::{IPowCheatCodes, CheatCodeUsed};
 
     // --- Game Components ---
 
@@ -75,6 +76,7 @@ mod PowGame {
     impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
 
 
+
     #[storage]
     struct Storage {
         hosts: Map<ContractAddress, bool>,
@@ -92,6 +94,8 @@ mod PowGame {
         user_balances: Map<ContractAddress, u128>,
         // Maps: user address -> reward claimed
         reward_claimed: Map<ContractAddress, bool>,
+        // Cheat codes enabled flag
+        cheat_codes_enabled: bool,
         #[substorage(v0)]
         upgrades: PowUpgradesComponent::Storage,
         #[substorage(v0)]
@@ -155,10 +159,11 @@ mod PowGame {
         UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
         PausableEvent: PausableComponent::Event,
+        CheatCodeUsed: CheatCodeUsed,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams) {
+    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, is_devmode: bool) {
         self.genesis_block_reward.write(1);
         self.game_chain_count.write(2);
         self.next_chain_cost.write(316274400); // Default matching frontend L2 cost
@@ -168,6 +173,7 @@ mod PowGame {
         self.reward_token_address.write(reward_params.reward_token_address);
         self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
         self.reward_amount.write(reward_params.reward_amount);
+        self.cheat_codes_enabled.write(is_devmode);
     }
 
     #[abi(embed_v0)]
@@ -516,6 +522,34 @@ mod PowGame {
     //     }
     // }
 
+    #[abi(embed_v0)]
+    impl PowCheatCodesImpl of IPowCheatCodes<ContractState> {
+        fn double_balance_cheat(ref self: ContractState) {
+            assert!(self.cheat_codes_enabled.read(), "Cheat codes are disabled");
+            
+            let caller = get_caller_address();
+            let current_balance = self.user_balances.read(caller);
+            
+            // Use pay_user to add current_balance (so new balance = current + current = double)
+            pay_user(ref self, caller, current_balance);
+            
+            // Emit cheat code event
+            self.emit(CheatCodeUsed {
+                user: caller,
+                cheat_type: 'double_balance',
+            });
+        }
+
+        fn enable_cheat_codes(ref self: ContractState) {
+            self.check_valid_game_master();
+            self.cheat_codes_enabled.write(true);
+        }
+
+        fn disable_cheat_codes(ref self: ContractState) {
+            self.check_valid_game_master();
+            self.cheat_codes_enabled.write(false);
+        }
+    }
 
     #[abi(embed_v0)]
     impl PowStoreImpl of IPowStore<ContractState> {

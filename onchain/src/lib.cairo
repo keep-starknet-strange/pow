@@ -1,4 +1,5 @@
 pub mod actions;
+pub mod cheat_codes;
 pub mod interface;
 pub mod pow;
 pub mod store;
