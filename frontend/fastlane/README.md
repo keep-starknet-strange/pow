@@ -13,15 +13,28 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-## iOS
+## Android
 
-### ios update_build_number
+### android deploy_firebase
 
 ```sh
-[bundle exec] fastlane ios update_build_number
+[bundle exec] fastlane android deploy_firebase
 ```
 
 
+
+### android deploy_play_store
+
+```sh
+[bundle exec] fastlane android deploy_play_store
+```
+
+
+
+----
+
+
+## iOS
 
 ### ios deploy_testflight
 

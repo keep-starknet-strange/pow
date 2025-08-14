@@ -1,3 +1,6 @@
 app_identifier("com.starknet.pow")
 team_id("#{ENV['APPLE_DEVELOPER_TEAM_ID']}")
 itc_team_id("#{ENV['APPSTORE_CONNECT_TEAM_ID']}")
+
+package_name("com.starknet.pow")
+json_key_file("#{ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_FILE_PATH']}")

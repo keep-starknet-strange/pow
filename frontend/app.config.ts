@@ -60,8 +60,7 @@ const config: ExpoConfig = {
     ],
     "expo-web-browser",
     "expo-audio",
-    "./plugins/android/signing.ts",
-    "./plugins/ios/sentry.ts"
+    "./plugins/sentry.ts"
   ],
   experiments: {
     typedRoutes: true,
