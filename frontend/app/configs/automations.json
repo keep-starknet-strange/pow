@@ -4,7 +4,9 @@
       "id": 0,
       "name": "Miner",
       "color": "#f7f760",
-      "description": "Auto-mine completed L1 blocks",
+      "description": "Auto-mine L1 blocks",
+      "subDescription": "${currSpeed}/sec -> ${upgradeSpeed}/sec",
+      "maxSubDescription": "${upgradeSpeed}/sec",
       "levels": [
         {
           "id": 0,
@@ -57,6 +59,8 @@
       "name": "Sequencer",
       "color": "#f7f760",
       "description": "Auto-sequence L2 blocks",
+      "subDescription": "${currSpeed}/sec -> ${upgradeSpeed}/sec",
+      "maxSubDescription": "${upgradeSpeed}/sec",
       "levels": [
         {
           "id": 0,
@@ -106,7 +110,9 @@
       "id": 1,
       "name": "Prover",
       "color": "#f7f760",
-      "description": "Prove completed L2 batches",
+      "description": "Auto-prove L2 batches",
+      "subDescription": "${currSpeed}/sec -> ${upgradeSpeed}/sec",
+      "maxSubDescription": "${upgradeSpeed}/sec",
       "levels": [
         {
           "id": 0,
@@ -156,7 +162,9 @@
       "id": 2,
       "name": "DA",
       "color": "#f7f760",
-      "description": "Store L2 data",
+      "description": "Auto-store L2 data",
+      "subDescription": "${currSpeed}/sec -> ${upgradeSpeed}/sec",
+      "maxSubDescription": "${upgradeSpeed}/sec",
       "levels": [
         {
           "id": 0,

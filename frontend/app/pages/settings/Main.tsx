@@ -47,17 +47,17 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     onPress?: () => void;
     icon?: string;
   }[] = [
-    { label: "About", tab: "About" },
-    { label: "Credits", tab: "Credits" },
-    { label: "Terms of Use", tab: "TermsOfUse" },
-    { label: "Review", onPress: () => StoreReview.requestReview() },
-    ...(currentPrestige >= 1
-      ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
-      : []),
     {
       label: "Reset Game",
       onPress: () => setShowResetConfirmation(true),
     },
+    { label: "Review", onPress: () => StoreReview.requestReview() },
+    { label: "Terms of Use", tab: "TermsOfUse" },
+    { label: "About", tab: "About" },
+    { label: "Credits", tab: "Credits" },
+    ...(currentPrestige >= 1
+      ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
+      : []),
     {
       label: "Back",
       onPress: () =>
