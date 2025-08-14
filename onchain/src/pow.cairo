@@ -435,11 +435,11 @@ mod PowGame {
 
         fn store_da(ref self: ContractState, chain_id: u32) {
             // Validation
-            assert!(chain_id > 0, "DA compression not available on genesis chain");
+            assert!(chain_id > 0, "DA not available on genesis chain");
             let caller = get_caller_address();
-            let da_size = self.get_my_upgrade(chain_id, 'DA compression');
             let working_da = self.get_da_building_state(caller, chain_id);
-            assert!(working_da.size.into() >= da_size, "DA is not full");
+            let da_max_size = working_da.max_size;
+            assert!(working_da.size.into() >= da_max_size, "DA is not full");
 
             // Try Storing
             do_click_da(ref self, chain_id);
@@ -463,11 +463,11 @@ mod PowGame {
 
         fn prove(ref self: ContractState, chain_id: u32) {
             // Validation
-            assert!(chain_id > 0, "Proof compression not available on genesis chain");
+            assert!(chain_id > 0, "Proving not available on genesis chain");
             let caller = get_caller_address();
-            let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
             let working_proof = self.get_proof_building_state(caller, chain_id);
-            assert!(working_proof.size.into() >= proof_size, "Proof is not full");
+            let proof_max_size = working_proof.max_size;
+            assert!(working_proof.size.into() >= proof_max_size, "Proof is not full");
 
             // Try Proving
             do_click_proof(ref self, chain_id);

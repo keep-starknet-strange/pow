@@ -169,6 +169,9 @@ pub mod BuilderComponent {
         fn build_da(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
             let mut da = self.building_da.read((user, chain_id));
+            if da.size >= da.max_size {
+                return; // Return early if max size is reached
+            }
             da.fees += fees;
             da.size += 1;
             self.building_da.write((user, chain_id), da.clone());
@@ -195,6 +198,9 @@ pub mod BuilderComponent {
         fn build_proof(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
             let mut proof = self.building_proof.read((user, chain_id));
+            if proof.size >= proof.max_size {
+                return; // Return early if max size is reached
+            }
             proof.fees += fees;
             proof.size += 1;
             self.building_proof.write((user, chain_id), proof.clone());
