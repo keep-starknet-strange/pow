@@ -194,7 +194,7 @@ const BlockReward = memo(
       [],
     );
 
-    // TODO: this is a hack to get the correct number of decimals for the compact notation
+    // TODO: this gets the correct number of decimals for the compact notation
     const toFixed = (value: number) => {
       const length = value.toString().length;
       if (length % 3 === 0) return 0;
