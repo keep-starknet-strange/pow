@@ -158,6 +158,8 @@ platform :ios do
   # Used to build the app and sign it with the 
   # correct certificates and provisioning profiles
   private_lane :build_and_sign_release do
+    xcversion(version: "16.4")
+    
     # Since the ios project is dynamically generated, we need to update the 
     # code signing settings. This is similar to opening the project in Xcode and
     # 1. Click POW on the project navigator
