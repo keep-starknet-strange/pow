@@ -202,8 +202,6 @@ pub mod PowUpgradesComponent {
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
-        // TODO: Clear UpgradeConfig for values higher than params.costs.len()
-        // TODO: Game master checks on all component setup functions
         fn setup_upgrade(ref self: ComponentState<TContractState>, params: UpgradeSetupParams) {
             let chain_id = params.chain_id;
             let upgrade_id = params.upgrade_id;

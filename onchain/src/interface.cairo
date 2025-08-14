@@ -10,15 +10,15 @@ use starknet::ContractAddress;
 pub trait IPowGame<TContractState> {
     fn get_genesis_block_reward(self: @TContractState) -> u128;
     fn set_genesis_block_reward(ref self: TContractState, reward: u128);
-    fn get_max_chain_id(self: @TContractState) -> u32;
-    fn set_max_chain_id(ref self: TContractState, chain_id: u32);
+    fn get_game_chain_count(self: @TContractState) -> u32;
+    fn set_game_chain_count(ref self: TContractState, chain_id: u32);
     fn get_next_chain_cost(self: @TContractState) -> u128;
     fn set_next_chain_cost(ref self: TContractState, cost: u128);
     fn get_dapps_unlock_cost(self: @TContractState) -> u128;
     fn set_dapps_unlock_cost(ref self: TContractState, cost: u128);
     fn add_game_master(ref self: TContractState, user: ContractAddress);
     fn remove_game_master(ref self: TContractState, user: ContractAddress);
-    fn get_user_max_chain_id(self: @TContractState, user: ContractAddress) -> u32;
+    fn get_user_chain_count(self: @TContractState, user: ContractAddress) -> u32;
     fn get_user_balance(self: @TContractState, user: ContractAddress) -> u128;
 
     fn setup_upgrade_config(ref self: TContractState, config: UpgradeSetupParams);

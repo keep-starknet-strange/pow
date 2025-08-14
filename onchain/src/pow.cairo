@@ -82,11 +82,11 @@ mod PowGame {
         reward_prestige_threshold: u32,
         reward_amount: u256,
         genesis_block_reward: u128,
-        max_chain_id: u32,
+        game_chain_count: u32,
         next_chain_cost: u128,
         dapps_unlock_cost: u128,
         // Maps: user address -> user max chain unlocked
-        user_max_chains: Map<ContractAddress, u32>,
+        user_chain_count: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
         user_balances: Map<ContractAddress, u128>,
         // Maps: user address -> reward claimed
@@ -159,7 +159,7 @@ mod PowGame {
     #[constructor]
     fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams) {
         self.genesis_block_reward.write(1);
-        self.max_chain_id.write(2);
+        self.game_chain_count.write(2);
         self.next_chain_cost.write(316274400); // Default matching frontend L2 cost
         self.dapps_unlock_cost.write(100000000); // Default dapps unlock cost
         self.game_masters.write(host, true);
@@ -187,13 +187,13 @@ mod PowGame {
             self.genesis_block_reward.write(reward);
         }
 
-        fn get_max_chain_id(self: @ContractState) -> u32 {
-            self.max_chain_id.read()
+        fn get_game_chain_count(self: @ContractState) -> u32 {
+            self.game_chain_count.read()
         }
 
-        fn set_max_chain_id(ref self: ContractState, chain_id: u32) {
+        fn set_game_chain_count(ref self: ContractState, chain_id: u32) {
             self.check_valid_game_master(get_caller_address());
-            self.max_chain_id.write(chain_id);
+            self.game_chain_count.write(chain_id);
         }
 
         fn get_next_chain_cost(self: @ContractState) -> u128 {
@@ -225,8 +225,8 @@ mod PowGame {
             self.game_masters.write(user, false);
         }
 
-        fn get_user_max_chain_id(self: @ContractState, user: ContractAddress) -> u32 {
-            self.user_max_chains.read(user)
+        fn get_user_chain_count(self: @ContractState, user: ContractAddress) -> u32 {
+            self.user_chain_count.read(user)
         }
 
         fn get_user_balance(self: @ContractState, user: ContractAddress) -> u128 {
@@ -342,14 +342,14 @@ mod PowGame {
     #[abi(embed_v0)]
     impl PowGameValidationImpl of IPowGameValidation<ContractState> {
         fn check_valid_chain_id(self: @ContractState, chain_id: u32) {
-            let max_chain_id = self.max_chain_id.read();
-            assert!(chain_id < max_chain_id, "Invalid chain id");
+            let game_chain_count = self.game_chain_count.read();
+            assert!(chain_id < game_chain_count, "Invalid chain id");
         }
 
         fn check_user_valid_chain(self: @ContractState, chain_id: u32) {
             let caller = get_caller_address();
-            let max_chain_id = self.user_max_chains.read(caller);
-            assert!(chain_id < max_chain_id, "Chain not unlocked");
+            let game_chain_count = self.user_chain_count.read(caller);
+            assert!(chain_id < game_chain_count, "Chain not unlocked");
         }
 
         fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
@@ -367,7 +367,7 @@ mod PowGame {
     impl PowGameActionsImpl of IPowGameActions<ContractState> {
         fn init_my_game(ref self: ContractState) {
             let caller = get_caller_address();
-            assert!(self.user_max_chains.read(caller) == 0, "Account already initialized");
+            assert!(self.user_chain_count.read(caller) == 0, "Account already initialized");
             unlock_next_chain(ref self);
         }
 
@@ -602,9 +602,9 @@ mod PowGame {
 
     fn unlock_next_chain(ref self: ContractState) {
         let caller = get_caller_address();
-        let new_chain_id = self.user_max_chains.read(caller);
+        let new_chain_id = self.user_chain_count.read(caller);
         self.check_valid_chain_id(new_chain_id);
-        self.user_max_chains.write(caller, new_chain_id + 1);
+        self.user_chain_count.write(caller, new_chain_id + 1);
         // Finalize genesis block
         if (new_chain_id != 0) {
             // Add genesis block to da & proof
@@ -640,18 +640,18 @@ mod PowGame {
     fn do_prestige(ref self: ContractState) {
         // Validation
         let caller = get_caller_address();
-        let my_max_chain_id = self.user_max_chains.read(caller);
-        assert!(my_max_chain_id >= self.max_chain_id.read(), "Not enough chains unlocked");
+        let my_chain_count = self.user_chain_count.read(caller);
+        assert!(my_chain_count >= self.game_chain_count.read(), "Not enough chains unlocked");
         // TODO: Check upgrades, txs, etc. levels
 
         self.prestige.prestige();
 
         // Reset user state
-        self.user_max_chains.write(caller, 0);
+        self.user_chain_count.write(caller, 0);
         self.user_balances.write(caller, 0);
         let mut chain_id = 0;
-        let max_chain_id = self.max_chain_id.read();
-        while chain_id != max_chain_id {
+        let game_chain_count = self.game_chain_count.read();
+        while chain_id != game_chain_count {
             // Set max_size and difficulty for reset blocks based on current upgrade level
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
             let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);

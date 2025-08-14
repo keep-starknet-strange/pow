@@ -4,7 +4,6 @@ pub mod BuilderComponent {
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{ContractAddress, get_caller_address};
 
-    // TODO: Find a way to simplify this ( blocks, da, proofs )
     #[storage]
     pub struct Storage {
         // Maps: (user address, chain id) -> in progress block height
