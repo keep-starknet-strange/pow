@@ -1,4 +1,4 @@
-workspace("ios/POW.xcworkspace")
+workspace("./ios/POW.xcworkspace")
 scheme("POW")
 archive_path("./ios/build/POW.xcarchive")
 export_options({    

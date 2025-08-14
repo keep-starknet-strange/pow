@@ -139,6 +139,10 @@ jobs:
                 echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > AppStoreConnectKey.p8
                 echo "APPSTORE_CONNECT_KEY_FILE=$(realpath AppStoreConnectKey.p8)" >> $GITHUB_ENV
 
+            - name: Prebuild iOS app
+              working-directory: ./frontend
+              run: npx expo prebuild --platform ios
+              
             - name: Deploy to Testflight
               if: ${{ inputs.internal_testing == true }}
               working-directory: ./frontend

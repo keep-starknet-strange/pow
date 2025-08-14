@@ -205,7 +205,6 @@ platform :ios do
   end
 
   lane :deploy_testflight do
-    prebuild
     update_build_number
     build_and_sign_release
 
@@ -219,7 +218,6 @@ platform :ios do
   end
 
   lane :deploy_app_store do
-    prebuild
     update_build_number
     build_and_sign_release
 
