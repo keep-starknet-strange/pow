@@ -10,7 +10,10 @@ const withSentryAndroidPlugin: ConfigPlugin = (config) => {
   return withAndroidManifest(config, (config) => {
     const sentryAuthToken = process.env[SENTRY_AUTH_TOKEN];
 
-    fs.appendFileSync("android/sentry.properties", `\nauth.token=${sentryAuthToken}`);
+    fs.appendFileSync(
+      "android/sentry.properties",
+      `\nauth.token=${sentryAuthToken}`,
+    );
     return config;
   });
 };
@@ -19,7 +22,10 @@ const withSentryIOSPlugin: ConfigPlugin = (config) => {
   return withXcodeProject(config, (config) => {
     const sentryAuthToken = process.env[SENTRY_AUTH_TOKEN];
 
-    fs.appendFileSync("ios/sentry.properties", `\nauth.token=${sentryAuthToken}`);
+    fs.appendFileSync(
+      "ios/sentry.properties",
+      `\nauth.token=${sentryAuthToken}`,
+    );
     return config;
   });
 };

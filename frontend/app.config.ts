@@ -4,7 +4,7 @@ import { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "POW!",
   slug: "pow",
-  version: process.env.EXPO_APP_VERSION || '0.1.0',
+  version: process.env.EXPO_APP_VERSION || "0.1.0",
   orientation: "portrait",
   icon: "./assets/logo/icon.png",
   scheme: "myapp",
@@ -60,7 +60,7 @@ const config: ExpoConfig = {
     ],
     "expo-web-browser",
     "expo-audio",
-    "./plugins/sentry.ts"
+    "./plugins/sentry.ts",
   ],
   experiments: {
     typedRoutes: true,
