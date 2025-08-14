@@ -70,10 +70,13 @@ platform :android do
   end
 
   lane :prebuild do
-    sh("npx", "expo", "prebuild", "--platform", "android", "--clean")
+    Dir.chdir("..") do
+      sh("npx", "expo", "prebuild", "--platform", "android", "--clean")
+    end
   end
 
   lane :deploy_firebase do
+    prebuild
     new_build_number = new_build_number()
     UI.message("New android build number will be: #{new_build_number}")
 
@@ -105,6 +108,7 @@ platform :android do
   end
 
   lane :deploy_play_store do
+    prebuild
     new_build_number = new_build_number()
     UI.message("New android build number will be: #{new_build_number}")
 
@@ -145,6 +149,12 @@ platform :ios do
     setup_ci if ENV['CI']
 
     setup_appstore_connect_api_key()
+  end
+
+  lane :prebuild do
+    Dir.chdir("..") do
+      sh("npx", "expo", "prebuild", "--platform", "ios", "--clean")
+    end
   end
 
   # Used to update the build number to the highest build number 
@@ -195,6 +205,7 @@ platform :ios do
   end
 
   lane :deploy_testflight do
+    prebuild
     update_build_number
     build_and_sign_release
 
@@ -208,6 +219,7 @@ platform :ios do
   end
 
   lane :deploy_app_store do
+    prebuild
     update_build_number
     build_and_sign_release
 
