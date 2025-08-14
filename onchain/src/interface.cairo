@@ -35,7 +35,7 @@ pub trait IPowGameRewards<TContractState> {
     fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
     fn claim_reward(ref self: TContractState, recipient: ContractAddress);
     fn get_reward_params(self: @TContractState) -> RewardParams;
-    fn game_master_give_reward(
+    fn host_give_reward(
         ref self: TContractState, user: ContractAddress, recipient: ContractAddress,
     );
     fn remove_funds(
@@ -54,6 +54,6 @@ pub trait IPowGameValidation<TContractState> {
     fn check_valid_chain_id(self: @TContractState, chain_id: u32);
     fn check_user_valid_chain(self: @TContractState, chain_id: u32);
     fn check_valid_host(self: @TContractState, user: ContractAddress);
-    fn check_valid_game_master(self: @TContractState, user: ContractAddress);
+    fn check_valid_game_master(self: @TContractState);
     fn check_block_not_full(self: @TContractState, chain_id: u32);
 }

@@ -185,7 +185,7 @@ mod PowGame {
         }
 
         fn set_genesis_block_reward(ref self: ContractState, reward: u128) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.genesis_block_reward.write(reward);
         }
 
@@ -194,7 +194,7 @@ mod PowGame {
         }
 
         fn set_game_chain_count(ref self: ContractState, chain_id: u32) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.game_chain_count.write(chain_id);
         }
 
@@ -203,7 +203,7 @@ mod PowGame {
         }
 
         fn set_next_chain_cost(ref self: ContractState, cost: u128) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.next_chain_cost.write(cost);
         }
 
@@ -212,7 +212,7 @@ mod PowGame {
         }
 
         fn set_dapps_unlock_cost(ref self: ContractState, cost: u128) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.dapps_unlock_cost.write(cost);
         }
 
@@ -246,27 +246,27 @@ mod PowGame {
         }
 
         fn setup_upgrade_config(ref self: ContractState, config: UpgradeSetupParams) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.upgrades.setup_upgrade(config);
         }
 
         fn setup_automation_config(ref self: ContractState, config: AutomationSetupParams) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.upgrades.setup_automation(config);
         }
 
         fn setup_transaction_config(ref self: ContractState, config: TransactionSetupParams) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.transactions.setup_transaction_config(config);
         }
 
         fn setup_prestige_config(ref self: ContractState, config: PrestigeSetupParams) {
-            self.check_valid_game_master(get_caller_address());
+            self.check_valid_game_master();
             self.prestige.setup_prestige(config);
         }
 
         // fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
-        //     self.check_valid_game_master(get_caller_address());
+        //     self.check_valid_game_master();
         //     self.staking.setup_staking(config);
         // }
     }
@@ -276,6 +276,7 @@ mod PowGame {
         fn set_reward_params(ref self: ContractState, reward_params: RewardParams) {
             self.check_valid_host(get_caller_address());
             self.reward_token_address.write(reward_params.reward_token_address);
+            assert!(reward_params.reward_prestige_threshold > 0, "Prestige threshold must be > 0");
             self.reward_prestige_threshold.write(reward_params.reward_prestige_threshold);
             self.reward_amount.write(reward_params.reward_amount);
         }
@@ -300,7 +301,7 @@ mod PowGame {
             self.emit(RewardClaimed { user: caller, recipient });
         }
 
-        fn game_master_give_reward(
+        fn host_give_reward(
             ref self: ContractState, user: ContractAddress, recipient: ContractAddress,
         ) {
             self.check_valid_host(get_caller_address());
@@ -368,8 +369,8 @@ mod PowGame {
             assert!(self.hosts.read(user), "Invalid host");
         }
 
-        fn check_valid_game_master(self: @ContractState, user: ContractAddress) {
-            assert!(self.game_masters.read(user), "Invalid game master");
+        fn check_valid_game_master(self: @ContractState) {
+            assert!(self.game_masters.read(get_caller_address()), "Invalid game master");
         }
 
         fn check_block_not_full(self: @ContractState, chain_id: u32) {
