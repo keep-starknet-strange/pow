@@ -57,7 +57,7 @@ jobs:
 
             - name: Decode secrets
               working-directory: ./frontend
-              run: 
+              run: |
                 echo $KEYSTORE_ENCODED | base64 --decode > release.keystore
                 echo "KEYSTORE_FILE=$(realpath release.keystore)" >> $GITHUB_ENV
                 
@@ -128,7 +128,7 @@ jobs:
 
             - name: Decode secrets
               working-directory: ./frontend
-              run: 
+              run: |
                 echo $GOOGLE_PLAY_SERVICE_ACCOUNT_JSON >> GooglePlay.json
                 echo "GOOGLE_PLAY_SERVICE_ACCOUNT_FILE=$(realpath GooglePlay.json)" >> $GITHUB_ENV
                 
