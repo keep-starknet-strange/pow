@@ -1,20 +1,28 @@
 name: Release
 
-# on: 
-#     release:
-#         types: [published]
-on:
-    push:
-        branches:
-            - cd/ios
+on: 
+    release:
+        types: [published]
+# on:
+#     push:
+#         branches:
+#             - cd/ios
             
 
 jobs:
-    run-deploy:
-        uses: ./.github/workflows/deploy-mobile.yml
-        secrets: inherit
-        with:
-            deploy_android: true
-            deploy_ios: true
-            internal_testing: true
-            ref: ${{ github.ref }}
+    # run-deploy:
+    #     uses: ./.github/workflows/deploy-mobile.yml
+    #     secrets: inherit
+    #     with:
+    #         deploy_android: true
+    #         deploy_ios: true
+    #         internal_testing: ${{ github.event.release.prerelease }}
+    #         ref: ${{ github.ref }}
+    run-example:
+        runs-on: ubuntu-latest
+        env:
+            INTERNAL_TESTING: ${{ github.event.release.prerelease }}
+        steps:
+            - name: Run example
+              run: |
+                echo $INTERNAL_TESTING
