@@ -194,11 +194,18 @@ const BlockReward = memo(
       [],
     );
 
+    // TODO: this is a hack to get the correct number of decimals for the compact notation
+    const toFixed = (value: number) => {
+      const length = value.toString().length;
+      if (length % 3 === 0) return 0;
+      return 1;
+    };
+
     return (
       <AnimatedRollingNumber
         value={reward}
         enableCompactNotation
-        compactToFixed={1}
+        toFixed={toFixed(reward)}
         textStyle={textStyle}
         spinningAnimationConfig={animConfig}
       />
