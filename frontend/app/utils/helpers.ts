@@ -1,39 +1,41 @@
 export const shortMoneyString = (
   value: number,
   includeSymbol: boolean = false,
+  decimals: number = 1
 ): string => {
   const absValue = Math.abs(value);
+  const prefix = includeSymbol ? "₿" : "";
+  const fmt = (n: number) =>
+    decimals === 0
+      ? Math.round(n).toString()
+      : n
+          .toFixed(decimals)
+          // trim trailing zeros like "1.0" -> "1", "1.50" -> "1.5"
+          .replace(/\.0+$|(\.\d*[1-9])0+$/, "$1");
+
   if (absValue < 1e3) {
-    return includeSymbol ? `₿${value.toFixed(0)}` : value.toFixed(0);
+    return `${prefix}${value.toFixed(0)}`;
   } else if (absValue < 1e6) {
-    return includeSymbol
-      ? `₿${(value / 1e3).toFixed(1)}K`
-      : `${(value / 1e3).toFixed(1)}K`;
+    return `${prefix}${fmt(value / 1e3)}K`;
   } else if (absValue < 1e9) {
-    return includeSymbol
-      ? `₿${(value / 1e6).toFixed(1)}M`
-      : `${(value / 1e6).toFixed(1)}M`;
+    return `${prefix}${fmt(value / 1e6)}M`;
   } else if (absValue < 1e12) {
-    return includeSymbol
-      ? `₿${(value / 1e9).toFixed(1)}B`
-      : `${(value / 1e9).toFixed(1)}B`;
+    return `${prefix}${fmt(value / 1e9)}B`;
   } else if (absValue < 1e15) {
-    return includeSymbol
-      ? `₿${(value / 1e12).toFixed(1)}T`
-      : `${(value / 1e12).toFixed(1)}T`;
+    return `${prefix}${fmt(value / 1e12)}T`;
   } else if (absValue < 1e18) {
-    return includeSymbol
-      ? `₿${(value / 1e15).toFixed(1)}P`
-      : `${(value / 1e15).toFixed(1)}P`;
+    return `${prefix}${fmt(value / 1e15)}P`;
   } else if (absValue < 1e21) {
-    return includeSymbol
-      ? `₿${(value / 1e18).toFixed(1)}E`
-      : `${(value / 1e18).toFixed(1)}E`;
+    return `${prefix}${fmt(value / 1e18)}E`;
   } else {
     const exponent = Math.floor(Math.log10(absValue));
-    const mantissa = (value / Math.pow(10, exponent)).toFixed(1);
-    return includeSymbol
-      ? `₿${mantissa}e${exponent}`
-      : `${mantissa}e${exponent}`;
+    const mantissa = fmt(value / Math.pow(10, exponent));
+    return `${prefix}${mantissa}e${exponent}`;
   }
+};
+
+export const showThreeDigitsMax = (value: number) => {
+  const length = value.toString().length;
+  if (length % 3 === 0) return 0;
+  return 1;
 };

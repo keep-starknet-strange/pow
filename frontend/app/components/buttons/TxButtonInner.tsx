@@ -42,6 +42,7 @@ export const TxButtonInner = memo(
     const { getImage } = useImages();
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
+    const transactionUnlocked = props.feeLevel !== -1;
 
     const automationAnimHeight = useSharedValue(94);
     const automationAnimY = useDerivedValue(() => {
@@ -141,7 +142,7 @@ export const TxButtonInner = memo(
             />
           </Canvas>
         </View>
-        {props.feeLevel !== -1 && (
+        {transactionUnlocked && (
           <View
             className="absolute bottom-0 h-full"
             style={{
@@ -173,7 +174,7 @@ export const TxButtonInner = memo(
             </Canvas>
           </View>
         )}
-        {props.feeLevel !== -1 && (
+        {transactionUnlocked && (
           <View
             className="absolute left-[3px] h-[94px] w-full"
             style={{
@@ -204,34 +205,7 @@ export const TxButtonInner = memo(
             </Text>
           </View>
         )}
-        {props.feeLevel === -1 ? (
-          <View
-            className="absolute w-full h-full
-               pointer-events-none
-               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-            style={{
-              width: width * 0.18,
-            }}
-          >
-            <Canvas
-              style={{ flex: 1 }}
-              className="w-full h-full flex justify-center items-center"
-            >
-              <Image
-                image={getImage("shop.lock")}
-                fit="contain"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-                x={0}
-                y={30}
-                width={width * 0.18}
-                height={40}
-              />
-            </Canvas>
-          </View>
-        ) : (
+        {transactionUnlocked ? (
           <View
             className="absolute h-[94px]"
             style={{
@@ -246,6 +220,33 @@ export const TxButtonInner = memo(
                   props.isDapp,
                   getImage,
                 )}
+                fit="contain"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                x={0}
+                y={30}
+                width={width * 0.18}
+                height={40}
+              />
+            </Canvas>
+          </View>
+        ) : (
+          <View
+            className="absolute w-full h-full
+               pointer-events-none
+               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+            style={{
+              width: width * 0.18,
+            }}
+          >
+            <Canvas
+              style={{ flex: 1 }}
+              className="w-full h-full flex justify-center items-center"
+            >
+              <Image
+                image={getImage("shop.lock")}
                 fit="contain"
                 sampling={{
                   filter: FilterMode.Nearest,

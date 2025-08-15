@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas,
   Image,
@@ -9,7 +9,7 @@ import {
 import { useImages } from "@/app/hooks/useImages";
 import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { shortMoneyString } from "../../utils/helpers";
+import { shortMoneyString, showThreeDigitsMax } from "../../utils/helpers";
 
 // TODO: Reduce to chainId, txId, isDapp
 export interface TxButtonPlaqueProps {
@@ -28,14 +28,9 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
   const { canUnlockTx } = useTransactionsStore();
 
   return (
-    <View className="relative">
-      <View
-        className="h-[20px]"
-        style={{
-          width: width * 0.18,
-        }}
-      >
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+    <View style={styles.container}>
+      <View style={[styles.plaqueContainer, { width: width * 0.18 }]}>
+        <Canvas style={styles.fillFlex}>
           <Image
             image={getImage(
               feeLevel === -1 ? "tx.plaque.minus" : "tx.plaque.plus",
@@ -53,11 +48,15 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
         </Canvas>
       </View>
       {canUnlockTx(props.chainId, props.txId, props.isDapp) && (
-        <View className="absolute bottom-[0px] left-0 w-full h-[20px] justify-end flex flex-row">
-          <Text className="text-[14px] text-[#fff8ff] font-Pixels text-right mt-[1px]">
-            {shortMoneyString(feeLevel === -1 ? feeCost : fee)}
+        <View style={[styles.feeRowContainer, { width: width * 0.18 }]}>
+          <Text style={styles.feeText}>
+            {shortMoneyString(
+              feeLevel === -1 ? feeCost : fee,
+              false,
+              showThreeDigitsMax(feeLevel === -1 ? feeCost : fee),
+            )}
           </Text>
-          <Canvas style={{ width: 16, height: 16 }} className="mr-1">
+          <Canvas style={styles.feeIconCanvas}>
             <Image
               image={getImage("shop.btc")}
               fit="contain"
@@ -75,4 +74,39 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
       )}
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    position: "relative",
+  },
+  plaqueContainer: {
+    height: 20,
+  },
+  fillFlex: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  feeRowContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    height: 20,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+  feeText: {
+    fontSize: 14,
+    color: "#fff8ff",
+    fontFamily: "Pixels",
+    textAlign: "right",
+    marginTop: 2,
+  },
+  feeIconCanvas: {
+    width: 16,
+    height: 16,
+    marginRight: 2,
+  },
 });
