@@ -32,6 +32,9 @@ interface TransactionsState {
       chainId: number,
       txCount: number,
     ) => Promise<number[] | undefined>,
+    getUserDappsUnlocked: (
+      chainId: number,
+    ) => Promise<boolean | undefined>,
   ) => void;
 
   txFeeUpgrade: (chainId: number, txId: number) => void;
@@ -127,6 +130,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     user,
     getUserTxFeeLevels,
     getUserTxSpeedLevels,
+    getUserDappsUnlocked,
   ) => {
     const fetchTransactionSpeeds = async () => {
       if (!user || !powContract) return;
@@ -197,11 +201,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             newDappSpeedLevels[chainId][dappId] = level - 1; // -1 offset since 0 indexed
           }
         });
-        if (!newDappsUnlocked[chainId]) {
-          newDappsUnlocked[chainId] = false;
+        // Check if dapps are unlocked
+        const dappsUnlocked = await getUserDappsUnlocked(chainId);
+        if (dappsUnlocked !== undefined) {
+          newDappsUnlocked[chainId] = dappsUnlocked;
         }
-        // TODO: Replace this with a proper check
-        newDappsUnlocked[chainId] = (txFeeLevels.at(maxTxId + 1) || 0) > 0; // Check if 1st dapp level is >= 0
 
         /* TODO: Use foc engine? */
       }

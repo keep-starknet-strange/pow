@@ -73,7 +73,7 @@ const BalanceInitializer = memo(() => {
 
 const TransactionsInitializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels } =
+  const { powContract, getUserTxFeeLevels, getUserTxSpeedLevels, getUserDappsUnlocked } =
     usePowContractConnector();
   const { initializeTransactions } = useTransactionsStore();
 
@@ -83,6 +83,7 @@ const TransactionsInitializer = memo(() => {
       user,
       getUserTxFeeLevels,
       getUserTxSpeedLevels,
+      getUserDappsUnlocked,
     );
   }, [
     initializeTransactions,
