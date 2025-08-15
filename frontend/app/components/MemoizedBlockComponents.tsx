@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect, JSX, useMemo } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useGameStore } from "../stores/useGameStore";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
@@ -108,20 +108,18 @@ export const MemoizedMinerSequencer = memo(
     const { mineBlock } = useMiner(onBlockMined, triggerBlockShake);
     const { sequenceBlock } = useSequencer(onBlockSequenced, triggerBlockShake);
 
+    const containerStyle = useMemo(() => ({
+      ...styles.minerSequencerContainer,
+      top: placement.top,
+      left: placement.left,
+      width: placement.width,
+      height: placement.height,
+    }), [placement]);
+
     if (!isBuilt) return null;
 
     return (
-      <View
-        style={{
-          position: "absolute",
-          top: placement.top,
-          left: placement.left,
-          width: placement.width,
-          height: placement.height,
-          zIndex: 6,
-          transform: [{ scale: 1.25 }],
-        }}
-      >
+      <View style={containerStyle}>
         {chainId === 0 ? (
           <Miner triggerAnim={triggerBlockShake} mineBlock={mineBlock} />
         ) : (
@@ -164,18 +162,18 @@ export const MemoizedBlockTxContainer = memo(
       return insetWidth / txPerRow;
     }, [placement.width, txPerRow]);
 
+    const containerStyle = useMemo(() => ({
+      ...styles.blockTxContainer,
+      top: placement.top + 4,
+      left: placement.left + 4,
+      width: placement.width - 8,
+      height: placement.height - 8,
+    }), [placement]);
+
     if (blockId === 0) return null;
 
     return (
-      <View
-        style={{
-          position: "absolute",
-          top: placement.top + 4,
-          left: placement.left + 4,
-          width: placement.width - 8,
-          height: placement.height - 8,
-        }}
-      >
+      <View style={containerStyle}>
         <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
       </View>
     );
@@ -192,3 +190,14 @@ export const MemoizedBlockTxContainer = memo(
 );
 
 MemoizedBlockTxContainer.displayName = "MemoizedBlockTxContainer";
+
+const styles = StyleSheet.create({
+  minerSequencerContainer: {
+    position: 'absolute',
+    zIndex: 6,
+    transform: [{ scale: 1.25 }],
+  },
+  blockTxContainer: {
+    position: 'absolute',
+  },
+});
