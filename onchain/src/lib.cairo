@@ -20,8 +20,8 @@ pub mod transactions {
     pub mod interface;
 
     pub use interface::{
-        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
-        TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
+        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait, TransactionFeeConfig,
+        TransactionSetupParams, TransactionSpeedConfig,
     };
 }
 

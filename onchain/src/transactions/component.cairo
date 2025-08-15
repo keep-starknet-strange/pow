@@ -3,7 +3,10 @@ pub mod PowTransactionsComponent {
     use pow_game::transactions::interface::{
         IPowTransactions, TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
     };
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess};
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
+    };
     use starknet::{ContractAddress, get_caller_address};
 
     #[storage]
@@ -149,7 +152,7 @@ pub mod PowTransactionsComponent {
             let next_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id)) + 1;
             assert!(
                 next_level <= self.max_transaction_fee_levels.read((chain_id, tx_type_id)),
-                "Max Tx Fee Level Reached"
+                "Max Tx Fee Level Reached",
             );
             self.transaction_fee_config.read((chain_id, tx_type_id, next_level)).cost
         }
@@ -161,7 +164,7 @@ pub mod PowTransactionsComponent {
             let next_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id)) + 1;
             assert!(
                 next_level <= self.max_transaction_speed_levels.read((chain_id, tx_type_id)),
-                "Max Tx Speed Level Reached"
+                "Max Tx Speed Level Reached",
             );
             self.transaction_speed_config.read((chain_id, tx_type_id, next_level)).cost
         }
@@ -222,8 +225,7 @@ pub mod PowTransactionsComponent {
                     .write((chain_id, tx_type_id, idx), params.fee_levels[idx].clone());
                 idx += 1;
             }
-            self.max_transaction_fee_levels
-                .write((chain_id, tx_type_id), maxFeeLevel);
+            self.max_transaction_fee_levels.write((chain_id, tx_type_id), maxFeeLevel);
             idx = 0;
             let maxSpeedLevel = params.speed_levels.len();
             while idx != maxSpeedLevel {
@@ -232,8 +234,7 @@ pub mod PowTransactionsComponent {
                     .write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
                 idx += 1;
             }
-            self.max_transaction_speed_levels
-                .write((chain_id, tx_type_id), maxSpeedLevel);
+            self.max_transaction_speed_levels.write((chain_id, tx_type_id), maxSpeedLevel);
             if params.is_dapp {
                 self.dapps.write((chain_id, tx_type_id), true);
             }

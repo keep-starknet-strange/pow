@@ -96,7 +96,9 @@ pub mod StakingComponent {
             self.user_rewards.read(user)
         }
 
-        fn get_staking_unlocked(self: @ComponentState<TContractState>, user: ContractAddress) -> bool {
+        fn get_staking_unlocked(
+            self: @ComponentState<TContractState>, user: ContractAddress,
+        ) -> bool {
             self.staking_unlocked.read(user)
         }
     }
@@ -116,7 +118,7 @@ pub mod StakingComponent {
 
         fn unlock_staking(ref self: ComponentState<TContractState>, user: ContractAddress) {
             self.staking_unlocked.write(user.into(), true);
-            self.emit(StakingUnlocked{ user, is_unlocked: true });
+            self.emit(StakingUnlocked { user, is_unlocked: true });
         }
 
         fn stake(

@@ -3,7 +3,10 @@ pub mod PowUpgradesComponent {
     use pow_game::upgrades::interface::{
         AutomationConfig, AutomationSetupParams, IPowUpgrades, UpgradeConfig, UpgradeSetupParams,
     };
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess};
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
+    };
     use starknet::{ContractAddress, get_caller_address};
 
     #[storage]
@@ -150,7 +153,10 @@ pub mod PowUpgradesComponent {
         ) -> u128 {
             let caller = get_caller_address();
             let next_level = self.upgrade_levels.read((caller, chain_id, upgrade_id)) + 1;
-            assert!(next_level <= self.max_upgrade_levels.read((chain_id, upgrade_id)), "Max level reached");
+            assert!(
+                next_level <= self.max_upgrade_levels.read((chain_id, upgrade_id)),
+                "Max level reached",
+            );
             self.upgrades.read((chain_id, upgrade_id, next_level)).cost
         }
 
@@ -159,7 +165,10 @@ pub mod PowUpgradesComponent {
         ) -> u128 {
             let caller = get_caller_address();
             let next_level = self.automation_levels.read((caller, chain_id, automation_id)) + 1;
-            assert!(next_level <= self.max_automation_levels.read((chain_id, automation_id)), "Max level reached");
+            assert!(
+                next_level <= self.max_automation_levels.read((chain_id, automation_id)),
+                "Max level reached",
+            );
             self.automations.read((chain_id, automation_id, next_level)).cost
         }
 
@@ -247,7 +256,10 @@ pub mod PowUpgradesComponent {
             let current_level = self.upgrade_levels.read((caller, chain_id, upgrade_id));
             let new_level = current_level + 1;
             // Ensure not exceeding max level
-            assert!(new_level <= self.max_upgrade_levels.read((chain_id, upgrade_id)), "Max level reached");
+            assert!(
+                new_level <= self.max_upgrade_levels.read((chain_id, upgrade_id)),
+                "Max level reached",
+            );
             self.upgrade_levels.write((caller, chain_id, upgrade_id), new_level);
             self
                 .emit(
@@ -266,7 +278,10 @@ pub mod PowUpgradesComponent {
             let current_level = self.automation_levels.read((caller, chain_id, automation_id));
             let new_level = current_level + 1;
             // Ensure not exceeding max level
-            assert!(new_level <= self.max_automation_levels.read((chain_id, automation_id)), "Max level reached");
+            assert!(
+                new_level <= self.max_automation_levels.read((chain_id, automation_id)),
+                "Max level reached",
+            );
             self.automation_levels.write((caller, chain_id, automation_id), new_level);
             self
                 .emit(

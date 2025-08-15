@@ -5,10 +5,10 @@ mod PowGame {
     use openzeppelin_upgrades::UpgradeableComponent;
     use openzeppelin_upgrades::interface::IUpgradeable;
     use pow_game::actions::*;
+    use pow_game::cheat_codes::{CheatCodeUsed, IPowCheatCodes};
     use pow_game::interface::{IPowGame, IPowGameRewards, IPowGameValidation};
     use pow_game::store::*;
     use pow_game::types::RewardParams;
-    use pow_game::cheat_codes::{IPowCheatCodes, CheatCodeUsed};
 
     // --- Game Components ---
 
@@ -74,7 +74,6 @@ mod PowGame {
     #[abi(embed_v0)]
     impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
     impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
-
 
 
     #[storage]
@@ -163,7 +162,12 @@ mod PowGame {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, is_devmode: bool) {
+    fn constructor(
+        ref self: ContractState,
+        host: ContractAddress,
+        reward_params: RewardParams,
+        is_devmode: bool,
+    ) {
         self.genesis_block_reward.write(1);
         self.game_chain_count.write(2);
         self.next_chain_cost.write(527124000);
@@ -271,11 +275,10 @@ mod PowGame {
             self.check_valid_game_master();
             self.prestige.setup_prestige(config);
         }
-
         // fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
-        //     self.check_valid_game_master();
-        //     self.staking.setup_staking(config);
-        // }
+    //     self.check_valid_game_master();
+    //     self.staking.setup_staking(config);
+    // }
     }
 
     #[abi(embed_v0)]
@@ -527,18 +530,15 @@ mod PowGame {
     impl PowCheatCodesImpl of IPowCheatCodes<ContractState> {
         fn double_balance_cheat(ref self: ContractState) {
             assert!(self.cheat_codes_enabled.read(), "Cheat codes are disabled");
-            
+
             let caller = get_caller_address();
             let current_balance = self.user_balances.read(caller);
-            
+
             // Use pay_user to add current_balance (so new balance = current + current = double)
             pay_user(ref self, caller, current_balance);
-            
+
             // Emit cheat code event
-            self.emit(CheatCodeUsed {
-                user: caller,
-                cheat_type: 'double_balance',
-            });
+            self.emit(CheatCodeUsed { user: caller, cheat_type: 'double_balance' });
         }
 
         fn enable_cheat_codes(ref self: ContractState) {
@@ -666,12 +666,13 @@ mod PowGame {
         } else {
             pay_user(ref self, caller, self.genesis_block_reward.read());
         }
-        // Set max_size and difficulty for the new chain's first block based on current upgrade level
+        // Set max_size and difficulty for the new chain's first block based on current upgrade
+        // level
         let block_width = self.get_my_upgrade(new_chain_id, 'Block Size');
         let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
         let block_difficulty = self.get_my_upgrade(new_chain_id, 'Block Difficulty');
         self.builder.reset_block(new_chain_id, max_size, block_difficulty);
-        
+
         // Initialize DA and Proof for new chains (L2+)
         if (new_chain_id != 0) {
             // Set max_size and difficulty for initial DA based on current upgrade level
@@ -679,14 +680,14 @@ mod PowGame {
             let da_max_size: u32 = da_size.try_into().unwrap_or(1);
             let da_difficulty = da_size; // DA uses same value for size and difficulty
             self.builder.reset_da(new_chain_id, da_max_size, da_difficulty);
-            
+
             // Set max_size and difficulty for initial proof based on current upgrade level
             let proof_size = self.get_my_upgrade(new_chain_id, 'Recursive Proving');
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
             let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
             self.builder.reset_proof(new_chain_id, proof_max_size, proof_difficulty);
         }
-        
+
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
     }
 

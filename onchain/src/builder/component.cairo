@@ -155,7 +155,12 @@ pub mod BuilderComponent {
             self.emit(BuildingBlockClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_block(ref self: ComponentState<TContractState>, chain_id: u32, max_size: u32, difficulty: u128) {
+        fn reset_block(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
             let empty_block = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_blocks.write((user, chain_id), empty_block.clone());
@@ -186,7 +191,12 @@ pub mod BuilderComponent {
             self.emit(BuildingDaClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_da(ref self: ComponentState<TContractState>, chain_id: u32, max_size: u32, difficulty: u128) {
+        fn reset_da(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
             let empty_da = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_da.write((user, chain_id), empty_da.clone());
@@ -215,7 +225,12 @@ pub mod BuilderComponent {
             self.emit(BuildingProofClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_proof(ref self: ComponentState<TContractState>, chain_id: u32, max_size: u32, difficulty: u128) {
+        fn reset_proof(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
             let empty_proof = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_proof.write((user, chain_id), empty_proof.clone());

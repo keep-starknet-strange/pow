@@ -525,7 +525,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   getDappUnlockCost: (chainId) => {
-    return chainId === 0 ? unlocksConfig.dapps.L1.cost : unlocksConfig.dapps.L2.cost;
+    return chainId === 0
+      ? unlocksConfig.dapps.L1.cost
+      : unlocksConfig.dapps.L2.cost;
   },
 
   getNextFeeCost: (chainId, txId, isDapp = false) => {
