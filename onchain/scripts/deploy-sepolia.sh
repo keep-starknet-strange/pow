@@ -73,18 +73,24 @@ echo "Building the contract..."
 cd $ONCHAIN_DIR && scarb build
 
 # Declaring the contract
-echo "Declaring the contract..."
-echo "starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE"
-POW_GAME_DECLARE_OUTPUT=$(starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE 2>&1)
-POR_GAME_CONTRACT_CLASSHASH=$(echo $POW_GAME_DECLARE_OUTPUT | tail -n 1 | awk '{print $NF}')
-echo "Contract class hash: $POR_GAME_CONTRACT_CLASSHASH"
+# Declare if POW_GAME_CLASS_HASH is not set
+if [ -z "$POW_GAME_CLASS_HASH" ]; then
+  echo "Declaring the contract..."
+  echo "starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE"
+  POW_GAME_DECLARE_OUTPUT=$(starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE 2>&1)
+  POW_GAME_CONTRACT_CLASSHASH=$(echo $POW_GAME_DECLARE_OUTPUT | tail -n 1 | awk '{print $NF}')
+  echo "Contract class hash: $POW_GAME_CONTRACT_CLASSHASH"
+else
+  echo "Using existing contract class hash: $POW_GAME_CLASS_HASH"
+  POW_GAME_CONTRACT_CLASSHASH=$POW_GAME_CLASS_HASH
+fi
 
 # Deploying the contract
 ACCOUNT_ADDRESS=$(cat $STARKNET_ACCOUNT | jq -r '.deployment.address')
 ETH_TOKEN_ADDRESS=0x4718F5A0FC34CC1AF16A1CDEE98FFB20C31F5CD61D6AB07201858F4287C938D
-CALLDATA=$(echo -n $ACCOUNT_ADDRESS $ETH_TOKEN_ADDRESS 0x100 0x0 0x1)
+CALLDATA=$(echo -n $ACCOUNT_ADDRESS $ETH_TOKEN_ADDRESS 0x100 0x0 0x1 0x1)
 echo "Deploying the contract..."
-echo "starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POR_GAME_CONTRACT_CLASSHASH $CALLDATA"
-starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POR_GAME_CONTRACT_CLASSHASH $CALLDATA
+echo "starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_CLASSHASH $CALLDATA"
+starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_CLASSHASH $CALLDATA
 
 #TODO: sncast deploy option
