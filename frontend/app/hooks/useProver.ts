@@ -27,7 +27,7 @@ export const useProver = (
           const clicks = await getUserProofClicks(1);
           setProverCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching proof counter:", error);
+          if (__DEV__) console.error("Error fetching proof counter:", error);
           setProverCounter(0);
         }
       }
@@ -37,7 +37,7 @@ export const useProver = (
 
   const prove = useCallback(() => {
     if (!proverIsBuilt) {
-      console.warn("Prover is not built yet.");
+      if (__DEV__) console.warn("Prover is not built yet.");
       return;
     }
 

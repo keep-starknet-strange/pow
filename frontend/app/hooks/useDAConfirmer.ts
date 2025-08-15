@@ -27,7 +27,7 @@ export const useDAConfirmer = (
           const clicks = await getUserDaClicks(1);
           setDaConfirmCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching da counter:", error);
+          if (__DEV__) console.error("Error fetching da counter:", error);
           setDaConfirmCounter(0);
         }
       }
@@ -37,7 +37,7 @@ export const useDAConfirmer = (
 
   const daConfirm = useCallback(() => {
     if (!daIsBuilt) {
-      console.warn("Data Availability is not built yet.");
+      if (__DEV__) console.warn("Data Availability is not built yet.");
       return;
     }
 

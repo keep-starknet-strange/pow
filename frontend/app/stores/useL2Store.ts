@@ -66,7 +66,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
             isL2Unlocked: true,
           });
         } catch (error) {
-          console.error("Error initializing L2 store:", error);
+          if (__DEV__) console.error("Error initializing L2 store:", error);
         }
       } else {
         get().resetL2Store();

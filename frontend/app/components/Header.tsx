@@ -31,7 +31,7 @@ export const Header: React.FC = memo(() => {
     try {
       doubleBalanceCheat();
     } catch (error) {
-      console.error("Failed to execute cheat code:", error);
+      if (__DEV__) console.error("Failed to execute cheat code:", error);
     }
   };
   return (
