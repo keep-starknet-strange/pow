@@ -23,6 +23,7 @@ DAPP_CONFIG=$CONFIGS_DIR/dapps.json
 PRESTIGE_CONFIG=$CONFIGS_DIR/prestige.json
 UPGRADES_CONFIG=$CONFIGS_DIR/upgrades.json
 TRANSACTIONS_CONFIG=$CONFIGS_DIR/transactions.json
+UNLOCKS_CONFIG=$CONFIGS_DIR/unlocks.json
 
 ETH_ADDRESS=0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
 DEVNET_ACCOUNT_ADDRESS=0x064b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
@@ -78,7 +79,7 @@ for entry in $(echo $L1_UPGRADES | jq -r '. | @base64'); do
     SETUP_UPGRADE_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade_config --calldata $SETUP_UPGRADE_CALLDATA
 done
 for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     _jq() {
@@ -102,7 +103,7 @@ for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     SETUP_UPGRADE_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_upgrade_config --calldata $SETUP_UPGRADE_CALLDATA
 done
 
 echo
@@ -138,7 +139,7 @@ for entry in $(echo $L1_AUTOMATIONS | jq -r '. | @base64'); do
     SETUP_AUTOMATION_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation_config --calldata $SETUP_AUTOMATION_CALLDATA
 done
 for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     _jq() {
@@ -164,7 +165,7 @@ for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     SETUP_AUTOMATION_CALLDATA=$(echo $CHAIN_ID $ID 0x$NAME_HEX $((LEVELS + 1)) $LEVEL_INFO)
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
-    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
+    sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_automation_config --calldata $SETUP_AUTOMATION_CALLDATA
 done
 
 echo
@@ -321,8 +322,27 @@ PRESTIGE_LEVELS=$(echo $PRESTIGE_CONFIG_CONTENT | jq -r '. | length')
 SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS)) $PRESTIGE_COSTS_INFO $((PRESTIGE_LEVELS)) $PRESTIGE_SCALERS_INFO)
 
 # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
-sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function setup_prestige_config --calldata $SETUP_PRESTIGE_CALLDATA
 echo
 echo "Done setting up prestige!"
+echo
+echo "6. Setting up chain and dapps unlock costs"
+echo
+
+# Set next chain cost (L2 unlock cost) from unlocks config
+NEXT_CHAIN_COST=$(cat $UNLOCKS_CONFIG | jq -r '.next_chain_cost')
+echo "Setting next chain cost to $NEXT_CHAIN_COST (from unlocks config)"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_next_chain_cost --calldata $NEXT_CHAIN_COST
+
+# Set dapps unlock costs from unlocks config
+L1_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L1.cost')
+L2_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L2.cost')
+echo "Setting L1 dapps unlock cost to $L1_DAPPS_UNLOCK_COST (from unlocks config)"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata 0 $L1_DAPPS_UNLOCK_COST
+echo "Setting L2 dapps unlock cost to $L2_DAPPS_UNLOCK_COST (from unlocks config)"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata 1 $L2_DAPPS_UNLOCK_COST
+
+echo
+echo "Done setting up costs!"
 echo
 echo "Completed setting up POW! contracts!"

@@ -1,109 +1,146 @@
 import { Observer, EventType } from "@/app/stores/useEventManager";
-import { Block } from "../types/Chains";
 import transactionsJson from "../configs/transactions.json";
-import { PowAction } from "../context/PowContractConnector";
+import { Call } from "starknet";
 import { daTxTypeId, proofTxTypeId } from "../utils/transactions";
+import { useOnchainActions } from "@/app/stores/useOnchainActions";
 
-export const createAddTransactionAction = (
+export const createAddTransactionCall = (
+  contractAddress: string,
   chainId: number,
   txTypeId: number,
-): PowAction => {
+): Call => {
   return {
-    action: "add_transaction",
-    args: [chainId, txTypeId],
+    contractAddress,
+    entrypoint: "add_transaction",
+    calldata: [chainId, txTypeId],
   };
 };
 
-export const createMineBlockAction = (chainId: number): PowAction => {
+export const createMineBlockCall = (
+  contractAddress: string,
+  chainId: number,
+): Call => {
   return {
-    action: "mine_block",
-    args: [chainId],
+    contractAddress,
+    entrypoint: "mine_block",
+    calldata: [chainId],
   };
 };
 
-export const createStoreDaAction = (chainId: number): PowAction => {
+export const createStoreDaCall = (
+  contractAddress: string,
+  chainId: number,
+): Call => {
   return {
-    action: "store_da",
-    args: [chainId],
+    contractAddress,
+    entrypoint: "store_da",
+    calldata: [chainId],
   };
 };
 
-export const createProveAction = (chainId: number): PowAction => {
+export const createProveCall = (
+  contractAddress: string,
+  chainId: number,
+): Call => {
   return {
-    action: "prove",
-    args: [chainId],
+    contractAddress,
+    entrypoint: "prove",
+    calldata: [chainId],
   };
 };
 
-export const createBuyTxFeeAction = (
+export const createBuyTxFeeCall = (
+  contractAddress: string,
   chainId: number,
   txTypeId: number,
-): PowAction => {
+): Call => {
   return {
-    action: "buy_tx_fee",
-    args: [chainId, txTypeId],
+    contractAddress,
+    entrypoint: "buy_tx_fee",
+    calldata: [chainId, txTypeId],
   };
 };
 
-export const createBuyTxSpeedAction = (
+export const createBuyTxSpeedCall = (
+  contractAddress: string,
   chainId: number,
   txTypeId: number,
-): PowAction => {
+): Call => {
   return {
-    action: "buy_tx_speed",
-    args: [chainId, txTypeId],
+    contractAddress,
+    entrypoint: "buy_tx_speed",
+    calldata: [chainId, txTypeId],
   };
 };
 
-export const createBuyUpgradeAction = (
+export const createBuyUpgradeCall = (
+  contractAddress: string,
   chainId: number,
   upgradeId: number,
-): PowAction => {
+): Call => {
   return {
-    action: "buy_upgrade",
-    args: [chainId, upgradeId],
+    contractAddress,
+    entrypoint: "buy_upgrade",
+    calldata: [chainId, upgradeId],
   };
 };
 
-export const createBuyAutomationAction = (
+export const createBuyAutomationCall = (
+  contractAddress: string,
   chainId: number,
   automationId: number,
-): PowAction => {
+): Call => {
   return {
-    action: "buy_automation",
-    args: [chainId, automationId],
+    contractAddress,
+    entrypoint: "buy_automation",
+    calldata: [chainId, automationId],
   };
 };
 
-export const createBuyDappsAction = (chainId: number): PowAction => {
+export const createBuyDappsCall = (
+  contractAddress: string,
+  chainId: number,
+): Call => {
   return {
-    action: "buy_dapps",
-    args: [chainId],
+    contractAddress,
+    entrypoint: "buy_dapps",
+    calldata: [chainId],
   };
 };
 
-export const createBuyNextChainAction = (): PowAction => {
+export const createBuyNextChainCall = (contractAddress: string): Call => {
   return {
-    action: "buy_next_chain",
-    args: [],
+    contractAddress,
+    entrypoint: "buy_next_chain",
+    calldata: [],
   };
 };
 
-export const createBuyPrestigeAction = (): PowAction => {
+export const createBuyPrestigeCall = (contractAddress: string): Call => {
   return {
-    action: "buy_prestige",
-    args: [],
+    contractAddress,
+    entrypoint: "buy_prestige",
+    calldata: [],
   };
 };
 
 export class TxBuilderObserver implements Observer {
-  private addAction: (call: PowAction) => void;
+  private contractAddress: string;
 
-  constructor(addAction: (call: PowAction) => void) {
-    this.addAction = addAction;
+  constructor(contractAddress: string) {
+    this.contractAddress = contractAddress;
+  }
+
+  setContractAddress(contractAddress: string) {
+    this.contractAddress = contractAddress;
   }
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
+    const { addAction } = useOnchainActions.getState();
+    if (!this.contractAddress) {
+      return;
+    }
+
     if (eventType === "TxAdded" && data?.tx) {
       // TODO: Temporary work around
       if (data.tx.typeId === proofTxTypeId || data.tx.typeId === daTxTypeId) {
@@ -115,15 +152,20 @@ export class TxBuilderObserver implements Observer {
         const txTypes =
           data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
         const txTypeCount = txTypes.length;
-        this.addAction(
-          createAddTransactionAction(
+        addAction(
+          createAddTransactionCall(
+            this.contractAddress,
             data.chainId,
             txTypeCount + data.tx.typeId,
           ),
         );
       } else {
-        this.addAction(
-          createAddTransactionAction(data.chainId, data.tx.typeId),
+        addAction(
+          createAddTransactionCall(
+            this.contractAddress,
+            data.chainId,
+            data.tx.typeId,
+          ),
         );
       }
       return;
@@ -134,59 +176,85 @@ export class TxBuilderObserver implements Observer {
         // Proccessed above in the if statement since this is a special case
         break;
       case "MineClicked":
+      case "MineDone":
         if (data.ignoreAction) return;
-        this.addAction(createMineBlockAction(0));
+        addAction(createMineBlockCall(this.contractAddress, 0));
         break;
       case "SequenceClicked":
+      case "SequenceDone":
         if (data.ignoreAction) return;
-        this.addAction(createMineBlockAction(1));
+        addAction(createMineBlockCall(this.contractAddress, 1));
         break;
       case "DaClicked":
-        this.addAction(createStoreDaAction(1));
+      case "DaDone":
+        addAction(createStoreDaCall(this.contractAddress, 1));
         break;
       case "ProveClicked":
-        this.addAction(createProveAction(1));
+      case "ProveDone":
+        addAction(createProveCall(this.contractAddress, 1));
         break;
       case "TxUpgradePurchased":
         if (data.type === "txFee") {
-          this.addAction(createBuyTxFeeAction(data.chainId, data.txId));
+          addAction(
+            createBuyTxFeeCall(this.contractAddress, data.chainId, data.txId),
+          );
         } else if (data.type === "txSpeed") {
-          this.addAction(createBuyTxSpeedAction(data.chainId, data.txId));
+          addAction(
+            createBuyTxSpeedCall(this.contractAddress, data.chainId, data.txId),
+          );
         } else if (data.type === "dappFee") {
           // Offset the txId by the number of tx types to get the correct txId for the dapp
           const txTypes =
             data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
           const txTypeCount = txTypes.length;
-          this.addAction(
-            createBuyTxFeeAction(data.chainId, txTypeCount + data.txId),
+          addAction(
+            createBuyTxFeeCall(
+              this.contractAddress,
+              data.chainId,
+              txTypeCount + data.txId,
+            ),
           );
         } else if (data.type === "dappSpeed") {
           const txTypes =
             data.chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
           const txTypeCount = txTypes.length;
-          this.addAction(
-            createBuyTxSpeedAction(data.chainId, txTypeCount + data.txId),
+          addAction(
+            createBuyTxSpeedCall(
+              this.contractAddress,
+              data.chainId,
+              txTypeCount + data.txId,
+            ),
           );
         } else {
           console.error("Unknown tx upgrade type:", data.type);
         }
         break;
       case "UpgradePurchased":
-        this.addAction(createBuyUpgradeAction(data.chainId, data.upgradeId));
+        addAction(
+          createBuyUpgradeCall(
+            this.contractAddress,
+            data.chainId,
+            data.upgradeId,
+          ),
+        );
         break;
       case "AutomationPurchased":
-        this.addAction(
-          createBuyAutomationAction(data.chainId, data.automationId),
+        addAction(
+          createBuyAutomationCall(
+            this.contractAddress,
+            data.chainId,
+            data.automationId,
+          ),
         );
         break;
       case "DappsPurchased":
-        this.addAction(createBuyDappsAction(data.chainId));
+        addAction(createBuyDappsCall(this.contractAddress, data.chainId));
         break;
       case "L2Purchased":
-        this.addAction(createBuyNextChainAction());
+        addAction(createBuyNextChainCall(this.contractAddress));
         break;
       case "PrestigePurchased":
-        this.addAction(createBuyPrestigeAction());
+        addAction(createBuyPrestigeCall(this.contractAddress));
         break;
       default:
         break;

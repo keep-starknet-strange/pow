@@ -28,17 +28,6 @@ interface GameStore {
   addTransaction: (chainId: number, transaction: Transaction) => void;
   initL2WorkingBlock: () => void;
 
-  /*
-   * TODO: Move from context ?
-  miningProgress: number;
-  mineBlock: () => void;
-  sequencingProgress: number;
-  sequenceBlock: () => void;
-  daProgress: number;
-  daConfirm: () => void;
-  proverProgress: number;
-  prove: () => void;
-  */
   onBlockMined: () => void;
   onBlockSequenced: () => void;
 
@@ -111,7 +100,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               fee: 0,
               isDapp: false,
             })),
-            isBuilt: false,
+            isBuilt: (blockSize || 0) >= maxBlockSize,
             maxSize: maxBlockSize,
             difficulty: blockDifficulty,
             reward: blockNumber === 0 ? get().genesisBlockReward : undefined,
@@ -136,7 +125,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 fee: 0,
                 isDapp: false,
               })),
-              isBuilt: false,
+              isBuilt: (l2BlockSize || 0) >= l2MaxBlockSize,
               maxSize: l2MaxBlockSize,
               difficulty: l2BlockDifficulty,
               reward:

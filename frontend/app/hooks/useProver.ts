@@ -1,9 +1,9 @@
 import { useCallback, useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useFocEngine } from "../context/FocEngineConnector";
-import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 
 export const useProver = (
@@ -14,6 +14,9 @@ export const useProver = (
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
+  const { l2 } = useL2Store();
+  const proverIsBuilt = l2?.prover.isBuilt;
+  const proverDifficulty = l2?.prover.maxSize || 1;
   const [proverCounter, setProverCounter] = useState(0);
 
   useEffect(() => {
@@ -21,10 +24,10 @@ export const useProver = (
       if (powContract && user) {
         try {
           // TODO: Use foc engine?
-          const clicks = await getUserProofClicks(0);
+          const clicks = await getUserProofClicks(1);
           setProverCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching mine counter:", error);
+          console.error("Error fetching proof counter:", error);
           setProverCounter(0);
         }
       }
@@ -32,9 +35,6 @@ export const useProver = (
     fetchProofCounter();
   }, [powContract, user, getUserProofClicks]);
 
-  const { l2 } = useL2Store();
-  const proverIsBuilt = l2?.prover.isBuilt;
-  const proverMaxSize = l2?.prover.maxSize;
   const prove = useCallback(() => {
     if (!proverIsBuilt) {
       console.warn("Prover is not built yet.");
@@ -45,31 +45,37 @@ export const useProver = (
     if (triggerProveAnimation) {
       triggerProveAnimation();
     }
-
+    // Batch state updates to prevent multiple rerenders
     setProverCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const proverDifficulty = proverMaxSize || 1;
-      if (newCounter <= proverDifficulty) {
-        return newCounter; // Reset counter after proving
+
+      if (newCounter < proverDifficulty) {
+        notify("ProveClicked", {
+          counter: newCounter,
+          difficulty: proverDifficulty,
+        });
+        return newCounter;
+      } else if (newCounter === proverDifficulty) {
+        return newCounter;
       } else {
-        return prevCounter; // Do not increment beyond difficulty
+        return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [proverIsBuilt, proverMaxSize, triggerProveAnimation]);
+  }, [
+    triggerProveAnimation,
+    proverIsBuilt,
+    proverDifficulty,
+    proverCounter,
+    notify,
+    onProve,
+  ]);
 
   useEffect(() => {
-    if (proverCounter == proverMaxSize) {
+    if (proverCounter === proverDifficulty) {
       onProve();
-      notify("ProveDone", { counter: proverCounter });
-    } else if (proverCounter > 0) {
-      notify("ProveClicked", { counter: proverCounter });
+      setProverCounter(0);
     }
-  }, [proverCounter, proverMaxSize, onProve, notify]);
-
-  // Reset prover progress when the prover is built
-  useEffect(() => {
-    setProverCounter(0);
-  }, [proverIsBuilt]);
+  }, [proverDifficulty, proverCounter, onProve]);
 
   useAutoClicker(
     getAutomationValue(1, "Prover") > 0 && (proverIsBuilt || false),

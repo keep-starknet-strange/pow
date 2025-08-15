@@ -3,7 +3,10 @@ pub mod PowTransactionsComponent {
     use pow_game::transactions::interface::{
         IPowTransactions, TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
     };
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
+    };
     use starknet::{ContractAddress, get_caller_address};
 
     #[storage]
@@ -12,10 +15,16 @@ pub mod PowTransactionsComponent {
         dapps_unlocked: Map<(ContractAddress, u32), bool>,
         // Maps: (chain id, tx type id) -> is dapp
         dapps: Map<(u32, u32), bool>,
+        // Total number of transaction types
+        transaction_types_count: u32,
         // Maps: (chain_id, tx_type_id, level) -> transaction fee config
         transaction_fee_config: Map<(u32, u32, u32), TransactionFeeConfig>,
         // Maps: (chain_id, tx_type_id, level) -> transaction speed config
         transaction_speed_config: Map<(u32, u32, u32), TransactionSpeedConfig>,
+        // Maps: (chain_id, tx_type_id) -> max transaction fee level
+        max_transaction_fee_levels: Map<(u32, u32), u32>,
+        // Maps: (chain_id, tx_type_id) -> max transaction speed level
+        max_transaction_speed_levels: Map<(u32, u32), u32>,
         // Maps: (user address, chain id, tx type id) -> transaction fee level
         transaction_fee_levels: Map<(ContractAddress, u32, u32), u32>,
         // Maps: (user address, chain id, tx type id) -> transaction speed level
@@ -136,12 +145,15 @@ pub mod PowTransactionsComponent {
             levels.span()
         }
 
-        // TODO: If maxlevel
         fn get_next_tx_fee_cost(
             self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
         ) -> u128 {
             let caller = get_caller_address();
             let next_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id)) + 1;
+            assert!(
+                next_level <= self.max_transaction_fee_levels.read((chain_id, tx_type_id)),
+                "Max Tx Fee Level Reached",
+            );
             self.transaction_fee_config.read((chain_id, tx_type_id, next_level)).cost
         }
 
@@ -150,6 +162,10 @@ pub mod PowTransactionsComponent {
         ) -> u128 {
             let caller = get_caller_address();
             let next_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id)) + 1;
+            assert!(
+                next_level <= self.max_transaction_speed_levels.read((chain_id, tx_type_id)),
+                "Max Tx Speed Level Reached",
+            );
             self.transaction_speed_config.read((chain_id, tx_type_id, next_level)).cost
         }
 
@@ -176,6 +192,17 @@ pub mod PowTransactionsComponent {
             assert!(level != 0, "Tx Type Locked");
         }
 
+        fn check_has_all_txs(self: @ComponentState<TContractState>, chain_id: u32) {
+            let caller = get_caller_address();
+            let transactions_count = self.transaction_types_count.read();
+            let mut idx = 0;
+            while idx != transactions_count {
+                let level = self.transaction_fee_levels.read((caller, chain_id, idx));
+                assert!(level != 0, "All Tx Types Must Be Unlocked");
+                idx += 1;
+            }
+        }
+
         fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
             self.dapps.read((chain_id, tx_type_id))
         }
@@ -185,7 +212,6 @@ pub mod PowTransactionsComponent {
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
-        // TODO: Clear TransactionFeeConfig & TransactionSpeedConfig for higher than len()
         fn setup_transaction_config(
             ref self: ComponentState<TContractState>, params: TransactionSetupParams,
         ) {
@@ -199,6 +225,7 @@ pub mod PowTransactionsComponent {
                     .write((chain_id, tx_type_id, idx), params.fee_levels[idx].clone());
                 idx += 1;
             }
+            self.max_transaction_fee_levels.write((chain_id, tx_type_id), maxFeeLevel);
             idx = 0;
             let maxSpeedLevel = params.speed_levels.len();
             while idx != maxSpeedLevel {
@@ -207,16 +234,25 @@ pub mod PowTransactionsComponent {
                     .write((chain_id, tx_type_id, idx), params.speed_levels[idx].clone());
                 idx += 1;
             }
+            self.max_transaction_speed_levels.write((chain_id, tx_type_id), maxSpeedLevel);
             if params.is_dapp {
                 self.dapps.write((chain_id, tx_type_id), true);
             }
             self.emit(TransactionConfigUpdated { chain_id, tx_type_id, new_config: params });
+
+            let transaction_types_count = self.transaction_types_count.read();
+            if (tx_type_id >= transaction_types_count) {
+                self.transaction_types_count.write(tx_type_id + 1);
+            }
         }
 
         fn level_transaction_fee(
             ref self: ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
         ) {
             let caller = get_caller_address();
+            // Ensure valid tx type
+            let transaction_types_count = self.transaction_types_count.read();
+            assert!(tx_type_id < transaction_types_count, "Invalid Tx Type");
             // Ensure previous tx unlocked
             if (tx_type_id != 0) {
                 let previous_level = self
@@ -231,6 +267,9 @@ pub mod PowTransactionsComponent {
             }
             let current_level = self.transaction_fee_levels.read((caller, chain_id, tx_type_id));
             let new_level = current_level + 1;
+            // Ensure not exceeding max level
+            let max_level = self.max_transaction_fee_levels.read((chain_id, tx_type_id));
+            assert!(new_level <= max_level, "Max Tx Fee Level Reached");
             self.transaction_fee_levels.write((caller, chain_id, tx_type_id), new_level);
             self
                 .emit(
@@ -248,6 +287,9 @@ pub mod PowTransactionsComponent {
             assert!(tx_fee_level != 0, "Tx Type Locked");
             let current_level = self.transaction_speed_levels.read((caller, chain_id, tx_type_id));
             let new_level = current_level + 1;
+            // Ensure not exceeding max level
+            let max_level = self.max_transaction_speed_levels.read((chain_id, tx_type_id));
+            assert!(new_level <= max_level, "Max Tx Speed Level Reached");
             self.transaction_speed_levels.write((caller, chain_id, tx_type_id), new_level);
             self
                 .emit(
@@ -260,7 +302,7 @@ pub mod PowTransactionsComponent {
         fn reset_tx_levels(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
             let mut idx = 0;
-            let transactions_count = 20; // TODO
+            let transactions_count = self.transaction_types_count.read();
             while idx != transactions_count {
                 self.transaction_fee_levels.write((caller, chain_id, idx), 0);
                 self.transaction_speed_levels.write((caller, chain_id, idx), 0);
@@ -271,6 +313,20 @@ pub mod PowTransactionsComponent {
 
         fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
+            // Check if can unlock dapps
+            let dapps_unlocked = self.dapps_unlocked.read((caller, chain_id));
+            assert!(!dapps_unlocked, "Dapps Already Unlocked");
+            // Ensure all tx types are unlocked
+            let transactions_count = self.transaction_types_count.read();
+            let mut idx = 0;
+            while idx != transactions_count {
+                let level = self.transaction_fee_levels.read((caller, chain_id, idx));
+                if (self.is_dapp(chain_id, idx)) {
+                    continue;
+                }
+                assert!(level != 0, "All Tx Types Must Be Unlocked");
+                idx += 1;
+            }
             self.dapps_unlocked.write((caller, chain_id), true);
             self.emit(DappsUnlocked { user: caller, chain_id });
         }

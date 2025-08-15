@@ -4,7 +4,6 @@ pub mod BuilderComponent {
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{ContractAddress, get_caller_address};
 
-    // TODO: Find a way to simplify this ( blocks, da, proofs )
     #[storage]
     pub struct Storage {
         // Maps: (user address, chain id) -> in progress block height
@@ -156,9 +155,14 @@ pub mod BuilderComponent {
             self.emit(BuildingBlockClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_block(ref self: ComponentState<TContractState>, chain_id: u32, max_size: u32) {
+        fn reset_block(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
-            let empty_block = BuildingState { fees: 0, size: 0, max_size };
+            let empty_block = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_blocks.write((user, chain_id), empty_block.clone());
             self.emit(BuildingBlockUpdate { user, chain_id, new_block: empty_block });
             self.block_clicks.write((user, chain_id), 0);
@@ -170,6 +174,9 @@ pub mod BuilderComponent {
         fn build_da(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
             let mut da = self.building_da.read((user, chain_id));
+            if da.size >= da.max_size {
+                return; // Return early if max size is reached
+            }
             da.fees += fees;
             da.size += 1;
             self.building_da.write((user, chain_id), da.clone());
@@ -184,9 +191,14 @@ pub mod BuilderComponent {
             self.emit(BuildingDaClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_da(ref self: ComponentState<TContractState>, chain_id: u32) {
+        fn reset_da(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
-            let empty_da = BuildingState { fees: 0, size: 0, max_size: 1 };
+            let empty_da = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_da.write((user, chain_id), empty_da.clone());
             self.emit(BuildingDaUpdate { user, chain_id, new_da: empty_da });
             self.da_clicks.write((user, chain_id), 0);
@@ -196,6 +208,9 @@ pub mod BuilderComponent {
         fn build_proof(ref self: ComponentState<TContractState>, chain_id: u32, fees: u128) {
             let user = get_caller_address();
             let mut proof = self.building_proof.read((user, chain_id));
+            if proof.size >= proof.max_size {
+                return; // Return early if max size is reached
+            }
             proof.fees += fees;
             proof.size += 1;
             self.building_proof.write((user, chain_id), proof.clone());
@@ -210,9 +225,14 @@ pub mod BuilderComponent {
             self.emit(BuildingProofClicked { user, chain_id, click_count: clicks });
         }
 
-        fn reset_proof(ref self: ComponentState<TContractState>, chain_id: u32) {
+        fn reset_proof(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            max_size: u32,
+            difficulty: u128,
+        ) {
             let user = get_caller_address();
-            let empty_proof = BuildingState { fees: 0, size: 0, max_size: 1 };
+            let empty_proof = BuildingState { fees: 0, size: 0, max_size, difficulty };
             self.building_proof.write((user, chain_id), empty_proof.clone());
             self.emit(BuildingProofUpdate { user, chain_id, new_proof: empty_proof });
             self.proof_clicks.write((user, chain_id), 0);

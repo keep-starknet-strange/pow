@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Observer, EventType } from "@/app/stores/useEventManager";
+import { useAchievementsStore } from "@/app/stores/useAchievementsStore";
 import achievements from "../configs/achievements.json";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -11,19 +12,10 @@ import { Transaction, Block } from "../types/Chains";
 type Achievement = (typeof achievements)[number];
 
 export class AchievementObserver implements Observer {
-  updateAchievement: (achievementId: number, progress: number) => void;
   achievementsByEvent: Map<string, Achievement[]>;
   completedAchievements: Set<number>;
 
-  constructor(
-    updateAchievement: (achievementId: number, progress: number) => void,
-  ) {
-    this.updateAchievement = (achievementId, progress) => {
-      updateAchievement(achievementId, progress);
-      if (progress >= 100) {
-        this.completedAchievements.add(achievementId);
-      }
-    };
+  constructor() {
     this.achievementsByEvent = this.groupAchievementsByEvent();
     this.completedAchievements = new Set<number>();
     // Load completed achievements from local storage
@@ -99,6 +91,16 @@ export class AchievementObserver implements Observer {
           break;
       }
     });
+  }
+
+  private updateAchievement(achievementId: number, progress: number): void {
+    // Get fresh updateAchievement function from store
+    const { updateAchievement } = useAchievementsStore.getState();
+    updateAchievement(achievementId, progress);
+
+    if (progress >= 100) {
+      this.completedAchievements.add(achievementId);
+    }
   }
 
   private handleTxAdded(achievement: Achievement, tx: Transaction) {

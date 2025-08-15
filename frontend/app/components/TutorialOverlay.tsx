@@ -14,7 +14,7 @@ import { useEventManager } from "../stores/useEventManager";
 const BUBBLE_WIDTH = 260;
 
 const TutorialOverlayComponent: React.FC = () => {
-  const { step, layouts, visible, setVisible } = useTutorial();
+  const { step, layouts, visible } = useTutorial();
   const { notify } = useEventManager();
   const [bubbleHeight, setBubbleHeight] = useState(0);
 
@@ -58,10 +58,6 @@ const TutorialOverlayComponent: React.FC = () => {
   const handleMeasured = useCallback((height: number) => {
     setBubbleHeight(height);
   }, []);
-
-  useEffect(() => {
-    if (step !== "completed") setVisible(true);
-  }, [step]);
 
   if (!visible || !isReady) return null;
   return (

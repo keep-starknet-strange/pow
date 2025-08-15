@@ -4,6 +4,7 @@ import { FocAccount } from "../context/FocEngineConnector";
 import { useEventManager } from "./useEventManager";
 import transactionJson from "@/app/configs/transactions.json";
 import dappsJson from "@/app/configs/dapps.json";
+import unlocksConfig from "@/app/configs/unlocks.json";
 import { useBalanceStore } from "./useBalanceStore";
 import { useUpgradesStore } from "./useUpgradesStore";
 
@@ -524,7 +525,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   getDappUnlockCost: (chainId) => {
-    return chainId === 0 ? dappsJson.L1.cost : dappsJson.L2.cost;
+    return chainId === 0
+      ? unlocksConfig.dapps.L1.cost
+      : unlocksConfig.dapps.L2.cost;
   },
 
   getNextFeeCost: (chainId, txId, isDapp = false) => {

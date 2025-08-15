@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useFocEngine } from "../context/FocEngineConnector";
-import { usePowContractConnector } from "../context/PowContractConnector";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useL2Store } from "../stores/useL2Store";
+import { useFocEngine } from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
 
 export const useDAConfirmer = (
@@ -11,9 +11,12 @@ export const useDAConfirmer = (
   triggerDAAnimation?: () => void,
 ) => {
   const { notify } = useEventManager();
+  const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
-  const { getAutomationValue } = useUpgrades();
+  const { l2 } = useL2Store();
+  const daIsBuilt = l2?.da.isBuilt;
+  const daDifficulty = l2?.da.maxSize || 1;
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
 
   useEffect(() => {
@@ -24,7 +27,7 @@ export const useDAConfirmer = (
           const clicks = await getUserDaClicks(1);
           setDaConfirmCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching mine counter:", error);
+          console.error("Error fetching da counter:", error);
           setDaConfirmCounter(0);
         }
       }
@@ -32,9 +35,6 @@ export const useDAConfirmer = (
     fetchDaCounter();
   }, [powContract, user, getUserDaClicks]);
 
-  const { l2 } = useL2Store();
-  const daIsBuilt = l2?.da.isBuilt;
-  const daMaxSize = l2?.da.maxSize;
   const daConfirm = useCallback(() => {
     if (!daIsBuilt) {
       console.warn("Data Availability is not built yet.");
@@ -45,32 +45,37 @@ export const useDAConfirmer = (
     if (triggerDAAnimation) {
       triggerDAAnimation();
     }
-
+    // Batch state updates to prevent multiple rerenders
     setDaConfirmCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const daDifficulty = daMaxSize || 1;
-      if (newCounter <= daDifficulty) {
+
+      if (newCounter < daDifficulty) {
+        notify("DaClicked", {
+          counter: newCounter,
+          difficulty: daDifficulty,
+        });
+        return newCounter;
+      } else if (newCounter === daDifficulty) {
         return newCounter;
       } else {
-        return prevCounter; // Prevent counter from exceeding difficulty
+        return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [daIsBuilt, daMaxSize, triggerDAAnimation]);
+  }, [
+    triggerDAAnimation,
+    daIsBuilt,
+    daDifficulty,
+    daConfirmCounter,
+    notify,
+    onDAConfirm,
+  ]);
 
   useEffect(() => {
-    if (daConfirmCounter === daMaxSize) {
+    if (daConfirmCounter === daDifficulty) {
       onDAConfirm();
-      notify("DaDone", { counter: daConfirmCounter });
       setDaConfirmCounter(0);
-    } else if (daConfirmCounter > 0) {
-      notify("DaClicked", { counter: daConfirmCounter });
     }
-  }, [daConfirmCounter, daMaxSize, onDAConfirm, notify]);
-
-  // Reset da confirm counter when the DA is built
-  useEffect(() => {
-    setDaConfirmCounter(0);
-  }, [daIsBuilt]);
+  }, [daDifficulty, daConfirmCounter, onDAConfirm]);
 
   useAutoClicker(
     getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),

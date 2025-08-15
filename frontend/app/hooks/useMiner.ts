@@ -49,27 +49,34 @@ export const useMiner = (
     setMineCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
 
-      if (newCounter <= blockDifficulty) {
+      if (newCounter < blockDifficulty) {
+        notify("MineClicked", {
+          counter: newCounter,
+          difficulty: blockDifficulty,
+          ignoreAction: miningBlock?.blockId === 0,
+        });
+        return newCounter;
+      } else if (newCounter === blockDifficulty) {
         return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [triggerMineAnimation, miningBlock?.isBuilt, blockDifficulty]);
+  }, [
+    triggerMineAnimation,
+    miningBlock?.isBuilt,
+    blockDifficulty,
+    mineCounter,
+    notify,
+    onBlockMined,
+  ]);
 
   useEffect(() => {
     if (mineCounter === blockDifficulty) {
       onBlockMined();
       setMineCounter(0);
-    } else if (mineCounter > 0) {
-      notify("MineClicked", {
-        counter: mineCounter,
-        difficulty: blockDifficulty,
-      });
     }
-  }, [mineCounter, blockDifficulty, notify, onBlockMined]);
-
-  // Reset mining progress when a block is mined
+  }, [blockDifficulty, mineCounter, onBlockMined]);
 
   useAutoClicker(
     getAutomationValue(0, "Miner") > 0 && miningBlock?.isBuilt,

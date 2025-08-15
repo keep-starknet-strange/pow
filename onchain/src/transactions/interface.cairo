@@ -52,4 +52,5 @@ pub trait IPowTransactions<TContractState> {
     fn get_my_tx_fee_value(self: @TContractState, chain_id: u32, tx_type_id: u32) -> u128;
     fn get_my_tx_speed_value(self: @TContractState, chain_id: u32, tx_type_id: u32) -> u128;
     fn check_has_tx(self: @TContractState, chain_id: u32, tx_type_id: u32);
+    fn check_has_all_txs(self: @TContractState, chain_id: u32);
 }
