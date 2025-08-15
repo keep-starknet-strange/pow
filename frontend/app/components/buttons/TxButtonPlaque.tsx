@@ -102,11 +102,12 @@ const styles = StyleSheet.create({
     color: "#fff8ff",
     fontFamily: "Pixels",
     textAlign: "right",
-    marginTop: 2,
+    marginBottom: 2,
   },
   feeIconCanvas: {
     width: 16,
     height: 16,
-    marginRight: 2,
+    marginRight: -2,
+    marginBottom: 1,
   },
 });

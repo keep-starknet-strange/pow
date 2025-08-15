@@ -9,7 +9,6 @@ import {
 import Animated, { Easing } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
-import { useUpgrades } from "../stores/useUpgradesStore";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import { useDerivedValue, withTiming } from "react-native-reanimated";
 

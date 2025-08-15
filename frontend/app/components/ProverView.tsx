@@ -34,7 +34,7 @@ export const ProverView = () => {
   }));
 
   // Use prover hook with animation callback for automation
-  const { proverProgress, prove } = useProver(
+  const { prove } = useProver(
     onProverConfirmed,
     triggerProverShake,
   );
@@ -54,7 +54,6 @@ export const ProverView = () => {
         >
           <Prover
             triggerAnim={triggerProverShake}
-            proverProgress={proverProgress}
             prove={prove}
           />
         </Animated.View>

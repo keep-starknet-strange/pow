@@ -4,13 +4,11 @@ import { Confirmer } from "./Confirmer";
 
 interface ProverProps {
   triggerAnim: () => void;
-  proverProgress: number;
   prove: () => void;
 }
 
 export const Prover: React.FC<ProverProps> = ({
   triggerAnim,
-  proverProgress,
   prove,
 }) => {
   return (
