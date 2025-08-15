@@ -108,13 +108,16 @@ export const MemoizedMinerSequencer = memo(
     const { mineBlock } = useMiner(onBlockMined, triggerBlockShake);
     const { sequenceBlock } = useSequencer(onBlockSequenced, triggerBlockShake);
 
-    const containerStyle = useMemo(() => ({
-      ...styles.minerSequencerContainer,
-      top: placement.top,
-      left: placement.left,
-      width: placement.width,
-      height: placement.height,
-    }), [placement]);
+    const containerStyle = useMemo(
+      () => ({
+        ...styles.minerSequencerContainer,
+        top: placement.top,
+        left: placement.left,
+        width: placement.width,
+        height: placement.height,
+      }),
+      [placement],
+    );
 
     if (!isBuilt) return null;
 
@@ -162,13 +165,16 @@ export const MemoizedBlockTxContainer = memo(
       return insetWidth / txPerRow;
     }, [placement.width, txPerRow]);
 
-    const containerStyle = useMemo(() => ({
-      ...styles.blockTxContainer,
-      top: placement.top + 4,
-      left: placement.left + 4,
-      width: placement.width - 8,
-      height: placement.height - 8,
-    }), [placement]);
+    const containerStyle = useMemo(
+      () => ({
+        ...styles.blockTxContainer,
+        top: placement.top + 4,
+        left: placement.left + 4,
+        width: placement.width - 8,
+        height: placement.height - 8,
+      }),
+      [placement],
+    );
 
     if (blockId === 0) return null;
 
@@ -193,11 +199,11 @@ MemoizedBlockTxContainer.displayName = "MemoizedBlockTxContainer";
 
 const styles = StyleSheet.create({
   minerSequencerContainer: {
-    position: 'absolute',
+    position: "absolute",
     zIndex: 6,
     transform: [{ scale: 1.25 }],
   },
   blockTxContainer: {
-    position: 'absolute',
+    position: "absolute",
   },
 });

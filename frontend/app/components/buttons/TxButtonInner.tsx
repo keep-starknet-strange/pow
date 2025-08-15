@@ -1,4 +1,3 @@
-
 import React, { memo, useEffect, useCallback, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useInterval } from "usehooks-ts";
@@ -121,13 +120,13 @@ export const TxButtonInner = memo(
     );
 
     return (
-      <View style={[styles.container, { width: '100%' }]}>
+      <View style={[styles.container, { width: "100%" }]}>
         <View
           style={[
             styles.backgroundContainer,
             {
               width: width * 0.185,
-            }
+            },
           ]}
         >
           <Canvas style={styles.canvas}>
@@ -151,7 +150,7 @@ export const TxButtonInner = memo(
               styles.animationContainer,
               {
                 width: width * 0.18,
-              }
+              },
             ]}
           >
             <Canvas style={styles.canvas}>
@@ -185,7 +184,7 @@ export const TxButtonInner = memo(
               styles.nameplateContainer,
               {
                 width: width * 0.17,
-              }
+              },
             ]}
           >
             <Canvas style={styles.canvas}>
@@ -207,9 +206,7 @@ export const TxButtonInner = memo(
                 height={19}
               />
             </Canvas>
-            <Text style={styles.nameText}>
-              {props.name}
-            </Text>
+            <Text style={styles.nameText}>{props.name}</Text>
           </View>
         )}
         {transactionUnlocked ? (
@@ -218,7 +215,7 @@ export const TxButtonInner = memo(
               styles.iconContainer,
               {
                 width: width * 0.18,
-              }
+              },
             ]}
           >
             <Canvas style={styles.canvas}>
@@ -247,7 +244,7 @@ export const TxButtonInner = memo(
               styles.lockContainer,
               {
                 width: width * 0.18,
-              }
+              },
             ]}
           >
             <Canvas style={styles.lockCanvas}>
@@ -282,54 +279,54 @@ export const TxButtonInner = memo(
 const styles = StyleSheet.create({
   container: {
     height: 94,
-    position: 'relative',
+    position: "relative",
   },
   backgroundContainer: {
-    position: 'absolute',
+    position: "absolute",
     height: 94,
   },
   animationContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
-    height: '100%',
+    height: "100%",
   },
   nameplateContainer: {
-    position: 'absolute',
+    position: "absolute",
     left: 3,
     height: 94,
   },
   iconContainer: {
-    position: 'absolute',
+    position: "absolute",
     height: 94,
   },
   lockContainer: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    pointerEvents: 'none',
+    position: "absolute",
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    pointerEvents: "none",
   },
   canvas: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   lockCanvas: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   nameText: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 4,
-    width: '100%',
-    textAlign: 'center',
+    width: "100%",
+    textAlign: "center",
     fontSize: 16,
-    color: '#fff8ff',
-    fontFamily: 'Pixels',
+    color: "#fff8ff",
+    fontFamily: "Pixels",
   },
 });
