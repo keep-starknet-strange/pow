@@ -8,6 +8,7 @@ import { useUpgradesStore } from "./useUpgradesStore";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
+import unlocksConfig from "../configs/unlocks.json";
 
 interface L2Store {
   l2: L2 | undefined;
@@ -140,8 +141,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
   },
 
   getL2Cost: () => {
-    const cost = 316274400; // TODO: Config
-    return cost;
+    return unlocksConfig.next_chain_cost;
   },
 
   getL2: () => {

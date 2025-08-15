@@ -23,6 +23,7 @@ DAPP_CONFIG=$CONFIGS_DIR/dapps.json
 PRESTIGE_CONFIG=$CONFIGS_DIR/prestige.json
 UPGRADES_CONFIG=$CONFIGS_DIR/upgrades.json
 TRANSACTIONS_CONFIG=$CONFIGS_DIR/transactions.json
+UNLOCKS_CONFIG=$CONFIGS_DIR/unlocks.json
 
 ETH_ADDRESS=0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
 DEVNET_ACCOUNT_ADDRESS=0x064b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
@@ -328,15 +329,18 @@ echo
 echo "6. Setting up chain and dapps unlock costs"
 echo
 
-# Set next chain cost (L2 unlock cost)
-NEXT_CHAIN_COST=316274400
-echo "Setting next chain cost to $NEXT_CHAIN_COST"
+# Set next chain cost (L2 unlock cost) from unlocks config
+NEXT_CHAIN_COST=$(cat $UNLOCKS_CONFIG | jq -r '.next_chain_cost')
+echo "Setting next chain cost to $NEXT_CHAIN_COST (from unlocks config)"
 sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_next_chain_cost --calldata $NEXT_CHAIN_COST
 
-# Set dapps unlock cost
-DAPPS_UNLOCK_COST=100000000
-echo "Setting dapps unlock cost to $DAPPS_UNLOCK_COST"
-sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata $DAPPS_UNLOCK_COST
+# Set dapps unlock costs from unlocks config
+L1_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L1.cost')
+L2_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L2.cost')
+echo "Setting L1 dapps unlock cost to $L1_DAPPS_UNLOCK_COST (from unlocks config)"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata 0 $L1_DAPPS_UNLOCK_COST
+echo "Setting L2 dapps unlock cost to $L2_DAPPS_UNLOCK_COST (from unlocks config)"
+sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_GAME_CONTRACT_ADDRESS --function set_dapps_unlock_cost --calldata 1 $L2_DAPPS_UNLOCK_COST
 
 echo
 echo "Done setting up costs!"

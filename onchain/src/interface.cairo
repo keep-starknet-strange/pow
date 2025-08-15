@@ -13,8 +13,8 @@ pub trait IPowGame<TContractState> {
     fn set_game_chain_count(ref self: TContractState, chain_id: u32);
     fn get_next_chain_cost(self: @TContractState) -> u128;
     fn set_next_chain_cost(ref self: TContractState, cost: u128);
-    fn get_dapps_unlock_cost(self: @TContractState) -> u128;
-    fn set_dapps_unlock_cost(ref self: TContractState, cost: u128);
+    fn get_dapps_unlock_cost(self: @TContractState, chain_id: u32) -> u128;
+    fn set_dapps_unlock_cost(ref self: TContractState, chain_id: u32, cost: u128);
     fn add_host(ref self: TContractState, user: ContractAddress);
     fn remove_host(ref self: TContractState, user: ContractAddress);
     fn add_game_master(ref self: TContractState, user: ContractAddress);

@@ -87,7 +87,7 @@ mod PowGame {
         genesis_block_reward: u128,
         game_chain_count: u32,
         next_chain_cost: u128,
-        dapps_unlock_cost: u128,
+        dapps_unlock_cost: Map<u32, u128>,
         // Maps: user address -> user max chain unlocked
         user_chain_count: Map<ContractAddress, u32>,
         // Maps: user address -> user balance
@@ -166,8 +166,9 @@ mod PowGame {
     fn constructor(ref self: ContractState, host: ContractAddress, reward_params: RewardParams, is_devmode: bool) {
         self.genesis_block_reward.write(1);
         self.game_chain_count.write(2);
-        self.next_chain_cost.write(316274400); // Default matching frontend L2 cost
-        self.dapps_unlock_cost.write(100000000); // Default dapps unlock cost
+        self.next_chain_cost.write(527124000);
+        self.dapps_unlock_cost.write(0, 847462);
+        self.dapps_unlock_cost.write(1, 12086666666667);
         self.hosts.write(host, true);
         self.game_masters.write(host, true);
         self.reward_token_address.write(reward_params.reward_token_address);
@@ -213,13 +214,13 @@ mod PowGame {
             self.next_chain_cost.write(cost);
         }
 
-        fn get_dapps_unlock_cost(self: @ContractState) -> u128 {
-            self.dapps_unlock_cost.read()
+        fn get_dapps_unlock_cost(self: @ContractState, chain_id: u32) -> u128 {
+            self.dapps_unlock_cost.read(chain_id)
         }
 
-        fn set_dapps_unlock_cost(ref self: ContractState, cost: u128) {
+        fn set_dapps_unlock_cost(ref self: ContractState, chain_id: u32, cost: u128) {
             self.check_valid_game_master();
-            self.dapps_unlock_cost.write(cost);
+            self.dapps_unlock_cost.write(chain_id, cost);
         }
 
         fn add_host(ref self: ContractState, user: ContractAddress) {
@@ -582,7 +583,7 @@ mod PowGame {
         }
 
         fn buy_dapps(ref self: ContractState, chain_id: u32) {
-            let cost = self.dapps_unlock_cost.read();
+            let cost = self.dapps_unlock_cost.read(chain_id);
             let caller = get_caller_address();
             debit_user(ref self, caller, cost);
             self.transactions.unlock_dapps(chain_id);

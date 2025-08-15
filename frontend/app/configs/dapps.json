@@ -1,6 +1,5 @@
 {
   "L1": {
-    "cost": 508477,
     "transactions": [
       {
         "id": 0,
@@ -66,7 +65,6 @@
     ]
   },
   "L2": {
-    "cost": 1000,
     "transactions": [
       {
         "id": 0,
