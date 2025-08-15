@@ -22,7 +22,6 @@ export const useOnchainActions = create<OnchainActionsState>((set) => ({
           state.invokeActions(toInvoke);
         }
       }
-      console.log("Updated Actions:", updatedActions);
       return { actions: updatedActions };
     }),
   invokeActions: async (actions: Call[]) => {},
