@@ -4,15 +4,10 @@ import { Confirmer } from "./Confirmer";
 
 interface ProverProps {
   triggerAnim: () => void;
-  proverProgress: number;
   prove: () => void;
 }
 
-export const Prover: React.FC<ProverProps> = ({
-  triggerAnim,
-  proverProgress,
-  prove,
-}) => {
+export const Prover: React.FC<ProverProps> = ({ triggerAnim, prove }) => {
   return (
     <View className="flex flex-col bg-[#27272740] rounded-xl relative w-full">
       <Confirmer
