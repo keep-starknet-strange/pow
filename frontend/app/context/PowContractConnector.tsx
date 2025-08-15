@@ -368,7 +368,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
           account?.address || "",
           chainId,
         );
-        return dappsUnlocked
+        return dappsUnlocked;
       } catch (error) {
         console.error("Failed to fetch user dapps unlocked:", error);
         return undefined;

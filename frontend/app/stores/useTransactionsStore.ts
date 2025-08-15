@@ -32,9 +32,7 @@ interface TransactionsState {
       chainId: number,
       txCount: number,
     ) => Promise<number[] | undefined>,
-    getUserDappsUnlocked: (
-      chainId: number,
-    ) => Promise<boolean | undefined>,
+    getUserDappsUnlocked: (chainId: number) => Promise<boolean | undefined>,
   ) => void;
 
   txFeeUpgrade: (chainId: number, txId: number) => void;

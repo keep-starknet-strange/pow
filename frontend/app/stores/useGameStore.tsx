@@ -246,7 +246,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newBlockHeights[0] = newBlockInstance.blockId;
       return { workingBlocks: newWorkingBlocks, blockHeights: newBlockHeights };
     });
-    useEventManager.getState().notify("MineDone", { block: completedBlock, ignoreAction: completedBlock.blockId === 0 });
+    useEventManager.getState().notify("MineDone", {
+      block: completedBlock,
+      ignoreAction: completedBlock.blockId === 0,
+    });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
   },
 
@@ -275,9 +278,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newBlockHeights[1] = newBlockInstance.blockId;
       return { workingBlocks: newWorkingBlocks, blockHeights: newBlockHeights };
     });
-    useEventManager
-      .getState()
-      .notify("SequenceDone", { block: completedBlock, ignoreAction: completedBlock.blockId === 0 });
+    useEventManager.getState().notify("SequenceDone", {
+      block: completedBlock,
+      ignoreAction: completedBlock.blockId === 0,
+    });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
     useL2Store.getState().addBlockToDa(completedBlock);
     useL2Store.getState().addBlockToProver(completedBlock);

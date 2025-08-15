@@ -231,7 +231,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
       newL2Instance.prover = newL2Prover(proverMaxSize);
-      useEventManager.getState().notify("ProveDone", { proof: state.l2.prover });
+      useEventManager
+        .getState()
+        .notify("ProveDone", { proof: state.l2.prover });
 
       return { l2: newL2Instance };
     });
