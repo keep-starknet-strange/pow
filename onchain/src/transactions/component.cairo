@@ -189,6 +189,17 @@ pub mod PowTransactionsComponent {
             assert!(level != 0, "Tx Type Locked");
         }
 
+        fn check_has_all_txs(self: @ComponentState<TContractState>, chain_id: u32) {
+            let caller = get_caller_address();
+            let transactions_count = self.transaction_types_count.read();
+            let mut idx = 0;
+            while idx != transactions_count {
+                let level = self.transaction_fee_levels.read((caller, chain_id, idx));
+                assert!(level != 0, "All Tx Types Must Be Unlocked");
+                idx += 1;
+            }
+        }
+
         fn is_dapp(self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32) -> bool {
             self.dapps.read((chain_id, tx_type_id))
         }
@@ -301,6 +312,20 @@ pub mod PowTransactionsComponent {
 
         fn unlock_dapps(ref self: ComponentState<TContractState>, chain_id: u32) {
             let caller = get_caller_address();
+            // Check if can unlock dapps
+            let dapps_unlocked = self.dapps_unlocked.read((caller, chain_id));
+            assert!(!dapps_unlocked, "Dapps Already Unlocked");
+            // Ensure all tx types are unlocked
+            let transactions_count = self.transaction_types_count.read();
+            let mut idx = 0;
+            while idx != transactions_count {
+                let level = self.transaction_fee_levels.read((caller, chain_id, idx));
+                if (self.is_dapp(chain_id, idx)) {
+                    continue;
+                }
+                assert!(level != 0, "All Tx Types Must Be Unlocked");
+                idx += 1;
+            }
             self.dapps_unlocked.write((caller, chain_id), true);
             self.emit(DappsUnlocked { user: caller, chain_id });
         }

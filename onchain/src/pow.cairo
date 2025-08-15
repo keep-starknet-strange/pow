@@ -657,6 +657,7 @@ mod PowGame {
         let new_chain_id = self.user_chain_count.read(caller);
         self.check_valid_chain_id(new_chain_id);
         self.user_chain_count.write(caller, new_chain_id + 1);
+        self.transactions.check_has_all_txs(new_chain_id);
         // Finalize genesis block
         if (new_chain_id != 0) {
             // Add genesis block to da & proof

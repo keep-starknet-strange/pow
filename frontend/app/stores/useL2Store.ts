@@ -107,9 +107,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
       }
     }
 
-    // TODO: Add automations and upgrades checks once requirements are clarified
-    // TODO: Add staking check once staking is implemented
-
     return true;
   },
 
@@ -174,7 +171,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward =
         block.reward ||
-        useUpgradesStore.getState().getUpgradeValue(0, "Block Reward");
+        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
       newL2Instance.da.blockFees += blockReward;
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return { l2: newL2Instance };

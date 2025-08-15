@@ -24,7 +24,7 @@ export const useProver = (
       if (powContract && user) {
         try {
           // TODO: Use foc engine?
-          const clicks = await getUserProofClicks(0);
+          const clicks = await getUserProofClicks(1);
           setProverCounter(clicks || 0);
         } catch (error) {
           console.error("Error fetching proof counter:", error);
