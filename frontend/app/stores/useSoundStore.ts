@@ -82,14 +82,18 @@ class SoundPool {
       player.seekTo(0);
       player.play();
 
-      // Simple cleanup - no tracking needed
+      // Cleanup after sound duration
+      const duration = soundConfig.duration || 1000;
+      const playbackRate = (soundConfig.rate || 1.0) * pitchShift;
+      const estimatedDuration = Math.min(duration / playbackRate, 3000);
+
       setTimeout(() => {
         try {
           player.pause();
         } catch (e) {
           // Ignore errors during cleanup
         }
-      }, 2000);
+      }, estimatedDuration + 100);
     } catch (error) {
       // Silently ignore errors to maintain performance
     }
@@ -146,24 +150,44 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
 
       const musicOn = musicEnabled === "true" || musicEnabled === null;
-      const musicAsset = musicAssets["The Return"];
-      const musicPlayer = createAudioPlayer(musicAsset);
-      musicPlayer.volume = musicVolume ? parseFloat(musicVolume) : 0.5;
+      const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
+
+      let musicPlayer = null;
+      if (musicOn) {
+        try {
+          const trackNames = Object.keys(musicAssets);
+          const randomTrack =
+            trackNames[Math.floor(Math.random() * trackNames.length)];
+          const musicAsset = musicAssets[randomTrack];
+          musicPlayer = createAudioPlayer(musicAsset);
+          musicPlayer.volume = volume;
+          musicPlayer.loop = true;
+        } catch (error) {
+          if (__DEV__) console.error("Failed to create music player:", error);
+        }
+      }
 
       set({
         isSoundOn: soundEnabled === "true" || soundEnabled === null,
         isMusicOn: musicOn,
         soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
-        musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
+        musicVolume: volume,
         musicPlayer: musicPlayer,
-        soundPool: new SoundPool(), // Initialize sound pool
+        soundPool: new SoundPool(),
       });
 
-      if (musicOn) {
-        get().playMusic();
+      if (musicOn && musicPlayer) {
+        musicPlayer.play();
       }
     } catch (error) {
-      console.error("Failed to load sound settings:", error);
+      if (__DEV__) console.error("Failed to load sound settings:", error);
+      set({
+        isSoundOn: true,
+        isMusicOn: false,
+        soundEffectVolume: 1,
+        musicVolume: 0.5,
+        soundPool: new SoundPool(),
+      });
     }
   },
 
@@ -182,7 +206,24 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     AsyncStorage.setItem(MUSIC_ENABLED_KEY, newValue.toString());
 
     if (newValue) {
-      await get().playMusic();
+      if (!currentState.musicPlayer) {
+        try {
+          const trackNames = Object.keys(musicAssets);
+          const randomTrack =
+            trackNames[Math.floor(Math.random() * trackNames.length)];
+          const musicAsset = musicAssets[randomTrack];
+
+          const musicPlayer = createAudioPlayer(musicAsset);
+          musicPlayer.volume = currentState.musicVolume;
+          musicPlayer.loop = true;
+
+          set({ musicPlayer });
+        } catch (error) {
+          if (__DEV__) console.error("Failed to create music player:", error);
+          return;
+        }
+      }
+      get().playMusic();
     } else {
       await get().stopMusic();
     }
@@ -199,7 +240,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     const { musicPlayer } = get();
     if (!musicPlayer) {
-      console.warn("Music player is not initialized.");
+      if (__DEV__) console.warn("Music player is not initialized.");
       return;
     }
     musicPlayer.volume = volume;
@@ -212,22 +253,23 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     try {
       if (!musicPlayer) {
-        console.warn("Music player is not initialized.");
-        return;
-      }
+        const trackNames = Object.keys(musicAssets);
+        const randomTrack =
+          trackNames[Math.floor(Math.random() * trackNames.length)];
+        const musicAsset = musicAssets[randomTrack];
 
-      const randomSong =
-        musicAssets[
-          Object.keys(musicAssets)[
-            Math.floor(Math.random() * Object.keys(musicAssets).length)
-          ]
-        ];
-      musicPlayer.replace(randomSong);
-      musicPlayer.volume = get().musicVolume;
-      musicPlayer.seekTo(0);
-      musicPlayer.play();
+        const newMusicPlayer = createAudioPlayer(musicAsset);
+        newMusicPlayer.volume = get().musicVolume;
+        newMusicPlayer.loop = true;
+
+        set({ musicPlayer: newMusicPlayer });
+
+        newMusicPlayer.play();
+      } else {
+        musicPlayer.play();
+      }
     } catch (error) {
-      console.error("Failed to play music:", error);
+      if (__DEV__) console.error("Failed to play music:", error);
     }
   },
 
@@ -238,7 +280,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         musicPlayer.pause();
       } catch (error) {
-        console.error("Failed to stop music:", error);
+        if (__DEV__) console.error("Failed to stop music:", error);
       }
     }
   },
@@ -284,7 +326,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         musicPlayer.release();
         set({ musicPlayer: null });
       } catch (error) {
-        console.warn("Failed to cleanup music player:", error);
+        if (__DEV__) console.warn("Failed to cleanup music player:", error);
       }
     }
     if (soundPool) {
@@ -323,7 +365,7 @@ const playHaptic = async (type: string) => {
     case "None":
       break;
     default:
-      console.warn(`Unknown haptic type: ${type}`);
+      if (__DEV__) console.warn(`Unknown haptic type: ${type}`);
       break;
   }
 };

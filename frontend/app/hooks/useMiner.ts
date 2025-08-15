@@ -27,7 +27,7 @@ export const useMiner = (
           const clicks = await getUserBlockClicks(0);
           setMineCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching mine counter:", error);
+          if (__DEV__) console.error("Error fetching mine counter:", error);
           setMineCounter(0);
         }
       }
@@ -37,7 +37,7 @@ export const useMiner = (
 
   const mineBlock = useCallback(() => {
     if (!miningBlock?.isBuilt) {
-      console.warn("Block is not built yet, cannot mine.");
+      if (__DEV__) console.warn("Block is not built yet, cannot mine.");
       return;
     }
 

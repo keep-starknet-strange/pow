@@ -145,7 +145,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
           }
         } catch (error) {
-          console.error("Error fetching game state:", error);
+          if (__DEV__) console.error("Error fetching game state:", error);
           get().resetGameStore();
         }
       } else {
@@ -168,7 +168,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
       if (!newWorkingBlocks[chainId]) {
-        console.warn(`No working block found for chainId ${chainId}`);
+        if (__DEV__)
+          console.warn(`No working block found for chainId ${chainId}`);
         return { workingBlocks: newWorkingBlocks };
       }
       const block = newWorkingBlocks[chainId];

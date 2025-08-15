@@ -28,7 +28,7 @@ export const useSequencer = (
           const clicks = await getUserBlockClicks(1);
           setSequenceCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching sequence counter:", error);
+          if (__DEV__) console.error("Error fetching sequence counter:", error);
           setSequenceCounter(0);
         }
       }
@@ -38,7 +38,7 @@ export const useSequencer = (
 
   const sequenceBlock = useCallback(() => {
     if (!sequencingBlock?.isBuilt) {
-      console.warn("Block is not built yet, cannot sequence.");
+      if (__DEV__) console.warn("Block is not built yet, cannot sequence.");
       return;
     }
 

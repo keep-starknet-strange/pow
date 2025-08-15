@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableWithoutFeedback, Text } from "react-native";
+import { View, TouchableWithoutFeedback, Text, Platform } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import {
@@ -90,11 +90,16 @@ const BasicButton: React.FC<BasicButtonProps> = ({
           </Canvas>
           <Text
             className={`
-            absolute top-[6px] left-0 w-full h-full
+            absolute left-0 w-full
             font-Teatime text-[36px] text-center
             ${disabled ? "text-gray-400" : "text-[#fff7ff]"}
           `}
             style={{
+              top: Platform.OS === "android" ? 0 : 6,
+              height: Platform.OS === "android" ? 46 : "auto",
+              textAlignVertical:
+                Platform.OS === "android" ? "center" : undefined,
+              includeFontPadding: false,
               ...textStyle,
             }}
           >

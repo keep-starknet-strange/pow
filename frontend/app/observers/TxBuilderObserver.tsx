@@ -226,7 +226,7 @@ export class TxBuilderObserver implements Observer {
             ),
           );
         } else {
-          console.error("Unknown tx upgrade type:", data.type);
+          if (__DEV__) console.error("Unknown tx upgrade type:", data.type);
         }
         break;
       case "UpgradePurchased":

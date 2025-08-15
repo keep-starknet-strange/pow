@@ -76,7 +76,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         visible: savedVisible,
       });
     } catch (error) {
-      console.error("Failed to load tutorial progress:", error);
+      if (__DEV__) console.error("Failed to load tutorial progress:", error);
     }
   },
 
@@ -96,7 +96,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         AsyncStorage.setItem(TUTORIAL_VISIBLE_KEY, state.visible.toString()),
       ]);
     } catch (error) {
-      console.error("Failed to save tutorial progress:", error);
+      if (__DEV__) console.error("Failed to save tutorial progress:", error);
     }
   },
 
@@ -168,7 +168,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
       AsyncStorage.removeItem(TUTORIAL_STEP_INDEX_KEY),
       AsyncStorage.removeItem(TUTORIAL_VISIBLE_KEY),
     ]).catch((error) => {
-      console.error("Failed to clear tutorial progress:", error);
+      if (__DEV__) console.error("Failed to clear tutorial progress:", error);
     });
   },
 }));
