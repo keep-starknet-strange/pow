@@ -45,6 +45,7 @@ pub trait IPowTransactions<TContractState> {
     fn get_user_transaction_speed_levels(
         self: @TContractState, user: ContractAddress, chain_id: u32, tx_count: u32,
     ) -> Span<u32>;
+    fn get_user_dapps_unlocked(self: @TContractState, user: ContractAddress, chain_id: u32) -> bool;
 
     // Use transactions
     fn get_next_tx_fee_cost(self: @TContractState, chain_id: u32, tx_type_id: u32) -> u128;

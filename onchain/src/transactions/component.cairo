@@ -145,6 +145,12 @@ pub mod PowTransactionsComponent {
             levels.span()
         }
 
+        fn get_user_dapps_unlocked(
+            self: @ComponentState<TContractState>, user: ContractAddress, chain_id: u32,
+        ) -> bool {
+            self.dapps_unlocked.read((user, chain_id))
+        }
+
         fn get_next_tx_fee_cost(
             self: @ComponentState<TContractState>, chain_id: u32, tx_type_id: u32,
         ) -> u128 {
@@ -322,6 +328,7 @@ pub mod PowTransactionsComponent {
             while idx != transactions_count {
                 let level = self.transaction_fee_levels.read((caller, chain_id, idx));
                 if (self.is_dapp(chain_id, idx)) {
+                    idx += 1;
                     continue;
                 }
                 assert!(level != 0, "All Tx Types Must Be Unlocked");

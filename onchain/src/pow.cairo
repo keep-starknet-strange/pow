@@ -657,12 +657,9 @@ mod PowGame {
         let new_chain_id = self.user_chain_count.read(caller);
         self.check_valid_chain_id(new_chain_id);
         self.user_chain_count.write(caller, new_chain_id + 1);
-        self.transactions.check_has_all_txs(new_chain_id);
-        // Finalize genesis block
         if (new_chain_id != 0) {
-            // Add genesis block to da & proof
-            self.builder.build_proof(new_chain_id, self.genesis_block_reward.read());
-            self.builder.build_da(new_chain_id, self.genesis_block_reward.read());
+            // Check can unlock new chain
+            self.transactions.check_has_all_txs(new_chain_id - 1);
         } else {
             pay_user(ref self, caller, self.genesis_block_reward.read());
         }
@@ -686,6 +683,10 @@ mod PowGame {
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
             let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
             self.builder.reset_proof(new_chain_id, proof_max_size, proof_difficulty);
+
+            // Add genesis block to da & proof
+            self.builder.build_proof(new_chain_id, self.genesis_block_reward.read());
+            self.builder.build_da(new_chain_id, self.genesis_block_reward.read());
         }
 
         self.emit(ChainUnlocked { user: caller, chain_id: new_chain_id });
