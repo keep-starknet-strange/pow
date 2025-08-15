@@ -1,0 +1,238 @@
+default_platform(:ios)
+
+def latest_google_play_build_number
+  tracks = ["internal", "alpha", "beta", "production"]
+  version_codes = []
+  tracks.each do |track|
+    begin
+      vc =  google_play_track_version_codes(track: track)
+    rescue 
+      puts  "No track found for " + track
+    else
+      version_codes.concat(vc)
+    end
+  end
+  return version_codes.max || 1
+end
+
+def latest_app_store_build_number 
+  current_build_num = 1
+
+  begin
+    testflight_build_num = app_store_build_number(live: false)
+
+    if testflight_build_num > current_build_num 
+      current_build_num = testflight_build_num
+    end
+  rescue => e
+    UI.error(e)
+  end
+
+  begin
+    live_build_num = app_store_build_number(live: true)
+
+    if live_build_num > current_build_num 
+      current_build_num = live_build_num
+    end
+  rescue => e
+    UI.error(e)
+  end
+
+  return current_build_num
+end
+
+def new_build_number
+  google_play_build_number = latest_google_play_build_number
+  app_store_build_number = latest_app_store_build_number
+
+  if google_play_build_number > app_store_build_number
+    return google_play_build_number + 1
+  else
+    return app_store_build_number + 1
+  end
+end
+
+def setup_appstore_connect_api_key
+  app_store_connect_api_key(
+    key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
+    issuer_id: ENV['APPSTORE_CONNECT_ISSUER_ID'],
+    key_filepath: ENV['APPSTORE_CONNECT_KEY_FILE'],
+    duration: 1200,
+    in_house: false,
+  )
+end
+
+platform :android do
+  before_all do
+    setup_ci if ENV['CI']
+
+    setup_appstore_connect_api_key()
+  end
+
+  lane :prebuild do
+    Dir.chdir("..") do
+      sh("npx", "expo", "prebuild", "--platform", "android")
+    end
+  end
+
+  lane :deploy_firebase do
+    prebuild
+    new_build_number = new_build_number()
+    UI.message("New android build number will be: #{new_build_number}")
+
+    android_set_version_code(
+      version_code: new_build_number,
+      gradle_file: "./android/app/build.gradle"
+    )
+
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE'],
+        "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
+        "android.injected.signing.key.alias" => ENV['KEYSTORE_KEY_ALIAS'],
+        "android.injected.signing.key.password" => ENV['KEYSTORE_KEY_PASSWORD'],
+      },
+      project_dir: "./android",
+      gradle_path: "gradlew",
+      print_command_output: true
+    )
+
+    firebase_app_distribution(
+      app: ENV['FIREBASE_APP_ID'],
+      service_credentials_file: ENV['FIREBASE_SERVICE_CREDENTIALS_FILE'],
+      android_artifact_type: "APK",
+      groups: "internal-testers, external-testers"
+    )
+  end
+
+  lane :deploy_play_store do
+    prebuild
+    new_build_number = new_build_number()
+    UI.message("New android build number will be: #{new_build_number}")
+
+    android_set_version_code(
+      version_code: new_build_number,
+      gradle_file: "./android/app/build.gradle"
+    )
+
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE'],
+        "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
+        "android.injected.signing.key.alias" => ENV['KEYSTORE_KEY_ALIAS'],
+        "android.injected.signing.key.password" => ENV['KEYSTORE_KEY_PASSWORD'],
+      },
+      project_dir: "./android",
+      gradle_path: "gradlew",
+      print_command_output: true
+    )
+
+    upload_to_play_store(
+      release_status: "draft",
+      track: "production",
+      aab: "./android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
+
+platform :ios do
+  before_all do
+    setup_ci if ENV['CI']
+
+    setup_appstore_connect_api_key()
+  end
+
+  lane :prebuild do
+    Dir.chdir("..") do
+      sh("npx", "expo", "prebuild", "--platform", "ios")
+    end
+  end
+
+  # Used to update the build number to the highest build number 
+  # found in Testflight, App Store or Play Store
+  private_lane :update_build_number do 
+    new_build_number = new_build_number()
+    UI.message("New iOS build number will be: #{new_build_number}")
+
+    increment_build_number(
+      build_number: new_build_number,
+      xcodeproj: "ios/POW.xcodeproj"
+    )
+  end
+
+  # Used to build the app and sign it with the 
+  # correct certificates and provisioning profiles
+  private_lane :build_and_sign_release do
+    # Since the ios project is dynamically generated, we need to update the 
+    # code signing settings. This is similar to opening the project in Xcode and
+    # 1. Click POW on the project navigator
+    # 2. Then in TARGETS click on POW
+    # 3. Then click Signing & Capabilities tab
+    # 4. Then click on Release tab
+    # 5. The uncheck the "Automatically manage signing" checkbox
+    # 6. Select the profile "match AppStore com.starknet.pow"
+    # Since this script is run in CI those settings can be changed with the follwing lane.
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/POW.xcodeproj",
+      team_id: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+      bundle_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      code_sign_identity: "iPhone Distribution",
+      sdk: "iphoneos*",
+      profile_name: "match AppStore com.starknet.pow"
+    )
+
+    # Setup certificates and provisioning profiles (Check the Matchfile)
+    match(
+      type: 'appstore',
+      readonly: true
+    )
+
+    # Build the app (Check the Gymfile)
+    gym(
+      clean: true,
+      configuration: "Release"
+    )
+  end
+
+  lane :deploy_testflight do |options|
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+
+    update_build_number
+    build_and_sign_release
+
+    upload_to_testflight(
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      submit_beta_review: false,
+      skip_waiting_for_build_processing: true,
+      # changelog: "", Only add this when publishing to external testers. The log should not be too short
+      groups: ["Internal Testers"]
+    )
+  end
+
+  lane :deploy_app_store do |options|
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+    
+    update_build_number
+    build_and_sign_release
+
+    upload_to_app_store(
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      skip_screenshots: true,
+      skip_metadata: true
+    )
+  end
+end

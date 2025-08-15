@@ -1,41 +1,41 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "../stores/useGameStore";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { usePowContractConnector } from "../context/PowContractConnector";
 import { useAutoClicker } from "./useAutoClicker";
-import { Block } from "../types/Chains";
 
 export const useSequencer = (
   onBlockSequenced: () => void,
   triggerSequenceAnimation?: () => void,
 ) => {
   const { notify } = useEventManager();
+  const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
-  const { getAutomationValue } = useUpgrades();
+  const { workingBlocks } = useGameStore();
+  const sequencingBlock = workingBlocks[1];
+  const miningBlock = workingBlocks[0];
+  const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
   const [sequenceCounter, setSequenceCounter] = useState(0);
 
   useEffect(() => {
-    const fetchSequencerCounter = async () => {
+    const fetchSequenceCounter = async () => {
       if (powContract && user) {
         try {
           // TODO: Use foc engine?
           const clicks = await getUserBlockClicks(1);
           setSequenceCounter(clicks || 0);
         } catch (error) {
-          console.error("Error fetching mine counter:", error);
+          console.error("Error fetching sequence counter:", error);
           setSequenceCounter(0);
         }
       }
     };
-    fetchSequencerCounter();
+    fetchSequenceCounter();
   }, [powContract, user, getUserBlockClicks]);
 
-  const { workingBlocks } = useGameStore();
-  const sequencingBlock = workingBlocks[1];
-  const miningBlock = workingBlocks[0];
   const sequenceBlock = useCallback(() => {
     if (!sequencingBlock?.isBuilt) {
       console.warn("Block is not built yet, cannot sequence.");
@@ -46,40 +46,41 @@ export const useSequencer = (
     if (triggerSequenceAnimation) {
       triggerSequenceAnimation();
     }
-
+    // Batch state updates to prevent multiple rerenders
     setSequenceCounter((prevCounter) => {
       const newCounter = prevCounter + 1;
-      const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
-      if (newCounter <= blockDifficulty) {
+
+      if (newCounter < blockDifficulty) {
+        notify("SequenceClicked", {
+          counter: newCounter,
+          difficulty: blockDifficulty,
+          ignoreAction: sequencingBlock?.blockId === 0,
+        });
+        return newCounter;
+      } else if (newCounter === blockDifficulty) {
         return newCounter;
       } else {
-        return prevCounter; // Prevent incrementing beyond block difficulty
+        return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
   }, [
-    notify,
-    sequencingBlock?.isBuilt,
-    sequencingBlock?.difficulty,
     triggerSequenceAnimation,
+    sequencingBlock?.isBuilt,
+    blockDifficulty,
+    sequenceCounter,
+    notify,
+    onBlockSequenced,
   ]);
 
   useEffect(() => {
-    if (sequenceCounter == sequencingBlock?.difficulty) {
+    if (sequenceCounter === blockDifficulty) {
       onBlockSequenced();
-    } else if (sequenceCounter > 0) {
-      notify("SequenceClicked", {
-        counter: sequenceCounter,
-      });
+      setSequenceCounter(0);
     }
-  }, [sequenceCounter]);
-
-  // Reset sequencing progress when block is sequenced
-  useEffect(() => {
-    setSequenceCounter(0);
-  }, [sequencingBlock?.blockId]);
+  }, [blockDifficulty, sequenceCounter, onBlockSequenced]);
 
   useAutoClicker(
-    getAutomationValue(1, "Sequencer") > 0 && miningBlock?.isBuilt,
+    getAutomationValue(1, "Sequencer") > 0 && sequencingBlock?.isBuilt,
     5000 / (getAutomationValue(1, "Sequencer") || 1),
     sequenceBlock,
   );

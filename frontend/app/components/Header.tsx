@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import {
   Canvas,
   FilterMode,
@@ -13,13 +13,27 @@ import { useBalance } from "../stores/useBalanceStore";
 import { useImages } from "../hooks/useImages";
 import { TutorialRefView } from "../components/tutorial/TutorialRefView";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
+import { usePowContractConnector } from "../context/PowContractConnector";
 
 export const Header: React.FC = memo(() => {
   const { balance } = useBalance();
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
+  const { doubleBalanceCheat } = usePowContractConnector();
 
   const insets = useSafeAreaInsets();
+
+  // Check if cheat codes are enabled via environment variable
+  const cheatCodesEnabled =
+    process.env.EXPO_PUBLIC_ENABLE_CHEAT_CODES === "true";
+
+  const handleCheatCode = () => {
+    try {
+      doubleBalanceCheat();
+    } catch (error) {
+      console.error("Failed to execute cheat code:", error);
+    }
+  };
   return (
     <View
       className="bg-[#101119] h-[76px] p-0 relative"
@@ -46,6 +60,21 @@ export const Header: React.FC = memo(() => {
           spinningAnimationConfig={{ duration: 400, easing: Easing.bounce }}
         />
       </View>
+
+      {/* Hidden cheat code button - only visible when cheat codes are enabled */}
+      {cheatCodesEnabled && (
+        <TouchableOpacity
+          onPress={handleCheatCode}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 70,
+            height: 70,
+            zIndex: 1000,
+          }}
+        ></TouchableOpacity>
+      )}
     </View>
   );
 });
