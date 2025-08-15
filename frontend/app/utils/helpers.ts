@@ -1,7 +1,7 @@
 export const shortMoneyString = (
   value: number,
   includeSymbol: boolean = false,
-  decimals: number = 1
+  decimals: number = 1,
 ): string => {
   const absValue = Math.abs(value);
   const prefix = includeSymbol ? "₿" : "";

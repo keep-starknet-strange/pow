@@ -166,7 +166,7 @@ const TransactionCount = memo(
             color: "#c3c3c3",
             fontFamily: "Pixels" as const,
           }}
-          >
+        >
           /{maxSize}
         </Text>
       </>
@@ -178,16 +178,15 @@ TransactionCount.displayName = "TransactionCount";
 
 const BlockReward = memo(
   ({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
-          const textStyle = useMemo(
-        () => ({
-          fontSize: isSmall ? 14 : 18,
-          color: "#fff2fdff",
-          fontFamily: "Pixels" as const,
-          marginBottom: isSmall ? 2 : 0,
-          alignItems: "flex-end" as const,
-
-        }),
-        [isSmall],
+    const textStyle = useMemo(
+      () => ({
+        fontSize: isSmall ? 14 : 18,
+        color: "#fff2fdff",
+        fontFamily: "Pixels" as const,
+        marginBottom: isSmall ? 2 : 0,
+        alignItems: "flex-end" as const,
+      }),
+      [isSmall],
     );
 
     const animConfig = useMemo(

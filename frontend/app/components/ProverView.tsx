@@ -34,10 +34,7 @@ export const ProverView = () => {
   }));
 
   // Use prover hook with animation callback for automation
-  const { prove } = useProver(
-    onProverConfirmed,
-    triggerProverShake,
-  );
+  const { prove } = useProver(onProverConfirmed, triggerProverShake);
 
   return (
     <View>
@@ -52,10 +49,7 @@ export const ProverView = () => {
           className="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full z-[10]"
           style={[animatedStyle, proverShakeStyle]}
         >
-          <Prover
-            triggerAnim={triggerProverShake}
-            prove={prove}
-          />
+          <Prover triggerAnim={triggerProverShake} prove={prove} />
         </Animated.View>
       )}
     </View>

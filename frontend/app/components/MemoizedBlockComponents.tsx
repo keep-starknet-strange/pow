@@ -1,10 +1,4 @@
-import React, {
-  memo,
-  useState,
-  useEffect,
-  JSX,
-  useMemo,
-} from "react";
+import React, { memo, useState, useEffect, JSX, useMemo } from "react";
 import { View } from "react-native";
 import { useGameStore } from "../stores/useGameStore";
 import { useMiner } from "../hooks/useMiner";
@@ -111,14 +105,8 @@ export const MemoizedMinerSequencer = memo(
     const onBlockMined = useGameStore((state) => state.onBlockMined);
     const onBlockSequenced = useGameStore((state) => state.onBlockSequenced);
 
-    const { mineBlock } = useMiner(
-      onBlockMined,
-      triggerBlockShake,
-    );
-    const { sequenceBlock } = useSequencer(
-      onBlockSequenced,
-      triggerBlockShake,
-    );
+    const { mineBlock } = useMiner(onBlockMined, triggerBlockShake);
+    const { sequenceBlock } = useSequencer(onBlockSequenced, triggerBlockShake);
 
     if (!isBuilt) return null;
 
@@ -135,10 +123,7 @@ export const MemoizedMinerSequencer = memo(
         }}
       >
         {chainId === 0 ? (
-          <Miner
-            triggerAnim={triggerBlockShake}
-            mineBlock={mineBlock}
-          />
+          <Miner triggerAnim={triggerBlockShake} mineBlock={mineBlock} />
         ) : (
           <Sequencer
             triggerAnim={triggerBlockShake}
