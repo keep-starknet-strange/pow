@@ -9,6 +9,7 @@ import { Call, Contract } from "starknet";
 import { useStarknetConnector } from "./StarknetConnector";
 import { useFocEngine } from "./FocEngineConnector";
 import { useOnchainActions } from "../stores/useOnchainActions";
+import { useBalanceStore } from "../stores/useBalanceStore";
 
 type PowContractContextType = {
   powGameContractAddress: string | null;
@@ -41,9 +42,13 @@ type PowContractContextType = {
     { size: number | undefined; fees: number | undefined } | undefined
   >;
   getUserMaxChainId: () => Promise<number | undefined>;
+  getUserDappsUnlocked: (chainId: number) => Promise<boolean | undefined>;
   getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
   getUserProofClicks: (chainId: number) => Promise<number | undefined>;
+
+  // Cheat Codes
+  doubleBalanceCheat: () => void;
 };
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(
@@ -341,7 +346,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     try {
-      const maxChainId = await powContract.get_user_max_chain_id(
+      const maxChainId = await powContract.get_user_chain_count(
         account?.address || "",
       );
       return maxChainId.toString
@@ -352,6 +357,25 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       return undefined;
     }
   }, [account, powContract, STARKNET_ENABLED]);
+
+  const getUserDappsUnlocked = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const dappsUnlocked = await powContract.get_user_dapps_unlocked(
+          account?.address || "",
+          chainId,
+        );
+        return dappsUnlocked;
+      } catch (error) {
+        console.error("Failed to fetch user dapps unlocked:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
 
   const getUserBlockClicks = useCallback(
     async (chainId: number) => {
@@ -410,6 +434,25 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  // Cheat Codes Functions
+  const doubleBalanceCheat = useCallback(() => {
+    if (!STARKNET_ENABLED || !powGameContractAddress) {
+      return;
+    }
+
+    const doubleBalanceCall: Call = {
+      contractAddress: powGameContractAddress,
+      entrypoint: "double_balance_cheat",
+      calldata: [],
+    };
+
+    addAction(doubleBalanceCall);
+
+    // Update frontend balance store immediately
+    const currentBalance = useBalanceStore.getState().balance;
+    useBalanceStore.getState().setBalance(currentBalance * 2);
+  }, [powGameContractAddress, addAction, STARKNET_ENABLED]);
+
   return (
     <PowContractConnector.Provider
       value={{
@@ -425,9 +468,11 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserBlockNumber,
         getUserBlockState,
         getUserMaxChainId,
+        getUserDappsUnlocked,
         getUserBlockClicks,
         getUserDaClicks,
         getUserProofClicks,
+        doubleBalanceCheat,
       }}
     >
       {children}

@@ -8,6 +8,7 @@ import { useUpgradesStore } from "./useUpgradesStore";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
+import unlocksConfig from "../configs/unlocks.json";
 
 interface L2Store {
   l2: L2 | undefined;
@@ -17,6 +18,7 @@ interface L2Store {
   initializeL2Store: (
     powContract: Contract | null,
     user: FocAccount | null,
+    getUserMaxChainId: () => Promise<number | undefined>,
   ) => void;
 
   canUnlockL2: () => boolean;
@@ -38,10 +40,14 @@ export const useL2Store = create<L2Store>((set, get) => ({
   isL2Unlocked: false,
 
   resetL2Store: () => set({ l2: undefined, isL2Unlocked: false }),
-  initializeL2Store: (powContract, user) => {
+  initializeL2Store: (powContract, user, getUserMaxChainId) => {
     const fetchL2Store = async () => {
       if (powContract && user) {
         try {
+          const maxChainId = (await getUserMaxChainId()) || 0;
+          if (maxChainId < 2) {
+            return;
+          }
           // Get upgrade values at initialization time
           const daMaxSize =
             useUpgradesStore.getState().getUpgradeValue(1, "DA compression") ||
@@ -60,7 +66,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
             isL2Unlocked: true,
           });
         } catch (error) {
-          console.error("Error initializing L2 store:", error);
+          if (__DEV__) console.error("Error initializing L2 store:", error);
         }
       } else {
         get().resetL2Store();
@@ -101,9 +107,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
       }
     }
 
-    // TODO: Add automations and upgrades checks once requirements are clarified
-    // TODO: Add staking check once staking is implemented
-
     return true;
   },
 
@@ -135,8 +138,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
   },
 
   getL2Cost: () => {
-    const cost = 316274400; // TODO: Config
-    return cost;
+    return unlocksConfig.next_chain_cost;
   },
 
   getL2: () => {
@@ -169,7 +171,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       newL2Instance.da.blocks.push(block.blockId);
       const blockReward =
         block.reward ||
-        useUpgradesStore.getState().getUpgradeValue(0, "Block Reward");
+        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
       newL2Instance.da.blockFees += blockReward;
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return { l2: newL2Instance };
@@ -212,6 +214,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const daMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
       newL2Instance.da = newL2DA(daMaxSize);
+      useEventManager.getState().notify("DaDone", { da: state.l2.da });
 
       return { l2: newL2Instance };
     });
@@ -228,6 +231,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
       newL2Instance.prover = newL2Prover(proverMaxSize);
+      useEventManager
+        .getState()
+        .notify("ProveDone", { proof: state.l2.prover });
 
       return { l2: newL2Instance };
     });

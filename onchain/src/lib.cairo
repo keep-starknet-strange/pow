@@ -1,4 +1,5 @@
 pub mod actions;
+pub mod cheat_codes;
 pub mod interface;
 pub mod pow;
 pub mod store;
@@ -19,8 +20,8 @@ pub mod transactions {
     pub mod interface;
 
     pub use interface::{
-        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait,
-        TransactionFeeConfig, TransactionSetupParams, TransactionSpeedConfig,
+        IPowTransactionsDispatcher, IPowTransactionsDispatcherTrait, TransactionFeeConfig,
+        TransactionSetupParams, TransactionSpeedConfig,
     };
 }
 

@@ -1,4 +1,4 @@
-name: Publish  
+name: Publish 
 
 on:
     workflow_call:
@@ -18,6 +18,11 @@ on:
           required: true
           default: true
           type: boolean
+        version:
+          description: "Version to deploy (e.g. 0.1.0)"
+          required: true
+          default: "0.1.0"
+          type: string
         ref:
           description: "Git reference to deploy"
           required: true
@@ -28,6 +33,31 @@ jobs:
     deploy-android:
         if: ${{ inputs.deploy_android == true }}
         runs-on: ubuntu-latest
+        environment: ${{ inputs.internal_testing == true && 'QA' || 'PROD' }}
+        env:
+          ## Environment variables setup
+          EXPO_PUBLIC_USE_MOCK: ${{ vars.USE_MOCK }}
+          EXPO_PUBLIC_ENABLE_STARKNET: ${{ vars.ENABLE_STARKNET }}
+          EXPO_PUBLIC_STARKNET_CHAIN: ${{ vars.STARKNET_CHAIN }}
+          EXPO_PUBLIC_FOC_ENGINE_API: ${{ vars.FOC_ENGINE_API }}
+          EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS: ${{ vars.POW_GAME_CONTRACT_ADDRESS }}
+          EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS: ${{ vars.ACCOUNTS_CONTRACT_ADDRESS }}
+          EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
+          EXPO_APP_VERSION: ${{ inputs.version }}
+
+          ## Secrets setup
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
+          APPSTORE_CONNECT_TEAM_ID: ${{ secrets.APPSTORE_CONNECT_TEAM_ID }}
+          APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
         steps:
             - name: Checkout project
               uses: actions/checkout@v4
@@ -45,67 +75,79 @@ jobs:
               working-directory: ./frontend
               run: npm ci
 
-            - name: Decode Keystore
+            - name: Decode secrets
               working-directory: ./frontend
-              env:
-                KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
-              run: 
-                echo $KEYSTORE_ENCODED | base64 --decode > ${{ secrets.KEYSTORE_FILE_NAME }}
+              run: |
+                echo $KEYSTORE_ENCODED | base64 --decode > release.keystore
+                echo "KEYSTORE_FILE=$(realpath release.keystore)" >> $GITHUB_ENV
+                
+                echo $GOOGLE_PLAY_SERVICE_ACCOUNT_JSON >> GooglePlay.json
+                echo "GOOGLE_PLAY_SERVICE_ACCOUNT_FILE=$(realpath GooglePlay.json)" >> $GITHUB_ENV
+                
+                echo $FIREBASE_SERVICE_ACCOUNT_JSON >> Firebase.json
+                echo "FIREBASE_SERVICE_CREDENTIALS_FILE=$(realpath Firebase.json)" >> $GITHUB_ENV
 
-            - name: Prebuild app
+                echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > AppStoreConnectKey.p8
+                echo "APPSTORE_CONNECT_KEY_FILE=$(realpath AppStoreConnectKey.p8)" >> $GITHUB_ENV
+
+            - uses: ruby/setup-ruby@v1
+              with:
+                ruby-version: '2.6'
+
+            - name: Update Gems
               working-directory: ./frontend
-              env:
-                KEYSTORE_FILE_NAME: ${{ secrets.KEYSTORE_FILE_NAME }}
-                KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-                KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-              run: npx expo prebuild --platform android
-
-            - name: Move keystore into app folder
-              working-directory: ./frontend
-              run: mv ${{ secrets.KEYSTORE_FILE_NAME }} android/app/${{ secrets.KEYSTORE_FILE_NAME }}
-
-            - name: Build Android (APK)
-              if: ${{ inputs.internal_testing == true }}
-              working-directory: ./frontend/android
-              env:
-                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              run: ./gradlew app:assembleRelease
+              run: |
+                gem install bundler -v 2.4.22
+                bundle config path vendor/bundle
+                bundle update
 
             - name: Upload to Firebase
               if: ${{ inputs.internal_testing == true }}
-              uses: wzieba/Firebase-Distribution-Github-Action@v1
-              with:
-                appId: ${{ secrets.FIREBASE_APP_ID }}
-                serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-                groups: internal-testers
-                file: "./frontend/android/app/build/outputs/apk/release/app-release.apk"
-
-            - name: Build Android (AAB)
-              if: ${{ inputs.internal_testing == false }}
-              working-directory: ./frontend/android
-              env:
-                SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              run: ./gradlew app:bundleRelease
+              working-directory: ./frontend
+              run: bundle exec fastlane android deploy_firebase
 
             - name: Upload to Google Play
-              uses: r0adkll/upload-google-play@v1
               if: ${{ inputs.internal_testing == false }}
-              with:
-                serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-                packageName: com.starknet.pow
-                releaseFiles: ./frontend/android/app/build/outputs/bundle/release/app-release.aab
-                track: production
-                status: draft
+              working-directory: ./frontend
+              run: bundle exec fastlane android deploy_play_store
 
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
-      runs-on: macos-latest
+      runs-on: macos-15
+      environment: ${{ inputs.internal_testing == true && 'QA' || 'PROD' }}
+      env:
+        ## Environment variables setup
+        EXPO_PUBLIC_USE_MOCK: ${{ vars.USE_MOCK }}
+        EXPO_PUBLIC_ENABLE_STARKNET: ${{ vars.ENABLE_STARKNET }}
+        EXPO_PUBLIC_STARKNET_CHAIN: ${{ vars.STARKNET_CHAIN }}
+        EXPO_PUBLIC_FOC_ENGINE_API: ${{ vars.FOC_ENGINE_API }}
+        EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS: ${{ vars.POW_GAME_CONTRACT_ADDRESS }}
+        EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS: ${{ vars.ACCOUNTS_CONTRACT_ADDRESS }}
+        EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
+        EXPO_APP_VERSION: ${{ inputs.version }}
+
+        ## Secrets setup
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+        APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}
+        APPSTORE_CONNECT_TEAM_ID: ${{ secrets.APPSTORE_CONNECT_TEAM_ID }}
+        APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+        APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
       steps:
             - name: Checkout project
               uses: actions/checkout@v4
               with:
                 ref: ${{ inputs.ref }}
+
+            - uses: webfactory/ssh-agent@v0.6.0
+              with:
+                ssh-private-key: ${{ secrets.APPSTORE_CERTIFICATES_SSH_KEY }}
+
+            - name: Setup Xcode
+              run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -118,12 +160,30 @@ jobs:
               working-directory: ./frontend
               run: npm ci
 
-            - name: Prebuild app
+            - name: Update Gems
+              working-directory: ./frontend
+              run: bundle update
+
+            - name: Decode secrets
+              working-directory: ./frontend
+              run: |
+                echo $GOOGLE_PLAY_SERVICE_ACCOUNT_JSON >> GooglePlay.json
+                echo "GOOGLE_PLAY_SERVICE_ACCOUNT_FILE=$(realpath GooglePlay.json)" >> $GITHUB_ENV
+                
+                echo $APPSTORE_CONNECT_KEY_ENCODED | base64 --decode > AppStoreConnectKey.p8
+                echo "APPSTORE_CONNECT_KEY_FILE=$(realpath AppStoreConnectKey.p8)" >> $GITHUB_ENV
+
+              # For some reason, prebuild from fastlane fails. We need to prebuild manually.
+            - name: Prebuild iOS app
               working-directory: ./frontend
               run: npx expo prebuild --platform ios
 
-            ## TODO 
-            ## 1. Setup certificate, provisioning profile and ExportOptions.plist
-            ## 2. Build archive
-            ## 3. Export IPA
-            ## 4. Upload application
+            - name: Deploy to Testflight
+              if: ${{ inputs.internal_testing == true }}
+              working-directory: ./frontend
+              run: bundle exec fastlane ios deploy_testflight skip_prebuild:true
+
+            - name: Deploy to App Store
+              if: ${{ inputs.internal_testing == false }}
+              working-directory: ./frontend
+              run: bundle exec fastlane ios deploy_app_store skip_prebuild:true

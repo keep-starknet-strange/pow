@@ -4,6 +4,7 @@ import { FocAccount } from "../context/FocEngineConnector";
 import { useEventManager } from "./useEventManager";
 import transactionJson from "@/app/configs/transactions.json";
 import dappsJson from "@/app/configs/dapps.json";
+import unlocksConfig from "@/app/configs/unlocks.json";
 import { useBalanceStore } from "./useBalanceStore";
 import { useUpgradesStore } from "./useUpgradesStore";
 
@@ -31,6 +32,7 @@ interface TransactionsState {
       chainId: number,
       txCount: number,
     ) => Promise<number[] | undefined>,
+    getUserDappsUnlocked: (chainId: number) => Promise<boolean | undefined>,
   ) => void;
 
   txFeeUpgrade: (chainId: number, txId: number) => void;
@@ -126,6 +128,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     user,
     getUserTxFeeLevels,
     getUserTxSpeedLevels,
+    getUserDappsUnlocked,
   ) => {
     const fetchTransactionSpeeds = async () => {
       if (!user || !powContract) return;
@@ -145,7 +148,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
           { chain_id: chainId, user: user.account_address }
         );
         if (!events) {
-          console.warn("No events found for chain", chainId);
+          if (__DEV__) console.warn("No events found for chain", chainId);
           continue;
         }
         */
@@ -196,11 +199,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             newDappSpeedLevels[chainId][dappId] = level - 1; // -1 offset since 0 indexed
           }
         });
-        if (!newDappsUnlocked[chainId]) {
-          newDappsUnlocked[chainId] = false;
+        // Check if dapps are unlocked
+        const dappsUnlocked = await getUserDappsUnlocked(chainId);
+        if (dappsUnlocked !== undefined) {
+          newDappsUnlocked[chainId] = dappsUnlocked;
         }
-        // TODO: Replace this with a proper check
-        newDappsUnlocked[chainId] = (txFeeLevels.at(maxTxId + 1) || 0) > 0; // Check if 1st dapp level is >= 0
 
         /* TODO: Use foc engine? */
       }
@@ -233,16 +236,18 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         chainId === 0 ? transactionJson.L1 : transactionJson.L2;
       const transactionData = transactionJsonData.find((tx) => tx.id === txId);
       if (!transactionData) {
-        console.warn(
-          `Transaction with ID ${txId} not found for chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Transaction with ID ${txId} not found for chain ${chainId}`,
+          );
         return { transactionFeeLevels: newFees };
       }
       const currentLevel = newFees[chainId][txId];
       if (currentLevel >= transactionData.feeCosts.length - 1) {
-        console.warn(
-          `Transaction fee level already at max for transaction ID ${txId} on chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Transaction fee level already at max for transaction ID ${txId} on chain ${chainId}`,
+          );
         return { transactionFeeLevels: newFees };
       }
       const cost = transactionData.feeCosts[currentLevel + 1];
@@ -272,16 +277,18 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         chainId === 0 ? transactionJson.L1 : transactionJson.L2;
       const transactionData = transactionJsonData.find((tx) => tx.id === txId);
       if (!transactionData) {
-        console.warn(
-          `Transaction with ID ${txId} not found for chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Transaction with ID ${txId} not found for chain ${chainId}`,
+          );
         return { transactionSpeedLevels: newSpeeds };
       }
       const currentLevel = newSpeeds[chainId][txId];
       if (currentLevel >= transactionData.speedCosts.length - 1) {
-        console.warn(
-          `Transaction speed level already at max for transaction ID ${txId} on chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Transaction speed level already at max for transaction ID ${txId} on chain ${chainId}`,
+          );
         return { transactionSpeedLevels: newSpeeds };
       }
       const cost = transactionData.speedCosts[currentLevel + 1];
@@ -315,14 +322,16 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
       const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
-        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        if (__DEV__)
+          console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
         return { dappFeeLevels: newFees };
       }
       const currentLevel = newFees[chainId][dappId];
       if (currentLevel >= dappData.feeCosts.length - 1) {
-        console.warn(
-          `Dapp fee level already at max for dapp ID ${dappId} on chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Dapp fee level already at max for dapp ID ${dappId} on chain ${chainId}`,
+          );
         return { dappFeeLevels: newFees };
       }
       const cost = dappData.feeCosts[currentLevel + 1];
@@ -351,14 +360,16 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
       const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
       if (!dappData) {
-        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+        if (__DEV__)
+          console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
         return { dappSpeedLevels: newSpeeds };
       }
       const currentLevel = newSpeeds[chainId][dappId];
       if (currentLevel >= dappData.speedCosts.length - 1) {
-        console.warn(
-          `Dapp speed level already at max for dapp ID ${dappId} on chain ${chainId}`,
-        );
+        if (__DEV__)
+          console.warn(
+            `Dapp speed level already at max for dapp ID ${dappId} on chain ${chainId}`,
+          );
         return { dappSpeedLevels: newSpeeds };
       }
       const cost = dappData.speedCosts[currentLevel + 1];
@@ -445,7 +456,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
     const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
     if (!dappData || dappLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+      if (__DEV__)
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
       return 0;
     }
     const level = dappLevels[dappId];
@@ -461,7 +473,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
     const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
     if (!dappData || dappLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+      if (__DEV__)
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
       return 0;
     }
     const level = dappLevels[dappId];
@@ -486,9 +499,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const txFees = get().transactionFeeLevels[chainId];
     const lastTxLevel = txFees[txId - 1];
     if (lastTxLevel === undefined) {
-      console.warn(
-        `Transaction with ID ${txId - 1} not found for chain ${chainId}`,
-      );
+      if (__DEV__)
+        console.warn(
+          `Transaction with ID ${txId - 1} not found for chain ${chainId}`,
+        );
       return false;
     }
     return lastTxLevel >= 0;
@@ -499,7 +513,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const dappFees = get().dappFeeLevels[chainId];
     const lastDappLevel = dappFees[dappId - 1];
     if (lastDappLevel === undefined) {
-      console.warn(`Dapp with ID ${dappId - 1} not found for chain ${chainId}`);
+      if (__DEV__)
+        console.warn(
+          `Dapp with ID ${dappId - 1} not found for chain ${chainId}`,
+        );
       return false;
     }
     return lastDappLevel >= 0;
@@ -524,7 +541,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   },
 
   getDappUnlockCost: (chainId) => {
-    return chainId === 0 ? dappsJson.L1.cost : dappsJson.L2.cost;
+    return chainId === 0
+      ? unlocksConfig.dapps.L1.cost
+      : unlocksConfig.dapps.L2.cost;
   },
 
   getNextFeeCost: (chainId, txId, isDapp = false) => {
@@ -577,7 +596,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
     const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
     if (!dappData || dappLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+      if (__DEV__)
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
       return 0;
     }
     const level = dappLevels[dappId];
@@ -590,7 +610,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
     const dappData = dappsJsonData.find((dapp) => dapp.id === dappId);
     if (!dappData || dappLevels[dappId] === undefined) {
-      console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
+      if (__DEV__)
+        console.warn(`Dapp with ID ${dappId} not found for chain ${chainId}`);
       return 0;
     }
     const level = dappLevels[dappId];

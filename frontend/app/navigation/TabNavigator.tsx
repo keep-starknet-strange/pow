@@ -19,6 +19,10 @@ import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
 import { TutorialRefView } from "../components/tutorial/TutorialRefView";
 import {
+  TargetId,
+  useIsTutorialTargetActive,
+} from "../stores/useTutorialStore";
+import {
   Canvas,
   Image,
   FilterMode,
@@ -30,10 +34,15 @@ const Tab = createBottomTabNavigator();
 
 const StoreTabButton = memo(
   ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
+    const isStoreTabActive = useIsTutorialTargetActive("storeTab" as TargetId);
     return (
       <View className="relative">
         <TutorialRefView targetId="storeTab" enabled={true} />
-        <TabBarButton tabName="Store" isActive={isActive} onPress={onPress} />
+        <TabBarButton
+          tabName="Store"
+          isActive={isActive || isStoreTabActive}
+          onPress={onPress}
+        />
       </View>
     );
   },

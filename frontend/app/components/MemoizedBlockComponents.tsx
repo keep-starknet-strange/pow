@@ -1,25 +1,11 @@
-import React, {
-  memo,
-  useState,
-  useEffect,
-  useCallback,
-  JSX,
-  useMemo,
-} from "react";
-import { View } from "react-native";
-import Animated, {
-  useSharedValue,
-  withSequence,
-  withSpring,
-} from "react-native-reanimated";
+import React, { memo, useState, useEffect, JSX, useMemo } from "react";
+import { View, StyleSheet } from "react-native";
 import { useGameStore } from "../stores/useGameStore";
-import { useUpgrades } from "../stores/useUpgradesStore";
 import { useMiner } from "../hooks/useMiner";
 import { useSequencer } from "../hooks/useSequencer";
 import { Miner } from "./Miner";
 import { Sequencer } from "./Sequencer";
 import { BlockTxOutlines } from "./BlockTxOutlines";
-import { BlockchainBlockView } from "./BlockchainView";
 
 type BlockPlacement = {
   top: number;
@@ -119,39 +105,29 @@ export const MemoizedMinerSequencer = memo(
     const onBlockMined = useGameStore((state) => state.onBlockMined);
     const onBlockSequenced = useGameStore((state) => state.onBlockSequenced);
 
-    const { miningProgress, mineBlock } = useMiner(
-      onBlockMined,
-      triggerBlockShake,
-    );
-    const { sequencingProgress, sequenceBlock } = useSequencer(
-      onBlockSequenced,
-      triggerBlockShake,
+    const { mineBlock } = useMiner(onBlockMined, triggerBlockShake);
+    const { sequenceBlock } = useSequencer(onBlockSequenced, triggerBlockShake);
+
+    const containerStyle = useMemo(
+      () => ({
+        ...styles.minerSequencerContainer,
+        top: placement.top,
+        left: placement.left,
+        width: placement.width,
+        height: placement.height,
+      }),
+      [placement],
     );
 
     if (!isBuilt) return null;
 
     return (
-      <View
-        style={{
-          position: "absolute",
-          top: placement.top,
-          left: placement.left,
-          width: placement.width,
-          height: placement.height,
-          zIndex: 6,
-          transform: [{ scale: 1.25 }],
-        }}
-      >
+      <View style={containerStyle}>
         {chainId === 0 ? (
-          <Miner
-            triggerAnim={triggerBlockShake}
-            miningProgress={miningProgress}
-            mineBlock={mineBlock}
-          />
+          <Miner triggerAnim={triggerBlockShake} mineBlock={mineBlock} />
         ) : (
           <Sequencer
             triggerAnim={triggerBlockShake}
-            sequencingProgress={sequencingProgress}
             sequenceBlock={sequenceBlock}
           />
         )}
@@ -189,18 +165,21 @@ export const MemoizedBlockTxContainer = memo(
       return insetWidth / txPerRow;
     }, [placement.width, txPerRow]);
 
+    const containerStyle = useMemo(
+      () => ({
+        ...styles.blockTxContainer,
+        top: placement.top + 4,
+        left: placement.left + 4,
+        width: placement.width - 8,
+        height: placement.height - 8,
+      }),
+      [placement],
+    );
+
     if (blockId === 0) return null;
 
     return (
-      <View
-        style={{
-          position: "absolute",
-          top: placement.top + 4,
-          left: placement.left + 4,
-          width: placement.width - 8,
-          height: placement.height - 8,
-        }}
-      >
+      <View style={containerStyle}>
         <BlockTxOutlines txSize={txSize} txPerRow={txPerRow} />
       </View>
     );
@@ -217,3 +196,14 @@ export const MemoizedBlockTxContainer = memo(
 );
 
 MemoizedBlockTxContainer.displayName = "MemoizedBlockTxContainer";
+
+const styles = StyleSheet.create({
+  minerSequencerContainer: {
+    position: "absolute",
+    zIndex: 6,
+    transform: [{ scale: 1.25 }],
+  },
+  blockTxContainer: {
+    position: "absolute",
+  },
+});

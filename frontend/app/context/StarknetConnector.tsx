@@ -142,7 +142,8 @@ export const StarknetConnectorProvider: React.FC<{
     } else if (accountClassName === "devnet") {
       return "0x02b31e19e45c06f29234e06e2ee98a9966479ba3067f8785ed972794fdb0065c";
     } else {
-      console.error(`Unsupported account class: ${accountClassName}`);
+      if (__DEV__)
+        console.error(`Unsupported account class: ${accountClassName}`);
       return "";
     }
   };
@@ -163,7 +164,7 @@ export const StarknetConnectorProvider: React.FC<{
     const accountAddress = generateAccountAddress(privateKey, accountClassName);
     const key = `${network}.${appName}.${accountClassName || "argentX"}.${accountAddress}`;
     await SecureStore.setItemAsync(key, privateKey).catch((error) => {
-      console.error("Error storing private key:", error);
+      if (__DEV__) console.error("Error storing private key:", error);
       throw error;
     });
     // Store the key in a list of available keys ( using async unsecure storage )
@@ -174,20 +175,22 @@ export const StarknetConnectorProvider: React.FC<{
         keyStorageName,
         JSON.stringify([...availableKeys, key]),
       ).catch((error) => {
-        console.error("Error storing available keys:", error);
+        if (__DEV__) console.error("Error storing available keys:", error);
         throw error;
       });
     }
-    console.log(`✅ Private key for ${key} stored successfully.`);
-    console.log(
-      `Available keys: ${JSON.stringify(await getAvailableKeys(appName))}`,
-    );
+    if (__DEV__) console.log(`✅ Private key for ${key} stored successfully.`);
+    if (__DEV__)
+      console.log(
+        `Available keys: ${JSON.stringify(await getAvailableKeys(appName))}`,
+      );
   };
 
   const clearPrivateKey = async (key: string): Promise<void> => {
     try {
       await SecureStore.deleteItemAsync(key);
-      console.log(`✅ Private key for ${key} cleared successfully.`);
+      if (__DEV__)
+        console.log(`✅ Private key for ${key} cleared successfully.`);
       // Remove the key from the list of available keys
       const appName = key.split(".")[1];
       const availableKeys = await getAvailableKeys(appName);
@@ -209,7 +212,11 @@ export const StarknetConnectorProvider: React.FC<{
           parsedKeys.map((key) => SecureStore.deleteItemAsync(key)),
         );
         await AsyncStorage.removeItem(keyStorageName);
-        console.log(`✅ All private keys for ${appName} cleared successfully.`);
+        if (__DEV__) {
+          console.log(
+            `✅ All private keys for ${appName} cleared successfully.`,
+          );
+        }
       } else {
         console.warn(`No keys found for app: ${appName}`);
       }
@@ -275,7 +282,8 @@ export const StarknetConnectorProvider: React.FC<{
       const constructorCalldata = CallData.compile({ pub_key: starkKeyPub });
       return constructorCalldata;
     } else {
-      console.error(`Unsupported account class: ${accountClassName}`);
+      if (__DEV__)
+        console.error(`Unsupported account class: ${accountClassName}`);
       return CallData.compile({});
     }
   };
@@ -296,7 +304,8 @@ export const StarknetConnectorProvider: React.FC<{
       const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       return [starkKeyPub];
     } else {
-      console.error(`Unsupported account class: ${accountClassName}`);
+      if (__DEV__)
+        console.error(`Unsupported account class: ${accountClassName}`);
       return [];
     }
   };
@@ -341,7 +350,9 @@ export const StarknetConnectorProvider: React.FC<{
       );
       const newAccount = new Account(provider!, accountAddress, privateKey);
       setAccount(newAccount);
-      console.log("✅ Connected to account:", newAccount.address);
+      if (__DEV__) {
+        console.log("✅ Connected to account:", newAccount.address);
+      }
     },
     [provider],
   );
@@ -513,7 +524,6 @@ export const StarknetConnectorProvider: React.FC<{
           maxFee: 100_000_000_000_000,
         })
         .catch((error) => {
-          console.error("Error executing calls:", error);
           throw error;
         });
       console.log(`Transaction hash: ${res.transaction_hash}`);
@@ -589,7 +599,6 @@ export const StarknetConnectorProvider: React.FC<{
         )
           .then((response) => response.json())
           .catch((error) => {
-            console.error("Error fetching gasless transaction data:", error);
             throw error;
           });
         let signature = await invokeAccount.signMessage(gaslessTxRes.data);
@@ -618,7 +627,6 @@ export const StarknetConnectorProvider: React.FC<{
         })
           .then((response) => response.json())
           .catch((error) => {
-            console.error("Error sending gasless transaction:", error);
             throw error;
           });
         console.log("Gasless transaction sent:", sendGaslessTxRes);

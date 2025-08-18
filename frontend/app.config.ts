@@ -4,14 +4,14 @@ import { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "POW!",
   slug: "pow",
-  version: "0.1.0",
+  version: process.env.EXPO_APP_VERSION || "0.1.0",
   orientation: "portrait",
   icon: "./assets/logo/icon.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   ios: {
-    supportsTablet: true,
+    supportsTablet: false,
     infoPlist: {
       LSApplicationQueriesSchemes: [
         "argent",
@@ -20,8 +20,10 @@ const config: ExpoConfig = {
         "braavos",
       ],
     },
+    config: {
+      usesNonExemptEncryption: false,
+    },
     bundleIdentifier: "com.starknet.pow",
-    buildNumber: "1",
   },
   android: {
     adaptiveIcon: {
@@ -30,7 +32,6 @@ const config: ExpoConfig = {
     },
     package: "com.starknet.pow",
     edgeToEdgeEnabled: true,
-    versionCode: 1,
   },
   web: {
     bundler: "metro",
@@ -59,7 +60,7 @@ const config: ExpoConfig = {
     ],
     "expo-web-browser",
     "expo-audio",
-    "./plugins/android/signing.ts",
+    "./plugins/sentry.ts",
   ],
   experiments: {
     typedRoutes: true,
