@@ -1,8 +1,13 @@
 name: Release
 
-on: 
-    release:
-        types: [published]
+# on: 
+#     release:
+#         types: [published]
+
+on:
+    push:
+        branches:
+            - env/setup
 
 jobs:
     run-deploy:
@@ -10,7 +15,9 @@ jobs:
         secrets: inherit
         with:
             deploy_android: true
-            deploy_ios: true
-            internal_testing: ${{ github.event.release.prerelease }}
-            version: ${{ github.event.release.name }}
+            deploy_ios: false
+            internal_testing: true
+                # ${{ github.event.release.prerelease }}
+            version: "0.1.2"
+                # ${{ github.event.release.name }}
             ref: ${{ github.ref }}
