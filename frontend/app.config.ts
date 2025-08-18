@@ -11,7 +11,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   ios: {
-    supportsTablet: true,
+    supportsTablet: false,
     infoPlist: {
       LSApplicationQueriesSchemes: [
         "argent",
