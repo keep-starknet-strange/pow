@@ -15,7 +15,7 @@
       "id": 1,
       "name": "Segwit",
       "slug": "segwit",
-      "description": "Send funds using Segwit addresses.",
+      "description": "Send funds with lower fees using witness data.",
       "color": "yellow",
       "feeCosts": [439, 487, 970, 1812, 3135],
       "fees": [10, 20, 35, 55, 80],
@@ -26,7 +26,7 @@
       "id": 2,
       "name": "Blob",
       "slug": "blob",
-      "description": "Stores data on the chain.",
+      "description": "Store data on-chain. Accessible to all.",
       "color": "blue",
       "feeCosts": [4628, 4335, 7734, 14550, 26250],
       "fees": [50, 75, 125, 200, 300],
@@ -37,7 +37,7 @@
       "id": 3,
       "name": "Ordinal",
       "slug": "ordinal",
-      "description": "Etches images to the chain.",
+      "description": "Etch images into satoshis. Create digital artifacts.",
       "color": "pink",
       "feeCosts": [33281, 39140, 71718, 118945, 183750],
       "fees": [250, 375, 525, 700, 900],
@@ -48,7 +48,7 @@
       "id": 4,
       "name": "Runes",
       "slug": "runes",
-      "description": "Trade runes on the chain.",
+      "description": "Create and trade new tokens. Secured by your L1.",
       "color": "purple",
       "feeCosts": [206550, 230850, 388800, 627750, 947700],
       "fees": [800, 1050, 1400, 1800, 2250],
@@ -61,7 +61,7 @@
       "id": 0,
       "name": "Bridge",
       "slug": "bridge",
-      "description": "Send funds to L2.",
+      "description": "Send funds between L1 <-> L2. Time to onboard!",
       "color": "purple",
       "feeCosts": [
         1, 1970738400, 2279138400, 3837538400, 8395938400
@@ -76,7 +76,7 @@
       "id": 1,
       "name": "Swap",
       "slug": "swap",
-      "description": "Trade ERC20 assets.",
+      "description": "Trade ERC20 tokens instantly.",
       "color": "green",
       "feeCosts": [
         6759259259, 7685185185, 16419753086, 32098765432, 57037037037
@@ -91,7 +91,7 @@
       "id": 2,
       "name": "NFTs",
       "slug": "nfts",
-      "description": "Mint images to the chain.",
+      "description": "Mint and trade digital collectibles.",
       "color": "yellow",
       "feeCosts": [
         68800000000, 64000000000, 117333333333, 226666666667, 416000000000
@@ -106,7 +106,7 @@
       "id": 3,
       "name": "Oracle",
       "slug": "oracle",
-      "description": "Fetch data from the world.",
+      "description": "Fetch real-world data for your chain.",
       "color": "blue",
       "feeCosts": [
         496000000000, 592000000000, 1109333333333, 1866666666667, 2912000000000
@@ -121,7 +121,7 @@
       "id": 4,
       "name": "DAO",
       "slug": "dao",
-      "description": "Manage decentralized organizations.",
+      "description": "Manage decentralized organizations, treasuries, and voting.",
       "color": "pink",
       "feeCosts": [
         2881925925926, 3237629629630, 5502518518519, 8953086419753, 13589333333333

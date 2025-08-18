@@ -183,13 +183,6 @@ export const StorePage: React.FC = () => {
           }
         });
       }
-
-      // Add DappsUnlock component
-      data.push({
-        type: "dapps-unlock",
-        chainId,
-        id: "dapps-unlock",
-      });
     }
 
     if (activeSubTab === "Upgrades") {
@@ -218,12 +211,7 @@ export const StorePage: React.FC = () => {
       });
 
       // Add unlock components
-      if (storeType === "L1") {
-        data.push({
-          type: "l2-unlock",
-          id: "l2-unlock",
-        });
-      } else {
+      if (storeType !== "L1") {
         data.push({
           type: "prestige-unlock",
           id: "prestige-unlock",

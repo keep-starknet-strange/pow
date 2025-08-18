@@ -42,6 +42,14 @@ export const getTxIcon = (
   isDapp: boolean,
   getImage: (name: string) => any,
 ) => {
+  return getImage(getTxIconName(chainId, typeId, isDapp));
+};
+
+export const getTxIconName = (
+  chainId: number,
+  typeId: number,
+  isDapp: boolean,
+) => {
   const txData = isDapp
     ? chainId === 0
       ? dappsJson.L1.transactions[typeId]
@@ -49,9 +57,9 @@ export const getTxIcon = (
     : chainId === 0
       ? transactionsJson.L1[typeId]
       : transactionsJson.L2[typeId];
-  if (!txData) return getImage("tx.icon.tx");
-  return getImage(`tx.icon.${txData.slug}`);
-};
+  if (!txData) return "tx.icon.tx";
+  return `tx.icon.${txData.slug}`;
+}
 
 export const getTxImg = (
   chainId: number,

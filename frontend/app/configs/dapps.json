@@ -5,7 +5,7 @@
         "id": 0,
         "name": "GMswap",
         "slug": "gmswap",
-        "description": "Decentralized exchange (DEX) for token swaps!",
+        "description": "GM. Decentralized exchange (DEX) for token swaps!",
         "color": "blue",
         "feeCosts": [1, 1138050, 1841400, 2868750, 4317300],
         "fees": [2000, 2500, 3200, 4100, 5200],
@@ -16,7 +16,7 @@
         "id": 1,
         "name": "ArtSea",
         "slug": "artsea",
-        "description": "NFT Marketplace for digital art",
+        "description": "NFT Marketplace for digital art, by the boatload ;)",
         "color": "pink",
         "feeCosts": [4165612, 4525762, 7474950, 11444562, 16434600],
         "fees": [4500, 5700, 7100, 8600, 10000],
@@ -27,7 +27,7 @@
         "id": 2,
         "name": "Paave",
         "slug": "paave",
-        "description": "Liquidity & flashloans protocol",
+        "description": "Liquidity & Flashloans protocol. Paave your way to riches!",
         "color": "purple",
         "feeCosts": [17173275, 18253725, 28660100, 41827625, 58476600],
         "fees": [9200, 11000, 13000, 15300, 17800],
@@ -40,7 +40,7 @@
         "id": 3,
         "name": "Hodlee",
         "slug": "hodlee",
-        "description": "Stake and Hold your crypto.",
+        "description": "Yield aggregator. HODL -> FARM -> EZ $$$",
         "color": "green",
         "feeCosts": [50673600, 54360000, 82720000, 118760000, 164016000],
         "fees": [16500, 19000, 22000, 25500, 30000],
@@ -53,7 +53,7 @@
         "id": 4,
         "name": "Wagmi",
         "slug": "wagmi",
-        "description": "Censorship fee social DeFi platform",
+        "description": "Censorship fee social DeFi platform. (real)",
         "color": "yellow",
         "feeCosts": [160344000, 175704000, 275232000, 405480000, 572592000],
         "fees": [28000, 33000, 39000, 46000, 55000],
@@ -70,7 +70,7 @@
         "id": 0,
         "name": "Unrug",
         "slug": "unrug",
-        "description": "Unruggable memecoins at light speed",
+        "description": "Unruggable memecoins at light speed. Tired of getting rugged?",
         "color": "yellow",
         "feeCosts": [
           1, 16013925925926, 26094617283951, 40918024691358, 61906962962963
@@ -85,7 +85,7 @@
         "id": 1,
         "name": "42inch",
         "slug": "42inch",
-        "description": "Cross-chain DEX aggregator",
+        "description": "Cross-chain DEX aggregator. Borderless trades!",
         "color": "blue",
         "feeCosts": [
           54651259259259, 59505777777778, 98759111111111, 151766913580247, 218529185185185
@@ -100,7 +100,7 @@
         "id": 2,
         "name": "lend.me",
         "slug": "lendme",
-        "description": "Permissionless lending protocol",
+        "description": "Permissionless lending protocol. Low rates + high yields = :)",
         "color": "green",
         "feeCosts": [
           226152296296296, 240715851851852, 379208691358025, 554919506172840, 777557333333333
@@ -115,7 +115,7 @@
         "id": 3,
         "name": "Galaxia",
         "slug": "galaxia",
-        "description": "Fully-onchain space strategy game",
+        "description": "Fully-onchain space strategy game. Real assets, real conquest!",
         "color": "pink",
         "feeCosts": [
           631584000000000, 678240000000000, 1033920000000000, 1486800000000000, 2056320000000000
@@ -130,7 +130,7 @@
         "id": 4,
         "name": "Journey",
         "slug": "journey",
-        "description": "Fractal scale with app-chains!",
+        "description": "Fractal scale with app-chains! Cause your journey only just begun.",
         "color": "purple",
         "feeCosts": [
           2019600000000000, 58492800000000, 83174400000000, 111744000000000, 144979200000000

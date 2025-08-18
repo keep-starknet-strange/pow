@@ -1,105 +1,105 @@
 {
   "mineBlock": {
     "title": "Welcome to POW!",
-    "description": "Your mission? Mine blocks to grow your chain, earn rewards, and unlock new powers. \nStart clicking to mine your first block!",
+    "description": "Your mission? Build a blockchain empire!\nMine blocks to grow your chain, earn rewards, and unlock new powers.\nStart clicking to mine your first block!",
     "bubbleTargetId": "minerConfirmer",
     "highlightTargetId": "minerConfirmer",
     "canDismiss": false
   },
   "balanceExplanation": {
     "title": "Stack Sats!",
-    "description": "Great job! After successfully mining a block it's fees will go to your balance.\nHODL your coins and watch your balance grow!",
+    "description": "Great job!\nAfter successfully mining a block, you will collect its fees and reward.\nHODL your coins and watch your balance grow!",
     "bubbleTargetId": "headerBalance",
     "highlightTargetId": "headerBalance",
     "canDismiss": true
   },
   "purchaseTransactions": {
-    "title": "Unlock a Transaction",
-    "description": "Click the transaction to unlock it — that's how you include it in a block. \nTransactions fuel your blockchain… and your profits!",
+    "title": "Unlock Txs!",
+    "description": "Expand your empire by unlocking new transaction types.\nTransactions fuel your blockchain… and your profits!\nSimply click the transaction to buy and unlock it.",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton",
     "canDismiss": false
   },
   "addTransactionsToBlock": {
-    "title": "Transaction ready!",
-    "description": "You can only mine a block once it's full of transactions.\nAdd transactions until your block is packed and ready.\nThen hit mine to seal it and earn your reward!",
+    "title": "Build your Block!",
+    "description": "Now that transactions are unlocked, it's time to build your first block.\nClick the transaction to add it to the chain forever.\nKeep clicking until your block is packed and ready to mine!",
     "bubbleTargetId": "firstTransactionButton",
     "highlightTargetId": "firstTransactionButton",
     "canDismiss": false
   },
   "checkStore": {
-    "title": "Visit the Shop",
-    "description": "Let's spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades. \nEvery purchase boosts your blockchain!",
+    "title": "Visit the Shop!",
+    "description": "Let's spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades.\nEvery purchase boosts your blockchain!",
     "bubbleTargetId": "storeTab",
     "highlightTargetId": "storeTab",
     "canDismiss": false
   },
   "purchaseFeeUpgrade": {
-    "title": "Boost Transaction Value",
-    "description": "Each transaction you process earns you rewards.\nClick the value upgrade to increase how much each one is worth.\nThe higher the value, the faster your earnings stack up!",
+    "title": "Boost Fees!",
+    "description": "Each transaction you add to the chain earns fees.\nYou can exponentially increase your earnings by purchasing fee boosts!\nThe higher the fees, the faster you stack BTC.\nStay humble.",
     "bubbleTargetId": "feeUpgradeButton",
     "highlightTargetId": "feeUpgradeButton",
     "canDismiss": true
   },
   "purchaseSpeedUpgrade": {
-    "title": "Automate and Accelerate Transaction",
-    "description": "This upgrade automates your transactions — no need to click each one!\nUpgrade again to increase how fast they're added to your block.",
+    "title": "Automate Txs!",
+    "description": "Tired of clicking to add transactions to the block?\nBoost your speed to automate block building.\nThe more you automate, the more time you get to spend your BTC.\nWork smarter not harder.",
     "bubbleTargetId": "speedUpgradeButton",
     "highlightTargetId": "speedUpgradeButton",
     "canDismiss": true
   },
   "purchaseChainUpgrade": {
-    "title": "Supercharge Your Chain",
-    "description": "Unlock powerful upgrades to boost your blockchain’s performance.\nClick the upgrade to enhance your chain and maximize your rewards.",
+    "title": "Upgrades!",
+    "description": "Your blockchain is ready to evolve!\nFork your chain by unlocking powerful upgrades and new features.\nThis tab will show you the way to building a superpowered blockchain empire!",
     "bubbleTargetId": "chainUpgradeTab",
     "highlightTargetId": "chainUpgradeTab",
     "canDismiss": false
   },
   "purchaseChainAutomation": {
-    "title": "Automate Your Chain",
-    "description": "Unlock automation so you can chill while your blockchain empire expands.\nClick the automation upgrade to set it up and let your chain run itself.",
+    "title": "Automation!",
+    "description": "Finally, the last piece of the puzzle. Automation!\nWith automation, you can setup your blockchain to run itself.\nNo more manual clicks — just sit back and watch your empire grow.",
     "bubbleTargetId": "chainAutomationTab",
     "highlightTargetId": "chainAutomationTab",
     "canDismiss": false
   },
   "dapps": {
-    "title": "Build Bigger with dApps",
-    "description": "Decentralized applications (dApps) are the future!\nClick here to manage your first dApps.",
+    "title": "dApps! dApps! dApps!",
+    "description": "Decentralized applications (dApps) are the backbone of your blockchain ecosystem.\nThey bring utility, users, and value to your chain.\nClick here to begin your dApps journey!",
     "bubbleTargetId": "dappsTab",
     "highlightTargetId": "dappsTab",
     "canDismiss": false
   },
   "L2Upgrade": {
-    "title": "Congrats! You now have an L2",
-    "description": "You've just unlocked a Layer 2 — a faster, cheaper way to scale your blockchain.\nClick here to manage it and boost your chain's performance.",
+    "title": "GM, Let's Scale!",
+    "description": "Congrats! It's time for Layer 2!\nL2s let your break the limits of traditional blockchains - build faster, cheaper, and be more expressive.\nStart clicking to Sequence your first L2 block!",
     "bubbleTargetId": "sequencerConfirmer",
     "highlightTargetId": "sequencerConfirmer",
     "canDismiss": false
   },
   "prover": {
-    "title": "Congrats! You now have a prover",
-    "description": "Click here to manage the prover.",
+    "title": "Just Prove It!",
+    "description": "Now that you have a Layer 2, it's time to prove it!\nProving is the process of validating your L2 blocks and ensuring they are secure. Every block you complete needs to be proved!\nClick to start proving your first L2 batch!",
     "bubbleTargetId": "proverConfirmer",
     "highlightTargetId": "proverConfirmer",
     "canDismiss": false
   },
   "dataAvailability": {
-    "title": "Congrats! You now have a data availability layer",
-    "description": "Click here to manage the data availability layer.",
+    "title": "LFG DA!",
+    "description": "Data Availability (DA) is crucial for L2s.\nIt ensures that all the data from your L2 blocks is accessible and verifiable.\nClick to start your first DA confirmation!",
     "bubbleTargetId": "daConfirmer",
     "highlightTargetId": "daConfirmer",
     "canDismiss": false
   },
   "l2Store": {
-    "title": "Visit the L2 Shop",
-    "description": "Your L2 has its own shop!\nHead to the Shop to upgrade your L2 and unlock powerful new features.",
+    "title": "L2 Shop!",
+    "description": "Awesome work!\nNow that your L2 is up and running, it's time to enhance it.\nL2s offer a wide variety of features and upgrades that you can use to scale boundlessly with integrity.\nLet's head to the shop and check it out!",
     "bubbleTargetId": "storeTab",
     "highlightTargetId": "storeTab",
     "canDismiss": false
   },
   "l2StoreTab": {
-    "title": "Welcome to the L2 Store",
-    "description": "Here you can purchase L2-specific upgrades to enhance your blockchain’s capabilities.\nExplore the options and supercharge your L2!",
+    "title": "L2 Shop!",
+    "description": "Welcome back to the store!\nYou can switch to your L2 store by clicking the L2 tab.\nHere you can purchase L2-specific upgrades.\nExplore the options. Prepare for the Endgame.",
     "bubbleTargetId": "l2StoreTab",
     "highlightTargetId": "l2StoreTab",
     "canDismiss": false
