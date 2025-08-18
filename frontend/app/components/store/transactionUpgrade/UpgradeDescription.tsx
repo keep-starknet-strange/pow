@@ -78,10 +78,9 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
 
     // Split by our value markers and BTC icons
     // Updated regex to handle decimal numbers (e.g., 0.2, 1.5)
-    const parts = text.split(
-      /(__CURR_VAL__[\d.]+__|__UPGRADE_VAL__[\d.]+__|\{BTC\})/g,
-    ).filter(part => part.length > 0);
-
+    const parts = text
+      .split(/(__CURR_VAL__[\d.]+__|__UPGRADE_VAL__[\d.]+__|\{BTC\})/g)
+      .filter((part) => part.length > 0);
 
     return parts.map((part, partIndex) => {
       // Handle BTC icon
