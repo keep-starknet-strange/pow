@@ -80,7 +80,8 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
     // Updated regex to handle decimal numbers (e.g., 0.2, 1.5)
     const parts = text.split(
       /(__CURR_VAL__[\d.]+__|__UPGRADE_VAL__[\d.]+__|\{BTC\})/g,
-    );
+    ).filter(part => part.length > 0);
+
 
     return parts.map((part, partIndex) => {
       // Handle BTC icon
@@ -91,7 +92,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
             style={{
               width: 14,
               height: 14,
-              marginLeft: -8,
+              marginLeft: 0,
               marginRight: 0,
             }}
           >
@@ -122,7 +123,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
               value={value}
               enableCompactNotation
               compactToFixed={1}
-              fixedOnlyForCompact={false}
+              fixedOnlyForCompact={value < 1 ? false : undefined}
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",
@@ -145,7 +146,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
               value={value}
               enableCompactNotation
               compactToFixed={1}
-              fixedOnlyForCompact={false}
+              fixedOnlyForCompact={value < 1 ? false : undefined}
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",
@@ -162,7 +163,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
         <Text
           key={partIndex}
           style={{ color: textColor }}
-          className="text-lg font-Pixels leading-none"
+          className="text-[16px] font-Pixels leading-none"
         >
           {part}
         </Text>
@@ -176,7 +177,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
         const isSecondLine = lineIndex === 1;
 
         return (
-          <View key={lineIndex} className="flex-row flex-wrap items-center">
+          <View key={lineIndex} className="flex-row flex-wrap">
             {renderTextWithNumbers(line, isSecondLine)}
           </View>
         );

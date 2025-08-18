@@ -63,7 +63,7 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
           {name}
         </Animated.Text>
       </View>
-      <Animated.View entering={FadeInRight} className="mt-[2px]">
+      <Animated.View entering={FadeInRight} className="mt-[2px] ml-[8px]">
         {chainId !== undefined &&
         upgradeId !== undefined &&
         currentLevel !== undefined &&
