@@ -4,7 +4,6 @@ import { useUpgrades } from "../../stores/useUpgradesStore";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
-import { getUpgradeIcon } from "../../utils/transactions";
 
 export type UpgradeViewProps = {
   chainId: number;
@@ -15,8 +14,15 @@ export const UpgradeView: React.FC<UpgradeViewProps> = React.memo((props) => {
   const { upgrades, getNextUpgradeCost, upgrade } = useUpgrades();
 
   const [level, setLevel] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(-1);
   useEffect(() => {
-    setLevel(upgrades[props.chainId][props.upgrade.id] + 1 || 0);
+    const upgradeLevels = upgrades[props.chainId] || {};
+    const upgradeLevel =
+      upgradeLevels[props.upgrade.id] !== undefined
+        ? upgradeLevels[props.upgrade.id]
+        : -1;
+    setCurrentLevel(upgradeLevel);
+    setLevel(upgradeLevel + 1);
   }, [props.chainId, props.upgrade, upgrades]);
 
   const getUpgradeIcon = (chainId: number, upgradeName: string) => {
@@ -53,6 +59,13 @@ export const UpgradeView: React.FC<UpgradeViewProps> = React.memo((props) => {
         <TxDetails
           name={props.upgrade.name}
           description={props.upgrade.description}
+          chainId={props.chainId}
+          upgradeId={props.upgrade.id}
+          currentLevel={currentLevel}
+          values={props.upgrade.values}
+          baseValue={props.upgrade.baseValue}
+          subDescription={props.upgrade.subDescription}
+          maxSubDescription={props.upgrade.maxSubDescription}
         />
       </View>
       <UpgradeButton

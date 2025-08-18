@@ -62,6 +62,7 @@ export const TxFlashBurstManager: React.FC<TxFlashBurstManagerProps> = ({
         right: 0,
         bottom: 0,
         pointerEvents: "none",
+        zIndex: 50,
       }}
     >
       {flashes.map((flash) => (

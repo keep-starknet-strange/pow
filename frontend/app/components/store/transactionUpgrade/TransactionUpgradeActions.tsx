@@ -49,7 +49,7 @@ export const TransactionUpgradeActions: React.FC<
           )}
           <UpgradeButton
             icon={"shop.btc"}
-            label={`Upgrade Value`}
+            label={`Boost Value`}
             level={feeProps.level}
             maxLevel={feeProps.maxLevel}
             nextCost={feeProps.nextCost}
@@ -65,7 +65,7 @@ export const TransactionUpgradeActions: React.FC<
           )}
           <UpgradeButton
             icon={"shop.clock"}
-            label={`Upgrade Speed`}
+            label={`Boost Speed`}
             level={speedProps.level}
             maxLevel={speedProps.maxLevel}
             nextCost={speedProps.nextCost}

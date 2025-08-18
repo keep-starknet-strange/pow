@@ -437,6 +437,8 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
+      const currentBalance = useBalanceStore.getState().balance;
+      useBalanceStore.getState().setBalance(currentBalance * 2);
       return;
     }
 
