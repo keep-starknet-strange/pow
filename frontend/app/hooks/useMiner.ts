@@ -10,7 +10,7 @@ export const useMiner = (
   onBlockMined: () => void,
   triggerMineAnimation?: () => void,
 ) => {
-  const { notifyImmediate } = useEventManager();
+  const { notify } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
@@ -46,7 +46,7 @@ export const useMiner = (
 
     // Trigger sound immediately before animation and state updates
     if (newCounter < blockDifficulty) {
-      notifyImmediate("MineClicked", {
+      notify("MineClicked", {
         counter: newCounter,
         difficulty: blockDifficulty,
         ignoreAction: miningBlock?.blockId === 0,
@@ -72,7 +72,7 @@ export const useMiner = (
     miningBlock?.isBuilt,
     blockDifficulty,
     mineCounter,
-    notifyImmediate,
+    notify,
     onBlockMined,
   ]);
 

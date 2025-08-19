@@ -179,7 +179,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { workingBlocks: newWorkingBlocks };
       }
       // Trigger sound immediately before state changes
-      useEventManager.getState().notifyImmediate("TxAdded", {
+      useEventManager.getState().notify("TxAdded", {
         chainId,
         tx: transaction,
         progress: (block.transactions.length + 1) / maxBlockSize,

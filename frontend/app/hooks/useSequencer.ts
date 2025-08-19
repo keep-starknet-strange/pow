@@ -10,7 +10,7 @@ export const useSequencer = (
   onBlockSequenced: () => void,
   triggerSequenceAnimation?: () => void,
 ) => {
-  const { notifyImmediate } = useEventManager();
+  const { notify } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserBlockClicks } = usePowContractConnector();
@@ -50,7 +50,7 @@ export const useSequencer = (
       const newCounter = prevCounter + 1;
 
       if (newCounter < blockDifficulty) {
-        notifyImmediate("SequenceClicked", {
+        notify("SequenceClicked", {
           counter: newCounter,
           difficulty: blockDifficulty,
           ignoreAction: sequencingBlock?.blockId === 0,
@@ -67,7 +67,7 @@ export const useSequencer = (
     sequencingBlock?.isBuilt,
     blockDifficulty,
     sequenceCounter,
-    notifyImmediate,
+    notify,
     onBlockSequenced,
   ]);
 
