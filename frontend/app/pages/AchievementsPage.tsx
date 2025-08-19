@@ -29,7 +29,10 @@ export const AchievementsPage: React.FC = () => {
         // Handle BTC icon
         if (part === "{BTC}") {
           return (
-            <View key={partIndex} style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View
+              key={partIndex}
+              style={{ alignItems: "center", justifyContent: "center" }}
+            >
               <Canvas
                 style={{
                   width: 14,

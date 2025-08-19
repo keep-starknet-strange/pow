@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
+import { getUpgradeShopIconBackground } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
@@ -55,6 +56,10 @@ export const UpgradeView: React.FC<UpgradeViewProps> = React.memo((props) => {
         <IconWithLock
           txIcon={getUpgradeIcon(props.chainId, props.upgrade.name)}
           locked={false}
+          backgroundColor={getUpgradeShopIconBackground(
+            props.chainId,
+            props.upgrade.id,
+          )}
         />
         <TxDetails
           name={props.upgrade.name}

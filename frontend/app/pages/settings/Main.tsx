@@ -25,7 +25,14 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   goBackToLogin,
 }) => {
   const { navigate } = useNavigation();
-  const { isSoundOn, isMusicOn, isHapticsOn, toggleSound, toggleMusic, toggleHaptics } = useSound();
+  const {
+    isSoundOn,
+    isMusicOn,
+    isHapticsOn,
+    toggleSound,
+    toggleMusic,
+    toggleHaptics,
+  } = useSound();
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
