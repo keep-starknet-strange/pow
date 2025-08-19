@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useCallback, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
   Canvas,
@@ -42,6 +42,7 @@ export const TxButtonInner = memo(
     const { getImage } = useImages();
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
+    const transactionUnlocked = props.feeLevel !== -1;
 
     const automationAnimHeight = useSharedValue(94);
     const automationAnimY = useDerivedValue(() => {
@@ -119,14 +120,16 @@ export const TxButtonInner = memo(
     );
 
     return (
-      <View className="w-full h-[94px] relative">
+      <View style={[styles.container, { width: "100%" }]}>
         <View
-          className="absolute h-[94px]"
-          style={{
-            width: width * 0.185,
-          }}
+          style={[
+            styles.backgroundContainer,
+            {
+              width: width * 0.185,
+            },
+          ]}
         >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Canvas style={styles.canvas}>
             <Image
               image={getTxBg(props.chainId, props.txId, props.isDapp, getImage)}
               fit="fill"
@@ -141,14 +144,16 @@ export const TxButtonInner = memo(
             />
           </Canvas>
         </View>
-        {props.feeLevel !== -1 && (
+        {transactionUnlocked && (
           <View
-            className="absolute bottom-0 h-full"
-            style={{
-              width: width * 0.18,
-            }}
+            style={[
+              styles.animationContainer,
+              {
+                width: width * 0.18,
+              },
+            ]}
           >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Canvas style={styles.canvas}>
               <Rect
                 x={0}
                 y={automationAnimY}
@@ -173,14 +178,16 @@ export const TxButtonInner = memo(
             </Canvas>
           </View>
         )}
-        {props.feeLevel !== -1 && (
+        {transactionUnlocked && (
           <View
-            className="absolute left-[3px] h-[94px] w-full"
-            style={{
-              width: width * 0.17,
-            }}
+            style={[
+              styles.nameplateContainer,
+              {
+                width: width * 0.17,
+              },
+            ]}
           >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Canvas style={styles.canvas}>
               <Image
                 image={getTxNameplate(
                   props.chainId,
@@ -199,26 +206,26 @@ export const TxButtonInner = memo(
                 height={19}
               />
             </Canvas>
-            <Text className="absolute left-0 top-[4px] w-full text-center text-[16px] text-[#fff8ff] font-Pixels">
-              {props.name}
-            </Text>
+            <Text style={styles.nameText}>{props.name}</Text>
           </View>
         )}
-        {props.feeLevel === -1 ? (
+        {transactionUnlocked ? (
           <View
-            className="absolute w-full h-full
-               pointer-events-none
-               top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-            style={{
-              width: width * 0.18,
-            }}
+            style={[
+              styles.iconContainer,
+              {
+                width: width * 0.18,
+              },
+            ]}
           >
-            <Canvas
-              style={{ flex: 1 }}
-              className="w-full h-full flex justify-center items-center"
-            >
+            <Canvas style={styles.canvas}>
               <Image
-                image={getImage("shop.lock")}
+                image={getTxIcon(
+                  props.chainId,
+                  props.txId,
+                  props.isDapp,
+                  getImage,
+                )}
                 fit="contain"
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -233,19 +240,16 @@ export const TxButtonInner = memo(
           </View>
         ) : (
           <View
-            className="absolute h-[94px]"
-            style={{
-              width: width * 0.18,
-            }}
+            style={[
+              styles.lockContainer,
+              {
+                width: width * 0.18,
+              },
+            ]}
           >
-            <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <Canvas style={styles.lockCanvas}>
               <Image
-                image={getTxIcon(
-                  props.chainId,
-                  props.txId,
-                  props.isDapp,
-                  getImage,
-                )}
+                image={getImage("shop.lock")}
                 fit="contain"
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -271,3 +275,58 @@ export const TxButtonInner = memo(
     );
   },
 );
+
+const styles = StyleSheet.create({
+  container: {
+    height: 94,
+    position: "relative",
+  },
+  backgroundContainer: {
+    position: "absolute",
+    height: 94,
+  },
+  animationContainer: {
+    position: "absolute",
+    bottom: 0,
+    height: "100%",
+  },
+  nameplateContainer: {
+    position: "absolute",
+    left: 3,
+    height: 94,
+  },
+  iconContainer: {
+    position: "absolute",
+    height: 94,
+  },
+  lockContainer: {
+    position: "absolute",
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    pointerEvents: "none",
+  },
+  canvas: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  lockCanvas: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nameText: {
+    position: "absolute",
+    left: 0,
+    top: 4,
+    width: "100%",
+    textAlign: "center",
+    fontSize: 16,
+    color: "#fff8ff",
+    fontFamily: "Pixels",
+  },
+});

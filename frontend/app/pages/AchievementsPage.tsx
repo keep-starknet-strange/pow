@@ -20,6 +20,58 @@ export const AchievementsPage: React.FC = () => {
   const { width, height } = useCachedWindowDimensions();
   const { getImage } = useImages();
 
+  const renderAchievementName = useCallback(
+    (name: string) => {
+      // Split by BTC icon
+      const parts = name.split(/(\{BTC\})/g).filter((part) => part.length > 0);
+
+      return parts.map((part, partIndex) => {
+        // Handle BTC icon
+        if (part === "{BTC}") {
+          return (
+            <View
+              key={partIndex}
+              style={{ alignItems: "center", justifyContent: "center" }}
+            >
+              <Canvas
+                style={{
+                  width: 14,
+                  height: 14,
+                  marginLeft: 0,
+                  marginRight: 1,
+                }}
+              >
+                <Image
+                  image={getImage("shop.btc")}
+                  fit="contain"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={0}
+                  width={14}
+                  height={14}
+                />
+              </Canvas>
+            </View>
+          );
+        }
+
+        // Handle regular text
+        return (
+          <Text
+            key={partIndex}
+            className="font-Pixels text-[#fff7ff] text-[16px] leading-none text-center"
+          >
+            {part}
+          </Text>
+        );
+      });
+    },
+    [getImage],
+  );
+
   const categoriesData = useMemo(() => {
     if (!isFocused) return [];
     const cats = achievementJson.reduce(
@@ -142,12 +194,9 @@ export const AchievementsPage: React.FC = () => {
                   </Canvas>
                 </View>
               )}
-              <Text
-                className="font-Pixels text-[#fff7ff] text-[16px] leading-none
-              absolute top-[12px] w-full text-center px-[4px]"
-              >
-                {achievement.name}
-              </Text>
+              <View className="absolute top-[8px] left-0 right-0 flex-row flex-wrap justify-center items-center">
+                {renderAchievementName(achievement.name)}
+              </View>
               <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
                 <Canvas
                   key={`achievement-icon-${item.id}-${achievement.id}`}
@@ -173,7 +222,7 @@ export const AchievementsPage: React.FC = () => {
         />
       </View>
     ),
-    [width, getImage, achievementsProgress],
+    [width, getImage, achievementsProgress, renderAchievementName],
   );
 
   if (!isFocused) {

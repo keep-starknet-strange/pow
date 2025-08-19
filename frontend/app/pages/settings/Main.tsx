@@ -25,7 +25,14 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   goBackToLogin,
 }) => {
   const { navigate } = useNavigation();
-  const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
+  const {
+    isSoundOn,
+    isMusicOn,
+    isHapticsOn,
+    toggleSound,
+    toggleMusic,
+    toggleHaptics,
+  } = useSound();
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
@@ -50,17 +57,17 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     onPress?: () => void;
     icon?: string;
   }[] = [
-    { label: "About", tab: "About" },
-    { label: "Credits", tab: "Credits" },
-    { label: "Terms of Use", tab: "TermsOfUse" },
-    { label: "Review", onPress: () => StoreReview.requestReview() },
-    ...(currentPrestige >= 1
-      ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
-      : []),
     {
       label: "Reset Game",
       onPress: () => setShowResetConfirmation(true),
     },
+    { label: "Review", onPress: () => StoreReview.requestReview() },
+    { label: "Terms of Use", tab: "TermsOfUse" },
+    { label: "About", tab: "About" },
+    { label: "Credits", tab: "Credits" },
+    ...(currentPrestige >= 1
+      ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
+      : []),
     {
       label: "Back",
       onPress: () =>
@@ -83,8 +90,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
           onPress={toggleMusic}
         />
         <BasicButton
-          label={notifs ? "Notifs On" : "Notifs Off"}
-          onPress={toggleNotifs}
+          label={isHapticsOn ? "Haptics On" : "Haptics Off"}
+          onPress={toggleHaptics}
         />
 
         {settingsComponents.map(({ label, tab, onPress }) => (

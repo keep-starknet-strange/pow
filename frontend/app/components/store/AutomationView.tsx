@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
+import { getAutomationShopIconBackground } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
@@ -17,10 +18,15 @@ export const AutomationView: React.FC<AutomationViewProps> = React.memo(
       useUpgrades();
 
     const [level, setLevel] = useState(0);
+    const [currentLevel, setCurrentLevel] = useState(-1);
     useEffect(() => {
+      const automationLevels = automations[props.chainId] || {};
       const automationLevel =
-        automations[props.chainId][props.automation.id] + 1 || 0;
-      setLevel(automationLevel);
+        automationLevels[props.automation.id] !== undefined
+          ? automationLevels[props.automation.id]
+          : -1;
+      setCurrentLevel(automationLevel);
+      setLevel(automationLevel + 1);
     }, [props.chainId, props.automation.id, automations]);
 
     return (
@@ -33,6 +39,10 @@ export const AutomationView: React.FC<AutomationViewProps> = React.memo(
               level - 1,
             )}
             locked={false}
+            backgroundColor={getAutomationShopIconBackground(
+              props.chainId,
+              props.automation.id,
+            )}
           />
           <TxDetails
             name={
@@ -41,6 +51,13 @@ export const AutomationView: React.FC<AutomationViewProps> = React.memo(
                 : `${props.automation.levels[level - 1]?.name} ${props.automation.name}`
             }
             description={props.automation.description}
+            chainId={props.chainId}
+            upgradeId={props.automation.id}
+            currentLevel={currentLevel}
+            speeds={props.automation.levels?.map((level: any) => level.speed)}
+            baseSpeed={0}
+            subDescription={props.automation.subDescription}
+            maxSubDescription={props.automation.maxSubDescription}
           />
         </View>
         <UpgradeButton

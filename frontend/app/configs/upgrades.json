@@ -3,8 +3,10 @@
     {
       "id": 0,
       "name": "Block Reward",
-      "color": "#f760f7a0",
-      "description": "Increase the block reward for miners",
+      "color": "green",
+      "description": "Increase the block reward",
+      "subDescription": "${currVal}{BTC} -> ${upgradeVal}{BTC} per block",
+      "maxSubDescription": "${upgradeVal}{BTC} per block",
       "costs": [250, 18916, 154628, 816075, 3729375, 14877931, 54375912, 154388000],
       "values": [330, 1200, 8400, 21600, 98400, 206400, 734400, 1224000],
       "baseValue": 5
@@ -12,8 +14,10 @@
     {
       "id": 1,
       "name": "MEV Boost",
-      "color": "#f760f7a0",
-      "description": "Increase the transaction fee for miners",
+      "color": "pink",
+      "description": "Transaction fees multiplier",
+      "subDescription": "x${currVal} -> x${upgradeVal}",
+      "maxSubDescription": "x${upgradeVal}",
       "costs": [350, 18916, 816075, 14877931, 154388000],
       "values": [2, 4, 8, 16, 32],
       "baseValue": 1
@@ -21,8 +25,10 @@
     {
       "id": 2,
       "name": "Block Size",
-      "color": "#f760f7a0",
-      "description": "Increase the transactions per block",
+      "color": "blue",
+      "description": "More TXs per block",
+      "subDescription": "${currVal} -> ${upgradeVal} width",
+      "maxSubDescription": "${upgradeVal} width",
       "costs": [2175, 142734, 3442500, 50193150],
       "values": [5, 6, 7, 8],
       "baseValue": 4
@@ -30,8 +36,10 @@
     {
       "id": 3,
       "name": "Block Difficulty",
-      "color": "#f760f7a0",
-      "description": "Lower block difficulty for faster mining",
+      "color": "yellow",
+      "description": "Lower mining difficulty",
+      "subDescription": "${currVal} -> ${upgradeVal} hits",
+      "maxSubDescription": "${upgradeVal} hits",
       "costs": [2356, 18916, 154628, 816075, 3729375, 14877931, 54375912],
       "values": [7, 6, 5, 4, 3, 2, 1],
       "baseValue": 8
@@ -41,8 +49,10 @@
     {
       "id": 0,
       "name": "Block Reward",
-      "color": "#f760f7a0",
-      "description": "Increase the block reward for L2 sequencers",
+      "color": "green",
+      "description": "Increase the block reward",
+      "subDescription": "${currVal}{BTC} -> ${upgradeVal}{BTC} per block",
+      "maxSubDescription": "${upgradeVal}{BTC} per block",
       "costs": [41728395062, 294666666667, 2426666666667, 11639012345679, 53193432098765, 197296987654321, 721395358024691, 1932840000000000],
       "values": [3300000000, 12000000000, 84000000000, 216000000000, 984000000000, 2064000000000, 7344000000000, 12240000000000],
       "baseValue": 441600000
@@ -50,8 +60,10 @@
     {
       "id": 1,
       "name": "MEV Boost",
-      "color": "#f760f7a0",
-      "description": "Increase the transaction fee for L2 sequencers",
+      "color": "pink",
+      "description": "Transaction fees multiplier",
+      "subDescription": "x${currVal} -> x${upgradeVal}",
+      "maxSubDescription": "x${upgradeVal}",
       "costs": [4988799920, 294666666667, 11639012345679, 197296987654321, 1932840000000000],
       "values": [2, 4, 8, 16, 32],
       "baseValue": 1
@@ -59,8 +71,10 @@
     {
       "id": 2,
       "name": "Block Size",
-      "color": "#f760f7a0",
-      "description": "Increase the transactions per L2 block",
+      "color": "blue",
+      "description": "More TXs per L2 block",
+      "subDescription": "${currVal} -> ${upgradeVal} width",
+      "maxSubDescription": "${upgradeVal} width",
       "costs": [38518518519, 2240000000000, 49101629629630, 665903407407407],
       "values": [6, 7, 8, 9],
       "baseValue": 5
@@ -68,8 +82,10 @@
     {
       "id": 3,
       "name": "Block Difficulty",
-      "color": "#f760f7a0",
-      "description": "Lower block difficulty for faster L2 mining",
+      "color": "yellow",
+      "description": "Lower sequencing difficulty",
+      "subDescription": "${currVal} -> ${upgradeVal} hits",
+      "maxSubDescription": "${upgradeVal} hits",
       "costs": [41728395062, 294666666667, 2426666666667, 11639012345679, 53193432098765, 197296987654321, 721395358024691],
       "values": [7, 6, 5, 4, 3, 2, 1],
       "baseValue": 8
@@ -77,8 +93,10 @@
     {
       "id": 4,
       "name": "Recursive Proving",
-      "color": "#f760f7a0",
-      "description": "Enable recursive proving for L2",
+      "color": "pink",
+      "description": "Boost proving efficiency",
+      "subDescription": "${currVal} -> ${upgradeVal} L2 blocks per proof",
+      "maxSubDescription": "${upgradeVal} L2 blocks per proof",
       "costs": [4989799920, 294666666667, 11639012345679, 197296987654321, 1932840000000000],
       "values": [2, 4, 8, 16, 32],
       "baseValue": 1
@@ -86,8 +104,10 @@
     {
       "id": 5,
       "name": "DA compression",
-      "color": "#f760f7a0",
-      "description": "Enable data availability compression",
+      "color": "purple",
+      "description": "Boost compression algorithm",
+      "subDescription": "${currVal} -> ${upgradeVal} blocks per DA store",
+      "maxSubDescription": "${upgradeVal} blocks per DA store",
       "costs": [
         4989799920, 294666666667, 11639012345679, 197296987654321, 1932840000000000
       ],

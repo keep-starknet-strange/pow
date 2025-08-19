@@ -199,6 +199,8 @@ export const useTutorial = () => {
 
 export function useIsTutorialTargetActive(targetId: TargetId): boolean {
   return useTutorialStore((s) => {
+    if (!s.isTutorialActive) return false;
+    if (!s.visible) return false;
     const cfg = tutorialConfig[s.step];
     return (
       cfg?.highlightTargetId === targetId || cfg?.bubbleTargetId === targetId

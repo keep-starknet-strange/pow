@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "EXPO_PUBLIC_ENABLE_CHEAT_CODES=true expo start",
     "start:devnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_DEVNET EXPO_PUBLIC_ENABLE_CHEAT_CODES=true expo start",
     "start:sepolia": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_SEPOLIA EXPO_PUBLIC_ENABLE_CHEAT_CODES=false expo start",
     "start:mainnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_MAINNET EXPO_PUBLIC_ENABLE_CHEAT_CODES=false expo start",

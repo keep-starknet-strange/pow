@@ -163,8 +163,9 @@ const TransactionCount = memo(
         <Text
           style={{
             fontSize: isSmall ? 16 : 18,
+            color: "#c3c3c3",
+            fontFamily: "Pixels" as const,
           }}
-          className="text-[#c3c3c3] font-Pixels"
         >
           /{maxSize}
         </Text>
@@ -179,9 +180,11 @@ const BlockReward = memo(
   ({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
     const textStyle = useMemo(
       () => ({
-        fontSize: isSmall ? 18 : 18,
+        fontSize: isSmall ? 14 : 18,
         color: "#fff2fdff",
         fontFamily: "Pixels" as const,
+        marginBottom: isSmall ? 2 : 0,
+        alignItems: "flex-end" as const,
       }),
       [isSmall],
     );
@@ -290,8 +293,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         left: props.placement.width * 0.49,
         paddingRight: 4,
         paddingBottom: 6,
+        transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [props.placement.height, props.placement.width],
+      [props.placement.height, props.placement.width, props.chainId],
     );
 
     const rewardStyle = useMemo(
@@ -301,8 +305,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         left: props.placement.width * 0.81,
         paddingRight: 4,
         paddingBottom: 6,
+        // For L2 (chainId 1), add a small downward adjustment to prevent being pushed up
+        transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [props.placement.height, props.placement.width],
+      [props.placement.height, props.placement.width, props.chainId],
     );
 
     const maxSize = useMemo(

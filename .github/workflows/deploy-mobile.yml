@@ -33,8 +33,19 @@ jobs:
     deploy-android:
         if: ${{ inputs.deploy_android == true }}
         runs-on: ubuntu-latest
+        environment: ${{ inputs.internal_testing == true && 'QA' || 'PROD' }}
         env:
+          ## Environment variables setup
+          EXPO_PUBLIC_USE_MOCK: ${{ vars.USE_MOCK }}
+          EXPO_PUBLIC_ENABLE_STARKNET: ${{ vars.ENABLE_STARKNET }}
+          EXPO_PUBLIC_STARKNET_CHAIN: ${{ vars.STARKNET_CHAIN }}
+          EXPO_PUBLIC_FOC_ENGINE_API: ${{ vars.FOC_ENGINE_API }}
+          EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS: ${{ vars.POW_GAME_CONTRACT_ADDRESS }}
+          EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS: ${{ vars.ACCOUNTS_CONTRACT_ADDRESS }}
+          EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
           EXPO_APP_VERSION: ${{ inputs.version }}
+
+          ## Secrets setup
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -103,8 +114,19 @@ jobs:
     deploy-ios:
       if: ${{ inputs.deploy_ios == true }}
       runs-on: macos-15
+      environment: ${{ inputs.internal_testing == true && 'QA' || 'PROD' }}
       env:
+        ## Environment variables setup
+        EXPO_PUBLIC_USE_MOCK: ${{ vars.USE_MOCK }}
+        EXPO_PUBLIC_ENABLE_STARKNET: ${{ vars.ENABLE_STARKNET }}
+        EXPO_PUBLIC_STARKNET_CHAIN: ${{ vars.STARKNET_CHAIN }}
+        EXPO_PUBLIC_FOC_ENGINE_API: ${{ vars.FOC_ENGINE_API }}
+        EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS: ${{ vars.POW_GAME_CONTRACT_ADDRESS }}
+        EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS: ${{ vars.ACCOUNTS_CONTRACT_ADDRESS }}
+        EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
         EXPO_APP_VERSION: ${{ inputs.version }}
+
+        ## Secrets setup
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
         APPSTORE_CONNECT_KEY_ENCODED: ${{ secrets.APPSTORE_CONNECT_KEY_BASE64 }}

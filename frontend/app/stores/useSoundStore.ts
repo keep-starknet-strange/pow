@@ -9,6 +9,7 @@ const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
+const HAPTICS_ENABLED_KEY = "haptics_enabled";
 
 const musicAssets: { [key: string]: any } = {
   "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
@@ -118,6 +119,7 @@ class SoundPool {
 interface SoundState {
   isSoundOn: boolean;
   isMusicOn: boolean;
+  isHapticsOn: boolean;
   soundEffectVolume: number;
   musicVolume: number;
   musicPlayer: AudioPlayer | null;
@@ -125,6 +127,7 @@ interface SoundState {
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
+  toggleHaptics: () => void;
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
   playSoundEffect: (soundType: string, pitchShift?: number) => Promise<void>;
@@ -137,6 +140,7 @@ interface SoundState {
 export const useSoundStore = create<SoundState>((set, get) => ({
   isSoundOn: false,
   isMusicOn: false,
+  isHapticsOn: true,
   soundEffectVolume: 1,
   musicVolume: 0.2,
   musicPlayer: null,
@@ -146,6 +150,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     try {
       const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
       const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
+      const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
       const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
 
@@ -170,6 +175,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       set({
         isSoundOn: soundEnabled === "true" || soundEnabled === null,
         isMusicOn: musicOn,
+        isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
         soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
         musicVolume: volume,
         musicPlayer: musicPlayer,
@@ -184,6 +190,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       set({
         isSoundOn: true,
         isMusicOn: false,
+        isHapticsOn: true,
         soundEffectVolume: 1,
         musicVolume: 0.5,
         soundPool: new SoundPool(),
@@ -227,6 +234,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     } else {
       await get().stopMusic();
     }
+  },
+
+  toggleHaptics: () => {
+    set((state) => {
+      const newValue = !state.isHapticsOn;
+      AsyncStorage.setItem(HAPTICS_ENABLED_KEY, newValue.toString());
+      return { isHapticsOn: newValue };
+    });
   },
 
   setSoundEffectVolume: (volume) => {
@@ -289,9 +304,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     soundType: string,
     pitchShift: number = 1.0,
   ): Promise<void> => {
-    const { isSoundOn, soundEffectVolume, soundPool } = get();
+    const { isSoundOn, isHapticsOn, soundEffectVolume, soundPool } = get();
 
-    // Fast early returns for performance
+    // Get sound config once for both sound and haptics
+    const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
+    if (!soundConfig) return;
+
+    // Play haptic feedback independently of sound
+    if (isHapticsOn && soundConfig.haptic) {
+      playHaptic(soundConfig.haptic);
+    }
+
+    // Fast early returns for sound performance
     if (!isSoundOn || !soundPool || !getSoundFileForEvent(soundType)) {
       return;
     }
@@ -300,12 +324,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     pitchShift = Math.max(0.5, Math.min(2.0, pitchShift));
 
     try {
-      const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
-      if (!soundConfig) return;
-
-      // Play haptic feedback
-      playHaptic(soundConfig.haptic);
-
       // Play sound with minimal overhead
       soundPool.playSound(
         soundType,
@@ -374,10 +392,12 @@ export const useSound = () => {
   const {
     isSoundOn,
     isMusicOn,
+    isHapticsOn,
     soundEffectVolume,
     musicVolume,
     toggleSound,
     toggleMusic,
+    toggleHaptics,
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,
@@ -389,10 +409,12 @@ export const useSound = () => {
   return {
     isSoundOn,
     isMusicOn,
+    isHapticsOn,
     soundEffectVolume,
     musicVolume,
     toggleSound,
     toggleMusic,
+    toggleHaptics,
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,
