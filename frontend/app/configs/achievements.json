@@ -2,83 +2,83 @@
   {
     "id": 0,
     "name": "Reach L1 Block 10",
-    "category": "L1 CHAIN",
+    "category": "L1 BLOCKCHAIN",
     "image": "achievements.l1.blocks.1",
     "updateOn": "MineDone"
   },
   {
     "id": 1,
     "name": "Reach L1 Block 42",
-    "category": "L1 CHAIN",
+    "category": "L1 BLOCKCHAIN",
     "image": "achievements.l1.blocks.2",
     "updateOn": "MineDone"
   },
   {
     "id": 2,
     "name": "Reach L1 Block 100",
-    "category": "L1 CHAIN",
+    "category": "L1 BLOCKCHAIN",
     "image": "achievements.l1.blocks.3",
     "updateOn": "MineDone"
   },
   {
     "id": 3,
     "name": "Reach L1 Block 420",
-    "category": "L1 CHAIN",
+    "category": "L1 BLOCKCHAIN",
     "image": "achievements.l1.blocks.4",
     "updateOn": "MineDone"
   },
   {
     "id": 4,
     "name": "Reach L2 Block 10",
-    "category": "L2 CHAIN",
+    "category": "L2 BLOCKCHAIN",
     "image": "achievements.l2.blocks.1",
     "updateOn": "SequenceDone"
   },
   {
     "id": 5,
     "name": "Reach L2 Block 100",
-    "category": "L2 CHAIN",
+    "category": "L2 BLOCKCHAIN",
     "image": "achievements.l2.blocks.2",
     "updateOn": "SequenceDone"
   },
   {
     "id": 6,
     "name": "Reach L2 Block 314",
-    "category": "L2 CHAIN",
+    "category": "L2 BLOCKCHAIN",
     "image": "achievements.l2.blocks.3",
     "updateOn": "SequenceDone"
   },
   {
     "id": 7,
     "name": "Reach L2 Block 420",
-    "category": "L2 CHAIN",
+    "category": "L2 BLOCKCHAIN",
     "image": "achievements.l2.blocks.4",
     "updateOn": "SequenceDone"
   },
   {
     "id": 8,
-    "name": "Reach ₿100",
+    "name": "Reach 100{BTC}",
     "category": "HODL",
     "image": "achievements.money.1",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 9,
-    "name": "Reach ₿10K",
+    "name": "Reach 10K{BTC}",
     "category": "HODL",
     "image": "achievements.money.2",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 10,
-    "name": "Reach ₿100M",
+    "name": "Reach 100M{BTC}",
     "category": "HODL",
     "image": "achievements.money.3",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 11,
-    "name": "Reach ₿1T",
+    "name": "Reach 1T{BTC}",
     "category": "HODL",
     "image": "achievements.money.4",
     "updateOn": "BalanceUpdated"
@@ -183,14 +183,14 @@
   },
   {
     "id": 26,
-    "name": "Get ₿100 in 1 Transaction",
+    "name": "Get 100{BTC} in 1 Transaction",
     "category": "MISSIONS",
     "image": "achievements.mission.btc.1",
     "updateOn": "TxAdded"
   },
   {
     "id": 27,
-    "name": "Get ₿1M in 1 Transaction",
+    "name": "Get 1M{BTC} in 1 Transaction",
     "category": "MISSIONS",
     "image": "achievements.mission.btc.2",
     "updateOn": "TxAdded"

@@ -49,7 +49,7 @@ export const TransactionUpgradeActions: React.FC<
           )}
           <UpgradeButton
             icon={"shop.btc"}
-            label={`Boost Value`}
+            label={`Boost Fees`}
             level={feeProps.level}
             maxLevel={feeProps.maxLevel}
             nextCost={feeProps.nextCost}

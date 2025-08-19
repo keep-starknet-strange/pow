@@ -25,7 +25,14 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   goBackToLogin,
 }) => {
   const { navigate } = useNavigation();
-  const { isSoundOn, isMusicOn, toggleSound, toggleMusic } = useSound();
+  const {
+    isSoundOn,
+    isMusicOn,
+    isHapticsOn,
+    toggleSound,
+    toggleMusic,
+    toggleHaptics,
+  } = useSound();
   const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
@@ -83,8 +90,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
           onPress={toggleMusic}
         />
         <BasicButton
-          label={notifs ? "Notifs On" : "Notifs Off"}
-          onPress={toggleNotifs}
+          label={isHapticsOn ? "Haptics On" : "Haptics Off"}
+          onPress={toggleHaptics}
         />
 
         {settingsComponents.map(({ label, tab, onPress }) => (

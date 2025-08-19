@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
+import { getAutomationShopIconBackground } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { UpgradeButton } from "./transactionUpgrade/UpgradeButton";
@@ -38,6 +39,10 @@ export const AutomationView: React.FC<AutomationViewProps> = React.memo(
               level - 1,
             )}
             locked={false}
+            backgroundColor={getAutomationShopIconBackground(
+              props.chainId,
+              props.automation.id,
+            )}
           />
           <TxDetails
             name={

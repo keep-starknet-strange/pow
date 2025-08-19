@@ -104,11 +104,11 @@ export class AchievementObserver implements Observer {
   }
 
   private handleTxAdded(achievement: Achievement, tx: Transaction) {
-    if (achievement.name === "Get ₿100 in 1 Transaction" && tx.fee >= 100) {
+    if (achievement.name === "Get 100{BTC} in 1 Transaction" && tx.fee >= 100) {
       this.updateAchievement(achievement.id, 100);
     } else if (
-      achievement.name === "Get ₿1K in 1 Transaction" &&
-      tx.fee >= 1000
+      achievement.name === "Get 1M{BTC} in 1 Transaction" &&
+      tx.fee >= 1000000
     ) {
       this.updateAchievement(achievement.id, 100);
     }
@@ -116,10 +116,10 @@ export class AchievementObserver implements Observer {
 
   private handleBalanceUpdated(achievement: Achievement, balance: number) {
     const balanceTargets: Record<string, number> = {
-      "Reach ₿100": 100,
-      "Reach ₿10K": 10_000,
-      "Reach ₿100M": 100_000_000,
-      "Reach ₿1T": 1_000_000_000,
+      "Reach 100{BTC}": 100,
+      "Reach 10K{BTC}": 10_000,
+      "Reach 100M{BTC}": 100_000_000,
+      "Reach 1T{BTC}": 1_000_000_000,
       "STRK Reward Unlocked": 1_000_000_000,
     };
     const target = balanceTargets[achievement.name];

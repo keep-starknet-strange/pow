@@ -223,7 +223,17 @@ const imagePaths = {
   shopAutoBuyButton: require(
     `${assetsPath}/shop/shop_automation_buy_button.webp`,
   ),
-  shopIconBg: require(`${assetsPath}/shop/shop_icon_background.webp`),
+  shopIconBgBlue: require(`${assetsPath}/shop/shop_icon_background_blue.webp`),
+  shopIconBgGreen: require(
+    `${assetsPath}/shop/shop_icon_background_green.webp`,
+  ),
+  shopIconBgPink: require(`${assetsPath}/shop/shop_icon_background_pink.webp`),
+  shopIconBgPurple: require(
+    `${assetsPath}/shop/shop_icon_background_purple.webp`,
+  ),
+  shopIconBgYellow: require(
+    `${assetsPath}/shop/shop_icon_background_yellow.webp`,
+  ),
   shopLock: require(`${assetsPath}/shop/icon_lock.webp`),
 
   // Shop Upgrades
@@ -568,7 +578,11 @@ export const useImagePreloader = () => {
     shopTabActive: useImage(imagePaths.shopTabActive),
     shopTxBuyButton: useImage(imagePaths.shopTxBuyButton),
     shopAutoBuyButton: useImage(imagePaths.shopAutoBuyButton),
-    shopIconBg: useImage(imagePaths.shopIconBg),
+    shopIconBgBlue: useImage(imagePaths.shopIconBgBlue),
+    shopIconBgGreen: useImage(imagePaths.shopIconBgGreen),
+    shopIconBgPink: useImage(imagePaths.shopIconBgPink),
+    shopIconBgPurple: useImage(imagePaths.shopIconBgPurple),
+    shopIconBgYellow: useImage(imagePaths.shopIconBgYellow),
     shopLock: useImage(imagePaths.shopLock),
     shopBlockDifficulty: useImage(imagePaths.shopBlockDifficulty),
     shopBlockSize: useImage(imagePaths.shopBlockSize),
@@ -788,7 +802,11 @@ export const useImagePreloader = () => {
         "shop.tab.active": images.shopTabActive,
         "shop.tx.buy": images.shopTxBuyButton,
         "shop.auto.buy": images.shopAutoBuyButton,
-        "shop.tx.bg": images.shopIconBg,
+        "shop.icon.bg.blue": images.shopIconBgBlue,
+        "shop.icon.bg.green": images.shopIconBgGreen,
+        "shop.icon.bg.pink": images.shopIconBgPink,
+        "shop.icon.bg.purple": images.shopIconBgPurple,
+        "shop.icon.bg.yellow": images.shopIconBgYellow,
         "shop.lock": images.shopLock,
         "shop.upgrades.blockDifficulty": images.shopBlockDifficulty,
         "shop.upgrades.blockSize": images.shopBlockSize,

@@ -3,7 +3,7 @@
     {
       "id": 0,
       "name": "Block Reward",
-      "color": "#f760f7a0",
+      "color": "green",
       "description": "Increase the block reward",
       "subDescription": "${currVal}{BTC} -> ${upgradeVal}{BTC} per block",
       "maxSubDescription": "${upgradeVal}{BTC} per block",
@@ -14,7 +14,7 @@
     {
       "id": 1,
       "name": "MEV Boost",
-      "color": "#f760f7a0",
+      "color": "pink",
       "description": "Transaction fees multiplier",
       "subDescription": "x${currVal} -> x${upgradeVal}",
       "maxSubDescription": "x${upgradeVal}",
@@ -25,7 +25,7 @@
     {
       "id": 2,
       "name": "Block Size",
-      "color": "#f760f7a0",
+      "color": "blue",
       "description": "More TXs per block",
       "subDescription": "${currVal} -> ${upgradeVal} width",
       "maxSubDescription": "${upgradeVal} width",
@@ -36,7 +36,7 @@
     {
       "id": 3,
       "name": "Block Difficulty",
-      "color": "#f760f7a0",
+      "color": "yellow",
       "description": "Lower mining difficulty",
       "subDescription": "${currVal} -> ${upgradeVal} hits",
       "maxSubDescription": "${upgradeVal} hits",
@@ -49,7 +49,7 @@
     {
       "id": 0,
       "name": "Block Reward",
-      "color": "#f760f7a0",
+      "color": "green",
       "description": "Increase the block reward",
       "subDescription": "${currVal}{BTC} -> ${upgradeVal}{BTC} per block",
       "maxSubDescription": "${upgradeVal}{BTC} per block",
@@ -60,7 +60,7 @@
     {
       "id": 1,
       "name": "MEV Boost",
-      "color": "#f760f7a0",
+      "color": "pink",
       "description": "Transaction fees multiplier",
       "subDescription": "x${currVal} -> x${upgradeVal}",
       "maxSubDescription": "x${upgradeVal}",
@@ -71,7 +71,7 @@
     {
       "id": 2,
       "name": "Block Size",
-      "color": "#f760f7a0",
+      "color": "blue",
       "description": "More TXs per L2 block",
       "subDescription": "${currVal} -> ${upgradeVal} width",
       "maxSubDescription": "${upgradeVal} width",
@@ -82,7 +82,7 @@
     {
       "id": 3,
       "name": "Block Difficulty",
-      "color": "#f760f7a0",
+      "color": "yellow",
       "description": "Lower sequencing difficulty",
       "subDescription": "${currVal} -> ${upgradeVal} hits",
       "maxSubDescription": "${upgradeVal} hits",
@@ -93,7 +93,7 @@
     {
       "id": 4,
       "name": "Recursive Proving",
-      "color": "#f760f7a0",
+      "color": "pink",
       "description": "Boost proving efficiency",
       "subDescription": "${currVal} -> ${upgradeVal} L2 blocks per proof",
       "maxSubDescription": "${upgradeVal} L2 blocks per proof",
@@ -104,7 +104,7 @@
     {
       "id": 5,
       "name": "DA compression",
-      "color": "#f760f7a0",
+      "color": "purple",
       "description": "Boost compression algorithm",
       "subDescription": "${currVal} -> ${upgradeVal} blocks per DA store",
       "maxSubDescription": "${upgradeVal} blocks per DA store",

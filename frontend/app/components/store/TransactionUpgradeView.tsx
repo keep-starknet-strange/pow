@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "@/app/hooks/useImages";
-import { getBlockTxIconName } from "../../utils/transactions";
+import { getTxIconName, getShopIconBackground } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";
 import { TransactionUpgradeActions } from "./transactionUpgrade/TransactionUpgradeActions";
@@ -50,12 +50,17 @@ export const TransactionUpgradeView: React.FC<TransactionUpgradeViewProps> =
       <View className="flex flex-col w-full">
         <View className="flex flex-row w-full mb-[4px]">
           <IconWithLock
-            txIcon={getBlockTxIconName(
+            txIcon={getTxIconName(
               props.chainId,
               props.txData.id,
-              props.isDapp,
+              props.isDapp || false,
             )}
             locked={txFeeLevel === -1}
+            backgroundColor={getShopIconBackground(
+              props.chainId,
+              props.txData.id,
+              props.isDapp || false,
+            )}
           />
           <TxDetails
             name={props.txData.name}

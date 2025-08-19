@@ -12,14 +12,18 @@ import { useImages } from "../../../hooks/useImages";
 type IconWithLockProps = {
   txIcon: string;
   locked: boolean;
+  backgroundColor?: string;
 };
 
 export const IconWithLock: React.FC<IconWithLockProps> = React.memo(
-  ({ txIcon, locked }) => {
+  ({ txIcon, locked, backgroundColor }) => {
     const { getImage } = useImages();
 
     // Memoize image references to prevent Canvas re-renders
-    const backgroundImage = useMemo(() => getImage("shop.tx.bg"), [getImage]);
+    const backgroundImage = useMemo(
+      () => getImage(backgroundColor || "shop.icon.bg.green"),
+      [getImage, backgroundColor],
+    );
     const iconImage = useMemo(() => getImage(txIcon), [getImage, txIcon]);
     const lockImage = useMemo(() => getImage("shop.lock"), [getImage]);
 
