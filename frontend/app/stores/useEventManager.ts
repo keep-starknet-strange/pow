@@ -40,6 +40,7 @@ export type EventManager = {
   registerObserver(key: string, observer: Observer): void;
   unregisterObserver(key: string): void;
   notify(eventType: EventType, data?: any): void;
+  notifyImmediate(eventType: EventType, data?: any): void;
 };
 
 export const useEventManager = create<EventManager>((set, get) => ({
@@ -66,5 +67,13 @@ export const useEventManager = create<EventManager>((set, get) => ({
         observer.onNotify(eventType, data);
       });
     }, 0);
+  },
+
+  notifyImmediate(eventType: EventType, data?: any): void {
+    // Call only SoundObserver immediately for responsive audio feedback
+    const soundObserver = get().observers.get("sound");
+    if (soundObserver) {
+      soundObserver.onNotify(eventType, data);
+    }
   },
 }));

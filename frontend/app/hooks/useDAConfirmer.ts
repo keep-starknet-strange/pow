@@ -10,7 +10,7 @@ export const useDAConfirmer = (
   onDAConfirm: () => void,
   triggerDAAnimation?: () => void,
 ) => {
-  const { notify } = useEventManager();
+  const { notifyImmediate } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
@@ -50,7 +50,7 @@ export const useDAConfirmer = (
       const newCounter = prevCounter + 1;
 
       if (newCounter < daDifficulty) {
-        notify("DaClicked", {
+        notifyImmediate("DaClicked", {
           counter: newCounter,
           difficulty: daDifficulty,
         });
@@ -66,7 +66,7 @@ export const useDAConfirmer = (
     daIsBuilt,
     daDifficulty,
     daConfirmCounter,
-    notify,
+    notifyImmediate,
     onDAConfirm,
   ]);
 

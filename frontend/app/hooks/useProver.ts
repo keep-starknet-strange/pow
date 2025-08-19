@@ -10,7 +10,7 @@ export const useProver = (
   onProve: () => void,
   triggerProveAnimation?: () => void,
 ) => {
-  const { notify } = useEventManager();
+  const { notifyImmediate } = useEventManager();
   const { getAutomationValue } = useUpgrades();
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
@@ -50,7 +50,7 @@ export const useProver = (
       const newCounter = prevCounter + 1;
 
       if (newCounter < proverDifficulty) {
-        notify("ProveClicked", {
+        notifyImmediate("ProveClicked", {
           counter: newCounter,
           difficulty: proverDifficulty,
         });
@@ -66,7 +66,7 @@ export const useProver = (
     proverIsBuilt,
     proverDifficulty,
     proverCounter,
-    notify,
+    notifyImmediate,
     onProve,
   ]);
 

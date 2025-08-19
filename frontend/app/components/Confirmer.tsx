@@ -79,7 +79,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     <Pressable
       ref={pressableRef}
       className="w-full h-full relative"
-      onPress={handlePress}
+      onPressIn={handlePress}
     >
       {enabled && <TutorialRefView targetId={targetId} enabled={true} />}
       {props.image && (
