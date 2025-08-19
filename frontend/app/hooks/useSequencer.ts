@@ -16,7 +16,6 @@ export const useSequencer = (
   const { powContract, getUserBlockClicks } = usePowContractConnector();
   const { workingBlocks } = useGameStore();
   const sequencingBlock = workingBlocks[1];
-  const miningBlock = workingBlocks[0];
   const blockDifficulty = sequencingBlock?.difficulty || 4 ** 2;
   const [sequenceCounter, setSequenceCounter] = useState(0);
 
