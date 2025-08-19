@@ -57,28 +57,28 @@
   },
   {
     "id": 8,
-    "name": "Reach ₿100",
+    "name": "Reach 100{BTC}",
     "category": "HODL",
     "image": "achievements.money.1",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 9,
-    "name": "Reach ₿10K",
+    "name": "Reach 10K{BTC}",
     "category": "HODL",
     "image": "achievements.money.2",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 10,
-    "name": "Reach ₿100M",
+    "name": "Reach 100M{BTC}",
     "category": "HODL",
     "image": "achievements.money.3",
     "updateOn": "BalanceUpdated"
   },
   {
     "id": 11,
-    "name": "Reach ₿1T",
+    "name": "Reach 1T{BTC}",
     "category": "HODL",
     "image": "achievements.money.4",
     "updateOn": "BalanceUpdated"
@@ -183,14 +183,14 @@
   },
   {
     "id": 26,
-    "name": "Get ₿100 in 1 Transaction",
+    "name": "Get 100{BTC} in 1 Transaction",
     "category": "MISSIONS",
     "image": "achievements.mission.btc.1",
     "updateOn": "TxAdded"
   },
   {
     "id": 27,
-    "name": "Get ₿1M in 1 Transaction",
+    "name": "Get 1M{BTC} in 1 Transaction",
     "category": "MISSIONS",
     "image": "achievements.mission.btc.2",
     "updateOn": "TxAdded"
