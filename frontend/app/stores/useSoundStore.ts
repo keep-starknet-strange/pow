@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AudioPlayer, createAudioPlayer } from "expo-audio";
+import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import soundPoolsJson from "../configs/soundpools.json";
@@ -148,6 +148,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
   initializeSound: async () => {
     try {
+      // Configure global audio mode to play sounds even in iOS silent mode
+      await setAudioModeAsync({
+        playsInSilentMode: true,
+      });
+
       const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
       const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
       const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
