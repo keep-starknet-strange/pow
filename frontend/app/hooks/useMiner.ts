@@ -41,28 +41,23 @@ export const useMiner = (
       return;
     }
 
-    // Calculate new counter value first
-    const newCounter = mineCounter + 1;
-
-    // Trigger sound immediately before animation and state updates
-    if (newCounter < blockDifficulty) {
-      notify("MineClicked", {
-        counter: newCounter,
-        difficulty: blockDifficulty,
-        ignoreAction: miningBlock?.blockId === 0,
-      });
-    }
-
-    // Trigger animation after sound
+    // Trigger animation if provided
     if (triggerMineAnimation) {
       triggerMineAnimation();
     }
-
-    // Update state
+    // Batch state updates to prevent multiple rerenders
     setMineCounter((prevCounter) => {
-      const updatedCounter = prevCounter + 1;
-      if (updatedCounter <= blockDifficulty) {
-        return updatedCounter;
+      const newCounter = prevCounter + 1;
+
+      if (newCounter < blockDifficulty) {
+        notify("MineClicked", {
+          counter: newCounter,
+          difficulty: blockDifficulty,
+          ignoreAction: miningBlock?.blockId === 0,
+        });
+        return newCounter;
+      } else if (newCounter === blockDifficulty) {
+        return newCounter;
       } else {
         return prevCounter; // Prevent incrementing beyond difficulty
       }
