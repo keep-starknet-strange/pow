@@ -52,7 +52,8 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
             {txIsLocked ? "-" : "+"}
             {shortMoneyString(
               txIsLocked ? feeCost : fee,
-              false
+              false,
+              showThreeDigitsMax(feeLevel === -1 ? feeCost : fee),
             )}
           </Text>
           <Canvas style={styles.feeIconCanvas}>
