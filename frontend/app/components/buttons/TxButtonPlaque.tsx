@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     color: "#fff8ff",
     fontFamily: "Pixels",
     textAlign: "center",
-    // transform: [{ translateY: 2 }],
   },
   feeIconCanvas: {
     width: 16,
