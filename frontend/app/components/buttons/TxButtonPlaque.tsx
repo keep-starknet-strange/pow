@@ -49,7 +49,7 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
       {canUnlockTx(props.chainId, props.txId, props.isDapp) && (
         <View style={[styles.feeRowContainer, { width: width * 0.18 }]}>
           <Text style={styles.feeText}>
-            {txIsLocked ? "- " : "+ "}
+            {txIsLocked ? "-" : "+"}
             {shortMoneyString(
               txIsLocked ? feeCost : fee,
               false
