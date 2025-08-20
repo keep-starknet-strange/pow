@@ -24,6 +24,7 @@ export interface TxButtonPlaqueProps {
 export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
   const { width } = useCachedWindowDimensions();
   const { feeLevel, feeCost, fee } = props;
+  const txIsLocked = feeLevel === -1;
   const { getImage } = useImages();
   const { canUnlockTx } = useTransactionsStore();
 
@@ -32,9 +33,7 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
       <View style={[styles.plaqueContainer, { width: width * 0.18 }]}>
         <Canvas style={styles.fillFlex}>
           <Image
-            image={getImage(
-              feeLevel === -1 ? "tx.plaque.minus" : "tx.plaque.plus",
-            )}
+            image={getImage("tx.plaque")}
             fit="fill"
             sampling={{
               filter: FilterMode.Nearest,
@@ -50,8 +49,9 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
       {canUnlockTx(props.chainId, props.txId, props.isDapp) && (
         <View style={[styles.feeRowContainer, { width: width * 0.18 }]}>
           <Text style={styles.feeText}>
+            {txIsLocked ? "-" : "+"}
             {shortMoneyString(
-              feeLevel === -1 ? feeCost : fee,
+              txIsLocked ? feeCost : fee,
               false,
               showThreeDigitsMax(feeLevel === -1 ? feeCost : fee),
             )}
@@ -94,15 +94,14 @@ const styles = StyleSheet.create({
     left: 0,
     height: 20,
     flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
   },
   feeText: {
     fontSize: 14,
     color: "#fff8ff",
     fontFamily: "Pixels",
-    textAlign: "right",
-    marginBottom: 2,
+    textAlign: "center",
   },
   feeIconCanvas: {
     width: 16,

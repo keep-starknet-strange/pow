@@ -125,8 +125,7 @@ const imagePaths = {
   txNameplateYellow: require(
     `${assetsPath}/transactions/nameplate/nameplate_yellow.webp`,
   ),
-  txPlaquePlus: require(`${assetsPath}/transactions/value_plaque_plus.webp`),
-  txPlaqueMinus: require(`${assetsPath}/transactions/value_plaque_minus.webp`),
+  txPlaque: require(`${assetsPath}/transactions/value_plaque.webp`),
 
   // Block Images
   blockTxBgBlue: require(
@@ -515,8 +514,7 @@ export const useImagePreloader = () => {
     txNameplatePink: useImage(imagePaths.txNameplatePink),
     txNameplatePurple: useImage(imagePaths.txNameplatePurple),
     txNameplateYellow: useImage(imagePaths.txNameplateYellow),
-    txPlaquePlus: useImage(imagePaths.txPlaquePlus),
-    txPlaqueMinus: useImage(imagePaths.txPlaqueMinus),
+    txPlaque: useImage(imagePaths.txPlaque),
     blockTxBgBlue: useImage(imagePaths.blockTxBgBlue),
     blockTxBgGreen: useImage(imagePaths.blockTxBgGreen),
     blockTxBgPink: useImage(imagePaths.blockTxBgPink),
@@ -746,8 +744,7 @@ export const useImagePreloader = () => {
         "tx.nameplate.pink": images.txNameplatePink,
         "tx.nameplate.purple": images.txNameplatePurple,
         "tx.nameplate.yellow": images.txNameplateYellow,
-        "tx.plaque.plus": images.txPlaquePlus,
-        "tx.plaque.minus": images.txPlaqueMinus,
+        "tx.plaque": images.txPlaque,
         "block.bg.blue": images.blockTxBgBlue,
         "block.bg.green": images.blockTxBgGreen,
         "block.bg.pink": images.blockTxBgPink,
