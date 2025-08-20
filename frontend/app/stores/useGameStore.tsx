@@ -178,17 +178,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         block.isBuilt = true;
         return { workingBlocks: newWorkingBlocks };
       }
+      // Trigger sound immediately before state changes
+      useEventManager.getState().notify("TxAdded", {
+        chainId,
+        tx: transaction,
+        progress: (block.transactions.length + 1) / maxBlockSize,
+      });
+
       block.transactions.push(transaction);
       block.fees += transaction.fee;
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
       }
       newWorkingBlocks[chainId] = block;
-      useEventManager.getState().notify("TxAdded", {
-        chainId,
-        tx: transaction,
-        progress: block.transactions.length / maxBlockSize,
-      });
       return { workingBlocks: newWorkingBlocks };
     });
   },
