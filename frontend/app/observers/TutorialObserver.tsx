@@ -8,6 +8,9 @@ export class TutorialObserver implements Observer {
 
   constructor() {
     // Setup handlers - they will get current store state when called
+    // each step is triggered by an event + some data maybe and the previous step
+
+
     // mineBlock step
     this.handlers.set(`MineClicked-mineBlock`, () => {
       const { setVisible } = useTutorialStore.getState();
