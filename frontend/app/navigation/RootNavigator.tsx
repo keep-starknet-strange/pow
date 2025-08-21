@@ -26,26 +26,6 @@ export const RootNavigator = memo(() => {
 
   const screenOptions = useMemo(() => ({ headerShown: false }), []);
 
-  /*
-  const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
-  const [isAutoLoginChecking, setIsAutoLoginChecking] = useState(true);
-  useEffect(() => {
-    const tryAutoLogin = async () => {
-      try {
-        const keys = await getAvailableKeys("pow_game");
-        if (keys.length > 0) {
-          await connectStorageAccount(keys[0]);
-        }
-      } catch (error) {
-        console.error("Auto-login failed:", error);
-      } finally {
-        setIsAutoLoginChecking(false);
-      }
-    };
-    tryAutoLogin();
-  }, [connectStorageAccount]);
-  */
-
   return (
     <View className="flex-1 bg-[#101119ff] relative">
       {userAccountConnected ? (
