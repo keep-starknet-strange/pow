@@ -16,25 +16,34 @@ import Animated, {
   useDerivedValue,
 } from "react-native-reanimated";
 
-export const Logo: React.FC = () => {
+interface LogoProps {
+  doEnterAnim?: boolean;
+}
+
+export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false }) => {
   const { getImage } = useImages();
   const { width: screenWidth } = Dimensions.get("window");
 
   // Scale factor based on screen width (iPhone SE width is 375)
   const scaleFactor = Math.min(screenWidth / 400, 1);
 
-  // Animated values for character Y positions (falling from top)
-  const pShadowY = useSharedValue(-200);
-  const oShadowY = useSharedValue(-250);
-  const wShadowY = useSharedValue(-300);
-  const exclamationShadowY = useSharedValue(-350);
+  // Final positions
+  const finalY = 232 * scaleFactor;
+  const mainFinalY = 220 * scaleFactor;
+  const sublogoFinalX = 100 * scaleFactor;
 
-  const pMainY = useSharedValue(-200);
-  const oMainY = useSharedValue(-250);
-  const wMainY = useSharedValue(-300);
-  const exclamationMainY = useSharedValue(-350);
+  // Animated values for character Y positions (falling from top if animated, otherwise at final position)
+  const pShadowY = useSharedValue(doEnterAnim ? -200 : finalY);
+  const oShadowY = useSharedValue(doEnterAnim ? -250 : finalY);
+  const wShadowY = useSharedValue(doEnterAnim ? -300 : finalY);
+  const exclamationShadowY = useSharedValue(doEnterAnim ? -350 : finalY);
 
-  const sublogoX = useSharedValue(400);
+  const pMainY = useSharedValue(doEnterAnim ? -200 : mainFinalY);
+  const oMainY = useSharedValue(doEnterAnim ? -250 : mainFinalY);
+  const wMainY = useSharedValue(doEnterAnim ? -300 : mainFinalY);
+  const exclamationMainY = useSharedValue(doEnterAnim ? -350 : mainFinalY);
+
+  const sublogoX = useSharedValue(doEnterAnim ? 400 : sublogoFinalX);
 
   // Fixed X positions for each character (scaled)
   const pX = 30 * scaleFactor;
@@ -86,10 +95,8 @@ export const Logo: React.FC = () => {
   );
 
   useEffect(() => {
-    // Animate characters falling from top with bouncy spring animation
-    // Final positions adjusted for canvas offset (200px down due to marginTop: -200)
-    const finalY = 232 * scaleFactor;
-    const mainFinalY = 220 * scaleFactor;
+    // Only animate if doEnterAnim is true
+    if (!doEnterAnim) return;
 
     pShadowY.value = withDelay(
       100,
@@ -185,7 +192,7 @@ export const Logo: React.FC = () => {
 
     sublogoX.value = withDelay(
       600,
-      withSpring(100 * scaleFactor, {
+      withSpring(sublogoFinalX, {
         damping: 12,
         stiffness: 90,
         mass: 0.8,
@@ -194,7 +201,7 @@ export const Logo: React.FC = () => {
         restSpeedThreshold: 0.01,
       }),
     );
-  }, []);
+  }, [doEnterAnim]);
 
   return (
     <Animated.View

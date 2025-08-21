@@ -65,7 +65,7 @@ export const LoadingScreen: React.FC = memo(() => {
     <View className="flex-1 items-center">
       <MainBackground />
       <View className="relative flex-col items-center justify-center flex-1">
-        <Logo />
+        <Logo doEnterAnim={false} />
         <TipTextDisplay key={tipText} tipText={tipText} />
       </View>
       <View className="absolute bottom-[60px] right-[20px] flex-row">

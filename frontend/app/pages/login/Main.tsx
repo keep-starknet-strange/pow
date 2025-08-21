@@ -29,7 +29,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       }}
       className="flex-1 items-center justify-around relative bg-transparent"
     >
-      <Logo />
+      <Logo doEnterAnim={true} />
       <Animated.View
         entering={FadeInDown}
         className="absolute bottom-[150px] items-center justify-center gap-3"
