@@ -7,6 +7,7 @@ import { TabNavigator } from "./TabNavigator";
 import { Header } from "../components/Header";
 import { InAppNotification } from "../components/InAppNotification";
 import { TutorialOverlay } from "../components/TutorialOverlay";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
@@ -27,12 +28,14 @@ export const RootNavigator = memo(() => {
   return (
     <View className="flex-1 bg-[#101119ff] relative">
       {isAuthenticated ? (
-        <>
-          {isTutorialActive && <TutorialOverlay />}
-          <Header />
-          <InAppNotification />
-          <TabNavigator />
-        </>
+        // Temporarily showing LoadingScreen for testing
+        <LoadingScreen />
+        // <>
+        //   {isTutorialActive && <TutorialOverlay />}
+        //   <Header />
+        //   <InAppNotification />
+        //   <TabNavigator />
+        // </>
       ) : (
         <Stack.Navigator screenOptions={screenOptions}>
           <Stack.Screen name="Login" component={LoginPage} />
