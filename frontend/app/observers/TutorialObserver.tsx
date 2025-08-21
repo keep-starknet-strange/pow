@@ -1,5 +1,5 @@
 import { Observer, EventType } from "@/app/stores/useEventManager";
-import { useTutorialStore, TutorialStep } from "../stores/useTutorialStore";
+import { useTutorialStore } from "../stores/useTutorialStore";
 
 type Handler = () => void;
 
@@ -19,13 +19,13 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
-    
+
     // purchaseTransactions step
     this.handlers.set(`TutorialDismissed-balanceExplanation`, () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
-    
+
     // addTransactionsToBlock step
     this.handlers.set(`TxUpgradePurchased-purchaseTransactions`, () => {
       const { advanceStep } = useTutorialStore.getState();
@@ -36,20 +36,19 @@ export class TutorialObserver implements Observer {
       // break in tutorial
       setVisible(false);
     });
-    
-    
+
     // finishMiningBlock step
     this.handlers.set("BlockIsBuilt-addTransactionsToBlock", () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
-    
+
     // checkStore step
     this.handlers.set("MineDone-finishMiningBlock", () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
-   
+
     // purchaseFeeUpgrade step
     this.handlers.set("SwitchPage-Store-checkStore", () => {
       const { advanceStep } = useTutorialStore.getState();
@@ -76,7 +75,6 @@ export class TutorialObserver implements Observer {
       advanceStep();
     });
 
-
     // purchaseChainAutomation step if they purchase the upgrade or click got it
     this.handlers.set("SwitchStore-Upgrades-purchaseChainUpgrade", () => {
       const { advanceStep } = useTutorialStore.getState();
@@ -98,19 +96,18 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
 
-    
     // dapps step
     this.handlers.set("DappsPurchased-checkAchievements", () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
-    
+
     this.handlers.set("SwitchTxTab-dApps-dapps", () => {
       const { setVisible } = useTutorialStore.getState();
       // break in tutorial
       setVisible(false);
     });
-    
+
     // leaderboard step
     this.handlers.set("TxUpgradePurchased-3-dapps", () => {
       const { advanceStep } = useTutorialStore.getState();
@@ -162,7 +159,6 @@ export class TutorialObserver implements Observer {
     const { step } = useTutorialStore.getState();
     console.log("eventName", eventName, "step", step, "data", data);
 
-    // these events need use data
     if (
       eventName === "SwitchPage" ||
       eventName === "SwitchStore" ||
@@ -180,8 +176,9 @@ export class TutorialObserver implements Observer {
       }
     }
 
+    // Leaderboard event
     if (eventName === "TxUpgradePurchased") {
-      if (data.txId === 3 && data.chainId === 0 && data.isDapp ) {
+      if (data.txId === 3 && data.chainId === 0 && data.isDapp) {
         eventName = eventName + "-" + data.txId;
       }
     }
