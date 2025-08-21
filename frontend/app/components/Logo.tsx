@@ -445,8 +445,8 @@ export const Logo: React.FC = () => {
         style={{
           width: 600 * scaleFactor,
           height: 18 * scaleFactor,
-          top: 320 * scaleFactor,
-          right: (30 - 300) * scaleFactor,
+          top: 325 * scaleFactor,
+          right: (30 - 320) * scaleFactor,
           zIndex: -1,
           overflow: "visible",
           paddingLeft: 100 * scaleFactor,
