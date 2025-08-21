@@ -15,6 +15,7 @@ import Animated, {
   withDelay,
   withSequence,
   withTiming,
+  withRepeat,
   useDerivedValue,
   Easing,
 } from "react-native-reanimated";
@@ -207,58 +208,227 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
     );
   }, [doEnterAnim]);
 
-  // P bouncing animation
   useEffect(() => {
     if (!doWaveAnim) return;
 
-    // Start the bouncing animation loop
-    const bounceAnimation = () => {
-      // Sequence: bounce up quickly, then fall back with gravity and squishy landing
-      pMainY.value = withSequence(
+    // Create the bounce animation sequence with rest period
+    pMainY.value = withRepeat(
+      withSequence(
         // Quick bounce up
-        withTiming(mainFinalY - 40 * scaleFactor, {
+        withTiming(mainFinalY - 40, {
           duration: 200,
           easing: Easing.inOut(Easing.ease),
         }),
         // Fall back down with gravity feel and squishy landing
         withSpring(mainFinalY, {
-          damping: 8,
+          damping: 10,
           stiffness: 120,
           mass: 1.2,
           overshootClamping: false,
           restDisplacementThreshold: 0.01,
           restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(mainFinalY, {
+          duration: 400,
         })
-      );
-      
-      pShadowY.value = withSequence(
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    oMainY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(mainFinalY, {
+          duration: 100,
+        }),
         // Quick bounce up
-        withTiming(finalY - 40 * scaleFactor, {
+        withTiming(mainFinalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(mainFinalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(mainFinalY, {
+          duration: 300,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    wMainY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(mainFinalY, {
+          duration: 200,
+        }),
+        // Quick bounce up
+        withTiming(mainFinalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(mainFinalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(mainFinalY, {
+          duration: 200,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    exclamationMainY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(mainFinalY, {
+          duration: 300,
+        }),
+        // Quick bounce up
+        withTiming(mainFinalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(mainFinalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(mainFinalY, {
+          duration: 100,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    pShadowY.value = withRepeat(
+      withSequence(
+        // Quick bounce up
+        withTiming(finalY - 40, {
           duration: 200,
           easing: Easing.inOut(Easing.ease),
         }),
         // Fall back down with gravity feel and squishy landing
         withSpring(finalY, {
-          damping: 8,
+          damping: 10,
           stiffness: 120,
           mass: 1.2,
           overshootClamping: false,
           restDisplacementThreshold: 0.01,
           restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(finalY, {
+          duration: 400,
         })
-      );
-    };
+      ),
+      -1, // Repeat indefinitely
+    );
 
-    const initialTimeout = setTimeout(bounceAnimation, 500);
+    oShadowY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(finalY, {
+          duration: 100,
+        }),
+        // Quick bounce up
+        withTiming(finalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(finalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(finalY, {
+          duration: 300,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    wShadowY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(finalY, {
+          duration: 200,
+        }),
+        // Quick bounce up
+        withTiming(finalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(finalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(finalY, {
+          duration: 200,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
+
+    exclamationShadowY.value = withRepeat(
+      withSequence(
+        // Delay for wave effect
+        withTiming(finalY, {
+          duration: 300,
+        }),
+        // Quick bounce up
+        withTiming(finalY - 40, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(finalY, {
+          damping: 10,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }),
+        // Rest period (1 second)
+        withTiming(finalY, {
+          duration: 100,
+        })
+      ),
+      -1, // Repeat indefinitely
+    );
     
-    // Set up interval for continuous bouncing (every 2 seconds)
-    const interval = setInterval(bounceAnimation, 2000);
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
-  }, [doWaveAnim, pMainY, pShadowY, mainFinalY, finalY, scaleFactor]);
+  }, [doWaveAnim]);
 
   return (
     <Animated.View
