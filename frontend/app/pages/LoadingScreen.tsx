@@ -13,6 +13,7 @@ import { useTransactionsStore } from "../stores/useTransactionsStore";
 import { useTutorialStore } from "../stores/useTutorialStore";
 import { useUpgradesStore } from "../stores/useUpgradesStore";
 import { useSoundStore } from "../stores/useSoundStore";
+import { useStarknetConnector } from "../context/StarknetConnector";
 
 interface TipTextDisplayProps {
   tipText: string;
@@ -92,6 +93,9 @@ export const LoadingScreenView: React.FC = memo(() => {
 });
 
 export const LoadingScreen: React.FC = memo(() => {
+  // Check if account is connected
+  const { account } = useStarknetConnector();
+  
   // Check if all stores are initialized
   const gameInitialized = useGameStore((state) => state.isInitialized);
   const balanceInitialized = useBalanceStore((state) => state.isInitialized);
@@ -112,8 +116,8 @@ export const LoadingScreen: React.FC = memo(() => {
     upgradesInitialized &&
     soundInitialized;
 
-  // Only render if not all stores are initialized
-  if (allStoresInitialized) {
+  // Only render if account is connected AND not all stores are initialized
+  if (!account || allStoresInitialized) {
     return null;
   }
 
