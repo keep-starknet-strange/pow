@@ -44,7 +44,10 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     }
 
     set({ achievementsAccount: account });
-    set({ achievementsProgress: initialAchievementsProgress, isInitialized: true });
+    set({
+      achievementsProgress: initialAchievementsProgress,
+      isInitialized: true,
+    });
   },
 
   updateAchievement: (achievementId: number, progress: number) => {

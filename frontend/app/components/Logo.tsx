@@ -25,7 +25,10 @@ interface LogoProps {
   doWaveAnim?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = false }) => {
+export const Logo: React.FC<LogoProps> = ({
+  doEnterAnim = false,
+  doWaveAnim = false,
+}) => {
   const { getImage } = useImages();
   const { width: screenWidth } = Dimensions.get("window");
 
@@ -231,7 +234,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(mainFinalY, {
           duration: 400,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -259,7 +262,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(mainFinalY, {
           duration: 300,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -287,7 +290,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(mainFinalY, {
           duration: 200,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -315,7 +318,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(mainFinalY, {
           duration: 100,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -339,7 +342,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(finalY, {
           duration: 400,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -367,7 +370,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(finalY, {
           duration: 300,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -395,7 +398,7 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(finalY, {
           duration: 200,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
@@ -423,11 +426,10 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = fa
         // Rest period (1 second)
         withTiming(finalY, {
           duration: 100,
-        })
+        }),
       ),
       -1, // Repeat indefinitely
     );
-    
   }, [doWaveAnim]);
 
   return (

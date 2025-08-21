@@ -365,7 +365,6 @@ export const StarknetConnectorProvider: React.FC<{
         return;
       }
       if (!provider) {
-        console.error("Provider is not initialized.");
         return;
       }
       console.log("Connecting to account from storage:", key);

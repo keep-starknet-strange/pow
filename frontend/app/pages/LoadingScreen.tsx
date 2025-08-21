@@ -5,6 +5,14 @@ import { useInterval } from "usehooks-ts";
 import { MainBackground } from "../components/MainBackground";
 import { Logo } from "../components/Logo";
 import loadingConfig from "../configs/loading.json";
+import { useGameStore } from "../stores/useGameStore";
+import { useBalanceStore } from "../stores/useBalanceStore";
+import { useL2Store } from "../stores/useL2Store";
+import { useAchievementsStore } from "../stores/useAchievementsStore";
+import { useTransactionsStore } from "../stores/useTransactionsStore";
+import { useTutorialStore } from "../stores/useTutorialStore";
+import { useUpgradesStore } from "../stores/useUpgradesStore";
+import { useSoundStore } from "../stores/useSoundStore";
 
 interface TipTextDisplayProps {
   tipText: string;
@@ -33,7 +41,7 @@ export const LoadingScreenView: React.FC = memo(() => {
     ...loadingConfig.lore,
     ...loadingConfig.facts,
   ]);
-  
+
   // Initialize with a random text
   const [tipText, setTipText] = useState(() => {
     return allTextsRef.current[
@@ -60,7 +68,7 @@ export const LoadingScreenView: React.FC = memo(() => {
       return ".";
     });
   }, 500);
-  
+
   return (
     <View className="flex-1 items-center w-full h-full">
       <MainBackground />
@@ -84,6 +92,31 @@ export const LoadingScreenView: React.FC = memo(() => {
 });
 
 export const LoadingScreen: React.FC = memo(() => {
+  // Check if all stores are initialized
+  const gameInitialized = useGameStore((state) => state.isInitialized);
+  const balanceInitialized = useBalanceStore((state) => state.isInitialized);
+  const l2Initialized = useL2Store((state) => state.isInitialized);
+  const achievementsInitialized = useAchievementsStore((state) => state.isInitialized);
+  const transactionsInitialized = useTransactionsStore((state) => state.isInitialized);
+  const tutorialInitialized = useTutorialStore((state) => state.isInitialized);
+  const upgradesInitialized = useUpgradesStore((state) => state.isInitialized);
+  const soundInitialized = useSoundStore((state) => state.isInitialized);
+
+  const allStoresInitialized = 
+    gameInitialized &&
+    balanceInitialized &&
+    l2Initialized &&
+    achievementsInitialized &&
+    transactionsInitialized &&
+    tutorialInitialized &&
+    upgradesInitialized &&
+    soundInitialized;
+
+  // Only render if not all stores are initialized
+  if (allStoresInitialized) {
+    return null;
+  }
+
   return (
     <View className="flex-1 w-full h-full absolute z-[1000]">
       <LoadingScreenView />

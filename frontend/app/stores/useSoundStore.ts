@@ -205,7 +205,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       });
       return;
     }
-    
+
     // Mark as initialized
     set((state) => ({ ...state, isInitialized: true }));
   },

@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 
@@ -11,6 +11,7 @@ import { LoadingScreen } from "../pages/LoadingScreen";
 
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
+import { useStarknetConnector } from "../context/StarknetConnector";
 
 const Stack = createStackNavigator();
 
@@ -18,16 +19,36 @@ export const RootNavigator = memo(() => {
   const { user } = useFocEngine();
   const { isTutorialActive } = useTutorial();
 
-  const isAuthenticated = useMemo(
+  const userAccountConnected = useMemo(
     () => user && user.account.username !== "",
     [user],
   );
 
   const screenOptions = useMemo(() => ({ headerShown: false }), []);
 
+  /*
+  const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
+  const [isAutoLoginChecking, setIsAutoLoginChecking] = useState(true);
+  useEffect(() => {
+    const tryAutoLogin = async () => {
+      try {
+        const keys = await getAvailableKeys("pow_game");
+        if (keys.length > 0) {
+          await connectStorageAccount(keys[0]);
+        }
+      } catch (error) {
+        console.error("Auto-login failed:", error);
+      } finally {
+        setIsAutoLoginChecking(false);
+      }
+    };
+    tryAutoLogin();
+  }, [connectStorageAccount]);
+  */
+
   return (
     <View className="flex-1 bg-[#101119ff] relative">
-      {isAuthenticated ? (
+      {userAccountConnected ? (
         <>
           {isTutorialActive && <TutorialOverlay />}
           <Header />
@@ -39,9 +60,7 @@ export const RootNavigator = memo(() => {
           <Stack.Screen name="Login" component={LoginPage} />
         </Stack.Navigator>
       )}
-      {false && (
-        <LoadingScreen />
-      )}
+      <LoadingScreen />
     </View>
   );
 });

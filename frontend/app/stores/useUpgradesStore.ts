@@ -233,7 +233,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
     // Check can prestige after loading
     get().checkCanPrestige();
-    
+
     // Mark as initialized
     set({ isInitialized: true });
   },
@@ -424,7 +424,11 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useGameStore.getState().resetGameStore();
     useL2Store.getState().resetL2Store();
 
-    set({ currentPrestige: nextPrestige, canPrestige: false, isInitialized: false });
+    set({
+      currentPrestige: nextPrestige,
+      canPrestige: false,
+      isInitialized: false,
+    });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);
   },
