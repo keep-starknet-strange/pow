@@ -95,18 +95,22 @@ export const LoadingScreenView: React.FC = memo(() => {
 export const LoadingScreen: React.FC = memo(() => {
   // Check if account is connected
   const { account } = useStarknetConnector();
-  
+
   // Check if all stores are initialized
   const gameInitialized = useGameStore((state) => state.isInitialized);
   const balanceInitialized = useBalanceStore((state) => state.isInitialized);
   const l2Initialized = useL2Store((state) => state.isInitialized);
-  const achievementsInitialized = useAchievementsStore((state) => state.isInitialized);
-  const transactionsInitialized = useTransactionsStore((state) => state.isInitialized);
+  const achievementsInitialized = useAchievementsStore(
+    (state) => state.isInitialized,
+  );
+  const transactionsInitialized = useTransactionsStore(
+    (state) => state.isInitialized,
+  );
   const tutorialInitialized = useTutorialStore((state) => state.isInitialized);
   const upgradesInitialized = useUpgradesStore((state) => state.isInitialized);
   const soundInitialized = useSoundStore((state) => state.isInitialized);
 
-  const allStoresInitialized = 
+  const allStoresInitialized =
     gameInitialized &&
     balanceInitialized &&
     l2Initialized &&
