@@ -13,14 +13,18 @@ import Animated, {
   useSharedValue,
   withSpring,
   withDelay,
+  withSequence,
+  withTiming,
   useDerivedValue,
+  Easing,
 } from "react-native-reanimated";
 
 interface LogoProps {
   doEnterAnim?: boolean;
+  doWaveAnim?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false }) => {
+export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false, doWaveAnim = false }) => {
   const { getImage } = useImages();
   const { width: screenWidth } = Dimensions.get("window");
 
@@ -202,6 +206,59 @@ export const Logo: React.FC<LogoProps> = ({ doEnterAnim = false }) => {
       }),
     );
   }, [doEnterAnim]);
+
+  // P bouncing animation
+  useEffect(() => {
+    if (!doWaveAnim) return;
+
+    // Start the bouncing animation loop
+    const bounceAnimation = () => {
+      // Sequence: bounce up quickly, then fall back with gravity and squishy landing
+      pMainY.value = withSequence(
+        // Quick bounce up
+        withTiming(mainFinalY - 40 * scaleFactor, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(mainFinalY, {
+          damping: 8,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        })
+      );
+      
+      pShadowY.value = withSequence(
+        // Quick bounce up
+        withTiming(finalY - 40 * scaleFactor, {
+          duration: 200,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        // Fall back down with gravity feel and squishy landing
+        withSpring(finalY, {
+          damping: 8,
+          stiffness: 120,
+          mass: 1.2,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        })
+      );
+    };
+
+    const initialTimeout = setTimeout(bounceAnimation, 500);
+    
+    // Set up interval for continuous bouncing (every 2 seconds)
+    const interval = setInterval(bounceAnimation, 2000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, [doWaveAnim, pMainY, pShadowY, mainFinalY, finalY, scaleFactor]);
 
   return (
     <Animated.View
