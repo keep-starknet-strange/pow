@@ -145,7 +145,11 @@ const TabBarButton = memo(
     );
 
     return (
-      <Pressable style={styles.tabPressable} onPress={onPress} onLayout={handleLayout}>
+      <Pressable
+        style={styles.tabPressable}
+        onPress={onPress}
+        onLayout={handleLayout}
+      >
         <Canvas style={backgroundCanvasStyle}>
           <Image
             image={buttonImage}
