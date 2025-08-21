@@ -28,18 +28,19 @@ export const RootNavigator = memo(() => {
   return (
     <View className="flex-1 bg-[#101119ff] relative">
       {isAuthenticated ? (
-        // Temporarily showing LoadingScreen for testing
-        <LoadingScreen />
+        <>
+          {isTutorialActive && <TutorialOverlay />}
+          <Header />
+          <InAppNotification />
+          <TabNavigator />
+        </>
       ) : (
-        // <>
-        //   {isTutorialActive && <TutorialOverlay />}
-        //   <Header />
-        //   <InAppNotification />
-        //   <TabNavigator />
-        // </>
         <Stack.Navigator screenOptions={screenOptions}>
           <Stack.Screen name="Login" component={LoginPage} />
         </Stack.Navigator>
+      )}
+      {false && (
+        <LoadingScreen />
       )}
     </View>
   );

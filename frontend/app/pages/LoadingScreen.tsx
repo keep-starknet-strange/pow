@@ -27,7 +27,7 @@ const TipTextDisplay: React.FC<TipTextDisplayProps> = memo(({ tipText }) => {
   );
 });
 
-export const LoadingScreen: React.FC = memo(() => {
+export const LoadingScreenView: React.FC = memo(() => {
   const allTextsRef = useRef([
     ...loadingConfig.tips,
     ...loadingConfig.lore,
@@ -60,9 +60,9 @@ export const LoadingScreen: React.FC = memo(() => {
       return ".";
     });
   }, 500);
-
+  
   return (
-    <View className="flex-1 items-center">
+    <View className="flex-1 items-center w-full h-full">
       <MainBackground />
       <View className="relative flex-col items-center justify-center flex-1">
         <Logo doEnterAnim={false} doWaveAnim={true} />
@@ -79,6 +79,14 @@ export const LoadingScreen: React.FC = memo(() => {
           {dots}
         </Text>
       </View>
+    </View>
+  );
+});
+
+export const LoadingScreen: React.FC = memo(() => {
+  return (
+    <View className="flex-1 w-full h-full absolute z-[1000]">
+      <LoadingScreenView />
     </View>
   );
 });
