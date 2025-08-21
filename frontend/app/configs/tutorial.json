@@ -71,7 +71,7 @@
   },
   "checkAchievements": {
     "title": "Achievements!",
-    "description": "Check out your achievements!\nYou can see your progress and maybe one day earn rewards for completing them, if we ever implement it.\nClick here to see your achievements!",
+    "description": "Check out your achievements!\nYou can see your progress for completing them.\nClick here to see your achievements!",
     "bubbleTargetId": "achievementsTab",
     "highlightTargetId": "achievementsTab",
     "canDismiss": false
