@@ -7,6 +7,7 @@ const DEFAULT_BALANCE = Number(process.env.EXPO_PUBLIC_DEFAULT_BALANCE) || 0;
 
 interface BalanceState {
   balance: number;
+  isInitialized: boolean;
   setBalance: (balance: number) => void;
   updateBalance: (change: number) => void;
   tryBuy: (cost: number) => boolean;
@@ -20,9 +21,10 @@ interface BalanceState {
 
 export const useBalanceStore = create<BalanceState>((set, get) => ({
   balance: DEFAULT_BALANCE,
+  isInitialized: false,
   setBalance: (balance: number) => set({ balance }),
 
-  resetBalance: () => set({ balance: DEFAULT_BALANCE }),
+  resetBalance: () => set({ balance: DEFAULT_BALANCE, isInitialized: false }),
 
   updateBalance: (change: number) => {
     set((state) => {
@@ -53,15 +55,15 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   initializeBalance: async (powContract, user, getUserBalance) => {
     const fetchBalance = async () => {
       if (!user || !powContract) {
-        set({ balance: DEFAULT_BALANCE });
+        set({ balance: DEFAULT_BALANCE, isInitialized: true });
         return;
       }
       try {
         const balance = await getUserBalance();
-        set({ balance });
+        set({ balance, isInitialized: true });
       } catch (error) {
         console.error("Error fetching balance:", error);
-        set({ balance: DEFAULT_BALANCE });
+        set({ balance: DEFAULT_BALANCE, isInitialized: true });
       }
     };
     fetchBalance();

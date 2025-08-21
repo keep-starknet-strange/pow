@@ -19,6 +19,7 @@ interface TransactionsState {
   dappSpeedLevels: { [chainId: number]: { [dappId: number]: number } };
   // Map: chainId -> boolean indicating if dapps are unlocked
   dappsUnlocked: { [chainId: number]: boolean };
+  isInitialized: boolean;
 
   resetTransactions: () => void;
   initializeTransactions: (
@@ -68,6 +69,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   dappFeeLevels: {},
   dappSpeedLevels: {},
   dappsUnlocked: {},
+  isInitialized: false,
 
   resetTransactions: () => {
     // Initialize transaction levels
@@ -213,6 +215,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         dappFeeLevels: newDappFeeLevels,
         dappSpeedLevels: newDappSpeedLevels,
         dappsUnlocked: newDappsUnlocked,
+        isInitialized: true,
       }));
     };
 

@@ -11,6 +11,7 @@ interface GameStore {
   genesisBlockReward: number;
   workingBlocks: Block[];
   blockHeights: Record<number, number>; // ChainId -> Block Height
+  isInitialized: boolean;
 
   resetGameStore: () => void;
   initializeGameStore: (
@@ -39,6 +40,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   genesisBlockReward: 1,
   workingBlocks: [],
   blockHeights: {},
+  isInitialized: false,
   initMyGameDependency: undefined,
   setInitMyGameDependency: (initMyGame) =>
     set({ initMyGameDependency: initMyGame }),
@@ -80,6 +82,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const blockNumber = (await getUserBlockNumber(0)) || 0;
           if (blockNumber === 0) {
             get().resetGameStore();
+            set({ isInitialized: true });
             return;
           }
           const { size: blockSize, fees: blockFees } = (await getUserBlockState(
@@ -137,19 +140,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 0: l1WorkingBlock.blockId,
                 1: l2WorkingBlock.blockId,
               },
+              isInitialized: true,
             });
           } else {
             set({
               workingBlocks: [l1WorkingBlock],
               blockHeights: { 0: l1WorkingBlock.blockId },
+              isInitialized: true,
             });
           }
         } catch (error) {
           if (__DEV__) console.error("Error fetching game state:", error);
           get().resetGameStore();
+          set({ isInitialized: true });
         }
       } else {
         get().resetGameStore();
+        set({ isInitialized: true });
       }
     };
     fetchGameState();

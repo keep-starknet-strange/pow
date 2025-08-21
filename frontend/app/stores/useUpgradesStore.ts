@@ -17,6 +17,7 @@ interface UpgradesState {
   automations: { [chainId: number]: { [automationId: number]: number } };
   currentPrestige: number;
   canPrestige: boolean;
+  isInitialized: boolean;
 
   // Actions
   upgrade: (chainId: number, upgradeId: number) => void;
@@ -63,6 +64,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   automations: {},
   currentPrestige: 0,
   canPrestige: false,
+  isInitialized: false,
 
   resetUpgrades: () => {
     // Initialize upgrades
@@ -231,6 +233,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
     // Check can prestige after loading
     get().checkCanPrestige();
+    
+    // Mark as initialized
+    set({ isInitialized: true });
   },
 
   upgrade: (chainId: number, upgradeId: number) => {
@@ -419,7 +424,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useGameStore.getState().resetGameStore();
     useL2Store.getState().resetL2Store();
 
-    set({ currentPrestige: nextPrestige, canPrestige: false });
+    set({ currentPrestige: nextPrestige, canPrestige: false, isInitialized: false });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);
   },

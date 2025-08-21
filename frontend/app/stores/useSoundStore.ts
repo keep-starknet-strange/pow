@@ -124,6 +124,7 @@ interface SoundState {
   musicVolume: number;
   musicPlayer: AudioPlayer | null;
   soundPool: SoundPool | null;
+  isInitialized: boolean;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -145,6 +146,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   musicVolume: 0.2,
   musicPlayer: null,
   soundPool: null,
+  isInitialized: false,
 
   initializeSound: async () => {
     try {
@@ -199,8 +201,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         soundEffectVolume: 1,
         musicVolume: 0.5,
         soundPool: new SoundPool(),
+        isInitialized: true,
       });
+      return;
     }
+    
+    // Mark as initialized
+    set((state) => ({ ...state, isInitialized: true }));
   },
 
   toggleSound: () => {

@@ -13,6 +13,7 @@ import unlocksConfig from "../configs/unlocks.json";
 interface L2Store {
   l2: L2 | undefined;
   isL2Unlocked: boolean;
+  isInitialized: boolean;
 
   resetL2Store: () => void;
   initializeL2Store: (
@@ -38,8 +39,9 @@ interface L2Store {
 export const useL2Store = create<L2Store>((set, get) => ({
   l2: undefined,
   isL2Unlocked: false,
+  isInitialized: false,
 
-  resetL2Store: () => set({ l2: undefined, isL2Unlocked: false }),
+  resetL2Store: () => set({ l2: undefined, isL2Unlocked: false, isInitialized: false }),
   initializeL2Store: (powContract, user, getUserMaxChainId) => {
     const fetchL2Store = async () => {
       if (powContract && user) {
@@ -64,12 +66,14 @@ export const useL2Store = create<L2Store>((set, get) => ({
           set({
             l2: l2Instance,
             isL2Unlocked: true,
+            isInitialized: true,
           });
         } catch (error) {
           if (__DEV__) console.error("Error initializing L2 store:", error);
         }
       } else {
         get().resetL2Store();
+        set({ isInitialized: true });
       }
     };
     fetchL2Store();
