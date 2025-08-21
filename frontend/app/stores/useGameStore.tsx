@@ -174,6 +174,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       const block = newWorkingBlocks[chainId];
       const maxBlockSize = block.maxSize; // Use the block's static maxSize
+
+      // early return if the block is already full
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
         return { workingBlocks: newWorkingBlocks };
@@ -189,6 +191,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       block.fees += transaction.fee;
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
+        // Notify immediately when the block becomes full as a result of this addition
+        useEventManager.getState().notify("BlockIsBuilt");
       }
       newWorkingBlocks[chainId] = block;
       return { workingBlocks: newWorkingBlocks };

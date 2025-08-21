@@ -48,6 +48,42 @@ const StoreTabButton = memo(
   },
 );
 
+const AchievementsTabButton = memo(
+  ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
+    const isAchievementsActive = useIsTutorialTargetActive(
+      "achievementsTab" as TargetId,
+    );
+    return (
+      <View className="relative">
+        <TutorialRefView targetId="achievementsTab" enabled={true} />
+        <TabBarButton
+          tabName="Achievements"
+          isActive={isActive || isAchievementsActive}
+          onPress={onPress}
+        />
+      </View>
+    );
+  },
+);
+
+const LeaderboardTabButton = memo(
+  ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
+    const isLeaderboardActive = useIsTutorialTargetActive(
+      "leaderboardTab" as TargetId,
+    );
+    return (
+      <View className="relative">
+        <TutorialRefView targetId="leaderboardTab" enabled={true} />
+        <TabBarButton
+          tabName="Leaderboard"
+          isActive={isActive || isLeaderboardActive}
+          onPress={onPress}
+        />
+      </View>
+    );
+  },
+);
+
 const TabBarButton = memo(
   ({
     tabName,
@@ -224,8 +260,7 @@ export const TabNavigator = memo(() => {
         options={{
           freezeOnBlur: true,
           tabBarButton: (props) => (
-            <TabBarButton
-              tabName="Leaderboard"
+            <LeaderboardTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
             />
@@ -242,8 +277,7 @@ export const TabNavigator = memo(() => {
         options={{
           freezeOnBlur: true,
           tabBarButton: (props) => (
-            <TabBarButton
-              tabName="Achievements"
+            <AchievementsTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
             />
