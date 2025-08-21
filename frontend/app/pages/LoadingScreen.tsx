@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef } from "react";
+import React, { memo, useState, useRef, useEffect } from "react";
 import { View, Text } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { useInterval } from "usehooks-ts";
@@ -116,8 +116,24 @@ export const LoadingScreen: React.FC = memo(() => {
     upgradesInitialized &&
     soundInitialized;
 
-  // Only render if account is connected AND not all stores are initialized
-  if (!account || allStoresInitialized) {
+  // State to track if we should hide the loading screen after delay
+  const [shouldHide, setShouldHide] = useState(false);
+
+  // Effect to handle 2-second delay after stores are initialized
+  useEffect(() => {
+    if (allStoresInitialized) {
+      const timer = setTimeout(() => {
+        setShouldHide(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShouldHide(false);
+    }
+  }, [allStoresInitialized]);
+
+  // Only render if account is connected AND (stores not initialized OR still within delay period)
+  if (!account || shouldHide) {
     return null;
   }
 
