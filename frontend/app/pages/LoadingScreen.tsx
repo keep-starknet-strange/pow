@@ -10,7 +10,7 @@ interface TipTextDisplayProps {
   tipText: string;
 }
 
-const TipTextDisplay: React.FC<TipTextDisplayProps> = ({ tipText }) => {
+const TipTextDisplay: React.FC<TipTextDisplayProps> = memo(({ tipText }) => {
   return (
     <Animated.View
       className="px-4 mt-[40px] h-[60px] justify-center"
@@ -25,7 +25,7 @@ const TipTextDisplay: React.FC<TipTextDisplayProps> = ({ tipText }) => {
       </Text>
     </Animated.View>
   );
-};
+});
 
 export const LoadingScreen: React.FC = memo(() => {
   const allTextsRef = useRef([
@@ -66,7 +66,7 @@ export const LoadingScreen: React.FC = memo(() => {
       <MainBackground />
       <View className="relative flex-col items-center justify-center flex-1">
         <Logo />
-        <TipTextDisplay tipText={tipText} />
+        <TipTextDisplay key={tipText} tipText={tipText} />
       </View>
       <View className="absolute bottom-[60px] right-[20px] flex-row">
         <Text className="text-black font-Pixels" style={{ fontSize: 18 }}>
