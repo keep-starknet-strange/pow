@@ -29,7 +29,8 @@ export type EventType =
   | "TutorialDismissed"
   | "SwitchStore"
   | "SwitchPage"
-  | "SwitchTxTab";
+  | "SwitchTxTab"
+  | "BlockIsBuilt";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): Promise<void>;

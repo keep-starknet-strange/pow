@@ -27,6 +27,13 @@
     "highlightTargetId": "firstTransactionButton",
     "canDismiss": false
   },
+  "finishMiningBlock": {
+    "title": "Mining Block!",
+    "description": "Great job!\nYou've successfully filled your first block.\nNow, let's finish mining it and collect your rewards!",
+    "bubbleTargetId": "minerConfirmer",
+    "highlightTargetId": "minerConfirmer",
+    "canDismiss": false
+  },
   "checkStore": {
     "title": "Visit the Shop!",
     "description": "Let's spend those rewards!\nHead to the Shop to unlock new transaction types, activate automation, and buy powerful upgrades.\nEvery purchase boosts your blockchain!",
@@ -62,11 +69,25 @@
     "highlightTargetId": "chainAutomationTab",
     "canDismiss": false
   },
+  "checkAchievements": {
+    "title": "Achievements!",
+    "description": "Check out your achievements!\nYou can see your progress for completing them.\nClick here to see your achievements!",
+    "bubbleTargetId": "achievementsTab",
+    "highlightTargetId": "achievementsTab",
+    "canDismiss": false
+  },
   "dapps": {
     "title": "dApps! dApps! dApps!",
     "description": "Decentralized applications (dApps) are the backbone of your blockchain ecosystem.\nThey bring utility, users, and value to your chain.\nClick here to begin your dApps journey!",
     "bubbleTargetId": "dappsTab",
     "highlightTargetId": "dappsTab",
+    "canDismiss": false
+  },
+  "leaderboard": {
+    "title": "Leaderboard!",
+    "description": "Check out the leaderboard!\nYou can see how you stack up against other players.\nClick here to see the leaderboard!",
+    "bubbleTargetId": "leaderboardTab",
+    "highlightTargetId": "leaderboardTab",
     "canDismiss": false
   },
   "L2Upgrade": {

@@ -1,13 +1,7 @@
-import React, {
-  useCallback,
-  memo,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useMemo,
-} from "react";
+import React, { useCallback, memo, useState, useMemo } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Pressable } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
 import { StorePage } from "../pages/StorePage";
@@ -36,11 +30,47 @@ const StoreTabButton = memo(
   ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
     const isStoreTabActive = useIsTutorialTargetActive("storeTab" as TargetId);
     return (
-      <View className="relative">
+      <View style={styles.relative}>
         <TutorialRefView targetId="storeTab" enabled={true} />
         <TabBarButton
           tabName="Store"
           isActive={isActive || isStoreTabActive}
+          onPress={onPress}
+        />
+      </View>
+    );
+  },
+);
+
+const AchievementsTabButton = memo(
+  ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
+    const isAchievementsActive = useIsTutorialTargetActive(
+      "achievementsTab" as TargetId,
+    );
+    return (
+      <View style={styles.relative}>
+        <TutorialRefView targetId="achievementsTab" enabled={true} />
+        <TabBarButton
+          tabName="Achievements"
+          isActive={isActive || isAchievementsActive}
+          onPress={onPress}
+        />
+      </View>
+    );
+  },
+);
+
+const LeaderboardTabButton = memo(
+  ({ isActive, onPress }: { isActive: boolean; onPress: any }) => {
+    const isLeaderboardActive = useIsTutorialTargetActive(
+      "leaderboardTab" as TargetId,
+    );
+    return (
+      <View style={styles.relative}>
+        <TutorialRefView targetId="leaderboardTab" enabled={true} />
+        <TabBarButton
+          tabName="Leaderboard"
+          isActive={isActive || isLeaderboardActive}
           onPress={onPress}
         />
       </View>
@@ -59,7 +89,6 @@ const TabBarButton = memo(
     onPress: any;
   }) => {
     const { getImage } = useImages();
-    const buttonRef = useRef<View>(null);
     const [buttonSize, setButtonSize] = useState({ width: 0, height: 0 });
 
     const tabIcon = useMemo(() => {
@@ -93,25 +122,35 @@ const TabBarButton = memo(
       return isActive ? getImage("nav.button.active") : getImage("nav.button");
     }, [isActive, getImage]);
 
-    useLayoutEffect(() => {
-      buttonRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
-        setButtonSize({ width: width, height: height });
-      });
-    }, [buttonRef, setButtonSize]);
+    const handleLayout = useCallback((e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      setButtonSize({ width, height });
+    }, []);
+
+    const backgroundCanvasStyle = useMemo(
+      () => ({
+        position: "absolute" as const,
+        width: buttonSize.width,
+        height: buttonSize.height,
+      }),
+      [buttonSize],
+    );
+
+    const iconCanvasStyle = useMemo(
+      () => ({
+        width: buttonSize.width * 0.8,
+        height: buttonSize.width * 0.8,
+      }),
+      [buttonSize],
+    );
 
     return (
       <Pressable
-        className="h-full justify-center items-center mx-[1px]"
-        ref={buttonRef}
+        style={styles.tabPressable}
         onPress={onPress}
+        onLayout={handleLayout}
       >
-        <Canvas
-          style={{
-            position: "absolute",
-            width: buttonSize.width,
-            height: buttonSize.height,
-          }}
-        >
+        <Canvas style={backgroundCanvasStyle}>
           <Image
             image={buttonImage}
             fit="fill"
@@ -125,12 +164,7 @@ const TabBarButton = memo(
             }}
           />
         </Canvas>
-        <Canvas
-          style={{
-            width: buttonSize.width * 0.8,
-            height: buttonSize.width * 0.8,
-          }}
-        >
+        <Canvas style={iconCanvasStyle}>
           <Image
             image={tabIcon}
             fit="contain"
@@ -224,8 +258,7 @@ export const TabNavigator = memo(() => {
         options={{
           freezeOnBlur: true,
           tabBarButton: (props) => (
-            <TabBarButton
-              tabName="Leaderboard"
+            <LeaderboardTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
             />
@@ -242,8 +275,7 @@ export const TabNavigator = memo(() => {
         options={{
           freezeOnBlur: true,
           tabBarButton: (props) => (
-            <TabBarButton
-              tabName="Achievements"
+            <AchievementsTabButton
               isActive={props["aria-selected"] || false}
               onPress={props.onPress}
             />
@@ -273,4 +305,16 @@ export const TabNavigator = memo(() => {
       />
     </Tab.Navigator>
   );
+});
+
+const styles = StyleSheet.create({
+  relative: {
+    position: "relative",
+  },
+  tabPressable: {
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 1,
+  },
 });
