@@ -10,6 +10,7 @@ export const CreditsSection = () => {
     { name: "MICHAEL", role: "Development" },
     { name: "MORAN", role: "Design" },
     { name: "JON", role: "Art & Design" },
+    { name: "NOUNSDAO", role: "Avatar Art" },
   ];
   const specialThanks = [
     { name: "SATOSHI NAKAMOTO", reason: "Creating a new era" },
