@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: "#fff7ff",
     fontSize: 12,
-    fontFamily: "Pixels",
+    fontFamily: "Xerxes",
     textAlign: "center",
   },
 });
