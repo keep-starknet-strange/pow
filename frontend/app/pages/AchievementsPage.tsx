@@ -3,7 +3,7 @@ import { View, Text, FlatList } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
-import { useAchievement } from "../stores/useAchievementsStore";
+import { useAchievement, useAchievementsLastViewed } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
 import {
@@ -17,8 +17,15 @@ import { LinearGradient } from "expo-linear-gradient";
 export const AchievementsPage: React.FC = () => {
   const isFocused = useIsFocused();
   const { achievementsProgress } = useAchievement();
-  const { width, height } = useCachedWindowDimensions();
+  const { setAchievementsLastViewedNow } = useAchievementsLastViewed();
+  const { width } = useCachedWindowDimensions();
   const { getImage } = useImages();
+
+  useEffect(() => {
+    if (isFocused) {
+      setAchievementsLastViewedNow();
+    }
+  }, [isFocused, setAchievementsLastViewedNow]);
 
   const renderAchievementName = useCallback(
     (name: string) => {

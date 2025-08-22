@@ -23,6 +23,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAchievementsHasUnseen } from "../stores/useAchievementsStore";
 
 const Tab = createBottomTabNavigator();
 
@@ -47,6 +48,7 @@ const AchievementsTabButton = memo(
     const isAchievementsActive = useIsTutorialTargetActive(
       "achievementsTab" as TargetId,
     );
+    const hasUnseen = useAchievementsHasUnseen();
     return (
       <View style={styles.relative}>
         <TutorialRefView targetId="achievementsTab" enabled={true} />
@@ -55,6 +57,7 @@ const AchievementsTabButton = memo(
           isActive={isActive || isAchievementsActive}
           onPress={onPress}
         />
+        {hasUnseen && <BadgeOverlay />}
       </View>
     );
   },
@@ -182,6 +185,25 @@ const TabBarButton = memo(
     );
   },
 );
+
+const BadgeOverlay = memo(() => {
+  const { getImage } = useImages();
+  return (
+    <View style={styles.badgeContainer} pointerEvents="none">
+      <Canvas style={styles.badgeCanvas}>
+        <Image
+          image={getImage("notif.badge")}
+          fit="contain"
+          x={0}
+          y={0}
+          width={20}
+          height={20}
+          sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+        />
+      </Canvas>
+    </View>
+  );
+});
 
 export const TabNavigator = memo(() => {
   const { notify } = useEventManager();
@@ -316,5 +338,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 1,
+  },
+  badgeContainer: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 20,
+    height: 20,
+    zIndex: 30,
+  },
+  badgeCanvas: {
+    width: 20,
+    height: 20,
   },
 });
