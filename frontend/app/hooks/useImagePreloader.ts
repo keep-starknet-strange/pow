@@ -26,7 +26,7 @@ const imagePaths = {
   headerSwitchActive: require(`${assetsPath}/lSwitch_active.webp`),
   headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.webp`),
   notificationUnlock: require(`${assetsPath}/notification.webp`),
-  notificationBadge: require(`${assetsPath}/exclamation_notification.png`),
+  notificationBadge: require(`${assetsPath}/notification_badge.webp`),
 
   // Account Creation
   nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.webp`),
