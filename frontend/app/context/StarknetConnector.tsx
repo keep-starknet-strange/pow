@@ -381,7 +381,10 @@ export const StarknetConnectorProvider: React.FC<{
       const newAccount = new Account(provider!, accountAddress, privateKey);
       setAccount(newAccount);
       if (__DEV__)
-        console.log("✅ Connected to account from storage:", newAccount.address);
+        console.log(
+          "✅ Connected to account from storage:",
+          newAccount.address,
+        );
     },
     [provider],
   );
@@ -579,30 +582,31 @@ export const StarknetConnectorProvider: React.FC<{
           network: network,
           deploymentData: deploymentData || undefined,
         };
-        const gaslessTxRes = await fetch(
-          buildGaslessTxDataUrl,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(gaslessTxInput),
+        const gaslessTxRes = await fetch(buildGaslessTxDataUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        )
+          body: JSON.stringify(gaslessTxInput),
+        })
           .then((response) => response.json())
           .catch((error) => {
             throw error;
           });
-        const privateKey = (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
-        
+        const privateKey =
+          (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
+
         let signature: any;
         if (!privateKey) {
           console.error("Could not extract private key from account");
           throw new Error("Private key not accessible for manual signing");
         }
-        
+
         // Manual EC signing (replaces the internal signing in signMessage)
-        signature = ec.starkCurve.sign(gaslessTxRes.data.messageHash, privateKey);
+        signature = ec.starkCurve.sign(
+          gaslessTxRes.data.messageHash,
+          privateKey,
+        );
         if (Array.isArray(signature)) {
           signature = signature.map((sig) => toBeHex(BigInt(sig)));
         } else if (signature.r && signature.s) {
@@ -630,8 +634,7 @@ export const StarknetConnectorProvider: React.FC<{
           .catch((error) => {
             throw error;
           });
-        if (__DEV__)
-          console.log("Gasless transaction sent:", sendGaslessTxRes);
+        if (__DEV__) console.log("Gasless transaction sent:", sendGaslessTxRes);
       } else {
         // Use gasless-sdk to execute calls with paymaster
         const options: GaslessOptions = {
@@ -659,8 +662,7 @@ export const StarknetConnectorProvider: React.FC<{
       if (!STARKNET_ENABLED) {
         return;
       }
-      if (__DEV__)
-        console.log("Invoking contract calls:", calls.length);
+      if (__DEV__) console.log("Invoking contract calls:", calls.length);
       if (network === "SN_DEVNET") {
         invokeContractCalls(calls);
       } else {
