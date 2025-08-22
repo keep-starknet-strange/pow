@@ -7,6 +7,7 @@ import { useInAppNotificationsStore } from "./useInAppNotificationsStore";
 interface AchievementState {
   achievementsAccount: string;
   achievementsProgress: { [key: number]: number };
+  isInitialized: boolean;
   updateAchievement: (achievementId: number, progress: number) => void;
   initializeAchievements: (account?: string) => Promise<void>;
   playSoundEffect?: (sound: string) => void;
@@ -16,6 +17,7 @@ interface AchievementState {
 export const useAchievementsStore = create<AchievementState>((set, get) => ({
   achievementsAccount: "default",
   achievementsProgress: {},
+  isInitialized: false,
 
   setSoundDependency: (playSoundEffect) => {
     set({ playSoundEffect });
@@ -42,7 +44,10 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     }
 
     set({ achievementsAccount: account });
-    set({ achievementsProgress: initialAchievementsProgress });
+    set({
+      achievementsProgress: initialAchievementsProgress,
+      isInitialized: true,
+    });
   },
 
   updateAchievement: (achievementId: number, progress: number) => {

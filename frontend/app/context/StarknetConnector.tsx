@@ -17,6 +17,7 @@ import {
   RpcProvider,
   hash,
   CallData,
+  typedData,
 } from "starknet";
 import {
   BASE_URL,
@@ -365,10 +366,8 @@ export const StarknetConnectorProvider: React.FC<{
         return;
       }
       if (!provider) {
-        console.error("Provider is not initialized.");
         return;
       }
-      console.log("Connecting to account from storage:", key);
       const privateKey = await getPrivateKey(key);
       if (!privateKey) {
         console.error(`Private key for ${key} not found.`);
@@ -381,7 +380,11 @@ export const StarknetConnectorProvider: React.FC<{
       );
       const newAccount = new Account(provider!, accountAddress, privateKey);
       setAccount(newAccount);
-      console.log("✅ Connected to account from storage:", newAccount.address);
+      if (__DEV__)
+        console.log(
+          "✅ Connected to account from storage:",
+          newAccount.address,
+        );
     },
     [provider],
   );
@@ -437,12 +440,6 @@ export const StarknetConnectorProvider: React.FC<{
         contractAddress,
         privateKey,
       );
-      console.log(
-        "Deploying account: ",
-        accountClassName,
-        " at:",
-        contractAddress,
-      );
       const { transaction_hash, contract_address } = await accountInstance
         .deployAccount(
           {
@@ -457,20 +454,18 @@ export const StarknetConnectorProvider: React.FC<{
           // TODO: Handle error ( for now assume it is already deployed )
           // console.error('Error deploying account:', error);
           // throw error;
-          console.log("Assuming account is already deployed:", error);
           return {
             transaction_hash: "Account already exists",
             contract_address: contractAddress,
           };
         });
       if (transaction_hash === "Account already exists") {
-        console.log("Account already exists:", contractAddress);
         connectAccount(privateKey, accountClassName);
         return;
       }
-      console.log("Transaction hash:", transaction_hash);
       await provider!.waitForTransaction(transaction_hash);
-      console.log("✅ New account created.\n   address =", contract_address);
+      if (__DEV__)
+        console.log("✅ New account created.\n   address =", contract_address);
       connectAccount(privateKey, accountClassName);
     },
     [provider, STARKNET_ENABLED, connectAccount],
@@ -499,11 +494,11 @@ export const StarknetConnectorProvider: React.FC<{
           maxFee: 100_000_000_000_000,
         },
       );
-      console.log(`Transaction hash: ${res.transaction_hash}`);
       await provider!.waitForTransaction(res.transaction_hash);
-      console.log(
-        `✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`,
-      );
+      if (__DEV__)
+        console.log(
+          `✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`,
+        );
     },
     [account, provider],
   );
@@ -526,11 +521,11 @@ export const StarknetConnectorProvider: React.FC<{
         .catch((error) => {
           throw error;
         });
-      console.log(`Transaction hash: ${res.transaction_hash}`);
       await provider!.waitForTransaction(res.transaction_hash);
-      console.log(
-        `✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`,
-      );
+      if (__DEV__)
+        console.log(
+          `✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`,
+        );
     },
     [provider, account],
   );
@@ -587,21 +582,31 @@ export const StarknetConnectorProvider: React.FC<{
           network: network,
           deploymentData: deploymentData || undefined,
         };
-        const gaslessTxRes: { data: TypedData } = await fetch(
-          buildGaslessTxDataUrl,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(gaslessTxInput),
+        const gaslessTxRes = await fetch(buildGaslessTxDataUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        )
+          body: JSON.stringify(gaslessTxInput),
+        })
           .then((response) => response.json())
           .catch((error) => {
             throw error;
           });
-        let signature = await invokeAccount.signMessage(gaslessTxRes.data);
+        const privateKey =
+          (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
+
+        let signature: any;
+        if (!privateKey) {
+          console.error("Could not extract private key from account");
+          throw new Error("Private key not accessible for manual signing");
+        }
+
+        // Manual EC signing (replaces the internal signing in signMessage)
+        signature = ec.starkCurve.sign(
+          gaslessTxRes.data.messageHash,
+          privateKey,
+        );
         if (Array.isArray(signature)) {
           signature = signature.map((sig) => toBeHex(BigInt(sig)));
         } else if (signature.r && signature.s) {
@@ -613,7 +618,7 @@ export const StarknetConnectorProvider: React.FC<{
         const sendGaslessTxUrl = `${focEngineUrl}/paymaster/send-gasless-tx`;
         const sendGaslessTxInput = {
           account: invokeAccount.address,
-          txData: JSON.stringify(gaslessTxRes.data),
+          txData: JSON.stringify(gaslessTxRes.data.typedData),
           signature: signature,
           network: network,
           deploymentData: deploymentData || undefined,
@@ -629,7 +634,7 @@ export const StarknetConnectorProvider: React.FC<{
           .catch((error) => {
             throw error;
           });
-        console.log("Gasless transaction sent:", sendGaslessTxRes);
+        if (__DEV__) console.log("Gasless transaction sent:", sendGaslessTxRes);
       } else {
         // Use gasless-sdk to execute calls with paymaster
         const options: GaslessOptions = {
@@ -645,7 +650,8 @@ export const StarknetConnectorProvider: React.FC<{
           console.error("Error executing calls with paymaster:", error);
           throw error;
         });
-        console.log("Response from executeCalls with paymaster:", res);
+        if (__DEV__)
+          console.log("Response from executeCalls with paymaster:", res);
       }
     },
     [provider, network, account, STARKNET_ENABLED, connectAccount],
@@ -656,7 +662,7 @@ export const StarknetConnectorProvider: React.FC<{
       if (!STARKNET_ENABLED) {
         return;
       }
-      console.log("Invoking contract calls:", calls.length);
+      if (__DEV__) console.log("Invoking contract calls:", calls.length);
       if (network === "SN_DEVNET") {
         invokeContractCalls(calls);
       } else {
