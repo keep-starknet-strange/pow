@@ -14,6 +14,7 @@ import { useTutorialStore } from "../stores/useTutorialStore";
 import { useUpgradesStore } from "../stores/useUpgradesStore";
 import { useSoundStore } from "../stores/useSoundStore";
 import { useStarknetConnector } from "../context/StarknetConnector";
+import Constants from "expo-constants";
 
 interface TipTextDisplayProps {
   tipText: string;
@@ -37,6 +38,7 @@ const TipTextDisplay: React.FC<TipTextDisplayProps> = memo(({ tipText }) => {
 });
 
 export const LoadingScreenView: React.FC = memo(() => {
+  const version = Constants.expoConfig?.version || "0.0.1";
   const allTextsRef = useRef([
     ...loadingConfig.tips,
     ...loadingConfig.lore,
@@ -87,6 +89,19 @@ export const LoadingScreenView: React.FC = memo(() => {
         >
           {dots}
         </Text>
+      </View>
+      <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">
+        <Animated.View
+          entering={FadeInDown}
+          className="flex flex-row items-center justify-between w-full"
+        >
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            version {version}
+          </Text>
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            We're open source!
+          </Text>
+        </Animated.View>
       </View>
     </View>
   );
