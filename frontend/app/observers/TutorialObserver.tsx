@@ -159,8 +159,6 @@ export class TutorialObserver implements Observer {
   async onNotify(eventName: EventType, data?: any): Promise<void> {
     // Get current step from store
     const { step } = useTutorialStore.getState();
-    console.log("eventName", eventName, "step", step, "data", data);
-
     if (
       eventName === "SwitchPage" ||
       eventName === "SwitchStore" ||
