@@ -9,6 +9,7 @@ interface AchievementState {
   achievementsProgress: { [key: number]: number };
   achievementsUnlockedAt: { [key: number]: number };
   lastViewedAt: number;
+  isInitialized: boolean;
   updateAchievement: (achievementId: number, progress: number) => void;
   initializeAchievements: (account?: string) => Promise<void>;
   playSoundEffect?: (sound: string) => void;
@@ -22,6 +23,7 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
   achievementsProgress: {},
   achievementsUnlockedAt: {},
   lastViewedAt: 0,
+  isInitialized: false,
 
   setSoundDependency: (playSoundEffect) => {
     set({ playSoundEffect });
@@ -91,6 +93,10 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     set({ achievementsProgress: initialAchievementsProgress });
     set({ achievementsUnlockedAt: initialAchievementsUnlockedAt });
     set({ lastViewedAt });
+    set({
+      achievementsProgress: initialAchievementsProgress,
+      isInitialized: true,
+    });
   },
 
   updateAchievement: (achievementId: number, progress: number) => {

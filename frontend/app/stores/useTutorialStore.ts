@@ -25,6 +25,7 @@ interface TutorialState {
   stepIndex: number;
   layouts: Partial<Record<TargetId, Layout>>;
   visible: boolean;
+  isInitialized: boolean;
 
   advanceStep: () => void;
   registerLayout: (targetId: TargetId, layout: Layout) => void;
@@ -41,6 +42,7 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
   stepIndex: 0,
   layouts: {},
   visible: false,
+  isInitialized: false,
 
   initializeTutorial: async () => {
     try {
@@ -74,9 +76,11 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
         step: validStep,
         stepIndex: validIndex,
         visible: savedVisible,
+        isInitialized: true,
       });
     } catch (error) {
       if (__DEV__) console.error("Failed to load tutorial progress:", error);
+      set({ isInitialized: true });
     }
   },
 

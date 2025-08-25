@@ -1,0 +1,26 @@
+{
+  "tips": [
+    "Block Size upgrades increase transaction capacity quadratically (4→5 width = 16→25 slots)",
+    "MEV Boost multipliers apply to all transaction fees - upgrade early for efficiency.",
+    "Recursive Proving batches multiple L2 blocks into single proofs!",
+    "Transaction speeds determine how fast your blocks build themselves.",
+    "Each transaction/dApp must be unlocked before proceeding to the next phase.",
+    "Block rewards and transaction fees both contribute to your total earnings!"
+  ],
+  "lore": [
+    "The genesis block holds the primordial energy that is channeled into every block",
+    "Zero-knowledge proofs compress entire chain histories into cryptographic truths",
+    "The Prover network validates reality itself using mathematical certainty",
+    "Data Availability ensures that no transaction is ever truly lost to time",
+    "Prestige transcends chains, carrying power across dimensional resets",
+    "Cairo smart contracts are the ancient runes that govern this realm",
+    "Each upgrade unlocks deeper layers of the blockchain's true potential"
+  ],
+  "facts": [
+    "POW! uses Starknet's validity proofs to ensure all game actions are verifiable",
+    "AVNU paymasters sponsor gas fees, making every transaction completely free",
+    "Achievement system tracks 30 different milestones across the game",
+    "Built by Starkware Exploration as an open-source blockchain gaming experiment",
+    "Every click corresponds to one call on Starknet!"
+  ]
+}
