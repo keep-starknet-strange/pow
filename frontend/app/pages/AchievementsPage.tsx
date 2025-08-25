@@ -3,7 +3,10 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
-import { useAchievement, useAchievementsLastViewed } from "../stores/useAchievementsStore";
+import {
+  useAchievement,
+  useAchievementsLastViewed,
+} from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
 import {
@@ -21,6 +24,7 @@ const CATEGORY_HEADER_HEIGHT = 24;
 const CATEGORY_MARGIN_HORIZONTAL = 16;
 const CATEGORY_MARGIN_VERTICAL = 8;
 const CATEGORY_TITLE_LEFT = 8;
+const CATEGORY_TITLE_TOP = 3;
 const SCREEN_BACKGROUND = "#101119ff";
 const SCREEN_BACKGROUND_INACTIVE = "#101119";
 const PIXEL_FONT = "Pixels";
@@ -30,6 +34,9 @@ const ACHIEVEMENT_NAME_TOP = 8;
 const ICON_CONTAINER_BOTTOM = 38;
 const ICON_CONTAINER_LEFT = 33;
 const ICON_SIZE = 50;
+const TILE_HORIZONTAL_MARGIN = 4;
+const HEADER_TO_ROW_SPACING = 8;
+const GRADIENT_FRACTION = 0.14; // of screen width, clamped below
 
 const styles = StyleSheet.create({
   screen: {
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
   categoryHeaderText: {
     position: "absolute",
     left: CATEGORY_TITLE_LEFT,
+    top: CATEGORY_TITLE_TOP,
     fontFamily: PIXEL_FONT,
     fontSize: 20,
     color: TEXT_PRIMARY,
@@ -84,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     width: ACHIEVEMENT_TILE_WIDTH,
     height: ACHIEVEMENT_TILE_HEIGHT,
-    marginHorizontal: 4,
+    marginHorizontal: TILE_HORIZONTAL_MARGIN,
   },
   fillCanvas: {
     flex: 1,
@@ -115,7 +123,7 @@ const styles = StyleSheet.create({
   achievementNameText: {
     fontFamily: PIXEL_FONT,
     color: TEXT_PRIMARY,
-    fontSize: 16,
+    fontSize: 17,
     textAlign: "center",
     lineHeight: 16,
   },
@@ -228,7 +236,10 @@ export const AchievementsPage: React.FC = () => {
         <View
           style={[
             styles.categoryHeaderWrapper,
-            { width: width - CATEGORY_MARGIN_HORIZONTAL * 2, height: CATEGORY_HEADER_HEIGHT },
+            {
+              width: width - CATEGORY_MARGIN_HORIZONTAL * 2,
+              height: CATEGORY_HEADER_HEIGHT,
+            },
           ]}
         >
           <Canvas key={`category-header-${item.id}`} style={styles.fillCanvas}>
@@ -245,7 +256,10 @@ export const AchievementsPage: React.FC = () => {
               }}
             />
           </Canvas>
-          <Animated.Text style={styles.categoryHeaderText} entering={FadeInRight}>
+          <Animated.Text
+            style={styles.categoryHeaderText}
+            entering={FadeInRight}
+          >
             {item.category}
           </Animated.Text>
         </View>
@@ -401,7 +415,7 @@ export const AchievementsPage: React.FC = () => {
             position: "absolute",
             top: 0,
             right: 0,
-            width: 120,
+            width: Math.max(96, Math.min(140, width * GRADIENT_FRACTION)),
             height: "100%",
             marginRight: 8,
             pointerEvents: "none",

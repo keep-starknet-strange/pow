@@ -23,7 +23,10 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAchievementsHasUnseen, useAchievementsUnseenCount } from "../stores/useAchievementsStore";
+import {
+  useAchievementsHasUnseen,
+  useAchievementsUnseenCount,
+} from "../stores/useAchievementsStore";
 
 const Tab = createBottomTabNavigator();
 
@@ -204,7 +207,11 @@ const BadgeOverlay = memo(({ count }: { count: number }) => {
         />
       </Canvas>
       <View style={styles.badgeTextWrapper}>
-        <Pressable accessibilityLabel={`Achievements, ${display} new`} accessibilityRole="text" disabled>
+        <Pressable
+          accessibilityLabel={`Achievements, ${display} new`}
+          accessibilityRole="text"
+          disabled
+        >
           <View>
             <Text style={styles.badgeText}>{42}</Text>
           </View>

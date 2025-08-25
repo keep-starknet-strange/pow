@@ -151,8 +151,11 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     const account = get().achievementsAccount;
     const now = Date.now();
     set({ lastViewedAt: now });
-    AsyncStorage.setItem(`${account}.achievements_lastViewedAt`, String(now)).catch(
-      (error) => console.error("Error saving achievements lastViewedAt:", error),
+    AsyncStorage.setItem(
+      `${account}.achievements_lastViewedAt`,
+      String(now),
+    ).catch((error) =>
+      console.error("Error saving achievements lastViewedAt:", error),
     );
   },
 
@@ -198,28 +201,24 @@ export const useAchievementsLastViewed = () => {
 };
 
 export const useAchievementsUnseenCount = (): number => {
-  return useAchievementsStore(
-    (state) => {
-      const lastViewed = state.lastViewedAt;
-      let count = 0;
-      for (const idStr in state.achievementsUnlockedAt) {
-        const ts = state.achievementsUnlockedAt[idStr as unknown as number] || 0;
-        if (ts > lastViewed) count += 1;
-      }
-      return count;
+  return useAchievementsStore((state) => {
+    const lastViewed = state.lastViewedAt;
+    let count = 0;
+    for (const idStr in state.achievementsUnlockedAt) {
+      const ts = state.achievementsUnlockedAt[idStr as unknown as number] || 0;
+      if (ts > lastViewed) count += 1;
     }
-  ) as number;
+    return count;
+  }) as number;
 };
 
 export const useAchievementsHasUnseen = (): boolean => {
-  return useAchievementsStore(
-    (state) => {
-      const lastViewed = state.lastViewedAt;
-      for (const idStr in state.achievementsUnlockedAt) {
-        const ts = state.achievementsUnlockedAt[idStr as unknown as number] || 0;
-        if (ts > lastViewed) return true;
-      }
-      return false;
-      }
-    ) as boolean;
-  }
+  return useAchievementsStore((state) => {
+    const lastViewed = state.lastViewedAt;
+    for (const idStr in state.achievementsUnlockedAt) {
+      const ts = state.achievementsUnlockedAt[idStr as unknown as number] || 0;
+      if (ts > lastViewed) return true;
+    }
+    return false;
+  }) as boolean;
+};
