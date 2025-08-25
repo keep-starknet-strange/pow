@@ -76,13 +76,11 @@ const styles = StyleSheet.create({
     color: TEXT_PRIMARY,
   },
   categoryList: {
-    flex: 1,
     marginHorizontal: 12,
     height: ACHIEVEMENT_TILE_HEIGHT,
   },
   achievementItem: {
     position: "relative",
-    flex: 1,
     flexDirection: "column",
     width: ACHIEVEMENT_TILE_WIDTH,
     height: ACHIEVEMENT_TILE_HEIGHT,
