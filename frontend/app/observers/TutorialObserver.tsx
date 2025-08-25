@@ -171,7 +171,7 @@ export class TutorialObserver implements Observer {
 
     // this is the first achievement event
     if (eventName === "MineDone") {
-      if (data.block?.blockId === 2) {
+      if (data.block?.blockId === 10) {
         eventName = eventName + "-" + data.block?.blockId;
       }
     }
