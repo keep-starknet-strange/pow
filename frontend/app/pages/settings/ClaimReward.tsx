@@ -1,14 +1,6 @@
 import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ImageBackground,
-  Linking,
-} from "react-native";
-import background from "../../../assets/background.webp";
+import { View, Text, TextInput, TouchableOpacity, Linking } from "react-native";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import BasicButton from "../../components/buttons/Basic";
@@ -26,18 +18,28 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
 
+  // TODO: derive from on-chain prestige state; for now, assume unlocked via UI
   const rewardUnlocked = true;
 
   const claimReward = async () => {
-    if (!account || accountInput.trim() === "") {
-      console.error("No account connected");
+    // gameAccount is the signer used to call the contract; recipient is where tokens go
+    if (!gameAccount) {
+      console.error("Game account is not connected");
+      return;
+    }
+    const recipient = (account && account.trim()) || accountInput.trim();
+    if (!recipient) {
+      console.error("No recipient provided");
       return;
     }
     const contractAddress =
-      "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"; // Replace with actual contract address
+      process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || "";
+    if (!contractAddress) {
+      console.error("Missing EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS");
+      return;
+    }
     const functionName = "claim_reward";
-    const accountReceiver = gameAccount || accountInput.trim();
-    invokeContract(contractAddress, functionName, [accountReceiver]);
+    await invokeContract(contractAddress, functionName, [recipient]);
   };
 
   useEffect(() => {
@@ -49,8 +51,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
   }, [accountInput]);
 
   return (
-    <ImageBackground className="flex-1" source={background} resizeMode="cover">
-      <View className="flex-1 justify-center items-center px-6">
+    <View className="flex-1 justify-center items-center px-6">
         {!rewardUnlocked ? (
           <Text className="text-4xl font-bold text-[#101119] mb-4">
             Keep playing to Earn STRK!
@@ -113,7 +114,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
               <BasicButton
                 label="Claim STRK"
                 onPress={claimReward}
-                disabled={!debouncedInput.trim() || !gameAccount}
+                disabled={!gameAccount || (!debouncedInput.trim() && !account)}
               />
             </View>
 
@@ -136,6 +137,5 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
           style={{ paddingHorizontal: 24, marginTop: 20 }}
         />
       </View>
-    </ImageBackground>
   );
 };
