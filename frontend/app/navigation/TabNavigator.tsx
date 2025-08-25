@@ -213,7 +213,7 @@ const BadgeOverlay = memo(({ count }: { count: number }) => {
           disabled
         >
           <View>
-            <Text style={styles.badgeText}>{42}</Text>
+            <Text style={styles.badgeText}>{display}</Text>
           </View>
         </Pressable>
       </View>
