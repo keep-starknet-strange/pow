@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useCallback } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
-import { useAchievement } from "../stores/useAchievementsStore";
+import {
+  useAchievement,
+  useAchievementsLastViewed,
+} from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
 import {
@@ -14,11 +17,145 @@ import {
 } from "@shopify/react-native-skia";
 import { LinearGradient } from "expo-linear-gradient";
 
+// Constants to avoid magic numbers and improve readability
+const ACHIEVEMENT_TILE_WIDTH = 117;
+const ACHIEVEMENT_TILE_HEIGHT = 158;
+const CATEGORY_HEADER_HEIGHT = 24;
+const CATEGORY_MARGIN_HORIZONTAL = 16;
+const CATEGORY_MARGIN_VERTICAL = 8;
+const CATEGORY_TITLE_LEFT = 8;
+const CATEGORY_TITLE_TOP = 3;
+const SCREEN_BACKGROUND = "#101119ff";
+const SCREEN_BACKGROUND_INACTIVE = "#101119";
+const PIXEL_FONT = "Pixels";
+const TEXT_PRIMARY = "#fff7ff";
+const TITLE_RIGHT_MARGIN = 8; // Tailwind right-2
+const ACHIEVEMENT_NAME_TOP = 8;
+const ICON_CONTAINER_BOTTOM = 38;
+const ICON_CONTAINER_LEFT = 33;
+const ICON_SIZE = 50;
+const TILE_HORIZONTAL_MARGIN = 4;
+const HEADER_TO_ROW_SPACING = 8;
+const GRADIENT_FRACTION = 0.14; // of screen width, clamped below
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: "relative",
+    backgroundColor: SCREEN_BACKGROUND,
+  },
+  screenInactive: {
+    flex: 1,
+    backgroundColor: SCREEN_BACKGROUND_INACTIVE,
+  },
+  absoluteFill: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  titleBar: {
+    width: "100%",
+    position: "relative",
+    height: CATEGORY_HEADER_HEIGHT,
+    marginBottom: 10,
+  },
+  titleText: {
+    color: TEXT_PRIMARY,
+    fontSize: 20,
+    position: "absolute",
+    right: TITLE_RIGHT_MARGIN,
+    fontFamily: PIXEL_FONT,
+  },
+  categoryContainer: {
+    width: "100%",
+  },
+  categoryHeaderWrapper: {
+    position: "relative",
+    marginHorizontal: CATEGORY_MARGIN_HORIZONTAL,
+    marginVertical: CATEGORY_MARGIN_VERTICAL,
+    zIndex: 10,
+  },
+  categoryHeaderText: {
+    position: "absolute",
+    left: CATEGORY_TITLE_LEFT,
+    top: CATEGORY_TITLE_TOP,
+    fontFamily: PIXEL_FONT,
+    fontSize: 20,
+    color: TEXT_PRIMARY,
+  },
+  categoryList: {
+    marginHorizontal: 12,
+    height: ACHIEVEMENT_TILE_HEIGHT,
+  },
+  achievementItem: {
+    position: "relative",
+    flexDirection: "column",
+    width: ACHIEVEMENT_TILE_WIDTH,
+    height: ACHIEVEMENT_TILE_HEIGHT,
+    marginHorizontal: TILE_HORIZONTAL_MARGIN,
+  },
+  fillCanvas: {
+    flex: 1,
+  },
+  progressOverlayBase: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    height: "100%",
+  },
+  progressOverlayImageWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: ACHIEVEMENT_TILE_WIDTH,
+    height: ACHIEVEMENT_TILE_HEIGHT,
+  },
+  achievementNameContainer: {
+    position: "absolute",
+    top: ACHIEVEMENT_NAME_TOP,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  achievementNameText: {
+    fontFamily: PIXEL_FONT,
+    color: TEXT_PRIMARY,
+    fontSize: 17,
+    textAlign: "center",
+    lineHeight: 16,
+  },
+  achievementIconContainer: {
+    position: "absolute",
+    bottom: ICON_CONTAINER_BOTTOM,
+    left: ICON_CONTAINER_LEFT,
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+  },
+  listArea: {
+    flex: 1,
+    position: "relative",
+  },
+  centerIconWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+
 export const AchievementsPage: React.FC = () => {
   const isFocused = useIsFocused();
   const { achievementsProgress } = useAchievement();
-  const { width, height } = useCachedWindowDimensions();
+  const { setAchievementsLastViewedNow } = useAchievementsLastViewed();
+  const { width } = useCachedWindowDimensions();
   const { getImage } = useImages();
+
+  useEffect(() => {
+    if (isFocused) {
+      setAchievementsLastViewedNow();
+    }
+  }, [isFocused, setAchievementsLastViewedNow]);
 
   const renderAchievementName = useCallback(
     (name: string) => {
@@ -29,10 +166,7 @@ export const AchievementsPage: React.FC = () => {
         // Handle BTC icon
         if (part === "{BTC}") {
           return (
-            <View
-              key={partIndex}
-              style={{ alignItems: "center", justifyContent: "center" }}
-            >
+            <View key={partIndex} style={styles.centerIconWrapper}>
               <Canvas
                 style={{
                   width: 14,
@@ -60,10 +194,7 @@ export const AchievementsPage: React.FC = () => {
 
         // Handle regular text
         return (
-          <Text
-            key={partIndex}
-            className="font-Pixels text-[#fff7ff] text-[16px] leading-none text-center"
-          >
+          <Text key={partIndex} style={styles.achievementNameText}>
             {part}
           </Text>
         );
@@ -101,23 +232,24 @@ export const AchievementsPage: React.FC = () => {
       item: { category: string; achievements: any[]; id: string };
       index: number;
     }) => (
-      <View key={item.id} className="w-full">
+      <View key={item.id} style={styles.categoryContainer}>
         <View
-          className="relative mx-[16px] my-[8px] z-[10]"
-          style={{ width: width - 32, height: 24 }}
+          style={[
+            styles.categoryHeaderWrapper,
+            {
+              width: width - CATEGORY_MARGIN_HORIZONTAL * 2,
+              height: CATEGORY_HEADER_HEIGHT,
+            },
+          ]}
         >
-          <Canvas
-            key={`category-header-${item.id}`}
-            style={{ flex: 1 }}
-            className="w-full h-full"
-          >
+          <Canvas key={`category-header-${item.id}`} style={styles.fillCanvas}>
             <Image
               image={getImage(`achievements.title`)}
               fit="fill"
               x={0}
               y={0}
-              width={width - 32}
-              height={24}
+              width={width - CATEGORY_MARGIN_HORIZONTAL * 2}
+              height={CATEGORY_HEADER_HEIGHT}
               sampling={{
                 filter: FilterMode.Nearest,
                 mipmap: MipmapMode.Nearest,
@@ -125,7 +257,7 @@ export const AchievementsPage: React.FC = () => {
             />
           </Canvas>
           <Animated.Text
-            className="absolute left-[8px] font-Pixels text-xl text-[#fff7ff]"
+            style={styles.categoryHeaderText}
             entering={FadeInRight}
           >
             {item.category}
@@ -135,7 +267,7 @@ export const AchievementsPage: React.FC = () => {
           data={item.achievements}
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="flex mx-[12px]"
+          style={styles.categoryList}
           keyExtractor={(achievement, achievementIndex) =>
             `${item.id}-${achievementIndex}`
           }
@@ -145,39 +277,39 @@ export const AchievementsPage: React.FC = () => {
           windowSize={10}
           renderItem={({ item: achievement, index: achievementIndex }) => (
             <Animated.View
-              className="relative flex flex-col w-[117px] h-[158px] mx-[4px]"
+              style={styles.achievementItem}
               key={achievementIndex}
               entering={FadeInRight}
             >
               <Canvas
                 key={`achievement-bg-${item.id}-${achievement.id}`}
-                style={{ flex: 1 }}
-                className="w-full h-full"
+                style={styles.fillCanvas}
               >
                 <Image
                   image={getImage("achievements.tile.locked")}
                   fit="fill"
                   x={0}
                   y={0}
-                  width={117}
-                  height={158}
+                  width={ACHIEVEMENT_TILE_WIDTH}
+                  height={ACHIEVEMENT_TILE_HEIGHT}
                 />
               </Canvas>
               {achievementsProgress[achievement.id] > 0 && (
                 <View
-                  className="absolute top-0 left-0 h-full"
-                  style={{
-                    backgroundColor: "#6dcd64",
-                    width: `${achievementsProgress[achievement.id]}%`,
-                  }}
+                  style={[
+                    styles.progressOverlayBase,
+                    {
+                      backgroundColor: "#6dcd64",
+                      width: `${achievementsProgress[achievement.id]}%`,
+                    },
+                  ]}
                 />
               )}
               {achievementsProgress[achievement.id] > 0 && (
-                <View className="absolute top-0 left-0 w-[117px] h-[158px]">
+                <View style={styles.progressOverlayImageWrapper}>
                   <Canvas
                     key={`achievement-overlay-${item.id}-${achievement.id}-${achievementsProgress[achievement.id]}`}
-                    style={{ flex: 1 }}
-                    className="w-full h-full"
+                    style={styles.fillCanvas}
                   >
                     <Image
                       image={getImage(
@@ -188,28 +320,27 @@ export const AchievementsPage: React.FC = () => {
                       fit="fill"
                       x={0}
                       y={0}
-                      width={117}
-                      height={158}
+                      width={ACHIEVEMENT_TILE_WIDTH}
+                      height={ACHIEVEMENT_TILE_HEIGHT}
                     />
                   </Canvas>
                 </View>
               )}
-              <View className="absolute top-[8px] left-0 right-0 flex-row flex-wrap justify-center items-center">
+              <View style={styles.achievementNameContainer}>
                 {renderAchievementName(achievement.name)}
               </View>
-              <View className="absolute bottom-[38px] left-[33px] w-[50px] h-[50px]">
+              <View style={styles.achievementIconContainer}>
                 <Canvas
                   key={`achievement-icon-${item.id}-${achievement.id}`}
-                  style={{ flex: 1 }}
-                  className="w-full h-full"
+                  style={styles.fillCanvas}
                 >
                   <Image
                     image={getImage(achievement.image)}
                     fit="contain"
                     x={0}
                     y={0}
-                    width={50}
-                    height={50}
+                    width={ICON_SIZE}
+                    height={ICON_SIZE}
                     sampling={{
                       filter: FilterMode.Nearest,
                       mipmap: MipmapMode.Nearest,
@@ -226,13 +357,13 @@ export const AchievementsPage: React.FC = () => {
   );
 
   if (!isFocused) {
-    return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
+    return <View style={styles.screenInactive}></View>; // Return empty view if not focused
   }
 
   return (
-    <View className="flex-1 relative bg-[#101119ff]">
-      <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+    <View style={styles.screen}>
+      <View style={styles.absoluteFill}>
+        <Canvas style={{ flex: 1 }}>
           <Image
             image={getImage("achievements.bg")}
             fit="fill"
@@ -247,7 +378,7 @@ export const AchievementsPage: React.FC = () => {
           />
         </Canvas>
       </View>
-      <View className="w-full relative h-[24px] mb-[10px]">
+      <View style={styles.titleBar}>
         <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
           <Image
             image={getImage("shop.title")}
@@ -262,17 +393,14 @@ export const AchievementsPage: React.FC = () => {
             }}
           />
         </Canvas>
-        <Animated.Text
-          className="text-[#fff7ff] text-xl absolute right-2 font-Pixels"
-          entering={FadeInLeft}
-        >
+        <Animated.Text style={styles.titleText} entering={FadeInLeft}>
           ACHIEVEMENTS
         </Animated.Text>
       </View>
       <View style={{ height: 558 }}>
         <FlatList
           data={categoriesData}
-          className="flex-1 relative"
+          style={styles.listArea}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           renderItem={renderCategoryItem}
@@ -287,7 +415,7 @@ export const AchievementsPage: React.FC = () => {
             position: "absolute",
             top: 0,
             right: 0,
-            width: 120,
+            width: Math.max(96, Math.min(140, width * GRADIENT_FRACTION)),
             height: "100%",
             marginRight: 8,
             pointerEvents: "none",
