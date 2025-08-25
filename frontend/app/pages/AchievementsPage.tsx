@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   categoryList: {
     flex: 1,
     marginHorizontal: 12,
+    height: ACHIEVEMENT_TILE_HEIGHT,
   },
   achievementItem: {
     position: "relative",
