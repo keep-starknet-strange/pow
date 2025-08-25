@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -11,6 +11,7 @@ import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
+import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 
 export type SettingsMainSectionProps = {
@@ -40,6 +41,23 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const { user } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
+  const { getUserPrestige } = usePowContractConnector();
+  const [onchainPrestige, setOnchainPrestige] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const p = await getUserPrestige();
+        if (!cancelled && typeof p === "number") setOnchainPrestige(p);
+      } catch (_e) {
+        // ignore; fallback to local store value
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [getUserPrestige]);
   const { resetTutorial } = useTutorialStore();
 
   const toggleNotifs = () => setNotifs(!notifs);
@@ -65,7 +83,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "About", tab: "About" },
     { label: "Credits", tab: "Credits" },
-    ...(currentPrestige >= 1
+    ...(((onchainPrestige ?? currentPrestige) >= 1)
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
     {

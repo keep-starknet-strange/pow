@@ -42,6 +42,7 @@ type PowContractContextType = {
     { size: number | undefined; fees: number | undefined } | undefined
   >;
   getUserMaxChainId: () => Promise<number | undefined>;
+  getUserPrestige: () => Promise<number | undefined>;
   getUserDappsUnlocked: (chainId: number) => Promise<boolean | undefined>;
   getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
@@ -358,6 +359,21 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [account, powContract, STARKNET_ENABLED]);
 
+  const getUserPrestige = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract) {
+      return;
+    }
+    try {
+      const prestige = await (powContract as any).get_user_prestige(
+        account?.address || "",
+      );
+      return prestige.toString ? parseInt(prestige.toString(), 10) : undefined;
+    } catch (error) {
+      console.error("Failed to fetch user prestige:", error);
+      return undefined;
+    }
+  }, [account, powContract, STARKNET_ENABLED]);
+
   const getUserDappsUnlocked = useCallback(
     async (chainId: number) => {
       if (!STARKNET_ENABLED || !powContract) {
@@ -470,6 +486,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserBlockNumber,
         getUserBlockState,
         getUserMaxChainId,
+        getUserPrestige,
         getUserDappsUnlocked,
         getUserBlockClicks,
         getUserDaClicks,
