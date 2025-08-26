@@ -36,7 +36,10 @@ export const useMiner = (
   }, [powContract, user, getUserBlockClicks]);
 
   const mineBlock = useCallback(() => {
-    if (!miningBlock?.isBuilt) {
+    const currentWorkingBlocks = useGameStore.getState().workingBlocks;
+    const currentMiningBlock = currentWorkingBlocks[0];
+    
+    if (!currentMiningBlock?.isBuilt) {
       if (__DEV__) console.warn("Block is not built yet, cannot mine.");
       return;
     }
@@ -53,7 +56,7 @@ export const useMiner = (
         notify("MineClicked", {
           counter: newCounter,
           difficulty: blockDifficulty,
-          ignoreAction: miningBlock?.blockId === 0,
+          ignoreAction: currentMiningBlock?.blockId === 0,
         });
         return newCounter;
       } else if (newCounter === blockDifficulty) {
@@ -64,7 +67,6 @@ export const useMiner = (
     });
   }, [
     triggerMineAnimation,
-    miningBlock?.isBuilt,
     blockDifficulty,
     mineCounter,
     notify,
