@@ -122,7 +122,9 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
               value={value}
               enableCompactNotation
               compactToFixed={1}
-              fixedOnlyForCompact={value % 1 !== 0 && value < 10 ? false : undefined}
+              fixedOnlyForCompact={
+                value % 1 !== 0 && value < 10 ? false : undefined
+              }
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",
@@ -145,7 +147,9 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
               value={value}
               enableCompactNotation
               compactToFixed={1}
-              fixedOnlyForCompact={value % 1 !== 0 && value < 10 ? false : undefined}
+              fixedOnlyForCompact={
+                value % 1 !== 0 && value < 10 ? false : undefined
+              }
               textStyle={{
                 color: textColor,
                 fontFamily: "Pixels",

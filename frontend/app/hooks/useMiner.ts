@@ -38,7 +38,7 @@ export const useMiner = (
   const mineBlock = useCallback(() => {
     const currentWorkingBlocks = useGameStore.getState().workingBlocks;
     const currentMiningBlock = currentWorkingBlocks[0];
-    
+
     if (!currentMiningBlock?.isBuilt) {
       if (__DEV__) console.warn("Block is not built yet, cannot mine.");
       return;
