@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused, useFocusEffect } from "@react-navigation/native";

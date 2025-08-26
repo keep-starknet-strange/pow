@@ -204,6 +204,34 @@ platform :ios do
     )
   end
 
+  private_lane :select_simulator do
+    Struct.new("Device", :udid, :name, :state)
+    require 'json'
+    json = sh(command: "xcrun simctl list devices -je")
+    devices_result = JSON.parse(json)
+    devices = devices_result["devices"].values.first.map { 
+      |d| Struct::Device.new(udid: d['udid'], name: d["name"], state: d["state"])
+    }
+    
+    index = prompt(
+      text: "Select a device to install the app: (Reply with the index)\n" + 
+            devices.each_with_index.map { |d, index| "[#{index}] " + d.name + " (#{d.state})" }
+            .join("\n"),
+      ci_input: "0",
+    ).to_i
+
+    if index < 0 || index >= devices.length
+      UI.user_error!("❌ Invalid index selected.")
+    end
+
+    selected_device = devices[index]
+    if selected_device.state != "Booted"
+      sh("xcrun", "simctl", "bootstatus", selected_device.udid, "-b")
+    end
+    
+    selected_device
+  end
+
   lane :deploy_testflight do |options|
     if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
       prebuild
@@ -235,5 +263,40 @@ platform :ios do
       skip_metadata: true,
       precheck_include_in_app_purchases: false
     )
+  end
+
+  # This lane is used to build and install (Release configuration) the app in a simulator
+  # It is useful for testing the app in a simulator after making changes. It will ask on what 
+  # simulator to install the app. If the simulator is not booted it will boot it first.
+  # This script does not require signing.
+  # args: clean: true/false (default: false) - whether to clean the build folder before building
+  #       skip_prebuild: true/false (default: false) - whether to skip the expo prebuild step. This is useful
+  #                                                    only if you have already prebuild the ios project manually.
+  # Example: fastlane ios local_build clean:true
+  lane :local_build do |options|    
+    selected_device = select_simulator
+    UI.message("📱 Selected device: #{selected_device.name}")
+        
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+
+    gym(
+      clean: options[:clean] == true,
+      configuration: "Release",
+      silent: false,
+      skip_package_ipa: true,
+      build_path: ".ios/build",
+      output_directory: ".ios/build",
+      destination: "generic/platform=iOS Simulator"
+    )
+
+    UI.message("📲 Installing in device: #{selected_device.name}")
+    Dir.chdir("..") do
+      sh(command: "xcrun simctl install #{selected_device.udid} #{lane_context[SharedValues::XCODEBUILD_ARCHIVE]}/Products/Applications/POW.app")
+    end
+
+    UI.message("🚀 Launching app")
+    sh(command: "xcrun simctl launch #{selected_device.udid} #{CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)}")
   end
 end
