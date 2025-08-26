@@ -37,7 +37,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     useStarknetConnector();
   const [notifs, setNotifs] = useState(true);
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
-  const { user } = useFocEngine();
+  const { user, disconnectUser } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
@@ -46,8 +46,9 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const handleResetGame = () => {
     setShowResetConfirmation(false);
+    disconnectUser(); // Disconnect from FocEngine first
     clearPrivateKeys("pow_game");
-    disconnectAccount();
+    disconnectAccount(); // Then disconnect from Starknet
     resetTutorial(); // Reset tutorial progress when game is reset
   };
 

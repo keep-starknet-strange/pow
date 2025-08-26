@@ -60,7 +60,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
       }
       try {
         const balance = await getUserBalance();
-        set({ balance, isInitialized: true });
+        set({ balance: balance ?? DEFAULT_BALANCE, isInitialized: true });
       } catch (error) {
         console.error("Error fetching balance:", error);
         set({ balance: DEFAULT_BALANCE, isInitialized: true });

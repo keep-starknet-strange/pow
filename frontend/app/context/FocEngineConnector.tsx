@@ -51,6 +51,7 @@ type FocEngineContextType = {
     metadata: string[],
     contract?: string,
   ) => Promise<void>;
+  disconnectUser: () => void;
   usernameValidationError: string;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
 
@@ -823,6 +824,11 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     [],
   );
 
+  const disconnectUser = useCallback(() => {
+    setUser(null);
+    setUserContract(undefined);
+  }, []);
+
   return (
     <FocEngineConnector.Provider
       value={{
@@ -841,6 +847,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         isUsernameValid,
         usernameValidationError,
         initializeAccount,
+        disconnectUser,
         mintFunds,
         getRegisteredContract,
         getLatestEventWith,
