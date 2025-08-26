@@ -39,7 +39,7 @@ export const Header: React.FC = memo(() => {
       className="bg-[#101119] h-[76px] p-0 relative"
       style={{ width: width, marginTop: insets.top }}
     >
-      <TutorialRefView targetId="headerBalance" enabled={true} />
+      <TutorialRefView targetId="headerBalance" enabled={true} style={{ paddingHorizontal: 8 }} />
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <Image
           image={getImage("header")}
