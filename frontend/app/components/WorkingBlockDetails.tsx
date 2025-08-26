@@ -244,6 +244,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
           damping: 4,
           stiffness: 200,
         });
+        if (workingBlockData?.blockId !== workingBlock?.blockId) {
+          updateWorkingBlock();
+          return;
+        }
       } else {
         if (!workingBlockData?.blockId) {
           detailsScaleAnim.value = 1;
@@ -313,9 +317,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
 
     const maxSize = useMemo(
       () =>
-        workingBlockData?.maxSize ||
+        workingBlock?.maxSize ||
         getUpgradeValue(props.chainId, "Block Size") ** 2,
-      [workingBlockData?.maxSize, getUpgradeValue, props.chainId],
+      [workingBlock?.maxSize, getUpgradeValue, props.chainId],
     );
 
     const totalReward = useMemo(
