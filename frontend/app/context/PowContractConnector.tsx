@@ -103,7 +103,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args
-        // Use local ABI instead of fetching from RPC
         const abi = powGameAbi.abi;
         if (abi) {
           const powGameContract = new Contract(abi, contract, provider);

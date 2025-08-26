@@ -188,7 +188,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS;
       if (contract && provider) {
         setRegistryContractAddress(contract);
-        // Use local ABI instead of fetching from RPC
         const registryAbi = focRegistryAbi.abi;
         if (registryAbi) {
           const registryContract = new Contract(
@@ -221,7 +220,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS;
       if (contract && provider) {
         setAccountsContractAddress(contract);
-        // Use local ABI instead of fetching from RPC
         const accountsAbi = focAccountsAbi.abi;
         if (accountsAbi) {
           const accountsContract = new Contract(
