@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { Call, Contract } from "starknet";
 import { useStarknetConnector } from "./StarknetConnector";
+import focRegistryAbi from "../abis/foc_registry.json";
+import focAccountsAbi from "../abis/foc_accounts.json";
 
 export const FOC_ENGINE_API =
   process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
@@ -185,12 +187,8 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS;
       if (contract && provider) {
         setRegistryContractAddress(contract);
-        const { abi: registryAbi } = await provider
-          .getClassAt(contract)
-          .catch((error) => {
-            console.error("Error fetching registry ABI:", error);
-            return { abi: null };
-          });
+        // Use local ABI instead of fetching from RPC
+        const registryAbi = focRegistryAbi.abi;
         if (registryAbi) {
           const registryContract = new Contract(
             registryAbi,
@@ -222,12 +220,8 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS;
       if (contract && provider) {
         setAccountsContractAddress(contract);
-        const { abi: accountsAbi } = await provider
-          .getClassAt(contract)
-          .catch((error) => {
-            console.error("Error fetching accounts ABI:", error);
-            return { abi: null };
-          });
+        // Use local ABI instead of fetching from RPC
+        const accountsAbi = focAccountsAbi.abi;
         if (accountsAbi) {
           const accountsContract = new Contract(
             accountsAbi,
