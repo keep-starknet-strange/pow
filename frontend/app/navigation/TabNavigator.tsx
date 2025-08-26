@@ -1,6 +1,6 @@
 import React, { useCallback, memo, useState, useMemo } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, Text } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { MainPage } from "../pages/MainPage";
@@ -23,6 +23,10 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  useAchievementsHasUnseen,
+  useAchievementsUnseenCount,
+} from "../stores/useAchievementsStore";
 
 const Tab = createBottomTabNavigator();
 
@@ -47,6 +51,8 @@ const AchievementsTabButton = memo(
     const isAchievementsActive = useIsTutorialTargetActive(
       "achievementsTab" as TargetId,
     );
+    const hasUnseen = useAchievementsHasUnseen();
+    const unseenCount = useAchievementsUnseenCount();
     return (
       <View style={styles.relative}>
         <TutorialRefView targetId="achievementsTab" enabled={true} />
@@ -55,6 +61,7 @@ const AchievementsTabButton = memo(
           isActive={isActive || isAchievementsActive}
           onPress={onPress}
         />
+        {hasUnseen && <BadgeOverlay count={unseenCount} />}
       </View>
     );
   },
@@ -182,6 +189,37 @@ const TabBarButton = memo(
     );
   },
 );
+
+const BadgeOverlay = memo(({ count }: { count: number }) => {
+  const { getImage } = useImages();
+  const display = count > 99 ? "99+" : String(count);
+  return (
+    <View style={styles.badgeContainer} pointerEvents="none">
+      <Canvas style={styles.badgeCanvas}>
+        <Image
+          image={getImage("notif.badge")}
+          fit="contain"
+          x={0}
+          y={0}
+          width={22}
+          height={22}
+          sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+        />
+      </Canvas>
+      <View style={styles.badgeTextWrapper}>
+        <Pressable
+          accessibilityLabel={`Achievements, ${display} new`}
+          accessibilityRole="text"
+          disabled
+        >
+          <View>
+            <Text style={styles.badgeText}>{display}</Text>
+          </View>
+        </Pressable>
+      </View>
+    </View>
+  );
+});
 
 export const TabNavigator = memo(() => {
   const { notify } = useEventManager();
@@ -316,5 +354,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 1,
+  },
+  badgeContainer: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    width: 22,
+    height: 22,
+    zIndex: 30,
+  },
+  badgeCanvas: {
+    width: 22,
+    height: 22,
+  },
+  badgeTextWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    color: "#fff7ff",
+    fontSize: 12,
+    fontFamily: "Xerxes",
+    textAlign: "center",
   },
 });

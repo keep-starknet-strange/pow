@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { Call, Contract } from "starknet";
 import { useStarknetConnector } from "./StarknetConnector";
+import focRegistryAbi from "../abis/foc_registry.json";
+import focAccountsAbi from "../abis/foc_accounts.json";
 
 export const FOC_ENGINE_API =
   process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
@@ -49,6 +51,7 @@ type FocEngineContextType = {
     metadata: string[],
     contract?: string,
   ) => Promise<void>;
+  disconnectUser: () => void;
   usernameValidationError: string;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
 
@@ -185,12 +188,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS;
       if (contract && provider) {
         setRegistryContractAddress(contract);
-        const { abi: registryAbi } = await provider
-          .getClassAt(contract)
-          .catch((error) => {
-            console.error("Error fetching registry ABI:", error);
-            return { abi: null };
-          });
+        const registryAbi = focRegistryAbi.abi;
         if (registryAbi) {
           const registryContract = new Contract(
             registryAbi,
@@ -222,12 +220,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       const contract = process.env.EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS;
       if (contract && provider) {
         setAccountsContractAddress(contract);
-        const { abi: accountsAbi } = await provider
-          .getClassAt(contract)
-          .catch((error) => {
-            console.error("Error fetching accounts ABI:", error);
-            return { abi: null };
-          });
+        const accountsAbi = focAccountsAbi.abi;
         if (accountsAbi) {
           const accountsContract = new Contract(
             accountsAbi,
@@ -829,6 +822,11 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     [],
   );
 
+  const disconnectUser = useCallback(() => {
+    setUser(null);
+    setUserContract(undefined);
+  }, []);
+
   return (
     <FocEngineConnector.Provider
       value={{
@@ -847,6 +845,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         isUsernameValid,
         usernameValidationError,
         initializeAccount,
+        disconnectUser,
         mintFunds,
         getRegisteredContract,
         getLatestEventWith,

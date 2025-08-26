@@ -10,6 +10,7 @@ import { useStarknetConnector } from "./StarknetConnector";
 import { useFocEngine } from "./FocEngineConnector";
 import { useOnchainActions } from "../stores/useOnchainActions";
 import { useBalanceStore } from "../stores/useBalanceStore";
+import powGameAbi from "../abis/pow_game.json";
 
 type PowContractContextType = {
   powGameContractAddress: string | null;
@@ -103,12 +104,12 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       if (contract) {
         setPowGameContractAddress(contract);
         connectContract(contract); // TODO: Allow getRegisteredContract args
-        const { abi: powGameAbi } = await provider.getClassAt(contract);
-        if (powGameAbi) {
-          const powGameContract = new Contract(powGameAbi, contract, provider);
+        const abi = powGameAbi.abi;
+        if (abi) {
+          const powGameContract = new Contract(abi, contract, provider);
           setPowContract(powGameContract);
         } else {
-          console.error("Failed to fetch Pow Game ABI");
+          console.error("Failed to load Pow Game ABI");
         }
       } else {
         console.error("Failed to fetch pow_game contract address");
