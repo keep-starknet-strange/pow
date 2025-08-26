@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useFocusEffect } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import {
   useAchievement,
@@ -151,11 +151,11 @@ export const AchievementsPage: React.FC = () => {
   const { width } = useCachedWindowDimensions();
   const { getImage } = useImages();
 
-  useEffect(() => {
-    if (isFocused) {
+  useFocusEffect(
+    useCallback(() => {
       setAchievementsLastViewedNow();
-    }
-  }, [isFocused, setAchievementsLastViewedNow]);
+    }, [setAchievementsLastViewedNow]),
+  );
 
   const renderAchievementName = useCallback(
     (name: string) => {
