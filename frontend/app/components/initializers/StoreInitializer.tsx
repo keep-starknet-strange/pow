@@ -13,12 +13,16 @@ import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 
 const OnchainActionsInitializer = memo(() => {
-  const { invokeCalls } = useStarknetConnector();
-  const { onInvokeActions } = useOnchainActions();
+  const { invokeCalls, waitForTransaction } = useStarknetConnector();
+  const { onInvokeActions, onWaitForTransaction } = useOnchainActions();
 
   useEffect(() => {
     onInvokeActions(invokeCalls);
   }, [invokeCalls, onInvokeActions]);
+
+  useEffect(() => {
+    onWaitForTransaction(waitForTransaction);
+  }, [waitForTransaction, onWaitForTransaction]);
 
   return null;
 });

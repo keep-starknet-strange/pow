@@ -75,6 +75,7 @@ type StarknetConnectorContextType = {
   invokeContractCalls: (calls: Call[]) => Promise<void>;
   invokeWithPaymaster: (calls: Call[], privateKey?: string) => Promise<void>;
   invokeCalls: (calls: Call[]) => Promise<any>;
+  waitForTransaction: (txHash: string) => Promise<boolean>;
 };
 
 const StarknetConnector = createContext<
@@ -650,12 +651,12 @@ export const StarknetConnectorProvider: React.FC<{
         if (sendGaslessTxRes.data.revertError) {
           if (__DEV__)
             console.log(
-              "Revert error from paymaster: ",
+              "⚠️ Revert error from paymaster: ",
               sendGaslessTxRes.data.revertError,
             );
           return sendGaslessTxRes;
         }
-        if (__DEV__) console.log("Gasless transaction sent:", sendGaslessTxRes);
+        if (__DEV__) console.log("📤 Gasless transaction sent:", sendGaslessTxRes);
         return sendGaslessTxRes;
       } else {
         // Use gasless-sdk to execute calls with paymaster
@@ -687,7 +688,7 @@ export const StarknetConnectorProvider: React.FC<{
       if (!STARKNET_ENABLED) {
         return null;
       }
-      if (__DEV__) console.log("Invoking contract calls:", calls.length);
+      if (__DEV__) console.log("🚀 Invoking contract calls:", calls.length);
       if (network === "SN_DEVNET") {
         await invokeContractCalls(calls);
         // TODO: Get real transaction hash from devnet
@@ -701,6 +702,39 @@ export const StarknetConnectorProvider: React.FC<{
       }
     },
     [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
+  );
+
+  const waitForTransaction = useCallback(
+    async (txHash: string): Promise<boolean> => {
+      if (!provider) {
+        console.error("Provider is not initialized");
+        return false;
+      }
+
+      try {
+        if (__DEV__) console.log(`⏳ Waiting for transaction ${txHash} to be confirmed...`);
+        
+        // Wait for the transaction to be accepted on L2
+        const receipt = await provider.waitForTransaction(txHash, {
+          retryInterval: 2000, // Check every 2 seconds
+        });
+        
+        // Check if transaction was successful
+        if (receipt.execution_status === "SUCCEEDED" || 
+            receipt.status === "ACCEPTED_ON_L2" || 
+            receipt.status === "ACCEPTED_ON_L1") {
+          if (__DEV__) console.log(`✅ Transaction ${txHash} confirmed on-chain`);
+          return true;
+        } else {
+          if (__DEV__) console.error(`❌ Transaction ${txHash} failed:`, receipt);
+          return false;
+        }
+      } catch (error) {
+        if (__DEV__) console.error(`❌ Error waiting for transaction ${txHash}:`, error);
+        return false;
+      }
+    },
+    [provider],
   );
 
   const value = {
@@ -725,6 +759,7 @@ export const StarknetConnectorProvider: React.FC<{
     invokeContractCalls,
     invokeWithPaymaster,
     invokeCalls,
+    waitForTransaction,
   };
   return (
     <StarknetConnector.Provider value={value}>

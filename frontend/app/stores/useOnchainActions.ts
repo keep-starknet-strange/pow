@@ -17,7 +17,9 @@ interface OnchainActionsState {
   currentProcessingId: string | null;
   addAction: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
+  waitForTransaction?: (txHash: string) => Promise<boolean>;
   onInvokeActions: (invokeActions: (actions: Call[]) => Promise<any>) => void;
+  onWaitForTransaction: (waitForTransaction: (txHash: string) => Promise<boolean>) => void;
   processQueue: () => Promise<void>;
   retryFailedAction: (id: string) => Promise<void>;
 }
@@ -88,8 +90,10 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
     }),
 
   invokeActions: async (actions: Call[]) => {},
+  waitForTransaction: async (txHash: string) => false,
 
   onInvokeActions: (invokeActions) => set({ invokeActions: invokeActions }),
+  onWaitForTransaction: (waitForTransaction) => set({ waitForTransaction: waitForTransaction }),
 
   processQueue: async () => {
     const state = get();
@@ -123,9 +127,20 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       // Attempt to invoke the actions
       const response = await state.invokeActions(nextItem.actions);
 
-      // Check if transaction was successful
+      // Check if we got a transaction hash
       if (isTransactionSuccessful(response)) {
-        // Mark as completed
+        const txHash = response.data?.transactionHash;
+        
+        // Wait for the transaction to be confirmed on-chain
+        if (state.waitForTransaction && txHash) {
+          const isConfirmed = await state.waitForTransaction(txHash);
+          
+          if (!isConfirmed) {
+            throw new Error(`Transaction ${txHash} failed on-chain validation`);
+          }
+        }
+        
+        // Mark as completed only after on-chain confirmation
         set((state) => ({
           invokeQueue: state.invokeQueue.map((item) =>
             item.id === nextItem.id
@@ -135,7 +150,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
         }));
 
         if (__DEV__) {
-          console.log(`✅ ActionsCall ${nextItem.id} completed successfully`);
+          console.log(`✅ ActionsCall ${nextItem.id} completed and confirmed on-chain`);
         }
       } else {
         throw new Error("Transaction validation failed - invalid response");
