@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { View, Text, Pressable } from "react-native";
 import {
   Canvas,
@@ -13,6 +13,7 @@ import { useEventManager } from "../../stores/useEventManager";
 import { PFPView } from "../../components/PFPView";
 
 export interface AvatarCreatorProps {
+  containerSize: {width: number, height: number};
   avatar: NounsAttributes;
   setAvatar: (avatar: NounsAttributes) => void;
   newAvatar: NounsAttributes;
@@ -21,8 +22,12 @@ export interface AvatarCreatorProps {
   creatingAvatar: boolean;
 }
 
+const AVATAR_SIZE_RATIO = 0.65;
+const BUTTONS_SIZE_RATIO = 0.18;
+
 export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
   ({
+    containerSize,
     avatar,
     setAvatar,
     newAvatar,
@@ -30,27 +35,38 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
     startCreatingAvatar,
     creatingAvatar,
   }) => {
-    const HEADER_HEIGHT = 60;
     const { getImage } = useImages();
     const { notify } = useEventManager();
+    const [size, setSize] = useState<number>(0);
+    const [buttonSize, setButtonSize] = useState<number>(0);
+
+    useEffect(() => {
+      const containerMinSize = Math.min(containerSize.width, containerSize.height);
+      setSize(containerMinSize * AVATAR_SIZE_RATIO);
+    }, [containerSize.width, containerSize.height]);
+
+    useEffect(() => {
+      setButtonSize(size * BUTTONS_SIZE_RATIO);
+    }, [size]);
 
     return (
       <Animated.View
         entering={FadeInUp}
         style={{
           alignItems: "center",
-          marginTop: HEADER_HEIGHT,
         }}
       >
         <View className="relative">
           <Pressable
-            className="flex items-center justify-center bg-[#10111910]
-                     w-[250px] h-[250px] p-4 mt-8
-                     rounded-xl shadow-lg shadow-black/50 relative"
+            style={{
+              width: size,
+              height: size,
+            }}
+            className="items-center justify-center bg-[#10111910] p-4 rounded-xl shadow-lg shadow-black/50 relative"
             onPress={startCreatingAvatar}
           >
-            <View className="absolute top-0 left-0 w-[250px] h-[250px]">
-              <Canvas style={{ flex: 1 }} className="w-full h-full">
+            <View style={{flex: 1, position: "absolute", top: 0, left: 0}}>
+              <Canvas style={{ width: size, height: size }}>
                 <Image
                   image={getImage("block.grid.min")}
                   fit="fill"
@@ -60,18 +76,27 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
                     filter: FilterMode.Nearest,
                     mipmap: MipmapMode.Nearest,
                   }}
-                  width={246}
-                  height={246}
+                  width={size}
+                  height={size}
                 />
               </Canvas>
             </View>
+            
             <PFPView attributes={creatingAvatar ? newAvatar : avatar} />
           </Pressable>
+
           <Pressable
-            className="absolute top-[85px] right-[-42px]"
+            style={{
+              width: buttonSize,
+              height: buttonSize,
+              top: 0,
+              right: -buttonSize,
+              marginRight: -10,
+              position: "absolute",
+            }}
             onPress={startCreatingAvatar}
           >
-            <Canvas style={{ width: 40, height: 40 }}>
+            <Canvas style={{ width: buttonSize, height: buttonSize }}>
               <Image
                 image={getImage("icon.edit")}
                 fit="contain"
@@ -81,13 +106,22 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.Nearest,
                 }}
-                width={40}
-                height={40}
+                width={buttonSize}
+                height={buttonSize}
               />
             </Canvas>
           </Pressable>
+
           <Pressable
-            className="absolute top-[40px] right-[-42px]"
+            style={{
+              width: buttonSize,
+              height: buttonSize,
+              top: buttonSize,
+              right: -buttonSize,
+              marginRight: -10,
+              marginTop: 10,
+              position: "absolute",
+            }}
             onPress={() => {
               const newAvatar = getRandomNounsAttributes();
               setAvatar(newAvatar);
@@ -95,7 +129,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
               notify("DiceRoll");
             }}
           >
-            <Canvas style={{ width: 40, height: 40 }}>
+            <Canvas style={{ width: buttonSize, height: buttonSize }}>
               <Image
                 image={getImage("icon.random")}
                 fit="contain"
@@ -105,8 +139,8 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.Nearest,
                 }}
-                width={40}
-                height={40}
+                width={buttonSize}
+                height={buttonSize}
               />
             </Canvas>
           </Pressable>
@@ -120,8 +154,10 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if the avatar or newAvatar props change
+    // Only re-render if the avatar, newAvatar or containerSize props change
     return (
+      prevProps.containerSize.width === nextProps.containerSize.width &&
+      prevProps.containerSize.height === nextProps.containerSize.height &&
       prevProps.avatar.head === nextProps.avatar.head &&
       prevProps.avatar.body === nextProps.avatar.body &&
       prevProps.avatar.accessories === nextProps.avatar.accessories &&
