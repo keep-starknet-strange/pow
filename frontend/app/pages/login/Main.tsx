@@ -25,7 +25,6 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
     <View
       style={{
         paddingTop: insets.top,
-        paddingBottom: insets.bottom,
         overflow: "visible",
       }}
       className="flex-1 items-center justify-around relative bg-transparent"
@@ -33,7 +32,10 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       <Logo doEnterAnim={true} />
       <Animated.View
         entering={FadeInDown}
-        className="absolute bottom-[150px] items-center justify-center gap-3"
+        style={{
+          bottom: "15%"
+        }}
+        className="absolute items-center justify-center gap-3"
       >
         <BasicButton
           label="PLAY!"
@@ -64,7 +66,12 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
           }}
         />
       </Animated.View>
-      <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">
+      <View 
+        style={{
+          paddingBottom: insets.bottom,
+        }}
+        className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]"
+      >
         <Animated.View
           entering={FadeInDown}
           className="flex flex-row items-center justify-between w-full"
