@@ -591,8 +591,13 @@ export const StarknetConnectorProvider: React.FC<{
         })
           .then((response) => response.json())
           .catch((error) => {
+            console.error("Error building gasless tx data:", error);
             throw error;
           });
+        if (gaslessTxRes.error) {
+          console.error("Error from build-gasless-tx:", gaslessTxRes);
+          throw new Error(gaslessTxRes.error);
+        }
         const privateKey =
           (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
 
@@ -634,6 +639,40 @@ export const StarknetConnectorProvider: React.FC<{
           .catch((error) => {
             throw error;
           });
+        if (sendGaslessTxRes.error) {
+          console.error("Error from send-gasless-tx:", sendGaslessTxRes);
+          throw new Error(sendGaslessTxRes.error);
+        }
+        if (sendGaslessTxRes.data.revertError) {
+          // Try to send the transaction again after 3 seconds
+          console.log("Revert error, retrying transaction: ", sendGaslessTxRes.data.revertError);
+          const trySendTransaction = async () => {
+            const sendGaslessTxRes2 = await fetch(sendGaslessTxUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(sendGaslessTxInput),
+            })
+              .then((response) => response.json())
+              .catch((error) => {
+                throw error;
+              });
+            if (sendGaslessTxRes2.error) {
+              console.error("Error from send-gasless-tx retry:", sendGaslessTxRes2);
+              throw new Error(sendGaslessTxRes2.error);
+            }
+            if (sendGaslessTxRes2.data.revertError) {
+              console.error("Revert error on retry, aborting: ", sendGaslessTxRes2.data.revertError);
+              throw new Error(sendGaslessTxRes2.data.revertError);
+            } else {
+              if (__DEV__)
+                console.log("Gasless transaction sent on retry:", sendGaslessTxRes2);
+            }
+          }
+          setTimeout(trySendTransaction, 3000);
+          return;
+        }
         if (__DEV__) console.log("Gasless transaction sent:", sendGaslessTxRes);
       } else {
         // Use gasless-sdk to execute calls with paymaster
