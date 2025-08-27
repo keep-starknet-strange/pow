@@ -207,11 +207,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       }}
       className="flex-1 items-center justify-around relative"
     >
-      <View
-        className="absolute top-0 left-0 w-full bg-[#10111A]"
-        style={{ height: 60, width: width }}
-      />
-      <AccountCreationHeader width={width} />
+      <AccountCreationHeader width={width} topInset={insets.top} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior="position"
@@ -337,12 +333,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   );
 };
 
-const AccountCreationHeader: React.FC<{ width: number }> = memo(({ width }) => {
+const AccountCreationHeader: React.FC<{ width: number, topInset: number }> = memo(({ width, topInset }) => {
   const { getImage } = useImages();
   return (
     <View
-      className="absolute top-[60px] left-0 w-full"
-      style={{ height: 50, width: width }}
+      className="absolute top-0 left-0 w-full"
+      style={{ height: 50 + topInset, width: width }}
     >
       <Canvas style={{ flex: 1 }} className="w-full h-full">
         <SkiaImg
@@ -355,10 +351,13 @@ const AccountCreationHeader: React.FC<{ width: number }> = memo(({ width }) => {
             mipmap: MipmapMode.Nearest,
           }}
           width={width}
-          height={50}
+          height={50 + topInset}
         />
       </Canvas>
-      <View className="absolute top-0 left-0 w-full h-full">
+      <View
+        className="absolute top-0 left-0 w-full"
+        style={{ paddingTop: topInset }}
+      >
         <Marquee spacing={0} speed={1}>
           <View className="flex flex-row items-center justify-center">
             <Text className="text-[#fff7ff] font-Teatime text-[40px]">
