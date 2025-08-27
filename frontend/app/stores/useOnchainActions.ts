@@ -5,8 +5,7 @@ interface ActionsCall {
   id: string;
   actions: Call[];
   retryCount: number;
-  status: "pending" | "processing" | "completed" | "failed";
-  error?: string;
+  lastError?: string; // Optional, for debugging
 }
 
 interface OnchainActionsState {
@@ -14,20 +13,21 @@ interface OnchainActionsState {
   maxActions?: number;
   invokeQueue: ActionsCall[];
   isProcessing: boolean;
-  currentProcessingId: string | null;
   addAction: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
   waitForTransaction?: (txHash: string) => Promise<boolean>;
   onInvokeActions: (invokeActions: (actions: Call[]) => Promise<any>) => void;
-  onWaitForTransaction: (waitForTransaction: (txHash: string) => Promise<boolean>) => void;
+  onWaitForTransaction: (
+    waitForTransaction: (txHash: string) => Promise<boolean>,
+  ) => void;
   processQueue: () => Promise<void>;
-  retryFailedAction: (id: string) => Promise<void>;
+  clearQueue: () => void;
 }
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 3000;
 
-const isTransactionSuccessful = (response: any): boolean => {
+const hasValidTransactionHash = (response: any): boolean => {
   if (!response) return false;
 
   // Check if response has data with transactionHash
@@ -54,7 +54,6 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 100,
   invokeQueue: [],
   isProcessing: false,
-  currentProcessingId: null,
 
   addAction: (action: Call) =>
     set((state) => {
@@ -68,7 +67,6 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           id: `call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           actions: actionsToInvoke,
           retryCount: 0,
-          status: "pending",
         };
 
         // Add to queue and clear the processed actions
@@ -93,7 +91,8 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   waitForTransaction: async (txHash: string) => false,
 
   onInvokeActions: (invokeActions) => set({ invokeActions: invokeActions }),
-  onWaitForTransaction: (waitForTransaction) => set({ waitForTransaction: waitForTransaction }),
+  onWaitForTransaction: (waitForTransaction) =>
+    set({ waitForTransaction: waitForTransaction }),
 
   processQueue: async () => {
     const state = get();
@@ -103,54 +102,41 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       return;
     }
 
-    // Find the next pending item
-    const nextItem = state.invokeQueue.find(
-      (item) => item.status === "pending",
-    );
-    if (!nextItem || !state.invokeActions) {
-      set({ isProcessing: false });
+    // Always process the first item in queue
+    const currentItem = state.invokeQueue[0];
+    if (!currentItem || !state.invokeActions) {
       return;
     }
 
     // Mark as processing
-    set((state) => ({
-      isProcessing: true,
-      currentProcessingId: nextItem.id,
-      invokeQueue: state.invokeQueue.map((item) =>
-        item.id === nextItem.id
-          ? { ...item, status: "processing" as const }
-          : item,
-      ),
-    }));
+    set({ isProcessing: true });
 
     try {
       // Attempt to invoke the actions
-      const response = await state.invokeActions(nextItem.actions);
+      const response = await state.invokeActions(currentItem.actions);
 
       // Check if we got a transaction hash
-      if (isTransactionSuccessful(response)) {
+      if (hasValidTransactionHash(response)) {
         const txHash = response.data?.transactionHash;
-        
+
         // Wait for the transaction to be confirmed on-chain
         if (state.waitForTransaction && txHash) {
           const isConfirmed = await state.waitForTransaction(txHash);
-          
+
           if (!isConfirmed) {
             throw new Error(`Transaction ${txHash} failed on-chain validation`);
           }
         }
-        
-        // Mark as completed only after on-chain confirmation
+
+        // Remove completed item from queue (pruning)
         set((state) => ({
-          invokeQueue: state.invokeQueue.map((item) =>
-            item.id === nextItem.id
-              ? { ...item, status: "completed" as const }
-              : item,
-          ),
+          invokeQueue: state.invokeQueue.slice(1), // Remove first item
         }));
 
         if (__DEV__) {
-          console.log(`✅ ActionsCall ${nextItem.id} completed and confirmed on-chain`);
+          console.log(
+            `✅ ActionsCall ${currentItem.id} completed and pruned from queue`,
+          );
         }
       } else {
         throw new Error("Transaction validation failed - invalid response");
@@ -161,22 +147,21 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
 
       if (__DEV__) {
         console.log(
-          `❌ ActionsCall ${nextItem.id} failed (attempt ${nextItem.retryCount + 1}/${MAX_RETRIES}):`,
+          `❌ ActionsCall ${currentItem.id} failed (attempt ${currentItem.retryCount + 1}/${MAX_RETRIES}):`,
           errorMessage,
         );
       }
 
       // Check if we should retry
-      if (nextItem.retryCount < MAX_RETRIES - 1) {
-        // Update retry count and mark as pending again for retry
+      if (currentItem.retryCount < MAX_RETRIES - 1) {
+        // Update retry count for first item
         set((state) => ({
-          invokeQueue: state.invokeQueue.map((item) =>
-            item.id === nextItem.id
+          invokeQueue: state.invokeQueue.map((item, index) =>
+            index === 0
               ? {
                   ...item,
-                  status: "pending" as const,
                   retryCount: item.retryCount + 1,
-                  error: errorMessage,
+                  lastError: errorMessage,
                 }
               : item,
           ),
@@ -185,60 +170,32 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
         // Wait before retrying
         await delay(RETRY_DELAY_MS);
       } else {
-        // Max retries reached, mark as failed
-        set((state) => ({
-          invokeQueue: state.invokeQueue.map((item) =>
-            item.id === nextItem.id
-              ? {
-                  ...item,
-                  status: "failed" as const,
-                  error: `Failed after ${MAX_RETRIES} attempts: ${errorMessage}`,
-                }
-              : item,
-          ),
-        }));
-
+        // Max retries reached - clear entire queue
         if (__DEV__) {
           console.error(
-            `🛑 ActionsCall ${nextItem.id} permanently failed after ${MAX_RETRIES} attempts`,
+            `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items).`,
           );
         }
 
-        // Throw error to notify failure
-        throw new Error(
-          `Transaction failed after ${MAX_RETRIES} attempts: ${errorMessage}`,
-        );
+        set({ invokeQueue: [] });
+        return; // Don't continue processing
       }
     } finally {
       // Clear processing state
-      set({ isProcessing: false, currentProcessingId: null });
+      set({ isProcessing: false });
 
       // Continue processing queue if there are more items
       const updatedState = get();
-      if (updatedState.invokeQueue.some((item) => item.status === "pending")) {
+      if (updatedState.invokeQueue.length > 0) {
         setTimeout(() => get().processQueue(), 0);
       }
     }
   },
 
-  retryFailedAction: async (id: string) => {
-    set((state) => ({
-      invokeQueue: state.invokeQueue.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: "pending" as const,
-              retryCount: 0,
-              error: undefined,
-            }
-          : item,
-      ),
-    }));
-
-    // Start processing if not already doing so
-    const state = get();
-    if (!state.isProcessing) {
-      setTimeout(() => get().processQueue(), 0);
+  clearQueue: () => {
+    set({ invokeQueue: [] });
+    if (__DEV__) {
+      console.log("🧹 Queue manually cleared");
     }
   },
 }));

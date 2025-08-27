@@ -656,7 +656,8 @@ export const StarknetConnectorProvider: React.FC<{
             );
           return sendGaslessTxRes;
         }
-        if (__DEV__) console.log("📤 Gasless transaction sent:", sendGaslessTxRes);
+        if (__DEV__)
+          console.log("📤 Gasless transaction sent:", sendGaslessTxRes);
         return sendGaslessTxRes;
       } else {
         // Use gasless-sdk to execute calls with paymaster
@@ -712,25 +713,33 @@ export const StarknetConnectorProvider: React.FC<{
       }
 
       try {
-        if (__DEV__) console.log(`⏳ Waiting for transaction ${txHash} to be confirmed...`);
-        
+        if (__DEV__)
+          console.log(
+            `⏳ Waiting for transaction ${txHash} to be confirmed...`,
+          );
+
         // Wait for the transaction to be accepted on L2
         const receipt = await provider.waitForTransaction(txHash, {
           retryInterval: 2000, // Check every 2 seconds
         });
-        
+
         // Check if transaction was successful
-        if (receipt.execution_status === "SUCCEEDED" || 
-            receipt.status === "ACCEPTED_ON_L2" || 
-            receipt.status === "ACCEPTED_ON_L1") {
-          if (__DEV__) console.log(`✅ Transaction ${txHash} confirmed on-chain`);
+        if (
+          receipt.execution_status === "SUCCEEDED" ||
+          receipt.status === "ACCEPTED_ON_L2" ||
+          receipt.status === "ACCEPTED_ON_L1"
+        ) {
+          if (__DEV__)
+            console.log(`✅ Transaction ${txHash} confirmed on-chain`);
           return true;
         } else {
-          if (__DEV__) console.error(`❌ Transaction ${txHash} failed:`, receipt);
+          if (__DEV__)
+            console.error(`❌ Transaction ${txHash} failed:`, receipt);
           return false;
         }
       } catch (error) {
-        if (__DEV__) console.error(`❌ Error waiting for transaction ${txHash}:`, error);
+        if (__DEV__)
+          console.error(`❌ Error waiting for transaction ${txHash}:`, error);
         return false;
       }
     },
