@@ -84,7 +84,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerClassName="gap-3 py-16"
+          contentContainerClassName="grow gap-3 justify-center py-8"
         >
           <BasicButton
             label={isSoundOn ? "Sound On" : "Sound Off"}
