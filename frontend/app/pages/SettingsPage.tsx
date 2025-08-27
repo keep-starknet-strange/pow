@@ -22,10 +22,16 @@ const tabs = {
 
 type SettingsProps = {
   setLoginPage: ((page: string) => void) | null;
+  initialTab?: string;
 };
 
-export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
-  const [activeTab, setActiveTab] = useState<keyof typeof tabs>("Main");
+export const SettingsPage: React.FC<SettingsProps> = ({
+  setLoginPage,
+  initialTab,
+}) => {
+  const [activeTab, setActiveTab] = useState<keyof typeof tabs>(
+    (initialTab as keyof typeof tabs) || "Main",
+  );
   const insets = useSafeAreaInsets();
 
   const ActiveComponent = tabs[activeTab];
@@ -54,12 +60,22 @@ export const SettingsPage: React.FC<SettingsProps> = ({ setLoginPage }) => {
           goBackToLogin={() => {
             setLoginPage?.("login");
           }}
+          onBack={function (): void {
+            throw new Error("Function not implemented.");
+          }}
         />
         {activeTab !== "Main" && (
           <Animated.View entering={FadeInDown}>
             <BasicButton
               label="Back"
-              onPress={() => setActiveTab("Main")}
+              onPress={() => {
+                // If we're in login mode and came from login page, go back to login
+                if (isInLoginMode && initialTab === "About") {
+                  setLoginPage?.("login");
+                } else {
+                  setActiveTab("Main");
+                }
+              }}
               style={{ marginTop: 32 }}
             />
           </Animated.View>

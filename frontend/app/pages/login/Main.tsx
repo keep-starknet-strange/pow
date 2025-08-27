@@ -10,10 +10,12 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type LoginMainPageProps = {
   setLoginPage: (page: string) => void;
+  setSettingTab?: (tab: string) => void;
 };
 
 export const LoginMainPage: React.FC<LoginMainPageProps> = ({
   setLoginPage,
+  setSettingTab,
 }) => {
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
   const { createGameAccount } = usePowContractConnector();
@@ -49,13 +51,19 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
         <BasicButton
           label="SETTINGS"
           onPress={async () => {
+            if (setSettingTab) {
+              setSettingTab("Main");
+            }
             setLoginPage("settings");
           }}
         />
         <BasicButton
-          label="CLOSE"
+          label="ABOUT"
           onPress={() => {
-            BackHandler.exitApp();
+            setLoginPage("settings");
+            if (setSettingTab) {
+              setSettingTab("About");
+            }
           }}
         />
       </Animated.View>

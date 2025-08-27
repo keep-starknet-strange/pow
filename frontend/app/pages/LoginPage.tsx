@@ -13,17 +13,30 @@ export const LoginPage: React.FC = () => {
   };
   const [currentPage, setCurrentPage] =
     useState<keyof typeof loginPages>("login");
-  const ActivePage = loginPages[currentPage];
+  const [settingsTab, setSettingsTab] = useState<string>("Main");
 
   const setLoginPage = (page: string) => {
     setCurrentPage(page as keyof typeof loginPages);
+  };
+
+  const handleSetSettingTab = (tab: string) => {
+    setSettingsTab(tab);
   };
 
   return (
     <View className="flex-1 items-center">
       <MainBackground />
       <View className="absolute w-full h-full">
-        <ActivePage setLoginPage={setLoginPage} />
+        {currentPage === "login" ? (
+          <LoginMainPage
+            setLoginPage={setLoginPage}
+            setSettingTab={handleSetSettingTab}
+          />
+        ) : currentPage === "settings" ? (
+          <SettingsPage setLoginPage={setLoginPage} initialTab={settingsTab} />
+        ) : (
+          <AccountCreationPage setLoginPage={setLoginPage} />
+        )}
       </View>
     </View>
   );
