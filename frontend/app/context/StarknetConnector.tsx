@@ -74,7 +74,7 @@ type StarknetConnectorContextType = {
   ) => Promise<void>;
   invokeContractCalls: (calls: Call[]) => Promise<void>;
   invokeWithPaymaster: (calls: Call[], privateKey?: string) => Promise<void>;
-  invokeCalls: (calls: Call[]) => Promise<void>;
+  invokeCalls: (calls: Call[]) => Promise<any>;
 };
 
 const StarknetConnector = createContext<
@@ -534,19 +534,19 @@ export const StarknetConnectorProvider: React.FC<{
   const invokeWithPaymaster = useCallback(
     async (calls: Call[], privateKey?: any) => {
       if (!STARKNET_ENABLED) {
-        return;
+        return null;
       }
 
       if (!provider) {
         console.error("Provider is not initialized.");
-        return;
+        return null;
       }
 
       if (network !== "SN_SEPOLIA" && network !== "SN_MAINNET") {
         console.error(
           "Paymaster is only supported on SN_SEPOLIA and SN_MAINNET chains.",
         );
-        return;
+        return null;
       }
 
       const deploymentData = privateKey
@@ -554,7 +554,7 @@ export const StarknetConnectorProvider: React.FC<{
         : undefined;
       if (!account && !deploymentData) {
         console.error("No account connected and no deployment data provided.");
-        return;
+        return null;
       }
       let invokeAccount = account;
       if (!invokeAccount) {
@@ -591,11 +591,13 @@ export const StarknetConnectorProvider: React.FC<{
         })
           .then((response) => response.json())
           .catch((error) => {
-            console.error("Error building gasless tx data:", error);
+            if (__DEV__)
+              console.error("Error building gasless tx data:", error);
             throw error;
           });
         if (gaslessTxRes.error) {
-          console.error("Error from build-gasless-tx:", gaslessTxRes);
+          if (__DEV__)
+            console.error("Error from build-gasless-tx:", gaslessTxRes);
           throw new Error(gaslessTxRes.error);
         }
         const privateKey =
@@ -603,7 +605,8 @@ export const StarknetConnectorProvider: React.FC<{
 
         let signature: any;
         if (!privateKey) {
-          console.error("Could not extract private key from account");
+          if (__DEV__)
+            console.error("Could not extract private key from account");
           throw new Error("Private key not accessible for manual signing");
         }
 
@@ -640,40 +643,20 @@ export const StarknetConnectorProvider: React.FC<{
             throw error;
           });
         if (sendGaslessTxRes.error) {
-          console.error("Error from send-gasless-tx:", sendGaslessTxRes);
+          if (__DEV__)
+            console.error("Error from send-gasless-tx:", sendGaslessTxRes);
           throw new Error(sendGaslessTxRes.error);
         }
         if (sendGaslessTxRes.data.revertError) {
-          // Try to send the transaction again after 3 seconds
-          console.log("Revert error, retrying transaction: ", sendGaslessTxRes.data.revertError);
-          const trySendTransaction = async () => {
-            const sendGaslessTxRes2 = await fetch(sendGaslessTxUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(sendGaslessTxInput),
-            })
-              .then((response) => response.json())
-              .catch((error) => {
-                throw error;
-              });
-            if (sendGaslessTxRes2.error) {
-              console.error("Error from send-gasless-tx retry:", sendGaslessTxRes2);
-              throw new Error(sendGaslessTxRes2.error);
-            }
-            if (sendGaslessTxRes2.data.revertError) {
-              console.error("Revert error on retry, aborting: ", sendGaslessTxRes2.data.revertError);
-              throw new Error(sendGaslessTxRes2.data.revertError);
-            } else {
-              if (__DEV__)
-                console.log("Gasless transaction sent on retry:", sendGaslessTxRes2);
-            }
-          }
-          setTimeout(trySendTransaction, 3000);
-          return;
+          if (__DEV__)
+            console.log(
+              "Revert error from paymaster: ",
+              sendGaslessTxRes.data.revertError,
+            );
+          return sendGaslessTxRes;
         }
         if (__DEV__) console.log("Gasless transaction sent:", sendGaslessTxRes);
+        return sendGaslessTxRes;
       } else {
         // Use gasless-sdk to execute calls with paymaster
         const options: GaslessOptions = {
@@ -686,11 +669,14 @@ export const StarknetConnectorProvider: React.FC<{
           { deploymentData },
           options,
         ).catch((error) => {
-          console.error("Error executing calls with paymaster:", error);
+          if (__DEV__)
+            console.error("Error executing calls with paymaster:", error);
           throw error;
         });
         if (__DEV__)
           console.log("Response from executeCalls with paymaster:", res);
+        // TODO: Check response format
+        return { data: { transactionHash: res } };
       }
     },
     [provider, network, account, STARKNET_ENABLED, connectAccount],
@@ -699,13 +685,19 @@ export const StarknetConnectorProvider: React.FC<{
   const invokeCalls = useCallback(
     async (calls: Call[]) => {
       if (!STARKNET_ENABLED) {
-        return;
+        return null;
       }
       if (__DEV__) console.log("Invoking contract calls:", calls.length);
       if (network === "SN_DEVNET") {
-        invokeContractCalls(calls);
+        await invokeContractCalls(calls);
+        // TODO: Get real transaction hash from devnet
+        return {
+          data: {
+            transactionHash: "0x" + Math.random().toString(16).substr(2, 64),
+          },
+        };
       } else {
-        invokeWithPaymaster(calls);
+        return await invokeWithPaymaster(calls);
       }
     },
     [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
