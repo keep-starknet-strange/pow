@@ -397,7 +397,7 @@ export const AchievementsPage: React.FC = () => {
           ACHIEVEMENTS
         </Animated.Text>
       </View>
-      <View style={{ height: 558 }}>
+      <View style={{ flex: 1, height: 558 }}>
         <FlatList
           data={categoriesData}
           style={styles.listArea}

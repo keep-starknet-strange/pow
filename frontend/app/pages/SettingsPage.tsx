@@ -49,8 +49,8 @@ export const SettingsPage: React.FC<SettingsProps> = ({
       <View
         className="w-full h-full flex-1 items-center justify-center"
         style={{
-          paddingTop: isInLoginMode ? insets.top + 32 : 32,
-          paddingBottom: isInLoginMode ? insets.bottom + 32 : 32,
+          paddingTop: isInLoginMode ? insets.top : 0,
+          paddingBottom: isInLoginMode ? insets.bottom : 0,
           paddingHorizontal: 32,
           gap: 8,
         }}
@@ -76,7 +76,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
                   setActiveTab("Main");
                 }
               }}
-              style={{ marginTop: 32 }}
+              style={{ marginTop: 16 }}
             />
           </Animated.View>
         )}

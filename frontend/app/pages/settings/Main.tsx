@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
@@ -79,32 +79,37 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   return (
     <>
       <Animated.View
-        className="flex flex-col gap-3 h-full w-full justify-center items-center"
+        className="flex-1"
         entering={FadeInDown}
       >
-        <BasicButton
-          label={isSoundOn ? "Sound On" : "Sound Off"}
-          onPress={toggleSound}
-        />
-        <BasicButton
-          label={isMusicOn ? "Music On" : "Music Off"}
-          onPress={toggleMusic}
-        />
-        <BasicButton
-          label={isHapticsOn ? "Haptics On" : "Haptics Off"}
-          onPress={toggleHaptics}
-        />
-
-        {settingsComponents.map(({ label, tab, onPress }) => (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerClassName="gap-3 py-16"
+        >
           <BasicButton
-            key={label}
-            label={label}
-            onPress={() => {
-              if (tab) setSettingTab(tab);
-              if (onPress) onPress();
-            }}
+            label={isSoundOn ? "Sound On" : "Sound Off"}
+            onPress={toggleSound}
           />
-        ))}
+          <BasicButton
+            label={isMusicOn ? "Music On" : "Music Off"}
+            onPress={toggleMusic}
+          />
+          <BasicButton
+            label={isHapticsOn ? "Haptics On" : "Haptics Off"}
+            onPress={toggleHaptics}
+          />
+
+          {settingsComponents.map(({ label, tab, onPress }) => (
+            <BasicButton
+              key={label}
+              label={label}
+              onPress={() => {
+                if (tab) setSettingTab(tab);
+                if (onPress) onPress();
+              }}
+            />
+          ))}
+        </ScrollView>
       </Animated.View>
 
       <ConfirmationModal

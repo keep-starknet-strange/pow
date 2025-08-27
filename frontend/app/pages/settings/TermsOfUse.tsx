@@ -1,22 +1,13 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export type TermsOfUseProps = {
-  onBack: () => void;
-};
-
-const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
-  const insets = useSafeAreaInsets();
-
+const TermsOfUse: React.FC = () => {
   return (
     <View className="flex-1 bg-white">
       <Animated.View
         entering={FadeInDown}
         style={{
-          flex: 1,
-          paddingTop: 40,
-          paddingBottom: 40,
+          flex: 1,        
           paddingHorizontal: 24,
         }}
       >
@@ -29,7 +20,7 @@ const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
                 fontWeight: "bold",
                 color: "#000",
                 textAlign: "center",
-                marginBottom: 16,
+                marginVertical: 16,
               }}
             >
               Terms and Conditions for POW!

@@ -346,7 +346,7 @@ export const StorePage: React.FC = () => {
           );
         })}
       </View>
-      <View style={{ height: 522, marginTop: 2 }} onLayout={handleListLayout}>
+      <View style={{ flex: 1,height: 522, marginTop: 2 }} onLayout={handleListLayout}>
         <FlatList
           data={storeData}
           className="flex-1 relative py-[10px]"
