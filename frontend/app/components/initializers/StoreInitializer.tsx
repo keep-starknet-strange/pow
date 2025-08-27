@@ -141,12 +141,30 @@ const GameStoreInitializer = memo(() => {
 
 const L2Initializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, getUserMaxChainId } = usePowContractConnector();
+  const {
+    powContract,
+    getUserMaxChainId,
+    getUserProofBuildingState,
+    getUserDABuildingState,
+  } = usePowContractConnector();
   const { initializeL2Store } = useL2Store();
 
   useEffect(() => {
-    initializeL2Store(powContract, user, getUserMaxChainId);
-  }, [initializeL2Store, powContract, user, getUserMaxChainId]);
+    initializeL2Store(
+      powContract,
+      user,
+      getUserMaxChainId,
+      getUserProofBuildingState,
+      getUserDABuildingState,
+    );
+  }, [
+    initializeL2Store,
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserProofBuildingState,
+    getUserDABuildingState,
+  ]);
 
   return null;
 });

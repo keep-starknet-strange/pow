@@ -47,6 +47,16 @@ type PowContractContextType = {
   getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
   getUserProofClicks: (chainId: number) => Promise<number | undefined>;
+  getUserProofBuildingState: (
+    chainId: number,
+  ) => Promise<
+    { size: number | undefined; fees: number | undefined } | undefined
+  >;
+  getUserDABuildingState: (
+    chainId: number,
+  ) => Promise<
+    { size: number | undefined; fees: number | undefined } | undefined
+  >;
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
@@ -435,6 +445,58 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  const getUserProofBuildingState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const { size: proofSize, fees: proofFees } =
+          await powContract.get_proof_building_state(
+            account?.address || "",
+            chainId,
+          );
+        const proofSizeValue = proofSize.toString
+          ? parseInt(proofSize.toString(), 10)
+          : undefined;
+        const proofFeesValue = proofFees.toString
+          ? parseInt(proofFees.toString(), 10)
+          : undefined;
+        return { size: proofSizeValue, fees: proofFeesValue };
+      } catch (error) {
+        console.error("Failed to fetch user proof building state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserDABuildingState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const { size: daSize, fees: daFees } =
+          await powContract.get_da_building_state(
+            account?.address || "",
+            chainId,
+          );
+        const daSizeValue = daSize.toString
+          ? parseInt(daSize.toString(), 10)
+          : undefined;
+        const daFeesValue = daFees.toString
+          ? parseInt(daFees.toString(), 10)
+          : undefined;
+        return { size: daSizeValue, fees: daFeesValue };
+      } catch (error) {
+        console.error("Failed to fetch user DA building state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -475,6 +537,8 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserBlockClicks,
         getUserDaClicks,
         getUserProofClicks,
+        getUserProofBuildingState,
+        getUserDABuildingState,
         doubleBalanceCheat,
       }}
     >

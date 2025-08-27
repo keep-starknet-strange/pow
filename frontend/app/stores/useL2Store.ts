@@ -20,6 +20,16 @@ interface L2Store {
     powContract: Contract | null,
     user: FocAccount | null,
     getUserMaxChainId: () => Promise<number | undefined>,
+    getUserProofBuildingState: (
+      chainId: number,
+    ) => Promise<
+      { size: number | undefined; fees: number | undefined } | undefined
+    >,
+    getUserDABuildingState: (
+      chainId: number,
+    ) => Promise<
+      { size: number | undefined; fees: number | undefined } | undefined
+    >,
   ) => void;
 
   canUnlockL2: () => boolean;
@@ -43,7 +53,13 @@ export const useL2Store = create<L2Store>((set, get) => ({
 
   resetL2Store: () =>
     set({ l2: undefined, isL2Unlocked: false, isInitialized: false }),
-  initializeL2Store: (powContract, user, getUserMaxChainId) => {
+  initializeL2Store: (
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserProofBuildingState,
+    getUserDABuildingState,
+  ) => {
     const fetchL2Store = async () => {
       if (powContract && user) {
         try {
@@ -59,10 +75,31 @@ export const useL2Store = create<L2Store>((set, get) => ({
             useUpgradesStore
               .getState()
               .getUpgradeValue(1, "Recursive Proving") || 1;
+          const { size: proofSize, fees: proofFees } =
+            (await getUserProofBuildingState(1)) || { size: 0, fees: 0 };
+          const { size: daSize, fees: daFees } = (await getUserDABuildingState(
+            1,
+          )) || { size: 0, fees: 0 };
 
           const l2Instance: L2 = newL2();
+
+          // Initialize DA with existing state
           l2Instance.da = newL2DA(daMaxSize);
+          if (daSize && daSize > 0) {
+            l2Instance.da.blocks = new Array(daSize).fill(0).map((_, i) => i);
+            l2Instance.da.blockFees = daFees || 0;
+            l2Instance.da.isBuilt = daSize >= daMaxSize;
+          }
+
+          // Initialize Prover with existing state
           l2Instance.prover = newL2Prover(proverMaxSize);
+          if (proofSize && proofSize > 0) {
+            l2Instance.prover.blocks = new Array(proofSize)
+              .fill(0)
+              .map((_, i) => i);
+            l2Instance.prover.blockFees = proofFees || 0;
+            l2Instance.prover.isBuilt = proofSize >= proverMaxSize;
+          }
 
           set({
             l2: l2Instance,
