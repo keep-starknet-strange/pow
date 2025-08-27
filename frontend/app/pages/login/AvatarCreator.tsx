@@ -6,7 +6,7 @@ import {
   MipmapMode,
   Image,
 } from "@shopify/react-native-skia";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInUp, LinearTransition } from "react-native-reanimated";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import { useImages } from "../../hooks/useImages";
 import { useEventManager } from "../../stores/useEventManager";
@@ -52,6 +52,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
     return (
       <Animated.View
         entering={FadeInUp}
+        layout={LinearTransition}
         style={{
           alignItems: "center",
         }}
