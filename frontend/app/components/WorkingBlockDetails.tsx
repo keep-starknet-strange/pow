@@ -7,7 +7,6 @@ import Animated, {
   runOnJS,
   Easing,
   useSharedValue,
-  useAnimatedStyle,
   withSpring,
   withTiming,
   withSequence,
@@ -19,7 +18,6 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { hexToInt } from "../api/utils";
 
 export type WorkingBlockDetailsProps = {
   chainId: number;
@@ -79,14 +77,14 @@ const BlockCanvas = memo(
 BlockCanvas.displayName = "BlockCanvas";
 
 const BlockIdLabel = memo(
-  ({ blockId, isSmall }: { blockId: number; isSmall: boolean }) => {
+  ({ blockId, blockSizeType }: { blockId: number; blockSizeType: BlockSizeType }) => {
     const textStyle = useMemo(
       () => ({
         color: "#c3c3c3",
         fontFamily: "Pixels" as const,
-        fontSize: isSmall ? 16 : 18,
+        fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 10),
       }),
-      [isSmall],
+      [blockSizeType],
     );
 
     const animConfig = useMemo(
@@ -142,19 +140,19 @@ const TransactionCount = memo(
   ({
     transactionCount,
     maxSize,
-    isSmall,
+    blockSizeType,
   }: {
     transactionCount: number;
     maxSize: number;
-    isSmall: boolean;
+    blockSizeType: BlockSizeType;
   }) => {
     const textStyle = useMemo(
       () => ({
-        fontSize: isSmall ? 16 : 18,
+        fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 8),
         color: "#c3c3c3",
         fontFamily: "Pixels" as const,
       }),
-      [isSmall],
+      [blockSizeType],
     );
 
     const animConfig = useMemo(
@@ -176,7 +174,7 @@ const TransactionCount = memo(
         />
         <Text
           style={{
-            fontSize: isSmall ? 16 : 18,
+            fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 8),
             color: "#c3c3c3",
             fontFamily: "Pixels" as const,
           }}
@@ -191,16 +189,16 @@ const TransactionCount = memo(
 TransactionCount.displayName = "TransactionCount";
 
 const BlockReward = memo(
-  ({ reward, isSmall }: { reward: number; isSmall: boolean }) => {
+  ({ reward, blockSizeType }: { reward: number; blockSizeType: BlockSizeType }) => {
     const textStyle = useMemo(
       () => ({
-        fontSize: isSmall ? 14 : 18,
+        fontSize: BlockSizeType.selector(blockSizeType, 18, 14, 8),
         color: "#fff2fdff",
         fontFamily: "Pixels" as const,
-        marginBottom: isSmall ? 2 : 0,
+        marginBottom: BlockSizeType.selector(blockSizeType, 2, 2, 4),
         alignItems: "flex-end" as const,
       }),
-      [isSmall],
+      [blockSizeType],
     );
 
     const animConfig = useMemo(
@@ -232,15 +230,41 @@ const BlockReward = memo(
 
 BlockReward.displayName = "BlockReward";
 
+enum BlockSizeType {
+  Normal,
+  Small,
+  Tiny
+}
+
+namespace BlockSizeType {
+  export function selector(type: BlockSizeType, normal: number, small: number, tiny: number) {
+    if (type === BlockSizeType.Normal) {
+      return normal;
+    } else if (type === BlockSizeType.Small) {
+      return small;
+    } else {
+      return tiny;
+    }
+  }
+}
+
 export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
   (props) => {
     const { getUpgradeValue } = useUpgrades();
     const { workingBlocks } = useGameStore();
     const workingBlockData = workingBlocks[props.chainId];
 
-    const isSmall = useMemo(
-      () => props.placement.width < 250,
-      [props.placement.width],
+    const blockSizeType = useMemo(
+      () => {
+        if (props.placement.width < 200) {
+          return BlockSizeType.Tiny;
+        } else if (props.placement.width < 250) {
+          return BlockSizeType.Small;
+        } else {
+          return BlockSizeType.Normal;
+        }
+      },
+      [props.placement.width]
     );
 
     const [workingBlock, setWorkingBlock] = React.useState(workingBlockData);
@@ -301,12 +325,12 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         width: props.placement.width * 0.3,
         height: props.placement.height * BLOCK_IMAGE_LABEL_PERCENT,
         top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-        paddingTop: 4,
-        paddingBottom: 4,
-        paddingLeft: isSmall ? 4: 6,
-        paddingRight: isSmall ? 4: 6,
+        paddingTop: BlockSizeType.selector(blockSizeType, 4, 4, 2),
+        paddingBottom: BlockSizeType.selector(blockSizeType, 4, 4, 2),
+        paddingLeft: BlockSizeType.selector(blockSizeType, 6, 4, 2),
+        paddingRight: BlockSizeType.selector(blockSizeType, 6, 4, 2),
       }),
-      [isSmall, props.placement.width, props.placement.height],
+      [blockSizeType, props.placement.width, props.placement.height],
     );
 
     const transactionCountStyle = useMemo(
@@ -316,10 +340,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         left: props.placement.width * 0.49,
         paddingRight: 4,
-        paddingBottom: isSmall ? 4 : 6,
+        paddingBottom: BlockSizeType.selector(blockSizeType, 6, 4, 6),
         transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [isSmall, props.placement.height, props.placement.width, props.chainId],
+      [blockSizeType, props.placement.height, props.placement.width, props.chainId],
     );
 
     const rewardStyle = useMemo(
@@ -328,11 +352,11 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         left: props.placement.width * 0.81,
         paddingRight: 4,
-        paddingBottom: isSmall ? 4 : 6,
+        paddingBottom: BlockSizeType.selector(blockSizeType, 6, 4, 2),
         // For L2 (chainId 1), add a small downward adjustment to prevent being pushed up
         transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [isSmall, props.placement.height, props.placement.width, props.chainId],
+      [blockSizeType, props.placement.height, props.placement.width, props.chainId],
     );
 
     const maxSize = useMemo(
@@ -366,7 +390,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         >
           <BlockIdLabel
             blockId={workingBlock?.blockId || 0}
-            isSmall={isSmall}
+            blockSizeType={blockSizeType}
           />
         </View>
 
@@ -374,12 +398,12 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
           <TransactionCount
             transactionCount={workingBlock?.transactions.length || 0}
             maxSize={maxSize}
-            isSmall={isSmall}
+            blockSizeType={blockSizeType}
           />
         </View>
 
         <View style={rewardStyle}>
-          <BlockReward reward={totalReward} isSmall={isSmall} />
+          <BlockReward reward={totalReward} blockSizeType={blockSizeType} />
         </View>
       </Animated.View>
     );
