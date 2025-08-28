@@ -57,17 +57,18 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
         ))}
       </View>
       {props.block?.blockId === 0 && (
-        <View 
+        <View
           style={{
             width: props.width,
             height: props.height,
-            flex: 1
+            flex: 1,
           }}
         >
-          <Text 
+          <Text
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            className="text-[#101119ff] text-[32px] font-bold underline text-center font-Xerxes px-4 pt-2">
+            className="text-[#101119ff] text-[32px] font-bold underline text-center font-Xerxes px-4 pt-2"
+          >
             Genesis Block
           </Text>
           <Text

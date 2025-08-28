@@ -58,7 +58,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
-  const [avatarContainerSize, setAvatarContainerSize] = React.useState<{width: number, height: number}>({width: 0, height: 0});
+  const [avatarContainerSize, setAvatarContainerSize] = React.useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
 
   const [usernameError, setUsernameError] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
@@ -222,7 +225,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             }}
             onLayout={(event) => {
               const { width, height } = event.nativeEvent.layout;
-              setAvatarContainerSize({width, height});
+              setAvatarContainerSize({ width, height });
             }}
           >
             <AvatarCreator

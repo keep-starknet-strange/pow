@@ -78,10 +78,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   return (
     <>
-      <Animated.View
-        className="flex-1"
-        entering={FadeInDown}
-      >
+      <Animated.View className="flex-1" entering={FadeInDown}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerClassName="grow gap-3 justify-center py-8"

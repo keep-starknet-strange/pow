@@ -77,12 +77,18 @@ const BlockCanvas = memo(
 BlockCanvas.displayName = "BlockCanvas";
 
 const BlockIdLabel = memo(
-  ({ blockId, blockSizeType }: { blockId: number; blockSizeType: BlockSizeType }) => {
+  ({
+    blockId,
+    blockSizeType,
+  }: {
+    blockId: number;
+    blockSizeType: BlockSizeType;
+  }) => {
     const textStyle = useMemo(
       () => ({
         color: "#c3c3c3",
         fontFamily: "Pixels" as const,
-        fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 10),
+        fontSize: BlockSizeUtil.selector(blockSizeType, 18, 16, 10),
       }),
       [blockSizeType],
     );
@@ -102,7 +108,7 @@ const BlockIdLabel = memo(
             flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-end"
+            justifyContent: "flex-end",
           }}
         >
           <Text style={textStyle}>#</Text>
@@ -148,7 +154,7 @@ const TransactionCount = memo(
   }) => {
     const textStyle = useMemo(
       () => ({
-        fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 8),
+        fontSize: BlockSizeUtil.selector(blockSizeType, 18, 16, 8),
         color: "#c3c3c3",
         fontFamily: "Pixels" as const,
       }),
@@ -174,7 +180,7 @@ const TransactionCount = memo(
         />
         <Text
           style={{
-            fontSize: BlockSizeType.selector(blockSizeType, 18, 16, 8),
+            fontSize: BlockSizeUtil.selector(blockSizeType, 18, 16, 8),
             color: "#c3c3c3",
             fontFamily: "Pixels" as const,
           }}
@@ -189,13 +195,19 @@ const TransactionCount = memo(
 TransactionCount.displayName = "TransactionCount";
 
 const BlockReward = memo(
-  ({ reward, blockSizeType }: { reward: number; blockSizeType: BlockSizeType }) => {
+  ({
+    reward,
+    blockSizeType,
+  }: {
+    reward: number;
+    blockSizeType: BlockSizeType;
+  }) => {
     const textStyle = useMemo(
       () => ({
-        fontSize: BlockSizeType.selector(blockSizeType, 18, 14, 8),
+        fontSize: BlockSizeUtil.selector(blockSizeType, 18, 14, 8),
         color: "#fff2fdff",
         fontFamily: "Pixels" as const,
-        marginBottom: BlockSizeType.selector(blockSizeType, 2, 2, 4),
+        marginBottom: BlockSizeUtil.selector(blockSizeType, 2, 2, 4),
         alignItems: "flex-end" as const,
       }),
       [blockSizeType],
@@ -233,11 +245,16 @@ BlockReward.displayName = "BlockReward";
 enum BlockSizeType {
   Normal,
   Small,
-  Tiny
+  Tiny,
 }
 
-namespace BlockSizeType {
-  export function selector(type: BlockSizeType, normal: number, small: number, tiny: number) {
+class BlockSizeUtil {
+  public static selector(
+    type: BlockSizeType,
+    normal: number,
+    small: number,
+    tiny: number,
+  ) {
     if (type === BlockSizeType.Normal) {
       return normal;
     } else if (type === BlockSizeType.Small) {
@@ -254,18 +271,15 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
     const { workingBlocks } = useGameStore();
     const workingBlockData = workingBlocks[props.chainId];
 
-    const blockSizeType = useMemo(
-      () => {
-        if (props.placement.width < 200) {
-          return BlockSizeType.Tiny;
-        } else if (props.placement.width < 250) {
-          return BlockSizeType.Small;
-        } else {
-          return BlockSizeType.Normal;
-        }
-      },
-      [props.placement.width]
-    );
+    const blockSizeType = useMemo(() => {
+      if (props.placement.width < 200) {
+        return BlockSizeType.Tiny;
+      } else if (props.placement.width < 250) {
+        return BlockSizeType.Small;
+      } else {
+        return BlockSizeType.Normal;
+      }
+    }, [props.placement.width]);
 
     const [workingBlock, setWorkingBlock] = React.useState(workingBlockData);
 
@@ -325,10 +339,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         width: props.placement.width * 0.3,
         height: props.placement.height * BLOCK_IMAGE_LABEL_PERCENT,
         top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-        paddingTop: BlockSizeType.selector(blockSizeType, 4, 4, 2),
-        paddingBottom: BlockSizeType.selector(blockSizeType, 4, 4, 2),
-        paddingLeft: BlockSizeType.selector(blockSizeType, 6, 4, 2),
-        paddingRight: BlockSizeType.selector(blockSizeType, 6, 4, 2),
+        paddingTop: BlockSizeUtil.selector(blockSizeType, 4, 4, 2),
+        paddingBottom: BlockSizeUtil.selector(blockSizeType, 4, 4, 2),
+        paddingLeft: BlockSizeUtil.selector(blockSizeType, 6, 4, 2),
+        paddingRight: BlockSizeUtil.selector(blockSizeType, 6, 4, 2),
       }),
       [blockSizeType, props.placement.width, props.placement.height],
     );
@@ -340,10 +354,15 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         left: props.placement.width * 0.49,
         paddingRight: 4,
-        paddingBottom: BlockSizeType.selector(blockSizeType, 6, 4, 6),
+        paddingBottom: BlockSizeUtil.selector(blockSizeType, 6, 4, 6),
         transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [blockSizeType, props.placement.height, props.placement.width, props.chainId],
+      [
+        blockSizeType,
+        props.placement.height,
+        props.placement.width,
+        props.chainId,
+      ],
     );
 
     const rewardStyle = useMemo(
@@ -352,11 +371,16 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         bottom: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
         left: props.placement.width * 0.81,
         paddingRight: 4,
-        paddingBottom: BlockSizeType.selector(blockSizeType, 6, 4, 2),
+        paddingBottom: BlockSizeUtil.selector(blockSizeType, 6, 4, 2),
         // For L2 (chainId 1), add a small downward adjustment to prevent being pushed up
         transform: props.chainId === 1 ? [{ translateY: 2 }] : undefined,
       }),
-      [blockSizeType, props.placement.height, props.placement.width, props.chainId],
+      [
+        blockSizeType,
+        props.placement.height,
+        props.placement.width,
+        props.chainId,
+      ],
     );
 
     const maxSize = useMemo(
@@ -384,10 +408,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       <Animated.View style={containerStyle}>
         <BlockCanvas placement={props.placement} />
 
-        <View
-          className="absolute flex flex-row"
-          style={blockIdLabelStyle}
-        >
+        <View className="absolute flex flex-row" style={blockIdLabelStyle}>
           <BlockIdLabel
             blockId={workingBlock?.blockId || 0}
             blockSizeType={blockSizeType}

@@ -7,7 +7,7 @@ const TermsOfUse: React.FC = () => {
       <Animated.View
         entering={FadeInDown}
         style={{
-          flex: 1,        
+          flex: 1,
           paddingHorizontal: 24,
         }}
       >

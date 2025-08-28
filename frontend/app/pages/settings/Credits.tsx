@@ -18,13 +18,8 @@ export const CreditsSection = () => {
     { name: "ELI BEN-SASSON", reason: "Creating STARK tech" },
   ];
   return (
-    <Animated.View 
-      className="flex-1"
-      entering={FadeInUp}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-      >
+    <Animated.View className="flex-1" entering={FadeInUp}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
           Credits
         </Text>

@@ -13,7 +13,7 @@ import { useEventManager } from "../../stores/useEventManager";
 import { PFPView } from "../../components/PFPView";
 
 export interface AvatarCreatorProps {
-  containerSize: {width: number, height: number};
+  containerSize: { width: number; height: number };
   avatar: NounsAttributes;
   setAvatar: (avatar: NounsAttributes) => void;
   newAvatar: NounsAttributes;
@@ -41,7 +41,10 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
     const [buttonSize, setButtonSize] = useState<number>(0);
 
     useEffect(() => {
-      const containerMinSize = Math.min(containerSize.width, containerSize.height);
+      const containerMinSize = Math.min(
+        containerSize.width,
+        containerSize.height,
+      );
       setSize(containerMinSize * AVATAR_SIZE_RATIO);
     }, [containerSize.width, containerSize.height]);
 
@@ -66,7 +69,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
             className="items-center justify-center bg-[#10111910] p-4 rounded-xl shadow-lg shadow-black/50 relative"
             onPress={startCreatingAvatar}
           >
-            <View style={{flex: 1, position: "absolute", top: 0, left: 0}}>
+            <View style={{ flex: 1, position: "absolute", top: 0, left: 0 }}>
               <Canvas style={{ width: size, height: size }}>
                 <Image
                   image={getImage("block.grid.min")}
@@ -82,7 +85,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = memo(
                 />
               </Canvas>
             </View>
-            
+
             <PFPView attributes={creatingAvatar ? newAvatar : avatar} />
           </Pressable>
 

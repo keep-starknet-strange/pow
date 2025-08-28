@@ -1,22 +1,23 @@
-import { View, Text, TouchableOpacity, Linking, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Linking,
+  ScrollView,
+} from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const AboutSection = () => {
   return (
-    <Animated.View 
-      className="flex-1"
-      entering={FadeInUp}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-      >
+    <Animated.View className="flex-1" entering={FadeInUp}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
           About
         </Text>
         <Text className="text-[#101119] mt-4 text-[18px] font-Pixels">
-          POW! is THE idle clicker game on Starknet, where players can experience
-          the thrill of building their own blockchain empire through simple yet
-          addictive click-to-earn mechanics.
+          POW! is THE idle clicker game on Starknet, where players can
+          experience the thrill of building their own blockchain empire through
+          simple yet addictive click-to-earn mechanics.
         </Text>
         <View className="mt-8">
           <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
@@ -57,7 +58,8 @@ export const AboutSection = () => {
             <TouchableOpacity
               onPress={() => {
                 const url =
-                  process.env.NEXT_PUBLIC_TELEGRAM_URL || "https://t.me/powgame";
+                  process.env.NEXT_PUBLIC_TELEGRAM_URL ||
+                  "https://t.me/powgame";
                 Linking.openURL(url);
               }}
             >

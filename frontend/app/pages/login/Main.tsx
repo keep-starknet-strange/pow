@@ -33,7 +33,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       <Animated.View
         entering={FadeInDown}
         style={{
-          bottom: "15%"
+          bottom: "15%",
         }}
         className="absolute items-center justify-center gap-3"
       >
@@ -66,7 +66,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
           }}
         />
       </Animated.View>
-      <View 
+      <View
         style={{
           paddingBottom: insets.bottom,
         }}
