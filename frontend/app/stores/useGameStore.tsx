@@ -19,10 +19,14 @@ interface GameStore {
     user: FocAccount | null,
     getUserMaxChainId: () => Promise<number | undefined>,
     getUserBlockNumber: (chainId: number) => Promise<number | undefined>,
-    getUserBlockState: (
-      chainId: number,
-    ) => Promise<
-      { size: number | undefined; fees: number | undefined } | undefined
+    getUserBlockState: (chainId: number) => Promise<
+      | {
+          size: number | undefined;
+          fees: number | undefined;
+          max_size: number | undefined;
+          difficulty: number | undefined;
+        }
+      | undefined
     >,
   ) => void;
   getWorkingBlock: (chainId: number) => Block | undefined;
@@ -85,16 +89,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({ isInitialized: true });
             return;
           }
-          const { size: blockSize, fees: blockFees } = (await getUserBlockState(
-            0,
-          )) || { size: 0, fees: 0 };
-          const blockSizeUpgrade = useUpgradesStore
-            .getState()
-            .getUpgradeValue(0, "Block Size");
-          const maxBlockSize = blockSizeUpgrade ** 2;
-          const blockDifficulty = useUpgradesStore
-            .getState()
-            .getUpgradeValue(0, "Block Difficulty");
+          const {
+            size: blockSize,
+            fees: blockFees,
+            max_size: blockMaxSize,
+            difficulty: blockDifficulty,
+          } = (await getUserBlockState(0)) || {
+            size: 0,
+            fees: 0,
+            max_size: 0,
+            difficulty: 0,
+          };
+          // Fallback to upgrades if contract doesn't return max_size or difficulty
+          const maxBlockSize =
+            blockMaxSize ||
+            useUpgradesStore.getState().getUpgradeValue(0, "Block Size") ** 2;
+          const difficulty =
+            blockDifficulty ||
+            useUpgradesStore.getState().getUpgradeValue(0, "Block Difficulty");
           const l1WorkingBlock: Block = {
             blockId: blockNumber,
             fees: blockFees || 0,
@@ -105,21 +117,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
             })),
             isBuilt: (blockSize || 0) >= maxBlockSize,
             maxSize: maxBlockSize,
-            difficulty: blockDifficulty,
+            difficulty: difficulty,
             reward: blockNumber === 0 ? get().genesisBlockReward : undefined,
           };
           if (maxChainId > 1) {
             // Setup l2 state
             const l2BlockNumber = (await getUserBlockNumber(1)) || 0;
-            const { size: l2BlockSize, fees: l2BlockFees } =
-              (await getUserBlockState(1)) || { size: 0, fees: 0 };
-            const l2BlockSizeUpgrade = useUpgradesStore
-              .getState()
-              .getUpgradeValue(1, "Block Size");
-            const l2MaxBlockSize = l2BlockSizeUpgrade ** 2;
-            const l2BlockDifficulty = useUpgradesStore
-              .getState()
-              .getUpgradeValue(1, "Block Difficulty");
+            const {
+              size: l2BlockSize,
+              fees: l2BlockFees,
+              max_size: l2BlockMaxSize,
+              difficulty: l2BlockDifficulty,
+            } = (await getUserBlockState(1)) || {
+              size: 0,
+              fees: 0,
+              max_size: 0,
+              difficulty: 0,
+            };
+            // Fallback to upgrades if contract doesn't return max_size or difficulty
+            const l2MaxBlockSize =
+              l2BlockMaxSize ||
+              useUpgradesStore.getState().getUpgradeValue(1, "Block Size") ** 2;
+            const l2Difficulty =
+              l2BlockDifficulty ||
+              useUpgradesStore
+                .getState()
+                .getUpgradeValue(1, "Block Difficulty");
             const l2WorkingBlock: Block = {
               blockId: l2BlockNumber,
               fees: l2BlockFees || 0,
@@ -130,7 +153,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               })),
               isBuilt: (l2BlockSize || 0) >= l2MaxBlockSize,
               maxSize: l2MaxBlockSize,
-              difficulty: l2BlockDifficulty,
+              difficulty: l2Difficulty,
               reward:
                 l2BlockNumber === 0 ? get().genesisBlockReward : undefined,
             };

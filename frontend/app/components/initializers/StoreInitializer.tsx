@@ -13,12 +13,16 @@ import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 
 const OnchainActionsInitializer = memo(() => {
-  const { invokeCalls } = useStarknetConnector();
-  const { onInvokeActions } = useOnchainActions();
+  const { invokeCalls, waitForTransaction } = useStarknetConnector();
+  const { onInvokeActions, onWaitForTransaction } = useOnchainActions();
 
   useEffect(() => {
     onInvokeActions(invokeCalls);
   }, [invokeCalls, onInvokeActions]);
+
+  useEffect(() => {
+    onWaitForTransaction(waitForTransaction);
+  }, [waitForTransaction, onWaitForTransaction]);
 
   return null;
 });
@@ -137,12 +141,30 @@ const GameStoreInitializer = memo(() => {
 
 const L2Initializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, getUserMaxChainId } = usePowContractConnector();
+  const {
+    powContract,
+    getUserMaxChainId,
+    getUserProofBuildingState,
+    getUserDABuildingState,
+  } = usePowContractConnector();
   const { initializeL2Store } = useL2Store();
 
   useEffect(() => {
-    initializeL2Store(powContract, user, getUserMaxChainId);
-  }, [initializeL2Store, powContract, user, getUserMaxChainId]);
+    initializeL2Store(
+      powContract,
+      user,
+      getUserMaxChainId,
+      getUserProofBuildingState,
+      getUserDABuildingState,
+    );
+  }, [
+    initializeL2Store,
+    powContract,
+    user,
+    getUserMaxChainId,
+    getUserProofBuildingState,
+    getUserDABuildingState,
+  ]);
 
   return null;
 });

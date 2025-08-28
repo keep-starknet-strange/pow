@@ -50,7 +50,10 @@ type FocEngineContextType = {
     username: string,
     metadata: string[],
     contract?: string,
+    privateKey?: string,
+    retries?: number,
   ) => Promise<void>;
+  isUserInitializing: boolean;
   disconnectUser: () => void;
   usernameValidationError: string;
   mintFunds: (address: string, amount: bigint, unit?: string) => Promise<any>;
@@ -152,6 +155,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     invokeContractCalls,
     invokeWithPaymaster,
     STARKNET_ENABLED,
+    storeKeyAndConnect,
   } = useStarknetConnector();
 
   const [registryContractAddress, setRegistryContractAddress] = useState<
@@ -307,8 +311,10 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
           accountData = await accountsContract.get_account(accountAddress);
         }
         if (!accountData || !accountData.username) {
-          console.log(`accountData:`, accountData);
-          console.warn(`No account data found for address: ${accountAddress}`);
+          if (__DEV__)
+            console.warn(
+              `No account data found for address: ${accountAddress}`,
+            );
           return null;
         }
         const account: FocAccount = {
@@ -338,7 +344,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
       const accountData = await getAccount(account.address, contract, true);
-      console.log("Refreshed account data:", accountData);
       if (accountData) {
         setUser(accountData);
       } else {
@@ -575,8 +580,15 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     ],
   );
 
+  const [isUserInitializing, setIsUserInitializing] = useState(false);
   const initializeAccount = useCallback(
-    async (username: string, metadata: string[] = [], contract?: string) => {
+    async (
+      username: string,
+      metadata: string[] = [],
+      contract?: string,
+      privateKey?: string,
+      retries?: number,
+    ) => {
       if (!STARKNET_ENABLED) {
         setUser({
           account_address: account?.address || "",
@@ -586,6 +598,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         return;
       }
+      setIsUserInitializing(true);
 
       // TODO: Check if username is already claimed?
       if (!accountsContractAddress) {
@@ -598,7 +611,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("Username invalid");
         return;
       }
-      console.log(`Claiming username: ${username}`);
       let entrypointClaim = "claim_username";
       let calldataClaim: string[] = [];
       let entrypointMetadata = "set_account_metadata";
@@ -633,19 +645,22 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
           calldata: calldataMetadata,
         },
       ];
-      console.log("Initializing account with:", calls);
       if (network === "SN_DEVNET") {
-        await invokeContractCalls(calls);
+        await invokeContractCalls(calls, retries);
       } else {
-        await invokeWithPaymaster(calls);
+        await invokeWithPaymaster(calls, privateKey, retries);
       }
+      if (privateKey) await storeKeyAndConnect(privateKey, "pow_game"); // TODO: pass contract name as parameter
+      /*
       setUser({
         account_address: account?.address || "",
         contract_address:
           contract || userContract || accountsContractAddress || "",
         account: { username, metadata: metadata || null }, // Optional metadata field
       });
+      */
       // await refreshUser(contract || userContract); // TODO: delays can cause issues, consider using a more robust solution
+      setIsUserInitializing(false);
     },
     [
       accountsContractAddress,
@@ -843,6 +858,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         setUserMetadata,
         isUsernameUnique,
         isUsernameValid,
+        isUserInitializing,
         usernameValidationError,
         initializeAccount,
         disconnectUser,

@@ -37,10 +37,14 @@ type PowContractContextType = {
     automationCount: number,
   ) => Promise<number[] | undefined>;
   getUserBlockNumber: (chainId: number) => Promise<number | undefined>;
-  getUserBlockState: (
-    chainId: number,
-  ) => Promise<
-    { size: number | undefined; fees: number | undefined } | undefined
+  getUserBlockState: (chainId: number) => Promise<
+    | {
+        size: number | undefined;
+        fees: number | undefined;
+        max_size: number | undefined;
+        difficulty: number | undefined;
+      }
+    | undefined
   >;
   getUserMaxChainId: () => Promise<number | undefined>;
   getUserPrestige: () => Promise<number | undefined>;
@@ -48,6 +52,24 @@ type PowContractContextType = {
   getUserBlockClicks: (chainId: number) => Promise<number | undefined>;
   getUserDaClicks: (chainId: number) => Promise<number | undefined>;
   getUserProofClicks: (chainId: number) => Promise<number | undefined>;
+  getUserProofBuildingState: (chainId: number) => Promise<
+    | {
+        size: number | undefined;
+        fees: number | undefined;
+        max_size: number | undefined;
+        difficulty: number | undefined;
+      }
+    | undefined
+  >;
+  getUserDABuildingState: (chainId: number) => Promise<
+    | {
+        size: number | undefined;
+        fees: number | undefined;
+        max_size: number | undefined;
+        difficulty: number | undefined;
+      }
+    | undefined
+  >;
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
@@ -323,18 +345,33 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
       try {
-        const { size: blockSize, fees: blockFees } =
-          await powContract.get_block_building_state(
-            account?.address || "",
-            chainId,
-          );
+        const {
+          size: blockSize,
+          fees: blockFees,
+          max_size: blockMaxSize,
+          difficulty: blockDifficulty,
+        } = await powContract.get_block_building_state(
+          account?.address || "",
+          chainId,
+        );
         const blockSizeValue = blockSize.toString
           ? parseInt(blockSize.toString(), 10)
           : undefined;
         const blockFeesValue = blockFees.toString
           ? parseInt(blockFees.toString(), 10)
           : undefined;
-        return { size: blockSizeValue, fees: blockFeesValue };
+        const blockMaxSizeValue = blockMaxSize.toString
+          ? parseInt(blockMaxSize.toString(), 10)
+          : undefined;
+        const blockDifficultyValue = blockDifficulty.toString
+          ? parseInt(blockDifficulty.toString(), 10)
+          : undefined;
+        return {
+          size: blockSizeValue,
+          fees: blockFeesValue,
+          max_size: blockMaxSizeValue,
+          difficulty: blockDifficultyValue,
+        };
       } catch (error) {
         console.error("Failed to fetch user block state:", error);
         return undefined;
@@ -451,6 +488,88 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  const getUserProofBuildingState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const {
+          size: proofSize,
+          fees: proofFees,
+          max_size: proofMaxSize,
+          difficulty: proofDifficulty,
+        } = await powContract.get_proof_building_state(
+          account?.address || "",
+          chainId,
+        );
+        const proofSizeValue = proofSize.toString
+          ? parseInt(proofSize.toString(), 10)
+          : undefined;
+        const proofFeesValue = proofFees.toString
+          ? parseInt(proofFees.toString(), 10)
+          : undefined;
+        const proofMaxSizeValue = proofMaxSize.toString
+          ? parseInt(proofMaxSize.toString(), 10)
+          : undefined;
+        const proofDifficultyValue = proofDifficulty.toString
+          ? parseInt(proofDifficulty.toString(), 10)
+          : undefined;
+        return {
+          size: proofSizeValue,
+          fees: proofFeesValue,
+          max_size: proofMaxSizeValue,
+          difficulty: proofDifficultyValue,
+        };
+      } catch (error) {
+        console.error("Failed to fetch user proof building state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
+  const getUserDABuildingState = useCallback(
+    async (chainId: number) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const {
+          size: daSize,
+          fees: daFees,
+          max_size: daMaxSize,
+          difficulty: daDifficulty,
+        } = await powContract.get_da_building_state(
+          account?.address || "",
+          chainId,
+        );
+        const daSizeValue = daSize.toString
+          ? parseInt(daSize.toString(), 10)
+          : undefined;
+        const daFeesValue = daFees.toString
+          ? parseInt(daFees.toString(), 10)
+          : undefined;
+        const daMaxSizeValue = daMaxSize.toString
+          ? parseInt(daMaxSize.toString(), 10)
+          : undefined;
+        const daDifficultyValue = daDifficulty.toString
+          ? parseInt(daDifficulty.toString(), 10)
+          : undefined;
+        return {
+          size: daSizeValue,
+          fees: daFeesValue,
+          max_size: daMaxSizeValue,
+          difficulty: daDifficultyValue,
+        };
+      } catch (error) {
+        console.error("Failed to fetch user DA building state:", error);
+        return undefined;
+      }
+    },
+    [account, powContract, STARKNET_ENABLED],
+  );
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -492,6 +611,8 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserBlockClicks,
         getUserDaClicks,
         getUserProofClicks,
+        getUserProofBuildingState,
+        getUserDABuildingState,
         doubleBalanceCheat,
       }}
     >

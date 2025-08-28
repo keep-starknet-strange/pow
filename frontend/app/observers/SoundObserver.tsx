@@ -8,9 +8,7 @@ export class SoundObserver implements Observer {
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
     // Get fresh state and actions directly from store
-    const { isSoundOn, playSoundEffect } = useSoundStore.getState();
-
-    if (!isSoundOn) return; // Early exit if sound is disabled
+    const { playSoundEffect } = useSoundStore.getState();
 
     switch (eventType) {
       case "TxAdded": {
