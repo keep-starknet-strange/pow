@@ -50,23 +50,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ initMyGameDependency: initMyGame }),
 
   resetGameStore: () => {
-    const blockSizeUpgrade = useUpgradesStore
-      .getState()
-      .getUpgradeValue(0, "Block Size");
-    const maxBlockSize = blockSizeUpgrade ** 2;
-    const blockDifficulty = useUpgradesStore
-      .getState()
-      .getUpgradeValue(0, "Block Difficulty");
+    // Use default values instead of reading from other stores to avoid circular dependencies
+    const defaultBlockSize = 3; // Default block size
+    const maxBlockSize = defaultBlockSize ** 2; // 9 transactions
+    const defaultBlockDifficulty = 100; // Default difficulty
+
     const initBlock = newBlock(
       0,
       maxBlockSize,
-      blockDifficulty,
+      defaultBlockDifficulty,
       get().genesisBlockReward,
     );
     initBlock.isBuilt = true; // Mark the genesis block as built
     set({
       workingBlocks: [initBlock],
       blockHeights: { 0: initBlock.blockId },
+      isInitialized: false, // Mark as not initialized so it will re-fetch on next load
     });
   },
 

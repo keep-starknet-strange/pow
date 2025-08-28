@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
@@ -12,6 +11,12 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
 import { useTutorialStore } from "../../stores/useTutorialStore";
+import { useGameStore } from "../../stores/useGameStore";
+import { useBalanceStore } from "../../stores/useBalanceStore";
+import { useTransactionsStore } from "../../stores/useTransactionsStore";
+import { useL2Store } from "../../stores/useL2Store";
+import { useAchievementsStore } from "../../stores/useAchievementsStore";
+import { useUpgradesStore } from "../../stores/useUpgradesStore";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
@@ -33,23 +38,41 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     toggleMusic,
     toggleHaptics,
   } = useSound();
-  const { disconnectAccount, clearPrivateKeys, disconnectAndDeleteAccount } =
-    useStarknetConnector();
-  const [notifs, setNotifs] = useState(true);
+  const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const { user, disconnectUser } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
 
-  const toggleNotifs = () => setNotifs(!notifs);
-
-  const handleResetGame = () => {
+  const handleResetGame = async () => {
     setShowResetConfirmation(false);
-    disconnectUser(); // Disconnect from FocEngine first
+
+    // Reset all game stores first to clear in-memory state
+    useGameStore.getState().resetGameStore();
+    useBalanceStore.getState().resetBalance();
+    useUpgradesStore.getState().resetUpgrades();
+    useTransactionsStore.getState().resetTransactions();
+    useL2Store.getState().resetL2Store();
+
+    // Reset achievements with current account
+    const currentAccount = user?.account_address || "default";
+    await useAchievementsStore
+      .getState()
+      .resetAchievementsState(currentAccount);
+
+    // Reset tutorial
+    resetTutorial();
+
+    // Clear authentication and keys
+    disconnectUser(); // Disconnect from FocEngine
     clearPrivateKeys("pow_game");
-    disconnectAccount(); // Then disconnect from Starknet
-    resetTutorial(); // Reset tutorial progress when game is reset
+    disconnectAccount(); // Disconnect from Starknet
+
+    // Navigate back to login after a short delay to ensure cleanup
+    setTimeout(() => {
+      goBackToLogin();
+    }, 100);
   };
 
   const settingsComponents: {
