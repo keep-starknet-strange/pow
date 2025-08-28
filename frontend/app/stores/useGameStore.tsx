@@ -51,9 +51,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resetGameStore: () => {
     // Use default values instead of reading from other stores to avoid circular dependencies
-    const defaultBlockSize = 3; // Default block size
-    const maxBlockSize = defaultBlockSize ** 2; // 9 transactions
-    const defaultBlockDifficulty = 100; // Default difficulty
+    const defaultBlockSize = 4; // Default block size (baseValue from config)
+    const maxBlockSize = defaultBlockSize ** 2; // 16 transactions
+    const defaultBlockDifficulty = 8; // Default difficulty (baseValue from config)
 
     const initBlock = newBlock(
       0,
