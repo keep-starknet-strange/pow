@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { Call } from "starknet";
+import { useEventManager } from "./useEventManager";
 
 interface ActionsCall {
   id: string;
@@ -13,6 +14,7 @@ interface OnchainActionsState {
   maxActions?: number;
   invokeQueue: ActionsCall[];
   isProcessing: boolean;
+  isReverting: boolean;
   addAction: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
   waitForTransaction?: (txHash: string) => Promise<boolean>;
@@ -22,6 +24,7 @@ interface OnchainActionsState {
   ) => void;
   processQueue: () => Promise<void>;
   clearQueue: () => void;
+  doneReverting: () => void;
 }
 
 const MAX_RETRIES = 3;
@@ -54,9 +57,15 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 100,
   invokeQueue: [],
   isProcessing: false,
+  isReverting: false,
 
   addAction: (action: Call) =>
     set((state) => {
+      // Prevent adding actions when reverting
+      if (state.isReverting) {
+        return state;
+      }
+
       const updatedActions = [...state.actions, action];
 
       // Check if we've reached max actions
@@ -177,7 +186,14 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           );
         }
 
-        set({ invokeQueue: [] });
+        // Notify that actions have been reverted
+        useEventManager.getState().notify("ActionsReverted", {
+          failedActionId: currentItem.id,
+          queueLength: state.invokeQueue.length,
+          lastError: errorMessage,
+        });
+
+        set({ invokeQueue: [], isReverting: true });
         return; // Don't continue processing
       }
     } finally {
@@ -196,6 +212,13 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
     set({ invokeQueue: [] });
     if (__DEV__) {
       console.log("🧹 Queue manually cleared");
+    }
+  },
+
+  doneReverting: () => {
+    set({ isReverting: false });
+    if (__DEV__) {
+      console.log("✅ Reverting completed, store unlocked");
     }
   },
 }));
