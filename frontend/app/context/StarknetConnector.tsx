@@ -76,10 +76,15 @@ type StarknetConnectorContextType = {
     contractAddress: string,
     functionName: string,
     args: any[],
+    retries?: number,
   ) => Promise<void>;
-  invokeContractCalls: (calls: Call[]) => Promise<void>;
-  invokeWithPaymaster: (calls: Call[], privateKey?: string) => Promise<void>;
-  invokeCalls: (calls: Call[]) => Promise<any>;
+  invokeContractCalls: (calls: Call[], retries?: number) => Promise<void>;
+  invokeWithPaymaster: (
+    calls: Call[],
+    privateKey?: string,
+    retries?: number,
+  ) => Promise<void>;
+  invokeCalls: (calls: Call[], retries?: number) => Promise<any>;
   waitForTransaction: (txHash: string) => Promise<boolean>;
 };
 
@@ -119,6 +124,94 @@ export const getStarknetProvider = (network: string): RpcProvider => {
     default:
       throw new Error(`Unsupported network: ${network}`);
   }
+};
+
+// Helper functions for retry logic
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const hasValidTransactionHash = (response: any): boolean => {
+  if (!response) return false;
+
+  // Check if response has data with transactionHash
+  if (response.data?.transactionHash) {
+    // Check if it's a valid hash (starts with 0x and has proper length)
+    const hash = response.data.transactionHash;
+    return (
+      typeof hash === "string" && hash.startsWith("0x") && hash.length > 10
+    );
+  }
+
+  // Check for error indicators
+  if (response.error || response.data?.revertError) {
+    return false;
+  }
+
+  return false;
+};
+
+const executeWithRetries = async (
+  invokeFunction: () => Promise<any>,
+  waitForTransaction: (txHash: string) => Promise<boolean>,
+  retries: number = 0,
+): Promise<any> => {
+  const RETRY_DELAY_MS = 2000;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await invokeFunction();
+
+      // If no retries requested, return immediately
+      if (retries === 0) {
+        return response;
+      }
+
+      // Check if we got a valid transaction hash for confirmation
+      if (hasValidTransactionHash(response)) {
+        const txHash =
+          response.data?.transactionHash || response.transaction_hash;
+
+        if (txHash) {
+          // Wait for transaction confirmation
+          const isConfirmed = await waitForTransaction(txHash);
+
+          if (isConfirmed) {
+            if (__DEV__) {
+              console.log(
+                `✅ Transaction ${txHash} confirmed on attempt ${attempt + 1}`,
+              );
+            }
+            return response;
+          } else {
+            throw new Error(`Transaction ${txHash} failed on-chain validation`);
+          }
+        }
+      }
+
+      // If we reach here without valid response, throw error to trigger retry
+      throw new Error("Transaction validation failed - invalid response");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      if (attempt < retries) {
+        if (__DEV__) {
+          console.log(
+            `❌ Transaction failed (attempt ${attempt + 1}/${retries + 1}): ${errorMessage}. Retrying in ${RETRY_DELAY_MS}ms...`,
+          );
+        }
+        await delay(RETRY_DELAY_MS);
+      } else {
+        if (__DEV__) {
+          console.error(
+            `🛑 Transaction permanently failed after ${retries + 1} attempts: ${errorMessage}`,
+          );
+        }
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("Unexpected end of retry loop");
 };
 
 export const StarknetConnectorProvider: React.FC<{
@@ -495,239 +588,6 @@ export const StarknetConnectorProvider: React.FC<{
     [provider, STARKNET_ENABLED, connectAccount],
   );
 
-  const invokeContract = useCallback(
-    async (contractAddress: string, functionName: string, args: any[]) => {
-      if (!STARKNET_ENABLED) {
-        return;
-      }
-
-      if (!account) {
-        console.error("Account is not connected.");
-        return;
-      }
-
-      const res = await account.execute(
-        [
-          {
-            contractAddress,
-            entrypoint: functionName,
-            calldata: args,
-          },
-        ],
-        {
-          maxFee: 100_000_000_000_000,
-        },
-      );
-      await provider!.waitForTransaction(res.transaction_hash);
-      if (__DEV__)
-        console.log(
-          `✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`,
-        );
-    },
-    [account, provider],
-  );
-
-  const invokeContractCalls = useCallback(
-    async (calls: Call[]) => {
-      if (!STARKNET_ENABLED) {
-        return;
-      }
-
-      if (!account) {
-        console.error("Account is not connected.");
-        return;
-      }
-
-      const res = await account
-        .execute(calls, {
-          maxFee: 100_000_000_000_000,
-        })
-        .catch((error) => {
-          throw error;
-        });
-      await provider!.waitForTransaction(res.transaction_hash);
-      if (__DEV__)
-        console.log(
-          `✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`,
-        );
-    },
-    [provider, account],
-  );
-
-  // privateKey is used if you need to deploy a new account
-  const invokeWithPaymaster = useCallback(
-    async (calls: Call[], privateKey?: any) => {
-      if (!STARKNET_ENABLED) {
-        return null;
-      }
-
-      if (!provider) {
-        console.error("Provider is not initialized.");
-        return null;
-      }
-
-      if (network !== "SN_SEPOLIA" && network !== "SN_MAINNET") {
-        console.error(
-          "Paymaster is only supported on SN_SEPOLIA and SN_MAINNET chains.",
-        );
-        return null;
-      }
-
-      const deploymentData = privateKey
-        ? getDeploymentData(privateKey)
-        : undefined;
-      if (!account && !deploymentData) {
-        console.error("No account connected and no deployment data provided.");
-        return null;
-      }
-      let invokeAccount = account;
-      if (!invokeAccount) {
-        invokeAccount = new Account(
-          provider!,
-          generateAccountAddress(privateKey),
-          privateKey,
-        );
-        connectAccount(privateKey);
-      }
-
-      const apiKey = process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY || "";
-      if (apiKey === "") {
-        // TODO: buildGaslessTxData(address, calls, network, deploymentData?)
-        // TODO: sendGaslessTx(address, txData, signature, network, deploymentData?)
-
-        // Run using backend paymaster provider
-        const formattedCalls = formatCall(calls);
-        const focEngineUrl =
-          process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
-        const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
-        const gaslessTxInput = {
-          account: invokeAccount.address,
-          calls: formattedCalls,
-          network: network,
-          deploymentData: deploymentData || undefined,
-        };
-        const gaslessTxRes = await fetch(buildGaslessTxDataUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(gaslessTxInput),
-        })
-          .then((response) => response.json())
-          .catch((error) => {
-            if (__DEV__)
-              console.error("Error building gasless tx data:", error);
-            throw error;
-          });
-        if (gaslessTxRes.error) {
-          if (__DEV__)
-            console.error("Error from build-gasless-tx:", gaslessTxRes);
-          throw new Error(gaslessTxRes.error);
-        }
-        const privateKey =
-          (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
-
-        let signature: any;
-        if (!privateKey) {
-          if (__DEV__)
-            console.error("Could not extract private key from account");
-          throw new Error("Private key not accessible for manual signing");
-        }
-
-        // Manual EC signing (replaces the internal signing in signMessage)
-        signature = ec.starkCurve.sign(
-          gaslessTxRes.data.messageHash,
-          privateKey,
-        );
-        if (Array.isArray(signature)) {
-          signature = signature.map((sig) => toBeHex(BigInt(sig)));
-        } else if (signature.r && signature.s) {
-          signature = [
-            toBeHex(BigInt(signature.r)),
-            toBeHex(BigInt(signature.s)),
-          ];
-        }
-        const sendGaslessTxUrl = `${focEngineUrl}/paymaster/send-gasless-tx`;
-        const sendGaslessTxInput = {
-          account: invokeAccount.address,
-          txData: JSON.stringify(gaslessTxRes.data.typedData),
-          signature: signature,
-          network: network,
-          deploymentData: deploymentData || undefined,
-        };
-        const sendGaslessTxRes = await fetch(sendGaslessTxUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(sendGaslessTxInput),
-        })
-          .then((response) => response.json())
-          .catch((error) => {
-            throw error;
-          });
-        if (sendGaslessTxRes.error) {
-          if (__DEV__)
-            console.error("Error from send-gasless-tx:", sendGaslessTxRes);
-          throw new Error(sendGaslessTxRes.error);
-        }
-        if (sendGaslessTxRes.data.revertError) {
-          if (__DEV__)
-            console.log(
-              "⚠️ Revert error from paymaster: ",
-              sendGaslessTxRes.data.revertError,
-            );
-          return sendGaslessTxRes;
-        }
-        if (__DEV__)
-          console.log("📤 Gasless transaction sent:", sendGaslessTxRes);
-        return sendGaslessTxRes;
-      } else {
-        // Use gasless-sdk to execute calls with paymaster
-        const options: GaslessOptions = {
-          baseUrl: network === "SN_SEPOLIA" ? SEPOLIA_BASE_URL : BASE_URL,
-          apiKey,
-        };
-        const res = await executeCalls(
-          invokeAccount,
-          calls,
-          { deploymentData },
-          options,
-        ).catch((error) => {
-          if (__DEV__)
-            console.error("Error executing calls with paymaster:", error);
-          throw error;
-        });
-        if (__DEV__)
-          console.log("Response from executeCalls with paymaster:", res);
-        // TODO: Check response format
-        return { data: { transactionHash: res } };
-      }
-    },
-    [provider, network, account, STARKNET_ENABLED, connectAccount],
-  );
-
-  const invokeCalls = useCallback(
-    async (calls: Call[]) => {
-      if (!STARKNET_ENABLED) {
-        return null;
-      }
-      if (__DEV__) console.log("🚀 Invoking contract calls:", calls.length);
-      if (network === "SN_DEVNET") {
-        await invokeContractCalls(calls);
-        // TODO: Get real transaction hash from devnet
-        return {
-          data: {
-            transactionHash: "0x" + Math.random().toString(16).substr(2, 64),
-          },
-        };
-      } else {
-        return await invokeWithPaymaster(calls);
-      }
-    },
-    [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
-  );
-
   const waitForTransaction = useCallback(
     async (txHash: string): Promise<boolean> => {
       if (!provider) {
@@ -767,6 +627,288 @@ export const StarknetConnectorProvider: React.FC<{
       }
     },
     [provider],
+  );
+
+  const invokeContract = useCallback(
+    async (
+      contractAddress: string,
+      functionName: string,
+      args: any[],
+      retries: number = 0,
+    ) => {
+      if (!STARKNET_ENABLED) {
+        return;
+      }
+
+      if (!account) {
+        console.error("Account is not connected.");
+        return;
+      }
+
+      const invokeFunction = async () => {
+        return await account.execute(
+          [
+            {
+              contractAddress,
+              entrypoint: functionName,
+              calldata: args,
+            },
+          ],
+          {
+            maxFee: 100_000_000_000_000,
+          },
+        );
+      };
+
+      const res = await executeWithRetries(
+        invokeFunction,
+        waitForTransaction,
+        retries,
+      );
+
+      if (__DEV__)
+        console.log(
+          `✅ ${functionName} executed successfully. Transaction hash: ${res.transaction_hash}`,
+        );
+    },
+    [account, provider, STARKNET_ENABLED, waitForTransaction],
+  );
+
+  const invokeContractCalls = useCallback(
+    async (calls: Call[], retries: number = 0) => {
+      if (!STARKNET_ENABLED) {
+        return;
+      }
+
+      if (!account) {
+        console.error("Account is not connected.");
+        return;
+      }
+
+      const invokeFunction = async () => {
+        return await account.execute(calls, {
+          maxFee: 100_000_000_000_000,
+        });
+      };
+
+      const res = await executeWithRetries(
+        invokeFunction,
+        waitForTransaction,
+        retries,
+      );
+
+      if (__DEV__)
+        console.log(
+          `✅ Calls executed successfully. Transaction hash: ${res.transaction_hash}`,
+        );
+    },
+    [provider, account, STARKNET_ENABLED, waitForTransaction],
+  );
+
+  // privateKey is used if you need to deploy a new account
+  const invokeWithPaymaster = useCallback(
+    async (calls: Call[], privateKey?: any, retries: number = 0) => {
+      if (!STARKNET_ENABLED) {
+        return null;
+      }
+
+      if (!provider) {
+        console.error("Provider is not initialized.");
+        return null;
+      }
+
+      if (network !== "SN_SEPOLIA" && network !== "SN_MAINNET") {
+        console.error(
+          "Paymaster is only supported on SN_SEPOLIA and SN_MAINNET chains.",
+        );
+        return null;
+      }
+
+      const deploymentData = privateKey
+        ? getDeploymentData(privateKey)
+        : undefined;
+      if (!account && !deploymentData) {
+        console.error("No account connected and no deployment data provided.");
+        return null;
+      }
+
+      let invokeAccount = account;
+      if (!invokeAccount) {
+        invokeAccount = new Account(
+          provider!,
+          generateAccountAddress(privateKey),
+          privateKey,
+        );
+      }
+
+      // Define the paymaster execution function
+      const executePaymasterTransaction = async () => {
+        const apiKey = process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY || "";
+        if (apiKey === "") {
+          // Run using backend paymaster provider
+          const formattedCalls = formatCall(calls);
+          const focEngineUrl =
+            process.env.EXPO_PUBLIC_FOC_ENGINE_API || "http://localhost:8080";
+          const buildGaslessTxDataUrl = `${focEngineUrl}/paymaster/build-gasless-tx`;
+          const gaslessTxInput = {
+            account: invokeAccount.address,
+            calls: formattedCalls,
+            network: network,
+            deploymentData: deploymentData || undefined,
+          };
+
+          // Build gasless tx data
+          const gaslessTxRes = await fetch(buildGaslessTxDataUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(gaslessTxInput),
+          })
+            .then((response) => response.json())
+            .catch((error) => {
+              if (__DEV__)
+                console.error("Error building gasless tx data:", error);
+              throw error;
+            });
+
+          if (gaslessTxRes.error) {
+            if (__DEV__)
+              console.error("Error from build-gasless-tx:", gaslessTxRes);
+            throw new Error(gaslessTxRes.error);
+          }
+
+          const privateKey =
+            (invokeAccount as any).signer?.pk || (invokeAccount as any).pk;
+
+          let signature: any;
+          if (!privateKey) {
+            if (__DEV__)
+              console.error("Could not extract private key from account");
+            throw new Error("Private key not accessible for manual signing");
+          }
+
+          // Manual EC signing (replaces the internal signing in signMessage)
+          signature = ec.starkCurve.sign(
+            gaslessTxRes.data.messageHash,
+            privateKey,
+          );
+          if (Array.isArray(signature)) {
+            signature = signature.map((sig) => toBeHex(BigInt(sig)));
+          } else if (signature.r && signature.s) {
+            signature = [
+              toBeHex(BigInt(signature.r)),
+              toBeHex(BigInt(signature.s)),
+            ];
+          }
+
+          const sendGaslessTxUrl = `${focEngineUrl}/paymaster/send-gasless-tx`;
+          const sendGaslessTxInput = {
+            account: invokeAccount.address,
+            txData: JSON.stringify(gaslessTxRes.data.typedData),
+            signature: signature,
+            network: network,
+            deploymentData: deploymentData || undefined,
+          };
+
+          // Send gasless transaction
+          const sendGaslessTxRes = await fetch(sendGaslessTxUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendGaslessTxInput),
+          })
+            .then((response) => response.json())
+            .catch((error) => {
+              if (__DEV__) console.error("Error sending gasless tx:", error);
+              throw error;
+            });
+
+          if (sendGaslessTxRes.error) {
+            if (__DEV__)
+              console.error("Error from send-gasless-tx:", sendGaslessTxRes);
+            throw new Error(sendGaslessTxRes.error);
+          }
+
+          if (sendGaslessTxRes.data?.revertError) {
+            if (__DEV__)
+              console.log(
+                "⚠️ Revert error from paymaster: ",
+                sendGaslessTxRes.data.revertError,
+              );
+            // Don't throw here, let the retry logic handle validation
+            throw new Error(
+              `Revert error: ${sendGaslessTxRes.data.revertError}`,
+            );
+          }
+
+          if (__DEV__)
+            console.log("📤 Gasless transaction sent:", sendGaslessTxRes);
+          return sendGaslessTxRes;
+        } else {
+          // Use gasless-sdk to execute calls with paymaster
+          const options: GaslessOptions = {
+            baseUrl: network === "SN_SEPOLIA" ? SEPOLIA_BASE_URL : BASE_URL,
+            apiKey,
+          };
+          const res = await executeCalls(
+            invokeAccount,
+            calls,
+            { deploymentData },
+            options,
+          ).catch((error) => {
+            if (__DEV__)
+              console.error("Error executing calls with paymaster:", error);
+            throw error;
+          });
+          if (__DEV__)
+            console.log("Response from executeCalls with paymaster:", res);
+          // TODO: Check response format
+          return { data: { transactionHash: res } };
+        }
+      };
+
+      // Apply retry logic if requested
+      if (retries > 0) {
+        return await executeWithRetries(
+          executePaymasterTransaction,
+          waitForTransaction,
+          retries,
+        );
+      } else {
+        return await executePaymasterTransaction();
+      }
+    },
+    [
+      provider,
+      network,
+      account,
+      STARKNET_ENABLED,
+      connectAccount,
+      waitForTransaction,
+    ],
+  );
+
+  const invokeCalls = useCallback(
+    async (calls: Call[], retries: number = 0) => {
+      if (!STARKNET_ENABLED) {
+        return null;
+      }
+      if (__DEV__) console.log("🚀 Invoking contract calls:", calls.length);
+      if (network === "SN_DEVNET") {
+        await invokeContractCalls(calls, retries);
+        // TODO: Get real transaction hash from devnet
+        return {
+          data: {
+            transactionHash: "0x" + Math.random().toString(16).substr(2, 64),
+          },
+        };
+      } else {
+        return await invokeWithPaymaster(calls, undefined, retries);
+      }
+    },
+    [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
   );
 
   const value = {

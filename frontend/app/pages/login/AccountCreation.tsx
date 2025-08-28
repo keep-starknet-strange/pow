@@ -41,7 +41,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     isUsernameUnique,
     isUsernameValid,
     usernameValidationError,
-    claimUsername,
+    initializeAccount,
     accountsContractAddress,
     user,
     mintFunds,
@@ -147,7 +147,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       const keys = await getAvailableKeys("pow_game");
       if (keys.length > 0) {
         // Account exists, just claim username
-        await claimUsername(username);
+        await initializeAccount(username, [
+          `0x` + avatar.head.toString(16),
+          `0x` + avatar.body.toString(16),
+          `0x` + avatar.glasses.toString(16),
+          `0x` + avatar.accessories.toString(16),
+        ]);
         // No need to navigate, user will see the account creation process complete
         return;
       }
@@ -158,33 +163,27 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       }
 
       const privateKey = generatePrivateKey();
-      console.log("Creating game account with username claim...");
-
       if (network === "SN_DEVNET") {
         const accountAddress = generateAccountAddress(privateKey, "devnet");
         await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
         await deployAccount(privateKey, "devnet");
         await storeKeyAndConnect(privateKey, "pow_game", "devnet");
         // After account is deployed, claim username
-        await claimUsername(username);
+        await initializeAccount(username, [
+          `0x` + avatar.head.toString(16),
+          `0x` + avatar.body.toString(16),
+          `0x` + avatar.glasses.toString(16),
+          `0x` + avatar.accessories.toString(16),
+        ]);
       } else {
-        // For mainnet/sepolia, use paymaster with claim_username call
-        const usernameHex = `0x${Array.from(username)
-          .map((char) => char.charCodeAt(0).toString(16))
-          .join("")}`;
-
-        const claimUsernameCall = {
-          contractAddress: accountsContractAddress,
-          entrypoint: "claim_username",
-          calldata: [usernameHex],
-        };
-
-        // This will deploy the account and claim username in one transaction
-        await invokeWithPaymaster([claimUsernameCall], privateKey);
-        await storeKeyAndConnect(privateKey, "pow_game");
+        // This will deploy the account and claim username in one transaction with retries
+        await initializeAccount(username, [
+          `0x` + avatar.head.toString(16),
+          `0x` + avatar.body.toString(16),
+          `0x` + avatar.glasses.toString(16),
+          `0x` + avatar.accessories.toString(16),
+        ], undefined, privateKey, 3);
       }
-
-      console.log("Account created and username claimed successfully");
     } catch (error) {
       console.error("Error creating account and claiming username:", error);
       setUsernameError("Failed to create account. Please try again.");
@@ -244,7 +243,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 />
                 <Pressable
                   onPress={generateRandomUsername}
-                  disabled={isGeneratingUsername}
+                  disabled={isGeneratingUsername || isSavingAccount}
                   className="shadow-lg shadow-black/50"
                 >
                   <Canvas style={{ width: 40, height: 40 }}>
@@ -298,6 +297,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         />
         <BasicButton
           label="Cancel"
+          disabled={isSavingAccount}
           onPress={async () => {
             setLoginPage("login");
           }}

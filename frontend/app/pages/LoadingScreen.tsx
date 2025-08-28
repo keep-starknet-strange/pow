@@ -14,6 +14,7 @@ import { useTutorialStore } from "../stores/useTutorialStore";
 import { useUpgradesStore } from "../stores/useUpgradesStore";
 import { useSoundStore } from "../stores/useSoundStore";
 import { useStarknetConnector } from "../context/StarknetConnector";
+import { useFocEngine } from "../context/FocEngineConnector";
 import Constants from "expo-constants";
 
 interface TipTextDisplayProps {
@@ -110,6 +111,7 @@ export const LoadingScreenView: React.FC = memo(() => {
 export const LoadingScreen: React.FC = memo(() => {
   // Check if account is connected
   const { account } = useStarknetConnector();
+  const { isUserInitializing } = useFocEngine();
 
   // Check if all stores are initialized
   const gameInitialized = useGameStore((state) => state.isInitialized);
@@ -151,8 +153,8 @@ export const LoadingScreen: React.FC = memo(() => {
     }
   }, [allStoresInitialized]);
 
-  // Only render if account is connected AND (stores not initialized OR still within delay period)
-  if (!account || shouldHide) {
+  // Only render if account is connected/initializing AND (stores not initialized OR still within delay period)
+  if (!(account || isUserInitializing) || shouldHide) {
     return null;
   }
 
