@@ -19,9 +19,7 @@ interface GameStore {
     user: FocAccount | null,
     getUserMaxChainId: () => Promise<number | undefined>,
     getUserBlockNumber: (chainId: number) => Promise<number | undefined>,
-    getUserBlockState: (
-      chainId: number,
-    ) => Promise<
+    getUserBlockState: (chainId: number) => Promise<
       | {
           size: number | undefined;
           fees: number | undefined;

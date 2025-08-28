@@ -10,6 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useFocEngine } from "../../context/FocEngineConnector";
+import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import NounsBuilder from "../../components/NounsBuilder";
@@ -40,8 +41,20 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     isUsernameUnique,
     isUsernameValid,
     usernameValidationError,
-    initializeAccount,
+    claimUsername,
+    accountsContractAddress,
+    user,
+    mintFunds,
   } = useFocEngine();
+  const {
+    generatePrivateKey,
+    generateAccountAddress,
+    deployAccount,
+    invokeWithPaymaster,
+    network,
+    getAvailableKeys,
+    storeKeyAndConnect,
+  } = useStarknetConnector();
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
@@ -50,6 +63,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const [username, setUsername] = React.useState<string>("");
   const [isGeneratingUsername, setIsGeneratingUsername] =
     React.useState<boolean>(false);
+  const [isSavingAccount, setIsSavingAccount] = React.useState<boolean>(false);
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
   );
@@ -123,6 +137,60 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       notify("BasicError");
     } finally {
       setIsGeneratingUsername(false);
+    }
+  };
+
+  const createAccountAndClaimUsername = async () => {
+    setIsSavingAccount(true);
+    try {
+      // First check if we already have an account connected
+      const keys = await getAvailableKeys("pow_game");
+      if (keys.length > 0) {
+        // Account exists, just claim username
+        await claimUsername(username);
+        // No need to navigate, user will see the account creation process complete
+        return;
+      }
+
+      // No account exists, create new one using the claim_username logic
+      if (!accountsContractAddress) {
+        throw new Error("Accounts contract address is not set");
+      }
+
+      const privateKey = generatePrivateKey();
+      console.log("Creating game account with username claim...");
+
+      if (network === "SN_DEVNET") {
+        const accountAddress = generateAccountAddress(privateKey, "devnet");
+        await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
+        await deployAccount(privateKey, "devnet");
+        await storeKeyAndConnect(privateKey, "pow_game", "devnet");
+        // After account is deployed, claim username
+        await claimUsername(username);
+      } else {
+        // For mainnet/sepolia, use paymaster with claim_username call
+        const usernameHex = `0x${Array.from(username)
+          .map((char) => char.charCodeAt(0).toString(16))
+          .join("")}`;
+
+        const claimUsernameCall = {
+          contractAddress: accountsContractAddress,
+          entrypoint: "claim_username",
+          calldata: [usernameHex],
+        };
+
+        // This will deploy the account and claim username in one transaction
+        await invokeWithPaymaster([claimUsernameCall], privateKey);
+        await storeKeyAndConnect(privateKey, "pow_game");
+      }
+
+      console.log("Account created and username claimed successfully");
+    } catch (error) {
+      console.error("Error creating account and claiming username:", error);
+      setUsernameError("Failed to create account. Please try again.");
+      notify("BasicError");
+    } finally {
+      setIsSavingAccount(false);
     }
   };
 
@@ -212,7 +280,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         className="flex-1 items-center justify-center gap-4"
       >
         <BasicButton
-          label="Save"
+          label={isSavingAccount ? "Saving..." : "Save"}
+          disabled={isSavingAccount}
           onPress={async () => {
             if (!isUsernameValid(username)) {
               setUsernameError(`Invalid username:\n${usernameValidationError}`);
@@ -224,12 +293,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               notify("BasicError");
               return;
             }
-            await initializeAccount(username, [
-              `0x` + avatar.head.toString(16),
-              `0x` + avatar.body.toString(16),
-              `0x` + avatar.glasses.toString(16),
-              `0x` + avatar.accessories.toString(16),
-            ]);
+            await createAccountAndClaimUsername();
           }}
         />
         <BasicButton

@@ -64,6 +64,11 @@ type StarknetConnectorContextType = {
   ) => Promise<void>;
   connectStorageAccount: (key: string) => Promise<void>;
   connectAccount: (privateKey: string) => Promise<void>;
+  storeKeyAndConnect: (
+    privateKey: string,
+    appName: string,
+    accountClassName?: string,
+  ) => Promise<void>;
   disconnectAccount: () => void;
   disconnectAndDeleteAccount: () => Promise<void>;
 
@@ -388,6 +393,24 @@ export const StarknetConnectorProvider: React.FC<{
         );
     },
     [provider],
+  );
+
+  const storeKeyAndConnect = useCallback(
+    async (privateKey: string, appName: string, accountClassName?: string) => {
+      // Store the private key first
+      await storePrivateKey(privateKey, appName, accountClassName);
+
+      // Generate the key that was stored
+      const accountAddress = generateAccountAddress(
+        privateKey,
+        accountClassName,
+      );
+      const key = `${network}.${appName}.${accountClassName || "argentX"}.${accountAddress}`;
+
+      // Connect using the stored key
+      await connectStorageAccount(key);
+    },
+    [storePrivateKey, generateAccountAddress, connectStorageAccount, network],
   );
 
   const disconnectAccount = () => {
@@ -762,6 +785,7 @@ export const StarknetConnectorProvider: React.FC<{
     deployAccount,
     connectStorageAccount,
     connectAccount,
+    storeKeyAndConnect,
     disconnectAccount,
     disconnectAndDeleteAccount,
     invokeContract,
