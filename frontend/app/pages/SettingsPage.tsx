@@ -60,9 +60,6 @@ export const SettingsPage: React.FC<SettingsProps> = ({
           goBackToLogin={() => {
             setLoginPage?.("login");
           }}
-          onBack={function (): void {
-            throw new Error("Function not implemented.");
-          }}
         />
         {activeTab !== "Main" && (
           <Animated.View entering={FadeInDown}>
@@ -76,7 +73,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
                   setActiveTab("Main");
                 }
               }}
-              style={{ marginTop: 16 }}
+              style={{ marginVertical: 16 }}
             />
           </Animated.View>
         )}
