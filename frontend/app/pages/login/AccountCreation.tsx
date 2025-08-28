@@ -58,6 +58,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
+  const [avatarContainerSize, setAvatarContainerSize] = React.useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
 
   const [usernameError, setUsernameError] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
@@ -202,87 +206,100 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   return (
     <View
       style={{
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        flex: 1,
       }}
-      className="flex-1 items-center justify-around relative"
     >
-      <View
-        className="absolute top-0 left-0 w-full bg-[#10111A]"
-        style={{ height: 60, width: width }}
-      />
-      <AccountCreationHeader width={width} />
+      <AccountCreationHeader width={width} topInset={insets.top} />
+
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
-          behavior="position"
-          keyboardVerticalOffset={insets.top} // tweak this as needed based on header height
+          behavior="padding"
+          style={{
+            flex: 0.7,
+          }}
         >
-          <AvatarCreator
-            avatar={avatar}
-            setAvatar={setAvatar}
-            newAvatar={newAvatar}
-            setNewAvatar={setNewAvatar}
-            startCreatingAvatar={startCreatingAvatar}
-            creatingAvatar={creatingAvatar}
-          />
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+            }}
+            onLayout={(event) => {
+              const { width, height } = event.nativeEvent.layout;
+              setAvatarContainerSize({ width, height });
+            }}
+          >
+            <AvatarCreator
+              containerSize={avatarContainerSize}
+              avatar={avatar}
+              setAvatar={setAvatar}
+              newAvatar={newAvatar}
+              setNewAvatar={setNewAvatar}
+              startCreatingAvatar={startCreatingAvatar}
+              creatingAvatar={creatingAvatar}
+            />
+          </View>
+
           <Animated.View
             entering={FadeInDown}
-            className="flex flex-col items-center"
+            className="flex flex-col items-start w-screen px-8 my-2"
           >
-            <View className="flex flex-col items-start mt-12 w-screen px-8">
-              <Text className="text-[#101119] text-lg font-Pixels">
-                Set up a username
-              </Text>
-              <View className="flex-row items-center w-full mt-1 gap-2">
-                <TextInput
-                  className="bg-[#10111910] flex-1 px-2
-                          pt-1 text-[32px] text-[#101119] border-2 border-[#101119]
-                          shadow-lg shadow-black/50 font-Teatime"
-                  selectionColor="#101119"
-                  placeholder="Satoshi"
-                  placeholderTextColor="#10111980"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  autoComplete="off"
-                  value={username}
-                  onChangeText={setUsername}
-                />
-                <Pressable
-                  onPress={generateRandomUsername}
-                  disabled={isGeneratingUsername || isSavingAccount}
-                  className="shadow-lg shadow-black/50"
-                >
-                  <Canvas style={{ width: 40, height: 40 }}>
-                    <SkiaImg
-                      image={getImage("icon.random")}
-                      x={0}
-                      y={0}
-                      width={40}
-                      height={40}
-                      fit="contain"
-                      sampling={{
-                        filter: FilterMode.Nearest,
-                        mipmap: MipmapMode.Nearest,
-                      }}
-                    />
-                  </Canvas>
-                </Pressable>
-              </View>
-              <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
-                Please notice: your username will be public
-              </Text>
-              {usernameError ? (
-                <Text className="text-red-500 text-md mt-2 font-Pixels">
-                  {usernameError}
-                </Text>
-              ) : null}
+            <Text className="text-[#101119] text-lg font-Pixels">
+              Set up a username
+            </Text>
+            <View className="flex-row items-center w-full mt-1 gap-2">
+              <TextInput
+                className="bg-[#10111910] flex-1 px-2
+                            pt-1 text-[32px] text-[#101119] border-2 border-[#101119]
+                            shadow-lg shadow-black/50 font-Teatime"
+                selectionColor="#101119"
+                placeholder="Satoshi"
+                placeholderTextColor="#10111980"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                value={username}
+                onChangeText={setUsername}
+              />
+              <Pressable
+                onPress={generateRandomUsername}
+                disabled={isGeneratingUsername || isSavingAccount}
+                className="shadow-lg shadow-black/50"
+              >
+                <Canvas style={{ width: 40, height: 40 }}>
+                  <SkiaImg
+                    image={getImage("icon.random")}
+                    x={0}
+                    y={0}
+                    width={40}
+                    height={40}
+                    fit="contain"
+                    sampling={{
+                      filter: FilterMode.Nearest,
+                      mipmap: MipmapMode.Nearest,
+                    }}
+                  />
+                </Canvas>
+              </Pressable>
             </View>
+            <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
+              Please notice: your username will be public
+            </Text>
+            {usernameError ? (
+              <Text className="text-red-500 text-md mt-2 font-Pixels">
+                {usernameError}
+              </Text>
+            ) : null}
           </Animated.View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
       <Animated.View
+        style={{
+          flex: 0.3,
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+        }}
         entering={FadeInDown}
-        className="flex-1 items-center justify-center gap-4"
       >
         <BasicButton
           label={isSavingAccount ? "Saving..." : "Save"}
@@ -309,21 +326,27 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           }}
         />
       </Animated.View>
-      <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">
-        {!creatingAvatar && (
-          <Animated.View
-            entering={FadeInDown}
-            className="flex flex-row items-center justify-between w-full"
-          >
-            <Text className="text-[#fff7ff] font-Pixels text-[16px]">
-              version {version}
-            </Text>
-            <Text className="text-[#fff7ff] font-Pixels text-[16px]">
-              We're open source!
-            </Text>
-          </Animated.View>
-        )}
+
+      <View
+        style={{
+          alignSelf: "flex-end",
+          paddingBottom: insets.bottom,
+        }}
+        className="w-full px-8 py-4 pb-6 bg-[#10111A]"
+      >
+        <Animated.View
+          entering={FadeInDown}
+          className="flex flex-row items-center justify-between w-full"
+        >
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            version {version}
+          </Text>
+          <Text className="text-[#fff7ff] font-Pixels text-[16px]">
+            We're open source!
+          </Text>
+        </Animated.View>
       </View>
+
       {creatingAvatar && (
         <NounsBuilder
           avatar={avatar}
@@ -337,39 +360,43 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   );
 };
 
-const AccountCreationHeader: React.FC<{ width: number }> = memo(({ width }) => {
-  const { getImage } = useImages();
-  return (
-    <View
-      className="absolute top-[60px] left-0 w-full"
-      style={{ height: 50, width: width }}
-    >
-      <Canvas style={{ flex: 1 }} className="w-full h-full">
-        <SkiaImg
-          image={getImage("bar.top")}
-          fit="fill"
-          x={0}
-          y={0}
-          sampling={{
-            filter: FilterMode.Nearest,
-            mipmap: MipmapMode.Nearest,
-          }}
-          width={width}
-          height={50}
-        />
-      </Canvas>
-      <View className="absolute top-0 left-0 w-full h-full">
-        <Marquee spacing={0} speed={1}>
-          <View className="flex flex-row items-center justify-center">
-            <Text className="text-[#fff7ff] font-Teatime text-[40px]">
-              CREATE YOUR ACCOUNT
-            </Text>
-            <View className="w-2 aspect-square bg-[#fff7ff] mx-4" />
-          </View>
-        </Marquee>
+const AccountCreationHeader: React.FC<{ width: number; topInset: number }> =
+  memo(({ width, topInset }) => {
+    const { getImage } = useImages();
+    return (
+      <View
+        className="relative top-0 left-0 w-full"
+        style={{ height: 50 + topInset, width: width }}
+      >
+        <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <SkiaImg
+            image={getImage("bar.top")}
+            fit="fill"
+            x={0}
+            y={0}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+            width={width}
+            height={50 + topInset}
+          />
+        </Canvas>
+        <View
+          className="absolute top-0 left-0 w-full"
+          style={{ paddingTop: topInset }}
+        >
+          <Marquee spacing={0} speed={1}>
+            <View className="flex flex-row items-center justify-center">
+              <Text className="text-[#fff7ff] font-Teatime text-[40px]">
+                CREATE YOUR ACCOUNT
+              </Text>
+              <View className="w-2 aspect-square bg-[#fff7ff] mx-4" />
+            </View>
+          </Marquee>
+        </View>
       </View>
-    </View>
-  );
-});
+    );
+  });
 
 export default AccountCreationPage;
