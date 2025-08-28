@@ -177,12 +177,18 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         ]);
       } else {
         // This will deploy the account and claim username in one transaction with retries
-        await initializeAccount(username, [
-          `0x` + avatar.head.toString(16),
-          `0x` + avatar.body.toString(16),
-          `0x` + avatar.glasses.toString(16),
-          `0x` + avatar.accessories.toString(16),
-        ], undefined, privateKey, 3);
+        await initializeAccount(
+          username,
+          [
+            `0x` + avatar.head.toString(16),
+            `0x` + avatar.body.toString(16),
+            `0x` + avatar.glasses.toString(16),
+            `0x` + avatar.accessories.toString(16),
+          ],
+          undefined,
+          privateKey,
+          3,
+        );
       }
     } catch (error) {
       console.error("Error creating account and claiming username:", error);

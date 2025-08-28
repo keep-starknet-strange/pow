@@ -312,7 +312,9 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         if (!accountData || !accountData.username) {
           if (__DEV__)
-            console.warn(`No account data found for address: ${accountAddress}`);
+            console.warn(
+              `No account data found for address: ${accountAddress}`,
+            );
           return null;
         }
         const account: FocAccount = {
@@ -580,7 +582,13 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [isUserInitializing, setIsUserInitializing] = useState(false);
   const initializeAccount = useCallback(
-    async (username: string, metadata: string[] = [], contract?: string, privateKey?: string, retries?: number) => {
+    async (
+      username: string,
+      metadata: string[] = [],
+      contract?: string,
+      privateKey?: string,
+      retries?: number,
+    ) => {
       if (!STARKNET_ENABLED) {
         setUser({
           account_address: account?.address || "",
@@ -642,8 +650,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         await invokeWithPaymaster(calls, privateKey, retries);
       }
-      if (privateKey)
-        await storeKeyAndConnect(privateKey, "pow_game"); // TODO: pass contract name as parameter
+      if (privateKey) await storeKeyAndConnect(privateKey, "pow_game"); // TODO: pass contract name as parameter
       /*
       setUser({
         account_address: account?.address || "",
