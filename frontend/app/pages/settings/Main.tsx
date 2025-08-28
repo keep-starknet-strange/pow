@@ -96,33 +96,35 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   return (
     <>
-      <Animated.View
-        className="flex flex-col gap-3 h-full w-full justify-center items-center"
-        entering={FadeInDown}
-      >
-        <BasicButton
-          label={isSoundOn ? "Sound On" : "Sound Off"}
-          onPress={toggleSound}
-        />
-        <BasicButton
-          label={isMusicOn ? "Music On" : "Music Off"}
-          onPress={toggleMusic}
-        />
-        <BasicButton
-          label={isHapticsOn ? "Haptics On" : "Haptics Off"}
-          onPress={toggleHaptics}
-        />
-
-        {settingsComponents.map(({ label, tab, onPress }) => (
+      <Animated.View className="flex-1" entering={FadeInDown}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerClassName="grow gap-3 justify-center py-8"
+        >
           <BasicButton
-            key={label}
-            label={label}
-            onPress={() => {
-              if (tab) setSettingTab(tab);
-              if (onPress) onPress();
-            }}
+            label={isSoundOn ? "Sound On" : "Sound Off"}
+            onPress={toggleSound}
           />
-        ))}
+          <BasicButton
+            label={isMusicOn ? "Music On" : "Music Off"}
+            onPress={toggleMusic}
+          />
+          <BasicButton
+            label={isHapticsOn ? "Haptics On" : "Haptics Off"}
+            onPress={toggleHaptics}
+          />
+
+          {settingsComponents.map(({ label, tab, onPress }) => (
+            <BasicButton
+              key={label}
+              label={label}
+              onPress={() => {
+                if (tab) setSettingTab(tab);
+                if (onPress) onPress();
+              }}
+            />
+          ))}
+        </ScrollView>
       </Animated.View>
 
       <ConfirmationModal

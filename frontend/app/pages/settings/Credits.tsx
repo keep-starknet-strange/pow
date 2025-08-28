@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const CreditsSection = () => {
@@ -18,41 +18,43 @@ export const CreditsSection = () => {
     { name: "ELI BEN-SASSON", reason: "Creating STARK tech" },
   ];
   return (
-    <Animated.View entering={FadeInUp}>
-      <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
-        Credits
-      </Text>
-      <View className="mt-2">
-        <Text className="text-[#101119] text-[22px] font-Teatime mb-6">
-          created by StarkWare Exploration
+    <Animated.View className="flex-1" entering={FadeInUp}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
+          Credits
         </Text>
-        {creditedPeople.map((person, index) => (
-          <View
-            key={index}
-            className="flex-row items-center justify-between mb-2"
-          >
-            <Text className="text-[#101119] text-[24px] font-Teatime w-1/3">
-              {person.name}
-            </Text>
-            <Text className="text-[#101119] text-[16px] font-Pixels flex-1 text-left">
-              {person.role}
-            </Text>
-          </View>
-        ))}
-        <Text className="text-[#101119] text-[20px] font-Xerxes mt-6 mb-4 text-right">
-          Special thanks
-        </Text>
-        {specialThanks.map((thanks, index) => (
-          <View key={index} className="mb-4">
-            <Text className="text-[#101119] text-[24px] font-Teatime">
-              {thanks.name}
-            </Text>
-            <Text className="text-[#101119] text-[16px] font-Pixels ml-4">
-              {thanks.reason}
-            </Text>
-          </View>
-        ))}
-      </View>
+        <View className="mt-2">
+          <Text className="text-[#101119] text-[22px] font-Teatime mb-6">
+            created by StarkWare Exploration
+          </Text>
+          {creditedPeople.map((person, index) => (
+            <View
+              key={index}
+              className="flex-row items-center justify-between mb-2"
+            >
+              <Text className="text-[#101119] text-[24px] font-Teatime w-1/3">
+                {person.name}
+              </Text>
+              <Text className="text-[#101119] text-[16px] font-Pixels flex-1 text-left">
+                {person.role}
+              </Text>
+            </View>
+          ))}
+          <Text className="text-[#101119] text-[20px] font-Xerxes mt-6 mb-4 text-right">
+            Special thanks
+          </Text>
+          {specialThanks.map((thanks, index) => (
+            <View key={index} className="mb-4">
+              <Text className="text-[#101119] text-[24px] font-Teatime">
+                {thanks.name}
+              </Text>
+              <Text className="text-[#101119] text-[16px] font-Pixels ml-4">
+                {thanks.reason}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     </Animated.View>
   );
 };
