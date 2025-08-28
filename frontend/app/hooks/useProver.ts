@@ -15,7 +15,6 @@ export const useProver = (
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
   const { l2 } = useL2Store();
-  const proverIsBuilt = l2?.prover.isBuilt;
   const proverDifficulty = l2?.prover.maxSize || 1;
   const [proverCounter, setProverCounter] = useState(0);
 
@@ -36,6 +35,9 @@ export const useProver = (
   }, [powContract, user, getUserProofClicks]);
 
   const prove = useCallback(() => {
+    const currentL2Proof = useL2Store.getState().l2?.prover;
+    const proverIsBuilt = currentL2Proof?.isBuilt || false;
+
     if (!proverIsBuilt) {
       if (__DEV__) console.warn("Prover is not built yet.");
       return;
@@ -61,14 +63,7 @@ export const useProver = (
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [
-    triggerProveAnimation,
-    proverIsBuilt,
-    proverDifficulty,
-    proverCounter,
-    notify,
-    onProve,
-  ]);
+  }, [triggerProveAnimation, proverDifficulty, proverCounter, notify, onProve]);
 
   useEffect(() => {
     if (proverCounter === proverDifficulty) {
@@ -78,7 +73,7 @@ export const useProver = (
   }, [proverDifficulty, proverCounter, onProve]);
 
   useAutoClicker(
-    getAutomationValue(1, "Prover") > 0 && (proverIsBuilt || false),
+    getAutomationValue(1, "Prover") > 0 && (l2?.prover.isBuilt || false),
     5000 / (getAutomationValue(1, "Prover") || 1),
     prove,
   );

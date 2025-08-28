@@ -18,7 +18,6 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
   setSettingTab,
 }) => {
   const { getAvailableKeys, connectStorageAccount } = useStarknetConnector();
-  const { createGameAccount } = usePowContractConnector();
   const insets = useSafeAreaInsets();
 
   const version = Constants.expoConfig?.version || "0.0.1";
@@ -42,8 +41,6 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
             const keys = await getAvailableKeys("pow_game");
             if (keys.length > 0) {
               await connectStorageAccount(keys[0]);
-            } else {
-              await createGameAccount();
             }
             setLoginPage("accountCreation");
           }}

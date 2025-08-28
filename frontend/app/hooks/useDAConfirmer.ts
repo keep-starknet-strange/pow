@@ -15,7 +15,6 @@ export const useDAConfirmer = (
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
   const { l2 } = useL2Store();
-  const daIsBuilt = l2?.da.isBuilt;
   const daDifficulty = l2?.da.maxSize || 1;
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
 
@@ -36,6 +35,9 @@ export const useDAConfirmer = (
   }, [powContract, user, getUserDaClicks]);
 
   const daConfirm = useCallback(() => {
+    const currentL2DA = useL2Store.getState().l2?.da;
+    const daIsBuilt = currentL2DA?.isBuilt || false;
+
     if (!daIsBuilt) {
       if (__DEV__) console.warn("Data Availability is not built yet.");
       return;
@@ -61,14 +63,7 @@ export const useDAConfirmer = (
         return prevCounter; // Prevent incrementing beyond difficulty
       }
     });
-  }, [
-    triggerDAAnimation,
-    daIsBuilt,
-    daDifficulty,
-    daConfirmCounter,
-    notify,
-    onDAConfirm,
-  ]);
+  }, [triggerDAAnimation, daDifficulty, daConfirmCounter, notify, onDAConfirm]);
 
   useEffect(() => {
     if (daConfirmCounter === daDifficulty) {
@@ -78,7 +73,7 @@ export const useDAConfirmer = (
   }, [daDifficulty, daConfirmCounter, onDAConfirm]);
 
   useAutoClicker(
-    getAutomationValue(1, "DA") > 0 && (daIsBuilt || false),
+    getAutomationValue(1, "DA") > 0 && (l2?.da.isBuilt || false),
     5000 / (getAutomationValue(1, "DA") || 1),
     daConfirm,
   );
