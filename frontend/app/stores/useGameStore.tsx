@@ -6,6 +6,7 @@ import { useL2Store } from "./useL2Store";
 import { useEventManager } from "./useEventManager";
 import { useUpgradesStore } from "./useUpgradesStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
+import upgradesJson from "../configs/upgrades.json";
 
 interface GameStore {
   genesisBlockReward: number;
@@ -50,10 +51,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ initMyGameDependency: initMyGame }),
 
   resetGameStore: () => {
-    // Use default values instead of reading from other stores to avoid circular dependencies
-    const defaultBlockSize = 4; // Default block size (baseValue from config)
-    const maxBlockSize = defaultBlockSize ** 2; // 16 transactions
-    const defaultBlockDifficulty = 8; // Default difficulty (baseValue from config)
+    // Use default values from config instead of reading from other stores to avoid circular dependencies
+    const defaultBlockSize = upgradesJson.L1[2]?.baseValue ?? 4;
+    const maxBlockSize = defaultBlockSize ** 2;
+    const defaultBlockDifficulty = upgradesJson.L1[3]?.baseValue ?? 8;
 
     const initBlock = newBlock(
       0,
