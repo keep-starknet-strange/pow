@@ -312,7 +312,7 @@ const UserAccountSection: React.FC = memo(() => {
         <View className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]">
           <PFPView user={user?.account_address} attributes={userNouns} />
         </View>
-        <Text className="text-[28px] font-bold text-white font-Teatime truncate">
+        <Text className="text-[28px] text-white font-Teatime truncate">
           {user?.account.username}
         </Text>
       </View>
@@ -334,7 +334,7 @@ const UserAccountSection: React.FC = memo(() => {
           </Canvas>
         </View>
       </View>
-      <Text className="text-xl text-white w-[6rem] text-right font-bold font-Pixels">
+      <Text className="text-xl text-white w-[6rem] text-right font-Pixels">
         {shortMoneyString(balance)}
       </Text>
       <Canvas style={{ width: 16, height: 16 }} className="mr-1">
