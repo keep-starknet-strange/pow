@@ -6,7 +6,7 @@ const config: ExpoConfig = {
   slug: "pow",
   version: process.env.EXPO_APP_VERSION || "0.1.0",
   orientation: "portrait",
-  icon: "./assets/logo/icon.png",
+  icon: "./assets/logo/logo.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
