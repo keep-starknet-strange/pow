@@ -4,11 +4,12 @@ import { useBalanceStore } from "./useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";
-import { Contract } from "starknet";
-import { FocAccount } from "@/types/contexts";
+import { Contract, Call } from "starknet";
+import { FocAccount } from "../context/FocEngineConnector";
 import { useL2Store } from "./useL2Store";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useGameStore } from "./useGameStore";
+import { useOnchainActions } from "./useOnchainActions";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -22,7 +23,7 @@ interface UpgradesState {
   // Actions
   upgrade: (chainId: number, upgradeId: number) => void;
   upgradeAutomation: (chainId: number, upgradeId: number) => void;
-  prestige: () => void;
+  prestige: () => Promise<void>;
 
   // Getters
   canUnlockUpgrade: (chainId: number, upgradeId: number) => boolean;
@@ -113,7 +114,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       }
     }
 
-    set({ upgrades: initUpgrades, automations: initAutomation });
+    set({ upgrades: initUpgrades, automations: initAutomation, isInitialized: true });
   },
 
   initializeUpgrades: async (
@@ -409,10 +410,41 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     set({ canPrestige: true });
   },
 
-  prestige: () => {
+  prestige: async () => {
     const { currentPrestige } = get();
     const nextPrestige = currentPrestige + 1;
 
+    // Clear any pending on-chain actions to avoid multicall reverts
+    try {
+      useOnchainActions.getState().clearQueue();
+    } catch {}
+
+    // Invoke prestige on-chain directly (avoid bundling)
+    try {
+      const contractAddress =
+        process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || "";
+      if (contractAddress) {
+        const prestigeCall: Call = {
+          contractAddress,
+          entrypoint: "buy_prestige",
+          calldata: [],
+        };
+        const { invokeActions, waitForTransaction } = useOnchainActions.getState();
+        const response = await invokeActions?.([prestigeCall]);
+        const txHash = response?.data?.transactionHash as string | undefined;
+        if (txHash && waitForTransaction) {
+          await waitForTransaction(txHash);
+        }
+      }
+    } catch (error) {
+      console.error("Prestige transaction failed:", error);
+      useEventManager
+        .getState()
+        .notify("ActionsReverted", { failedActionId: "buy_prestige" });
+      return;
+    }
+
+    // Now update local state and reset stores
     useEventManager
       .getState()
       .notify("PrestigePurchased", { prestigeLevel: nextPrestige });
@@ -427,7 +459,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     set({
       currentPrestige: nextPrestige,
       canPrestige: false,
-      isInitialized: false,
+      isInitialized: true,
     });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);

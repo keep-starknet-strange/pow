@@ -107,19 +107,19 @@ export const getStarknetProvider = (network: string): RpcProvider => {
     case "SN_MAINNET":
       return new RpcProvider({
         nodeUrl: MAINNET_RPC_URL,
-        specVersion: "0.7",
+        specVersion: "0.7.1",
         chainId: constants.StarknetChainId.SN_MAIN,
       });
     case "SN_SEPOLIA":
       return new RpcProvider({
         nodeUrl: SEPOLIA_RPC_URL,
-        specVersion: "0.7",
+        specVersion: "0.7.1",
         chainId: constants.StarknetChainId.SN_SEPOLIA,
       });
     case "SN_DEVNET":
       return new RpcProvider({
         nodeUrl: LOCALHOST_RPC_URL,
-        specVersion: "0.8",
+        specVersion: "0.8.1",
       });
     default:
       throw new Error(`Unsupported network: ${network}`);
@@ -607,10 +607,15 @@ export const StarknetConnectorProvider: React.FC<{
         });
 
         // Check if transaction was successful
+        // See: https://github.com/0xSpaceShard/starknet.js/issues/1092
+        // Types may not include these fields, so use optional chaining and string checks
+        const executionStatus = (receipt as any)?.execution_status ?? (receipt as any)?.finality_status;
+        const status = (receipt as any)?.status ?? (receipt as any)?.finality_status;
+
         if (
-          receipt.execution_status === "SUCCEEDED" ||
-          receipt.status === "ACCEPTED_ON_L2" ||
-          receipt.status === "ACCEPTED_ON_L1"
+          executionStatus === "SUCCEEDED" ||
+          status === "ACCEPTED_ON_L2" ||
+          status === "ACCEPTED_ON_L1"
         ) {
           if (__DEV__)
             console.log(`✅ Transaction ${txHash} confirmed on-chain`);

@@ -11,6 +11,10 @@ const WALLET_DEEPLINKS = {
 
 const WC_PROJECT_ID = "ad27f7ecf50cf0802b7cd433724dff24";
 
+// Module-level singleton to avoid multiple initializations
+let sharedProvider: any | null = null;
+let initializing = false;
+
 export function useWalletConnect() {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<any>(null);
@@ -24,6 +28,23 @@ export function useWalletConnect() {
 
   const initializeProvider = async () => {
     try {
+      if (sharedProvider) {
+        setProvider(sharedProvider);
+        // adopt existing session if present
+        const activeSessions = Object.values(sharedProvider.session || {});
+        if (activeSessions.length > 0) {
+          const active = activeSessions[0];
+          setSession(active as any);
+          const starknetAccounts = (active as any)?.namespaces?.starknet?.accounts;
+          if (starknetAccounts?.length > 0) {
+            setAccount(starknetAccounts[0].split(":")[2]);
+          }
+        }
+        return;
+      }
+      if (initializing) return;
+      initializing = true;
+
       const projectId = WC_PROJECT_ID;
       const metadata = {
         name: "POW",
@@ -32,19 +53,20 @@ export function useWalletConnect() {
         icons: ["https://avatars.githubusercontent.com/u/37784886"],
       };
 
-      const providerInstance = await UniversalProvider.init({
+      sharedProvider = await UniversalProvider.init({
         projectId,
         metadata,
         relayUrl: "wss://relay.walletconnect.com",
       });
 
-      setProvider(providerInstance);
+      setProvider(sharedProvider);
+      initializing = false;
 
-      const activeSessions = Object.values(providerInstance.session || {});
+      const activeSessions = Object.values(sharedProvider.session || {});
       if (activeSessions.length > 0) {
         const active = activeSessions[0];
-        setSession(active);
-        const starknetAccounts = active?.namespaces?.starknet?.accounts;
+        setSession(active as any);
+        const starknetAccounts = (active as any)?.namespaces?.starknet?.accounts;
         if (starknetAccounts?.length > 0) {
           setAccount(starknetAccounts[0].split(":")[2]);
         }
@@ -52,17 +74,20 @@ export function useWalletConnect() {
     } catch (err: any) {
       console.error(err);
       setError("Setup failed: " + err.message);
+      initializing = false;
     }
   };
 
   const connect = async (wallet: "argent" | "braavos") => {
-    if (!provider) return;
+    if (!sharedProvider && !provider) await initializeProvider();
+    const effectiveProvider = sharedProvider || provider;
+    if (!effectiveProvider) return;
     setActiveWallet(wallet);
     setConnecting(true);
     setError(null);
 
     try {
-      const { uri, approval } = await provider.client.connect({
+      const { uri, approval } = await effectiveProvider.client.connect({
         requiredNamespaces: {
           starknet: {
             chains: ["starknet:SNMAIN"],
@@ -95,58 +120,6 @@ export function useWalletConnect() {
     }
   };
 
-  const claimRewards = async () => {
-    if (!provider || !session || !account) return;
-
-    const amount = "0xa"; // 10 STRK tokens, assumed to be the low u256 amount
-
-    const transaction = {
-      accountAddress: account,
-      executionRequest: {
-        calls: [
-          {
-            contractAddress:
-              "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7", // STRK contract
-            entrypoint: "claimRewards",
-            calldata: [
-              account, // to self
-              amount,
-              "0x0",
-            ],
-          },
-        ],
-      },
-    };
-
-    try {
-      if (activeWallet) {
-        await Linking.openURL(WALLET_DEEPLINKS[activeWallet](""));
-      }
-
-      const result = await provider.client.request({
-        topic: session.topic,
-        chainId: "starknet:SNMAIN",
-        request: {
-          method: "starknet_requestAddInvokeTransaction",
-          params: {
-            accountAddress: transaction.accountAddress,
-            executionRequest: transaction.executionRequest,
-          },
-        },
-      });
-
-      if (result?.transaction_hash) {
-        setTxHash(result.transaction_hash);
-        Alert.alert(
-          "Success",
-          `Transaction sent!\nHash: ${result.transaction_hash}`,
-        );
-      }
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
   const disconnect = useCallback(async () => {
     if (session && provider.client) {
       await provider.disconnect({
@@ -166,7 +139,6 @@ export function useWalletConnect() {
   return {
     connectArgent: () => connect("argent"),
     connectBraavos: () => connect("braavos"),
-    claimRewards,
     account,
     txHash,
     disconnect,

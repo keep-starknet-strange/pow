@@ -122,6 +122,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       dappFeeLevels: initDappFeeLevels,
       dappSpeedLevels: initDappSpeedLevels,
       dappsUnlocked: initDappsUnlocked,
+      isInitialized: true,
     });
   },
 
@@ -217,6 +218,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         dappsUnlocked: newDappsUnlocked,
         isInitialized: true,
       }));
+      useUpgradesStore.getState().checkCanPrestige();
     };
 
     get().resetTransactions();
@@ -267,6 +269,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { transactionFeeLevels: newFees };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   txSpeedUpgrade: (chainId, txId) => {
@@ -308,6 +311,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { transactionSpeedLevels: newSpeeds };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   dappFeeUpgrade: (chainId, dappId) => {
@@ -350,6 +354,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { dappFeeLevels: newFees };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   dappSpeedUpgrade: (chainId, dappId) => {
@@ -389,6 +394,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { dappSpeedLevels: newSpeeds };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   unlockDapps: (chainId) => {
@@ -404,6 +410,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       useEventManager.getState().notify("DappsPurchased", { chainId });
       return { dappsUnlocked: newDappsUnlocked };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   getFee: (chainId, txId, isDapp = false) => {

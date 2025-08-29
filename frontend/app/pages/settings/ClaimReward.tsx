@@ -5,39 +5,55 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
   Linking,
+  StyleSheet,
 } from "react-native";
-import background from "../../../assets/background.webp";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from "../../context/StarknetConnector";
+import { usePowContractConnector } from "../../context/PowContractConnector";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BasicButton from "../../components/buttons/Basic";
 
 type ClaimRewardProps = {
   setSettingTab: (tab: "Main") => void;
 };
 
-export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
-  setSettingTab,
-}) => {
+export const ClaimRewardSection: React.FC = () => {
   const { connectArgent, connectBraavos, account, txHash, error } =
     useWalletConnect();
-  const { account: gameAccount, invokeContract } = useStarknetConnector();
+  const { invokeCalls } = useStarknetConnector();
+  const { powGameContractAddress, getRewardParams, getHasClaimedReward } = usePowContractConnector();
+  const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
+  const [localTxHash, setLocalTxHash] = useState<string | null>(null);
+  const [claimed, setClaimed] = useState<boolean>(false);
+  const [claiming, setClaiming] = useState<boolean>(false);
+  const [rewardTitle, setRewardTitle] = useState<string>("🎉 You earned 10 STRK!");
 
   const rewardUnlocked = true;
 
   const claimReward = async () => {
-    if (!account || accountInput.trim() === "") {
-      console.error("No account connected");
+    const recipient = (debouncedInput || account || "").trim();
+    if (!recipient) {
+      console.error("No recipient provided");
       return;
     }
-    const contractAddress =
-      "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"; // Replace with actual contract address
-    const functionName = "claim_reward";
-    const accountReceiver = gameAccount || accountInput.trim();
-    invokeContract(contractAddress, functionName, [accountReceiver]);
+    if (!powGameContractAddress) {
+      console.error("pow_game contract address not set");
+      return;
+    }
+    const call = {
+      contractAddress: powGameContractAddress,
+      entrypoint: "claim_reward",
+      calldata: [recipient] as string[],
+    };
+    setClaiming(true);
+    const res = await invokeCalls([call], 1);
+    const hash = res?.data?.transactionHash || res?.transaction_hash || null;
+    if (hash) setLocalTxHash(hash);
+    setClaiming(false);
+    setClaimed(true);
   };
 
   useEffect(() => {
@@ -48,41 +64,57 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
     return () => clearTimeout(timer);
   }, [accountInput]);
 
+  useEffect(() => {
+    (async () => {
+      const params = await getRewardParams?.();
+      if (!params) return;
+      // Format u256 amount (assume low only for now)
+      let amountStr = "10";
+      const raw = params.rewardAmount as any;
+      if (raw?.low || raw?.high) {
+        const low = BigInt(raw.low || 0);
+        const high = BigInt(raw.high || 0);
+        const amount = (high << 128n) + low;
+        amountStr = amount.toString();
+      }
+      setRewardTitle(`🎉 You earned ${amountStr} STRK!`);
+      // Check claimed state on mount
+      const alreadyClaimed = await getHasClaimedReward?.();
+      if (alreadyClaimed === true) setClaimed(true);
+    })();
+  }, [getRewardParams, getHasClaimedReward]);
+
   return (
-    <ImageBackground className="flex-1" source={background} resizeMode="cover">
-      <View className="flex-1 justify-center items-center px-6">
+      <View style={[styles.screen, { paddingTop: insets.top + 8 }] }>
+        <View style={[styles.content, { marginBottom: insets.bottom + 140 }]}>
         {!rewardUnlocked ? (
-          <Text className="text-4xl font-bold text-[#101119] mb-4">
-            Keep playing to Earn STRK!
-          </Text>
+          <Text style={styles.titleAlt}>Keep playing to Earn STRK!</Text>
         ) : (
           <>
-            <Text className="text-4xl font-bold text-[#101119] mb-4">
-              🎉 You earned 10 STRK!
-            </Text>
+            <Text style={styles.title}>{rewardTitle}</Text>
 
-            <Text className="text-xl text-[#e7e7e7] mb-4 text-center">
-              Connect your wallet to receive them.
-            </Text>
+            <Text style={styles.subtitle}>Connect your wallet to receive them.</Text>
 
-            <View className="my-6">
+            <View style={styles.buttonWrap}>
               <BasicButton
                 onPress={connectArgent}
                 label="Connect Argent"
-                style={{ paddingHorizontal: 20 }}
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
               />
             </View>
 
-            <View className="my-6">
+            <View style={styles.buttonWrap}>
               <BasicButton
                 onPress={connectBraavos}
                 label="Connect Braavos"
-                style={{ paddingHorizontal: 20 }}
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
               />
             </View>
 
             <TextInput
-              className="bg-[#10111910] w-3/4 rounded-lg my-4 p-2 text-xl text-[#101119] border-2 border-[#101119] shadow-lg shadow-black/50"
+              style={styles.input}
               placeholder="copy/paste your account address"
               placeholderTextColor="#10111980"
               autoCapitalize="none"
@@ -92,50 +124,126 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
               onChangeText={setAccountInput}
             />
 
-            <TouchableOpacity
-              className="py-2"
-              disabled={!debouncedInput.trim()}
-              onPress={() => {
-                Linking.openURL(
-                  `https://starkscan.co/contract/${accountInput}`,
-                );
-              }}
-            >
-              <Text
-                className={`${!debouncedInput.trim() ? "text-gray-400" : "text-[#80bfff]"} underline text-center my-4`}
-              >
-                View on StarkScan ({debouncedInput.slice(0, 4)}...
-                {debouncedInput.slice(-4)})
-              </Text>
-            </TouchableOpacity>
-
-            <View className="my-3">
+            <View style={styles.buttonWrap}>
               <BasicButton
                 label="Claim STRK"
                 onPress={claimReward}
-                disabled={!debouncedInput.trim() || !gameAccount}
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+                disabled={claimed || claiming || (!debouncedInput.trim() && !account)}
               />
             </View>
+            
+            <View style={styles.linksContainer}>
+              {(() => {
+                const addr = (debouncedInput || account || "").trim();
+                if (!addr) return null;
+                return (
+                  <TouchableOpacity
+                    style={styles.linkWrap}
+                    onPress={() => Linking.openURL(`https://starkscan.co/contract/${addr}`)}
+                  >
+                    <Text style={styles.linkText}>
+                      View address on StarkScan ({addr.slice(0, 6)}...{addr.slice(-6)})
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })()}
 
-            {txHash && (
-              <Text className="text-green-300 mt-2 text-center">
-                Transaction sent: {txHash}
-              </Text>
+              {(txHash || localTxHash) && (
+                <TouchableOpacity
+                  style={styles.linkWrap}
+                  onPress={() => {
+                    const hash = (txHash || localTxHash) as string;
+                    Linking.openURL(`https://starkscan.co/tx/${hash}`);
+                  }}
+                >
+                  <Text style={styles.linkText}>
+                    View transaction on StarkScan ({(txHash || localTxHash)?.slice(0, 6)}...{(txHash || localTxHash)?.slice(-6)})
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {(txHash || localTxHash) && (
+              <Text style={styles.successText}>Reward claimed! 🎊</Text>
             )}
-            {error && (
-              <Text className="text-red-400 mt-2 text-center">
-                Error: {error}
-              </Text>
+            {claimed && (
+              <Text style={styles.successText}>Reward claimed! 🎊</Text>
             )}
+            {error && <Text style={styles.errorText}>Error: {error}</Text>}
           </>
         )}
-
-        <BasicButton
-          label="Back to Settings"
-          onPress={() => setSettingTab("Main")}
-          style={{ paddingHorizontal: 24, marginTop: 20 }}
-        />
+        </View>
       </View>
-    </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  content: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    marginBottom: 80,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: "700",
+    color: "#101119",
+    marginBottom: 12,
+  },
+  titleAlt: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#101119",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#e7e7e7",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  buttonWrap: {
+    marginVertical: 10,
+  },
+  basicButton: {
+    alignSelf: "center",
+  },
+  basicButtonText: {
+    fontSize: 24,
+  },
+  input: {
+    width: 300,
+    maxWidth: "100%",
+    alignSelf: "center",
+    minHeight: 46,
+    borderRadius: 10,
+    marginVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 18,
+    color: "#101119",
+    borderWidth: 2,
+    borderColor: "#101119",
+    backgroundColor: "#10111910",
+  },
+  linkWrap: { paddingVertical: 6 },
+  linkText: {
+    color: "#101119", // black, readable on green background
+    textDecorationLine: "underline",
+    textAlign: "center",
+    marginVertical: 6,
+  },
+  linkDisabled: { color: "#9ca3af" },
+  linksContainer: {
+    marginTop: 6,
+    marginBottom: 24,
+    width: "100%",
+    alignItems: "center",
+  },
+  successText: { color: "#22c55e", marginTop: 8, textAlign: "center" },
+  errorText: { color: "#f87171", marginTop: 8, textAlign: "center" },
+});

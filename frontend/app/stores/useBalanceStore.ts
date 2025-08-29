@@ -24,7 +24,7 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   isInitialized: false,
   setBalance: (balance: number) => set({ balance }),
 
-  resetBalance: () => set({ balance: DEFAULT_BALANCE, isInitialized: false }),
+  resetBalance: () => set({ balance: DEFAULT_BALANCE, isInitialized: true }),
 
   updateBalance: (change: number) => {
     set((state) => {
