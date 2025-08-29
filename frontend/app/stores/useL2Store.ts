@@ -60,7 +60,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
   isInitialized: false,
 
   resetL2Store: () =>
-    set({ l2: undefined, isL2Unlocked: false, isInitialized: true }),
+    set({ l2: undefined, isL2Unlocked: false }),
   initializeL2Store: (
     powContract,
     user,
@@ -73,7 +73,6 @@ export const useL2Store = create<L2Store>((set, get) => ({
         try {
           const maxChainId = (await getUserMaxChainId()) || 0;
           if (maxChainId < 2) {
-            set({ isInitialized: true });
             return;
           }
           // Get proof and DA building states from the contract

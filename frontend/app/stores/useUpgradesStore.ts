@@ -117,7 +117,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     set({
       upgrades: initUpgrades,
       automations: initAutomation,
-      isInitialized: true,
     });
   },
 
