@@ -7,6 +7,7 @@ import type {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
@@ -71,15 +72,9 @@ export const StorePage: React.FC = () => {
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
   const [listViewportHeight, setListViewportHeight] = useState(0);
-  const [showBottomFade, setShowBottomFade] = useState(true);
+  const fadeOpacity = useSharedValue(1);
   const SCROLL_BOTTOM_THRESHOLD = 16;
-  const prevFadeRef = useRef(showBottomFade);
-  const setFadeIfChanged = useCallback((next: boolean) => {
-    if (prevFadeRef.current !== next) {
-      prevFadeRef.current = next;
-      setShowBottomFade(next);
-    }
-  }, []);
+  const FADE_TRANSITION_DISTANCE = 100;
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(
     isL2Unlocked ? "L2" : "L1",
@@ -250,20 +245,37 @@ export const StorePage: React.FC = () => {
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      const isAtBottom =
-        contentOffset.y + layoutMeasurement.height >=
-        contentSize.height - SCROLL_BOTTOM_THRESHOLD;
-      setFadeIfChanged(
-        !isAtBottom && contentSize.height > layoutMeasurement.height,
-      );
+      
+      // Calculate distance from bottom
+      const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+      
+      // Only show fade if content is scrollable
+      if (contentSize.height <= layoutMeasurement.height) {
+        fadeOpacity.value = 0;
+        return;
+      }
+      
+      // Calculate opacity based on distance from bottom over the last 100px
+      if (distanceFromBottom <= FADE_TRANSITION_DISTANCE) {
+        // Linear transition from 1 to 0 over the last 100px
+        fadeOpacity.value = Math.max(0, distanceFromBottom / FADE_TRANSITION_DISTANCE);
+      } else {
+        fadeOpacity.value = 1;
+      }
     },
-    [setFadeIfChanged],
+    [],
   );
 
   const handleListLayout = useCallback((e: LayoutChangeEvent) => {
     const height = e.nativeEvent.layout.height;
     setListViewportHeight(height);
   }, []);
+
+  const animatedGradientStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeOpacity.value,
+    };
+  });
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -367,19 +379,24 @@ export const StorePage: React.FC = () => {
           scrollEventThrottle={32}
           onContentSizeChange={(_, h) => {
             if (listViewportHeight > 0) {
-              setFadeIfChanged(
-                h > listViewportHeight + SCROLL_BOTTOM_THRESHOLD,
-              );
+              // Set initial fade opacity based on content size
+              if (h <= listViewportHeight) {
+                fadeOpacity.value = 0;
+              } else {
+                fadeOpacity.value = 1;
+              }
             }
           }}
         />
-        <LinearGradient
-          style={{ ...GradientBaseStyle, opacity: showBottomFade ? 1 : 0 }}
-          colors={["transparent", "#000000c0", "#000000c0"]}
-          locations={[0, 0.995, 1]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        />
+        <Animated.View style={[GradientBaseStyle, animatedGradientStyle]}>
+          <LinearGradient
+            style={{ flex: 1 }}
+            colors={["transparent", "#000000c0", "#000000c0"]}
+            locations={[0, 0.995, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+          />
+        </Animated.View>
       </View>
     </View>
   );
