@@ -114,7 +114,11 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       }
     }
 
-    set({ upgrades: initUpgrades, automations: initAutomation, isInitialized: true });
+    set({
+      upgrades: initUpgrades,
+      automations: initAutomation,
+      isInitialized: true,
+    });
   },
 
   initializeUpgrades: async (
@@ -417,7 +421,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     // Clear any pending on-chain actions to avoid multicall reverts
     try {
       useOnchainActions.getState().clearQueue();
-    } catch {}
+    } catch (error) {
+      console.error("Error clearing on-chain actions:", error);
+    }
 
     // Invoke prestige on-chain directly (avoid bundling)
     try {
@@ -429,7 +435,8 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
           entrypoint: "buy_prestige",
           calldata: [],
         };
-        const { invokeActions, waitForTransaction } = useOnchainActions.getState();
+        const { invokeActions, waitForTransaction } =
+          useOnchainActions.getState();
         const response = await invokeActions?.([prestigeCall]);
         const txHash = response?.data?.transactionHash as string | undefined;
         if (txHash && waitForTransaction) {

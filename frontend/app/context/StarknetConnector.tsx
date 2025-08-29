@@ -609,8 +609,11 @@ export const StarknetConnectorProvider: React.FC<{
         // Check if transaction was successful
         // See: https://github.com/0xSpaceShard/starknet.js/issues/1092
         // Types may not include these fields, so use optional chaining and string checks
-        const executionStatus = (receipt as any)?.execution_status ?? (receipt as any)?.finality_status;
-        const status = (receipt as any)?.status ?? (receipt as any)?.finality_status;
+        const executionStatus =
+          (receipt as any)?.execution_status ??
+          (receipt as any)?.finality_status;
+        const status =
+          (receipt as any)?.status ?? (receipt as any)?.finality_status;
 
         if (
           executionStatus === "SUCCEEDED" ||

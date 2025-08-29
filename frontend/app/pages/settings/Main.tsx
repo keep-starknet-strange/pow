@@ -10,7 +10,7 @@ import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
-import { useUpgrades } from "../../stores/useUpgradesStore"
+import { useUpgrades } from "../../stores/useUpgradesStore";
 import { usePowContractConnector } from "@/app/context/PowContractConnector";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useGameStore } from "../../stores/useGameStore";

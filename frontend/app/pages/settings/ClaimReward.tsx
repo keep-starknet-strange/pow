@@ -22,14 +22,17 @@ export const ClaimRewardSection: React.FC = () => {
   const { connectArgent, connectBraavos, account, txHash, error } =
     useWalletConnect();
   const { invokeCalls } = useStarknetConnector();
-  const { powGameContractAddress, getRewardParams, getHasClaimedReward } = usePowContractConnector();
+  const { powGameContractAddress, getRewardParams, getHasClaimedReward } =
+    usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
-  const [rewardTitle, setRewardTitle] = useState<string>("🎉 You earned 10 STRK!");
+  const [rewardTitle, setRewardTitle] = useState<string>(
+    "🎉 You earned 10 STRK!",
+  );
 
   const rewardUnlocked = true;
 
@@ -85,15 +88,17 @@ export const ClaimRewardSection: React.FC = () => {
   }, [getRewardParams, getHasClaimedReward]);
 
   return (
-      <View style={[styles.screen, { paddingTop: insets.top + 8 }] }>
-        <View style={[styles.content, { marginBottom: insets.bottom + 140 }]}>
+    <View style={[styles.screen, { paddingTop: insets.top + 8 }]}>
+      <View style={[styles.content, { marginBottom: insets.bottom + 140 }]}>
         {!rewardUnlocked ? (
           <Text style={styles.titleAlt}>Keep playing to Earn STRK!</Text>
         ) : (
           <>
             <Text style={styles.title}>{rewardTitle}</Text>
 
-            <Text style={styles.subtitle}>Connect your wallet to receive them.</Text>
+            <Text style={styles.subtitle}>
+              Connect your wallet to receive them.
+            </Text>
 
             <View style={styles.buttonWrap}>
               <BasicButton
@@ -130,10 +135,12 @@ export const ClaimRewardSection: React.FC = () => {
                 onPress={claimReward}
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
-                disabled={claimed || claiming || (!debouncedInput.trim() && !account)}
+                disabled={
+                  claimed || claiming || (!debouncedInput.trim() && !account)
+                }
               />
             </View>
-            
+
             <View style={styles.linksContainer}>
               {(() => {
                 const addr = (debouncedInput || account || "").trim();
@@ -141,10 +148,13 @@ export const ClaimRewardSection: React.FC = () => {
                 return (
                   <TouchableOpacity
                     style={styles.linkWrap}
-                    onPress={() => Linking.openURL(`https://starkscan.co/contract/${addr}`)}
+                    onPress={() =>
+                      Linking.openURL(`https://starkscan.co/contract/${addr}`)
+                    }
                   >
                     <Text style={styles.linkText}>
-                      View address on StarkScan ({addr.slice(0, 6)}...{addr.slice(-6)})
+                      View address on StarkScan ({addr.slice(0, 6)}...
+                      {addr.slice(-6)})
                     </Text>
                   </TouchableOpacity>
                 );
@@ -159,7 +169,9 @@ export const ClaimRewardSection: React.FC = () => {
                   }}
                 >
                   <Text style={styles.linkText}>
-                    View transaction on StarkScan ({(txHash || localTxHash)?.slice(0, 6)}...{(txHash || localTxHash)?.slice(-6)})
+                    View transaction on StarkScan (
+                    {(txHash || localTxHash)?.slice(0, 6)}...
+                    {(txHash || localTxHash)?.slice(-6)})
                   </Text>
                 </TouchableOpacity>
               )}
@@ -174,8 +186,8 @@ export const ClaimRewardSection: React.FC = () => {
             {error && <Text style={styles.errorText}>Error: {error}</Text>}
           </>
         )}
-        </View>
       </View>
+    </View>
   );
 };
 

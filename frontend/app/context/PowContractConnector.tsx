@@ -70,11 +70,14 @@ type PowContractContextType = {
     | undefined
   >;
   getUserPrestige: () => Promise<number | undefined>;
-  getRewardParams: () => Promise<{
-    rewardTokenAddress: string;
-    rewardPrestigeThreshold: number;
-    rewardAmount: { low: string; high: string } | string;
-  } | undefined>;
+  getRewardParams: () => Promise<
+    | {
+        rewardTokenAddress: string;
+        rewardPrestigeThreshold: number;
+        rewardAmount: { low: string; high: string } | string;
+      }
+    | undefined
+  >;
   getHasClaimedReward: () => Promise<boolean | undefined>;
 
   // Cheat Codes
@@ -566,9 +569,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     try {
-      const prestige = await powContract.get_user_prestige(
-        account.address,
-      );
+      const prestige = await powContract.get_user_prestige(account.address);
       return prestige.toString ? parseInt(prestige.toString(), 10) : undefined;
     } catch (error) {
       console.error("Failed to fetch user prestige:", error);
@@ -582,7 +583,11 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       const params = await powContract.get_reward_params();
       return {
         rewardTokenAddress: params.reward_token_address as string,
-        rewardPrestigeThreshold: Number(params.reward_prestige_threshold?.toString?.() || params.reward_prestige_threshold || 0),
+        rewardPrestigeThreshold: Number(
+          params.reward_prestige_threshold?.toString?.() ||
+            params.reward_prestige_threshold ||
+            0,
+        ),
         rewardAmount: params.reward_amount as any,
       };
     } catch (e) {

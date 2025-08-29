@@ -35,7 +35,8 @@ export function useWalletConnect() {
         if (activeSessions.length > 0) {
           const active = activeSessions[0];
           setSession(active as any);
-          const starknetAccounts = (active as any)?.namespaces?.starknet?.accounts;
+          const starknetAccounts = (active as any)?.namespaces?.starknet
+            ?.accounts;
           if (starknetAccounts?.length > 0) {
             setAccount(starknetAccounts[0].split(":")[2]);
           }
@@ -66,7 +67,8 @@ export function useWalletConnect() {
       if (activeSessions.length > 0) {
         const active = activeSessions[0];
         setSession(active as any);
-        const starknetAccounts = (active as any)?.namespaces?.starknet?.accounts;
+        const starknetAccounts = (active as any)?.namespaces?.starknet
+          ?.accounts;
         if (starknetAccounts?.length > 0) {
           setAccount(starknetAccounts[0].split(":")[2]);
         }
