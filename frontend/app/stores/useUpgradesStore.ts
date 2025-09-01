@@ -465,7 +465,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     set({
       currentPrestige: nextPrestige,
       canPrestige: false,
-      isInitialized: true,
     });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);

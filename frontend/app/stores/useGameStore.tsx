@@ -66,7 +66,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       workingBlocks: [initBlock],
       blockHeights: { 0: initBlock.blockId },
-      isInitialized: false, // Mark as not initialized so it will re-fetch on next load
     });
   },
 

@@ -1,3 +1,4 @@
+import "@walletconnect/react-native-compat";
 import { Stack } from "expo-router";
 import * as Sentry from "@sentry/react-native";
 

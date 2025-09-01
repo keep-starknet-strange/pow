@@ -19,8 +19,7 @@ type ClaimRewardProps = {
 };
 
 export const ClaimRewardSection: React.FC = () => {
-  const { connectArgent, connectBraavos, account, txHash, error } =
-    useWalletConnect();
+  const { account, txHash, error } = useWalletConnect();
   const { invokeCalls } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getHasClaimedReward } =
     usePowContractConnector();
@@ -38,7 +37,7 @@ export const ClaimRewardSection: React.FC = () => {
 
   const claimReward = async () => {
     const recipient = (debouncedInput || account || "").trim();
-    if (!recipient) {
+    if (!recipient) { 
       console.error("No recipient provided");
       return;
     }
@@ -96,27 +95,7 @@ export const ClaimRewardSection: React.FC = () => {
           <>
             <Text style={styles.title}>{rewardTitle}</Text>
 
-            <Text style={styles.subtitle}>
-              Connect your wallet to receive them.
-            </Text>
-
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                onPress={connectArgent}
-                label="Connect Argent"
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-              />
-            </View>
-
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                onPress={connectBraavos}
-                label="Connect Braavos"
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-              />
-            </View>
+            <Text style={styles.subtitle}>Paste your Starknet address to receive them.</Text>
 
             <TextInput
               style={styles.input}
@@ -135,9 +114,7 @@ export const ClaimRewardSection: React.FC = () => {
                 onPress={claimReward}
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
-                disabled={
-                  claimed || claiming || (!debouncedInput.trim() && !account)
-                }
+                disabled={claimed || claiming || !debouncedInput.trim()}
               />
             </View>
 
