@@ -37,7 +37,7 @@ export const ClaimRewardSection: React.FC = () => {
 
   const claimReward = async () => {
     const recipient = (debouncedInput || account || "").trim();
-    if (!recipient) { 
+    if (!recipient) {
       console.error("No recipient provided");
       return;
     }
@@ -95,7 +95,9 @@ export const ClaimRewardSection: React.FC = () => {
           <>
             <Text style={styles.title}>{rewardTitle}</Text>
 
-            <Text style={styles.subtitle}>Paste your Starknet address to receive them.</Text>
+            <Text style={styles.subtitle}>
+              Paste your Starknet address to receive them.
+            </Text>
 
             <TextInput
               style={styles.input}

@@ -78,8 +78,7 @@ export function useWalletConnect() {
       const APP_DESCRIPTION =
         process.env.EXPO_PUBLIC_APP_DESCRIPTION ||
         "Connect your Starknet wallet to POW";
-      const APP_URL =
-        process.env.EXPO_PUBLIC_APP_URL || "https://example.com";
+      const APP_URL = process.env.EXPO_PUBLIC_APP_URL || "https://example.com";
       const APP_ICON =
         process.env.EXPO_PUBLIC_APP_ICON ||
         "https://avatars.githubusercontent.com/u/118723009";
@@ -108,7 +107,8 @@ export function useWalletConnect() {
       setProvider(sharedProvider);
       initializing = false;
 
-      const existingSessions = sharedProvider?.client?.session?.getAll?.() || [];
+      const existingSessions =
+        sharedProvider?.client?.session?.getAll?.() || [];
       if (existingSessions.length > 0) {
         const active = existingSessions[0];
         setSession(active as any);
@@ -170,7 +170,10 @@ export function useWalletConnect() {
               const universal = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
               await Linking.openURL(universal);
             } catch (deeplinkError: any) {
-              console.error("Deeplink open failed:", deeplinkError?.message || deeplinkError);
+              console.error(
+                "Deeplink open failed:",
+                deeplinkError?.message || deeplinkError,
+              );
               setError(
                 wallet === "argent"
                   ? "Could not open Argent via deep link. Try Braavos or paste your address."
@@ -205,7 +208,13 @@ export function useWalletConnect() {
               try {
                 const universal = `https://walletconnect.com/wc?uri=${encodeURIComponent(uri)}`;
                 await Linking.openURL(universal);
-              } catch (_) {}
+              } catch (err3: any) {
+                if (__DEV__)
+                  console.debug(
+                    "WC universal link open failed:",
+                    err3?.message || err3,
+                  );
+              }
             }
           }
         }
@@ -229,7 +238,9 @@ export function useWalletConnect() {
           topic: session.topic,
           reason: { code: 6000, message: "User disconnected" },
         });
-      } catch (_) {}
+      } catch (_) {
+        if (__DEV__) console.debug("WC disconnect failed (ignored)");
+      }
     }
     setSession(null);
     setAccount(null);
@@ -245,7 +256,9 @@ export function useWalletConnect() {
         setAccount(null);
       };
       const onSessionUpdate = ({ params }: any) => {
-        const s = params?.namespaces ? { ...session, namespaces: params.namespaces } : session;
+        const s = params?.namespaces
+          ? { ...session, namespaces: params.namespaces }
+          : session;
         if (s) setSession(s as any);
       };
       c.on("session_delete", onSessionDelete);
