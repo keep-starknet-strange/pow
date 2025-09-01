@@ -126,28 +126,6 @@ export const LoadingScreen: React.FC = memo(() => {
   const tutorialInitialized = useTutorialStore((state) => state.isInitialized);
   const upgradesInitialized = useUpgradesStore((state) => state.isInitialized);
   const soundInitialized = useSoundStore((state) => state.isInitialized);
-  console.log(
-    "isUserInitializing",
-    isUserInitializing,
-    "tutorialInitialized",
-    tutorialInitialized,
-    "account",
-    account,
-    "gameInitialized",
-    gameInitialized,
-    "balanceInitialized",
-    balanceInitialized,
-    "l2Initialized",
-    l2Initialized,
-    "achievementsInitialized",
-    achievementsInitialized,
-    "transactionsInitialized",
-    transactionsInitialized,
-    "upgradesInitialized",
-    upgradesInitialized,
-    "soundInitialized",
-    soundInitialized,
-  );
   const allStoresInitialized =
     gameInitialized &&
     balanceInitialized &&
