@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useCallback, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
   Canvas,
@@ -43,6 +43,26 @@ export const TxButtonInner = memo(
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
     const transactionUnlocked = props.feeLevel !== -1;
+
+    // Get the icon image and check if it's loaded
+    const iconImage = getTxIcon(
+      props.chainId,
+      props.txId,
+      props.isDapp,
+      getImage,
+    );
+
+    // iOS-specific: Force re-render when transaction is unlocked
+    const [forceUpdate, setForceUpdate] = useState(0);
+    useEffect(() => {
+      if (Platform.OS === "ios" && transactionUnlocked && iconImage) {
+        // Small delay to ensure image is loaded on iOS
+        const timer = setTimeout(() => {
+          setForceUpdate((prev) => prev + 1);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }, [transactionUnlocked, iconImage]);
 
     const automationAnimHeight = useSharedValue(94);
     const automationAnimY = useDerivedValue(() => {
@@ -218,25 +238,25 @@ export const TxButtonInner = memo(
               },
             ]}
           >
-            <Canvas style={styles.canvas}>
-              <Image
-                image={getTxIcon(
-                  props.chainId,
-                  props.txId,
-                  props.isDapp,
-                  getImage,
-                )}
-                fit="contain"
-                sampling={{
-                  filter: FilterMode.Nearest,
-                  mipmap: MipmapMode.Nearest,
-                }}
-                x={0}
-                y={30}
-                width={width * 0.18}
-                height={40}
-              />
-            </Canvas>
+            {iconImage && (
+              <Canvas
+                style={styles.canvas}
+                key={`tx-icon-${props.chainId}-${props.txId}-${props.isDapp}-${props.feeLevel}-${forceUpdate}`}
+              >
+                <Image
+                  image={iconImage}
+                  fit="contain"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={30}
+                  width={width * 0.18}
+                  height={40}
+                />
+              </Canvas>
+            )}
           </View>
         ) : (
           <View
