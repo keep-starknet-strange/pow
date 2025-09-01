@@ -24,13 +24,13 @@ interface TipTextDisplayProps {
 const TipTextDisplay: React.FC<TipTextDisplayProps> = memo(({ tipText }) => {
   return (
     <Animated.View
-      className="px-4 mt-[40px] h-[60px] justify-center"
+      className="px-4 mt-[40px] min-h-[60px] justify-center"
       exiting={FadeOutDown}
       entering={FadeInDown}
     >
       <Text
         className="text-black font-Teatime text-center"
-        style={{ fontSize: 20 }}
+        style={{ fontSize: 20, lineHeight: 24 }}
       >
         {tipText}
       </Text>
