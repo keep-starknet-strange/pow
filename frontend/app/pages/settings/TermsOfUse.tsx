@@ -171,7 +171,7 @@ const TermsOfUse: React.FC = () => {
                   textAlign: "justify",
                 }}
               >
-                • Play fair. Cheating, exploiting bugs, or using bots is
+                • Play fair — cheating, exploiting bugs, or using bots is
                 strictly prohibited.
               </Text>
               <Text
@@ -209,9 +209,9 @@ const TermsOfUse: React.FC = () => {
                   marginBottom: 12,
                 }}
               >
-                POW! allows players to unlock and receive STRK tokens as
-                rewards. The amount and conditions will be communicated within
-                the game.
+                <Text style={{ fontWeight: "600" }}>STRK Tokens:</Text> POW!
+                allows players to unlock and receive STRK tokens as rewards. The
+                amount and conditions will be communicated within the game.
               </Text>
               <Text
                 style={{
@@ -236,6 +236,9 @@ const TermsOfUse: React.FC = () => {
                   textAlign: "justify",
                 }}
               >
+                <Text style={{ fontWeight: "600" }}>
+                  No Responsibility for Value:
+                </Text>{" "}
                 We are not responsible for fluctuations in the value of STRK or
                 the availability of the token.
               </Text>
@@ -639,7 +642,8 @@ const TermsOfUse: React.FC = () => {
                   }}
                 >
                   • <Text style={{ fontWeight: "600" }}>Account Deletion:</Text>{" "}
-                  To delete your account, please contact us at [].
+                  To delete your account, click on "Reset Account" in the
+                  Settings menu.
                 </Text>
               </View>
 
@@ -663,7 +667,7 @@ const TermsOfUse: React.FC = () => {
                     textAlign: "justify",
                   }}
                 >
-                  This game is not intended for children under the age of 16. We
+                  This game is not intended for children under the age of 18. We
                   do not knowingly collect data from children below this age. If
                   you believe a child's data was collected, please contact us
                   for removal.

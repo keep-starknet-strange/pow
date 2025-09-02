@@ -7,7 +7,10 @@ import type {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
-import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useL2Store } from "@/app/stores/useL2Store";
@@ -83,6 +86,7 @@ export const StorePage: React.FC = () => {
   const handleStoreViewChange = useCallback(
     (view: "L1" | "L2") => {
       setStoreType(view);
+      setActiveSubTab("Transactions");
       notify("SwitchStore", { name: view });
     },
     [notify],
@@ -245,20 +249,24 @@ export const StorePage: React.FC = () => {
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      
+
       // Calculate distance from bottom
-      const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
-      
+      const distanceFromBottom =
+        contentSize.height - (contentOffset.y + layoutMeasurement.height);
+
       // Only show fade if content is scrollable
       if (contentSize.height <= layoutMeasurement.height) {
         fadeOpacity.value = 0;
         return;
       }
-      
+
       // Calculate opacity based on distance from bottom over the last 100px
       if (distanceFromBottom <= FADE_TRANSITION_DISTANCE) {
         // Linear transition from 1 to 0 over the last 100px
-        fadeOpacity.value = Math.max(0, distanceFromBottom / FADE_TRANSITION_DISTANCE);
+        fadeOpacity.value = Math.max(
+          0,
+          distanceFromBottom / FADE_TRANSITION_DISTANCE,
+        );
       } else {
         fadeOpacity.value = 1;
       }
