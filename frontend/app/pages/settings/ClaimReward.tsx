@@ -19,7 +19,7 @@ type ClaimRewardProps = {
 };
 
 export const ClaimRewardSection: React.FC = () => {
-  const { account, txHash, error } = useWalletConnect();
+  const { account, txHash, error, connectBraavos, connectArgent } = useWalletConnect();
   const { invokeCalls } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getHasClaimedReward } =
     usePowContractConnector();
@@ -94,6 +94,24 @@ export const ClaimRewardSection: React.FC = () => {
         ) : (
           <>
             <Text style={styles.title}>{rewardTitle}</Text>
+
+            <View style={styles.buttonWrap}>
+              <BasicButton
+                onPress={connectBraavos}
+                label="Connect Braavos"
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+              />
+            </View>
+
+            <View style={styles.buttonWrap}>
+              <BasicButton
+                onPress={connectArgent}
+                label="Connect Argent"
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+              />
+            </View>
 
             <Text style={styles.subtitle}>
               Paste your Starknet address to receive them.
