@@ -32,7 +32,7 @@ const STARKNET_MIN_METHODS = [
   "starknet_account",
   "starknet_requestAddInvokeTransaction",
   "starknet_chainId",
-]
+];
 
 const otherStarknetChain = (chain: string): string =>
   chain === "starknet:SNMAIN" ? "starknet:SNSEPOLIA" : "starknet:SNMAIN";
@@ -45,55 +45,54 @@ export function useWalletConnect() {
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const initializeProvider = async () => {
-    try {
-      const projectId = WC_PROJECT_ID;
-      if (!projectId) {
-        throw new Error("Missing WalletConnect Project ID");
-      }
+    const projectId = WC_PROJECT_ID;
+    if (!projectId) {
+      throw new Error("Missing WalletConnect Project ID");
+    }
 
-      const metadata = {
-        name: 'Wallet connect Test',
-        description: 'Test app for connecting to Ready',
-        url: 'https://walletconnect.com/',
-        icons: ['https://avatars.githubusercontent.com/u/37784886'],
+    const metadata = {
+      name: "Wallet connect Test",
+      description: "Test app for connecting to Ready",
+      url: "https://walletconnect.com/",
+      icons: ["https://avatars.githubusercontent.com/u/37784886"],
+    };
+
+    // Singleton guard: reuse or await in-flight init
+    if (sharedProvider) {
+      return sharedProvider;
+    }
+    if (initPromise) {
+      return await initPromise;
+    }
+
+    initPromise = (async () => {
+      const initOpts: any = {
+        projectId,
+        metadata,
       };
+      // Let SDK choose default relay; uncomment to force a relay
+      // initOpts.relayUrl = 'wss://relay.walletconnect.com';
 
-      // Singleton guard: reuse or await in-flight init
-      if (sharedProvider) {
-        return sharedProvider;
-      }
-      if (initPromise) {
-        return await initPromise;
-      }
-
-      initPromise = (async () => {
-        const initOpts: any = {
-          projectId,
-          metadata,
-        };
-        // Let SDK choose default relay; uncomment to force a relay
-        // initOpts.relayUrl = 'wss://relay.walletconnect.com';
-
-        const initTask = UniversalProvider.init(initOpts);
-        const instance: any = await Promise.race([
-          initTask,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('WalletConnect init timeout (20s)')), 20000),
+      const initTask = UniversalProvider.init(initOpts);
+      const instance: any = await Promise.race([
+        initTask,
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("WalletConnect init timeout (20s)")),
+            20000,
           ),
-        ]);
-        sharedProvider = instance;
-        listenersBound = true;
-        return sharedProvider;
-      })();
+        ),
+      ]);
+      sharedProvider = instance;
+      listenersBound = true;
+      return sharedProvider;
+    })();
 
-      try {
-        const inst = await initPromise;
-        return inst;
-      } finally {
-        initPromise = null;
-      }
-    } catch (err: any) {
-      throw err;
+    try {
+      const inst = await initPromise;
+      return inst;
+    } finally {
+      initPromise = null;
     }
   };
 
@@ -101,17 +100,19 @@ export function useWalletConnect() {
     initializeProvider()
       .then((prov) => {
         setProvider(prov);
-  
+
         // Check if we already have an active session
         const activeSessions = Object.values(prov.session || {});
         if (activeSessions.length > 0) {
           setSession(activeSessions[0] as SessionTypes.Struct);
-  
+
           // Extract account if available, with type safety
-          const session = activeSessions[0] as { namespaces?: Record<string, any> } | undefined;
+          const session = activeSessions[0] as
+            | { namespaces?: Record<string, any> }
+            | undefined;
           const starknetAccounts = session?.namespaces?.starknet?.accounts;
           if (Array.isArray(starknetAccounts) && starknetAccounts.length > 0) {
-            const accountAddress = starknetAccounts[0]?.split?.(':')[2];
+            const accountAddress = starknetAccounts[0]?.split?.(":")[2];
             if (accountAddress) {
               setAccount(accountAddress);
             }
@@ -119,16 +120,16 @@ export function useWalletConnect() {
         }
       })
       .catch((err) => {
-        setError('Setup failed: ' + (err?.message || 'Unknown error'));
+        setError("Setup failed: " + (err?.message || "Unknown error"));
       });
   }, []);
 
   const openWallet = async (uri: string) => {
     const encodedUri = encodeURIComponent(uri);
-  
+
     // Use Argent's deep link scheme
     const argentScheme = `ready://wc?uri=${encodedUri}`;
-  
+
     try {
       await Linking.openURL(argentScheme);
     } catch (err) {
@@ -137,18 +138,18 @@ export function useWalletConnect() {
       try {
         await Linking.openURL(universal);
       } catch (e) {
-        setError('Failed to open Ready. Please make sure it is installed.');
+        setError("Failed to open Ready. Please make sure it is installed.");
       }
     }
   };
 
   const openUriForWallet = async (
-    wallet: 'argent' | 'braavos',
+    wallet: "argent" | "braavos",
     uri: string,
   ) => {
     const encodedUri = encodeURIComponent(uri);
     const candidates =
-      wallet === 'argent'
+      wallet === "argent"
         ? [
             `ready://wc?uri=${encodedUri}`,
             `argent://wc?uri=${encodedUri}`,
@@ -167,45 +168,63 @@ export function useWalletConnect() {
 
     let opened = false;
     for (const url of candidates) {
-      try {
+      const can = await Linking.canOpenURL(url).catch(() => false);
+      if (can) {
         await Linking.openURL(url);
         opened = true;
         break;
-      } catch (_) {}
+      }
     }
     if (!opened) {
       // Fallback to universal link (works better in Expo Go)
       const universal = `https://walletconnect.com/wc?uri=${encodedUri}`;
-      try {
+      const canUniversal = await Linking.canOpenURL(universal).catch(
+        () => false,
+      );
+      if (canUniversal) {
         await Linking.openURL(universal);
         opened = true;
-      } catch (e) {
       }
     }
     return opened;
   };
 
-  const connectWallet = async (wallet: 'argent' | 'braavos') => {
+  const connectWallet = async (wallet: "argent" | "braavos") => {
     if (!provider) return;
-    
+
     try {
       // Build chain candidates (env-driven primary + variants)
-      const envChain = (process.env.EXPO_PUBLIC_STARKNET_CHAIN || 'SN_MAINNET').toUpperCase();
-      const wantMainnet = envChain.includes('MAIN');
-      const chainPrimary = wantMainnet ? 'starknet:SNMAIN' : 'starknet:SNSEPOLIA';
-      const chainVariant = wantMainnet ? 'starknet:SN_MAIN' : 'starknet:SN_SEPOLIA';
-      const otherPrimary = wantMainnet ? 'starknet:SNSEPOLIA' : 'starknet:SNMAIN';
-      const otherVariant = wantMainnet ? 'starknet:SN_SEPOLIA' : 'starknet:SN_MAIN';
-      const chainCandidates = [chainPrimary, chainVariant, otherPrimary, otherVariant];
-
-      const optionalChains = [
-        'starknet:SNMAIN',
-        'starknet:SNSEPOLIA',
-        'starknet:SN_MAIN',
-        'starknet:SN_SEPOLIA',
+      const envChain = (
+        process.env.EXPO_PUBLIC_STARKNET_CHAIN || "SN_MAINNET"
+      ).toUpperCase();
+      const wantMainnet = envChain.includes("MAIN");
+      const chainPrimary = wantMainnet
+        ? "starknet:SNMAIN"
+        : "starknet:SNSEPOLIA";
+      const chainVariant = wantMainnet
+        ? "starknet:SN_MAIN"
+        : "starknet:SN_SEPOLIA";
+      const otherPrimary = wantMainnet
+        ? "starknet:SNSEPOLIA"
+        : "starknet:SNMAIN";
+      const otherVariant = wantMainnet
+        ? "starknet:SN_SEPOLIA"
+        : "starknet:SN_MAIN";
+      const chainCandidates = [
+        chainPrimary,
+        chainVariant,
+        otherPrimary,
+        otherVariant,
       ];
 
-      const waitWithTimeout = async <T,>(p: Promise<T>, ms: number) => {
+      const optionalChains = [
+        "starknet:SNMAIN",
+        "starknet:SNSEPOLIA",
+        "starknet:SN_MAIN",
+        "starknet:SN_SEPOLIA",
+      ];
+
+      const waitWithTimeout = async <T>(p: Promise<T>, ms: number) => {
         return Promise.race<T | null>([
           p,
           new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
@@ -218,45 +237,56 @@ export function useWalletConnect() {
           requiredNamespaces: {
             starknet: {
               chains: [chain],
-              methods: ['starknet_account', 'starknet_requestAddInvokeTransaction'],
-              events: ['accountsChanged', 'chainChanged'],
+              methods: [
+                "starknet_account",
+                "starknet_requestAddInvokeTransaction",
+              ],
+              events: ["accountsChanged", "chainChanged"],
             },
           },
           optionalNamespaces: {
             starknet: {
               chains: optionalChains,
-              methods: ['starknet_account', 'starknet_requestAddInvokeTransaction'],
-              events: ['accountsChanged', 'chainChanged'],
+              methods: [
+                "starknet_account",
+                "starknet_requestAddInvokeTransaction",
+              ],
+              events: ["accountsChanged", "chainChanged"],
             },
           },
         });
 
         if (uri) await openUriForWallet(wallet, uri);
 
-        const newSession = (await waitWithTimeout(approval(), 15000)) as SessionTypes.Struct | null;
+        const newSession = (await waitWithTimeout(
+          approval(),
+          15000,
+        )) as SessionTypes.Struct | null;
         if (newSession) {
           setSession(newSession);
           if (newSession?.namespaces?.starknet?.accounts?.length > 0) {
-            setAccount(newSession.namespaces.starknet.accounts[0].split(':')[2]);
+            setAccount(
+              newSession.namespaces.starknet.accounts[0].split(":")[2],
+            );
           }
           connected = true;
           break;
         }
       }
-      if (!connected) throw new Error('Wallet did not approve session');
+      if (!connected) throw new Error("Wallet did not approve session");
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
     }
-  }
+  };
 
-  const connect = async () => connectWallet('argent');
-  const connectArgent = async () => connectWallet('argent');
-  const connectBraavos = async () => connectWallet('braavos');
+  const connect = async () => connectWallet("argent");
+  const connectArgent = async () => connectWallet("argent");
+  const connectBraavos = async () => connectWallet("braavos");
 
   const disconnect = async () => {
     if (!provider || !session) return;
-    
+
     try {
       await provider.disconnect();
       setSession(null);
@@ -266,10 +296,21 @@ export function useWalletConnect() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An unknown error occurred');
+        setError("An unknown error occurred");
       }
     }
   };
 
-  return { provider, session, account, error, openWallet, connect, connectArgent, connectBraavos, disconnect, txHash };
+  return {
+    provider,
+    session,
+    account,
+    error,
+    openWallet,
+    connect,
+    connectArgent,
+    connectBraavos,
+    disconnect,
+    txHash,
+  };
 }

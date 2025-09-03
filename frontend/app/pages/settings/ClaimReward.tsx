@@ -21,8 +21,7 @@ type ClaimRewardProps = {
 
 export const ClaimRewardSection: React.FC = () => {
   const { invokeCalls } = useStarknetConnector();
-  const { powGameContractAddress, getRewardParams } =
-    usePowContractConnector();
+  const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
   const {
     connectArgent,
@@ -77,9 +76,7 @@ export const ClaimRewardSection: React.FC = () => {
 
   useEffect(() => {
     if (walletError) {
-      try {
-        Alert.alert("Wallet Error", walletError);
-      } catch (_) {}
+      Alert.alert("Wallet Error", walletError);
     }
   }, [walletError]);
 
@@ -174,9 +171,7 @@ export const ClaimRewardSection: React.FC = () => {
                 onPress={claimReward}
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
-                disabled={
-                  claimed || claiming || !debouncedInput.trim()
-                }
+                disabled={claimed || claiming || !debouncedInput.trim()}
               />
             </View>
 
@@ -208,8 +203,7 @@ export const ClaimRewardSection: React.FC = () => {
                   }}
                 >
                   <Text style={styles.linkText}>
-                    View transaction on StarkScan (
-                    {localTxHash?.slice(0, 6)}...
+                    View transaction on StarkScan ({localTxHash?.slice(0, 6)}...
                     {localTxHash?.slice(-6)})
                   </Text>
                 </TouchableOpacity>
