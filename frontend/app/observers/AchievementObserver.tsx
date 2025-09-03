@@ -61,10 +61,6 @@ export class AchievementObserver implements Observer {
     const relevantAchievements = this.achievementsByEvent.get(eventName);
     if (!relevantAchievements) return;
 
-    // Some events like L2Purchased don't require data
-    const eventsWithoutData = ["L2Purchased"];
-    if (!data && !eventsWithoutData.includes(eventName)) return;
-
     relevantAchievements.forEach((achievement) => {
       if (this.completedAchievements.has(achievement.id)) return; // Skip completed achievements
 
@@ -142,7 +138,6 @@ export class AchievementObserver implements Observer {
   }
 
   private handleMineDone(achievement: Achievement, block: Block) {
-    // Check for "Mine a block 1st try" achievement
     if (achievement.name === "Mine a block 1st try") {
       // Achievement unlocks when mining a block with difficulty 1 (requires only 1 click)
       if (block.difficulty === 1) {
@@ -170,7 +165,6 @@ export class AchievementObserver implements Observer {
   }
 
   private handleSequenceDone(achievement: Achievement, block: Block) {
-    // Check for "Mine a block 1st try" achievement
     if (achievement.name === "Mine a block 1st try") {
       // Achievement unlocks when sequencing a block with difficulty 1 (requires only 1 click)
       if (block.difficulty === 1) {
