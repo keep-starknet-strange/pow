@@ -13,6 +13,7 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BasicButton from "../../components/buttons/Basic";
+import { useWalletConnect } from "../../hooks/useWalletConnect";
 
 type ClaimRewardProps = {
   setSettingTab: (tab: "Main") => void;
@@ -23,6 +24,13 @@ export const ClaimRewardSection: React.FC = () => {
   const { powGameContractAddress, getRewardParams } =
     usePowContractConnector();
   const insets = useSafeAreaInsets();
+  const {
+    connectArgent,
+    connectBraavos,
+    account,
+    error: wcError,
+    disconnect,
+  } = useWalletConnect();
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
@@ -32,7 +40,6 @@ export const ClaimRewardSection: React.FC = () => {
     "🎉 You earned 10 STRK!",
   );
   const [walletError, setWalletError] = useState<string | null>(null);
-  const [connectingWallet, setConnectingWallet] = useState(false);
 
   const rewardUnlocked = true;
 
@@ -59,51 +66,14 @@ export const ClaimRewardSection: React.FC = () => {
     setClaimed(true);
   };
 
-  const openWallet = async (wallet: "argent" | "braavos") => {
-    setConnectingWallet(true);
+  const handleConnectBraavos = () => {
     setWalletError(null);
-    try {
-      const candidates =
-        wallet === "argent"
-          ? [
-              "ready://",
-              "argent://",
-              "argentx://",
-              "argentmobile://",
-              "https://app.ready.co",
-              "https://ready.co",
-            ]
-          : [
-              "braavos://",
-              "itms-apps://itunes.apple.com/app/id1636013523",
-              "https://apps.apple.com/us/app/braavos-btc-starknet-wallet/id1636013523",
-              "https://braavos.app",
-            ];
-      let opened = false;
-      for (const url of candidates) {
-        try {
-          const can = await Linking.canOpenURL(url);
-          if (can) {
-            await Linking.openURL(url);
-            opened = true;
-            break;
-          }
-        } catch (_) {}
-      }
-      if (!opened) {
-        setWalletError(
-          wallet === "argent"
-            ? "Could not open Ready/Argent. Ensure it’s installed."
-            : "Could not open Braavos. Ensure it’s installed.",
-        );
-      }
-    } finally {
-      setConnectingWallet(false);
-    }
+    connectBraavos();
   };
-
-  const connectBraavos = () => openWallet("braavos");
-  const connectArgent = () => openWallet("argent");
+  const handleConnectArgent = () => {
+    setWalletError(null);
+    connectArgent();
+  };
 
   useEffect(() => {
     if (walletError) {
@@ -112,6 +82,16 @@ export const ClaimRewardSection: React.FC = () => {
       } catch (_) {}
     }
   }, [walletError]);
+
+  useEffect(() => {
+    if (wcError) setWalletError(wcError);
+  }, [wcError]);
+
+  useEffect(() => {
+    if (account && !accountInput) {
+      setAccountInput(account);
+    }
+  }, [account]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -149,21 +129,29 @@ export const ClaimRewardSection: React.FC = () => {
 
             <View style={styles.buttonWrap}>
               <BasicButton
-                onPress={connectBraavos}
+                onPress={handleConnectBraavos}
                 label="Connect Braavos"
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
+                // disabled={connecting}
               />
             </View>
 
             <View style={styles.buttonWrap}>
               <BasicButton
-                onPress={connectArgent}
+                onPress={handleConnectArgent}
                 label="Connect Argent"
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
+                // disabled={connecting}
               />
             </View>
+
+            {account ? (
+              <Text style={styles.subtitle}>
+                Connected wallet: {account.slice(0, 6)}...{account.slice(-6)}
+              </Text>
+            ) : null}
 
             <Text style={styles.subtitle}>
               Paste your Starknet address to receive them.
@@ -186,7 +174,9 @@ export const ClaimRewardSection: React.FC = () => {
                 onPress={claimReward}
                 style={styles.basicButton}
                 textStyle={styles.basicButtonText}
-                disabled={claimed || claiming || !debouncedInput.trim()}
+                disabled={
+                  claimed || claiming || !debouncedInput.trim()
+                }
               />
             </View>
 
