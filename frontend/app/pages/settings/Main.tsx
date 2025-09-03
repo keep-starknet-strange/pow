@@ -15,7 +15,7 @@ import { useTutorialStore } from "../../stores/useTutorialStore";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
-    tab: "About" | "Credits" | "ClaimReward" | "TermsOfUse",
+    tab: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse",
   ) => void;
   goBackToLogin: () => void;
 };
@@ -54,7 +54,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "About" | "Credits" | "ClaimReward" | "TermsOfUse";
+    tab?: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse";
     onPress?: () => void;
     icon?: string;
   }[] = [
@@ -64,8 +64,8 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     },
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Terms of Use", tab: "TermsOfUse" },
+    { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
-    { label: "Credits", tab: "Credits" },
     ...(currentPrestige >= 1
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),

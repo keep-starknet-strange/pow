@@ -60,7 +60,7 @@ export class AchievementObserver implements Observer {
   async onNotify(eventName: EventType, data?: any): Promise<void> {
     const relevantAchievements = this.achievementsByEvent.get(eventName);
     if (!relevantAchievements) return;
-    
+
     // Some events like L2Purchased don't require data
     const eventsWithoutData = ["L2Purchased"];
     if (!data && !eventsWithoutData.includes(eventName)) return;
@@ -211,20 +211,26 @@ export class AchievementObserver implements Observer {
       const txConfigJson =
         chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
       const totalTransactions = txConfigJson.length;
-      
+
       // Calculate current progress by counting unlocked transactions
-      const dappFeeLevels = useTransactionsStore.getState().dappFeeLevels[chainId] || {};
-      const unlockedCount = Object.keys(dappFeeLevels).filter(id => dappFeeLevels[Number(id)] >= 0).length;
+      const dappFeeLevels =
+        useTransactionsStore.getState().dappFeeLevels[chainId] || {};
+      const unlockedCount = Object.keys(dappFeeLevels).filter(
+        (id) => dappFeeLevels[Number(id)] >= 0,
+      ).length;
       const progress = Math.min((unlockedCount / totalTransactions) * 100, 100);
       this.updateAchievement(achievement.id, progress);
     } else {
       const txConfigJson =
         chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
       const totalTransactions = txConfigJson.length;
-      
+
       // Calculate current progress by counting unlocked transactions
-      const transactionFeeLevels = useTransactionsStore.getState().transactionFeeLevels[chainId] || {};
-      const unlockedCount = Object.keys(transactionFeeLevels).filter(id => transactionFeeLevels[Number(id)] >= 0).length;
+      const transactionFeeLevels =
+        useTransactionsStore.getState().transactionFeeLevels[chainId] || {};
+      const unlockedCount = Object.keys(transactionFeeLevels).filter(
+        (id) => transactionFeeLevels[Number(id)] >= 0,
+      ).length;
       const progress = Math.min((unlockedCount / totalTransactions) * 100, 100);
       this.updateAchievement(achievement.id, progress);
     }

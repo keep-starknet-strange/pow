@@ -4,6 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 
 import AboutSection from "./settings/About";
+import AccountSection from "./settings/Account";
 import CreditsSection from "./settings/Credits";
 import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
@@ -14,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabs = {
   Main: SettingsMainSection,
+  Account: AccountSection,
   About: AboutSection,
   Credits: CreditsSection,
   ClaimReward: ClaimRewardSection,
