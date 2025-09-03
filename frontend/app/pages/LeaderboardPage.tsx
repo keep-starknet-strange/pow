@@ -140,41 +140,47 @@ export const LeaderboardPage: React.FC = () => {
     const getLeaderboard = async () => {
       // Load the leaderboard data from the new API endpoint
       try {
-        const response = await fetch("http://localhost:8080/events-latest-ordered?order=desc&pageLength=20");
+        const response = await fetch(
+          "http://localhost:8080/events-latest-ordered?order=desc&pageLength=20",
+        );
         const data = await response.json();
         const events = data.events || [];
-        
+
         // Extract user addresses and balances from events
         const eventData = events.map((event: any) => ({
           user: event.keys[1], // User address from keys[1]
           balance: parseInt(event.data[1], 16), // Parse hex balance from data[1] as uint128
         }));
-        
+
         const addresses = eventData.map((item: any) => item.user);
         const accounts = await getAccounts(addresses, undefined, true);
-        
+
         const users = eventData.map((item: any, index: number) => {
           const shortAddress =
             item.user.slice(0, 4) + "..." + item.user.slice(-4);
           const account = accounts?.find(
             (account) => account.account_address === item.user,
           );
-          const hasValidUsername = account?.account.username && 
-            typeof account.account.username === 'string' && 
+          const hasValidUsername =
+            account?.account.username &&
+            typeof account.account.username === "string" &&
             account.account.username.trim().length > 1;
-          const name = hasValidUsername ? account.account.username : shortAddress;
+          const name = hasValidUsername
+            ? account.account.username
+            : shortAddress;
           return {
             address: item.user,
             balance: item.balance,
             prestige: 0, // TODO
-            nouns: account?.account.metadata && account.account.metadata.length === 4
-              ? createNounsAttributes(
-                  parseInt(account.account.metadata[0], 16),
-                  parseInt(account.account.metadata[1], 16),
-                  parseInt(account.account.metadata[2], 16),
-                  parseInt(account.account.metadata[3], 16),
-                )
-              : getRandomNounsAttributes(item.user),
+            nouns:
+              account?.account.metadata && account.account.metadata.length === 4
+                ? createNounsAttributes(
+                    parseInt(account.account.metadata[0], 16),
+                    parseInt(account.account.metadata[1], 16),
+                    parseInt(account.account.metadata[2], 16),
+                    parseInt(account.account.metadata[3], 16),
+                  )
+                : getRandomNounsAttributes(item.user),
             name,
             id: index + 1,
           };
@@ -188,12 +194,7 @@ export const LeaderboardPage: React.FC = () => {
       }
     };
     getLeaderboard();
-  }, [
-    STARKNET_ENABLED,
-    powGameContractAddress,
-    getAccounts,
-    isFocused,
-  ]);
+  }, [STARKNET_ENABLED, powGameContractAddress, getAccounts, isFocused]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused

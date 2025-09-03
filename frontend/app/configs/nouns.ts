@@ -53,19 +53,19 @@ const seededRandom = (seed: string) => {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     const char = seed.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
-  
+
   return () => {
-    hash = ((hash * 1103515245 + 12345) & 0x7fffffff);
+    hash = (hash * 1103515245 + 12345) & 0x7fffffff;
     return hash / 0x7fffffff;
   };
 };
 
 export const getRandomNounsAttributes = (seed?: string): NounsAttributes => {
   const random = seed ? seededRandom(seed) : Math.random;
-  
+
   const randomAttributes = {
     head: Math.floor(random() * headsCount),
     glasses: Math.floor(random() * glassesCount),

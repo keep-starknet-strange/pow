@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Share,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Share } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { useStarknetConnector } from "../../context/StarknetConnector";
@@ -46,15 +40,17 @@ export const AccountSection: React.FC = () => {
     const keys = await getAvailableKeys("pow_game");
     if (keys.length > 0) {
       // Get the first available key
-      const keyToUse = account?.address ? `pow_game_${account.address}` : keys[0];
+      const keyToUse = account?.address
+        ? `pow_game_${account.address}`
+        : keys[0];
       const pk = await getPrivateKey(keyToUse);
       setPrivateKey(pk);
-      
+
       // If we have a private key but no connected account, generate the address
       if (pk && !account?.address) {
         const address = generateAccountAddress(pk);
         setAvailableAccount(address);
-        
+
         // Try to fetch user data for this address
         try {
           const userData = await getAccount(address);
@@ -105,7 +101,15 @@ export const AccountSection: React.FC = () => {
           {/* PFP View with Background */}
           <View className="w-[140px] aspect-square mb-[10px] relative bg-[#10111910] shadow-lg shadow-black/50">
             {/* Grid Background */}
-            <View style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            >
               <Canvas style={{ width: 140, height: 140 }}>
                 <Image
                   image={getImage("block.grid.min")}
@@ -122,7 +126,15 @@ export const AccountSection: React.FC = () => {
               </Canvas>
             </View>
             {/* PFP View */}
-            <View style={{ position: "absolute", width: "90%", height: "90%", top: "5%", left: "5%" }}>
+            <View
+              style={{
+                position: "absolute",
+                width: "90%",
+                height: "90%",
+                top: "5%",
+                left: "5%",
+              }}
+            >
               <PFPView attributes={nounsAttributes} />
             </View>
           </View>
@@ -130,7 +142,9 @@ export const AccountSection: React.FC = () => {
           {/* Username and Prestige in same row */}
           <View className="flex-row items-center justify-center gap-[10px]">
             <Text className="text-[#101119] text-[24px] font-Xerxes text-center">
-              {user?.account?.username || availableUser?.account?.username || "Anonymous"}
+              {user?.account?.username ||
+                availableUser?.account?.username ||
+                "Anonymous"}
             </Text>
             <View className="w-[36px] aspect-square">
               <Canvas style={{ flex: 1 }} className="w-full h-full">
@@ -198,7 +212,10 @@ export const AccountSection: React.FC = () => {
                   ) : availableAccount ? (
                     <>
                       {formatAddress(availableAccount)}
-                      <Text className="text-white text-[12px]"> (not connected)</Text>
+                      <Text className="text-white text-[12px]">
+                        {" "}
+                        (not connected)
+                      </Text>
                     </>
                   ) : (
                     "No account found"
@@ -235,7 +252,7 @@ export const AccountSection: React.FC = () => {
                     ••••••••••••
                   </Text>
                 )}
-                
+
                 <TouchableOpacity
                   onPress={() => setShowPrivateKey(!showPrivateKey)}
                   className="flex-row items-center justify-center p-2 rounded"
@@ -253,7 +270,6 @@ export const AccountSection: React.FC = () => {
                   ⚠️ Save your private key to restore your account later.
                 </Text>
               </View>
-              
             </View>
           </View>
         </View>

@@ -90,10 +90,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         </View>
       </ScrollView>
       <View className="mt-4 items-center">
-        <BasicButton
-          label="Credits"
-          onPress={() => setSettingTab("Credits")}
-        />
+        <BasicButton label="Credits" onPress={() => setSettingTab("Credits")} />
       </View>
     </Animated.View>
   );
