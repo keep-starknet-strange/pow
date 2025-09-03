@@ -15,7 +15,7 @@ export const useDAConfirmer = (
   const { user } = useFocEngine();
   const { powContract, getUserDaClicks } = usePowContractConnector();
   const { l2 } = useL2Store();
-  const daDifficulty = l2?.da.maxSize || 1;
+  const daDifficulty = l2?.da.difficulty || 1;
   const [daConfirmCounter, setDaConfirmCounter] = useState(0);
 
   useEffect(() => {

@@ -467,7 +467,7 @@ mod PowGame {
             // Set max_size and difficulty for the new DA based on current upgrade level
             let da_size = self.get_my_upgrade(chain_id, 'DA compression');
             let da_max_size: u32 = da_size.try_into().unwrap_or(1);
-            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            let da_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'DA compression').into() + 1; // Add +1 offset so level 0 returns 1 for difficulty
             self.builder.reset_da(chain_id, da_max_size, da_difficulty);
         }
 
@@ -495,7 +495,7 @@ mod PowGame {
             // Set max_size and difficulty for the new proof based on current upgrade level
             let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
-            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            let proof_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'Recursive Proving').into() + 1; // Add +1 offset so level 0 returns 1 for difficulty
             self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
         }
     }
@@ -675,13 +675,13 @@ mod PowGame {
             // Set max_size and difficulty for initial DA based on current upgrade level
             let da_size = self.get_my_upgrade(new_chain_id, 'DA compression');
             let da_max_size: u32 = da_size.try_into().unwrap_or(1);
-            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            let da_difficulty: u128 = self.get_my_upgrade_level(new_chain_id, 'DA compression').into();
             self.builder.reset_da(new_chain_id, da_max_size, da_difficulty);
 
             // Set max_size and difficulty for initial proof based on current upgrade level
             let proof_size = self.get_my_upgrade(new_chain_id, 'Recursive Proving');
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
-            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            let proof_difficulty: u128 = self.get_my_upgrade_level(new_chain_id, 'Recursive Proving').into();
             self.builder.reset_proof(new_chain_id, proof_max_size, proof_difficulty);
 
             // Add genesis block to da & proof
@@ -715,12 +715,12 @@ mod PowGame {
             // Set max_size and difficulty for reset DA based on current upgrade level
             let da_size = self.get_my_upgrade(chain_id, 'DA compression');
             let da_max_size: u32 = da_size.try_into().unwrap_or(1);
-            let da_difficulty = da_size; // DA uses same value for size and difficulty
+            let da_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'DA compression').into();
             self.builder.reset_da(chain_id, da_max_size, da_difficulty);
             // Set max_size and difficulty for reset proof based on current upgrade level
             let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
-            let proof_difficulty = proof_size; // Proof uses same value for size and difficulty
+            let proof_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'Recursive Proving').into();
             self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
             self.transactions.reset_tx_levels(chain_id);
             self.upgrades.reset_upgrade_levels(chain_id);
