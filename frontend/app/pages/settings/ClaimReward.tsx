@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Linking,
   StyleSheet,
+  Alert,
 } from "react-native";
-import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,9 +19,8 @@ type ClaimRewardProps = {
 };
 
 export const ClaimRewardSection: React.FC = () => {
-  const { account, txHash, error, connectBraavos, connectArgent } = useWalletConnect();
   const { invokeCalls } = useStarknetConnector();
-  const { powGameContractAddress, getRewardParams, getHasClaimedReward } =
+  const { powGameContractAddress, getRewardParams } =
     usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
@@ -32,11 +31,13 @@ export const ClaimRewardSection: React.FC = () => {
   const [rewardTitle, setRewardTitle] = useState<string>(
     "🎉 You earned 10 STRK!",
   );
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [connectingWallet, setConnectingWallet] = useState(false);
 
   const rewardUnlocked = true;
 
   const claimReward = async () => {
-    const recipient = (debouncedInput || account || "").trim();
+    const recipient = (debouncedInput || "").trim();
     if (!recipient) {
       console.error("No recipient provided");
       return;
@@ -57,6 +58,60 @@ export const ClaimRewardSection: React.FC = () => {
     setClaiming(false);
     setClaimed(true);
   };
+
+  const openWallet = async (wallet: "argent" | "braavos") => {
+    setConnectingWallet(true);
+    setWalletError(null);
+    try {
+      const candidates =
+        wallet === "argent"
+          ? [
+              "ready://",
+              "argent://",
+              "argentx://",
+              "argentmobile://",
+              "https://app.ready.co",
+              "https://ready.co",
+            ]
+          : [
+              "braavos://",
+              "itms-apps://itunes.apple.com/app/id1636013523",
+              "https://apps.apple.com/us/app/braavos-btc-starknet-wallet/id1636013523",
+              "https://braavos.app",
+            ];
+      let opened = false;
+      for (const url of candidates) {
+        try {
+          const can = await Linking.canOpenURL(url);
+          if (can) {
+            await Linking.openURL(url);
+            opened = true;
+            break;
+          }
+        } catch (_) {}
+      }
+      if (!opened) {
+        setWalletError(
+          wallet === "argent"
+            ? "Could not open Ready/Argent. Ensure it’s installed."
+            : "Could not open Braavos. Ensure it’s installed.",
+        );
+      }
+    } finally {
+      setConnectingWallet(false);
+    }
+  };
+
+  const connectBraavos = () => openWallet("braavos");
+  const connectArgent = () => openWallet("argent");
+
+  useEffect(() => {
+    if (walletError) {
+      try {
+        Alert.alert("Wallet Error", walletError);
+      } catch (_) {}
+    }
+  }, [walletError]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,11 +135,8 @@ export const ClaimRewardSection: React.FC = () => {
         amountStr = amount.toString();
       }
       setRewardTitle(`🎉 You earned ${amountStr} STRK!`);
-      // Check claimed state on mount
-      const alreadyClaimed = await getHasClaimedReward?.();
-      if (alreadyClaimed === true) setClaimed(true);
     })();
-  }, [getRewardParams, getHasClaimedReward]);
+  }, [getRewardParams]);
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 8 }]}>
@@ -140,7 +192,7 @@ export const ClaimRewardSection: React.FC = () => {
 
             <View style={styles.linksContainer}>
               {(() => {
-                const addr = (debouncedInput || account || "").trim();
+                const addr = (debouncedInput || "").trim();
                 if (!addr) return null;
                 return (
                   <TouchableOpacity
@@ -157,30 +209,32 @@ export const ClaimRewardSection: React.FC = () => {
                 );
               })()}
 
-              {(txHash || localTxHash) && (
+              {localTxHash && (
                 <TouchableOpacity
                   style={styles.linkWrap}
                   onPress={() => {
-                    const hash = (txHash || localTxHash) as string;
+                    const hash = localTxHash as string;
                     Linking.openURL(`https://starkscan.co/tx/${hash}`);
                   }}
                 >
                   <Text style={styles.linkText}>
                     View transaction on StarkScan (
-                    {(txHash || localTxHash)?.slice(0, 6)}...
-                    {(txHash || localTxHash)?.slice(-6)})
+                    {localTxHash?.slice(0, 6)}...
+                    {localTxHash?.slice(-6)})
                   </Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            {(txHash || localTxHash) && (
+            {localTxHash && (
               <Text style={styles.successText}>Reward claimed! 🎊</Text>
             )}
             {claimed && (
               <Text style={styles.successText}>Reward claimed! 🎊</Text>
             )}
-            {error && <Text style={styles.errorText}>Error: {error}</Text>}
+            {walletError && (
+              <Text style={styles.errorText}>Error: {walletError}</Text>
+            )}
           </>
         )}
       </View>

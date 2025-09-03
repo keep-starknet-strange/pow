@@ -17,6 +17,7 @@ const config: ExpoConfig = {
         "argent",
         "argentx",
         "argentmobile",
+        "ready",
         "braavos",
         "wc",
       ],
