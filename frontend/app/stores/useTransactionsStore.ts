@@ -135,7 +135,6 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   ) => {
     const fetchTransactionSpeeds = async () => {
       if (!user || !powContract) return;
-      // TODO: Hardcoded chain ids
       const chainIds = [0, 1]; // L1 and L2
       const newFeeLevels = { ...get().transactionFeeLevels };
       const newSpeedLevels = { ...get().transactionSpeedLevels };

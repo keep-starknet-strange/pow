@@ -190,7 +190,6 @@ export const ClaimRewardSection: React.FC = () => {
         ) : (
           <>
             <Text style={styles.title}>{rewardTitle}</Text>
-
             <View style={styles.buttonWrap}>
               <BasicButton
                 onPress={handleConnectBraavos}

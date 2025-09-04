@@ -5,13 +5,6 @@
 if [ "$FOC_ENV_FILE" ]; then
     source $FOC_ENV_FILE
 fi
-if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
-    POW_GAME_CONTRACT_ADDRESS=$1
-    if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
-        echo "POW_GAME_CONTRACT_ADDRESS not set. Please set it in the environment or pass it as an argument."
-        exit 1
-    fi
-fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR=$SCRIPT_DIR/../..
@@ -30,6 +23,14 @@ if [ -z "$STARKNET_KEYSTORE" ]; then
 elif [ -z "$STARKNET_ACCOUNT" ]; then
   echo "Error: STARKNET_ACCOUNT is not set."
   exit 1
+fi
+
+if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
+    POW_GAME_CONTRACT_ADDRESS=$1
+    if [ -z $POW_GAME_CONTRACT_ADDRESS ]; then
+        echo "POW_GAME_CONTRACT_ADDRESS not set. Please set it in the environment or pass it as an argument."
+        exit 1
+    fi
 fi
 
 # TODO: Host & ...
@@ -85,7 +86,7 @@ UPGRADES_CONFIG=$CONFIGS_DIR/upgrades.json
 TRANSACTIONS_CONFIG=$CONFIGS_DIR/transactions.json
 UNLOCKS_CONFIG=$CONFIGS_DIR/unlocks.json
 
-RPC_URL=https://starknet-mainnet.public.blastapi.io
+RPC_URL=https://starknet-mainnet.infura.io/v3/0d98c49747574cda8eeebee9c7353ca8
 
 OUTPUT_DIR=$HOME/.pow-tests
 TIMESTAMP=$(date +%s)
@@ -133,7 +134,7 @@ for entry in $(echo $L1_UPGRADES | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
 done
 for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
     _jq() {
@@ -158,7 +159,7 @@ for entry in $(echo $L2_UPGRADES | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_upgrade --calldata $SETUP_UPGRADE_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_upgrade_config $SETUP_UPGRADE_CALLDATA
 done
 
 echo
@@ -195,7 +196,7 @@ for entry in $(echo $L1_AUTOMATIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
 done
 for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
     _jq() {
@@ -222,7 +223,7 @@ for entry in $(echo $L2_AUTOMATIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_automation --calldata $SETUP_AUTOMATION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_automation_config $SETUP_AUTOMATION_CALLDATA
 done
 
 echo
@@ -264,7 +265,7 @@ for entry in $(echo $L1_TRANSACTIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
 done
 for entry in $(echo $L2_TRANSACTIONS | jq -r '. | @base64'); do
     _jq() {
@@ -293,7 +294,7 @@ for entry in $(echo $L2_TRANSACTIONS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
 done
 
 echo
@@ -332,7 +333,7 @@ for entry in $(echo $L1_DAPPS | jq -r '. | @base64'); do
 
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
 done
 for entry in $(echo $L2_DAPPS | jq -r '. | @base64'); do
     _jq() {
@@ -360,7 +361,7 @@ for entry in $(echo $L2_DAPPS | jq -r '. | @base64'); do
     SETUP_TRANSACTION_CALLDATA=$(echo $CHAIN_ID $((ID + L2_TX_COUNT)) $IS_DAPP $((FEE_LEVELS + 1)) $FEE_LEVELS_INFO $((SPEED_LEVELS + 1)) $SPEED_LEVELS_INFO)
     # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA"
     # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_transaction_config --calldata $SETUP_TRANSACTION_CALLDATA
-    starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
+    starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_transaction_config $SETUP_TRANSACTION_CALLDATA
 done
 
 echo
@@ -384,7 +385,7 @@ SETUP_PRESTIGE_CALLDATA=$(echo $((PRESTIGE_LEVELS)) $PRESTIGE_COSTS_INFO $((PRES
 
 # echo "sncast --accounts-file /Users/brandonroberts/workspace/keep-starknet-strange/asd/click-chain/scripts/../onchain/oz_acct.json --account account-1 --wait --json invoke --url http://localhost:5050 --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA"
 # sncast --accounts-file $DEVNET_ACCOUNT_FILE --account $DEVNET_ACCOUNT_NAME --wait --json invoke --url $RPC_URL --contract-address $POW_CONTRACT_ADDRESS --function setup_prestige --calldata $SETUP_PRESTIGE_CALLDATA
-starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_prestige_config $SETUP_PRESTIGE_CALLDATA
+starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_prestige_config $SETUP_PRESTIGE_CALLDATA
 echo
 echo "Done setting up prestige!"
 echo
@@ -394,15 +395,15 @@ echo
 # Set next chain cost (L2 unlock cost) from unlocks config
 NEXT_CHAIN_COST=$(cat $UNLOCKS_CONFIG | jq -r '.next_chain_cost')
 echo "Setting next chain cost to $NEXT_CHAIN_COST (from unlocks config)"
-starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_next_chain_cost $NEXT_CHAIN_COST
+starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_next_chain_cost $NEXT_CHAIN_COST
 
 # Set dapps unlock costs from unlocks config
 L1_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L1.cost')
 L2_DAPPS_UNLOCK_COST=$(cat $UNLOCKS_CONFIG | jq -r '.dapps.L2.cost')
 echo "Setting L1 dapps unlock cost to $L1_DAPPS_UNLOCK_COST (from unlocks config)"
-starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_dapps_unlock_cost 0 $L1_DAPPS_UNLOCK_COST
+starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_dapps_unlock_cost 0 $L1_DAPPS_UNLOCK_COST
 echo "Setting L2 dapps unlock cost to $L2_DAPPS_UNLOCK_COST (from unlocks config)"
-starkli invoke --network mainnet --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_dapps_unlock_cost 1 $L2_DAPPS_UNLOCK_COST
+starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS set_dapps_unlock_cost 1 $L2_DAPPS_UNLOCK_COST
 
 echo
 echo "Done setting up costs!"

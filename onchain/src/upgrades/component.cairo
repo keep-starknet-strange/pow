@@ -189,6 +189,15 @@ pub mod PowUpgradesComponent {
             self.upgrades.read((chain_id, upgrade_id, level)).value
         }
 
+        fn get_my_upgrade_level(
+            self: @ComponentState<TContractState>, chain_id: u32, upgrade_name: felt252,
+        ) -> u32 {
+            let caller = get_caller_address();
+            let upgrade_id = self.upgrade_ids.read(upgrade_name);
+            let level = self.upgrade_levels.read((caller, chain_id, upgrade_id));
+            level
+        }
+
         fn get_my_automation_value(
             self: @ComponentState<TContractState>, chain_id: u32, automation_id: u32,
         ) -> u128 {

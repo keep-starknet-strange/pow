@@ -11,7 +11,6 @@ import { useCachedWindowDimensions } from "@/app/hooks/useCachedDimensions";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { shortMoneyString, showThreeDigitsMax } from "../../utils/helpers";
 
-// TODO: Reduce to chainId, txId, isDapp
 export interface TxButtonPlaqueProps {
   feeLevel: number;
   feeCost: number;

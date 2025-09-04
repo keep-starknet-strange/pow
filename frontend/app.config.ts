@@ -35,6 +35,7 @@ const config: ExpoConfig = {
     },
     package: "com.starknet.pow",
     edgeToEdgeEnabled: true,
+    blockedPermissions: ["android.permission.RECORD_AUDIO"],
   },
   web: {
     bundler: "metro",

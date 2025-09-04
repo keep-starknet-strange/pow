@@ -57,6 +57,7 @@ pub trait IPowUpgrades<TContractState> {
     fn get_next_automation_cost(self: @TContractState, chain_id: u32, automation_id: u32) -> u128;
     fn get_my_upgrade_value(self: @TContractState, chain_id: u32, upgrade_id: u32) -> u128;
     fn get_my_upgrade(self: @TContractState, chain_id: u32, upgrade_name: felt252) -> u128;
+    fn get_my_upgrade_level(self: @TContractState, chain_id: u32, upgrade_name: felt252) -> u32;
     fn get_my_automation_value(self: @TContractState, chain_id: u32, automation_id: u32) -> u128;
     fn get_my_automation(self: @TContractState, chain_id: u32, automation_name: felt252) -> u128;
 }

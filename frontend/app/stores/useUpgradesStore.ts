@@ -28,6 +28,7 @@ interface UpgradesState {
   // Getters
   canUnlockUpgrade: (chainId: number, upgradeId: number) => boolean;
   getUpgradeValue: (chainId: number, upgradeName: string) => number;
+  getUpgradeLevel: (chainId: number, upgradeName: string) => number;
   getUpgradeValueAt: (chainId: number, upgradeId: number) => number;
   getNextUpgradeCost: (chainId: number, upgradeId: number) => number;
   getAutomationValue: (chainId: number, automationName: string) => number;
@@ -132,7 +133,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
     if (!user || !powContract) return;
 
-    // TODO: Hardcoded chain ids
     const chainIds = [0, 1]; // L1 and L2
 
     // Fetch upgrade levels
@@ -346,13 +346,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       return;
     }
 
-    /* TODO: Include once switched to zustand
-    if (!stakingUnlocked) {
-      set({ canPrestige: false });
-      return;
-    }
-    */
-
     // Check all L2 (chain 1) automations are unlocked
     const automationLevels = automations[1];
     if (!automationLevels) {
@@ -501,6 +494,24 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     const level =
       chainUpgrades[upgrade.id] !== undefined ? chainUpgrades[upgrade.id] : -1;
     return level === -1 ? upgrade.baseValue : upgrade.values[level];
+  },
+
+  getUpgradeLevel: (chainId: number, upgradeName: string): number => {
+    const { upgrades } = get();
+    // Get the upgrade info
+    const chainUpgrades = upgrades[chainId] || {};
+    const upgradeJsonChain = chainId === 0 ? upgradesJson.L1 : upgradesJson.L2;
+    const upgrade = upgradeJsonChain.find(
+      (upgrade) => upgrade.name === upgradeName,
+    );
+    if (!upgrade || chainUpgrades[upgrade.id] === undefined) {
+      console.warn(`Upgrade not found: ${upgradeName} for chainId: ${chainId}`);
+      return 0;
+    }
+
+    const level =
+      chainUpgrades[upgrade.id] !== undefined ? chainUpgrades[upgrade.id] : -1;
+    return level;
   },
 
   getUpgradeValueAt: (chainId: number, upgradeId: number): number => {
