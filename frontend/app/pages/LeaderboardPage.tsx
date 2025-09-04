@@ -26,6 +26,7 @@ import {
 } from "../configs/nouns";
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
+import { FOC_ENGINE_API } from "../context/FocEngineConnector";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -141,7 +142,7 @@ export const LeaderboardPage: React.FC = () => {
       // Load the leaderboard data from the new API endpoint
       try {
         const response = await fetch(
-          "http://localhost:8080/events-latest-ordered?order=desc&pageLength=20",
+          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=20`,
         );
         const data = await response.json();
         const events = data.events || [];
