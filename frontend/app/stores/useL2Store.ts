@@ -106,7 +106,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
             1;
           const finalDADifficulty =
             daDifficulty ||
-            (useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2) ||
+            useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") +
+              2 ||
             1;
           const finalProverMaxSize =
             proofMaxSize ||
@@ -116,7 +117,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
             1;
           const finalProverDifficulty =
             proofDifficulty ||
-            (useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") + 2) ||
+            useUpgradesStore
+              .getState()
+              .getUpgradeLevel(1, "Recursive Proving") + 2 ||
             1;
 
           const l2Instance: L2 = newL2();
@@ -130,7 +133,10 @@ export const useL2Store = create<L2Store>((set, get) => ({
           }
 
           // Initialize Prover with existing state
-          l2Instance.prover = newL2Prover(finalProverMaxSize, finalProverDifficulty);
+          l2Instance.prover = newL2Prover(
+            finalProverMaxSize,
+            finalProverDifficulty,
+          );
           if (proofSize && proofSize > 0) {
             l2Instance.prover.blocks = new Array(proofSize)
               .fill(0)
@@ -202,12 +208,14 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const daMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
       const daDifficulty =
-        (useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2) || 1;
+        useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2 ||
+        1;
       const proverMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
       const proverDifficulty =
-        (useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") + 2) || 1;
+        useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") +
+          2 || 1;
 
       const newL2Instance = newL2();
       newL2Instance.da = newL2DA(daMaxSize, daDifficulty);
@@ -298,7 +306,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const daMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
       const daDifficulty =
-        (useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2) || 1;
+        useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2 ||
+        1;
       newL2Instance.da = newL2DA(daMaxSize, daDifficulty);
       useEventManager.getState().notify("DaDone", { da: state.l2.da });
 
@@ -317,7 +326,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
       const proverDifficulty =
-        (useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") + 2) || 1;
+        useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") +
+          2 || 1;
       newL2Instance.prover = newL2Prover(proverMaxSize, proverDifficulty);
       useEventManager
         .getState()

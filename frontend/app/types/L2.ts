@@ -22,7 +22,10 @@ export type L2Prover = {
   difficulty: number;
 };
 
-export const newL2Prover = (maxSize: number = 1, difficulty: number = 1): L2Prover => ({
+export const newL2Prover = (
+  maxSize: number = 1,
+  difficulty: number = 1,
+): L2Prover => ({
   blocks: [],
   blockFees: 0,
   isBuilt: false,
