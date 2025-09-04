@@ -154,13 +154,6 @@
     "updateOn": "AutomationPurchased"
   },
   {
-    "id": 22,
-    "name": "Proof of Stake!",
-    "category": "STORY",
-    "image": "achievements.stake",
-    "updateOn": "StakingPurchased"
-  },
-  {
     "id": 23,
     "name": "Scale with Layer 2!",
     "category": "STORY",
@@ -200,7 +193,7 @@
     "name": "Mine a block 1st try",
     "category": "MISSIONS",
     "image": "achievements.mission.mine",
-    "updateOn": "MineClicked"
+    "updateOn": ["MineDone", "SequenceDone"]
   },
   {
     "id": 29,

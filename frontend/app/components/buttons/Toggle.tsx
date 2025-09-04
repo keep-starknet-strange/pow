@@ -27,10 +27,8 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
         ...style,
       }}
     >
-      <Text className="text-[#101119] font-bold text-2xl font-Xerxes">
-        {label}
-      </Text>
-      <Text className="font-bold text-4xl">{isOn ? onSymbol : offSymbol}</Text>
+      <Text className="text-[#101119] text-2xl font-Xerxes">{label}</Text>
+      <Text className="text-4xl">{isOn ? onSymbol : offSymbol}</Text>
     </Pressable>
   );
 };

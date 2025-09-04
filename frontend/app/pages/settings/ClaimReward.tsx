@@ -52,12 +52,12 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
     <ImageBackground className="flex-1" source={background} resizeMode="cover">
       <View className="flex-1 justify-center items-center px-6">
         {!rewardUnlocked ? (
-          <Text className="text-4xl font-bold text-[#101119] mb-4">
+          <Text className="text-4xl text-[#101119] mb-4">
             Keep playing to Earn STRK!
           </Text>
         ) : (
           <>
-            <Text className="text-4xl font-bold text-[#101119] mb-4">
+            <Text className="text-4xl text-[#101119] mb-4">
               🎉 You earned 10 STRK!
             </Text>
 

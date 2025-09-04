@@ -26,6 +26,7 @@ import {
 } from "../configs/nouns";
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
+import { FOC_ENGINE_API } from "../context/FocEngineConnector";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -42,7 +43,7 @@ export const getPrestigeIcon = (prestige: number) => {
 export const LeaderboardPage: React.FC = () => {
   const { STARKNET_ENABLED } = useStarknetConnector();
   const { getImage } = useImages();
-  const { getAccounts, getUniqueEventsOrdered } = useFocEngine();
+  const { getAccounts } = useFocEngine();
   const { width, height } = useCachedWindowDimensions();
   const { powGameContractAddress } = usePowContractConnector();
   const leaderboardMock = [
@@ -138,53 +139,63 @@ export const LeaderboardPage: React.FC = () => {
       return;
     }
     const getLeaderboard = async () => {
-      // Load the leaderboard data from an API
-      const scores = await getUniqueEventsOrdered(
-        powGameContractAddress,
-        "pow_game::pow::PowGame::BalanceUpdated",
-        "user",
-        "new_balance",
-        {},
-      );
-      // Example:
-      // [{"_id": "685a4b70d117280deb4d8824", "block_number": 58, "contract_address": "0x3e5dafbf907aed77522fbea63e585b422ddb9f2d1d9f74343538112cfcdbe6f", "event_type": "pow_game::pow::PowGame::BalanceUpdated", "new_balance": 28, "old_balance": 30, "transaction_hash": "0x1460c94fbadb252a6040b896a0bccfc1cfe595b2aba65d3be9b5c93ecfb49e2", "user": "0x7aa5ab9786925f5532017166691e2218c794ea2d05828fed0b133aca5edb8d9"}, {"_id": "685a4af9d117280deb4d87d9", "block_number": 54, "contract_address": "0x3e5dafbf907aed77522fbea63e585b422ddb9f2d1d9f74343538112cfcdbe6f", "event_type": "pow_game::pow::PowGame::BalanceUpdated", "new_balance": 25, "old_balance": 28, "transaction_hash": "0x4159d10b3193b31a321613e45efef6e5b01d2037927dfd435312dd3715193c5", "user": "0x790e1ae5b373f63cc2b8ea4c98cb301a3543dcc062e98a33c0ad450e75e2ac4"}]
-      const addresses = scores.map((score: any) => score.user);
-      const accounts = await getAccounts(addresses, undefined, true);
-      // Example:
-      //  {"accounts": [{"username": "qwdqwd", "address": "0x124"}, {"username": "hrthrth", "address": "0x125"}]}
-      const users = scores.map((score: any, index: number) => {
-        const shortAddress =
-          score.user.slice(0, 6) + "..." + score.user.slice(-4);
-        const account = accounts?.find(
-          (account) => account.account_address === score.user,
+      // Load the leaderboard data from the new API endpoint
+      try {
+        const response = await fetch(
+          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=20`,
         );
-        return {
-          address: score.user,
-          balance: score.new_balance,
-          prestige: 0, // TODO
-          nouns: account?.account.metadata
-            ? createNounsAttributes(
-                parseInt(account.account.metadata[0], 16),
-                parseInt(account.account.metadata[1], 16),
-                parseInt(account.account.metadata[2], 16),
-                parseInt(account.account.metadata[3], 16),
-              )
-            : getRandomNounsAttributes(),
-          name: account?.account.username || shortAddress,
-          id: index + 1,
-        };
-      });
-      users.sort((a: any, b: any) => b.balance - a.balance);
-      setLeaderboard(users);
+        const data = await response.json();
+        const events = data.events || [];
+
+        // Extract user addresses and balances from events
+        const eventData = events.map((event: any) => ({
+          user: event.keys[1], // User address from keys[1]
+          balance: parseInt(event.data[1], 16), // Parse hex balance from data[1] as uint128
+        }));
+
+        const addresses = eventData.map((item: any) => item.user);
+        const accounts = await getAccounts(addresses, undefined, true);
+
+        const users = eventData.map((item: any, index: number) => {
+          const shortAddress =
+            item.user.slice(0, 4) + "..." + item.user.slice(-4);
+          const account = accounts?.find(
+            (account) => account.account_address === item.user,
+          );
+          const hasValidUsername =
+            account?.account.username &&
+            typeof account.account.username === "string" &&
+            account.account.username.trim().length > 1;
+          const name = hasValidUsername
+            ? account.account.username
+            : shortAddress;
+          return {
+            address: item.user,
+            balance: item.balance,
+            prestige: 0, // TODO
+            nouns:
+              account?.account.metadata && account.account.metadata.length === 4
+                ? createNounsAttributes(
+                    parseInt(account.account.metadata[0], 16),
+                    parseInt(account.account.metadata[1], 16),
+                    parseInt(account.account.metadata[2], 16),
+                    parseInt(account.account.metadata[3], 16),
+                  )
+                : getRandomNounsAttributes(item.user),
+            name,
+            id: index + 1,
+          };
+        });
+        users.sort((a: any, b: any) => b.balance - a.balance);
+        setLeaderboard(users);
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+        // Fallback to mock data on error
+        setLeaderboard(leaderboardMock);
+      }
     };
     getLeaderboard();
-  }, [
-    STARKNET_ENABLED,
-    powGameContractAddress,
-    getAccounts,
-    getUniqueEventsOrdered,
-    isFocused,
-  ]);
+  }, [STARKNET_ENABLED, powGameContractAddress, getAccounts, isFocused]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -297,7 +308,7 @@ const UserAccountSection: React.FC = memo(() => {
         parseInt(user.account.metadata[3], 16),
       );
     }
-    return getRandomNounsAttributes();
+    return getRandomNounsAttributes(user?.account_address);
   }, [user?.account.metadata]);
 
   const username = user?.account.username || "";

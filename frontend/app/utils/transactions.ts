@@ -97,7 +97,6 @@ export const getTxBg = (
   return getImage(`tx.button.bg.${txData.color}`);
 };
 
-// TODO: Change getImage dependency
 export const getTxInner = (
   chainId: number,
   txId: number,
