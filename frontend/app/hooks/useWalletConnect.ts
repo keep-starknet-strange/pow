@@ -18,7 +18,6 @@ const WALLET_DEEPLINKS = {
 } as const;
 
 const WC_PROJECT_ID =
-  (process.env.WC_PROJECT_ID as string | undefined) ||
   (process.env.EXPO_PUBLIC_WC_PROJECT_ID as string | undefined) ||
   "";
 
@@ -26,6 +25,7 @@ const WC_PROJECT_ID =
 let sharedProvider: any | null = null;
 let initPromise: Promise<any> | null = null;
 let listenersBound = false;
+let coreListenersBound = false;
 
 const STARKNET_MIN_METHODS = [
   // Ready requires these for session + tx requests
@@ -117,6 +117,51 @@ export function useWalletConnect() {
               setAccount(accountAddress);
             }
           }
+        }
+
+        // Bind core session listeners once
+        if (!coreListenersBound && prov?.client) {
+          try {
+            const client: any = prov.client;
+
+            client.on?.("session_delete", () => {
+              setSession(null);
+              setAccount(null);
+            });
+
+            client.on?.("session_update", (update: any) => {
+              try {
+                const updatedSession = (client.session?.get?.(
+                  update?.topic,
+                ) || null) as SessionTypes.Struct | null;
+                if (updatedSession) {
+                  setSession(updatedSession);
+                  const updatedAccounts =
+                    updatedSession?.namespaces?.starknet?.accounts;
+                  if (Array.isArray(updatedAccounts) && updatedAccounts[0]) {
+                    const updatedAccount = updatedAccounts[0].split(":")[2];
+                    if (updatedAccount) setAccount(updatedAccount);
+                  }
+                }
+              } catch {}
+            });
+
+            client.on?.("session_event", (event: any) => {
+              try {
+                if (event?.event?.name === "accountsChanged") {
+                  const accounts = event?.event?.data as string[] | undefined;
+                  const first = Array.isArray(accounts) ? accounts[0] : undefined;
+                  const addr = first?.split?.(":")?.[2];
+                  if (addr) setAccount(addr);
+                }
+                if (event?.event?.name === "chainChanged") {
+                  // No-op: keep for future chain-aware UI if needed
+                }
+              } catch {}
+            });
+
+            coreListenersBound = true;
+          } catch {}
         }
       })
       .catch((err) => {
@@ -288,7 +333,14 @@ export function useWalletConnect() {
     if (!provider || !session) return;
 
     try {
-      await provider.disconnect();
+      if (typeof provider.disconnect === "function") {
+        await provider.disconnect();
+      } else if (provider?.client && session?.topic) {
+        await provider.client.disconnect({
+          topic: session.topic,
+          reason: { code: 6000, message: "User disconnected" },
+        });
+      }
       setSession(null);
       setAccount(null);
       setTxHash(null);
