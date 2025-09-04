@@ -41,17 +41,17 @@ export const AccountSection: React.FC = () => {
     if (keys.length > 0) {
       // Find the key that matches the connected account if available
       let keyToUse = keys[0]; // Default to first available key
-      
+
       if (account?.address) {
         // Find the key that contains the connected account address
-        const matchingKey = keys.find(key => 
-          key.toLowerCase().includes(account.address.toLowerCase())
+        const matchingKey = keys.find((key) =>
+          key.toLowerCase().includes(account.address.toLowerCase()),
         );
         if (matchingKey) {
           keyToUse = matchingKey;
         }
       }
-      
+
       const pk = await getPrivateKey(keyToUse);
       setPrivateKey(pk);
 
@@ -74,8 +74,8 @@ export const AccountSection: React.FC = () => {
       // If no stored keys but we have a connected account, try to find any matching key
       // This handles edge cases where keys list might not be properly loaded
       const allKeys = await getAvailableKeys("pow_game");
-      const matchingKey = allKeys.find(key => 
-        key.toLowerCase().includes(account.address.toLowerCase())
+      const matchingKey = allKeys.find((key) =>
+        key.toLowerCase().includes(account.address.toLowerCase()),
       );
       if (matchingKey) {
         const pk = await getPrivateKey(matchingKey);
