@@ -34,19 +34,20 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
 
-  // Get the icon image and check if it's loaded
+  // Get the images and check if they're loaded
   const iconImage = useMemo(() => getImage(props.icon), [getImage, props.icon]);
+  const buttonImage = useMemo(() => getImage("button.secondary"), [getImage]);
 
   // iOS-specific: Force re-render when icon is loaded
   const [forceUpdate, setForceUpdate] = useState(0);
   useEffect(() => {
-    if (Platform.OS === "ios" && iconImage) {
+    if (Platform.OS === "ios" && iconImage && buttonImage) {
       const timer = setTimeout(() => {
         setForceUpdate((prev) => prev + 1);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [iconImage]);
+  }, [iconImage, buttonImage]);
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
@@ -86,20 +87,25 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
             ...props.style,
           }}
         >
-          <Canvas style={{ width: width - 32, height: 92 }}>
-            <Image
-              image={getImage("button.secondary")}
-              fit="fill"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={0}
-              width={width - 32}
-              height={92}
-            />
-          </Canvas>
+          {buttonImage && (
+            <Canvas
+              style={{ width: width - 32, height: 92 }}
+              key={`unlock-bg-${forceUpdate}`}
+            >
+              <Image
+                image={buttonImage}
+                fit="fill"
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+                x={0}
+                y={0}
+                width={width - 32}
+                height={92}
+              />
+            </Canvas>
+          )}
           <View className="absolute flex flex-row items-start px-[48px] py-[8px]">
             {iconImage && (
               <Canvas

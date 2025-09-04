@@ -83,7 +83,7 @@ export const IconWithLock: React.FC<IconWithLockProps> = React.memo(
             </Canvas>
           )}
         </View>
-        {locked && (
+        {locked && lockImage && (
           <Animated.View
             className="absolute top-0 left-0 w-full h-full
                          bg-[#10111970] rounded-sm"
