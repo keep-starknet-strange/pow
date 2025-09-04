@@ -44,8 +44,14 @@ export const TxButtonInner = memo(
     const { getFee, getSpeed } = useTransactionsStore();
     const transactionUnlocked = props.feeLevel !== -1;
 
-    // Get the icon image and check if it's loaded
+    // Get the images and check if they're loaded
     const iconImage = getTxIcon(
+      props.chainId,
+      props.txId,
+      props.isDapp,
+      getImage,
+    );
+    const innerImage = getTxInner(
       props.chainId,
       props.txId,
       props.isDapp,
@@ -55,14 +61,19 @@ export const TxButtonInner = memo(
     // iOS-specific: Force re-render when transaction is unlocked
     const [forceUpdate, setForceUpdate] = useState(0);
     useEffect(() => {
-      if (Platform.OS === "ios" && transactionUnlocked && iconImage) {
+      if (
+        Platform.OS === "ios" &&
+        transactionUnlocked &&
+        iconImage &&
+        innerImage
+      ) {
         // Small delay to ensure image is loaded on iOS
         const timer = setTimeout(() => {
           setForceUpdate((prev) => prev + 1);
         }, 100);
         return () => clearTimeout(timer);
       }
-    }, [transactionUnlocked, iconImage]);
+    }, [transactionUnlocked, iconImage, innerImage]);
 
     const automationAnimHeight = useSharedValue(94);
     const automationAnimY = useDerivedValue(() => {
@@ -164,7 +175,7 @@ export const TxButtonInner = memo(
             />
           </Canvas>
         </View>
-        {transactionUnlocked && (
+        {transactionUnlocked && innerImage && (
           <View
             style={[
               styles.animationContainer,
@@ -173,7 +184,10 @@ export const TxButtonInner = memo(
               },
             ]}
           >
-            <Canvas style={styles.canvas}>
+            <Canvas
+              style={styles.canvas}
+              key={`tx-inner-${props.chainId}-${props.txId}-${props.isDapp}-${forceUpdate}`}
+            >
               <Rect
                 x={0}
                 y={automationAnimY}
@@ -181,12 +195,7 @@ export const TxButtonInner = memo(
                 height={automationAnimHeight}
               >
                 <ImageShader
-                  image={getTxInner(
-                    props.chainId,
-                    props.txId,
-                    props.isDapp,
-                    getImage,
-                  )}
+                  image={innerImage}
                   fit="fill"
                   sampling={{
                     filter: FilterMode.Nearest,

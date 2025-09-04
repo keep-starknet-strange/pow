@@ -243,22 +243,23 @@ export const LeaderboardPage: React.FC = () => {
       </View>
       <View className="flex flex-row justify-between items-center px-4 bg-[#101119] mb-[4px]">
         <Animated.Text
-          className="text-lg text-white flex-1 font-Pixels"
+          className="text-base text-white flex-1 font-Pixels"
           entering={FadeInLeft}
         >
           Leaderboard
         </Animated.Text>
         <Animated.Text
-          className="text-lg text-white w-[5rem] text-center font-Pixels"
-          entering={FadeInRight}
-        >
-          Prestige
-        </Animated.Text>
-        <Animated.Text
-          className="text-lg text-white w-[6rem] text-right font-Pixels"
+          className="text-base text-white w-[6rem] text-right font-Pixels"
           entering={FadeInRight}
         >
           Score
+        </Animated.Text>
+        <View className="w-[1rem]" />
+        <Animated.Text
+          className="text-base text-white w-[4.5rem] text-right font-Pixels"
+          entering={FadeInRight}
+        >
+          Prestige
         </Animated.Text>
       </View>
       <FlatList
@@ -310,6 +311,8 @@ const UserAccountSection: React.FC = memo(() => {
     return getRandomNounsAttributes(user?.account_address);
   }, [user?.account.metadata]);
 
+  const username = user?.account.username || "";
+
   if (!user) return null;
 
   return (
@@ -323,20 +326,49 @@ const UserAccountSection: React.FC = memo(() => {
         <View className="w-[60px] aspect-square mr-2 bg-[#11111160] relative p-[2px]">
           <PFPView user={user?.account_address} attributes={userNouns} />
         </View>
-        <Text className="text-[28px] text-white font-Teatime truncate">
-          {user?.account.username}
+        <View className="flex-1 flex justify-center">
+          <Text
+            className="text-[28px] text-[#fff7ff] font-Teatime truncate"
+            style={{ includeFontPadding: false }}
+          >
+            {username}
+          </Text>
+        </View>
+      </View>
+      <View className="w-[6rem] flex items-end justify-center">
+        <Text
+          className="text-xl text-white text-right font-Pixels"
+          style={{ includeFontPadding: false }}
+        >
+          {shortMoneyString(balance)}
         </Text>
       </View>
-      <View className="flex flex-row items-center justify-center w-[4rem]">
-        <View className="w-[36px] aspect-square">
+      <View className="w-[1rem] flex items-center justify-end">
+        <Canvas style={{ width: 16, height: 16, marginLeft: 2 }}>
+          <Image
+            image={getImage("shop.btc")}
+            fit="contain"
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+            x={0}
+            y={0}
+            width={13}
+            height={13}
+          />
+        </Canvas>
+      </View>
+      <View className="flex flex-row items-center justify-center w-[4.5rem]">
+        <View className="w-[30px] aspect-square">
           <Canvas style={{ flex: 1 }} className="w-full h-full">
             <Image
               image={getImage(getPrestigeIcon(currentPrestige))}
               fit="fill"
               x={0}
               y={0}
-              width={36}
-              height={36}
+              width={30}
+              height={30}
               sampling={{
                 filter: FilterMode.Nearest,
                 mipmap: MipmapMode.None,
@@ -345,23 +377,6 @@ const UserAccountSection: React.FC = memo(() => {
           </Canvas>
         </View>
       </View>
-      <Text className="text-xl text-white w-[6rem] text-right font-Pixels">
-        {shortMoneyString(balance)}
-      </Text>
-      <Canvas style={{ width: 16, height: 16 }} className="mr-1">
-        <Image
-          image={getImage("shop.btc")}
-          fit="contain"
-          sampling={{
-            filter: FilterMode.Nearest,
-            mipmap: MipmapMode.Nearest,
-          }}
-          x={0}
-          y={0}
-          width={13}
-          height={13}
-        />
-      </Canvas>
     </Animated.View>
   );
 });
@@ -384,6 +399,7 @@ export const LeaderboardItem: React.FC<{
 }> = memo(
   ({ index, user }: { index: number; user: any }) => {
     const { getImage } = useImages();
+
     return (
       <View
         key={user.id}
@@ -398,23 +414,55 @@ export const LeaderboardItem: React.FC<{
           <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
             <PFPView user={user.address} attributes={user.nouns} />
           </View>
-          <Text className="text-[28px] text-[#fff7ff] font-Teatime flex-1">
-            {user.name}
-          </Text>
+          <View className="flex-1 flex justify-center">
+            <Text
+              className="text-[28px] text-[#fff7ff] font-Teatime truncate"
+              style={{ includeFontPadding: false }}
+            >
+              {user.name}
+            </Text>
+          </View>
         </Animated.View>
         <Animated.View
-          className="flex flex-row items-center justify-center w-[4rem]"
+          className="w-[6rem] flex items-end justify-center"
           entering={FadeInRight}
         >
-          <View className="w-[36px] aspect-square">
+          <Text
+            className="text-xl text-white text-right font-Pixels"
+            style={{ includeFontPadding: false }}
+          >
+            {shortMoneyString(user.balance)}
+          </Text>
+        </Animated.View>
+        <View className="w-[1rem] flex items-center justify-end">
+          <Canvas style={{ width: 16, height: 16, marginLeft: 2 }}>
+            <Image
+              image={getImage("shop.btc")}
+              fit="contain"
+              sampling={{
+                filter: FilterMode.Nearest,
+                mipmap: MipmapMode.Nearest,
+              }}
+              x={0}
+              y={0}
+              width={13}
+              height={13}
+            />
+          </Canvas>
+        </View>
+        <Animated.View
+          className="flex flex-row items-center justify-center w-[4.5rem]"
+          entering={FadeInRight}
+        >
+          <View className="w-[30px] aspect-square">
             <Canvas style={{ flex: 1 }} className="w-full h-full">
               <Image
                 image={getImage(getPrestigeIcon(user.prestige))}
                 fit="contain"
                 x={0}
                 y={0}
-                width={36}
-                height={36}
+                width={30}
+                height={30}
                 sampling={{
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.None,
@@ -423,26 +471,6 @@ export const LeaderboardItem: React.FC<{
             </Canvas>
           </View>
         </Animated.View>
-        <Animated.Text
-          className="text-xl text-white w-[6rem] text-right font-Pixels"
-          entering={FadeInRight}
-        >
-          {shortMoneyString(user.balance)}
-        </Animated.Text>
-        <Canvas style={{ width: 16, height: 16 }} className="mr-1">
-          <Image
-            image={getImage("shop.btc")}
-            fit="contain"
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-            x={0}
-            y={0}
-            width={13}
-            height={13}
-          />
-        </Canvas>
       </View>
     );
   },
