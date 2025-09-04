@@ -25,12 +25,5 @@
     "message": "Block already full. Mine it to continue!",
     "type": "error",
     "color": "#f76060"
-  },
-  {
-    "id": 4,
-    "eventType": "TxError",
-    "message": "Transaction failed",
-    "type": "error",
-    "color": "#f76060"
   }
 ]
