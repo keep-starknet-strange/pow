@@ -24,7 +24,6 @@ type ClaimRewardProps = {
 export const ClaimRewardSection: React.FC = () => {
   const { invokeCalls } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
-  const { sendInAppNotification } = require("@/app/stores/useInAppNotificationsStore");
   const insets = useSafeAreaInsets();
   const {
     connectArgent,
@@ -43,7 +42,7 @@ export const ClaimRewardSection: React.FC = () => {
   const [walletError, setWalletError] = useState<string | null>(null);
   const [busyText, setBusyText] = useState<string | null>(null);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
-
+  const hideHint = localTxHash || claimed || txErrorMessage || walletError;
   const rewardUnlocked = true;
 
   const claimReward = async () => {
@@ -77,9 +76,15 @@ export const ClaimRewardSection: React.FC = () => {
         : "Transaction failed. Please try again.";
       setTxErrorMessage(friendly);
       try {
-        const { useInAppNotificationsStore } = require("@/app/stores/useInAppNotificationsStore");
-        useInAppNotificationsStore.getState().sendInAppNotification(4, friendly);
-      } catch {}
+        const {
+          useInAppNotificationsStore,
+        } = require("@/app/stores/useInAppNotificationsStore");
+        useInAppNotificationsStore
+          .getState()
+          .sendInAppNotification(4, friendly);
+      } catch (e) {
+        // ignore notification errors
+      }
       setClaimed(false);
     } finally {
       setClaiming(false);
@@ -94,10 +99,8 @@ export const ClaimRewardSection: React.FC = () => {
       const candidates = ["braavos://", "https://braavos.app"];
       let opened = false;
       for (const url of candidates) {
-        // eslint-disable-next-line no-await-in-loop
         const can = await Linking.canOpenURL(url).catch(() => false);
         if (can) {
-          // eslint-disable-next-line no-await-in-loop
           await Linking.openURL(url);
           opened = true;
           break;
@@ -167,13 +170,13 @@ export const ClaimRewardSection: React.FC = () => {
         const amount = (high << 128n) + low;
         amountStr = amount.toString();
       }
-      setRewardTitle(`🎉 You earned ${amountStr} STRK!`);
+      setRewardTitle(`You earned ${amountStr} STRK!`);
     })();
   }, [getRewardParams]);
 
   return (
-    <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>    
-      <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>        
+    <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>
+      <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>
         <Modal visible={!!busyText} transparent animationType="fade">
           <View style={styles.loadingOverlay}>
             <View style={styles.loadingBox}>
@@ -229,6 +232,27 @@ export const ClaimRewardSection: React.FC = () => {
               onChangeText={setAccountInput}
             />
 
+            {(() => {
+              const addr = (debouncedInput || "").trim();
+              return (
+                <View style={styles.linkSlot}>
+                  {addr ? (
+                    <TouchableOpacity
+                      style={styles.linkWrap}
+                      onPress={() =>
+                        Linking.openURL(`https://starkscan.co/contract/${addr}`)
+                      }
+                    >
+                      <Text style={styles.linkText}>
+                        View address on StarkScan ({addr.slice(0, 6)}...
+                        {addr.slice(-6)})
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              );
+            })()}
+
             <View style={styles.buttonWrap}>
               <BasicButton
                 label="Claim STRK"
@@ -239,30 +263,7 @@ export const ClaimRewardSection: React.FC = () => {
               />
             </View>
 
-            <View
-              style={[
-                styles.linksContainer,
-                { marginBottom: insets.bottom + 160 },
-              ]}
-            >
-              {(() => {
-                const addr = (debouncedInput || "").trim();
-                if (!addr) return null;
-                return (
-                  <TouchableOpacity
-                    style={styles.linkWrap}
-                    onPress={() =>
-                      Linking.openURL(`https://starkscan.co/contract/${addr}`)
-                    }
-                  >
-                    <Text style={styles.linkText}>
-                      View address on StarkScan ({addr.slice(0, 6)}...
-                      {addr.slice(-6)})
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })()}
-
+            <View style={styles.linksContainer}>
               {localTxHash && (
                 <TouchableOpacity
                   style={styles.linkWrap}
@@ -272,7 +273,7 @@ export const ClaimRewardSection: React.FC = () => {
                   }}
                 >
                   <Text style={styles.linkText}>
-                    View transaction on StarkScan ({localTxHash?.slice(0, 6)}...
+                    View transaction on StarkScan({localTxHash?.slice(0, 6)}...
                     {localTxHash?.slice(-6)})
                   </Text>
                 </TouchableOpacity>
@@ -291,10 +292,12 @@ export const ClaimRewardSection: React.FC = () => {
             {walletError && (
               <Text style={styles.errorText}>Error: {walletError}</Text>
             )}
-            <Text style={styles.hintText}>
-              If you use Braavos, open the app, copy your address, and paste it
-              above.
-            </Text>
+            {hideHint ? null : (
+              <Text style={styles.hintText}>
+                If you use Braavos, open the app, copy your address, and paste
+                it above.
+              </Text>
+            )}
           </>
         )}
       </View>
@@ -312,24 +315,24 @@ const styles = StyleSheet.create({
     marginBottom: 80,
   },
   title: {
-    fontSize: 36,
+    fontSize: 25,
     fontWeight: "700",
     color: "#101119",
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: "Xerxes",
   },
   titleAlt: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "700",
     color: "#101119",
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: "Xerxes",
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#e7e7e7",
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: 12,
     fontFamily: "Xerxes",
   },
   buttonWrap: {
@@ -339,7 +342,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   basicButtonText: {
-    fontSize: 24,
+    fontSize: 20,
     fontFamily: "Xerxes",
   },
   input: {
@@ -348,7 +351,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     minHeight: 46,
     borderRadius: 10,
-    marginVertical: 12,
+    marginVertical: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 18,
@@ -363,18 +366,34 @@ const styles = StyleSheet.create({
     color: "#101119", // black, readable on green background
     textDecorationLine: "underline",
     textAlign: "center",
-    marginVertical: 6,
+    marginVertical: 4,
     fontFamily: "Xerxes",
   },
   linkDisabled: { color: "#9ca3af" },
   linksContainer: {
-    marginTop: 10,
-    marginBottom: 64,
+    marginTop: 8,
+    marginBottom: 16,
     width: "100%",
     alignItems: "center",
   },
-  successText: { color: "#22c55e", marginTop: 8, textAlign: "center", fontFamily: "Xerxes" },
-  errorText: { color: "#f87171", marginTop: 8, textAlign: "center", fontFamily: "Xerxes" },
+  linkSlot: {
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  successText: {
+    color: "#22c55e",
+    marginTop: 8,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
+  errorText: {
+    color: "#f87171",
+    marginTop: 8,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
   loadingOverlay: {
     flex: 1,
     backgroundColor: "#00000080",

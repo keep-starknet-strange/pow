@@ -18,8 +18,7 @@ const WALLET_DEEPLINKS = {
 } as const;
 
 const WC_PROJECT_ID =
-  (process.env.EXPO_PUBLIC_WC_PROJECT_ID as string | undefined) ||
-  "";
+  (process.env.EXPO_PUBLIC_WC_PROJECT_ID as string | undefined) || "";
 
 // Module-level singleton to avoid multiple initializations
 let sharedProvider: any | null = null;
@@ -131,9 +130,8 @@ export function useWalletConnect() {
 
             client.on?.("session_update", (update: any) => {
               try {
-                const updatedSession = (client.session?.get?.(
-                  update?.topic,
-                ) || null) as SessionTypes.Struct | null;
+                const updatedSession = (client.session?.get?.(update?.topic) ||
+                  null) as SessionTypes.Struct | null;
                 if (updatedSession) {
                   setSession(updatedSession);
                   const updatedAccounts =
@@ -143,25 +141,33 @@ export function useWalletConnect() {
                     if (updatedAccount) setAccount(updatedAccount);
                   }
                 }
-              } catch {}
+              } catch (e) {
+                // ignore listener errors
+              }
             });
 
             client.on?.("session_event", (event: any) => {
               try {
                 if (event?.event?.name === "accountsChanged") {
                   const accounts = event?.event?.data as string[] | undefined;
-                  const first = Array.isArray(accounts) ? accounts[0] : undefined;
+                  const first = Array.isArray(accounts)
+                    ? accounts[0]
+                    : undefined;
                   const addr = first?.split?.(":")?.[2];
                   if (addr) setAccount(addr);
                 }
                 if (event?.event?.name === "chainChanged") {
                   // No-op: keep for future chain-aware UI if needed
                 }
-              } catch {}
+              } catch (e) {
+                // ignore listener errors
+              }
             });
 
             coreListenersBound = true;
-          } catch {}
+          } catch (e) {
+            // ignore binding errors
+          }
         }
       })
       .catch((err) => {
