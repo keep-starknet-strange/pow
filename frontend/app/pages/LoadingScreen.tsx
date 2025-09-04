@@ -126,7 +126,7 @@ export const LoadingScreen: React.FC = memo(() => {
   const tutorialInitialized = useTutorialStore((state) => state.isInitialized);
   const upgradesInitialized = useUpgradesStore((state) => state.isInitialized);
   const soundInitialized = useSoundStore((state) => state.isInitialized);
-  
+
   const allStoresInitialized =
     gameInitialized &&
     balanceInitialized &&
