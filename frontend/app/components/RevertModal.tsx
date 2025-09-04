@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
   interpolate,
 } from "react-native-reanimated";
+import NetInfo from "@react-native-community/netinfo";
 import { Window } from "./tutorial/Window";
 import { useOnchainActions } from "../stores/useOnchainActions";
 import {
@@ -107,6 +108,23 @@ const AttackerAvatar = memo(() => {
 
 const RevertModalComponent: React.FC = () => {
   const { isReverting } = useOnchainActions();
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    if (isReverting) {
+      // Check network connectivity when reverting starts
+      NetInfo.fetch().then((state) => {
+        setIsConnected(state.isConnected ?? true);
+      });
+
+      // Subscribe to network changes while reverting
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        setIsConnected(state.isConnected ?? true);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [isReverting]);
 
   if (!isReverting) return null;
 
@@ -127,14 +145,15 @@ const RevertModalComponent: React.FC = () => {
         >
           <View className="items-center">
             <Text className="text-[28px] font-Teatime text-red-400 my-[4px] text-center">
-              Reversion Attack!
+              {isConnected ? "Reversion Attack!" : "Connection Lost!"}
             </Text>
 
             <AttackerAvatar />
 
             <Text className="text-[14px] font-Pixels text-gray-100 text-center my-[4px] px-2 leading-5">
-              A mysterious spammer has infiltrated your blockchain! They're
-              causing chaos and forcing a rollback of recent transactions.
+              {isConnected
+                ? "A mysterious spammer has infiltrated your blockchain! They're causing chaos and forcing a rollback of recent transactions."
+                : "Your node went offline! POW! requires an internet connection for the fully onchain experience. Continuing in offline mode wont save progress!"}
             </Text>
 
             <LoadingDots />

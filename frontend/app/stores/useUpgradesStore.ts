@@ -128,7 +128,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
     if (!user || !powContract) return;
 
-    // TODO: Hardcoded chain ids
     const chainIds = [0, 1]; // L1 and L2
 
     // Fetch upgrade levels
@@ -341,13 +340,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       set({ canPrestige: false });
       return;
     }
-
-    /* TODO: Include once switched to zustand
-    if (!stakingUnlocked) {
-      set({ canPrestige: false });
-      return;
-    }
-    */
 
     // Check all L2 (chain 1) automations are unlocked
     const automationLevels = automations[1];

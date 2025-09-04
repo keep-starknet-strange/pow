@@ -142,11 +142,6 @@ export class TxBuilderObserver implements Observer {
     }
 
     if (eventType === "TxAdded" && data?.tx) {
-      // TODO: Temporary work around
-      if (data.tx.typeId === proofTxTypeId || data.tx.typeId === daTxTypeId) {
-        // Don't add the tx to the multi call if it's a proof or DA tx
-        return;
-      }
       if (data.tx.isDapp) {
         // Offset the txId by the number of tx types to get the correct txId for the dapp
         const txTypes =

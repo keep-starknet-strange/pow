@@ -6,8 +6,15 @@ import {
   ScrollView,
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import BasicButton from "../../components/buttons/Basic";
 
-export const AboutSection = () => {
+export type AboutSectionProps = {
+  setSettingTab: (tab: "Credits") => void;
+};
+
+export const AboutSection: React.FC<AboutSectionProps> = ({
+  setSettingTab,
+}) => {
   return (
     <Animated.View className="flex-1" entering={FadeInUp}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -82,6 +89,9 @@ export const AboutSection = () => {
           </View>
         </View>
       </ScrollView>
+      <View className="mt-4 items-center">
+        <BasicButton label="Credits" onPress={() => setSettingTab("Credits")} />
+      </View>
     </Animated.View>
   );
 };

@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Observer, EventType } from "@/app/stores/useEventManager";
 import { useAchievementsStore } from "@/app/stores/useAchievementsStore";
+import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import achievements from "../configs/achievements.json";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
@@ -41,17 +42,24 @@ export class AchievementObserver implements Observer {
   private groupAchievementsByEvent(): Map<string, Achievement[]> {
     const map = new Map<string, Achievement[]>();
     achievements.forEach((achievement) => {
-      if (!map.has(achievement.updateOn)) {
-        map.set(achievement.updateOn, []);
-      }
-      map.get(achievement.updateOn)!.push(achievement);
+      // Handle both string and array values for updateOn
+      const events = Array.isArray(achievement.updateOn)
+        ? achievement.updateOn
+        : [achievement.updateOn];
+
+      events.forEach((event) => {
+        if (!map.has(event)) {
+          map.set(event, []);
+        }
+        map.get(event)!.push(achievement);
+      });
     });
     return map;
   }
 
   async onNotify(eventName: EventType, data?: any): Promise<void> {
     const relevantAchievements = this.achievementsByEvent.get(eventName);
-    if (!relevantAchievements || !data) return;
+    if (!relevantAchievements) return;
 
     relevantAchievements.forEach((achievement) => {
       if (this.completedAchievements.has(achievement.id)) return; // Skip completed achievements
@@ -130,6 +138,14 @@ export class AchievementObserver implements Observer {
   }
 
   private handleMineDone(achievement: Achievement, block: Block) {
+    if (achievement.name === "Mine a block 1st try") {
+      // Achievement unlocks when mining a block with difficulty 1 (requires only 1 click)
+      if (block.difficulty === 1) {
+        this.updateAchievement(achievement.id, 100);
+      }
+      return;
+    }
+
     const blockTargets: Record<string, number> = {
       "Reach L1 Block 10": 10,
       "Reach L1 Block 42": 42,
@@ -144,16 +160,19 @@ export class AchievementObserver implements Observer {
   }
 
   private handleMineClicked(achievement: Achievement, data: any) {
-    const { counter, difficulty } = data;
-    if (achievement.name === "Mine a block 1st try") {
-      // Player successfully mined the block on the first attempt
-      if (counter === 1 && counter >= difficulty) {
-        this.updateAchievement(achievement.id, 100);
-      }
-    }
+    // Currently no achievements use MineClicked event
+    // This handler is kept for potential future achievements
   }
 
   private handleSequenceDone(achievement: Achievement, block: Block) {
+    if (achievement.name === "Mine a block 1st try") {
+      // Achievement unlocks when sequencing a block with difficulty 1 (requires only 1 click)
+      if (block.difficulty === 1) {
+        this.updateAchievement(achievement.id, 100);
+      }
+      return;
+    }
+
     const blockTargets: Record<string, number> = {
       "Reach L2 Block 10": 10,
       "Reach L2 Block 100": 100,
@@ -185,21 +204,29 @@ export class AchievementObserver implements Observer {
     if (isDapp) {
       const txConfigJson =
         chainId === 0 ? dappsJson.L1.transactions : dappsJson.L2.transactions;
-      const lastUnlockableTxId = txConfigJson[txConfigJson.length - 1].id + 1;
-      // Update progress if new txId unlocked
-      if (level === 0) {
-        const progress = Math.min(((txId + 1) / lastUnlockableTxId) * 100, 100);
-        this.updateAchievement(achievement.id, progress);
-      }
+      const totalTransactions = txConfigJson.length;
+
+      // Calculate current progress by counting unlocked transactions
+      const dappFeeLevels =
+        useTransactionsStore.getState().dappFeeLevels[chainId] || {};
+      const unlockedCount = Object.keys(dappFeeLevels).filter(
+        (id) => dappFeeLevels[Number(id)] >= 0,
+      ).length;
+      const progress = Math.min((unlockedCount / totalTransactions) * 100, 100);
+      this.updateAchievement(achievement.id, progress);
     } else {
       const txConfigJson =
         chainId === 0 ? transactionsJson.L1 : transactionsJson.L2;
-      const lastUnlockableTxId = txConfigJson[txConfigJson.length - 1].id + 1;
-      // Update progress if new txId unlocked
-      if (level === 0) {
-        const progress = Math.min(((txId + 1) / lastUnlockableTxId) * 100, 100);
-        this.updateAchievement(achievement.id, progress);
-      }
+      const totalTransactions = txConfigJson.length;
+
+      // Calculate current progress by counting unlocked transactions
+      const transactionFeeLevels =
+        useTransactionsStore.getState().transactionFeeLevels[chainId] || {};
+      const unlockedCount = Object.keys(transactionFeeLevels).filter(
+        (id) => transactionFeeLevels[Number(id)] >= 0,
+      ).length;
+      const progress = Math.min((unlockedCount / totalTransactions) * 100, 100);
+      this.updateAchievement(achievement.id, progress);
     }
   }
 
