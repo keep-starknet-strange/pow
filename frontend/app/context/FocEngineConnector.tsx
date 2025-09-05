@@ -839,7 +839,6 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const disconnectUser = useCallback(() => {
     setUser(null);
-    setUserContract(undefined);
   }, []);
 
   return (

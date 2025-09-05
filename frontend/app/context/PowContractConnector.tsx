@@ -108,7 +108,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<
     string | null
-  >(null);
+  >(process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || null);
   const [powContract, setPowContract] = useState<Contract | null>(null);
 
   useEffect(() => {
@@ -121,13 +121,15 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       // TODO: Use foc-engine API to get contract addresses
       // const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
-      const contract = process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS;
-      if (contract) {
-        setPowGameContractAddress(contract);
-        connectContract(contract); // TODO: Allow getRegisteredContract args
+      if (powGameContractAddress) {
+        connectContract(powGameContractAddress); // TODO: Allow getRegisteredContract args
         const abi = powGameAbi.abi;
         if (abi) {
-          const powGameContract = new Contract(abi, contract, provider);
+          const powGameContract = new Contract(
+            abi,
+            powGameContractAddress,
+            provider,
+          );
           setPowContract(powGameContract);
         } else {
           console.error("Failed to load Pow Game ABI");
@@ -137,7 +139,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     fetchPowGameContractAddress();
-  }, [getRegisteredContract, provider, STARKNET_ENABLED]);
+  }, [
+    getRegisteredContract,
+    provider,
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    connectContract,
+  ]);
 
   useEffect(() => {
     if (!STARKNET_ENABLED || !account) {

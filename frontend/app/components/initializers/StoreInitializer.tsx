@@ -1,4 +1,4 @@
-import { useEffect, memo } from "react";
+import { useEffect, memo, useCallback } from "react";
 import { useStarknetConnector } from "@/app/context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { usePowContractConnector } from "@/app/context/PowContractConnector";
@@ -23,6 +23,60 @@ const OnchainActionsInitializer = memo(() => {
   useEffect(() => {
     onWaitForTransaction(waitForTransaction);
   }, [waitForTransaction, onWaitForTransaction]);
+
+  return null;
+});
+
+const OnchainActionsRevertInitializer = memo(() => {
+  const { resetBalance, setIsInitialized: setBalanceInitialized } =
+    useBalanceStore();
+  const { resetGameStore, setIsInitialized: setGameInitialized } =
+    useGameStore();
+  const { resetL2Store, setIsInitialized: setL2Initialized } = useL2Store();
+  const { resetTransactions, setIsInitialized: setTransactionsInitialized } =
+    useTransactionsStore();
+  const { resetUpgrades, setIsInitialized: setUpgradesInitialized } =
+    useUpgradesStore();
+  const { onRevertCallback } = useOnchainActions();
+
+  const { disconnectUser, refreshUser, userContract } = useFocEngine();
+
+  const revertCallback = useCallback(async () => {
+    // Reset all user stores
+    resetBalance();
+    resetGameStore();
+    resetL2Store();
+    resetTransactions();
+    resetUpgrades();
+
+    // Manual reinitialization of user stores
+    disconnectUser();
+    setBalanceInitialized(false);
+    setGameInitialized(false);
+    setL2Initialized(false);
+    setTransactionsInitialized(false);
+    setUpgradesInitialized(false);
+    await new Promise((resolve) => setTimeout(resolve, 200)); // Small delay
+    refreshUser(userContract);
+  }, [
+    disconnectUser,
+    refreshUser,
+    userContract,
+    resetBalance,
+    resetGameStore,
+    resetL2Store,
+    resetTransactions,
+    resetUpgrades,
+    setBalanceInitialized,
+    setGameInitialized,
+    setL2Initialized,
+    setTransactionsInitialized,
+    setUpgradesInitialized,
+  ]);
+
+  useEffect(() => {
+    onRevertCallback(revertCallback);
+  }, [onRevertCallback, revertCallback]);
 
   return null;
 });
@@ -199,6 +253,7 @@ export const StoreInitializer = memo(() => {
   return (
     <>
       <OnchainActionsInitializer />
+      <OnchainActionsRevertInitializer />
       <SoundInitializer />
       <TutorialInitializer />
       <AchievementsInitializer />
