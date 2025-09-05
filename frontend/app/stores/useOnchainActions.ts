@@ -15,6 +15,7 @@ interface OnchainActionsState {
   invokeQueue: ActionsCall[];
   isProcessing: boolean;
   isReverting: boolean;
+  revertCounter: number;
   addAction: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
   waitForTransaction?: (txHash: string) => Promise<boolean>;
@@ -61,6 +62,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   invokeQueue: [],
   isProcessing: false,
   isReverting: false,
+  revertCounter: 0,
 
   addAction: (action: Call) =>
     set((state) => {
@@ -143,9 +145,10 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           }
         }
 
-        // Remove completed item from queue (pruning)
+        // Remove completed item from queue (pruning) and reset revert counter
         set((state) => ({
           invokeQueue: state.invokeQueue.slice(1), // Remove first item
+          revertCounter: 0, // Reset counter on success
         }));
 
         if (__DEV__) {
@@ -215,11 +218,16 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   },
 
   revert: async (failedActionId?: string, lastError?: string) => {
-    // Clear the entire queue and lock the store
-    set({ isReverting: true, invokeQueue: [], actions: [] });
+    // Clear the entire queue, lock the store, and increment revert counter
+    set((state) => ({ 
+      isReverting: true, 
+      invokeQueue: [], 
+      actions: [],
+      revertCounter: state.revertCounter + 1,
+    }));
 
     if (__DEV__) {
-      console.log("⚠️ Reverting initiated, store locked");
+      console.log("⚠️ Reverting initiated, store locked. Revert count:", get().revertCounter);
     }
 
     useEventManager.getState().notify("ActionsReverted", {

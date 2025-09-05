@@ -107,7 +107,7 @@ const AttackerAvatar = memo(() => {
 });
 
 const RevertModalComponent: React.FC = () => {
-  const { isReverting } = useOnchainActions();
+  const { isReverting, revertCounter } = useOnchainActions();
   const [shouldShow, setShouldShow] = useState(isReverting);
   const [canDismiss, setCanDismiss] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
@@ -158,7 +158,9 @@ const RevertModalComponent: React.FC = () => {
 
             <Text className="text-[14px] font-Pixels text-gray-100 text-center my-[4px] px-2 leading-5">
               {isConnected
-                ? "A mysterious spammer has infiltrated your blockchain! They're causing chaos and forced a rollback of recent transactions."
+                ? revertCounter >= 3
+                  ? "Multiple failures detected! There may be network issues. Please try restarting the app or coming back later."
+                  : "A mysterious spammer has infiltrated your blockchain! They're causing chaos and forced a rollback of recent transactions."
                 : "Your node went offline! POW! requires an internet connection for the fully onchain experience. Continuing in offline mode wont save progress!"}
             </Text>
 

@@ -7,6 +7,8 @@ export const PrestigeUnlock: React.FC = () => {
   const { prestige, getNextPrestigeCost, canPrestige, currentPrestige } =
     useUpgrades();
   const [showUnlock, setShowUnlock] = useState(false);
+  /*
+  TODO
   useEffect(() => {
     if (!canPrestige) {
       setShowUnlock(false);
@@ -14,6 +16,7 @@ export const PrestigeUnlock: React.FC = () => {
     }
     setShowUnlock(true);
   }, [canPrestige]);
+  */
 
   return (
     <View>
