@@ -18,6 +18,7 @@ interface UpgradesState {
   currentPrestige: number;
   canPrestige: boolean;
   isInitialized: boolean;
+  setIsInitialized: (initialized: boolean) => void;
 
   // Actions
   upgrade: (chainId: number, upgradeId: number) => void;
@@ -66,6 +67,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   currentPrestige: 0,
   canPrestige: false,
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
 
   resetUpgrades: () => {
     // Initialize upgrades
@@ -420,7 +422,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     set({
       currentPrestige: nextPrestige,
       canPrestige: false,
-      isInitialized: false,
     });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);

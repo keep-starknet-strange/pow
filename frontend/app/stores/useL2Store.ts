@@ -14,6 +14,7 @@ interface L2Store {
   l2: L2 | undefined;
   isL2Unlocked: boolean;
   isInitialized: boolean;
+  setIsInitialized: (isInitialized: boolean) => void;
 
   resetL2Store: () => void;
   initializeL2Store: (
@@ -58,9 +59,10 @@ export const useL2Store = create<L2Store>((set, get) => ({
   l2: undefined,
   isL2Unlocked: false,
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
 
   resetL2Store: () =>
-    set({ l2: undefined, isL2Unlocked: false, isInitialized: false }),
+    set({ l2: undefined, isL2Unlocked: false }),
   initializeL2Store: (
     powContract,
     user,

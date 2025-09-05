@@ -13,6 +13,7 @@ interface GameStore {
   workingBlocks: Block[];
   blockHeights: Record<number, number>; // ChainId -> Block Height
   isInitialized: boolean;
+  setIsInitialized: (isInitialized: boolean) => void;
 
   resetGameStore: () => void;
   initializeGameStore: (
@@ -46,6 +47,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   workingBlocks: [],
   blockHeights: {},
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
   initMyGameDependency: undefined,
   setInitMyGameDependency: (initMyGame) =>
     set({ initMyGameDependency: initMyGame }),
@@ -66,7 +68,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       workingBlocks: [initBlock],
       blockHeights: { 0: initBlock.blockId },
-      isInitialized: false, // Mark as not initialized so it will re-fetch on next load
     });
   },
 

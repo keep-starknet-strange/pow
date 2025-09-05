@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -108,10 +108,14 @@ const AttackerAvatar = memo(() => {
 
 const RevertModalComponent: React.FC = () => {
   const { isReverting } = useOnchainActions();
+  const [shouldShow, setShouldShow] = useState(isReverting);
+  const [canDismiss, setCanDismiss] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     if (isReverting) {
+      setShouldShow(true);
+      setCanDismiss(false);
       // Check network connectivity when reverting starts
       NetInfo.fetch().then((state) => {
         setIsConnected(state.isConnected ?? true);
@@ -123,20 +127,22 @@ const RevertModalComponent: React.FC = () => {
       });
 
       return () => unsubscribe();
+    } else {
+      // Allow dismissing the modal after reverting is done
+      setTimeout(() => setCanDismiss(true), 5000);
     }
   }, [isReverting]);
 
-  if (!isReverting) return null;
+  if (!shouldShow) return null;
 
   return (
-    <View className="absolute inset-0 z-[100]" pointerEvents="box-none">
+    <View className="absolute inset-0 z-[1001]">
       {/* Dark overlay */}
       <View className="absolute inset-0 bg-black/70" pointerEvents="auto" />
 
       {/* Modal window */}
       <View
         className="absolute inset-0 items-center justify-center"
-        pointerEvents="none"
       >
         <Window
           style={{
@@ -152,11 +158,19 @@ const RevertModalComponent: React.FC = () => {
 
             <Text className="text-[14px] font-Pixels text-gray-100 text-center my-[4px] px-2 leading-5">
               {isConnected
-                ? "A mysterious spammer has infiltrated your blockchain! They're causing chaos and forcing a rollback of recent transactions."
+                ? "A mysterious spammer has infiltrated your blockchain! They're causing chaos and forced a rollback of recent transactions."
                 : "Your node went offline! POW! requires an internet connection for the fully onchain experience. Continuing in offline mode wont save progress!"}
             </Text>
 
-            <LoadingDots />
+            {!canDismiss ?
+              <LoadingDots /> :
+              <Pressable
+                onPress={() => setShouldShow(false)}
+                className="bg-blue-500 px-4 py-2 rounded-lg mt-2 mb-2"
+              >
+                <Text className="text-white font-Pixels text-[14px]">Okay</Text>
+              </Pressable>
+            }
           </View>
         </Window>
       </View>

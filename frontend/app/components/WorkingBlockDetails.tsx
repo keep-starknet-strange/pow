@@ -110,7 +110,7 @@ const BlockIdLabel = memo(
             flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
           }}
         >
           <Text style={textStyle}>#</Text>
