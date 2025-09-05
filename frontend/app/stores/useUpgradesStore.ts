@@ -49,6 +49,7 @@ interface UpgradesState {
       chainId: number,
       automationsCount: number,
     ) => Promise<number[] | undefined>,
+    getUserPrestige: () => Promise<number | undefined>,
     getUniqueEventsWith?: (
       contractAddress: string,
       eventType: string,
@@ -126,12 +127,23 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     powContract,
     getUserUpgradeLevels,
     getUserAutomationLevels,
+    getUserPrestige,
     getUniqueEventsWith,
   ) => {
     const { resetUpgrades } = get();
     resetUpgrades();
 
     if (!user || !powContract) return;
+
+    // Fetch and set on-chain prestige to keep currentPrestige consistent across the app
+    try {
+      const prestige = await getUserPrestige();
+      if (typeof prestige === "number") {
+        set({ currentPrestige: prestige });
+      }
+    } catch (error) {
+      console.error("Failed to initialize currentPrestige:", error);
+    }
 
     const chainIds = [0, 1]; // L1 and L2
 

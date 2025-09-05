@@ -22,7 +22,7 @@ import { useUpgradesStore } from "../../stores/useUpgradesStore";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
-    tab: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse",
+    tab: "Account" | "About" | "ClaimReward" | "TermsOfUse",
   ) => void;
   goBackToLogin: () => void;
 };
@@ -45,20 +45,6 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const { user, disconnectUser } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
-  const { getUserPrestige } = usePowContractConnector();
-  const [onchainPrestige, setOnchainPrestige] = useState<number | null>(null);
-  const [rewardThreshold, setRewardThreshold] = useState<number | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const p = await getUserPrestige();
-      if (mounted && typeof p === "number") setOnchainPrestige(p);
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [getUserPrestige]);
   const { resetTutorial } = useTutorialStore();
 
   const handleResetGame = async () => {
@@ -93,7 +79,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse";
+    tab?: "Account" | "About" | "ClaimReward" | "TermsOfUse";
     onPress?: () => void;
     icon?: string;
   }[] = [
@@ -105,8 +91,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Terms of Use", tab: "TermsOfUse" },
     // { label: "Account", tab: "Account" }, // TODO: Hidden for now
     { label: "About", tab: "About" },
-    { label: "Credits", tab: "Credits" },
-    ...((onchainPrestige ?? currentPrestige) >= 1
+    ...(currentPrestige >= 1
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
     {
