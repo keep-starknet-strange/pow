@@ -35,6 +35,7 @@ pub trait IPowGameRewards<TContractState> {
     fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
     fn claim_reward(ref self: TContractState, recipient: ContractAddress);
     fn get_reward_params(self: @TContractState) -> RewardParams;
+    fn has_claimed_reward(self: @TContractState, user: ContractAddress) -> bool;
     fn host_give_reward(
         ref self: TContractState, user: ContractAddress, recipient: ContractAddress,
     );

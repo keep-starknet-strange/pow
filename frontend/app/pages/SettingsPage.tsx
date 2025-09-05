@@ -5,7 +5,6 @@ import { useIsFocused } from "@react-navigation/native";
 
 import AboutSection from "./settings/About";
 import AccountSection from "./settings/Account";
-import CreditsSection from "./settings/Credits";
 import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
 import TermsOfUse from "./settings/TermsOfUse";
@@ -17,7 +16,6 @@ const tabs = {
   Main: SettingsMainSection,
   Account: AccountSection,
   About: AboutSection,
-  Credits: CreditsSection,
   ClaimReward: ClaimRewardSection,
   TermsOfUse: TermsOfUse,
 };

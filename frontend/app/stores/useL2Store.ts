@@ -151,6 +151,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
             isL2Unlocked: true,
             isInitialized: true,
           });
+          useUpgradesStore.getState().checkCanPrestige();
         } catch (error) {
           if (__DEV__) console.error("Error initializing L2 store:", error);
         }
@@ -228,6 +229,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
         isL2Unlocked: true,
       };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   getL2Cost: () => {

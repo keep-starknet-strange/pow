@@ -225,8 +225,12 @@ const L2Initializer = memo(() => {
 
 const UpgradesInitializer = memo(() => {
   const { user, getUniqueEventsWith } = useFocEngine();
-  const { powContract, getUserUpgradeLevels, getUserAutomationLevels } =
-    usePowContractConnector();
+  const {
+    powContract,
+    getUserUpgradeLevels,
+    getUserAutomationLevels,
+    getUserPrestige,
+  } = usePowContractConnector();
   const { initializeUpgrades } = useUpgradesStore();
 
   useEffect(() => {
@@ -235,6 +239,7 @@ const UpgradesInitializer = memo(() => {
       powContract,
       getUserUpgradeLevels,
       getUserAutomationLevels,
+      getUserPrestige,
       getUniqueEventsWith,
     );
   }, [
@@ -242,6 +247,7 @@ const UpgradesInitializer = memo(() => {
     powContract,
     getUserUpgradeLevels,
     getUserAutomationLevels,
+    getUserPrestige,
     getUniqueEventsWith,
     initializeUpgrades,
   ]);

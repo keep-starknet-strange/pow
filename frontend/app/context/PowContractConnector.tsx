@@ -69,6 +69,16 @@ type PowContractContextType = {
       }
     | undefined
   >;
+  getUserPrestige: () => Promise<number | undefined>;
+  getRewardParams: () => Promise<
+    | {
+        rewardTokenAddress: string;
+        rewardPrestigeThreshold: number;
+        rewardAmount: { low: string; high: string } | string;
+      }
+    | undefined
+  >;
+  getHasClaimedReward: () => Promise<boolean | undefined>;
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
@@ -562,6 +572,49 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  const getUserPrestige = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract || !account) {
+      return;
+    }
+    try {
+      const prestige = await powContract.get_user_prestige(account.address);
+      return prestige.toString ? parseInt(prestige.toString(), 10) : undefined;
+    } catch (error) {
+      console.error("Failed to fetch user prestige:", error);
+      return undefined;
+    }
+  }, [account, powContract, STARKNET_ENABLED]);
+
+  const getRewardParams = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract) return;
+    try {
+      const params = await powContract.get_reward_params();
+      return {
+        rewardTokenAddress: params.reward_token_address as string,
+        rewardPrestigeThreshold: Number(
+          params.reward_prestige_threshold?.toString?.() ||
+            params.reward_prestige_threshold ||
+            0,
+        ),
+        rewardAmount: params.reward_amount as any,
+      };
+    } catch (e) {
+      console.error("Failed to fetch reward params:", e);
+      return undefined;
+    }
+  }, [powContract, STARKNET_ENABLED]);
+
+  const getHasClaimedReward = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract || !account) return;
+    try {
+      const claimed = await powContract.has_claimed_reward(account.address);
+      return Boolean(claimed);
+    } catch (e) {
+      console.error("Failed to fetch has_claimed_reward:", e);
+      return undefined;
+    }
+  }, [powContract, STARKNET_ENABLED, account]);
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -604,6 +657,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserProofClicks,
         getUserProofBuildingState,
         getUserDABuildingState,
+        getUserPrestige,
+        getRewardParams,
+        getHasClaimedReward,
         doubleBalanceCheat,
       }}
     >
