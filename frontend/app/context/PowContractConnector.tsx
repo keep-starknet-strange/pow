@@ -125,7 +125,11 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         connectContract(powGameContractAddress); // TODO: Allow getRegisteredContract args
         const abi = powGameAbi.abi;
         if (abi) {
-          const powGameContract = new Contract(abi, powGameContractAddress, provider);
+          const powGameContract = new Contract(
+            abi,
+            powGameContractAddress,
+            provider,
+          );
           setPowContract(powGameContract);
         } else {
           console.error("Failed to load Pow Game ABI");
@@ -135,7 +139,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     fetchPowGameContractAddress();
-  }, [getRegisteredContract, provider, STARKNET_ENABLED, powGameContractAddress, connectContract]);
+  }, [
+    getRegisteredContract,
+    provider,
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    connectContract,
+  ]);
 
   useEffect(() => {
     if (!STARKNET_ENABLED || !account) {

@@ -28,11 +28,15 @@ const OnchainActionsInitializer = memo(() => {
 });
 
 const OnchainActionsRevertInitializer = memo(() => {
-  const { resetBalance, setIsInitialized: setBalanceInitialized } = useBalanceStore();
-  const { resetGameStore, setIsInitialized: setGameInitialized } = useGameStore();
+  const { resetBalance, setIsInitialized: setBalanceInitialized } =
+    useBalanceStore();
+  const { resetGameStore, setIsInitialized: setGameInitialized } =
+    useGameStore();
   const { resetL2Store, setIsInitialized: setL2Initialized } = useL2Store();
-  const { resetTransactions, setIsInitialized: setTransactionsInitialized } = useTransactionsStore();
-  const { resetUpgrades, setIsInitialized: setUpgradesInitialized } = useUpgradesStore();
+  const { resetTransactions, setIsInitialized: setTransactionsInitialized } =
+    useTransactionsStore();
+  const { resetUpgrades, setIsInitialized: setUpgradesInitialized } =
+    useUpgradesStore();
   const { onRevertCallback } = useOnchainActions();
 
   const { disconnectUser, refreshUser, userContract } = useFocEngine();

@@ -219,15 +219,18 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
 
   revert: async (failedActionId?: string, lastError?: string) => {
     // Clear the entire queue, lock the store, and increment revert counter
-    set((state) => ({ 
-      isReverting: true, 
-      invokeQueue: [], 
+    set((state) => ({
+      isReverting: true,
+      invokeQueue: [],
       actions: [],
       revertCounter: state.revertCounter + 1,
     }));
 
     if (__DEV__) {
-      console.log("⚠️ Reverting initiated, store locked. Revert count:", get().revertCounter);
+      console.log(
+        "⚠️ Reverting initiated, store locked. Revert count:",
+        get().revertCounter,
+      );
     }
 
     useEventManager.getState().notify("ActionsReverted", {

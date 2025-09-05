@@ -141,9 +141,7 @@ const RevertModalComponent: React.FC = () => {
       <View className="absolute inset-0 bg-black/70" pointerEvents="auto" />
 
       {/* Modal window */}
-      <View
-        className="absolute inset-0 items-center justify-center"
-      >
+      <View className="absolute inset-0 items-center justify-center">
         <Window
           style={{
             width: 280,
@@ -164,15 +162,16 @@ const RevertModalComponent: React.FC = () => {
                 : "Your node went offline! POW! requires an internet connection for the fully onchain experience. Continuing in offline mode wont save progress!"}
             </Text>
 
-            {!canDismiss ?
-              <LoadingDots /> :
+            {!canDismiss ? (
+              <LoadingDots />
+            ) : (
               <Pressable
                 onPress={() => setShouldShow(false)}
                 className="bg-blue-500 px-4 py-2 rounded-lg mt-2 mb-2"
               >
                 <Text className="text-white font-Pixels text-[14px]">Okay</Text>
               </Pressable>
-            }
+            )}
           </View>
         </Window>
       </View>
