@@ -42,7 +42,7 @@ export const L2Phase: React.FC = () => {
     >
       <BlockchainView chainId={1} style={{ flex: 1 }} />
       <DappsUnlock chainId={1} />
-      <PrestigeUnlock />
+      <PrestigeUnlock disableMinimize={false} />
       <Animated.View
         style={{
           width: "100%",

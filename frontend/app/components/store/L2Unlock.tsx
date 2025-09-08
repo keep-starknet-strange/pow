@@ -14,21 +14,17 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
   const { workingBlocks } = useGameStore();
   const miningBlock = workingBlocks[0];
   const [showUnlock, setShowUnlock] = useState(false);
+
+  const canUnlockL2Value = canUnlockL2();
+
   useEffect(() => {
     if (alwaysShow) {
       setShowUnlock(true);
       return;
     }
 
-    if (miningBlock?.isBuilt) {
-      setShowUnlock(false);
-      return;
-    }
-
-    const canUnlock = canUnlockL2();
-
-    setShowUnlock(canUnlock);
-  }, [alwaysShow, canUnlockL2, miningBlock?.isBuilt]);
+    setShowUnlock(canUnlockL2Value);
+  }, [alwaysShow, canUnlockL2Value]);
 
   return (
     <View>
@@ -40,6 +36,7 @@ export const L2Unlock: React.FC<L2UnlockProps> = ({ alwaysShow }) => {
           onPress={() => {
             initL2();
           }}
+          hidden={miningBlock?.isBuilt}
         />
       )}
     </View>

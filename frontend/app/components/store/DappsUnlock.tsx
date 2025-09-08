@@ -15,8 +15,7 @@ export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
   const currentWorkingBlock = workingBlocks[props.chainId];
   const showUnlock =
     !dappsUnlocked[props.chainId] &&
-    canUnlockDapps(props.chainId) &&
-    !currentWorkingBlock.isBuilt;
+    canUnlockDapps(props.chainId)
 
   return (
     <View>
@@ -26,6 +25,7 @@ export const DappsUnlock: React.FC<DappsUnlockProps> = (props) => {
           description="Build an Ecosystem!"
           cost={getDappUnlockCost(props.chainId)}
           onPress={() => unlockDapps(props.chainId)}
+          hidden={currentWorkingBlock.isBuilt}
         />
       )}
     </View>
