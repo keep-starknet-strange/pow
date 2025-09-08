@@ -88,7 +88,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     },
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Terms of Use", tab: "TermsOfUse" },
-    // { label: "Account", tab: "Account" }, // TODO: Hidden for now
+    { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
     ...(currentPrestige >= 1
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]

@@ -71,7 +71,7 @@
   },
   "checkAchievements": {
     "title": "Achievements!",
-    "description": "Check out your achievements!\nYou can see your progress for completing them.\nClick here to see your achievements!",
+    "description": "Celebrate your milestones and track your journey!\nClick here to see your achievements and what's to come!",
     "bubbleTargetId": "achievementsTab",
     "highlightTargetId": "achievementsTab",
     "canDismiss": false
@@ -85,7 +85,7 @@
   },
   "leaderboard": {
     "title": "Leaderboard!",
-    "description": "Check out the leaderboard!\nYou can see how you stack up against other players.\nClick here to see the leaderboard!",
+    "description": "Stack more sats to climb the leaderboard!\nClick here to see where you stand among other miners!",
     "bubbleTargetId": "leaderboardTab",
     "highlightTargetId": "leaderboardTab",
     "canDismiss": false

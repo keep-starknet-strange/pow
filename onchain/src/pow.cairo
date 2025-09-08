@@ -697,7 +697,16 @@ mod PowGame {
         let caller = get_caller_address();
         let my_chain_count = self.user_chain_count.read(caller);
         assert!(my_chain_count >= self.game_chain_count.read(), "Not enough chains unlocked");
-        // TODO: Check upgrades, txs, etc. levels
+        
+        // Check all tx levels on the last chain (each tx must be unlocked including dapps)
+        let last_chain_id = self.game_chain_count.read() - 1;
+        
+        // Check all transactions are unlocked for the last chain
+        self.transactions.check_has_all_txs(last_chain_id);
+        
+        // Also check that dapps are unlocked for the last chain
+        let dapps_unlocked = self.transactions.get_user_dapps_unlocked(caller, last_chain_id);
+        assert!(dapps_unlocked, "Dapps must be unlocked on the last chain");
 
         self.prestige.prestige();
 
