@@ -1,4 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity, Linking } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const CreditsSection = () => {
@@ -18,41 +24,42 @@ export const CreditsSection = () => {
     { name: "ELI BEN-SASSON", reason: "Creating STARK tech" },
   ];
   const musicCredits = [
-    { 
-      title: "Mega Wall", 
+    {
+      title: "Mega Wall",
       artist: "The Cynic Project",
       link: "https://cynicmusic.com/",
-      attribution: null
+      attribution: null,
     },
-    { 
-      title: "Happy", 
+    {
+      title: "Happy",
       artist: "rezoner",
       link: "https://twitter.com/rezoner",
-      attribution: null
+      attribution: null,
     },
-    { 
-      title: "Busy Day At The Market", 
+    {
+      title: "Busy Day At The Market",
       artist: "David McKee (ViRiX)",
       link: "https://soundcloud.com/virix",
-      attribution: "Music created by David McKee (ViRiX) soundcloud.com/virix"
+      attribution: "Music created by David McKee (ViRiX) soundcloud.com/virix",
     },
-    { 
-      title: "Left Right Excluded", 
+    {
+      title: "Left Right Excluded",
       artist: "Matthew Klingensmith",
       link: "https://www.matthewklingensmith.com",
-      attribution: null
+      attribution: null,
     },
-    { 
-      title: "The Return of the 8-Bit Era", 
+    {
+      title: "The Return of the 8-Bit Era",
       artist: "DJARTMUSIC",
       link: null,
-      attribution: "DJARTMUSIC on Pixabay"
+      attribution: "DJARTMUSIC on Pixabay",
     },
-    { 
-      title: "Super Ninja Assassin", 
+    {
+      title: "Super Ninja Assassin",
       artist: "Ove Melaa",
       link: null,
-      attribution: "Written and produced by Ove Melaa (Omsofware@hotmail.com) -2013 Ove Melaa"
+      attribution:
+        "Written and produced by Ove Melaa (Omsofware@hotmail.com) -2013 Ove Melaa",
     },
   ];
   return (
@@ -100,9 +107,7 @@ export const CreditsSection = () => {
                 {music.title}
               </Text>
               {music.link ? (
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(music.link)}
-                >
+                <TouchableOpacity onPress={() => Linking.openURL(music.link)}>
                   <Text className="text-[#101119] text-[16px] font-Pixels ml-4 underline">
                     {music.artist}
                   </Text>
