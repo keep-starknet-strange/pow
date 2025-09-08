@@ -10,10 +10,15 @@ const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
+const FIRST_LAUNCH_KEY = "has_launched_before";
 
 const musicAssets: { [key: string]: any } = {
   "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
-  "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.m4a"),
+  "Busy Market": require("../../assets/music/Busy Day At The Market-LOOP.m4a"),
+  "Left Right": require("../../assets/music/LeftRightExcluded.m4a"),
+  "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
+  "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
+  "Happy": require("../../assets/music/happy.m4a"),
 };
 
 // Sound file assets - one entry per unique sound file
@@ -160,6 +165,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
       const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
+      const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
 
       const musicOn = musicEnabled === "true" || musicEnabled === null;
       const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
@@ -167,10 +173,20 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       let musicPlayer = null;
       if (musicOn) {
         try {
-          const trackNames = Object.keys(musicAssets);
-          const randomTrack =
-            trackNames[Math.floor(Math.random() * trackNames.length)];
-          const musicAsset = musicAssets[randomTrack];
+          // Check if this is the first launch
+          let selectedTrack: string;
+          if (!hasLaunchedBefore) {
+            // First launch - play "The Return"
+            selectedTrack = "The Return";
+            // Mark that the app has been launched before
+            await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
+          } else {
+            // Returning user - select random track
+            const trackNames = Object.keys(musicAssets);
+            selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
+          }
+          
+          const musicAsset = musicAssets[selectedTrack];
           musicPlayer = createAudioPlayer(musicAsset);
           musicPlayer.volume = volume;
           musicPlayer.loop = true;
