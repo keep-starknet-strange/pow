@@ -15,6 +15,7 @@ interface OnchainActionsState {
   invokeQueue: ActionsCall[];
   isProcessing: boolean;
   isReverting: boolean;
+  revertCounter: number;
   addAction: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
   waitForTransaction?: (txHash: string) => Promise<boolean>;
@@ -22,8 +23,11 @@ interface OnchainActionsState {
   onWaitForTransaction: (
     waitForTransaction: (txHash: string) => Promise<boolean>,
   ) => void;
+  revertCallback?: () => Promise<void>;
+  onRevertCallback: (revertCallback: () => Promise<void>) => void;
   processQueue: () => Promise<void>;
   clearQueue: () => void;
+  revert(failedActionId?: string, lastError?: string): void;
   doneReverting: () => void;
 }
 
@@ -58,6 +62,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   invokeQueue: [],
   isProcessing: false,
   isReverting: false,
+  revertCounter: 0,
 
   addAction: (action: Call) =>
     set((state) => {
@@ -103,6 +108,9 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   onWaitForTransaction: (waitForTransaction) =>
     set({ waitForTransaction: waitForTransaction }),
 
+  revertCallback: async () => {},
+  onRevertCallback: (revertCallback) => set({ revertCallback: revertCallback }),
+
   processQueue: async () => {
     const state = get();
 
@@ -137,9 +145,10 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           }
         }
 
-        // Remove completed item from queue (pruning)
+        // Remove completed item from queue (pruning) and reset revert counter
         set((state) => ({
           invokeQueue: state.invokeQueue.slice(1), // Remove first item
+          revertCounter: 0, // Reset counter on success
         }));
 
         if (__DEV__) {
@@ -182,18 +191,11 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
         // Max retries reached - clear entire queue
         if (__DEV__) {
           console.error(
-            `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items).`,
+            `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items). Last error: ${errorMessage}`,
           );
         }
 
-        // Notify that actions have been reverted
-        useEventManager.getState().notify("ActionsReverted", {
-          failedActionId: currentItem.id,
-          queueLength: state.invokeQueue.length,
-          lastError: errorMessage,
-        });
-
-        set({ invokeQueue: [], isReverting: true });
+        get().revert(currentItem.id, errorMessage);
         return; // Don't continue processing
       }
     } finally {
@@ -213,6 +215,39 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
     if (__DEV__) {
       console.log("🧹 Queue manually cleared");
     }
+  },
+
+  revert: async (failedActionId?: string, lastError?: string) => {
+    // Clear the entire queue, lock the store, and increment revert counter
+    set((state) => ({
+      isReverting: true,
+      invokeQueue: [],
+      actions: [],
+      revertCounter: state.revertCounter + 1,
+    }));
+
+    if (__DEV__) {
+      console.log(
+        "⚠️ Reverting initiated, store locked. Revert count:",
+        get().revertCounter,
+      );
+    }
+
+    useEventManager.getState().notify("ActionsReverted", {
+      failedActionId: failedActionId,
+      queueLength: get().invokeQueue.length,
+      lastError: lastError || "Unknown error",
+    });
+
+    const revertCallback = get().revertCallback;
+    if (revertCallback) {
+      await revertCallback().catch((error) => {
+        if (__DEV__) {
+          console.error("❌ Revert callback failed:", error);
+        }
+      });
+    }
+    get().doneReverting();
   },
 
   doneReverting: () => {

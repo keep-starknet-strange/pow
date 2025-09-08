@@ -19,6 +19,7 @@ interface UpgradesState {
   currentPrestige: number;
   canPrestige: boolean;
   isInitialized: boolean;
+  setIsInitialized: (initialized: boolean) => void;
 
   // Actions
   upgrade: (chainId: number, upgradeId: number) => void;
@@ -68,6 +69,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   currentPrestige: 0,
   canPrestige: false,
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
 
   resetUpgrades: () => {
     // Initialize upgrades

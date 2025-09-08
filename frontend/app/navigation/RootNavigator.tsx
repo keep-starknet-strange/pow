@@ -32,7 +32,6 @@ export const RootNavigator = memo(() => {
       {userAccountConnected ? (
         <>
           {isTutorialActive && <TutorialOverlay />}
-          <RevertModal />
           <Header />
           <InAppNotification />
           <TabNavigator />
@@ -43,6 +42,7 @@ export const RootNavigator = memo(() => {
         </Stack.Navigator>
       )}
       <LoadingScreen />
+      <RevertModal />
     </View>
   );
 });
