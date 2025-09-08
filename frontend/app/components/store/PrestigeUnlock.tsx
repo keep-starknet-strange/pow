@@ -5,8 +5,8 @@ import { FeatureUnlockView } from "../FeatureUnlockView";
 import { useGameStore } from "@/app/stores/useGameStore";
 
 export type PrestigeUnlockProps = {
-  disableMinimize?: boolean,
-  marginHorizontal?: number
+  disableMinimize?: boolean;
+  marginHorizontal?: number;
 };
 
 export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = (props) => {

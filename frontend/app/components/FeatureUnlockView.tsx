@@ -1,12 +1,18 @@
 import { useEventManager } from "@/app/stores/useEventManager";
-import Feather from '@expo/vector-icons/Feather';
+import Feather from "@expo/vector-icons/Feather";
 import {
   Canvas,
   FilterMode,
   Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -18,7 +24,7 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -31,8 +37,8 @@ export type FeatureUnlockView = {
   onPress: () => void;
   hidden: boolean;
   disabled?: boolean;
-  disableMinimize?: boolean,
-  marginHorizontal?: number
+  disableMinimize?: boolean;
+  marginHorizontal?: number;
 };
 
 enum NotificationState {
@@ -42,20 +48,21 @@ enum NotificationState {
 
 export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
   (props) => {
-    const parentRef = useRef<Animated.View>(null)
-    const [collapseState, setCollapseState] = useState(NotificationState.Expanded);
+    const parentRef = useRef<Animated.View>(null);
+    const [collapseState, setCollapseState] = useState(
+      NotificationState.Expanded,
+    );
     const [canAffordFeature, setCanAffordFeature] = useState(false);
-    const [parentWidth, setParentWidth] = useState(0)
+    const [parentWidth, setParentWidth] = useState(0);
     const { balance } = useBalanceStore();
     const { getImage } = useImages();
     const { notify } = useEventManager();
 
     useLayoutEffect(() => {
       parentRef.current?.measure((_x, _y, width, _height) => {
-        setParentWidth(width)
-      })
-    }, [setParentWidth])
-
+        setParentWidth(width);
+      });
+    }, [setParentWidth]);
 
     const shakeAnim = useSharedValue(0);
     const minimizeAnim = useSharedValue(0);
@@ -67,20 +74,20 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
         minimizeAnim.value,
         [0, 1],
         [0, 1],
-        Extrapolation.IDENTITY
+        Extrapolation.IDENTITY,
       ),
       transform: [
         {
-          translateY: shakeBadgeAnim.value
+          translateY: shakeBadgeAnim.value,
         },
         {
           translateX: interpolate(
             minimizeAnim.value,
             [0, 1],
             [0, parentWidth - 50],
-            Extrapolation.CLAMP
-          )
-        }
+            Extrapolation.CLAMP,
+          ),
+        },
       ],
     }));
 
@@ -89,7 +96,7 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
         minimizeAnim.value,
         [0, 1],
         [1, 0],
-        Extrapolation.IDENTITY
+        Extrapolation.IDENTITY,
       ),
       transform: [
         {
@@ -98,10 +105,14 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
               duration: 100,
               easing: Easing.linear,
             }),
-            withTiming(0, {
-              duration: 50,
-              easing: Easing.linear,
-            }, () => shakeAnim.value = 0),
+            withTiming(
+              0,
+              {
+                duration: 50,
+                easing: Easing.linear,
+              },
+              () => (shakeAnim.value = 0),
+            ),
           ),
         },
         {
@@ -109,15 +120,15 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             minimizeAnim.value,
             [0, 1],
             [0, parentWidth - 50],
-            Extrapolation.EXTEND
-          )
-        }
+            Extrapolation.EXTEND,
+          ),
+        },
       ],
     }));
 
-    const hideAnimatedStyle = useAnimatedStyle((() => (
-      { opacity: hideAnim.value }
-    )))
+    const hideAnimatedStyle = useAnimatedStyle(() => ({
+      opacity: hideAnim.value,
+    }));
 
     useEffect(() => {
       if (collapseState === NotificationState.Expanded) {
@@ -125,35 +136,38 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
       } else if (collapseState === NotificationState.Collapsed) {
         minimizeAnim.value = withTiming(1, { duration: 300 });
       }
-    }, [collapseState])
+    }, [collapseState]);
 
     useEffect(() => {
       setCanAffordFeature(balance >= props.cost);
     }, [balance, props.cost]);
 
     useEffect(() => {
-      hideAnim.value = withTiming(props.hidden ? 0 : 1, { duration: 150 })
-    }, [props.hidden])
+      hideAnim.value = withTiming(props.hidden ? 0 : 1, { duration: 150 });
+    }, [props.hidden]);
 
     useEffect(() => {
       if (canAffordFeature && collapseState === NotificationState.Collapsed) {
         shakeBadgeAnim.value = withRepeat(
           withSequence(
             withTiming(2, { duration: 200, easing: Easing.ease }),
-            withTiming(-2, { duration: 200, easing: Easing.ease })
-          ), 
-          -1, 
-          true
-        )
+            withTiming(-2, { duration: 200, easing: Easing.ease }),
+          ),
+          -1,
+          true,
+        );
       } else {
-        shakeBadgeAnim.value = 0
+        shakeBadgeAnim.value = 0;
       }
-    }, [canAffordFeature, collapseState])
+    }, [canAffordFeature, collapseState]);
 
     return (
-      <Animated.View 
+      <Animated.View
         ref={parentRef}
-        style={[hideAnimatedStyle, { zIndex: 100, marginHorizontal: props.marginHorizontal ?? 16 }]}
+        style={[
+          hideAnimatedStyle,
+          { zIndex: 100, marginHorizontal: props.marginHorizontal ?? 16 },
+        ]}
       >
         <Animated.View
           style={[notificationAnimatedStyle]}
@@ -172,8 +186,7 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
                 } else {
                   shakeAnim.value *= -1;
                 }
-              }
-              }
+              }}
             >
               <Canvas style={{ width: parentWidth, height: 55 }}>
                 <Image
@@ -189,7 +202,10 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
                   height={55}
                 />
               </Canvas>
-              <View className="absolute top-[4px]" style={{ left: parentWidth * 0.13 }}>
+              <View
+                className="absolute top-[4px]"
+                style={{ left: parentWidth * 0.13 }}
+              >
                 <Text className="text-[18px] font-Pixels text-[#fff7ff]">
                   {props.label}
                 </Text>
@@ -227,10 +243,10 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             </Pressable>
 
             {props.disableMinimize !== true && (
-              <Pressable 
+              <Pressable
                 className="absolute top-[-5] left-[-5] bg-[#8a1aef] border-[#33007e] rounded-full border-2 p-1"
                 onPress={() => {
-                  setCollapseState(NotificationState.Collapsed)
+                  setCollapseState(NotificationState.Collapsed);
                 }}
               >
                 <Feather
@@ -238,18 +254,15 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
                   size={12}
                   color="white"
                   onPress={() => {
-                    setCollapseState(NotificationState.Collapsed)
+                    setCollapseState(NotificationState.Collapsed);
                   }}
                 />
               </Pressable>
             )}
-
           </View>
         </Animated.View>
 
-        <Animated.View
-          style={[badgeAnimatedStyle]}
-        >
+        <Animated.View style={[badgeAnimatedStyle]}>
           <Pressable
             disabled={collapseState === NotificationState.Expanded}
             onPress={() => {
@@ -281,7 +294,7 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
       prevProps.label === nextProps.label &&
       prevProps.cost === nextProps.cost &&
       prevProps.disabled === nextProps.disabled &&
-      prevProps.hidden == nextProps.hidden && 
+      prevProps.hidden == nextProps.hidden &&
       prevProps.disableMinimize == nextProps.disableMinimize &&
       prevProps.marginHorizontal == nextProps.marginHorizontal
     );
