@@ -9,7 +9,6 @@ import {
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 import { useImages } from "../../../hooks/useImages";
 import { useUpgrades } from "../../../stores/useUpgradesStore";
-import prestigeConfig from "../../../configs/prestige.json";
 
 type UpgradeDescriptionProps = {
   name: string;
@@ -37,7 +36,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
   baseSpeed,
 }) => {
   const { getImage } = useImages();
-  const { currentPrestige } = useUpgrades();
+  const { getPrestigeScaler } = useUpgrades();
 
   // Handle both upgrade values and automation speeds
   const isAutomation = speeds !== undefined;
@@ -46,7 +45,7 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
 
   // Check if this is a Block Reward upgrade by name
   const isBlockReward = !isAutomation && name === "Block Reward";
-  const prestigeScaler = isBlockReward ? (prestigeConfig[currentPrestige]?.scaler || 1) : 1;
+  const prestigeScaler = isBlockReward ? getPrestigeScaler() : 1;
 
   // For automations, convert speed to actual rate per second (speed / 5)
   // Since the formula is 5000ms / speed, the actual rate is speed / 5 per second

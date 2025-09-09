@@ -9,7 +9,6 @@ import { useTransactionsStore } from "./useTransactionsStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
 import { L2, newL2, L2DA, newL2DA, L2Prover, newL2Prover } from "../types/L2";
 import unlocksConfig from "../configs/unlocks.json";
-import prestigeConfig from "../configs/prestige.json";
 
 interface L2Store {
   l2: L2 | undefined;
@@ -263,8 +262,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
         return state;
 
       newL2Instance.da.blocks.push(block.blockId);
-      const { currentPrestige } = useUpgradesStore.getState();
-      const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+      const { getPrestigeScaler } = useUpgradesStore.getState();
+      const prestigeScaler = getPrestigeScaler();
       const baseBlockReward =
         block.reward ||
         useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
@@ -291,8 +290,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
         return state;
 
       newL2Instance.prover.blocks.push(block.blockId);
-      const { currentPrestige } = useUpgradesStore.getState();
-      const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+      const { getPrestigeScaler } = useUpgradesStore.getState();
+      const prestigeScaler = getPrestigeScaler();
       const baseBlockReward =
         block.reward ||
         useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");

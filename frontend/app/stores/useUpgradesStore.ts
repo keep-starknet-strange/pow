@@ -38,6 +38,7 @@ interface UpgradesState {
   getNextPrestigeCost: () => number;
   isMaxPrestige: () => boolean;
   getMaxPrestige: () => number;
+  getPrestigeScaler: () => number;
 
   // Initialization
   resetUpgrades: () => void;
@@ -574,6 +575,11 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
   getMaxPrestige: (): number => {
     return prestigeJson.length - 1;
+  },
+
+  getPrestigeScaler: (): number => {
+    const { currentPrestige } = get();
+    return prestigeJson[currentPrestige]?.scaler || 1;
   },
 }));
 

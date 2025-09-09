@@ -5,7 +5,6 @@ import { useEventManager } from "./useEventManager";
 import transactionJson from "@/app/configs/transactions.json";
 import dappsJson from "@/app/configs/dapps.json";
 import unlocksConfig from "@/app/configs/unlocks.json";
-import prestigeConfig from "@/app/configs/prestige.json";
 import { useBalanceStore } from "./useBalanceStore";
 import { useUpgradesStore } from "./useUpgradesStore";
 
@@ -439,8 +438,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    const { currentPrestige } = useUpgradesStore.getState();
-    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
     return level === -1
       ? 0
       : transactionData.fees[level] * mevBoost * prestigeScaler;
@@ -475,8 +474,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    const { currentPrestige } = useUpgradesStore.getState();
-    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
     return level === -1 ? 0 : dappData.fees[level] * mevBoost * prestigeScaler;
   },
 
