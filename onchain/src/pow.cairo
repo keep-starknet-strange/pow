@@ -291,6 +291,10 @@ mod PowGame {
             self.reward_amount.write(reward_params.reward_amount);
         }
 
+        fn has_claimed_reward(self: @ContractState, user: ContractAddress) -> bool {
+            self.reward_claimed.read(user)
+        }
+
         fn claim_reward(ref self: ContractState, recipient: ContractAddress) {
             self.pausable.assert_not_paused();
             let caller = get_caller_address();

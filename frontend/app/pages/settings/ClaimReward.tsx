@@ -5,40 +5,149 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
   Linking,
+  StyleSheet,
+  Alert,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
-import background from "../../../assets/background.webp";
-import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { useStarknetConnector } from "../../context/StarknetConnector";
+import { usePowContractConnector } from "../../context/PowContractConnector";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BasicButton from "../../components/buttons/Basic";
+import { useWalletConnect } from "../../hooks/useWalletConnect";
 
 type ClaimRewardProps = {
   setSettingTab: (tab: "Main") => void;
 };
 
-export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
-  setSettingTab,
-}) => {
-  const { connectArgent, connectBraavos, account, txHash, error } =
-    useWalletConnect();
-  const { account: gameAccount, invokeContract } = useStarknetConnector();
+export const ClaimRewardSection: React.FC = () => {
+  const { invokeCalls } = useStarknetConnector();
+  const { powGameContractAddress, getRewardParams } = usePowContractConnector();
+  const insets = useSafeAreaInsets();
+  const {
+    connectArgent,
+    account,
+    error: wcError,
+    disconnect,
+  } = useWalletConnect();
   const [accountInput, setAccountInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
-
+  const [localTxHash, setLocalTxHash] = useState<string | null>(null);
+  const [claimed, setClaimed] = useState<boolean>(false);
+  const [claiming, setClaiming] = useState<boolean>(false);
+  const [rewardTitle, setRewardTitle] = useState<string>(
+    "🎉 You earned 10 STRK!",
+  );
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [busyText, setBusyText] = useState<string | null>(null);
+  const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
+  const hideHint = localTxHash || claimed || txErrorMessage || walletError;
   const rewardUnlocked = true;
 
   const claimReward = async () => {
-    if (!account || accountInput.trim() === "") {
-      console.error("No account connected");
+    const recipient = (debouncedInput || "").trim();
+    if (!recipient) {
+      console.error("No recipient provided");
       return;
     }
-    const contractAddress =
-      "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"; // Replace with actual contract address
-    const functionName = "claim_reward";
-    const accountReceiver = gameAccount || accountInput.trim();
-    invokeContract(contractAddress, functionName, [accountReceiver]);
+    if (!powGameContractAddress) {
+      console.error("pow_game contract address not set");
+      return;
+    }
+    const call = {
+      contractAddress: powGameContractAddress,
+      entrypoint: "claim_reward",
+      calldata: [recipient] as string[],
+    };
+    setClaiming(true);
+    setBusyText("Submitting transaction…");
+    setTxErrorMessage(null);
+    try {
+      const res = await invokeCalls([call], 1);
+      const hash = res?.data?.transactionHash || res?.transaction_hash || null;
+      if (hash) setLocalTxHash(hash);
+      setClaimed(true);
+    } catch (err: any) {
+      const raw = (err && (err.message || String(err))) || "";
+      const alreadyClaimed = /reward already claimed/i.test(raw);
+      const friendly = alreadyClaimed
+        ? "Reward already claimed"
+        : "Transaction failed. Please try again.";
+      setTxErrorMessage(friendly);
+      try {
+        const {
+          useInAppNotificationsStore,
+        } = require("@/app/stores/useInAppNotificationsStore");
+        useInAppNotificationsStore
+          .getState()
+          .sendInAppNotification(4, friendly);
+      } catch (e) {
+        // ignore notification errors
+      }
+      setClaimed(false);
+    } finally {
+      setClaiming(false);
+      setBusyText(null);
+    }
   };
+
+  const handleConnectBraavos = async () => {
+    setWalletError(null);
+    setBusyText("Opening Braavos…");
+    try {
+      const candidates = ["braavos://", "https://braavos.app"];
+      let opened = false;
+      for (const url of candidates) {
+        const can = await Linking.canOpenURL(url).catch(() => false);
+        if (can) {
+          await Linking.openURL(url);
+          opened = true;
+          break;
+        }
+      }
+      if (!opened) {
+        Alert.alert(
+          "Braavos not found",
+          "Please install Braavos, then copy your address and paste it here.",
+        );
+      } else {
+        Alert.alert(
+          "Open Braavos",
+          "Copy your Starknet address in Braavos, then return and paste it here.",
+        );
+      }
+    } finally {
+      setBusyText(null);
+    }
+  };
+  const handleConnectArgent = () => {
+    setWalletError(null);
+    setBusyText("Waiting for wallet approval…");
+    (async () => {
+      try {
+        await connectArgent();
+      } finally {
+        setBusyText(null);
+      }
+    })();
+  };
+
+  useEffect(() => {
+    if (walletError) {
+      Alert.alert("Wallet Error", walletError);
+    }
+  }, [walletError]);
+
+  useEffect(() => {
+    if (wcError) setWalletError(wcError);
+  }, [wcError]);
+
+  useEffect(() => {
+    if (account && !accountInput) {
+      setAccountInput(account);
+    }
+  }, [account]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -48,41 +157,71 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
     return () => clearTimeout(timer);
   }, [accountInput]);
 
+  useEffect(() => {
+    (async () => {
+      const params = await getRewardParams?.();
+      if (!params) return;
+      // Format u256 amount (assume low only for now)
+      let amountStr = "10";
+      const raw = params.rewardAmount as any;
+      if (raw?.low || raw?.high) {
+        const low = BigInt(raw.low || 0);
+        const high = BigInt(raw.high || 0);
+        const amount = (high << 128n) + low;
+        amountStr = amount.toString();
+      }
+      setRewardTitle(`You earned ${amountStr} STRK!`);
+    })();
+  }, [getRewardParams]);
+
   return (
-    <ImageBackground className="flex-1" source={background} resizeMode="cover">
-      <View className="flex-1 justify-center items-center px-6">
+    <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>
+      <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>
+        <Modal visible={!!busyText} transparent animationType="fade">
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingBox}>
+              <ActivityIndicator size="large" color="#ffffff" />
+              <Text style={styles.loadingText}>{busyText}</Text>
+            </View>
+          </View>
+        </Modal>
         {!rewardUnlocked ? (
-          <Text className="text-4xl text-[#101119] mb-4">
-            Keep playing to Earn STRK!
-          </Text>
+          <Text style={styles.titleAlt}>Keep playing to Earn STRK!</Text>
         ) : (
           <>
-            <Text className="text-4xl text-[#101119] mb-4">
-              🎉 You earned 10 STRK!
-            </Text>
-
-            <Text className="text-xl text-[#e7e7e7] mb-4 text-center">
-              Connect your wallet to receive them.
-            </Text>
-
-            <View className="my-6">
+            <Text style={styles.title}>{rewardTitle}</Text>
+            <View style={styles.buttonWrap}>
               <BasicButton
-                onPress={connectArgent}
-                label="Connect Argent"
-                style={{ paddingHorizontal: 20 }}
-              />
-            </View>
-
-            <View className="my-6">
-              <BasicButton
-                onPress={connectBraavos}
+                onPress={handleConnectBraavos}
                 label="Connect Braavos"
-                style={{ paddingHorizontal: 20 }}
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+                // disabled={connecting}
               />
             </View>
+
+            <View style={styles.buttonWrap}>
+              <BasicButton
+                onPress={handleConnectArgent}
+                label="Connect Argent"
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+                // disabled={connecting}
+              />
+            </View>
+
+            {account ? (
+              <Text style={styles.subtitle}>
+                Connected wallet: {account.slice(0, 6)}...{account.slice(-6)}
+              </Text>
+            ) : null}
+
+            <Text style={styles.subtitle}>
+              Paste your Starknet address to receive them.
+            </Text>
 
             <TextInput
-              className="bg-[#10111910] w-3/4 rounded-lg my-4 p-2 text-xl text-[#101119] border-2 border-[#101119] shadow-lg shadow-black/50"
+              style={styles.input}
               placeholder="copy/paste your account address"
               placeholderTextColor="#10111980"
               autoCapitalize="none"
@@ -92,50 +231,194 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({
               onChangeText={setAccountInput}
             />
 
-            <TouchableOpacity
-              className="py-2"
-              disabled={!debouncedInput.trim()}
-              onPress={() => {
-                Linking.openURL(
-                  `https://starkscan.co/contract/${accountInput}`,
-                );
-              }}
-            >
-              <Text
-                className={`${!debouncedInput.trim() ? "text-gray-400" : "text-[#80bfff]"} underline text-center my-4`}
-              >
-                View on StarkScan ({debouncedInput.slice(0, 4)}...
-                {debouncedInput.slice(-4)})
-              </Text>
-            </TouchableOpacity>
+            {(() => {
+              const addr = (debouncedInput || "").trim();
+              return (
+                <View style={styles.linkSlot}>
+                  {addr ? (
+                    <TouchableOpacity
+                      style={styles.linkWrap}
+                      onPress={() =>
+                        Linking.openURL(`https://starkscan.co/contract/${addr}`)
+                      }
+                    >
+                      <Text style={styles.linkText}>
+                        View address on StarkScan ({addr.slice(0, 6)}...
+                        {addr.slice(-6)})
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              );
+            })()}
 
-            <View className="my-3">
+            <View style={styles.buttonWrap}>
               <BasicButton
                 label="Claim STRK"
                 onPress={claimReward}
-                disabled={!debouncedInput.trim() || !gameAccount}
+                style={styles.basicButton}
+                textStyle={styles.basicButtonText}
+                disabled={claimed || claiming || !debouncedInput.trim()}
               />
             </View>
 
-            {txHash && (
-              <Text className="text-green-300 mt-2 text-center">
-                Transaction sent: {txHash}
-              </Text>
+            <View style={styles.linksContainer}>
+              {localTxHash && (
+                <TouchableOpacity
+                  style={styles.linkWrap}
+                  onPress={() => {
+                    const hash = localTxHash as string;
+                    Linking.openURL(`https://starkscan.co/tx/${hash}`);
+                  }}
+                >
+                  <Text style={styles.linkText}>
+                    View transaction on StarkScan({localTxHash?.slice(0, 6)}...
+                    {localTxHash?.slice(-6)})
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {localTxHash && (
+              <Text style={styles.successText}>Reward claimed! 🎊</Text>
             )}
-            {error && (
-              <Text className="text-red-400 mt-2 text-center">
-                Error: {error}
+            {claimed && (
+              <Text style={styles.successText}>Reward claimed! 🎊</Text>
+            )}
+            {txErrorMessage && (
+              <Text style={styles.errorText}>{txErrorMessage}</Text>
+            )}
+            {walletError && (
+              <Text style={styles.errorText}>Error: {walletError}</Text>
+            )}
+            {hideHint ? null : (
+              <Text style={styles.hintText}>
+                If you use Braavos, open the app, copy your address, and paste
+                it above.
               </Text>
             )}
           </>
         )}
-
-        <BasicButton
-          label="Back to Settings"
-          onPress={() => setSettingTab("Main")}
-          style={{ paddingHorizontal: 24, marginTop: 20 }}
-        />
       </View>
-    </ImageBackground>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  content: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    marginBottom: 80,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: "700",
+    color: "#101119",
+    marginBottom: 8,
+    fontFamily: "Xerxes",
+  },
+  titleAlt: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#101119",
+    marginBottom: 8,
+    fontFamily: "Xerxes",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#e7e7e7",
+    textAlign: "center",
+    marginBottom: 12,
+    fontFamily: "Xerxes",
+  },
+  buttonWrap: {
+    marginVertical: 10,
+  },
+  basicButton: {
+    alignSelf: "center",
+  },
+  basicButtonText: {
+    fontSize: 20,
+    fontFamily: "Xerxes",
+  },
+  input: {
+    width: 300,
+    maxWidth: "100%",
+    alignSelf: "center",
+    minHeight: 46,
+    borderRadius: 10,
+    marginVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 18,
+    color: "#101119",
+    borderWidth: 2,
+    borderColor: "#101119",
+    backgroundColor: "#10111910",
+    fontFamily: "Xerxes",
+  },
+  linkWrap: { paddingVertical: 6 },
+  linkText: {
+    color: "#101119", // black, readable on green background
+    textDecorationLine: "underline",
+    textAlign: "center",
+    marginVertical: 4,
+    fontFamily: "Xerxes",
+  },
+  linkDisabled: { color: "#9ca3af" },
+  linksContainer: {
+    marginTop: 8,
+    marginBottom: 16,
+    width: "100%",
+    alignItems: "center",
+  },
+  linkSlot: {
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  successText: {
+    color: "#22c55e",
+    marginTop: 8,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
+  errorText: {
+    color: "#f87171",
+    marginTop: 8,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: "#00000080",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingBox: {
+    backgroundColor: "#101119",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    maxWidth: 280,
+  },
+  loadingText: {
+    color: "#ffffff",
+    marginTop: 10,
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
+  hintText: {
+    fontSize: 14,
+    color: "#e7e7e7",
+    textAlign: "center",
+    marginTop: 12,
+    fontFamily: "Xerxes",
+  },
+});

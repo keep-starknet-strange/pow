@@ -17,7 +17,10 @@ const config: ExpoConfig = {
         "argent",
         "argentx",
         "argentmobile",
+        "ready",
         "braavos",
+        "braavos-btc-straknet-wallet",
+        "wc",
       ],
     },
     config: {

@@ -249,7 +249,7 @@ export class TxBuilderObserver implements Observer {
         addAction(createBuyNextChainCall(this.contractAddress));
         break;
       case "PrestigePurchased":
-        addAction(createBuyPrestigeCall(this.contractAddress));
+        // Handled via direct invoke to avoid multicall bundling
         break;
       default:
         break;
