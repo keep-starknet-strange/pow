@@ -27,6 +27,9 @@ const imagePaths = {
   headerSwitchInactive: require(`${assetsPath}/lSwitch_inactive.webp`),
   notificationUnlock: require(`${assetsPath}/notification.webp`),
   notificationBadge: require(`${assetsPath}/notification_badge.webp`),
+  notificationBadgeMinimized: require(
+    `${assetsPath}/notification_badge_minimized.webp`,
+  ),
 
   // Account Creation
   nounsTitleplate: require(`${assetsPath}/nouns/create_titleplate.webp`),
@@ -462,6 +465,7 @@ export const useImagePreloader = () => {
     headerSwitchInactive: useImage(imagePaths.headerSwitchInactive),
     notificationUnlock: useImage(imagePaths.notificationUnlock),
     notificationBadge: useImage(imagePaths.notificationBadge),
+    notificationBadgeMinimized: useImage(imagePaths.notificationBadgeMinimized),
     topBar: useImage(imagePaths.topBar),
     iconRandom: useImage(imagePaths.iconRandom),
     iconClose: useImage(imagePaths.iconClose),
@@ -693,6 +697,7 @@ export const useImagePreloader = () => {
         "header.switch.inactive": images.headerSwitchInactive,
         "notif.unlock": images.notificationUnlock,
         "notif.badge": images.notificationBadge,
+        "notif.badge.min": images.notificationBadgeMinimized,
         "bar.top": images.topBar,
         "icon.random": images.iconRandom,
         "icon.close": images.iconClose,
