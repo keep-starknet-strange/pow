@@ -10,10 +10,15 @@ const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
+const FIRST_LAUNCH_KEY = "has_launched_before";
 
 const musicAssets: { [key: string]: any } = {
   "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
-  "Jungle Beat": require("../../assets/music/jungle-ish-beat-for-video-games-314073.m4a"),
+  "Busy Market": require("../../assets/music/Busy Day At The Market-LOOP.m4a"),
+  "Left Right": require("../../assets/music/LeftRightExcluded.m4a"),
+  "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
+  "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
+  Happy: require("../../assets/music/happy.m4a"),
 };
 
 // Sound file assets - one entry per unique sound file
@@ -125,6 +130,8 @@ interface SoundState {
   musicPlayer: AudioPlayer | null;
   soundPool: SoundPool | null;
   isInitialized: boolean;
+  currentTrackName: string | null;
+  lastPlayedTracks: string[];
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -136,6 +143,7 @@ interface SoundState {
   playMusic: () => Promise<void>;
   stopMusic: () => Promise<void>;
   cleanupSound: () => void;
+  playNextTrack: () => Promise<void>;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -147,6 +155,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   musicPlayer: null,
   soundPool: null,
   isInitialized: false,
+  currentTrackName: null,
+  lastPlayedTracks: [],
 
   initializeSound: async () => {
     try {
@@ -160,20 +170,51 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
       const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
+      const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
 
       const musicOn = musicEnabled === "true" || musicEnabled === null;
       const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
 
       let musicPlayer = null;
+      let selectedTrack: string | null = null;
+
       if (musicOn) {
         try {
-          const trackNames = Object.keys(musicAssets);
-          const randomTrack =
-            trackNames[Math.floor(Math.random() * trackNames.length)];
-          const musicAsset = musicAssets[randomTrack];
+          // Check if this is the first launch
+          if (!hasLaunchedBefore) {
+            // First launch - play "The Return"
+            selectedTrack = "The Return";
+            // Mark that the app has been launched before
+            await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
+          } else {
+            // Returning user - select random track
+            const trackNames = Object.keys(musicAssets);
+            selectedTrack =
+              trackNames[Math.floor(Math.random() * trackNames.length)];
+          }
+
+          const musicAsset = musicAssets[selectedTrack];
           musicPlayer = createAudioPlayer(musicAsset);
           musicPlayer.volume = volume;
-          musicPlayer.loop = true;
+          musicPlayer.loop = false; // Don't loop, we'll play next track
+
+          // Set up playback status listener to detect when track ends
+          const statusListener = musicPlayer.addListener(
+            "playbackStatusUpdate",
+            (status) => {
+              if (
+                status.playing === false &&
+                status.currentTime > 0 &&
+                status.currentTime >= status.duration - 0.1
+              ) {
+                // Track has ended, wait 2-3 seconds then play next
+                const delay = 2000 + Math.random() * 1000; // 2-3 second delay
+                setTimeout(() => {
+                  get().playNextTrack();
+                }, delay);
+              }
+            },
+          );
         } catch (error) {
           if (__DEV__) console.error("Failed to create music player:", error);
         }
@@ -187,6 +228,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         musicVolume: volume,
         musicPlayer: musicPlayer,
         soundPool: new SoundPool(),
+        currentTrackName: selectedTrack,
       });
 
       if (musicOn && musicPlayer) {
@@ -234,9 +276,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
           const musicPlayer = createAudioPlayer(musicAsset);
           musicPlayer.volume = currentState.musicVolume;
-          musicPlayer.loop = true;
+          musicPlayer.loop = false; // Don't loop, we'll play next track
 
-          set({ musicPlayer });
+          // Set up playback status listener
+          const statusListener = musicPlayer.addListener(
+            "playbackStatusUpdate",
+            (status) => {
+              if (
+                status.playing === false &&
+                status.currentTime > 0 &&
+                status.currentTime >= status.duration - 0.1
+              ) {
+                // Track has ended, wait 2-3 seconds then play next
+                const delay = 2000 + Math.random() * 1000; // 2-3 second delay
+                setTimeout(() => {
+                  get().playNextTrack();
+                }, delay);
+              }
+            },
+          );
+
+          set({ musicPlayer, currentTrackName: randomTrack });
         } catch (error) {
           if (__DEV__) console.error("Failed to create music player:", error);
           return;
@@ -287,9 +347,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
         const newMusicPlayer = createAudioPlayer(musicAsset);
         newMusicPlayer.volume = get().musicVolume;
-        newMusicPlayer.loop = true;
+        newMusicPlayer.loop = false; // Don't loop, we'll play next track
 
-        set({ musicPlayer: newMusicPlayer });
+        // Set up playback status listener
+        const statusListener = newMusicPlayer.addListener(
+          "playbackStatusUpdate",
+          (status) => {
+            if (
+              status.playing === false &&
+              status.currentTime > 0 &&
+              status.currentTime >= status.duration - 0.1
+            ) {
+              // Track has ended, wait 2-3 seconds then play next
+              const delay = 2000 + Math.random() * 1000; // 2-3 second delay
+              setTimeout(() => {
+                get().playNextTrack();
+              }, delay);
+            }
+          },
+        );
+
+        set({ musicPlayer: newMusicPlayer, currentTrackName: randomTrack });
 
         newMusicPlayer.play();
       } else {
@@ -362,6 +440,90 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (soundPool) {
       soundPool.cleanup();
       set({ soundPool: null });
+    }
+  },
+
+  playNextTrack: async () => {
+    const {
+      isMusicOn,
+      musicVolume,
+      currentTrackName,
+      lastPlayedTracks,
+      musicPlayer,
+    } = get();
+
+    if (!isMusicOn) return;
+
+    // Clean up current player
+    if (musicPlayer) {
+      try {
+        musicPlayer.pause();
+        musicPlayer.release();
+      } catch (error) {
+        if (__DEV__) console.error("Failed to cleanup previous player:", error);
+      }
+    }
+
+    // Get all track names
+    const trackNames = Object.keys(musicAssets);
+
+    // Keep track of last 2 played tracks to avoid immediate repeats
+    const recentTracks = [...lastPlayedTracks, currentTrackName]
+      .filter(Boolean)
+      .slice(-2);
+
+    // Filter out recently played tracks if we have enough tracks
+    let availableTracks = trackNames;
+    if (trackNames.length > 3) {
+      availableTracks = trackNames.filter(
+        (track) => !recentTracks.includes(track),
+      );
+    }
+
+    // If all tracks were recently played (shouldn't happen with 6 tracks), use all tracks
+    if (availableTracks.length === 0) {
+      availableTracks = trackNames;
+    }
+
+    // Select random track from available tracks
+    const nextTrack =
+      availableTracks[Math.floor(Math.random() * availableTracks.length)];
+
+    try {
+      const musicAsset = musicAssets[nextTrack];
+      const newMusicPlayer = createAudioPlayer(musicAsset);
+      newMusicPlayer.volume = musicVolume;
+      newMusicPlayer.loop = false;
+
+      // Set up playback status listener for the new track
+      const statusListener = newMusicPlayer.addListener(
+        "playbackStatusUpdate",
+        (status) => {
+          if (
+            status.playing === false &&
+            status.currentTime > 0 &&
+            status.currentTime >= status.duration - 0.1
+          ) {
+            // Track has ended, wait 2-3 seconds then play next
+            const delay = 2000 + Math.random() * 1000; // 2-3 second delay
+            setTimeout(() => {
+              get().playNextTrack();
+            }, delay);
+          }
+        },
+      );
+
+      set({
+        musicPlayer: newMusicPlayer,
+        currentTrackName: nextTrack,
+        lastPlayedTracks: recentTracks,
+      });
+
+      newMusicPlayer.play();
+
+      if (__DEV__) console.log(`Now playing: ${nextTrack}`);
+    } catch (error) {
+      if (__DEV__) console.error("Failed to play next track:", error);
     }
   },
 }));
