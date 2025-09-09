@@ -92,7 +92,7 @@ export const StoreListItem = memo(
       case "prestige-unlock":
         return (
           <View className="px-[16px]">
-            <PrestigeUnlock />
+            <PrestigeUnlock disableMinimize={true} marginHorizontal={0} />
           </View>
         );
       default:
