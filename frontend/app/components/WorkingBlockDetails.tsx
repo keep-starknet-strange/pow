@@ -2,6 +2,7 @@ import React, { memo, useEffect, useCallback, useMemo } from "react";
 import { StyleProp, Text, View, ViewStyle } from "react-native";
 import { useUpgrades } from "../stores/useUpgradesStore";
 import { useGameStore } from "../stores/useGameStore";
+import prestigeConfig from "../configs/prestige.json";
 import { useImages } from "../hooks/useImages";
 import Animated, {
   runOnJS,
@@ -394,19 +395,22 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       [workingBlock?.maxSize, getUpgradeValue, props.chainId],
     );
 
-    const totalReward = useMemo(
-      () =>
-        (workingBlock?.fees || 0) +
-        (workingBlock?.reward ||
-          0 ||
-          getUpgradeValue(props.chainId, "Block Reward")),
-      [
-        workingBlock?.fees,
-        workingBlock?.reward,
-        getUpgradeValue,
-        props.chainId,
-      ],
-    );
+    const { currentPrestige } = useUpgrades();
+    const totalReward = useMemo(() => {
+      const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+      const baseBlockReward =
+        workingBlock?.reward ||
+        0 ||
+        getUpgradeValue(props.chainId, "Block Reward");
+      const scaledBlockReward = baseBlockReward * prestigeScaler;
+      return (workingBlock?.fees || 0) + scaledBlockReward;
+    }, [
+      workingBlock?.fees,
+      workingBlock?.reward,
+      getUpgradeValue,
+      props.chainId,
+      currentPrestige,
+    ]);
 
     return (
       <Animated.View style={containerStyle}>

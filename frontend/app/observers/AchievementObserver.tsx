@@ -95,6 +95,9 @@ export class AchievementObserver implements Observer {
         case "PrestigePurchased":
           this.handlePrestigePurchased(achievement, data);
           break;
+        case "RewardClaimed":
+          this.handleRewardClaimed(achievement, data);
+          break;
         default:
           break;
       }
@@ -128,7 +131,6 @@ export class AchievementObserver implements Observer {
       "Reach 10K{BTC}": 10_000,
       "Reach 100M{BTC}": 100_000_000,
       "Reach 1T{BTC}": 1_000_000_000,
-      "STRK Reward Unlocked": 1_000_000_000,
     };
     const target = balanceTargets[achievement.name];
     if (target) {
@@ -294,6 +296,12 @@ export class AchievementObserver implements Observer {
       const maxPrestigeLevel = prestigeConfigJson.length - 1;
       const progress = Math.min((prestigeLevel / maxPrestigeLevel) * 100, 100);
       this.updateAchievement(achievement.id, progress);
+    }
+  }
+
+  private handleRewardClaimed(achievement: Achievement, data: any) {
+    if (achievement.name === "STRK Reward Claimed") {
+      this.updateAchievement(achievement.id, 100);
     }
   }
 }

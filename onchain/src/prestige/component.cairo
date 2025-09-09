@@ -53,19 +53,13 @@ pub mod PrestigeComponent {
             let caller = get_caller_address();
             let next_prestige = self.user_prestige.read(caller) + 1;
             let max_prestige = self.max_prestige.read();
-            if next_prestige > max_prestige {
-                return self.prestiges.read(max_prestige).cost;
-            }
+            assert!(next_prestige <= max_prestige, "Max prestige reached");
             self.prestiges.read(next_prestige).cost
         }
 
         fn get_my_prestige_scaler(self: @ComponentState<TContractState>) -> u128 {
             let caller = get_caller_address();
             let prestige = self.user_prestige.read(caller);
-            let max_prestige = self.max_prestige.read();
-            if prestige > max_prestige {
-                return self.prestiges.read(max_prestige).scaler;
-            }
             self.prestiges.read(prestige).scaler
         }
     }
@@ -77,6 +71,11 @@ pub mod PrestigeComponent {
         fn prestige(ref self: ComponentState<TContractState>) {
             let caller = get_caller_address();
             let prestige = self.user_prestige.read(caller);
+            let max_prestige = self.max_prestige.read();
+            
+            // Enforce max prestige limit
+            assert!(prestige < max_prestige, "Max prestige reached");
+            
             self.user_prestige.write(caller, prestige + 1);
             self.emit(PrestigeUpdated { user: caller, prestige: prestige + 1 });
         }

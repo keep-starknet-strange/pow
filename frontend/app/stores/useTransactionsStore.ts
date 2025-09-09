@@ -5,6 +5,7 @@ import { useEventManager } from "./useEventManager";
 import transactionJson from "@/app/configs/transactions.json";
 import dappsJson from "@/app/configs/dapps.json";
 import unlocksConfig from "@/app/configs/unlocks.json";
+import prestigeConfig from "@/app/configs/prestige.json";
 import { useBalanceStore } from "./useBalanceStore";
 import { useUpgradesStore } from "./useUpgradesStore";
 
@@ -218,6 +219,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         dappsUnlocked: newDappsUnlocked,
         isInitialized: true,
       }));
+      useUpgradesStore.getState().checkCanPrestige();
     };
 
     get().resetTransactions();
@@ -351,6 +353,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { dappFeeLevels: newFees };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   dappSpeedUpgrade: (chainId, dappId) => {
@@ -436,7 +439,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
+    const { currentPrestige } = useUpgradesStore.getState();
+    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    return level === -1
+      ? 0
+      : transactionData.fees[level] * mevBoost * prestigeScaler;
   },
 
   getTransactionSpeed: (chainId, txId) => {
@@ -468,7 +475,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : dappData.fees[level] * mevBoost;
+    const { currentPrestige } = useUpgradesStore.getState();
+    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    return level === -1 ? 0 : dappData.fees[level] * mevBoost * prestigeScaler;
   },
 
   getDappSpeed: (chainId, dappId) => {

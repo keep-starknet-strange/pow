@@ -136,7 +136,7 @@ export class TxBuilderObserver implements Observer {
   }
 
   async onNotify(eventType: EventType, data?: any): Promise<void> {
-    const { addAction } = useOnchainActions.getState();
+    const { addAction, addActionForceCall } = useOnchainActions.getState();
     if (!this.contractAddress) {
       return;
     }
@@ -249,7 +249,7 @@ export class TxBuilderObserver implements Observer {
         addAction(createBuyNextChainCall(this.contractAddress));
         break;
       case "PrestigePurchased":
-        // Handled via direct invoke to avoid multicall bundling
+        addActionForceCall(createBuyPrestigeCall(this.contractAddress));
         break;
       default:
         break;

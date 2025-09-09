@@ -7,6 +7,7 @@ import { useEventManager } from "./useEventManager";
 import { useUpgradesStore } from "./useUpgradesStore";
 import { Transaction, Block, newBlock } from "../types/Chains";
 import upgradesJson from "../configs/upgrades.json";
+import prestigeConfig from "../configs/prestige.json";
 
 interface GameStore {
   genesisBlockReward: number;
@@ -261,9 +262,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         initMyGameDependency();
       }
     }
-    const blockReward =
+    const { currentPrestige } = useUpgradesStore.getState();
+    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    const baseBlockReward =
       completedBlock.reward ||
       useUpgradesStore.getState().getUpgradeValue(0, "Block Reward");
+    const blockReward = baseBlockReward * prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
@@ -293,9 +297,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   onBlockSequenced: () => {
     const completedBlock = get().workingBlocks[1];
-    const blockReward =
+    const { currentPrestige } = useUpgradesStore.getState();
+    const prestigeScaler = prestigeConfig[currentPrestige]?.scaler || 1;
+    const baseBlockReward =
       completedBlock.reward ||
       useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
+    const blockReward = baseBlockReward * prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
