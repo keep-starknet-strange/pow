@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
 import { FeatureUnlockView } from "../FeatureUnlockView";
@@ -10,22 +10,14 @@ export type PrestigeUnlockProps = {
 };
 
 export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = (props) => {
-  const { prestige, getNextPrestigeCost, canPrestige, currentPrestige } =
+  const { prestige, getNextPrestigeCost, canPrestige } =
     useUpgrades();
-  const [showUnlock, setShowUnlock] = useState(false);
   const { workingBlocks } = useGameStore();
   const miningBlock = workingBlocks[1];
 
-  /*
-  TODO
-  useEffect(() => {
-    setShowUnlock(canPrestige);
-  }, [canPrestige]);
-  */
-
   return (
     <View>
-      {showUnlock && (
+      {canPrestige && (
         <FeatureUnlockView
           label="Prestige"
           description="Reset and build bigger!"
