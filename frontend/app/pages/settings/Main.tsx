@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { useState } from "react";
+import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
@@ -11,7 +11,6 @@ import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
-import { usePowContractConnector } from "@/app/context/PowContractConnector";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useGameStore } from "../../stores/useGameStore";
 import { useBalanceStore } from "../../stores/useBalanceStore";
@@ -22,7 +21,7 @@ import { useUpgradesStore } from "../../stores/useUpgradesStore";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
-    tab: "Account" | "About" | "ClaimReward" | "TermsOfUse",
+    tab: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse",
   ) => void;
   goBackToLogin: () => void;
 };
@@ -79,7 +78,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "Account" | "About" | "ClaimReward" | "TermsOfUse";
+    tab?: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse";
     onPress?: () => void;
     icon?: string;
   }[] = [
