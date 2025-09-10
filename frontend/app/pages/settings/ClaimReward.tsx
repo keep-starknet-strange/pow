@@ -274,7 +274,7 @@ export const ClaimRewardSection: React.FC = () => {
                       onPress={() => {
                         const baseUrl =
                           network === "SN_SEPOLIA"
-                            ? "https://starknet.starkscan.co"
+                            ? "https://sepolia.starkscan.co"
                             : "https://starkscan.co";
                         Linking.openURL(`${baseUrl}/contract/${addr}`);
                       }}
@@ -309,7 +309,7 @@ export const ClaimRewardSection: React.FC = () => {
                     const hash = localTxHash as string;
                     const baseUrl =
                       network === "SN_SEPOLIA"
-                        ? "https://starknet.starkscan.co"
+                        ? "https://sepolia.starkscan.co"
                         : "https://starkscan.co";
                     Linking.openURL(`${baseUrl}/tx/${hash}`);
                   }}
