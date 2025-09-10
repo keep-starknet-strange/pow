@@ -20,7 +20,6 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
     getNextPrestigeCost,
     canPrestige,
     currentPrestige,
-    isMaxPrestige,
   } = useUpgrades();
   const { workingBlocks } = useGameStore();
   const { balance } = useBalanceStore();

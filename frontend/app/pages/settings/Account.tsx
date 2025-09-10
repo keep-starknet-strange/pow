@@ -32,7 +32,7 @@ export const AccountSection: React.FC = () => {
   const { account, getPrivateKey, getAvailableKeys, generateAccountAddress } =
     useStarknetConnector();
   const { user, getAccount } = useFocEngine();
-  const { currentPrestige, isMaxPrestige, getMaxPrestige } = useUpgrades();
+  const { currentPrestige } = useUpgrades();
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
   const [showPrivateKey, setShowPrivateKey] = useState(false);
@@ -132,6 +132,20 @@ export const AccountSection: React.FC = () => {
                 height: "100%",
               }}
             >
+              {currentPrestige > 0 && (
+                <View
+                  className="absolute inset-[-4px] rounded-lg"
+                  style={{
+                    borderColor: getPrestigeColor(currentPrestige) + "80",
+                    borderWidth: 4,
+                    shadowColor: getPrestigeColor(currentPrestige),
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 8,
+                    elevation: 8,
+                  }}
+                />
+              )}
               <Canvas style={{ width: 140, height: 140 }}>
                 <Image
                   image={getImage("block.grid.min")}
@@ -168,26 +182,13 @@ export const AccountSection: React.FC = () => {
                 availableUser?.account?.username ||
                 "Anonymous"}
             </Text>
-            <View className="w-[36px] aspect-square relative">
-              {isMaxPrestige() && (
-                <View
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    backgroundColor: getPrestigeColor(currentPrestige) + "30",
-                    shadowColor: getPrestigeColor(currentPrestige),
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.8,
-                    shadowRadius: 8,
-                    elevation: 8,
-                  }}
-                />
-              )}
+            <View className="w-[40px] aspect-square relative flex">
               <Canvas style={{ flex: 1 }} className="w-full h-full">
                 <Image
                   image={getImage(getPrestigeIcon(currentPrestige))}
                   fit="contain"
-                  x={0}
-                  y={0}
+                  x={4}
+                  y={4}
                   width={32}
                   height={32}
                   sampling={{
@@ -198,11 +199,6 @@ export const AccountSection: React.FC = () => {
               </Canvas>
             </View>
           </View>
-          {isMaxPrestige() && (
-            <Text className="text-[#FFD700] text-[12px] font-Pixels text-center mt-1">
-              MAX PRESTIGE {currentPrestige}/{getMaxPrestige()}
-            </Text>
-          )}
           {!user && availableUser && (
             <Text className="text-[#101119]/60 text-[12px] font-Pixels text-center mt-1">
               (not connected)
