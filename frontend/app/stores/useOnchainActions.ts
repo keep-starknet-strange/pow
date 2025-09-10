@@ -17,6 +17,7 @@ interface OnchainActionsState {
   isReverting: boolean;
   revertCounter: number;
   addAction: (action: Call) => void;
+  addActionForceCall: (action: Call) => void;
   invokeActions?: (actions: Call[]) => Promise<any>;
   waitForTransaction?: (txHash: string) => Promise<boolean>;
   onInvokeActions: (invokeActions: (actions: Call[]) => Promise<any>) => void;
@@ -99,6 +100,67 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       }
 
       return { actions: updatedActions };
+    }),
+
+  addActionForceCall: (action: Call) =>
+    set((state) => {
+      // Prevent adding actions when reverting
+      if (state.isReverting) {
+        return state;
+      }
+
+      // First force all currently queued actions into a call
+      if (state.actions.length > 0) {
+        const newActionsCall: ActionsCall = {
+          id: `call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          actions: [...state.actions],
+          retryCount: 0,
+        };
+
+        // Create another call with the single new action
+        const singleActionCall: ActionsCall = {
+          id: `call-${Date.now() + 1}-${Math.random().toString(36).substr(2, 9)}`,
+          actions: [action],
+          retryCount: 0,
+        };
+
+        // Add the single action call to queue
+        const newQueue = [
+          ...state.invokeQueue,
+          newActionsCall,
+          singleActionCall,
+        ];
+
+        // Start processing if not already doing so
+        if (!state.isProcessing) {
+          setTimeout(() => get().processQueue(), 0);
+        }
+
+        return {
+          actions: [], // Clear actions since they're now queued
+          invokeQueue: newQueue,
+        };
+      } else {
+        // No actions to force, just add the single action as a call
+        const singleActionCall: ActionsCall = {
+          id: `call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          actions: [action],
+          retryCount: 0,
+        };
+
+        // Add to queue
+        const newQueue = [...state.invokeQueue, singleActionCall];
+
+        // Start processing if not already doing so
+        if (!state.isProcessing) {
+          setTimeout(() => get().processQueue(), 0);
+        }
+
+        return {
+          actions: [],
+          invokeQueue: newQueue,
+        };
+      }
     }),
 
   invokeActions: async (actions: Call[]) => {},
@@ -211,7 +273,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   },
 
   clearQueue: () => {
-    set({ invokeQueue: [] });
+    set({ invokeQueue: [], actions: [] });
     if (__DEV__) {
       console.log("🧹 Queue manually cleared");
     }

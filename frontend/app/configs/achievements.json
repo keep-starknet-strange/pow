@@ -197,9 +197,9 @@
   },
   {
     "id": 29,
-    "name": "STRK Reward Unlocked",
+    "name": "STRK Reward Claimed",
     "category": "MISSIONS",
     "image": "logo.starknet",
-    "updateOn": "BalanceUpdated"
+    "updateOn": "RewardClaimed"
   }
 ]

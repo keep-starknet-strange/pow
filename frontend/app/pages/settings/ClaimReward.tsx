@@ -11,20 +11,23 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BasicButton from "../../components/buttons/Basic";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
+import { useEventManager } from "../../stores/useEventManager";
 
 type ClaimRewardProps = {
   setSettingTab: (tab: "Main") => void;
 };
 
 export const ClaimRewardSection: React.FC = () => {
-  const { invokeCalls } = useStarknetConnector();
+  const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
+  const { notify } = useEventManager();
   const {
     connectArgent,
     account,
@@ -66,8 +69,16 @@ export const ClaimRewardSection: React.FC = () => {
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
-      if (hash) setLocalTxHash(hash);
-      setClaimed(true);
+      if (hash) {
+        setLocalTxHash(hash);
+        setClaimed(true);
+        // Save transaction hash to AsyncStorage after successful transaction
+        await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+        // Notify achievement system that STRK reward was claimed
+        notify("RewardClaimed", { recipient, transactionHash: hash });
+      } else {
+        throw new Error("Transaction completed but no hash returned");
+      }
     } catch (err: any) {
       const raw = (err && (err.message || String(err))) || "";
       const alreadyClaimed = /reward already claimed/i.test(raw);
@@ -174,12 +185,34 @@ export const ClaimRewardSection: React.FC = () => {
     })();
   }, [getRewardParams]);
 
+  useEffect(() => {
+    // Load claimed state from AsyncStorage on component mount
+    const loadClaimedState = async () => {
+      try {
+        const claimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+        if (claimedTxHash) {
+          setClaimed(true);
+          setLocalTxHash(claimedTxHash);
+        }
+      } catch (error) {
+        console.error("Error loading claimed state:", error);
+      }
+    };
+    loadClaimedState();
+  }, []);
+
   return (
     <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>
       <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>
         <Modal visible={!!busyText} transparent animationType="fade">
           <View style={styles.loadingOverlay}>
             <View style={styles.loadingBox}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setBusyText(null)}
+              >
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
               <ActivityIndicator size="large" color="#ffffff" />
               <Text style={styles.loadingText}>{busyText}</Text>
             </View>
@@ -238,9 +271,13 @@ export const ClaimRewardSection: React.FC = () => {
                   {addr ? (
                     <TouchableOpacity
                       style={styles.linkWrap}
-                      onPress={() =>
-                        Linking.openURL(`https://starkscan.co/contract/${addr}`)
-                      }
+                      onPress={() => {
+                        const baseUrl =
+                          network === "SN_SEPOLIA"
+                            ? "https://sepolia.starkscan.co"
+                            : "https://starkscan.co";
+                        Linking.openURL(`${baseUrl}/contract/${addr}`);
+                      }}
                     >
                       <Text style={styles.linkText}>
                         View address on StarkScan ({addr.slice(0, 6)}...
@@ -252,15 +289,17 @@ export const ClaimRewardSection: React.FC = () => {
               );
             })()}
 
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                label="Claim STRK"
-                onPress={claimReward}
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-                disabled={claimed || claiming || !debouncedInput.trim()}
-              />
-            </View>
+            {!claimed && (
+              <View style={styles.buttonWrap}>
+                <BasicButton
+                  label="Claim STRK"
+                  onPress={claimReward}
+                  style={styles.basicButton}
+                  textStyle={styles.basicButtonText}
+                  disabled={claiming || !debouncedInput.trim()}
+                />
+              </View>
+            )}
 
             <View style={styles.linksContainer}>
               {localTxHash && (
@@ -268,7 +307,11 @@ export const ClaimRewardSection: React.FC = () => {
                   style={styles.linkWrap}
                   onPress={() => {
                     const hash = localTxHash as string;
-                    Linking.openURL(`https://starkscan.co/tx/${hash}`);
+                    const baseUrl =
+                      network === "SN_SEPOLIA"
+                        ? "https://sepolia.starkscan.co"
+                        : "https://starkscan.co";
+                    Linking.openURL(`${baseUrl}/tx/${hash}`);
                   }}
                 >
                   <Text style={styles.linkText}>
@@ -406,6 +449,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     maxWidth: 280,
+    position: "relative",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 8,
+    right: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#ffffff20",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+  closeButtonText: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "bold",
+    lineHeight: 20,
   },
   loadingText: {
     color: "#ffffff",

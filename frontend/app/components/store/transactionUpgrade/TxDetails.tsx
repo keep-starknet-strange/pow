@@ -72,6 +72,7 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
         subDescription &&
         maxSubDescription ? (
           <UpgradeDescription
+            name={name}
             chainId={chainId}
             upgradeId={upgradeId}
             description={description}

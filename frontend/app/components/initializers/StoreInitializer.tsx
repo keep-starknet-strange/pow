@@ -162,12 +162,11 @@ const GameStoreInitializer = memo(() => {
   const { user } = useFocEngine();
   const {
     powContract,
-    initMyGame,
     getUserMaxChainId,
     getUserBlockNumber,
     getUserBlockState,
   } = usePowContractConnector();
-  const { initializeGameStore, setInitMyGameDependency } = useGameStore();
+  const { initializeGameStore } = useGameStore();
 
   useEffect(() => {
     initializeGameStore(
@@ -185,10 +184,6 @@ const GameStoreInitializer = memo(() => {
     getUserBlockNumber,
     getUserBlockState,
   ]);
-
-  useEffect(() => {
-    setInitMyGameDependency(initMyGame);
-  }, [initMyGame, setInitMyGameDependency]);
 
   return null;
 });

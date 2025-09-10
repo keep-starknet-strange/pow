@@ -218,6 +218,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         dappsUnlocked: newDappsUnlocked,
         isInitialized: true,
       }));
+      useUpgradesStore.getState().checkCanPrestige();
     };
 
     get().resetTransactions();
@@ -351,6 +352,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       });
       return { dappFeeLevels: newFees };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   dappSpeedUpgrade: (chainId, dappId) => {
@@ -436,7 +438,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : transactionData.fees[level] * mevBoost;
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
+    return level === -1
+      ? 0
+      : transactionData.fees[level] * mevBoost * prestigeScaler;
   },
 
   getTransactionSpeed: (chainId, txId) => {
@@ -468,7 +474,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     const mevBoost = useUpgradesStore
       .getState()
       .getUpgradeValue(chainId, "MEV Boost");
-    return level === -1 ? 0 : dappData.fees[level] * mevBoost;
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
+    return level === -1 ? 0 : dappData.fees[level] * mevBoost * prestigeScaler;
   },
 
   getDappSpeed: (chainId, dappId) => {

@@ -432,13 +432,15 @@ mod PowGame {
             // Finalize block
             let fees = working_block.fees;
             let reward = self.get_my_upgrade(chain_id, 'Block Reward');
+            let prestige_scaler = self.get_my_prestige_scaler();
+            let total_reward = reward * prestige_scaler;
             if (chain_id != 0) {
                 // Add block to da & proof
-                self.builder.build_proof(chain_id, reward);
-                self.builder.build_da(chain_id, reward);
+                self.builder.build_proof(chain_id, total_reward);
+                self.builder.build_da(chain_id, total_reward);
             }
-            pay_user(ref self, caller, fees + reward);
-            self.emit(BlockMined { user: caller, chain_id, fees, reward });
+            pay_user(ref self, caller, fees + total_reward);
+            self.emit(BlockMined { user: caller, chain_id, fees, reward: total_reward });
 
             // Set max_size and difficulty for the new block based on current upgrade level
             let block_width = self.get_my_upgrade(chain_id, 'Block Size');
@@ -701,7 +703,16 @@ mod PowGame {
         let caller = get_caller_address();
         let my_chain_count = self.user_chain_count.read(caller);
         assert!(my_chain_count >= self.game_chain_count.read(), "Not enough chains unlocked");
-        // TODO: Check upgrades, txs, etc. levels
+        
+        // Check all tx levels on the last chain (each tx must be unlocked including dapps)
+        let last_chain_id = self.game_chain_count.read() - 1;
+        
+        // Check all transactions are unlocked for the last chain
+        self.transactions.check_has_all_txs(last_chain_id);
+        
+        // Also check that dapps are unlocked for the last chain
+        let dapps_unlocked = self.transactions.get_user_dapps_unlocked(caller, last_chain_id);
+        assert!(dapps_unlocked, "Dapps must be unlocked on the last chain");
 
         self.prestige.prestige();
 
@@ -711,21 +722,7 @@ mod PowGame {
         let mut chain_id = 0;
         let game_chain_count = self.game_chain_count.read();
         while chain_id != game_chain_count {
-            // Set max_size and difficulty for reset blocks based on current upgrade level
-            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
-            let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
-            let block_difficulty = self.get_my_upgrade(chain_id, 'Block Difficulty');
-            self.builder.reset_block(chain_id, max_size, block_difficulty);
-            // Set max_size and difficulty for reset DA based on current upgrade level
-            let da_size = self.get_my_upgrade(chain_id, 'DA compression');
-            let da_max_size: u32 = da_size.try_into().unwrap_or(1);
-            let da_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'DA compression').into();
-            self.builder.reset_da(chain_id, da_max_size, da_difficulty);
-            // Set max_size and difficulty for reset proof based on current upgrade level
-            let proof_size = self.get_my_upgrade(chain_id, 'Recursive Proving');
-            let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
-            let proof_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'Recursive Proving').into();
-            self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
+            self.builder.reset_builder(chain_id);
             self.transactions.reset_tx_levels(chain_id);
             self.upgrades.reset_upgrade_levels(chain_id);
             chain_id += 1;

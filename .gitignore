@@ -1,5 +1,6 @@
 .env
 .env.sep
+.env.main
 .DS_Store
 .cursorrules
 .idea/

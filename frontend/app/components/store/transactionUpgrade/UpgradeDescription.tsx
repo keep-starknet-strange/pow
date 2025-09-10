@@ -8,8 +8,10 @@ import {
 } from "@shopify/react-native-skia";
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 import { useImages } from "../../../hooks/useImages";
+import { useUpgrades } from "../../../stores/useUpgradesStore";
 
 type UpgradeDescriptionProps = {
+  name: string;
   chainId: number;
   upgradeId: number;
   description: string;
@@ -23,6 +25,7 @@ type UpgradeDescriptionProps = {
 };
 
 export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
+  name,
   description,
   subDescription,
   maxSubDescription,
@@ -33,11 +36,16 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
   baseSpeed,
 }) => {
   const { getImage } = useImages();
+  const { getPrestigeScaler } = useUpgrades();
 
   // Handle both upgrade values and automation speeds
   const isAutomation = speeds !== undefined;
   const dataArray = isAutomation ? speeds : values;
   const baseData = isAutomation ? baseSpeed : baseValue;
+
+  // Check if this is a Block Reward upgrade by name
+  const isBlockReward = !isAutomation && name === "Block Reward";
+  const prestigeScaler = isBlockReward ? getPrestigeScaler() : 1;
 
   // For automations, convert speed to actual rate per second (speed / 5)
   // Since the formula is 5000ms / speed, the actual rate is speed / 5 per second
@@ -47,8 +55,14 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
       ? dataArray?.[currentLevel + 1]
       : dataArray?.[currentLevel];
 
-  const currVal = isAutomation ? (rawCurrVal || 0) / 5 : rawCurrVal;
-  const upgradeVal = isAutomation ? (rawUpgradeVal || 0) / 5 : rawUpgradeVal;
+  // If automation, divide by 5 to get per second rate
+  // Apply prestige scaler to block reward values
+  const currVal = isAutomation
+    ? (rawCurrVal || 0) / 5
+    : (rawCurrVal || 0) * prestigeScaler;
+  const upgradeVal = isAutomation
+    ? (rawUpgradeVal || 0) / 5
+    : (rawUpgradeVal || 0) * prestigeScaler;
 
   // Check if we're at max level
   const isMaxLevel = currentLevel + 1 >= (dataArray?.length || 0);

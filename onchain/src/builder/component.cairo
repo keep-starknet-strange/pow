@@ -155,6 +155,13 @@ pub mod BuilderComponent {
             self.emit(BuildingBlockClicked { user, chain_id, click_count: clicks });
         }
 
+        fn reset_builder(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+        ) {
+            self.building_block_height.write((get_caller_address(), chain_id), 0);
+        }
+
         fn reset_block(
             ref self: ComponentState<TContractState>,
             chain_id: u32,

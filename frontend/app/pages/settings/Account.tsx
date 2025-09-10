@@ -7,6 +7,7 @@ import { useFocEngine } from "../../context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
 import { PFPView } from "../../components/PFPView";
 import { useImages } from "../../hooks/useImages";
+import prestigeConfig from "../../configs/prestige.json";
 import {
   Canvas,
   Image,
@@ -20,6 +21,11 @@ const getPrestigeIcon = (prestige: number) => {
     return `shop.lock`;
   }
   return `prestige.${prestige}`;
+};
+
+const getPrestigeColor = (prestige: number) => {
+  const config = prestigeConfig.find((p) => p.id === prestige);
+  return config?.color || "#FF0000";
 };
 
 export const AccountSection: React.FC = () => {
@@ -126,6 +132,20 @@ export const AccountSection: React.FC = () => {
                 height: "100%",
               }}
             >
+              {currentPrestige > 0 && (
+                <View
+                  className="absolute inset-[-4px] rounded-lg"
+                  style={{
+                    borderColor: getPrestigeColor(currentPrestige) + "80",
+                    borderWidth: 4,
+                    shadowColor: getPrestigeColor(currentPrestige),
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 8,
+                    elevation: 8,
+                  }}
+                />
+              )}
               <Canvas style={{ width: 140, height: 140 }}>
                 <Image
                   image={getImage("block.grid.min")}
@@ -162,13 +182,13 @@ export const AccountSection: React.FC = () => {
                 availableUser?.account?.username ||
                 "Anonymous"}
             </Text>
-            <View className="w-[36px] aspect-square">
+            <View className="w-[40px] aspect-square relative flex">
               <Canvas style={{ flex: 1 }} className="w-full h-full">
                 <Image
                   image={getImage(getPrestigeIcon(currentPrestige))}
                   fit="contain"
-                  x={0}
-                  y={0}
+                  x={4}
+                  y={4}
                   width={32}
                   height={32}
                   sampling={{

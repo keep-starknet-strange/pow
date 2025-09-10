@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { useState } from "react";
+import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
@@ -11,7 +11,6 @@ import { useSound } from "../../stores/useSoundStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
-import { usePowContractConnector } from "@/app/context/PowContractConnector";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useGameStore } from "../../stores/useGameStore";
 import { useBalanceStore } from "../../stores/useBalanceStore";
@@ -19,10 +18,11 @@ import { useTransactionsStore } from "../../stores/useTransactionsStore";
 import { useL2Store } from "../../stores/useL2Store";
 import { useAchievementsStore } from "../../stores/useAchievementsStore";
 import { useUpgradesStore } from "../../stores/useUpgradesStore";
+import { useOnchainActions } from "../../stores/useOnchainActions";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
-    tab: "Account" | "About" | "ClaimReward" | "TermsOfUse",
+    tab: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse",
   ) => void;
   goBackToLogin: () => void;
 };
@@ -46,6 +46,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
+  const { clearQueue } = useOnchainActions();
 
   const handleResetGame = async () => {
     setShowResetConfirmation(false);
@@ -66,6 +67,9 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     // Reset tutorial
     resetTutorial();
 
+    // Clear any pending on-chain actions
+    clearQueue();
+
     // Clear authentication and keys
     disconnectUser(); // Disconnect from FocEngine
     clearPrivateKeys("pow_game");
@@ -79,7 +83,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "Account" | "About" | "ClaimReward" | "TermsOfUse";
+    tab?: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse";
     onPress?: () => void;
     icon?: string;
   }[] = [
@@ -89,7 +93,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     },
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Terms of Use", tab: "TermsOfUse" },
-    // { label: "Account", tab: "Account" }, // TODO: Hidden for now
+    { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
     ...(currentPrestige >= 1
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]

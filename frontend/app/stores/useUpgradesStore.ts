@@ -36,6 +36,9 @@ interface UpgradesState {
   getAutomationSpeedAt: (chainId: number, automationId: number) => number;
   getNextAutomationCost: (chainId: number, automationId: number) => number;
   getNextPrestigeCost: () => number;
+  isMaxPrestige: () => boolean;
+  getMaxPrestige: () => number;
+  getPrestigeScaler: () => number;
 
   // Initialization
   resetUpgrades: () => void;
@@ -249,9 +252,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
       });
     }
 
-    // Check can prestige after loading
-    get().checkCanPrestige();
-
     // Mark as initialized
     set({ isInitialized: true });
   },
@@ -301,7 +301,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     });
 
     set({ upgrades: newUpgrades });
-    get().checkCanPrestige();
   },
 
   upgradeAutomation: (chainId: number, automationId: number) => {
@@ -346,128 +345,65 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     });
 
     set({ automations: newAutomations });
-    get().checkCanPrestige();
   },
 
-  // Can prestige if all L2 txs unlocked, all upgrades unlocked, all automations unlocked, and staking unlocked
   checkCanPrestige: () => {
-    const { upgrades, automations } = get();
+    const { currentPrestige } = get();
+    const maxPrestige = prestigeJson.length - 1;
 
-    // Check if L2 is unlocked first
-    const { isL2Unlocked } = useL2Store.getState();
-    if (!isL2Unlocked) {
+    // Check if already at max prestige
+    if (currentPrestige >= maxPrestige) {
       set({ canPrestige: false });
       return;
     }
 
-    // Check all L2 (chain 1) automations are unlocked
-    const automationLevels = automations[1];
-    if (!automationLevels) {
-      set({ canPrestige: false });
-      return;
-    }
-
-    for (const level of Object.values(automationLevels)) {
-      if (level < 0) {
-        set({ canPrestige: false });
-        return;
-      }
-    }
-
-    // Check all L2 (chain 1) upgrades are unlocked
-    const upgradeLevels = upgrades[1];
-    if (!upgradeLevels) {
-      set({ canPrestige: false });
-      return;
-    }
-
-    for (const level of Object.values(upgradeLevels)) {
-      if (level < 0) {
-        set({ canPrestige: false });
-        return;
-      }
-    }
-
-    // Check all L2 dapps are unlocked
-    const { dappFeeLevels, dappSpeedLevels } = useTransactionsStore.getState();
+    // Check if last dapp is unlocked
+    const { dappFeeLevels } = useTransactionsStore.getState();
     const dappLevels = dappFeeLevels[1];
     if (!dappLevels) {
       set({ canPrestige: false });
       return;
     }
-    for (const level of Object.values(dappLevels)) {
-      if (level < 0) {
-        set({ canPrestige: false });
-        return;
-      }
-    }
-
-    // Check all L2 transactions are unlocked
-    const { transactionFeeLevels, transactionSpeedLevels } =
-      useTransactionsStore.getState();
-    const transactionLevels = transactionFeeLevels[1];
-    if (!transactionLevels) {
+    const lastDappId = Math.max(...Object.keys(dappLevels).map(Number));
+    if (dappLevels[lastDappId] < 0) {
       set({ canPrestige: false });
       return;
     }
-    for (const level of Object.values(transactionLevels)) {
-      if (level < 0) {
-        set({ canPrestige: false });
-        return;
-      }
-    }
-
     set({ canPrestige: true });
+    return;
   },
 
   prestige: async () => {
-    const { currentPrestige } = get();
-    const nextPrestige = currentPrestige + 1;
+    const { currentPrestige, isMaxPrestige, getNextPrestigeCost } = get();
 
-    // Clear any pending on-chain actions to avoid multicall reverts
-    try {
-      useOnchainActions.getState().clearQueue();
-    } catch (error) {
-      console.error("Error clearing on-chain actions:", error);
-    }
-
-    // Invoke prestige on-chain directly (avoid bundling)
-    try {
-      const contractAddress =
-        process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || "";
-      if (contractAddress) {
-        const prestigeCall: Call = {
-          contractAddress,
-          entrypoint: "buy_prestige",
-          calldata: [],
-        };
-        const { invokeActions, waitForTransaction } =
-          useOnchainActions.getState();
-        const response = await invokeActions?.([prestigeCall]);
-        const txHash = response?.data?.transactionHash as string | undefined;
-        if (txHash && waitForTransaction) {
-          await waitForTransaction(txHash);
-        }
-      }
-    } catch (error) {
-      console.error("Prestige transaction failed:", error);
-      useEventManager
-        .getState()
-        .notify("ActionsReverted", { failedActionId: "buy_prestige" });
+    // Check if already at max prestige
+    if (isMaxPrestige()) {
+      console.warn("Already at max prestige level");
+      useEventManager.getState().notify("InvalidPurchase");
       return;
     }
 
-    // Now update local state and reset stores
+    // Check if user has enough balance
+    const cost = getNextPrestigeCost();
+    const { balance } = useBalanceStore.getState();
+    if (balance < cost) {
+      console.warn(
+        `Not enough balance for prestige. Need ${cost}, have ${balance}`,
+      );
+      useEventManager.getState().notify("InvalidPurchase");
+      return;
+    }
+
+    const nextPrestige = currentPrestige + 1;
     useEventManager
       .getState()
       .notify("PrestigePurchased", { prestigeLevel: nextPrestige });
 
-    console.log("Starting prestige reset...");
-    get().resetUpgrades();
     useBalanceStore.getState().resetBalance();
-    useTransactionsStore.getState().resetTransactions();
     useGameStore.getState().resetGameStore();
     useL2Store.getState().resetL2Store();
+    useTransactionsStore.getState().resetTransactions();
+    get().resetUpgrades();
 
     set({
       currentPrestige: nextPrestige,
@@ -631,8 +567,30 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
   getNextPrestigeCost: (): number => {
     const { currentPrestige } = get();
+    const maxPrestige = prestigeJson.length - 1;
+
+    // If at max prestige, return 0 or max cost
+    if (currentPrestige >= maxPrestige) {
+      return 0; // No cost since can't prestige further
+    }
+
     const prestigeCost = prestigeJson[currentPrestige + 1]?.cost || 0;
     return prestigeCost;
+  },
+
+  isMaxPrestige: (): boolean => {
+    const { currentPrestige } = get();
+    const maxPrestige = prestigeJson.length - 1;
+    return currentPrestige >= maxPrestige;
+  },
+
+  getMaxPrestige: (): number => {
+    return prestigeJson.length - 1;
+  },
+
+  getPrestigeScaler: (): number => {
+    const { currentPrestige } = get();
+    return prestigeJson[currentPrestige]?.scaler || 1;
   },
 }));
 

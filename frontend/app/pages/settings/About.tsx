@@ -26,7 +26,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           experience the thrill of building their own blockchain empire through
           simple yet addictive click-to-earn mechanics.
         </Text>
-        <View className="mt-8">
+        <View className="mt-4">
           <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
             Features
           </Text>
@@ -45,11 +45,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </Text>
           </View>
         </View>
-        <View className="mt-8">
+        <View className="mt-4">
           <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
             Contact
           </Text>
-          <View className="flex flex-row gap-4 mt-8 justify-around">
+          <View className="flex flex-row gap-4 mt-6 justify-around">
             <TouchableOpacity
               onPress={() => {
                 const url =

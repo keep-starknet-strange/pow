@@ -394,19 +394,22 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       [workingBlock?.maxSize, getUpgradeValue, props.chainId],
     );
 
-    const totalReward = useMemo(
-      () =>
-        (workingBlock?.fees || 0) +
-        (workingBlock?.reward ||
-          0 ||
-          getUpgradeValue(props.chainId, "Block Reward")),
-      [
-        workingBlock?.fees,
-        workingBlock?.reward,
-        getUpgradeValue,
-        props.chainId,
-      ],
-    );
+    const { getPrestigeScaler } = useUpgrades();
+    const totalReward = useMemo(() => {
+      const prestigeScaler = getPrestigeScaler();
+      const baseBlockReward =
+        workingBlock?.reward ||
+        0 ||
+        getUpgradeValue(props.chainId, "Block Reward");
+      const scaledBlockReward = baseBlockReward * prestigeScaler;
+      return (workingBlock?.fees || 0) + scaledBlockReward;
+    }, [
+      workingBlock?.fees,
+      workingBlock?.reward,
+      getUpgradeValue,
+      props.chainId,
+      getPrestigeScaler,
+    ]);
 
     return (
       <Animated.View style={containerStyle}>

@@ -37,9 +37,6 @@ interface GameStore {
 
   onBlockMined: () => void;
   onBlockSequenced: () => void;
-
-  initMyGameDependency?: () => void;
-  setInitMyGameDependency: (initMyGame: () => void) => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -48,9 +45,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   blockHeights: {},
   isInitialized: false,
   setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
-  initMyGameDependency: undefined,
-  setInitMyGameDependency: (initMyGame) =>
-    set({ initMyGameDependency: initMyGame }),
 
   resetGameStore: () => {
     // Use default values from config instead of reading from other stores to avoid circular dependencies
@@ -254,16 +248,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   onBlockMined: () => {
-    const { initMyGameDependency } = get();
     const completedBlock = get().workingBlocks[0];
-    if (completedBlock.blockId === 0) {
-      if (initMyGameDependency) {
-        initMyGameDependency();
-      }
-    }
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
     const blockReward =
       completedBlock.reward ||
-      useUpgradesStore.getState().getUpgradeValue(0, "Block Reward");
+      useUpgradesStore.getState().getUpgradeValue(0, "Block Reward") *
+        prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
@@ -286,16 +277,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     useEventManager.getState().notify("MineDone", {
       block: completedBlock,
-      ignoreAction: completedBlock.blockId === 0,
     });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
   },
 
   onBlockSequenced: () => {
     const completedBlock = get().workingBlocks[1];
+    const { getPrestigeScaler } = useUpgradesStore.getState();
+    const prestigeScaler = getPrestigeScaler();
     const blockReward =
       completedBlock.reward ||
-      useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
+      useUpgradesStore.getState().getUpgradeValue(1, "Block Reward") *
+        prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
