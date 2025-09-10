@@ -37,9 +37,6 @@ interface GameStore {
 
   onBlockMined: () => void;
   onBlockSequenced: () => void;
-
-  initMyGameDependency?: () => void;
-  setInitMyGameDependency: (initMyGame: () => void) => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -48,9 +45,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   blockHeights: {},
   isInitialized: false,
   setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
-  initMyGameDependency: undefined,
-  setInitMyGameDependency: (initMyGame) =>
-    set({ initMyGameDependency: initMyGame }),
 
   resetGameStore: () => {
     // Use default values from config instead of reading from other stores to avoid circular dependencies
@@ -254,13 +248,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   onBlockMined: () => {
-    const { initMyGameDependency } = get();
     const completedBlock = get().workingBlocks[0];
-    if (completedBlock.blockId === 0) {
-      if (initMyGameDependency) {
-        initMyGameDependency();
-      }
-    }
     const { getPrestigeScaler } = useUpgradesStore.getState();
     const prestigeScaler = getPrestigeScaler();
     const baseBlockReward =
@@ -289,7 +277,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     useEventManager.getState().notify("MineDone", {
       block: completedBlock,
-      ignoreAction: completedBlock.blockId === 0,
     });
     useBalanceStore.getState().updateBalance(blockReward + completedBlock.fees);
   },

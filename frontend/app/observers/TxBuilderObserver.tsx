@@ -124,6 +124,14 @@ export const createBuyPrestigeCall = (contractAddress: string): Call => {
   };
 };
 
+export const createInitMyGameCall = (contractAddress: string): Call => {
+  return {
+    contractAddress,
+    entrypoint: "init_my_game",
+    calldata: [],
+  };
+};
+
 export class TxBuilderObserver implements Observer {
   private contractAddress: string;
 
@@ -171,9 +179,15 @@ export class TxBuilderObserver implements Observer {
         // Proccessed above in the if statement since this is a special case
         break;
       case "MineClicked":
-      case "MineDone":
         if (data.ignoreAction) return;
         addAction(createMineBlockCall(this.contractAddress, 0));
+        break;
+      case "MineDone":
+        if (data.block?.blockId === 0) {
+          addActionForceCall(createInitMyGameCall(this.contractAddress));
+        } else {
+          addAction(createMineBlockCall(this.contractAddress, 0));
+        }
         break;
       case "SequenceClicked":
       case "SequenceDone":

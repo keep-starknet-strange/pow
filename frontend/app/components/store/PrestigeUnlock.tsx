@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
 import { FeatureUnlockView } from "../FeatureUnlockView";
@@ -36,7 +36,7 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
   );
   const prestigeScaler = nextPrestigeConfig?.scaler || 1;
 
-  const handlePrestigePress = () => {
+  const handlePrestigePress = useCallback(() => {
     // Check if user has enough balance
     const cost = getNextPrestigeCost();
     if (balance < cost) {
@@ -45,7 +45,7 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
       return;
     }
     setShowPrestigeConfirmation(true);
-  };
+  }, [balance, getNextPrestigeCost, notify]);
 
   const handleConfirmPrestige = async () => {
     setShowPrestigeConfirmation(false);

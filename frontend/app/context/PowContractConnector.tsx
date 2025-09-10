@@ -17,7 +17,6 @@ type PowContractContextType = {
   powContract: Contract | null;
 
   createGameAccount: () => Promise<void>;
-  initMyGame: () => Promise<void>;
 
   getUserBalance: () => Promise<number | undefined>;
   getUserTxFeeLevels: (
@@ -195,39 +194,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     deployAccount,
     mintFunds,
     powGameContractAddress,
-    network,
-    STARKNET_ENABLED,
-  ]);
-
-  const initMyGame = useCallback(async () => {
-    if (!STARKNET_ENABLED) {
-      return;
-    }
-    if (!powGameContractAddress) {
-      console.error("powGameContractAddress is not set");
-      return;
-    }
-
-    if (network === "SN_DEVNET") {
-      // TODO: Invoke like else statement with account deployment
-      const initMyGameCall: Call = {
-        contractAddress: powGameContractAddress,
-        entrypoint: "init_my_game",
-        calldata: [],
-      };
-      addAction(initMyGameCall);
-    } else {
-      const initMyGameCall: Call = {
-        contractAddress: powGameContractAddress,
-        entrypoint: "init_my_game",
-        calldata: [],
-      };
-      invokeWithPaymaster([initMyGameCall]);
-    }
-  }, [
-    powGameContractAddress,
-    invokeWithPaymaster,
-    addAction,
     network,
     STARKNET_ENABLED,
   ]);
@@ -641,7 +607,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         powGameContractAddress,
         createGameAccount,
-        initMyGame,
         getUserBalance,
         powContract,
         getUserTxFeeLevels,
