@@ -11,6 +11,7 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,7 +24,7 @@ type ClaimRewardProps = {
 };
 
 export const ClaimRewardSection: React.FC = () => {
-  const { invokeCalls } = useStarknetConnector();
+  const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
   const { notify } = useEventManager();
@@ -37,6 +38,7 @@ export const ClaimRewardSection: React.FC = () => {
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [claimed, setClaimed] = useState<boolean>(false);
+  const [hasClaimed, setHasClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardTitle, setRewardTitle] = useState<string>(
     "🎉 You earned 10 STRK!",
@@ -248,9 +250,12 @@ export const ClaimRewardSection: React.FC = () => {
                   {addr ? (
                     <TouchableOpacity
                       style={styles.linkWrap}
-                      onPress={() =>
-                        Linking.openURL(`https://starkscan.co/contract/${addr}`)
-                      }
+                      onPress={() => {
+                        const baseUrl = network === "SN_SEPOLIA" 
+                          ? "https://starknet.starkscan.co" 
+                          : "https://starkscan.co";
+                        Linking.openURL(`${baseUrl}/contract/${addr}`)
+                      }}
                     >
                       <Text style={styles.linkText}>
                         View address on StarkScan ({addr.slice(0, 6)}...
@@ -278,7 +283,10 @@ export const ClaimRewardSection: React.FC = () => {
                   style={styles.linkWrap}
                   onPress={() => {
                     const hash = localTxHash as string;
-                    Linking.openURL(`https://starkscan.co/tx/${hash}`);
+                    const baseUrl = network === "SN_SEPOLIA" 
+                      ? "https://starknet.starkscan.co" 
+                      : "https://starkscan.co";
+                    Linking.openURL(`${baseUrl}/tx/${hash}`);
                   }}
                 >
                   <Text style={styles.linkText}>

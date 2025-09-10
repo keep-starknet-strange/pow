@@ -2,7 +2,7 @@
 pub mod PrestigeComponent {
     use pow_game::prestige::interface::{IPrestige, PrestigeConfig, PrestigeSetupParams};
     use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
     };
     use starknet::{ContractAddress, get_caller_address};
 
@@ -90,6 +90,7 @@ pub mod PrestigeComponent {
                 self.prestiges.write(idx, prestige);
                 idx += 1;
             }
+            self.max_prestige.write(max_prestige - 1);
             self.emit(PrestigeConfigUpdated { new_config: params });
         }
     }
