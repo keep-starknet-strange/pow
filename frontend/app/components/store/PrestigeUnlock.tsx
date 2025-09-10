@@ -15,12 +15,8 @@ export type PrestigeUnlockProps = {
 };
 
 export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
-  const {
-    prestige,
-    getNextPrestigeCost,
-    canPrestige,
-    currentPrestige,
-  } = useUpgrades();
+  const { prestige, getNextPrestigeCost, canPrestige, currentPrestige } =
+    useUpgrades();
   const { workingBlocks } = useGameStore();
   const { balance } = useBalanceStore();
   const { notify } = useEventManager();
