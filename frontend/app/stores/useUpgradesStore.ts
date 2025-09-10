@@ -374,11 +374,20 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   },
 
   prestige: async () => {
-    const { currentPrestige, isMaxPrestige } = get();
+    const { currentPrestige, isMaxPrestige, getNextPrestigeCost } = get();
 
     // Check if already at max prestige
     if (isMaxPrestige()) {
       console.warn("Already at max prestige level");
+      useEventManager.getState().notify("InvalidPurchase");
+      return;
+    }
+
+    // Check if user has enough balance
+    const cost = getNextPrestigeCost();
+    const { balance } = useBalanceStore.getState();
+    if (balance < cost) {
+      console.warn(`Not enough balance for prestige. Need ${cost}, have ${balance}`);
       useEventManager.getState().notify("InvalidPurchase");
       return;
     }

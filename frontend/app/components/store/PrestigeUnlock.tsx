@@ -3,6 +3,8 @@ import { View } from "react-native";
 import { useUpgrades } from "../../stores/useUpgradesStore";
 import { FeatureUnlockView } from "../FeatureUnlockView";
 import { useGameStore } from "@/app/stores/useGameStore";
+import { useBalanceStore } from "@/app/stores/useBalanceStore";
+import { useEventManager } from "@/app/stores/useEventManager";
 import { ConfirmationModal } from "../ConfirmationModal";
 import { MaxPrestigeView } from "./MaxPrestigeView";
 import prestigeConfig from "../../configs/prestige.json";
@@ -21,6 +23,8 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
     isMaxPrestige,
   } = useUpgrades();
   const { workingBlocks } = useGameStore();
+  const { balance } = useBalanceStore();
+  const { notify } = useEventManager();
   const miningBlock = workingBlocks[1];
   const [showPrestigeConfirmation, setShowPrestigeConfirmation] =
     useState(false);
@@ -33,6 +37,13 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
   const prestigeScaler = nextPrestigeConfig?.scaler || 1;
 
   const handlePrestigePress = () => {
+    // Check if user has enough balance
+    const cost = getNextPrestigeCost();
+    if (balance < cost) {
+      console.warn(`Not enough balance for prestige. Need ${cost}, have ${balance}`);
+      notify("InvalidPurchase");
+      return;
+    }
     setShowPrestigeConfirmation(true);
   };
 
