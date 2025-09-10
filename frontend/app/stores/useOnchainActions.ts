@@ -273,7 +273,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   },
 
   clearQueue: () => {
-    set({ invokeQueue: [] });
+    set({ invokeQueue: [], actions: [] });
     if (__DEV__) {
       console.log("🧹 Queue manually cleared");
     }

@@ -18,6 +18,7 @@ import { useTransactionsStore } from "../../stores/useTransactionsStore";
 import { useL2Store } from "../../stores/useL2Store";
 import { useAchievementsStore } from "../../stores/useAchievementsStore";
 import { useUpgradesStore } from "../../stores/useUpgradesStore";
+import { useOnchainActions } from "../../stores/useOnchainActions";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
@@ -45,6 +46,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
+  const { clearQueue } = useOnchainActions();
 
   const handleResetGame = async () => {
     setShowResetConfirmation(false);
@@ -64,6 +66,9 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
     // Reset tutorial
     resetTutorial();
+
+    // Clear any pending on-chain actions
+    clearQueue();
 
     // Clear authentication and keys
     disconnectUser(); // Disconnect from FocEngine

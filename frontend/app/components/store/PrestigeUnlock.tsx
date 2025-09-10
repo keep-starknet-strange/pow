@@ -54,16 +54,6 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
 
   const showUnlock = canPrestige;
 
-  // Show max prestige view if at max level
-  if (isMaxPrestige()) {
-    return (
-      <MaxPrestigeView
-        prestigeLevel={currentPrestige}
-        marginHorizontal={props.marginHorizontal}
-      />
-    );
-  }
-
   return (
     <View>
       {showUnlock && (

@@ -251,10 +251,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const completedBlock = get().workingBlocks[0];
     const { getPrestigeScaler } = useUpgradesStore.getState();
     const prestigeScaler = getPrestigeScaler();
-    const baseBlockReward =
+    const blockReward =
       completedBlock.reward ||
-      useUpgradesStore.getState().getUpgradeValue(0, "Block Reward");
-    const blockReward = baseBlockReward * prestigeScaler;
+      useUpgradesStore.getState().getUpgradeValue(0, "Block Reward") * prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
@@ -285,10 +284,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const completedBlock = get().workingBlocks[1];
     const { getPrestigeScaler } = useUpgradesStore.getState();
     const prestigeScaler = getPrestigeScaler();
-    const baseBlockReward =
+    const blockReward =
       completedBlock.reward ||
-      useUpgradesStore.getState().getUpgradeValue(1, "Block Reward");
-    const blockReward = baseBlockReward * prestigeScaler;
+      useUpgradesStore.getState().getUpgradeValue(1, "Block Reward") * prestigeScaler;
     completedBlock.reward = blockReward;
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
