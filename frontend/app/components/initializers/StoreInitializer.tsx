@@ -185,7 +185,6 @@ const GameStoreInitializer = memo(() => {
     getUserBlockState,
   ]);
 
-
   return null;
 });
 

@@ -40,7 +40,9 @@ export const PrestigeUnlock: React.FC<PrestigeUnlockProps> = memo((props) => {
     // Check if user has enough balance
     const cost = getNextPrestigeCost();
     if (balance < cost) {
-      console.warn(`Not enough balance for prestige. Need ${cost}, have ${balance}`);
+      console.warn(
+        `Not enough balance for prestige. Need ${cost}, have ${balance}`,
+      );
       notify("InvalidPurchase");
       return;
     }

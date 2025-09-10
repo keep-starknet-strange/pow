@@ -266,7 +266,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const prestigeScaler = getPrestigeScaler();
       const blockReward =
         block.reward ||
-        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward")  * prestigeScaler;
+        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward") *
+          prestigeScaler;
       newL2Instance.da.blockFees += blockReward;
       newL2Instance.da.isBuilt = newL2Instance.da.blocks.length >= daMaxSize;
       return { l2: newL2Instance };
@@ -293,7 +294,8 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const prestigeScaler = getPrestigeScaler();
       const blockReward =
         block.reward ||
-        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward") * prestigeScaler;
+        useUpgradesStore.getState().getUpgradeValue(1, "Block Reward") *
+          prestigeScaler;
       newL2Instance.prover.blockFees += blockReward;
       newL2Instance.prover.isBuilt =
         newL2Instance.prover.blocks.length >= proverMaxSize;

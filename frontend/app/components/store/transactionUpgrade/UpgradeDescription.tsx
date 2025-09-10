@@ -57,11 +57,11 @@ export const UpgradeDescription: React.FC<UpgradeDescriptionProps> = ({
 
   // If automation, divide by 5 to get per second rate
   // Apply prestige scaler to block reward values
-  const currVal = isAutomation 
-    ? (rawCurrVal || 0) / 5 
+  const currVal = isAutomation
+    ? (rawCurrVal || 0) / 5
     : (rawCurrVal || 0) * prestigeScaler;
-  const upgradeVal = isAutomation 
-    ? (rawUpgradeVal || 0) / 5 
+  const upgradeVal = isAutomation
+    ? (rawUpgradeVal || 0) / 5
     : (rawUpgradeVal || 0) * prestigeScaler;
 
   // Check if we're at max level

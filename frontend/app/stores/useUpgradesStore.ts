@@ -387,7 +387,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     const cost = getNextPrestigeCost();
     const { balance } = useBalanceStore.getState();
     if (balance < cost) {
-      console.warn(`Not enough balance for prestige. Need ${cost}, have ${balance}`);
+      console.warn(
+        `Not enough balance for prestige. Need ${cost}, have ${balance}`,
+      );
       useEventManager.getState().notify("InvalidPurchase");
       return;
     }

@@ -272,10 +272,11 @@ export const ClaimRewardSection: React.FC = () => {
                     <TouchableOpacity
                       style={styles.linkWrap}
                       onPress={() => {
-                        const baseUrl = network === "SN_SEPOLIA" 
-                          ? "https://starknet.starkscan.co" 
-                          : "https://starkscan.co";
-                        Linking.openURL(`${baseUrl}/contract/${addr}`)
+                        const baseUrl =
+                          network === "SN_SEPOLIA"
+                            ? "https://starknet.starkscan.co"
+                            : "https://starkscan.co";
+                        Linking.openURL(`${baseUrl}/contract/${addr}`);
                       }}
                     >
                       <Text style={styles.linkText}>
@@ -306,9 +307,10 @@ export const ClaimRewardSection: React.FC = () => {
                   style={styles.linkWrap}
                   onPress={() => {
                     const hash = localTxHash as string;
-                    const baseUrl = network === "SN_SEPOLIA" 
-                      ? "https://starknet.starkscan.co" 
-                      : "https://starkscan.co";
+                    const baseUrl =
+                      network === "SN_SEPOLIA"
+                        ? "https://starknet.starkscan.co"
+                        : "https://starkscan.co";
                     Linking.openURL(`${baseUrl}/tx/${hash}`);
                   }}
                 >
