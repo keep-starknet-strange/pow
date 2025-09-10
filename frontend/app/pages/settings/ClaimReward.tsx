@@ -38,7 +38,6 @@ export const ClaimRewardSection: React.FC = () => {
   const [debouncedInput, setDebouncedInput] = useState(accountInput);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [claimed, setClaimed] = useState<boolean>(false);
-  const [hasClaimed, setHasClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardTitle, setRewardTitle] = useState<string>(
     "🎉 You earned 10 STRK!",
@@ -70,10 +69,16 @@ export const ClaimRewardSection: React.FC = () => {
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
-      if (hash) setLocalTxHash(hash);
-      setClaimed(true);
-      // Notify achievement system that STRK reward was claimed
-      notify("RewardClaimed", { recipient, transactionHash: hash });
+      if (hash) {
+        setLocalTxHash(hash);
+        setClaimed(true);
+        // Save transaction hash to AsyncStorage after successful transaction
+        await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+        // Notify achievement system that STRK reward was claimed
+        notify("RewardClaimed", { recipient, transactionHash: hash });
+      } else {
+        throw new Error("Transaction completed but no hash returned");
+      }
     } catch (err: any) {
       const raw = (err && (err.message || String(err))) || "";
       const alreadyClaimed = /reward already claimed/i.test(raw);
@@ -180,6 +185,22 @@ export const ClaimRewardSection: React.FC = () => {
     })();
   }, [getRewardParams]);
 
+  useEffect(() => {
+    // Load claimed state from AsyncStorage on component mount
+    const loadClaimedState = async () => {
+      try {
+        const claimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+        if (claimedTxHash) {
+          setClaimed(true);
+          setLocalTxHash(claimedTxHash);
+        }
+      } catch (error) {
+        console.error("Error loading claimed state:", error);
+      }
+    };
+    loadClaimedState();
+  }, []);
+
   return (
     <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>
       <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>
@@ -267,15 +288,17 @@ export const ClaimRewardSection: React.FC = () => {
               );
             })()}
 
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                label="Claim STRK"
-                onPress={claimReward}
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-                disabled={claimed || claiming || !debouncedInput.trim()}
-              />
-            </View>
+            {!claimed && (
+              <View style={styles.buttonWrap}>
+                <BasicButton
+                  label="Claim STRK"
+                  onPress={claimReward}
+                  style={styles.basicButton}
+                  textStyle={styles.basicButtonText}
+                  disabled={claiming || !debouncedInput.trim()}
+                />
+              </View>
+            )}
 
             <View style={styles.linksContainer}>
               {localTxHash && (
