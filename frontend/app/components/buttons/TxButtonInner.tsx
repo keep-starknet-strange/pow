@@ -13,6 +13,7 @@ import { useSharedValue, useDerivedValue } from "react-native-reanimated";
 import { useImages } from "../../hooks/useImages";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { useTransactionsStore } from "../../stores/useTransactionsStore";
+import { useTransactionPause } from "../../stores/useTransactionPauseStore";
 import {
   getTxBg,
   getTxIcon,
@@ -42,6 +43,7 @@ export const TxButtonInner = memo(
     const { getImage } = useImages();
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
+    const { isPaused } = useTransactionPause();
     const transactionUnlocked = props.feeLevel !== -1;
 
     // Get the images and check if they're loaded
@@ -103,9 +105,11 @@ export const TxButtonInner = memo(
     );
 
     const speed = getSpeed(props.chainId, props.txId, props.isDapp);
+    const paused = isPaused(props.chainId, props.txId, props.isDapp);
+    const shouldAutomate = speed > 0 && !paused;
 
     useEffect(() => {
-      if (speed > 0) {
+      if (shouldAutomate) {
         automationAnimHeight.value = 0;
         // Only trigger automation if it's not the initial mount/re-render
         automationAnimHeight.value = withSequence(
@@ -129,7 +133,7 @@ export const TxButtonInner = memo(
       return () => {
         automationAnimHeight.value = 94; // Reset to default height when unmounted
       };
-    }, [speed]);
+    }, [shouldAutomate, speed]);
     useInterval(
       () => {
         automationAnimHeight.value = withSequence(
@@ -147,7 +151,7 @@ export const TxButtonInner = memo(
           }),
         );
       },
-      speed > 0 ? 5000 / speed + 200 : null,
+      shouldAutomate ? 5000 / speed + 200 : null,
     );
 
     return (

@@ -23,8 +23,17 @@ type ActionsProps = {
 };
 
 export const TransactionUpgradeActions: React.FC<
-  ActionsProps & { txId?: number; chainId?: number }
-> = ({ locked, nextCost, onBuyPress, feeProps, speedProps, txId, chainId }) => {
+  ActionsProps & { txId?: number; chainId?: number; isDapp?: boolean }
+> = ({
+  locked,
+  nextCost,
+  onBuyPress,
+  feeProps,
+  speedProps,
+  txId,
+  chainId,
+  isDapp,
+}) => {
   // Enable tutorial only for first transaction (id: 0) on L1 (chainId: 0)
   const isFirstTransaction = txId === 0 && chainId === 0;
   const feeEnabled = feeProps !== undefined && !locked && isFirstTransaction;
@@ -71,6 +80,10 @@ export const TransactionUpgradeActions: React.FC<
             nextCost={speedProps.nextCost}
             onPress={speedProps.onPress}
             bgImage={"shop.tx.buy"}
+            chainId={chainId}
+            txId={txId}
+            isDapp={isDapp ?? false}
+            isSpeedUpgrade={true}
           />
         </View>
       )}

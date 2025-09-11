@@ -11,6 +11,7 @@ import { useAchievementsStore } from "@/app/stores/useAchievementsStore";
 import { useSoundStore, useSound } from "@/app/stores/useSoundStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
+import { useTransactionPauseStore } from "@/app/stores/useTransactionPauseStore";
 
 const OnchainActionsInitializer = memo(() => {
   const { invokeCalls, waitForTransaction } = useStarknetConnector();
@@ -250,6 +251,16 @@ const UpgradesInitializer = memo(() => {
   return null;
 });
 
+const TransactionPauseInitializer = memo(() => {
+  const { initializePauseStore } = useTransactionPauseStore();
+
+  useEffect(() => {
+    initializePauseStore();
+  }, [initializePauseStore]);
+
+  return null;
+});
+
 export const StoreInitializer = memo(() => {
   return (
     <>
@@ -263,6 +274,7 @@ export const StoreInitializer = memo(() => {
       <GameStoreInitializer />
       <L2Initializer />
       <UpgradesInitializer />
+      <TransactionPauseInitializer />
     </>
   );
 });
