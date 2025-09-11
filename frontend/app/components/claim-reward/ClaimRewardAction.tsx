@@ -16,14 +16,14 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../../hooks/useImages";
 
-interface StakingActionsProps {
+interface ClaimRewardActionProps {
   action: (e: GestureResponderEvent) => void;
   label: string;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-export const StakingAction: React.FC<StakingActionsProps> = React.memo(
+export const ClaimRewardAction: React.FC<ClaimRewardActionProps> = React.memo(
   ({ action, label, disabled = false, style }) => {
     const { getImage } = useImages();
     const [size, setSize] = useState({ width: 0, height: 0 });
@@ -98,3 +98,5 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
 });
+
+

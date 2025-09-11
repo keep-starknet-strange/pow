@@ -40,3 +40,5 @@ export const BackGround: React.FC<BackGroundProps> = React.memo(
     );
   },
 );
+
+

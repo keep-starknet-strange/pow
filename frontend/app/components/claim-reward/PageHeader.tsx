@@ -7,18 +7,18 @@ import {
 } from "@shopify/react-native-skia";
 import { useImages } from "../../hooks/useImages";
 
-interface SectionTitleProps {
+interface SectionHeaderProps {
   width: number;
   title: string;
 }
-export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
+export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
   const { getImage } = useImages();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { marginBottom: 14 }]}>
       <Canvas style={{ width: width, height: 24 }}>
         <Image
-          image={getImage("shop.name.plaque")}
+          image={getImage("shop.title")}
           fit="fill"
           x={0}
           y={0}
@@ -45,8 +45,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     position: "absolute",
-    left: 8,
+    right: 8,
     fontFamily: "Pixels",
     top: 2,
   },
 });
+
+

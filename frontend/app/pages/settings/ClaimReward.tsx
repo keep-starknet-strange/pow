@@ -18,11 +18,11 @@ import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useWalletConnect } from "../../hooks/useWalletConnect";
-import { SectionTitle } from "../../components/staking/SectionTitle";
-import { StakingAction } from "../../components/staking/StakingAction";
+import { SectionTitle } from "../../components/claim-reward/SectionTitle";
+import { ClaimRewardAction } from "../../components/claim-reward/ClaimRewardAction";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
-import { BackGround } from "../../components/staking/BackGround";
-import { PageHeader } from "../../components/staking/PageHeader";
+import { BackGround } from "../../components/claim-reward/BackGround";
+import { PageHeader } from "../../components/claim-reward/PageHeader";
 
 // Decode various shapes of a Starknet u256 into a bigint
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -95,11 +95,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const claimReward = async () => {
     const recipient = (debouncedInput || "").trim();
     if (!recipient) {
-      console.error("No recipient provided");
+      if (__DEV__) console.error("No recipient provided");
       return;
     }
     if (!powGameContractAddress) {
-      console.error("pow_game contract address not set");
+      if (__DEV__) console.error("pow_game contract address not set");
       return;
     }
     const call = {
@@ -160,12 +160,14 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       // Robustly decode u256 amount from various shapes
       const raw = (params as any).rewardAmount;
       const decoded = decodeU256ToBigInt(raw);
-      console.log(
-        "getRewardParams raw:",
-        params,
-        "decoded:",
-        decoded?.toString(),
-      );
+      if (__DEV__) {
+        console.log(
+          "getRewardParams raw:",
+          params,
+          "decoded:",
+          decoded?.toString(),
+        );
+      }
       const amountStr = decoded != null ? decoded.toString() : "10";
       setRewardAmountStr(amountStr);
       if ((params as any).rewardPrestigeThreshold != null) {
@@ -261,12 +263,12 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         <View style={styles.section}>
           <View style={styles.card}>
             <View style={styles.buttonRow}>
-              <StakingAction
+              <ClaimRewardAction
                 action={openReadyWallet}
                 label="READY"
                 style={styles.equalButton}
               />
-              <StakingAction
+              <ClaimRewardAction
                 action={openBraavosWallet}
                 label="BRAAVOS"
                 style={styles.equalButton}
@@ -314,7 +316,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         <View
           style={[styles.bottomAction, { marginBottom: insets.bottom + 96 }]}
         >
-          <StakingAction
+          <ClaimRewardAction
             action={claimReward}
             label="CLAIM"
             disabled={claimed || claiming || !debouncedInput.trim()}
@@ -336,7 +338,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       <View
         style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
       >
-        <StakingAction
+        <ClaimRewardAction
           action={() => {
             if (onBack) onBack();
           }}
