@@ -8,6 +8,7 @@ const DEFAULT_BALANCE = Number(process.env.EXPO_PUBLIC_DEFAULT_BALANCE) || 0;
 interface BalanceState {
   balance: number;
   isInitialized: boolean;
+  setIsInitialized: (isInitialized: boolean) => void;
   setBalance: (balance: number) => void;
   updateBalance: (change: number) => void;
   tryBuy: (cost: number) => boolean;
@@ -22,9 +23,10 @@ interface BalanceState {
 export const useBalanceStore = create<BalanceState>((set, get) => ({
   balance: DEFAULT_BALANCE,
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
   setBalance: (balance: number) => set({ balance }),
 
-  resetBalance: () => set({ balance: DEFAULT_BALANCE, isInitialized: false }),
+  resetBalance: () => set({ balance: DEFAULT_BALANCE }),
 
   updateBalance: (change: number) => {
     set((state) => {

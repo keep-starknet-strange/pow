@@ -1,5 +1,5 @@
-import React from "react";
-import { View, TouchableWithoutFeedback, Text } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, TouchableWithoutFeedback, Text, Platform } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
@@ -33,6 +33,21 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
   const { width } = useCachedWindowDimensions();
+
+  // Get the images and check if they're loaded
+  const iconImage = useMemo(() => getImage(props.icon), [getImage, props.icon]);
+  const buttonImage = useMemo(() => getImage("button.secondary"), [getImage]);
+
+  // iOS-specific: Force re-render when icon is loaded
+  const [forceUpdate, setForceUpdate] = useState(0);
+  useEffect(() => {
+    if (Platform.OS === "ios" && iconImage && buttonImage) {
+      const timer = setTimeout(() => {
+        setForceUpdate((prev) => prev + 1);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [iconImage, buttonImage]);
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
@@ -72,35 +87,45 @@ export const UnlockView: React.FC<UnlockViewProps> = (props) => {
             ...props.style,
           }}
         >
-          <Canvas style={{ width: width - 32, height: 92 }}>
-            <Image
-              image={getImage("button.secondary")}
-              fit="fill"
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-              x={0}
-              y={0}
-              width={width - 32}
-              height={92}
-            />
-          </Canvas>
-          <View className="absolute flex flex-row items-start px-[48px] py-[8px]">
-            <Canvas style={{ width: 64, height: 92 }} className="">
+          {buttonImage && (
+            <Canvas
+              style={{ width: width - 32, height: 92 }}
+              key={`unlock-bg-${forceUpdate}`}
+            >
               <Image
-                image={getImage(props.icon)}
-                fit="contain"
+                image={buttonImage}
+                fit="fill"
                 sampling={{
                   filter: FilterMode.Nearest,
                   mipmap: MipmapMode.Nearest,
                 }}
                 x={0}
-                y={4}
-                width={64}
-                height={64}
+                y={0}
+                width={width - 32}
+                height={92}
               />
             </Canvas>
+          )}
+          <View className="absolute flex flex-row items-start px-[48px] py-[8px]">
+            {iconImage && (
+              <Canvas
+                style={{ width: 64, height: 92 }}
+                key={`unlock-icon-${props.icon}-${forceUpdate}`}
+              >
+                <Image
+                  image={iconImage}
+                  fit="contain"
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                  x={0}
+                  y={4}
+                  width={64}
+                  height={64}
+                />
+              </Canvas>
+            )}
             <View className="flex flex-col items-start justify-start pl-[12px]">
               <Text
                 className="text-[32px] font-Teatime text-[#fff7ff]"

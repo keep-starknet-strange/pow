@@ -15,7 +15,7 @@ export const useProver = (
   const { user } = useFocEngine();
   const { powContract, getUserProofClicks } = usePowContractConnector();
   const { l2 } = useL2Store();
-  const proverDifficulty = l2?.prover.maxSize || 1;
+  const proverDifficulty = l2?.prover.difficulty || 1;
   const [proverCounter, setProverCounter] = useState(0);
 
   useEffect(() => {

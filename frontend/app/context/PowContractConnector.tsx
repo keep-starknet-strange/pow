@@ -12,6 +12,51 @@ import { useOnchainActions } from "../stores/useOnchainActions";
 import { useBalanceStore } from "../stores/useBalanceStore";
 import powGameAbi from "../abis/pow_game.json";
 
+// Decode various shapes of a Starknet u256 into a bigint
+function decodeU256ToBigInt(raw: unknown): bigint | null {
+  if (raw == null) return null;
+  try {
+    if (
+      typeof raw === "object" &&
+      raw !== null &&
+      ("low" in (raw as any) || "high" in (raw as any))
+    ) {
+      const lowRaw = (raw as any).low ?? 0;
+      const highRaw = (raw as any).high ?? 0;
+      const low = BigInt(
+        typeof lowRaw === "string" ||
+          typeof lowRaw === "number" ||
+          typeof lowRaw === "bigint"
+          ? (lowRaw as any)
+          : (lowRaw as any)?.toString?.() ?? 0,
+      );
+      const high = BigInt(
+        typeof highRaw === "string" ||
+          typeof highRaw === "number" ||
+          typeof highRaw === "bigint"
+          ? (highRaw as any)
+          : (highRaw as any)?.toString?.() ?? 0,
+      );
+      return (high << 128n) + low;
+    }
+
+    if (typeof raw === "object" && typeof (raw as any).toString === "function") {
+      return BigInt((raw as any).toString());
+    }
+
+    if (typeof raw === "string") {
+      return BigInt(raw);
+    }
+
+    if (typeof raw === "number" || typeof raw === "bigint") {
+      return BigInt(raw);
+    }
+    return null;
+  } catch (_e) {
+    return null;
+  }
+}
+
 type PowContractContextType = {
   powGameContractAddress: string | null;
   powContract: Contract | null;
@@ -69,6 +114,17 @@ type PowContractContextType = {
       }
     | undefined
   >;
+  getUserPrestige: () => Promise<number | undefined>;
+  getRewardParams: () => Promise<
+    | {
+        rewardTokenAddress: string;
+        rewardPrestigeThreshold: number;
+        rewardAmount: { low: string; high: string } | string;
+        rewardAmountStr?: string;
+      }
+    | undefined
+  >;
+  getHasClaimedReward: () => Promise<boolean | undefined>;
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
@@ -108,7 +164,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [powGameContractAddress, setPowGameContractAddress] = useState<
     string | null
-  >(null);
+  >(process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS || null);
   const [powContract, setPowContract] = useState<Contract | null>(null);
 
   useEffect(() => {
@@ -121,13 +177,15 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       // TODO: Use foc-engine API to get contract addresses
       // const contract = await getRegisteredContract("Pow Game", "v0.0.1"); // TODO: latest
-      const contract = process.env.EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS;
-      if (contract) {
-        setPowGameContractAddress(contract);
-        connectContract(contract); // TODO: Allow getRegisteredContract args
+      if (powGameContractAddress) {
+        connectContract(powGameContractAddress); // TODO: Allow getRegisteredContract args
         const abi = powGameAbi.abi;
         if (abi) {
-          const powGameContract = new Contract(abi, contract, provider);
+          const powGameContract = new Contract(
+            abi,
+            powGameContractAddress,
+            provider,
+          );
           setPowContract(powGameContract);
         } else {
           console.error("Failed to load Pow Game ABI");
@@ -137,7 +195,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     fetchPowGameContractAddress();
-  }, [getRegisteredContract, provider, STARKNET_ENABLED]);
+  }, [
+    getRegisteredContract,
+    provider,
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    connectContract,
+  ]);
 
   useEffect(() => {
     if (!STARKNET_ENABLED || !account) {
@@ -554,6 +618,59 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     [account, powContract, STARKNET_ENABLED],
   );
 
+  const getUserPrestige = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract || !account) {
+      return;
+    }
+    try {
+      const prestige = await powContract.get_user_prestige(account.address);
+      return prestige.toString ? parseInt(prestige.toString(), 10) : undefined;
+    } catch (error) {
+      console.error("Failed to fetch user prestige:", error);
+      return undefined;
+    }
+  }, [account, powContract, STARKNET_ENABLED]);
+
+  const getRewardParams = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract) return;
+    try {
+      const params = await powContract.get_reward_params();
+      const rawAmount: any = (params as any).reward_amount;
+      const decoded = decodeU256ToBigInt(rawAmount);
+      if (__DEV__)
+        console.log(
+          "get_reward_params raw:",
+          params,
+          "decoded amount:",
+          decoded?.toString?.(),
+        );
+      return {
+        rewardTokenAddress: params.reward_token_address as string,
+        rewardPrestigeThreshold: Number(
+          params.reward_prestige_threshold?.toString?.() ||
+            params.reward_prestige_threshold ||
+            0,
+        ),
+        rewardAmount: params.reward_amount as any,
+        rewardAmountStr: decoded != null ? decoded.toString() : undefined,
+      };
+    } catch (e) {
+      console.error("Failed to fetch reward params:", e);
+      return undefined;
+    }
+  }, [powContract, STARKNET_ENABLED]);
+
+  const getHasClaimedReward = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract || !account) return;
+    try {
+      const claimed = await powContract.has_claimed_reward(account.address);
+      return Boolean(claimed);
+    } catch (e) {
+      console.error("Failed to fetch has_claimed_reward:", e);
+      return undefined;
+    }
+  }, [powContract, STARKNET_ENABLED, account]);
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -596,6 +713,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserProofClicks,
         getUserProofBuildingState,
         getUserDABuildingState,
+        getUserPrestige,
+        getRewardParams,
+        getHasClaimedReward,
         doubleBalanceCheat,
       }}
     >

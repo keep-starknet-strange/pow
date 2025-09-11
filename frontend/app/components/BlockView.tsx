@@ -67,7 +67,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
           <Text
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            className="text-[#101119ff] text-[32px] font-bold underline text-center font-Xerxes px-4 pt-2"
+            className="text-[#101119ff] text-[32px] underline text-center font-Xerxes px-4 pt-2"
           >
             Genesis Block
           </Text>

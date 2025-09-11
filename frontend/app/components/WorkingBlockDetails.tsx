@@ -88,7 +88,9 @@ const BlockIdLabel = memo(
       () => ({
         color: "#c3c3c3",
         fontFamily: "Pixels" as const,
-        fontSize: BlockSizeUtil.selector(blockSizeType, 18, 16, 10),
+        fontSize: BlockSizeUtil.selector(blockSizeType, 16, 14, 10),
+        includeFontPadding: false,
+        textAlignVertical: "center" as const,
       }),
       [blockSizeType],
     );
@@ -101,14 +103,14 @@ const BlockIdLabel = memo(
       [],
     );
 
-    if (blockId >= 10) {
+    if (blockId >= 100) {
       return (
         <View
           style={{
             flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
           }}
         >
           <Text style={textStyle}>#</Text>
@@ -127,6 +129,7 @@ const BlockIdLabel = memo(
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
+          justifyContent: "flex-start",
         }}
       >
         <Text style={textStyle}>Block&nbsp;</Text>
@@ -336,13 +339,14 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
 
     const blockIdLabelStyle = useMemo(
       () => ({
-        width: props.placement.width * 0.3,
+        width: props.placement.width * 0.35,
         height: props.placement.height * BLOCK_IMAGE_LABEL_PERCENT,
         top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-        paddingTop: BlockSizeUtil.selector(blockSizeType, 4, 4, 2),
-        paddingBottom: BlockSizeUtil.selector(blockSizeType, 4, 4, 2),
-        paddingLeft: BlockSizeUtil.selector(blockSizeType, 6, 4, 2),
-        paddingRight: BlockSizeUtil.selector(blockSizeType, 6, 4, 2),
+        paddingTop: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
+        paddingBottom: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
+        paddingLeft: BlockSizeUtil.selector(blockSizeType, 4, 3, 2),
+        paddingRight: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
+        overflow: "hidden" as const,
       }),
       [blockSizeType, props.placement.width, props.placement.height],
     );
@@ -408,11 +412,13 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       <Animated.View style={containerStyle}>
         <BlockCanvas placement={props.placement} />
 
-        <View className="absolute flex flex-row" style={blockIdLabelStyle}>
-          <BlockIdLabel
-            blockId={workingBlock?.blockId || 0}
-            blockSizeType={blockSizeType}
-          />
+        <View className="absolute" style={blockIdLabelStyle}>
+          <View className="flex-1 flex-row">
+            <BlockIdLabel
+              blockId={workingBlock?.blockId || 0}
+              blockSizeType={blockSizeType}
+            />
+          </View>
         </View>
 
         <View style={transactionCountStyle}>

@@ -38,6 +38,7 @@ export const PopupAnimation = forwardRef<
         position: "absolute",
         top: 0,
         alignSelf: "center",
+        pointerEvents: "none",
         transform: [
           {
             translateY: popupAnimation.interpolate({
@@ -54,7 +55,7 @@ export const PopupAnimation = forwardRef<
       }}
     >
       <Text
-        className="text-3xl font-Pixels"
+        className="text-2xl font-Xerxes"
         style={{
           color: color || "black",
           textShadowColor: "black",

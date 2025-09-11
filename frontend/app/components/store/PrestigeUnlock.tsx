@@ -4,7 +4,7 @@ import { useUpgrades } from "../../stores/useUpgradesStore";
 import { FeatureUnlockView } from "../FeatureUnlockView";
 
 export const PrestigeUnlock: React.FC = () => {
-  const { prestige, getNextPrestigeCost, canPrestige, currentPrestige } =
+  const { prestige, getNextPrestigeCost, canPrestige } =
     useUpgrades();
   const [showUnlock, setShowUnlock] = useState(false);
   useEffect(() => {

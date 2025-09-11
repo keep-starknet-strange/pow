@@ -57,7 +57,7 @@ export const TxDetails: React.FC<TxDetailsProps> = ({
           />
         </Canvas>
         <Animated.Text
-          className="absolute top-0 left-[8px] text-[#fff7ff] text-xl font-bold font-Pixels"
+          className="absolute top-0 left-[8px] text-[#fff7ff] text-xl font-Pixels"
           entering={FadeInRight}
         >
           {name}

@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 
 import AboutSection from "./settings/About";
-import CreditsSection from "./settings/Credits";
+import AccountSection from "./settings/Account";
 import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
 import TermsOfUse from "./settings/TermsOfUse";
@@ -14,8 +14,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabs = {
   Main: SettingsMainSection,
+  Account: AccountSection,
   About: AboutSection,
-  Credits: CreditsSection,
   ClaimReward: ClaimRewardSection,
   TermsOfUse: TermsOfUse,
 };
@@ -37,6 +37,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
   const ActiveComponent = tabs[activeTab];
 
   const isInLoginMode = setLoginPage !== null;
+  const isClaimReward = activeTab === "ClaimReward";
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -45,23 +46,30 @@ export const SettingsPage: React.FC<SettingsProps> = ({
 
   return (
     <View className="flex-1 relative w-full h-full">
-      <MainBackground />
+      {activeTab !== "ClaimReward" && <MainBackground />}
       <View
         className="w-full h-full flex-1 items-center justify-center"
         style={{
           paddingTop: isInLoginMode ? insets.top : 0,
           paddingBottom: isInLoginMode ? insets.bottom : 0,
-          paddingHorizontal: 32,
+          paddingHorizontal: isClaimReward ? 0 : 32,
           gap: 8,
         }}
       >
-        <ActiveComponent
-          setSettingTab={setActiveTab}
-          goBackToLogin={() => {
-            setLoginPage?.("login");
-          }}
-        />
-        {activeTab !== "Main" && (
+        {activeTab === "ClaimReward" ? (
+          <ClaimRewardSection
+            setSettingTab={setActiveTab as any}
+            onBack={() => setActiveTab("Main")}
+          />
+        ) : (
+          <ActiveComponent
+            setSettingTab={setActiveTab as any}
+            goBackToLogin={() => {
+              setLoginPage?.("login");
+            }}
+          />
+        )}
+        {activeTab !== "Main" && activeTab !== "ClaimReward" && (
           <Animated.View entering={FadeInDown}>
             <BasicButton
               label="Back"

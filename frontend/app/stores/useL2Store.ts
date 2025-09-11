@@ -14,6 +14,7 @@ interface L2Store {
   l2: L2 | undefined;
   isL2Unlocked: boolean;
   isInitialized: boolean;
+  setIsInitialized: (isInitialized: boolean) => void;
 
   resetL2Store: () => void;
   initializeL2Store: (
@@ -58,9 +59,9 @@ export const useL2Store = create<L2Store>((set, get) => ({
   l2: undefined,
   isL2Unlocked: false,
   isInitialized: false,
+  setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
 
-  resetL2Store: () =>
-    set({ l2: undefined, isL2Unlocked: false, isInitialized: false }),
+  resetL2Store: () => set({ l2: undefined, isL2Unlocked: false }),
   initializeL2Store: (
     powContract,
     user,
@@ -104,17 +105,28 @@ export const useL2Store = create<L2Store>((set, get) => ({
             daMaxSize ||
             useUpgradesStore.getState().getUpgradeValue(1, "DA compression") ||
             1;
+          const finalDADifficulty =
+            daDifficulty ||
+            useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") +
+              2 ||
+            1;
           const finalProverMaxSize =
             proofMaxSize ||
             useUpgradesStore
               .getState()
               .getUpgradeValue(1, "Recursive Proving") ||
             1;
+          const finalProverDifficulty =
+            proofDifficulty ||
+            useUpgradesStore
+              .getState()
+              .getUpgradeLevel(1, "Recursive Proving") + 2 ||
+            1;
 
           const l2Instance: L2 = newL2();
 
           // Initialize DA with existing state
-          l2Instance.da = newL2DA(finalDAMaxSize);
+          l2Instance.da = newL2DA(finalDAMaxSize, finalDADifficulty);
           if (daSize && daSize > 0) {
             l2Instance.da.blocks = new Array(daSize).fill(0).map((_, i) => i);
             l2Instance.da.blockFees = daFees || 0;
@@ -122,7 +134,10 @@ export const useL2Store = create<L2Store>((set, get) => ({
           }
 
           // Initialize Prover with existing state
-          l2Instance.prover = newL2Prover(finalProverMaxSize);
+          l2Instance.prover = newL2Prover(
+            finalProverMaxSize,
+            finalProverDifficulty,
+          );
           if (proofSize && proofSize > 0) {
             l2Instance.prover.blocks = new Array(proofSize)
               .fill(0)
@@ -136,6 +151,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
             isL2Unlocked: true,
             isInitialized: true,
           });
+          useUpgradesStore.getState().checkCanPrestige();
         } catch (error) {
           if (__DEV__) console.error("Error initializing L2 store:", error);
         }
@@ -190,16 +206,22 @@ export const useL2Store = create<L2Store>((set, get) => ({
       if (state.l2) return state;
       useGameStore.getState().initL2WorkingBlock();
 
-      // Get upgrade values at initialization time and store them as maxSize
+      // Get upgrade values at initialization time and store them as maxSize and difficulty
       const daMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
+      const daDifficulty =
+        useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2 ||
+        1;
       const proverMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
+      const proverDifficulty =
+        useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") +
+          2 || 1;
 
       const newL2Instance = newL2();
-      newL2Instance.da = newL2DA(daMaxSize);
-      newL2Instance.prover = newL2Prover(proverMaxSize);
+      newL2Instance.da = newL2DA(daMaxSize, daDifficulty);
+      newL2Instance.prover = newL2Prover(proverMaxSize, proverDifficulty);
 
       useEventManager.getState().notify("L2Purchased");
       return {
@@ -207,6 +229,7 @@ export const useL2Store = create<L2Store>((set, get) => ({
         isL2Unlocked: true,
       };
     });
+    useUpgradesStore.getState().checkCanPrestige();
   },
 
   getL2Cost: () => {
@@ -285,7 +308,10 @@ export const useL2Store = create<L2Store>((set, get) => ({
       // Get current upgrade value for the new DA instance
       const daMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "DA compression") || 1;
-      newL2Instance.da = newL2DA(daMaxSize);
+      const daDifficulty =
+        useUpgradesStore.getState().getUpgradeLevel(1, "DA compression") + 2 ||
+        1;
+      newL2Instance.da = newL2DA(daMaxSize, daDifficulty);
       useEventManager.getState().notify("DaDone", { da: state.l2.da });
 
       return { l2: newL2Instance };
@@ -302,7 +328,10 @@ export const useL2Store = create<L2Store>((set, get) => ({
       const proverMaxSize =
         useUpgradesStore.getState().getUpgradeValue(1, "Recursive Proving") ||
         1;
-      newL2Instance.prover = newL2Prover(proverMaxSize);
+      const proverDifficulty =
+        useUpgradesStore.getState().getUpgradeLevel(1, "Recursive Proving") +
+          2 || 1;
+      newL2Instance.prover = newL2Prover(proverMaxSize, proverDifficulty);
       useEventManager
         .getState()
         .notify("ProveDone", { proof: state.l2.prover });
