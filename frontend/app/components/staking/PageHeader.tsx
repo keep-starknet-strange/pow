@@ -30,9 +30,7 @@ export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
           }}
         />
       </Canvas>
-      <Text style={styles.title}>
-        {title}
-      </Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 };
@@ -52,5 +50,3 @@ const styles = StyleSheet.create({
     top: 2,
   },
 });
-
-

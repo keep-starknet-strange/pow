@@ -33,12 +33,16 @@ function decodeU256ToBigInt(raw: any): bigint | null {
       const lowRaw = (raw as any).low ?? 0;
       const highRaw = (raw as any).high ?? 0;
       const low = BigInt(
-        typeof lowRaw === "string" || typeof lowRaw === "number" || typeof lowRaw === "bigint"
+        typeof lowRaw === "string" ||
+          typeof lowRaw === "number" ||
+          typeof lowRaw === "bigint"
           ? lowRaw
           : (lowRaw?.toString?.() ?? 0),
       );
       const high = BigInt(
-        typeof highRaw === "string" || typeof highRaw === "number" || typeof highRaw === "bigint"
+        typeof highRaw === "string" ||
+          typeof highRaw === "number" ||
+          typeof highRaw === "bigint"
           ? highRaw
           : (highRaw?.toString?.() ?? 0),
       );
@@ -81,7 +85,8 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
-  const [rewardPrestigeThreshold, setRewardPrestigeThreshold] = useState<number>(0);
+  const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
+    useState<number>(0);
   const [walletError, setWalletError] = useState<string | null>(null);
   const [busyText, setBusyText] = useState<string | null>(null);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
@@ -155,23 +160,33 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       // Robustly decode u256 amount from various shapes
       const raw = (params as any).rewardAmount;
       const decoded = decodeU256ToBigInt(raw);
-      console.log("getRewardParams raw:", params, "decoded:", decoded?.toString());
+      console.log(
+        "getRewardParams raw:",
+        params,
+        "decoded:",
+        decoded?.toString(),
+      );
       const amountStr = decoded != null ? decoded.toString() : "10";
       setRewardAmountStr(amountStr);
       if ((params as any).rewardPrestigeThreshold != null) {
-        setRewardPrestigeThreshold((params as any).rewardPrestigeThreshold as number);
+        setRewardPrestigeThreshold(
+          (params as any).rewardPrestigeThreshold as number,
+        );
       }
     })();
   }, [getRewardParams]);
 
   const openReadyWallet = async () => {
+    const scheme = "ready://open";
     try {
-      const scheme = network === "SN_SEPOLIA" ? "ready-dev://" : "ready://";
-      const can = await Linking.canOpenURL(scheme);
-      if (can) {
-        await Linking.openURL(scheme);
-        return;
+      await Linking.openURL(scheme);
+      return;
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open READY wallet scheme");
       }
+    }
+    try {
       if (Platform.OS === "ios") {
         await Linking.openURL(
           "https://apps.apple.com/us/app/ready-earn-on-bitcoin-usdc/id1358741926",
@@ -180,20 +195,26 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         const pkg = "im.argent.contractwalletclien";
         const market = `market://details?id=${pkg}`;
         const web = `https://play.google.com/store/apps/details?id=${pkg}`;
-        const ok = await Linking.canOpenURL(market);
-        await Linking.openURL(ok ? market : web);
+        await Linking.openURL(market).catch(() => Linking.openURL(web));
       }
-    } catch {}
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open READY install link");
+      }
+    }
   };
-
+  //
   const openBraavosWallet = async () => {
+    const scheme = "braavos://openr";
     try {
-      const scheme = "braavos://";
-      const can = await Linking.canOpenURL(scheme);
-      if (can) {
-        await Linking.openURL(scheme);
-        return;
+      await Linking.openURL(scheme);
+      return;
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open BRAAVOS wallet scheme");
       }
+    }
+    try {
       if (Platform.OS === "ios") {
         await Linking.openURL(
           "https://apps.apple.com/us/app/braavos-wallet/id1636013523",
@@ -202,23 +223,29 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         const pkg = "app.braavos.wallet";
         const market = `market://details?id=${pkg}`;
         const web = `https://play.google.com/store/apps/details?id=${pkg}`;
-        const ok = await Linking.canOpenURL(market);
-        await Linking.openURL(ok ? market : web);
+        await Linking.openURL(market).catch(() => Linking.openURL(web));
       }
-    } catch {}
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open BRAAVOS install link");
+      }
+    }
   };
 
   return (
     <SafeAreaView style={[styles.safe]}>
-
       <BackGround width={width} height={height} />
       <PageHeader title="CLAIM REWARD" width={width} />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 12 }} style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 12 }}
+        style={{ flex: 1 }}
+      >
         <View style={styles.section}>
           <View style={styles.card}>
             <Text style={styles.messageText}>
-              Congratulations for completing POW! and reaching Prestige {rewardPrestigeThreshold}.
+              Congratulations for completing POW! and reaching Prestige{" "}
+              {rewardPrestigeThreshold}.
             </Text>
             <Text style={styles.messageHighlight}>
               You are now eligible for {rewardAmountStr} STRK
@@ -272,7 +299,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
                       Linking.openURL(`https://starkscan.co/contract/${addr}`);
                     }}
                   >
-                    <Text style={[styles.linkText, !enabled && styles.linkDisabled]}>
+                    <Text
+                      style={[styles.linkText, !enabled && styles.linkDisabled]}
+                    >
                       View address on StarkScan
                     </Text>
                   </TouchableOpacity>
@@ -282,7 +311,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           </View>
         </View>
 
-        <View style={[styles.bottomAction, { marginBottom: insets.bottom + 96 }]}>
+        <View
+          style={[styles.bottomAction, { marginBottom: insets.bottom + 96 }]}
+        >
           <StakingAction
             action={claimReward}
             label="CLAIM"
@@ -297,10 +328,14 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         {txErrorMessage && (
           <Text style={styles.errorText}>{txErrorMessage}</Text>
         )}
-        {walletError && <Text style={styles.errorText}>Error: {walletError}</Text>}
+        {walletError && (
+          <Text style={styles.errorText}>Error: {walletError}</Text>
+        )}
       </ScrollView>
 
-      <View style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}>
+      <View
+        style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
+      >
         <StakingAction
           action={() => {
             if (onBack) onBack();

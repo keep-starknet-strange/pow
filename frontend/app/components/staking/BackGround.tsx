@@ -18,7 +18,10 @@ export const BackGround: React.FC<BackGroundProps> = React.memo(
     const { getImage } = useImages();
 
     return (
-      <View className="absolute w-full h-full" style={{ backgroundColor: "#0f0f14", zIndex: -1 }}>
+      <View
+        className="absolute w-full h-full"
+        style={{ backgroundColor: "#0f0f14", zIndex: -1 }}
+      >
         <Canvas style={{ flex: 1 }}>
           <Image
             image={getImage("background.staking")}

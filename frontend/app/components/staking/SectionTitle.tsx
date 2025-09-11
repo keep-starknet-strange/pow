@@ -30,9 +30,7 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
           }}
         />
       </Canvas>
-      <Text style={styles.title}>
-        {title}
-      </Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 };

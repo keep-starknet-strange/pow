@@ -8,7 +8,12 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
-import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import {
+  Canvas,
+  Image,
+  FilterMode,
+  MipmapMode,
+} from "@shopify/react-native-skia";
 import { useImages } from "../../hooks/useImages";
 
 interface StakingActionsProps {
@@ -43,7 +48,10 @@ export const StakingAction: React.FC<StakingActionsProps> = React.memo(
       >
         {size.width > 0 && size.height > 0 && (
           <Canvas
-            style={[StyleSheet.absoluteFillObject, { width: size.width, height: size.height }]}
+            style={[
+              StyleSheet.absoluteFillObject,
+              { width: size.width, height: size.height },
+            ]}
           >
             <Image
               image={getImage("staking.button.bg")}
@@ -90,5 +98,3 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
 });
-
-

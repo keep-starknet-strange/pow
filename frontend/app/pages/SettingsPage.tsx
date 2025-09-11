@@ -48,7 +48,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
 
   return (
     <View className="flex-1 relative w-full h-full">
-       {!isClaimReward && <MainBackground />}
+      {!isClaimReward && <MainBackground />}
       <View
         className="w-full h-full flex-1 items-center justify-center"
         style={{
