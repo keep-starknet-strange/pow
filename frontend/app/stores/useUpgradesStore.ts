@@ -10,6 +10,7 @@ import { useL2Store } from "./useL2Store";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useGameStore } from "./useGameStore";
 import { useOnchainActions } from "./useOnchainActions";
+import { useTransactionPauseStore } from "./useTransactionPauseStore";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -403,6 +404,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useGameStore.getState().resetGameStore();
     useL2Store.getState().resetL2Store();
     useTransactionsStore.getState().resetTransactions();
+    useTransactionPauseStore.getState().resetPauseStore();
     get().resetUpgrades();
 
     set({
