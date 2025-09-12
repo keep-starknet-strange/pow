@@ -8,12 +8,10 @@ import { Header } from "../components/Header";
 import { InAppNotification } from "../components/InAppNotification";
 import { TutorialOverlay } from "../components/TutorialOverlay";
 import { RevertModal } from "../components/RevertModal";
-import { ClaimRewardModal } from "../components/ClaimRewardModal";
 import { LoadingScreen } from "../pages/LoadingScreen";
 
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
-import { useStarknetConnector } from "../context/StarknetConnector";
 
 const Stack = createStackNavigator();
 
@@ -44,7 +42,6 @@ export const RootNavigator = memo(() => {
       )}
       <LoadingScreen />
       <RevertModal />
-      <ClaimRewardModal />
     </View>
   );
 });

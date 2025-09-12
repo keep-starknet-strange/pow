@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import {
   Canvas,
   Image,
@@ -44,9 +45,11 @@ const ClaimRewardModalComponent: React.FC = () => {
     checkAndShowModal();
   }, [currentPrestige, hasShownClaimModal, setHasShownClaimModal]);
 
+  const { navigate } = useNavigation();
   const handleClaim = () => {
     setShouldShow(false);
     // TODO: Navigate to Settings with ClaimReward tab using event system
+    (navigate as any)("Settings",{ initialTab: "ClaimReward" });
   };
 
   const handleLater = () => {

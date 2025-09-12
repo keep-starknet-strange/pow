@@ -326,7 +326,7 @@ export const TabNavigator = memo(() => {
 
       <Tab.Screen
         name="Settings"
-        children={() => <SettingsPage setLoginPage={null} />}
+        children={(nav) => <SettingsPage setLoginPage={null} initialTab={(nav.route.params as any)?.initialTab} />}
         options={{
           freezeOnBlur: true,
           tabBarButton: (props) => (
