@@ -6,6 +6,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Window } from "./tutorial/Window";
 import { useUpgradesStore } from "../stores/useUpgradesStore";
 import { useImages } from "../hooks/useImages";
@@ -19,10 +20,28 @@ const ClaimRewardModalComponent: React.FC = () => {
 
   useEffect(() => {
     // Show modal when user reaches prestige 1 for the first time
-    if (currentPrestige >= 1 && !hasShownClaimModal) {
-      setShouldShow(true);
-      setHasShownClaimModal(true);
-    }
+    const checkAndShowModal = async () => {
+      if (currentPrestige >= 1 && !hasShownClaimModal) {
+        try {
+          const rewardClaimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+          if (rewardClaimedTxHash) {
+            // User already claimed reward, don't show modal
+            setShouldShow(false);
+          } else {
+            // User hasn't claimed reward yet, show modal
+            setShouldShow(true);
+          }
+          setHasShownClaimModal(true);
+        } catch (error) {
+          console.error("Error checking rewardClaimedTxHash:", error);
+          // If there's an error reading AsyncStorage, show modal as fallback
+          setShouldShow(true);
+          setHasShownClaimModal(true);
+        }
+      }
+    };
+    
+    checkAndShowModal();
   }, [currentPrestige, hasShownClaimModal, setHasShownClaimModal]);
 
   const handleClaim = () => {
