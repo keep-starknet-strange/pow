@@ -22,7 +22,7 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -76,8 +76,8 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             Extrapolation.EXTEND,
           ),
         },
-      ]
-    }))
+      ],
+    }));
 
     const expandingItemsAnimatedStyle = useAnimatedStyle(() => ({
       opacity: interpolate(
@@ -85,8 +85,8 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
         [0, 1],
         [1, 0],
         Extrapolation.IDENTITY,
-      )
-    }))
+      ),
+    }));
 
     const collapsingItemsAnimatedStyle = useAnimatedStyle(() => ({
       opacity: interpolate(
@@ -94,16 +94,16 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
         [0, 1],
         [0, 1],
         Extrapolation.IDENTITY,
-      )
-    }))
+      ),
+    }));
 
     const parentStyle = useAnimatedStyle(() => ({
       opacity: opacityAnimation.value,
       transform: [
         {
           translateY: shakeAnimation.value,
-        }
-      ]
+        },
+      ],
     }));
 
     useEffect(() => {
@@ -119,7 +119,9 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
     }, [balance, props.cost]);
 
     useEffect(() => {
-      opacityAnimation.value = withTiming(props.hidden ? 0 : 1, { duration: 150 });
+      opacityAnimation.value = withTiming(props.hidden ? 0 : 1, {
+        duration: 150,
+      });
     }, [props.hidden]);
 
     useEffect(() => {
@@ -155,8 +157,8 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
 
                 shakeAnimation.value = withSequence(
                   withTiming(8, { duration: 100, easing: Easing.linear }),
-                  withTiming(0, { duration: 50, easing: Easing.linear })
-                )
+                  withTiming(0, { duration: 50, easing: Easing.linear }),
+                );
               } else {
                 setCollapseState(NotificationState.Expanded);
               }
@@ -180,7 +182,9 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             </Animated.View>
 
             {collapsingItemsAnimatedStyle.opacity !== -1 && (
-              <Animated.View style={[collapsingItemsAnimatedStyle, { position: "absolute" }]}>
+              <Animated.View
+                style={[collapsingItemsAnimatedStyle, { position: "absolute" }]}
+              >
                 <Canvas style={{ width: 48, height: 48, marginTop: 2 }}>
                   <Image
                     image={getImage("notif.badge.min")}
@@ -200,7 +204,10 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
 
             <Animated.View
               className="absolute top-[4px]"
-              style={[expandingItemsAnimatedStyle, { left: parentWidth * 0.13 }]}
+              style={[
+                expandingItemsAnimatedStyle,
+                { left: parentWidth * 0.13 },
+              ]}
             >
               <Text className="text-[18px] font-Pixels text-[#fff7ff]">
                 {props.label}
@@ -208,7 +215,10 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             </Animated.View>
             <Animated.View
               className="absolute bottom-[10px]"
-              style={[expandingItemsAnimatedStyle, { left: parentWidth * 0.13 }]}
+              style={[
+                expandingItemsAnimatedStyle,
+                { left: parentWidth * 0.13 },
+              ]}
             >
               <Text className="text-[18px] font-Pixels text-[#fff7ff]">
                 {props.description}
@@ -239,31 +249,29 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
           </Pressable>
 
           {props.disableMinimize !== true && (
-            <Animated.View style={[
-              expandingItemsAnimatedStyle,
-              {
-                zIndex: 101,
-                position: "absolute",
-                top: -5,
-                left: -5,
-                backgroundColor: "#8a1aef",
-                borderColor: "#33007e",
-                borderWidth: 2,
-                padding: 4,
-                borderRadius: 9999
-              }
-            ]}>
+            <Animated.View
+              style={[
+                expandingItemsAnimatedStyle,
+                {
+                  zIndex: 101,
+                  position: "absolute",
+                  top: -5,
+                  left: -5,
+                  backgroundColor: "#8a1aef",
+                  borderColor: "#33007e",
+                  borderWidth: 2,
+                  padding: 4,
+                  borderRadius: 9999,
+                },
+              ]}
+            >
               <Pressable
                 hitSlop={8}
                 onPress={() => {
                   setCollapseState(NotificationState.Collapsed);
                 }}
               >
-                <Feather
-                  name="minimize-2"
-                  size={12}
-                  color="white"
-                />
+                <Feather name="minimize-2" size={12} color="white" />
               </Pressable>
             </Animated.View>
           )}
