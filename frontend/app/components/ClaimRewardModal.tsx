@@ -24,7 +24,9 @@ const ClaimRewardModalComponent: React.FC = () => {
     const checkAndShowModal = async () => {
       if (currentPrestige >= 1 && !hasShownClaimModal) {
         try {
-          const rewardClaimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+          const rewardClaimedTxHash = await AsyncStorage.getItem(
+            "rewardClaimedTxHash",
+          );
           if (rewardClaimedTxHash) {
             // User already claimed reward, don't show modal
             setShouldShow(false);
@@ -41,15 +43,14 @@ const ClaimRewardModalComponent: React.FC = () => {
         }
       }
     };
-    
+
     checkAndShowModal();
   }, [currentPrestige, hasShownClaimModal, setHasShownClaimModal]);
 
   const { navigate } = useNavigation();
   const handleClaim = () => {
     setShouldShow(false);
-    // TODO: Navigate to Settings with ClaimReward tab using event system
-    (navigate as any)("Settings",{ initialTab: "ClaimReward" });
+    (navigate as any)("Settings", { initialTab: "ClaimReward" });
   };
 
   const handleLater = () => {
