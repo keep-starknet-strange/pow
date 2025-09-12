@@ -64,6 +64,7 @@ const config: ExpoConfig = {
     ],
     "expo-web-browser",
     "expo-audio",
+    "expo-font",
     "./plugins/sentry.ts",
   ],
   experiments: {
