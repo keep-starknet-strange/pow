@@ -68,7 +68,7 @@ export const ClaimRewardAction: React.FC<ClaimRewardActionProps> = React.memo(
           </Canvas>
         )}
 
-        <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit>
+        <Text style={styles.label} numberOfLines={1}>
           {label}
         </Text>
       </TouchableOpacity>
@@ -77,6 +77,8 @@ export const ClaimRewardAction: React.FC<ClaimRewardActionProps> = React.memo(
 );
 
 const BORDER_RADIUS = 8;
+const BUTTON_HEIGHT = 48;
+const LABEL_FONT_SIZE = 22;
 
 const styles = StyleSheet.create({
   button: {
@@ -87,10 +89,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#2c2c2e",
     justifyContent: "center",
     alignItems: "center",
+    height: BUTTON_HEIGHT,
   },
   label: {
     fontFamily: "Pixels",
-    fontSize: 24,
+    fontSize: LABEL_FONT_SIZE,
     color: "#fff7ff",
     textAlign: "center",
     paddingVertical: 12,

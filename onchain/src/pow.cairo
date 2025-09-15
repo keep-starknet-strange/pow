@@ -93,6 +93,8 @@ mod PowGame {
         user_balances: Map<ContractAddress, u128>,
         // Maps: user address -> reward claimed
         reward_claimed: Map<ContractAddress, bool>,
+        // Maps: recipient address -> reward received
+        received_reward: Map<ContractAddress, bool>,
         // Cheat codes enabled flag
         cheat_codes_enabled: bool,
         #[substorage(v0)]
@@ -300,11 +302,14 @@ mod PowGame {
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
+            let recipient_received = self.received_reward.read(recipient);
+            assert!(!recipient_received, "Recipient already received reward");
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
             assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");
 
             self.reward_claimed.write(caller, true);
+            self.received_reward.write(recipient, true);
 
             let success: bool = IERC20Dispatcher {
                 contract_address: self.reward_token_address.read(),
@@ -321,8 +326,11 @@ mod PowGame {
             self.check_valid_host(get_caller_address());
             let claimed = self.reward_claimed.read(user);
             assert!(!claimed, "Reward already claimed");
+            let recipient_received = self.received_reward.read(recipient);
+            assert!(!recipient_received, "Recipient already received reward");
 
             self.reward_claimed.write(user, true);
+            self.received_reward.write(recipient, true);
 
             let success: bool = IERC20Dispatcher {
                 contract_address: self.reward_token_address.read(),

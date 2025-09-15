@@ -14,14 +14,13 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
+import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useWalletConnect } from "../../hooks/useWalletConnect";
 import { SectionTitle } from "../../components/claim-reward/SectionTitle";
 import { ClaimRewardAction } from "../../components/claim-reward/ClaimRewardAction";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
-import { BackGround } from "../../components/claim-reward/BackGround";
 import { PageHeader } from "../../components/claim-reward/PageHeader";
 
 // Decode various shapes of a Starknet u256 into a bigint
@@ -32,21 +31,15 @@ function decodeU256ToBigInt(raw: any): bigint | null {
     if (typeof raw === "object" && ("low" in raw || "high" in raw)) {
       const lowRaw = (raw as any).low ?? 0;
       const highRaw = (raw as any).high ?? 0;
-      const low = BigInt(
-        typeof lowRaw === "string" ||
-          typeof lowRaw === "number" ||
-          typeof lowRaw === "bigint"
-          ? lowRaw
-          : (lowRaw?.toString?.() ?? 0),
-      );
-      const high = BigInt(
-        typeof highRaw === "string" ||
-          typeof highRaw === "number" ||
-          typeof highRaw === "bigint"
-          ? highRaw
-          : (highRaw?.toString?.() ?? 0),
-      );
-      return (high << 128n) + low;
+      const bn = uint256.uint256ToBN({
+        low:
+          typeof lowRaw === "string" ? lowRaw : (lowRaw?.toString?.() ?? "0"),
+        high:
+          typeof highRaw === "string"
+            ? highRaw
+            : (highRaw?.toString?.() ?? "0"),
+      } as any);
+      return BigInt(bn.toString());
     }
 
     // BN-like or BigNumberish with toString()
@@ -108,7 +101,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       calldata: [recipient] as string[],
     };
     setClaiming(true);
-    setBusyText("Submitting transaction…");
+    setBusyText("Claiming…");
     setTxErrorMessage(null);
     try {
       const res = await invokeCalls([call], 1);
@@ -236,7 +229,6 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
 
   return (
     <SafeAreaView style={[styles.safe]}>
-      <BackGround width={width} height={height} />
       <PageHeader title="CLAIM REWARD" width={width} />
 
       <ScrollView
@@ -249,12 +241,18 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
               Congratulations for completing POW! and reaching Prestige{" "}
               {rewardPrestigeThreshold}.
             </Text>
-            <Text style={styles.messageHighlight}>
-              You are now eligible for {rewardAmountStr} STRK
-            </Text>
-            <Text style={styles.messageSub}>
-              To claim this reward you’ll need a dedicated Starknet wallet.
-            </Text>
+            {claimed ? (
+              <Text style={styles.messageHighlight}>Reward claimed!</Text>
+            ) : (
+              <>
+                <Text style={styles.messageHighlight}>
+                  You are now eligible for {rewardAmountStr} STRK
+                </Text>
+                <Text style={styles.messageSub}>
+                  To claim this reward you’ll need a dedicated Starknet wallet.
+                </Text>
+              </>
+            )}
           </View>
         </View>
 
@@ -290,7 +288,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
 
             {(() => {
               const addr = (debouncedInput || "").trim();
-              const enabled = !!addr;
+              const enabled = /^0x[a-fA-F0-9]{64}$/.test(addr);
+              const explorerBase =
+                network === "SN_SEPOLIA"
+                  ? "https://sepolia.voyager.online"
+                  : "https://voyager.online";
               return (
                 <View style={styles.linkSlot}>
                   <TouchableOpacity
@@ -298,13 +300,13 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
                     disabled={!enabled}
                     onPress={() => {
                       if (!enabled) return;
-                      Linking.openURL(`https://starkscan.co/contract/${addr}`);
+                      Linking.openURL(`${explorerBase}/contract/${addr}`);
                     }}
                   >
                     <Text
                       style={[styles.linkText, !enabled && styles.linkDisabled]}
                     >
-                      View address on StarkScan
+                      View address on Voyager
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -313,26 +315,35 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           </View>
         </View>
 
-        <View
-          style={[styles.bottomAction, { marginBottom: insets.bottom + 96 }]}
-        >
-          <ClaimRewardAction
-            action={claimReward}
-            label="CLAIM"
-            disabled={claimed || claiming || !debouncedInput.trim()}
-          />
-        </View>
+        {(() => {
+          const isValidAddress = /^0x[a-fA-F0-9]{64}$/.test(
+            (debouncedInput || "").trim(),
+          );
+          const claimState = claimed ? "claimed" : claiming ? "claiming" : "idle";
+          const claimLabel =
+            claimState === "claimed"
+              ? "CLAIMED"
+              : claimState === "claiming"
+              ? `CLAIMING ${rewardAmountStr} STRK`
+              : `CLAIM ${rewardAmountStr} STRK`;
+          const claimDisabled = claimed || claiming || !isValidAddress;
+          const containerWidth = claimState === "claiming" ? 260 : 220;
 
-        {localTxHash && (
-          <Text style={styles.successText}>Reward claimed! 🎊</Text>
-        )}
-        {claimed && <Text style={styles.successText}>Reward claimed! 🎊</Text>}
-        {txErrorMessage && (
-          <Text style={styles.errorText}>{txErrorMessage}</Text>
-        )}
-        {walletError && (
-          <Text style={styles.errorText}>Error: {walletError}</Text>
-        )}
+          return (
+            <View
+              style={[
+                styles.bottomAction,
+                { marginBottom: insets.bottom + 64, width: containerWidth },
+              ]}
+            >
+              <ClaimRewardAction
+                action={claimReward}
+                label={claimLabel}
+                disabled={claimDisabled}
+              />
+            </View>
+          );
+        })()}
       </ScrollView>
 
       <View
@@ -346,6 +357,28 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           disabled={false}
         />
       </View>
+
+      {txErrorMessage && (
+        <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
+          <Text style={styles.errorText}>{txErrorMessage}</Text>
+        </View>
+      )}
+      {walletError && (
+        <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
+          <Text style={styles.errorText}>Error: {walletError}</Text>
+        </View>
+      )}
+
+      {claiming && (
+        <Modal transparent visible animationType="fade">
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingBox}>
+              <ActivityIndicator size="large" color="#ffffff" />
+              <Text style={styles.loadingText}>{busyText || "Claiming…"}</Text>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -354,6 +387,7 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     position: "relative",
+    backgroundColor: "#000000",
   },
   screen: {
     flex: 1,
@@ -487,12 +521,12 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     flex: 1,
-    // backgroundColor: "#00000080",
+    backgroundColor: "#00000080",
     justifyContent: "center",
     alignItems: "center",
   },
   loadingBox: {
-    // backgroundColor: "#101119",
+    backgroundColor: "#101119",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 12,
@@ -509,13 +543,20 @@ const styles = StyleSheet.create({
   bottomAction: {
     marginBottom: 16,
     alignSelf: "center",
-    width: 150,
+    width: 220,
   },
   backAction: {
     position: "absolute",
     bottom: 0,
     alignSelf: "center",
-    width: 150,
+    width: 220,
     // marginBottom: 8,
+  },
+  bannerOverlay: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    alignItems: "center",
+    pointerEvents: "none",
   },
 });
