@@ -1,39 +1,35 @@
-import React, {
-  useEffect,
-  useLayoutEffect,
-  memo,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-import Animated, {
-  useSharedValue,
-  withTiming,
-  withSequence,
-  withSpring,
-  useAnimatedStyle,
-  runOnJS,
-  Easing,
-} from "react-native-reanimated";
 import {
   Canvas,
-  Image,
   FilterMode,
+  Image,
   MipmapMode,
 } from "@shopify/react-native-skia";
-import { View, StyleProp, ViewStyle } from "react-native";
-import { BlockView } from "./BlockView";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useState
+} from "react";
+import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming
+} from "react-native-reanimated";
 import { useImages } from "../hooks/useImages";
 import { useGameStore } from "../stores/useGameStore";
 import { Block } from "../types/Chains";
-import { WorkingBlockDetails } from "./WorkingBlockDetails";
+import { BlockView } from "./BlockView";
 import { EmptyBlockView } from "./EmptyBlockView";
 import {
   MemoizedBlockContainer,
-  MemoizedMinerSequencer,
   MemoizedBlockTxContainer,
+  MemoizedMinerSequencer,
 } from "./MemoizedBlockComponents";
+import { WorkingBlockDetails } from "./WorkingBlockDetails";
 
 /*
  * The size of the block proportional to the smallest available dimension.
@@ -47,14 +43,11 @@ export type BlockchainViewProps = {
 
 export const BlockchainView: React.FC<BlockchainViewProps> = memo(
   (props) => {
-    const parentRef = useRef<View>(null);
     const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
 
-    useLayoutEffect(() => {
-      parentRef.current?.measure((_x, _y, width, height, _pageX, _pageY) => {
-        setParentSize({ width: width, height: height });
-      });
-    }, [parentRef, setParentSize]);
+    const onLayout = useCallback((e: LayoutChangeEvent) => {
+      setParentSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
+    }, [setParentSize]);
 
     const [newBlockInitPosition, setNewBlockInitPosition] = useState({
       top: 0,
@@ -113,7 +106,10 @@ export const BlockchainView: React.FC<BlockchainViewProps> = memo(
     );
 
     return (
-      <View ref={parentRef} style={props.style}>
+      <View 
+        style={props.style}
+        onLayout={onLayout}
+      >
         <WorkingBlockDetails
           chainId={props.chainId}
           placement={newBlockInitPosition}

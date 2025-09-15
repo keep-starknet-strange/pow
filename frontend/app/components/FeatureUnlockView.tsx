@@ -8,12 +8,13 @@ import {
 } from "@shopify/react-native-skia";
 import React, {
   memo,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import { Pressable, Text, View } from "react-native";
+import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   Extrapolation,
@@ -48,7 +49,6 @@ enum NotificationState {
 
 export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
   (props) => {
-    const parentRef = useRef<Animated.View>(null);
     const [collapseState, setCollapseState] = useState(
       NotificationState.Expanded,
     );
@@ -58,11 +58,9 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
     const { getImage } = useImages();
     const { notify } = useEventManager();
 
-    useLayoutEffect(() => {
-      parentRef.current?.measure((_x, _y, width, _height) => {
-        setParentWidth(width);
-      });
-    }, [setParentWidth]);
+    const onLayout = useCallback((e: LayoutChangeEvent) => {
+      setParentWidth(e.nativeEvent.layout.width);
+    }, [setParentWidth])
 
     const shakeAnim = useSharedValue(0);
     const minimizeAnim = useSharedValue(0);
@@ -163,11 +161,11 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
 
     return (
       <Animated.View
-        ref={parentRef}
         style={[
           hideAnimatedStyle,
           { zIndex: 100, marginHorizontal: props.marginHorizontal ?? 16 },
         ]}
+        onLayout={onLayout}
       >
         <Animated.View
           style={[notificationAnimatedStyle]}
