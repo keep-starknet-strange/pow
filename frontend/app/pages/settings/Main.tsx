@@ -15,6 +15,7 @@ import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useGameStore } from "../../stores/useGameStore";
 import { useBalanceStore } from "../../stores/useBalanceStore";
 import { useTransactionsStore } from "../../stores/useTransactionsStore";
+import { useTransactionPauseStore } from "../../stores/useTransactionPauseStore";
 import { useL2Store } from "../../stores/useL2Store";
 import { useAchievementsStore } from "../../stores/useAchievementsStore";
 import { useUpgradesStore } from "../../stores/useUpgradesStore";
@@ -56,6 +57,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     useBalanceStore.getState().resetBalance();
     useUpgradesStore.getState().resetUpgrades();
     useTransactionsStore.getState().resetTransactions();
+    useTransactionPauseStore.getState().resetPauseStore();
     useL2Store.getState().resetL2Store();
 
     // Reset achievements with current account
