@@ -319,13 +319,17 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           const isValidAddress = /^0x[a-fA-F0-9]{64}$/.test(
             (debouncedInput || "").trim(),
           );
-          const claimState = claimed ? "claimed" : claiming ? "claiming" : "idle";
+          const claimState = claimed
+            ? "claimed"
+            : claiming
+              ? "claiming"
+              : "idle";
           const claimLabel =
             claimState === "claimed"
               ? "CLAIMED"
               : claimState === "claiming"
-              ? `CLAIMING ${rewardAmountStr} STRK`
-              : `CLAIM ${rewardAmountStr} STRK`;
+                ? `CLAIMING ${rewardAmountStr} STRK`
+                : `CLAIM ${rewardAmountStr} STRK`;
           const claimDisabled = claimed || claiming || !isValidAddress;
           const containerWidth = claimState === "claiming" ? 260 : 220;
 
