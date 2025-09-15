@@ -12,7 +12,6 @@ import { LoadingScreen } from "../pages/LoadingScreen";
 
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
-import { useStarknetConnector } from "../context/StarknetConnector";
 
 const Stack = createNativeStackNavigator();
 

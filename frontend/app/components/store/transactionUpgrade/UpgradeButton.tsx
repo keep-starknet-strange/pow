@@ -1,11 +1,14 @@
 import { memo } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { PopupAnimation, PopupAnimationRef } from "../../PopupAnimation";
 import {
   Canvas,
   Image,
   FilterMode,
   MipmapMode,
+  Path,
+  Rect,
+  RoundedRect,
 } from "@shopify/react-native-skia";
 import { useBalance } from "../../../stores/useBalanceStore";
 import { useImages } from "../../../hooks/useImages";
@@ -18,6 +21,7 @@ import Animated, {
   FadeInRight,
 } from "react-native-reanimated";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
+import { useTransactionPause } from "../../../stores/useTransactionPauseStore";
 
 type UpgradeButtonProps = {
   icon?: string;
@@ -31,6 +35,11 @@ type UpgradeButtonProps = {
   nextCost: number;
   onPress: () => void;
   bgImage: string;
+  // For pause functionality on speed upgrades
+  chainId?: number;
+  txId?: number;
+  isDapp?: boolean;
+  isSpeedUpgrade?: boolean;
 };
 
 export const UpgradeButton = memo<UpgradeButtonProps>(
@@ -43,12 +52,32 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
     nextCost,
     onPress,
     bgImage,
+    chainId,
+    txId,
+    isDapp,
+    isSpeedUpgrade,
   }) => {
     const { getImage } = useImages();
     const { width } = useCachedWindowDimensions();
     const { balance } = useBalance();
+    const { isPaused, setPaused } = useTransactionPause();
 
     const popupRef = React.useRef<PopupAnimationRef>(null);
+
+    const isMaxLevel = level === maxLevel;
+    const showPauseButton =
+      isMaxLevel &&
+      isSpeedUpgrade &&
+      chainId !== undefined &&
+      txId !== undefined &&
+      isDapp !== undefined;
+    const paused = showPauseButton ? isPaused(chainId!, txId!, isDapp!) : false;
+
+    const handlePauseToggle = () => {
+      if (showPauseButton) {
+        setPaused(chainId!, txId!, isDapp!, !paused);
+      }
+    };
 
     return (
       <Pressable
@@ -111,12 +140,46 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
           )}
         </Animated.View>
         {level === maxLevel ? (
-          <Animated.Text
-            className="absolute right-[6px] top-[6px] font-Pixels text-xl text-[#e7e7e7]"
+          <Animated.View
+            className="absolute right-[6px] top-[6px]"
             entering={FadeInLeft}
           >
-            Max
-          </Animated.Text>
+            <View className="flex-row items-center gap-[8px]">
+              <Text className="font-Pixels text-xl text-[#e7e7e7]">Max</Text>
+              {showPauseButton && (
+                <Pressable
+                  onPress={handlePauseToggle}
+                  className="justify-center items-center"
+                  style={{ width: 24, height: 24 }}
+                >
+                  <Canvas style={{ width: 24, height: 24 }}>
+                    {paused ? (
+                      /* Play button - triangle */
+                      <Path path="M 9 7 L 9 17 L 17 12 Z" color="#e7e7e7" />
+                    ) : (
+                      /* Pause button - two bars */
+                      <>
+                        <Rect
+                          x={8}
+                          y={7}
+                          width={3}
+                          height={10}
+                          color="#e7e7e7"
+                        />
+                        <Rect
+                          x={13}
+                          y={7}
+                          width={3}
+                          height={10}
+                          color="#e7e7e7"
+                        />
+                      </>
+                    )}
+                  </Canvas>
+                </Pressable>
+              )}
+            </View>
+          </Animated.View>
         ) : (
           <Animated.View
             className="absolute right-[6px] top-[6px] flex-row items-center"

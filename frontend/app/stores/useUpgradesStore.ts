@@ -9,7 +9,7 @@ import { FocAccount } from "../context/FocEngineConnector";
 import { useL2Store } from "./useL2Store";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useGameStore } from "./useGameStore";
-import { useOnchainActions } from "./useOnchainActions";
+import { useTransactionPauseStore } from "./useTransactionPauseStore";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -20,6 +20,8 @@ interface UpgradesState {
   canPrestige: boolean;
   isInitialized: boolean;
   setIsInitialized: (initialized: boolean) => void;
+  hasShownClaimModal: boolean;
+  setHasShownClaimModal: (hasShown: boolean) => void;
 
   // Actions
   upgrade: (chainId: number, upgradeId: number) => void;
@@ -73,6 +75,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
   canPrestige: false,
   isInitialized: false,
   setIsInitialized: (isInitialized: boolean) => set({ isInitialized }),
+  hasShownClaimModal: false,
+  setHasShownClaimModal: (hasShown: boolean) =>
+    set({ hasShownClaimModal: hasShown }),
 
   resetUpgrades: () => {
     // Initialize upgrades
@@ -403,6 +408,7 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useGameStore.getState().resetGameStore();
     useL2Store.getState().resetL2Store();
     useTransactionsStore.getState().resetTransactions();
+    useTransactionPauseStore.getState().resetPauseStore();
     get().resetUpgrades();
 
     set({
