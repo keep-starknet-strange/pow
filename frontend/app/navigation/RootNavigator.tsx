@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useEffect, useState } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View } from "react-native";
 
 import { LoginPage } from "../pages/LoginPage";
@@ -14,7 +14,7 @@ import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
 import { useStarknetConnector } from "../context/StarknetConnector";
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export const RootNavigator = memo(() => {
   const { user } = useFocEngine();

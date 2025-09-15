@@ -1,7 +1,9 @@
+import "react-native-gesture-handler";
 import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Sentry from "@sentry/react-native";
 
-// Only initialize Sentry in production builds
+// Only initialize and wrap with Sentry in production builds
 if (!__DEV__) {
   Sentry.init({
     dsn: "https://9b8c74b3c76dc6fdbbfcecc727926eb3@o4506665673621504.ingest.us.sentry.io/4509632391348225",
@@ -64,14 +66,18 @@ if (!__DEV__) {
   });
 }
 
-export default Sentry.wrap(function RootLayout() {
+function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="index" options={{}} />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" options={{}} />
+      </Stack>
+    </GestureHandlerRootView>
   );
-});
+}
+
+export default __DEV__ ? RootLayout : Sentry.wrap(RootLayout);

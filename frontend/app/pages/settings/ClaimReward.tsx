@@ -14,6 +14,7 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
@@ -22,6 +23,7 @@ import { SectionTitle } from "../../components/claim-reward/SectionTitle";
 import { ClaimRewardAction } from "../../components/claim-reward/ClaimRewardAction";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { PageHeader } from "../../components/claim-reward/PageHeader";
+import { useEventManager } from "../../stores/useEventManager";
 
 // Decode various shapes of a Starknet u256 into a bigint
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -64,7 +66,6 @@ function decodeU256ToBigInt(raw: any): bigint | null {
 }
 
 type ClaimRewardProps = {
-  setSettingTab?: (tab: "Main") => void;
   onBack?: () => void;
 };
 
@@ -83,7 +84,8 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const [walletError, setWalletError] = useState<string | null>(null);
   const [busyText, setBusyText] = useState<string | null>(null);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
-  const { width, height } = useCachedWindowDimensions();
+  const { width } = useCachedWindowDimensions();
+  const notify = useEventManager((state) => state.notify);
 
   const claimReward = async () => {
     const recipient = (debouncedInput || "").trim();
@@ -108,6 +110,12 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) setLocalTxHash(hash);
       setClaimed(true);
+      // Save transaction hash to AsyncStorage after successful transaction
+      await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+      // Notify achievement system that STRK reward was claimed
+      notify("RewardClaimed", { recipient, transactionHash: hash });
+    } else {
+      throw new Error("Transaction completed but no hash returned");
     } catch (err: any) {
       const raw = (err && (err.message || String(err))) || "";
       const alreadyClaimed = /reward already claimed/i.test(raw);
