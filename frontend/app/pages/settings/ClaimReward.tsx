@@ -108,14 +108,16 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
-      if (hash) setLocalTxHash(hash);
-      setClaimed(true);
-      // Save transaction hash to AsyncStorage after successful transaction
-      await AsyncStorage.setItem("rewardClaimedTxHash", hash);
-      // Notify achievement system that STRK reward was claimed
-      notify("RewardClaimed", { recipient, transactionHash: hash });
-    } else {
-      throw new Error("Transaction completed but no hash returned");
+      if (hash) {
+        setLocalTxHash(hash);
+        setClaimed(true);
+        // Save transaction hash to AsyncStorage after successful transaction
+        await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+        // Notify achievement system that STRK reward was claimed
+        notify("RewardClaimed", { recipient, transactionHash: hash });
+      } else {
+        throw new Error("Transaction completed but no hash returned");
+      }
     } catch (err: any) {
       const raw = (err && (err.message || String(err))) || "";
       const alreadyClaimed = /reward already claimed/i.test(raw);
