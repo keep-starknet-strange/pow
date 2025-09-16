@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as StoreReview from "expo-store-review";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import BasicButton from "../../components/buttons/Basic";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
@@ -43,11 +44,24 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   } = useSound();
   const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
+  const [isRewardClaimed, setIsRewardClaimed] = useState(false);
   const { user, disconnectUser } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
   const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
   const { clearQueue } = useOnchainActions();
+
+  useEffect(() => {
+    const loadClaimedState = async () => {
+      try {
+        const claimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+        setIsRewardClaimed(!!claimedTxHash);
+      } catch (error) {
+        console.error("Error loading claimed state:", error);
+      }
+    };
+    loadClaimedState();
+  }, []);
 
   const handleResetGame = async () => {
     setShowResetConfirmation(false);
@@ -97,7 +111,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
-    ...(currentPrestige >= 1
+    ...(currentPrestige >= 1 && !isRewardClaimed
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
     {
