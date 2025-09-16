@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 
 /**
  * Hook for batching rapid state updates to improve performance
@@ -7,11 +7,22 @@ import { useCallback, useRef } from "react";
 export const useBatchedUpdates = () => {
   const batchRef = useRef<{
     updates: Array<() => void>;
-    timeoutId: NodeJS.Timeout | null;
+    timeoutId: ReturnType<typeof setTimeout> | null;
   }>({
     updates: [],
     timeoutId: null,
   });
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (batchRef.current.timeoutId) {
+        clearTimeout(batchRef.current.timeoutId);
+        batchRef.current.timeoutId = null;
+      }
+      batchRef.current.updates = [];
+    };
+  }, []);
 
   const batchUpdate = useCallback((updateFn: () => void) => {
     batchRef.current.updates.push(updateFn);
@@ -54,7 +65,17 @@ export const useBatchedUpdates = () => {
  * Useful for reducing event notification spam
  */
 export const useDebounce = (delay: number = 16) => {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const debounce = useCallback(
     (fn: () => void) => {
@@ -63,8 +84,11 @@ export const useDebounce = (delay: number = 16) => {
       }
 
       timeoutRef.current = setTimeout(() => {
-        fn();
-        timeoutRef.current = null;
+        // Check if component is still mounted
+        if (timeoutRef.current !== null) {
+          fn();
+          timeoutRef.current = null;
+        }
       }, delay);
     },
     [delay],
