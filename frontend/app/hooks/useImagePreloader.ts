@@ -11,7 +11,7 @@ const imagePaths = {
   logoW: require(`${assetsPath}/logo/W.webp`),
   logoExclamation: require(`${assetsPath}/logo/!.webp`),
   sublogo: require(`${assetsPath}/logo/sublogo.webp`),
-  starknet: require(`${assetsPath}/logo/starknet_pixel.webp`),
+  starknet: require(`${assetsPath}/logo/starknet_logo.webp`),
   background: require(`${assetsPath}/background.webp`),
   backgroundGrid: require(`${assetsPath}/background-grid.webp`),
   topBar: require(`${assetsPath}/top_bar.webp`),
