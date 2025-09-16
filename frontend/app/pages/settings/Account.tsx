@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Share } from "react-native";
+import React, { memo, useState, useEffect } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Share, TextInput, Pressable } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import BasicButton from "../../components/buttons/Basic";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "../../context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
@@ -14,6 +15,7 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import { useEventManager } from "../../stores/useEventManager";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 
 const getPrestigeIcon = (prestige: number) => {
@@ -28,18 +30,29 @@ const getPrestigeColor = (prestige: number) => {
   return config?.color || "#FF0000";
 };
 
-export const AccountSection: React.FC = () => {
-  const { account, getPrivateKey, getAvailableKeys, generateAccountAddress } =
+const isValidPrivateKey = (key: string): boolean => {
+  // Remove 0x prefix if present
+  const cleanKey = key.startsWith("0x") ? key.slice(2) : key;
+  // Check if it's a valid hex string of 64 characters (32 bytes)
+  return /^[0-9a-fA-F]{63}$/.test(cleanKey);
+};
+
+export const AccountSection: React.FC = memo(() => {
+  const { account, getPrivateKey, getAvailableKeys, generateAccountAddress, storeKeyAndConnect } =
     useStarknetConnector();
   const { user, getAccount } = useFocEngine();
   const { currentPrestige } = useUpgrades();
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
+  const { notify } = useEventManager();
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const [nounsAttributes, setNounsAttributes] = useState<any>(null);
   const [availableAccount, setAvailableAccount] = useState<string | null>(null);
   const [availableUser, setAvailableUser] = useState<any>(null);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [restorePrivateKey, setRestorePrivateKey] = useState("");
+  const [restoreError, setRestoreError] = useState("");
 
   const loadAccountData = async () => {
     // Check for available accounts first
@@ -108,6 +121,38 @@ export const AccountSection: React.FC = () => {
   const formatAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const handleRestoreAccount = async () => {
+    if (!restorePrivateKey.trim()) {
+      setRestoreError("Please enter a private key");
+      return;
+    }
+
+    const cleanKey = restorePrivateKey.startsWith("0x") ? restorePrivateKey : `0x${restorePrivateKey}`;
+    
+    if (!isValidPrivateKey(cleanKey)) {
+      setRestoreError("Invalid private key format. Must be 64 hex characters.");
+      return;
+    }
+
+    try {
+      setRestoreError("");
+      await storeKeyAndConnect(cleanKey, "pow_game");
+      setIsRestoring(false);
+      setRestorePrivateKey("");
+      // Reload account data to show the restored account
+      await loadAccountData();
+    } catch (error) {
+      console.error("Error restoring account:", error);
+      setRestoreError("Failed to restore account. Please check your private key.");
+    }
+  };
+
+  const cancelRestore = () => {
+    setIsRestoring(false);
+    setRestorePrivateKey("");
+    setRestoreError("");
   };
 
   return (
@@ -228,90 +273,194 @@ export const AccountSection: React.FC = () => {
 
           {/* Account Content */}
           <View className="p-6 relative z-10">
-            {/* Account Address */}
-            <View className="mb-4">
-              <Text className="text-white text-[18px] font-Pixels mb-1">
-                Starknet Address:
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  const addressToShare = account?.address || availableAccount;
-                  if (addressToShare) {
-                    shareOrCopy(addressToShare, "Account address");
-                  }
-                }}
-                className="flex-row items-center justify-between p-3 rounded-lg"
-              >
-                <Text className="text-white text-[16px] font-Pixels">
-                  {account?.address ? (
-                    formatAddress(account.address)
-                  ) : availableAccount ? (
-                    <>
-                      {formatAddress(availableAccount)}
-                      <Text className="text-white text-[12px]">
-                        {" "}
-                        (not connected)
-                      </Text>
-                    </>
-                  ) : (
-                    "No account found"
-                  )}
+            {isRestoring ? (
+              /* Restore Mode */
+              <View>
+                <Text className="text-white text-[18px] font-Pixels mb-3">
+                  Restore Account
                 </Text>
-                {(account?.address || availableAccount) && (
-                  <Ionicons name="share-outline" size={20} color="white" />
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {/* Private Key */}
-            <View>
-              <Text className="text-white text-[18px] font-Pixels mb-1">
-                Private Key:
-              </Text>
-              <View className="p-3 rounded-lg">
-                {showPrivateKey ? (
-                  <TouchableOpacity
-                    onPress={() =>
-                      privateKey && shareOrCopy(privateKey, "Private key")
-                    }
-                    className="flex-row items-center justify-between"
+                <Text className="text-white text-[14px] font-Pixels mb-2">
+                  Enter your private key:
+                </Text>
+                <TextInput
+                  className="bg-[#ffffff20] text-white text-[14px] font-Pixels p-2 rounded border border-white/30 mb-2"
+                  placeholder="Private key (0x...)"
+                  placeholderTextColor="#ffffff60"
+                  value={restorePrivateKey}
+                  onChangeText={setRestorePrivateKey}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  multiline
+                  numberOfLines={3}
+                  secureTextEntry
+                />
+                {restoreError ? (
+                  <Text className="text-red-400 text-[12px] font-Pixels mb-2">
+                    {restoreError}
+                  </Text>
+                ) : null}
+                <View className="flex-row gap-3 justify-center mt-4">
+                  {/* Restore Button */}
+                  <Pressable
+                    onPress={() => {
+                      notify("BasicClick");
+                      handleRestoreAccount();
+                    }}
+                    className="relative"
+                    style={{ width: 110, height: 40 }}
                   >
-                    <Text className="text-white text-[14px] font-Pixels flex-1">
-                      {privateKey ? formatAddress(privateKey) : "Not available"}
+                    <Canvas style={{ flex: 1, width: 110, height: 40 }}>
+                      <Image
+                        image={getImage("staking.button")}
+                        fit="fill"
+                        x={0}
+                        y={0}
+                        width={110}
+                        height={40}
+                        sampling={{
+                          filter: FilterMode.Nearest,
+                          mipmap: MipmapMode.Nearest,
+                        }}
+                      />
+                    </Canvas>
+                    <Text className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
+                          style={{ lineHeight: 40 }}>
+                      Restore
                     </Text>
-                    {privateKey && (
+                  </Pressable>
+                  
+                  {/* Cancel Button */}
+                  <Pressable
+                    onPress={() => {
+                      notify("BasicClick");
+                      cancelRestore();
+                    }}
+                    className="relative"
+                    style={{ width: 110, height: 40 }}
+                  >
+                    <Canvas style={{ flex: 1, width: 110, height: 40 }}>
+                      <Image
+                        image={getImage("staking.button")}
+                        fit="fill"
+                        x={0}
+                        y={0}
+                        width={110}
+                        height={40}
+                        sampling={{
+                          filter: FilterMode.Nearest,
+                          mipmap: MipmapMode.Nearest,
+                        }}
+                      />
+                    </Canvas>
+                    <Text className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
+                          style={{ lineHeight: 40 }}>
+                      Cancel
+                    </Text>
+                  </Pressable>
+                </View>
+                <Text className="text-[#fff7f7] text-[12px] font-Pixels mt-4 text-center">
+                  Using the power of Starknet, you can securely restore your accounts state. Your account is truly yours. Forever.
+                </Text>
+              </View>
+            ) : (
+              /* Normal Mode */
+              <>
+                {/* Account Address */}
+                <View className="mb-4">
+                  <Text className="text-white text-[18px] font-Pixels mb-1">
+                    Starknet Address:
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const addressToShare = account?.address || availableAccount;
+                      if (addressToShare) {
+                        shareOrCopy(addressToShare, "Account address");
+                      }
+                    }}
+                    className="flex-row items-center justify-between p-3 rounded-lg"
+                  >
+                    <Text className="text-white text-[16px] font-Pixels">
+                      {account?.address ? (
+                        formatAddress(account.address)
+                      ) : availableAccount ? (
+                        <>
+                          {formatAddress(availableAccount)}
+                          <Text className="text-white text-[12px]">
+                            {" "}
+                            (not connected)
+                          </Text>
+                        </>
+                      ) : (
+                        "No account found"
+                      )}
+                    </Text>
+                    {(account?.address || availableAccount) && (
                       <Ionicons name="share-outline" size={20} color="white" />
                     )}
                   </TouchableOpacity>
-                ) : (
-                  <Text className="text-white text-[16px] font-Pixels">
-                    ••••••••••••
-                  </Text>
-                )}
+                </View>
 
-                <TouchableOpacity
-                  onPress={() => setShowPrivateKey(!showPrivateKey)}
-                  className="flex-row items-center justify-center p-2 rounded"
-                >
-                  <Ionicons
-                    name={showPrivateKey ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color="white"
-                  />
-                  <Text className="text-white text-[14px] font-Pixels ml-2">
-                    {showPrivateKey ? "Hide" : "View"}
+                {/* Private Key */}
+                <View>
+                  <Text className="text-white text-[18px] font-Pixels mb-1">
+                    Private Key:
                   </Text>
-                </TouchableOpacity>
-                <Text className="text-[#fff7f7] text-[12px] font-Pixels mt-2 text-center">
-                  ⚠️ Save your private key to restore your account later.
-                </Text>
-              </View>
-            </View>
+                  <View className="p-3 rounded-lg">
+                    {showPrivateKey ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          privateKey && shareOrCopy(privateKey, "Private key")
+                        }
+                        className="flex-row items-center justify-between"
+                      >
+                        <Text className="text-white text-[14px] font-Pixels flex-1">
+                          {privateKey ? formatAddress(privateKey) : "Not available"}
+                        </Text>
+                        {privateKey && (
+                          <Ionicons name="share-outline" size={20} color="white" />
+                        )}
+                      </TouchableOpacity>
+                    ) : (
+                      <Text className="text-white text-[16px] font-Pixels">
+                        ••••••••••••
+                      </Text>
+                    )}
+
+                    <TouchableOpacity
+                      onPress={() => setShowPrivateKey(!showPrivateKey)}
+                      className="flex-row items-center justify-center p-2 rounded"
+                    >
+                      <Ionicons
+                        name={showPrivateKey ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color="white"
+                      />
+                      <Text className="text-white text-[14px] font-Pixels ml-2">
+                        {showPrivateKey ? "Hide" : "View"}
+                      </Text>
+                    </TouchableOpacity>
+                    <Text className="text-[#fff7f7] text-[12px] font-Pixels mt-2 text-center">
+                      ⚠️ Save your private key to restore your account later.
+                    </Text>
+                  </View>
+                </View>
+              </>
+            )}
           </View>
         </View>
+
+        {/* Restore Button - only show when no account is found and not currently restoring */}
+        {!account?.address && !availableAccount && !isRestoring && (
+          <View className="mt-6 items-center">
+            <BasicButton
+              label="Restore"
+              onPress={() => setIsRestoring(true)}
+            />
+          </View>
+        )}
       </ScrollView>
     </Animated.View>
   );
-};
+});
 
 export default AccountSection;

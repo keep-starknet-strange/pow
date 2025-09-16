@@ -101,6 +101,7 @@ export const TxButtonInner = memo(
         props.isDapp,
         props.triggerTxAnimation,
         props.addTransaction,
+        fee,
       ],
     );
 
