@@ -41,6 +41,8 @@ export const getAutomationIcon = (
           return "shop.automation.sequencer.4";
         case 5:
           return "shop.automation.sequencer.5";
+        case 6:
+          return "shop.automation.sequencer.5";
         default:
           return "unknown";
       }

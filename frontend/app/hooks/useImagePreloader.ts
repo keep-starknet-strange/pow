@@ -377,15 +377,18 @@ const imagePaths = {
     `${assetsPath}/shop/icons/automations/Sequencer/icon_base.webp`,
   ),
   shopAutomationsSequencer1: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cloud.webp`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_base.webp`,
   ),
   shopAutomationsSequencer2: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_cairo.webp`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_cloud.webp`,
   ),
   shopAutomationsSequencer3: require(
-    `${assetsPath}/shop/icons/automations/Sequencer/icon_parallel.webp`,
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_cairo.webp`,
   ),
   shopAutomationsSequencer4: require(
+    `${assetsPath}/shop/icons/automations/Sequencer/icon_parallel.webp`,
+  ),
+  shopAutomationsSequencer5: require(
     `${assetsPath}/shop/icons/automations/Sequencer/icon_decentralized.webp`,
   ),
   shopAutomationsProver0: require(
@@ -645,6 +648,7 @@ export const useImagePreloader = () => {
     shopAutomationSequencer2: useImage(imagePaths.shopAutomationsSequencer2),
     shopAutomationSequencer3: useImage(imagePaths.shopAutomationsSequencer3),
     shopAutomationSequencer4: useImage(imagePaths.shopAutomationsSequencer4),
+    shopAutomationSequencer5: useImage(imagePaths.shopAutomationsSequencer5),
     shopAutomationProver0: useImage(imagePaths.shopAutomationsProver0),
     shopAutomationProver1: useImage(imagePaths.shopAutomationsProver1),
     shopAutomationProver2: useImage(imagePaths.shopAutomationsProver2),
@@ -876,6 +880,7 @@ export const useImagePreloader = () => {
         "shop.automation.sequencer.2": images.shopAutomationSequencer2,
         "shop.automation.sequencer.3": images.shopAutomationSequencer3,
         "shop.automation.sequencer.4": images.shopAutomationSequencer4,
+        "shop.automation.sequencer.5": images.shopAutomationSequencer5,
         "shop.automation.prover.0": images.shopAutomationProver0,
         "shop.automation.prover.1": images.shopAutomationProver1,
         "shop.automation.prover.2": images.shopAutomationProver2,
