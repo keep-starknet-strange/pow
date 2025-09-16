@@ -86,7 +86,13 @@ UPGRADES_CONFIG=$CONFIGS_DIR/upgrades.json
 TRANSACTIONS_CONFIG=$CONFIGS_DIR/transactions.json
 UNLOCKS_CONFIG=$CONFIGS_DIR/unlocks.json
 
-RPC_URL=https://starknet-sepolia.infura.io/v3/2L0kNQGRBEf4gYmySjgK0EnpRlY
+# RPC_URL is loaded from .env file
+if [ -z "$RPC_URL" ]; then
+  echo "Error: RPC_URL is not set."
+  echo "Please set RPC_URL in your .env.sep file or environment variables."
+  echo "Example: RPC_URL=https://starknet-sepolia.infura.io/v3/YOUR_API_KEY"
+  exit 1
+fi
 
 OUTPUT_DIR=$HOME/.pow-tests
 TIMESTAMP=$(date +%s)

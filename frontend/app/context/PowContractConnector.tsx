@@ -69,6 +69,7 @@ type PowContractContextType = {
     | undefined
   >;
   getUserPrestige: () => Promise<number | undefined>;
+  getUserPrestiges: (users: string[]) => Promise<number[] | undefined>;
   getRewardParams: () => Promise<
     | {
         rewardTokenAddress: string;
@@ -551,6 +552,24 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [account, powContract, STARKNET_ENABLED]);
 
+  const getUserPrestiges = useCallback(
+    async (users: string[]) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const prestiges = await powContract.get_user_prestiges(users);
+        return prestiges.map((prestige: any) =>
+          prestige.toString ? parseInt(prestige.toString(), 10) : 0,
+        );
+      } catch (error) {
+        console.error("Failed to fetch user prestiges:", error);
+        return undefined;
+      }
+    },
+    [powContract, STARKNET_ENABLED],
+  );
+
   const getRewardParams = useCallback(async () => {
     if (!STARKNET_ENABLED || !powContract) return;
     try {
@@ -623,6 +642,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserProofBuildingState,
         getUserDABuildingState,
         getUserPrestige,
+        getUserPrestiges,
         getRewardParams,
         getHasClaimedReward,
         doubleBalanceCheat,
