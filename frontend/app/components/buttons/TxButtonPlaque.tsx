@@ -28,7 +28,7 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
   const { canUnlockTx } = useTransactionsStore();
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="none">
       <View style={[styles.plaqueContainer, { width: width * 0.18 }]}>
         <Canvas pointerEvents="none" style={styles.fillFlex}>
           <Image
