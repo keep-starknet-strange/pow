@@ -102,6 +102,9 @@ export const MemoizedMinerSequencer = memo(
     const isBuilt = useGameStore(
       (state) => state.workingBlocks[chainId]?.isBuilt,
     );
+    const currentBlockId = useGameStore(
+      (state) => state.workingBlocks[chainId]?.blockId,
+    );
     const onBlockMined = useGameStore((state) => state.onBlockMined);
     const onBlockSequenced = useGameStore((state) => state.onBlockSequenced);
 
@@ -119,7 +122,7 @@ export const MemoizedMinerSequencer = memo(
       [placement],
     );
 
-    if (!isBuilt) return null;
+    if (!isBuilt && currentBlockId !== 0) return null;
 
     return (
       <View style={containerStyle}>

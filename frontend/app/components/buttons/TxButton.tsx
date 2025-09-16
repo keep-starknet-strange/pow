@@ -49,24 +49,30 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const { width } = useCachedWindowDimensions();
   const { addTransaction } = useGameStore();
   const {
-    getFeeLevel,
-    getNextFeeCost,
-    getFee,
     getSpeed,
     txFeeUpgrade,
     dappFeeUpgrade,
     canUnlockTx,
   } = useTransactionsStore();
 
+  // Subscribe to store values so the button re-renders after unlocks
+  const feeLevel = useTransactionsStore((state) =>
+    props.isDapp
+      ? state.dappFeeLevels[props.chainId]?.[props.txId] ?? -1
+      : state.transactionFeeLevels[props.chainId]?.[props.txId] ?? -1,
+  );
+  const feeCost = useTransactionsStore((state) =>
+    state.getNextFeeCost(props.chainId, props.txId, props.isDapp),
+  );
+  const fee = useTransactionsStore((state) =>
+    state.getFee(props.chainId, props.txId, props.isDapp),
+  );
+
   const [triggerFlash, setTriggerFlash] = useState<
     ((x: number, y: number) => void) | null
   >(null);
 
   const enabled = props.txId === 0 && props.chainId === 0 && !props.isDapp;
-
-  const feeLevel = getFeeLevel(props.chainId, props.txId, props.isDapp);
-  const feeCost = getNextFeeCost(props.chainId, props.txId, props.isDapp);
-  const fee = getFee(props.chainId, props.txId, props.isDapp);
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
@@ -133,7 +139,14 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     (event: GestureResponderEvent) => {
       const { locationX, locationY } = event.nativeEvent;
       const currentTime = Date.now();
-
+      console.log("[TxButton] press", {
+        chainId: props.chainId,
+        txId: props.txId,
+        isDapp: props.isDapp,
+        feeLevel,
+        feeCost,
+        fee,
+      });
       // Batch visual feedback updates
       requestAnimationFrame(() => {
         // Trigger flash animation at click position
@@ -145,6 +158,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
       if (feeLevel === -1) {
         // Batch upgrade operations
         // Show popup animation for upgrade
+        console.log("[TxButton] unlock branch", { feeCost });
         const popupValue = "-" + shortMoneyString(feeCost);
         const popupColor = "#CA1F4B";
         popupRef.current?.showPopup(popupValue, popupColor);
@@ -156,6 +170,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
         }
         return;
       }
+      console.log("[TxButton] add branch -> addNewTransaction()");
       addNewTransaction();
     },
     [
@@ -186,6 +201,7 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
         <Pressable
           style={{
             width: width * 0.18,
+            zIndex: 5,
           }}
           className="relative h-[94px]"
           onPress={handlePress}

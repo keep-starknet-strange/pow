@@ -15,7 +15,7 @@ export const TutorialRefView: React.FC<TutorialRefViewProps> = memo(
       props.enabled,
     );
     return (
-      <View className="w-full h-full absolute" ref={ref} onLayout={onLayout} />
+      <View pointerEvents="none" className="w-full h-full absolute" ref={ref} onLayout={onLayout} />
     );
   },
   (prevProps, nextProps) => {

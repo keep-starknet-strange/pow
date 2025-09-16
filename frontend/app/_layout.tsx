@@ -64,7 +64,7 @@ if (!__DEV__) {
   });
 }
 
-export default Sentry.wrap(function RootLayout() {
+function RootLayout() {
   return (
     <Stack
       screenOptions={{
@@ -74,4 +74,6 @@ export default Sentry.wrap(function RootLayout() {
       <Stack.Screen name="index" options={{}} />
     </Stack>
   );
-});
+}
+
+export default __DEV__ ? RootLayout : Sentry.wrap(RootLayout);

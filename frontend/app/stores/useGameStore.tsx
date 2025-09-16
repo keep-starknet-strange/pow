@@ -58,7 +58,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       defaultBlockDifficulty,
       get().genesisBlockReward,
     );
-    initBlock.isBuilt = true; // Mark the genesis block as built
+    initBlock.isBuilt = true; // Allow mining the genesis block
     set({
       workingBlocks: [initBlock],
       blockHeights: { 0: initBlock.blockId },
@@ -238,7 +238,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       blockDifficulty,
       get().genesisBlockReward,
     );
-    newWorkingBlock.isBuilt = true; // Mark the genesis block as built
+    newWorkingBlock.isBuilt = true; // Allow sequencing the L2 genesis block
     set((state) => {
       return {
         workingBlocks: [...state.workingBlocks, newWorkingBlock],

@@ -74,7 +74,7 @@ const BasicButton: React.FC<BasicButtonProps> = ({
             ...style,
           }}
         >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Canvas pointerEvents="none" style={{ flex: 1 }} className="w-full h-full">
             <Image
               image={getImage("button.basic")}
               fit="fill"

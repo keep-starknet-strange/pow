@@ -29,7 +29,7 @@ export const BlockTxOutlines: React.FC<BlockTxOutlinesProps> = memo(
             height: props.txSize,
           }}
         >
-          <Canvas style={{ flex: 1 }} className="w-full h-full">
+          <Canvas pointerEvents="none" style={{ flex: 1 }} className="w-full h-full">
             <Image
               image={getImage("block.bg.empty")}
               fit="fill"

@@ -7,6 +7,7 @@ import Animated, {
   runOnJS,
   Easing,
   useSharedValue,
+  useAnimatedStyle,
   withSpring,
   withTiming,
   withSequence,
@@ -56,7 +57,7 @@ const BlockCanvas = memo(
     );
 
     return (
-      <Canvas style={canvasStyle}>
+      <Canvas pointerEvents="none" style={canvasStyle}>
         <Image
           image={getImage("block.grid")}
           fit="fill"
@@ -320,14 +321,13 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
       updateWorkingBlock,
     ]);
 
-    const containerStyle = useMemo(
+    const containerBaseStyle = useMemo(
       () => ({
         position: "absolute" as const,
         top: props.placement.top,
         left: props.placement.left,
         width: props.placement.width,
         height: props.placement.height,
-        transform: [{ scale: detailsScaleAnim }],
       }),
       [
         props.placement.top,
@@ -336,6 +336,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         props.placement.height,
       ],
     );
+
+    const containerAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: detailsScaleAnim.value }],
+    }));
 
     const blockIdLabelStyle = useMemo(
       () => ({
@@ -412,7 +416,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
     ]);
 
     return (
-      <Animated.View style={containerStyle}>
+      <Animated.View style={[containerBaseStyle, containerAnimatedStyle]}>
         <BlockCanvas placement={props.placement} />
 
         <View className="absolute" style={blockIdLabelStyle}>

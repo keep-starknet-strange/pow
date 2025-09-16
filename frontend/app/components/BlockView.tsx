@@ -58,6 +58,7 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
       </View>
       {props.block?.blockId === 0 && (
         <View
+          pointerEvents="none"
           style={{
             width: props.width,
             height: props.height,
@@ -95,7 +96,7 @@ export const BlockBorder: React.FC<{ width: number; height: number }> = memo(
 
     return (
       <View className="absolute top-0 left-0">
-        <Canvas style={{ width, height }}>
+        <Canvas pointerEvents="none" style={{ width, height }}>
           <Image
             image={getImage("block.grid.min")}
             fit="fill"

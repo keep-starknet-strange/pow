@@ -160,7 +160,7 @@ export const TxButtonInner = memo(
             },
           ]}
         >
-          <Canvas style={styles.canvas}>
+          <Canvas pointerEvents="none" style={styles.canvas}>
             <Image
               image={getTxBg(props.chainId, props.txId, props.isDapp, getImage)}
               fit="fill"
@@ -185,6 +185,7 @@ export const TxButtonInner = memo(
             ]}
           >
             <Canvas
+              pointerEvents="none"
               style={styles.canvas}
               key={`tx-inner-${props.chainId}-${props.txId}-${props.isDapp}-${forceUpdate}`}
             >
@@ -249,6 +250,7 @@ export const TxButtonInner = memo(
           >
             {iconImage && (
               <Canvas
+                pointerEvents="none"
                 style={styles.canvas}
                 key={`tx-icon-${props.chainId}-${props.txId}-${props.isDapp}-${props.feeLevel}-${forceUpdate}`}
               >

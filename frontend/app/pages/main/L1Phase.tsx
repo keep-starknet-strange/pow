@@ -51,7 +51,7 @@ export const L1Phase: React.FC = () => {
         }}
         entering={FadeInDown}
       >
-        <Canvas
+        <Canvas pointerEvents="none"
           style={{
             position: "absolute",
             width: "100%",
@@ -71,7 +71,7 @@ export const L1Phase: React.FC = () => {
             }}
           />
         </Canvas>
-        <Canvas style={{ position: "absolute", width: "100%", height: "100%" }}>
+        <Canvas pointerEvents="none" style={{ position: "absolute", width: "100%", height: "100%" }}>
           <Image
             image={getImage("tx.border")}
             fit="fill"

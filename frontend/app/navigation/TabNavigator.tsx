@@ -157,7 +157,7 @@ const TabBarButton = memo(
         onPress={onPress}
         onLayout={handleLayout}
       >
-        <Canvas style={backgroundCanvasStyle}>
+        <Canvas pointerEvents="none" style={backgroundCanvasStyle}>
           <Image
             image={buttonImage}
             fit="fill"
@@ -171,7 +171,7 @@ const TabBarButton = memo(
             }}
           />
         </Canvas>
-        <Canvas style={iconCanvasStyle}>
+        <Canvas pointerEvents="none" style={iconCanvasStyle}>
           <Image
             image={tabIcon}
             fit="contain"
@@ -195,7 +195,7 @@ const BadgeOverlay = memo(({ count }: { count: number }) => {
   const display = count > 99 ? "99+" : String(count);
   return (
     <View style={styles.badgeContainer} pointerEvents="none">
-      <Canvas style={styles.badgeCanvas}>
+      <Canvas pointerEvents="none" style={styles.badgeCanvas}>
         <Image
           image={getImage("notif.badge")}
           fit="contain"

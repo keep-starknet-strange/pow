@@ -97,7 +97,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           }}
           className="w-28 h-28"
         >
-          <Canvas style={{ width: 112, height: 112 }}>
+          <Canvas pointerEvents="none" style={{ width: 112, height: 112 }}>
             <SkiaImage
               x={0}
               y={0}

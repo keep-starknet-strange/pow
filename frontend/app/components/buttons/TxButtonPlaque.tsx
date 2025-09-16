@@ -30,7 +30,7 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
   return (
     <View style={styles.container}>
       <View style={[styles.plaqueContainer, { width: width * 0.18 }]}>
-        <Canvas style={styles.fillFlex}>
+        <Canvas pointerEvents="none" style={styles.fillFlex}>
           <Image
             image={getImage("tx.plaque")}
             fit="fill"
@@ -55,7 +55,7 @@ export const TxButtonPlaque = memo((props: TxButtonPlaqueProps) => {
               showThreeDigitsMax(feeLevel === -1 ? feeCost : fee),
             )}
           </Text>
-          <Canvas style={styles.feeIconCanvas}>
+          <Canvas pointerEvents="none" style={styles.feeIconCanvas}>
             <Image
               image={getImage("shop.btc")}
               fit="contain"

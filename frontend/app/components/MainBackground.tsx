@@ -96,7 +96,7 @@ export const MainBackground: React.FC = memo(() => {
   return (
     <View className="absolute w-full h-full">
       <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <Canvas pointerEvents="none" style={{ flex: 1 }} className="w-full h-full">
           <Rect x={0} y={0} width={width} height={height}>
             <ImageShader
               image={getImage("background")}
@@ -113,7 +113,7 @@ export const MainBackground: React.FC = memo(() => {
         </Canvas>
       </View>
       <View className="absolute w-full h-full">
-        <Canvas style={{ flex: 1 }} className="w-full h-full">
+        <Canvas pointerEvents="none" style={{ flex: 1 }} className="w-full h-full">
           <Rect x={0} y={0} width={width} height={height}>
             <ImageShader
               image={getImage("background.grid")}

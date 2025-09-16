@@ -65,6 +65,7 @@ const config: ExpoConfig = {
     "expo-web-browser",
     "expo-audio",
     "./plugins/sentry.ts",
+    "expo-font"
   ],
   experiments: {
     typedRoutes: true,

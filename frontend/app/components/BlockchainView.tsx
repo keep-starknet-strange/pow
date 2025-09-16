@@ -260,11 +260,11 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (
         {
           position: "absolute",
           top: props.placement.top,
-          left: blockSlideLeftAnim,
           width: props.placement.width,
           height: props.placement.height,
           zIndex: isCurrentWorkingBlock ? 5 : 1,
         },
+        useAnimatedStyle(() => ({ left: blockSlideLeftAnim.value })),
       ]}
     >
       <BlockView

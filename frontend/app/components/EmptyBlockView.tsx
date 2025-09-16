@@ -7,7 +7,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
-import Animated, { useSharedValue } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated";
 
 export type EmptyViewProps = {
   chainId: number;
@@ -123,19 +123,25 @@ export const EmptyBlockView: React.FC<EmptyViewProps> = memo(
     */
     }, [props.placement.left, props.completedPlacementLeft]);
 
+    const containerAnimatedStyle = useAnimatedStyle(() => ({
+      left: blockSlideLeftAnim.value,
+    }));
+
     if (!props.showEmpty) {
       return null;
     }
 
     return (
       <Animated.View
-        style={{
-          position: "absolute",
-          top: props.placement.top,
-          left: blockSlideLeftAnim,
-          width: props.placement.width,
-          height: props.placement.height,
-        }}
+        style={[
+          {
+            position: "absolute",
+            top: props.placement.top,
+            width: props.placement.width,
+            height: props.placement.height,
+          },
+          containerAnimatedStyle,
+        ]}
       >
         <EmptyBlockContent placement={props.placement} />
       </Animated.View>
