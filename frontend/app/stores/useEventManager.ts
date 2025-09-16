@@ -70,9 +70,9 @@ export const useEventManager = create<EventManager>((set, get) => ({
     queueMicrotask(() => {
       const currentObservers = get().observers;
       if (currentObservers.size > 0) {
-        currentObservers.forEach((observer, key) => {
+        currentObservers.forEach(async (observer, key) => {
           try {
-            observer.onNotify(eventType, data);
+            await observer.onNotify(eventType, data);
           } catch (error) {
             if (__DEV__) {
               console.warn(

@@ -3,6 +3,8 @@ import { useCallback, useRef, useEffect } from "react";
 /**
  * Hook for batching rapid state updates to improve performance
  * Useful for frequently clicked components like TxButton and useMiner
+ *
+ * @unused Currently not used but available for future performance optimizations
  */
 export const useBatchedUpdates = () => {
   const batchRef = useRef<{
@@ -58,41 +60,4 @@ export const useBatchedUpdates = () => {
   }, []);
 
   return { batchUpdate, flushUpdates };
-};
-
-/**
- * Hook for debouncing rapid function calls
- * Useful for reducing event notification spam
- */
-export const useDebounce = (delay: number = 16) => {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, []);
-
-  const debounce = useCallback(
-    (fn: () => void) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        // Check if component is still mounted
-        if (timeoutRef.current !== null) {
-          fn();
-          timeoutRef.current = null;
-        }
-      }, delay);
-    },
-    [delay],
-  );
-
-  return debounce;
 };

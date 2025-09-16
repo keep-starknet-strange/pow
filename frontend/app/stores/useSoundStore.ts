@@ -276,7 +276,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             "playbackStatusUpdate",
             (status) => {
               if (
-                status.playing === false &&
+                !status.playing &&
                 status.currentTime > 0 &&
                 status.currentTime >= status.duration - 0.1
               ) {
@@ -360,7 +360,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             "playbackStatusUpdate",
             (status) => {
               if (
-                status.playing === false &&
+                !status.playing &&
                 status.currentTime > 0 &&
                 status.currentTime >= status.duration - 0.1
               ) {
@@ -435,7 +435,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
           "playbackStatusUpdate",
           (status) => {
             if (
-              status.playing === false &&
+              !status.playing &&
               status.currentTime > 0 &&
               status.currentTime >= status.duration - 0.1
             ) {
@@ -604,7 +604,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         "playbackStatusUpdate",
         (status) => {
           if (
-            status.playing === false &&
+            !status.playing &&
             status.currentTime > 0 &&
             status.currentTime >= status.duration - 0.1
           ) {
