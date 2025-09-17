@@ -1,4 +1,3 @@
-import "react-native-gesture-handler";
 import React, { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";

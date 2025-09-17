@@ -66,9 +66,8 @@ if (!__DEV__) {
   });
 }
 
-function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -76,8 +75,5 @@ function RootLayout() {
       >
         <Stack.Screen name="index" options={{}} />
       </Stack>
-    </GestureHandlerRootView>
   );
 }
-
-export default __DEV__ ? RootLayout : Sentry.wrap(RootLayout);

@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useEffect, useState } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 
 import { LoginPage } from "../pages/LoginPage";
@@ -13,7 +13,7 @@ import { LoadingScreen } from "../pages/LoadingScreen";
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export const RootNavigator = memo(() => {
   const { user } = useFocEngine();

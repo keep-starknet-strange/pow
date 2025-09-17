@@ -54,7 +54,6 @@ const config: ExpoConfig = {
       },
     ],
     "expo-secure-store",
-    "expo-font",
     [
       "@sentry/react-native/expo",
       {
