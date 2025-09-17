@@ -43,6 +43,8 @@ const getSoundFileForEvent = (eventType: string): string | null => {
 class SoundPool {
   private soundPlayers: Map<string, AudioPlayer[]> = new Map();
   private currentIndex: Map<string, number> = new Map();
+  private activeTimeouts: Set<ReturnType<typeof setTimeout>> = new Set();
+  private isDestroyed: boolean = false;
 
   constructor() {
     // Create sound pools per sound file using configured pool sizes from soundpools.json
@@ -67,57 +69,126 @@ class SoundPool {
     soundConfig: any,
     volume: number,
   ): void {
+    // Early return if pool is destroyed
+    if (this.isDestroyed) return;
+
     // Get the sound file for this event type
     const soundFile = getSoundFileForEvent(eventType);
     if (!soundFile) return;
 
     const players = this.soundPlayers.get(soundFile);
-    if (!players) return;
+    if (!players || players.length === 0) return;
 
     // Get the next player in round-robin fashion
     const currentIdx = this.currentIndex.get(soundFile) || 0;
     const player = players[currentIdx];
 
+    // Validate player exists and is not null
+    if (!player) {
+      if (__DEV__)
+        console.warn(
+          `Audio player is null for ${soundFile} at index ${currentIdx}`,
+        );
+      return;
+    }
+
     // Update index for next time (round-robin within the pool for this sound file)
     this.currentIndex.set(soundFile, (currentIdx + 1) % players.length);
 
     try {
-      // Simple, fast configuration
-      player.volume = volume * (soundConfig.volume || 1.0);
-      player.setPlaybackRate((soundConfig.rate || 1.0) * pitchShift);
+      // Validate player state before operations
+      if (this.isDestroyed || !player) return;
+
+      // Simple, fast configuration with null checks
+      const finalVolume = Math.max(
+        0,
+        Math.min(1, volume * (soundConfig?.volume || 1.0)),
+      );
+      const finalRate = Math.max(
+        0.5,
+        Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
+      );
+
+      player.volume = finalVolume;
+      player.setPlaybackRate(finalRate);
       player.seekTo(0);
       player.play();
 
-      // Cleanup after sound duration
+      // Cleanup after sound duration with proper timeout tracking
       const duration = soundConfig.duration || 1000;
       const playbackRate = (soundConfig.rate || 1.0) * pitchShift;
       const estimatedDuration = Math.min(duration / playbackRate, 3000);
 
-      setTimeout(() => {
-        try {
-          player.pause();
-        } catch (e) {
-          // Ignore errors during cleanup
+      const timeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
+        this.activeTimeouts.delete(timeoutId);
+        if (!this.isDestroyed) {
+          try {
+            player.pause();
+          } catch (e) {
+            // Ignore errors during cleanup
+          }
         }
       }, estimatedDuration + 100);
+
+      this.activeTimeouts.add(timeoutId);
     } catch (error) {
-      // Silently ignore errors to maintain performance
+      // Log errors in development but don't crash
+      if (__DEV__) {
+        console.warn(
+          `Failed to play sound ${eventType} (${soundFile}):`,
+          error,
+        );
+      }
     }
   }
 
   cleanup() {
-    this.soundPlayers.forEach((players) => {
-      players.forEach((player) => {
+    // Create a copy of the map to avoid iterator issues during cleanup
+    const playersToCleanup = Array.from(this.soundPlayers.entries());
+
+    playersToCleanup.forEach(([soundFile, players]) => {
+      players.forEach((player, index) => {
         try {
-          player.pause();
-          player.release();
+          // Ensure player is stopped before release
+          if (player.playing) {
+            player.pause();
+          }
+          // Small delay to ensure pause completes before release
+          setTimeout(() => {
+            try {
+              player.release();
+            } catch (releaseError) {
+              if (__DEV__)
+                console.warn(
+                  `Failed to release audio player ${index} for ${soundFile}:`,
+                  releaseError,
+                );
+            }
+          }, 50);
         } catch (error) {
-          // Ignore cleanup errors
+          if (__DEV__)
+            console.warn(
+              `Failed to cleanup audio player ${index} for ${soundFile}:`,
+              error,
+            );
         }
       });
     });
-    this.soundPlayers.clear();
-    this.currentIndex.clear();
+
+    // Cancel all active timeouts to prevent operations on destroyed pool
+    this.activeTimeouts.forEach((timeoutId: ReturnType<typeof setTimeout>) => {
+      clearTimeout(timeoutId);
+    });
+    this.activeTimeouts.clear();
+
+    // Mark as destroyed to prevent further operations
+    this.isDestroyed = true;
+
+    // Clear maps after a delay to ensure all releases complete
+    setTimeout(() => {
+      this.soundPlayers.clear();
+      this.currentIndex.clear();
+    }, 100);
   }
 }
 
@@ -132,6 +203,7 @@ interface SoundState {
   isInitialized: boolean;
   currentTrackName: string | null;
   lastPlayedTracks: (string | null)[];
+  musicPlayerListener: any;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -157,6 +229,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   isInitialized: false,
   currentTrackName: null,
   lastPlayedTracks: [],
+  musicPlayerListener: null,
 
   initializeSound: async () => {
     try {
@@ -203,7 +276,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             "playbackStatusUpdate",
             (status) => {
               if (
-                status.playing === false &&
+                !status.playing &&
                 status.currentTime > 0 &&
                 status.currentTime >= status.duration - 0.1
               ) {
@@ -215,6 +288,9 @@ export const useSoundStore = create<SoundState>((set, get) => ({
               }
             },
           );
+
+          // Store listener reference for cleanup
+          set({ musicPlayerListener: statusListener });
         } catch (error) {
           if (__DEV__) console.error("Failed to create music player:", error);
         }
@@ -229,6 +305,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         musicPlayer: musicPlayer,
         soundPool: new SoundPool(),
         currentTrackName: selectedTrack,
+        musicPlayerListener: null,
       });
 
       if (musicOn && musicPlayer) {
@@ -283,7 +360,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             "playbackStatusUpdate",
             (status) => {
               if (
-                status.playing === false &&
+                !status.playing &&
                 status.currentTime > 0 &&
                 status.currentTime >= status.duration - 0.1
               ) {
@@ -296,7 +373,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             },
           );
 
-          set({ musicPlayer, currentTrackName: randomTrack });
+          set({
+            musicPlayer,
+            currentTrackName: randomTrack,
+            musicPlayerListener: statusListener,
+          });
         } catch (error) {
           if (__DEV__) console.error("Failed to create music player:", error);
           return;
@@ -354,7 +435,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
           "playbackStatusUpdate",
           (status) => {
             if (
-              status.playing === false &&
+              !status.playing &&
               status.currentTime > 0 &&
               status.currentTime >= status.duration - 0.1
             ) {
@@ -367,7 +448,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
           },
         );
 
-        set({ musicPlayer: newMusicPlayer, currentTrackName: randomTrack });
+        set({
+          musicPlayer: newMusicPlayer,
+          currentTrackName: randomTrack,
+          musicPlayerListener: statusListener,
+        });
 
         newMusicPlayer.play();
       } else {
@@ -427,16 +512,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   cleanupSound: () => {
-    const { musicPlayer, soundPool } = get();
+    const { musicPlayer, soundPool, musicPlayerListener } = get();
+
+    // Clean up music player and its listener
     if (musicPlayer) {
       try {
+        // Remove listener before cleanup
+        if (musicPlayerListener) {
+          musicPlayer.removeListener(
+            "playbackStatusUpdate",
+            musicPlayerListener,
+          );
+        }
         musicPlayer.pause();
         musicPlayer.release();
-        set({ musicPlayer: null });
+        set({ musicPlayer: null, musicPlayerListener: null });
       } catch (error) {
         if (__DEV__) console.warn("Failed to cleanup music player:", error);
       }
     }
+
+    // Clean up sound pool
     if (soundPool) {
       soundPool.cleanup();
       set({ soundPool: null });
@@ -450,6 +546,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       currentTrackName,
       lastPlayedTracks,
       musicPlayer,
+      musicPlayerListener,
     } = get();
 
     if (!isMusicOn) return;
@@ -457,6 +554,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     // Clean up current player
     if (musicPlayer) {
       try {
+        // Remove listener before cleanup
+        if (musicPlayerListener) {
+          musicPlayer.removeListener(
+            "playbackStatusUpdate",
+            musicPlayerListener,
+          );
+        }
         musicPlayer.pause();
         musicPlayer.release();
       } catch (error) {
@@ -469,7 +573,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     // Keep track of last 2 played tracks to avoid immediate repeats
     const recentTracks = [...lastPlayedTracks, currentTrackName]
-      .filter(Boolean)
+      .filter((track): track is string => track !== null)
       .slice(-2);
 
     // Filter out recently played tracks if we have enough tracks
@@ -500,7 +604,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         "playbackStatusUpdate",
         (status) => {
           if (
-            status.playing === false &&
+            !status.playing &&
             status.currentTime > 0 &&
             status.currentTime >= status.duration - 0.1
           ) {
@@ -517,6 +621,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         musicPlayer: newMusicPlayer,
         currentTrackName: nextTrack,
         lastPlayedTracks: recentTracks,
+        musicPlayerListener: statusListener,
       });
 
       newMusicPlayer.play();
