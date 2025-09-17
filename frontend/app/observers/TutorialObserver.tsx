@@ -15,6 +15,10 @@ export class TutorialObserver implements Observer {
       const { setVisible } = useTutorialStore.getState();
       setVisible(false);
     });
+    this.handlers.set(`TutorialDismissed-mineBlock`, () => {
+      const { setVisible } = useTutorialStore.getState();
+      setVisible(false);
+    });
 
     // balanceExplanation step
     this.handlers.set(`MineDone-mineBlock`, () => {
@@ -33,7 +37,16 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-purchaseTransactions`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
     this.handlers.set(`TxAdded-addTransactionsToBlock`, () => {
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
+    });
+    this.handlers.set(`TutorialDismissed-addTransactionsToBlock`, () => {
       const { setVisible } = useTutorialStore.getState();
       // break in tutorial
       setVisible(false);
@@ -50,9 +63,17 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-finishMiningBlock`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
 
     // purchaseFeeUpgrade step
     this.handlers.set("SwitchPage-Store-checkStore", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-checkStore`, () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
@@ -82,7 +103,15 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-purchaseChainUpgrade`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
     this.handlers.set("SwitchStore-Automation-purchaseChainAutomation", () => {
+      const { setVisible } = useTutorialStore.getState();
+      setVisible(false);
+    });
+    this.handlers.set(`TutorialDismissed-purchaseChainAutomation`, () => {
       const { setVisible } = useTutorialStore.getState();
       setVisible(false);
     });
@@ -93,6 +122,11 @@ export class TutorialObserver implements Observer {
       advanceStep();
     });
     this.handlers.set("SwitchPage-Achievements-checkAchievements", () => {
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
+    });
+    this.handlers.set(`TutorialDismissed-checkAchievements`, () => {
       const { setVisible } = useTutorialStore.getState();
       // break in tutorial
       setVisible(false);
@@ -109,6 +143,11 @@ export class TutorialObserver implements Observer {
       // break in tutorial
       setVisible(false);
     });
+    this.handlers.set(`TutorialDismissed-dapps`, () => {
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
+    });
 
     // leaderboard step
     this.handlers.set("TxUpgradePurchased-3-dapps", () => {
@@ -119,9 +158,17 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-leaderboard`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
 
     // L2Upgrade step
     this.handlers.set("L2Purchased-leaderboard", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-L2Upgrade`, () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
@@ -131,15 +178,27 @@ export class TutorialObserver implements Observer {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-prover`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
 
     // dataAvailability step
     this.handlers.set("ProveDone-prover", () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
+    this.handlers.set(`TutorialDismissed-dataAvailability`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
 
     // l2Store step
     this.handlers.set("DaDone-dataAvailability", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-l2Store`, () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
@@ -151,6 +210,10 @@ export class TutorialObserver implements Observer {
     });
 
     this.handlers.set("SwitchStore-L2-l2StoreTab", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-l2StoreTab`, () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });

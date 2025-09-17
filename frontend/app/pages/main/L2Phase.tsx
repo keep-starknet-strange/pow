@@ -25,11 +25,9 @@ export const L2Phase: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<string>(
     txTabs[dappsUnlocked[1] ? 1 : 0],
   );
-  /*
   useEffect(() => {
     setActiveTab(dappsUnlocked[1] ? "dApps" : "Transactions");
   }, [dappsUnlocked]);
-  */
 
   return (
     <View

@@ -40,7 +40,13 @@ if [ -z "$NEW_CLASS_HASH" ]; then
   exit 1
 fi
 
-RPC_URL=https://starknet-sepolia.infura.io/v3/2L0kNQGRBEf4gYmySjgK0EnpRlY
+# RPC_URL is loaded from .env file
+if [ -z "$RPC_URL" ]; then
+  echo "Error: RPC_URL is not set."
+  echo "Please set RPC_URL in your .env.sep file or environment variables."
+  echo "Example: RPC_URL=https://starknet-sepolia.infura.io/v3/YOUR_API_KEY"
+  exit 1
+fi
 
 echo "Upgrading POW! contract on Sepolia..."
 echo "Contract address: $CONTRACT_ADDRESS"

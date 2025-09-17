@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Pressable, Text } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -31,11 +31,9 @@ export const L1Phase: React.FC = () => {
     txTabs[dappsUnlocked[0] ? 1 : 0],
   );
   const isDappsTabActive = useIsTutorialTargetActive("dappsTab" as TargetId);
-  /*
   useEffect(() => {
     setActiveTab(dappsUnlocked[0] ? "dApps" : "Transactions");
   }, [dappsUnlocked]);
-  */
   return (
     <View
       style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
