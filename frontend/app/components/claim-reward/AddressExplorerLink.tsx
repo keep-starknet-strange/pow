@@ -26,7 +26,9 @@ export const AddressExplorerLink: React.FC<Props> = ({
   const addr = (address || "").trim();
   const isValid = /^0x[a-fA-F0-9]{64}$/.test(addr);
   const explorerBase =
-    network === "SN_SEPOLIA" ? "https://sepolia.voyager.online" : "https://voyager.online";
+    network === "SN_SEPOLIA"
+      ? "https://sepolia.voyager.online"
+      : "https://voyager.online";
 
   return (
     <>
@@ -52,5 +54,3 @@ export const AddressExplorerLink: React.FC<Props> = ({
     </>
   );
 };
-
-

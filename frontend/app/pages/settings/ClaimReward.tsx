@@ -1,6 +1,16 @@
 import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, StyleSheet, Alert, SafeAreaView, ScrollView, Platform, Linking } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  Platform,
+  Linking,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
@@ -253,7 +263,10 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         <SectionTitle title="Wallet Address" width={width} />
         <View style={styles.section}>
           <View style={styles.card}>
-            <WalletButtonRow onPressReady={openReadyWallet} onPressBraavos={openBraavosWallet} />
+            <WalletButtonRow
+              onPressReady={openReadyWallet}
+              onPressBraavos={openBraavosWallet}
+            />
             <Text style={styles.hintInline}>
               Open a wallet above and paste an address to receive your STRK.
             </Text>
