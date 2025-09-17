@@ -1,30 +1,17 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef } from "react";
 
 /**
  * Hook for batching rapid state updates to improve performance
  * Useful for frequently clicked components like TxButton and useMiner
- *
- * @unused Currently not used but available for future performance optimizations
  */
 export const useBatchedUpdates = () => {
   const batchRef = useRef<{
     updates: Array<() => void>;
-    timeoutId: ReturnType<typeof setTimeout> | null;
+    timeoutId: NodeJS.Timeout | null;
   }>({
     updates: [],
     timeoutId: null,
   });
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (batchRef.current.timeoutId) {
-        clearTimeout(batchRef.current.timeoutId);
-        batchRef.current.timeoutId = null;
-      }
-      batchRef.current.updates = [];
-    };
-  }, []);
 
   const batchUpdate = useCallback((updateFn: () => void) => {
     batchRef.current.updates.push(updateFn);
@@ -60,4 +47,28 @@ export const useBatchedUpdates = () => {
   }, []);
 
   return { batchUpdate, flushUpdates };
+};
+
+/**
+ * Hook for debouncing rapid function calls
+ * Useful for reducing event notification spam
+ */
+export const useDebounce = (delay: number = 16) => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debounce = useCallback(
+    (fn: () => void) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        fn();
+        timeoutRef.current = null;
+      }, delay);
+    },
+    [delay],
+  );
+
+  return debounce;
 };
