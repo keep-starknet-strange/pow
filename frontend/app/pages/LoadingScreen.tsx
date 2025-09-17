@@ -93,7 +93,7 @@ export const LoadingScreenView: React.FC = memo(() => {
           {dots}
         </Text>
       </View>
-      <View 
+      <View
         style={{
           paddingTop: 16,
           paddingBottom: insets.bottom + 16,
