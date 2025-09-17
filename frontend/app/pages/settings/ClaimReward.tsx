@@ -1,61 +1,74 @@
-import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
-  Linking,
   StyleSheet,
-  Alert,
-  Modal,
-  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  Platform,
+  Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BasicButton from "../../components/buttons/Basic";
-import { useWalletConnect } from "../../hooks/useWalletConnect";
+import { SectionTitle } from "../../components/claim-reward/SectionTitle";
+import { ClaimRewardAction } from "../../components/claim-reward/ClaimRewardAction";
+import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { AddressExplorerLink } from "../../components/claim-reward/AddressExplorerLink";
+import { PageHeader } from "../../components/claim-reward/PageHeader";
+import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
+import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 
+// Decode common Starknet u256/BigNumberish shapes using starknet helpers
+function decodeU256ToBigInt(raw: any): bigint | null {
+  if (raw == null) return null;
+  try {
+    if (typeof raw === "object" && ("low" in raw || "high" in raw)) {
+      return uint256.uint256ToBN(raw as any);
+    }
+    // Fallback for non-object: use uint256.uint256ToBN if possible, else try BigInt
+    try {
+      return BigInt(raw);
+    } catch {
+      return null;
+    }
+  } catch (_e) {
+    return null;
+  }
+}
+
 type ClaimRewardProps = {
-  setSettingTab: (tab: "Main") => void;
+  onBack?: () => void;
 };
 
-export const ClaimRewardSection: React.FC = () => {
+export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
-  const { notify } = useEventManager();
-  const {
-    connectArgent,
-    account,
-    error: wcError,
-    disconnect,
-  } = useWalletConnect();
   const [accountInput, setAccountInput] = useState("");
-  const [debouncedInput, setDebouncedInput] = useState(accountInput);
-  const [localTxHash, setLocalTxHash] = useState<string | null>(null);
+  const debouncedInput = useDebouncedValue(accountInput, 500);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
-  const [rewardTitle, setRewardTitle] = useState<string>(
-    "🎉 You earned 10 STRK!",
-  );
-  const [walletError, setWalletError] = useState<string | null>(null);
-  const [busyText, setBusyText] = useState<string | null>(null);
+  const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
+  const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
+    useState<number>(0);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
-  const hideHint = localTxHash || claimed || txErrorMessage || walletError;
-  const rewardUnlocked = true;
+  const { width } = useCachedWindowDimensions();
+  const notify = useEventManager((state) => state.notify);
 
   const claimReward = async () => {
     const recipient = (debouncedInput || "").trim();
     if (!recipient) {
-      console.error("No recipient provided");
+      if (__DEV__) console.error("No recipient provided");
       return;
     }
     if (!powGameContractAddress) {
-      console.error("pow_game contract address not set");
+      if (__DEV__) console.error("pow_game contract address not set");
       return;
     }
     const call = {
@@ -64,13 +77,11 @@ export const ClaimRewardSection: React.FC = () => {
       calldata: [recipient] as string[],
     };
     setClaiming(true);
-    setBusyText("Submitting transaction…");
     setTxErrorMessage(null);
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) {
-        setLocalTxHash(hash);
         setClaimed(true);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
@@ -99,164 +110,134 @@ export const ClaimRewardSection: React.FC = () => {
       setClaimed(false);
     } finally {
       setClaiming(false);
-      setBusyText(null);
     }
   };
-
-  const handleConnectBraavos = async () => {
-    setWalletError(null);
-    setBusyText("Opening Braavos…");
-    try {
-      const candidates = ["braavos://", "https://braavos.app"];
-      let opened = false;
-      for (const url of candidates) {
-        const can = await Linking.canOpenURL(url).catch(() => false);
-        if (can) {
-          await Linking.openURL(url);
-          opened = true;
-          break;
-        }
-      }
-      if (!opened) {
-        Alert.alert(
-          "Braavos not found",
-          "Please install Braavos, then copy your address and paste it here.",
-        );
-      } else {
-        Alert.alert(
-          "Open Braavos",
-          "Copy your Starknet address in Braavos, then return and paste it here.",
-        );
-      }
-    } finally {
-      setBusyText(null);
-    }
-  };
-  const handleConnectArgent = () => {
-    setWalletError(null);
-    setBusyText("Waiting for wallet approval…");
-    (async () => {
-      try {
-        await connectArgent();
-      } finally {
-        setBusyText(null);
-      }
-    })();
-  };
-
-  useEffect(() => {
-    if (walletError) {
-      Alert.alert("Wallet Error", walletError);
-    }
-  }, [walletError]);
-
-  useEffect(() => {
-    if (wcError) setWalletError(wcError);
-  }, [wcError]);
-
-  useEffect(() => {
-    if (account && !accountInput) {
-      setAccountInput(account);
-    }
-  }, [account]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedInput(accountInput);
-    }, 500); // 500ms delay
-
-    return () => clearTimeout(timer);
-  }, [accountInput]);
 
   useEffect(() => {
     (async () => {
       const params = await getRewardParams?.();
       if (!params) return;
-      // Format u256 amount (assume low only for now)
-      let amountStr = "10";
-      const raw = params.rewardAmount as any;
-      if (raw?.low || raw?.high) {
-        const low = BigInt(raw.low || 0);
-        const high = BigInt(raw.high || 0);
-        const amount = (high << 128n) + low;
-        amountStr = amount.toString();
+      // Robustly decode u256 amount from various shapes
+      const raw = (params as any).rewardAmount;
+      const decoded = decodeU256ToBigInt(raw);
+      if (__DEV__) {
+        console.log(
+          "getRewardParams raw:",
+          params,
+          "decoded:",
+          decoded?.toString(),
+        );
       }
-      setRewardTitle(`You earned ${amountStr} STRK!`);
+      const amountStr = decoded != null ? decoded.toString() : "10";
+      setRewardAmountStr(amountStr);
+      if ((params as any).rewardPrestigeThreshold != null) {
+        setRewardPrestigeThreshold(
+          (params as any).rewardPrestigeThreshold as number,
+        );
+      }
     })();
   }, [getRewardParams]);
 
-  useEffect(() => {
-    // Load claimed state from AsyncStorage on component mount
-    const loadClaimedState = async () => {
-      try {
-        const claimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
-        if (claimedTxHash) {
-          setClaimed(true);
-          setLocalTxHash(claimedTxHash);
-        }
-      } catch (error) {
-        console.error("Error loading claimed state:", error);
+  const openReadyWallet = async () => {
+    const scheme = "ready://open";
+    try {
+      await Linking.openURL(scheme);
+      return;
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open READY wallet scheme");
       }
-    };
-    loadClaimedState();
-  }, []);
+    }
+    try {
+      if (Platform.OS === "ios") {
+        await Linking.openURL(
+          "https://apps.apple.com/us/app/ready-earn-on-bitcoin-usdc/id1358741926",
+        );
+      } else {
+        const pkg = "im.argent.contractwalletclien";
+        const market = `market://details?id=${pkg}`;
+        const web = `https://play.google.com/store/apps/details?id=${pkg}`;
+        await Linking.openURL(market).catch(() => Linking.openURL(web));
+      }
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open READY install link");
+      }
+    }
+  };
+  //
+  const openBraavosWallet = async () => {
+    const scheme = "braavos://openr";
+    try {
+      await Linking.openURL(scheme);
+      return;
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open BRAAVOS wallet scheme");
+      }
+    }
+    try {
+      if (Platform.OS === "ios") {
+        await Linking.openURL(
+          "https://apps.apple.com/us/app/braavos-wallet/id1636013523",
+        );
+      } else {
+        const pkg = "app.braavos.wallet";
+        const market = `market://details?id=${pkg}`;
+        const web = `https://play.google.com/store/apps/details?id=${pkg}`;
+        await Linking.openURL(market).catch(() => Linking.openURL(web));
+      }
+    } catch (_e) {
+      if (__DEV__) {
+        console.debug("Failed to open BRAAVOS install link");
+      }
+    }
+  };
 
   return (
-    <View style={[styles.screen, { paddingTop: Math.max(insets.top - 12, 0) }]}>
-      <View style={[styles.content, { marginBottom: insets.bottom + 220 }]}>
-        <Modal visible={!!busyText} transparent animationType="fade">
-          <View style={styles.loadingOverlay}>
-            <View style={styles.loadingBox}>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setBusyText(null)}
-              >
-                <Text style={styles.closeButtonText}>×</Text>
-              </TouchableOpacity>
-              <ActivityIndicator size="large" color="#ffffff" />
-              <Text style={styles.loadingText}>{busyText}</Text>
-            </View>
-          </View>
-        </Modal>
-        {!rewardUnlocked ? (
-          <Text style={styles.titleAlt}>Keep playing to Earn STRK!</Text>
-        ) : (
-          <>
-            <Text style={styles.title}>{rewardTitle}</Text>
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                onPress={handleConnectBraavos}
-                label="Connect Braavos"
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-                // disabled={connecting}
-              />
-            </View>
+    <SafeAreaView style={[styles.safe]}>
+      <PageHeader title="CLAIM REWARD" width={width} />
 
-            <View style={styles.buttonWrap}>
-              <BasicButton
-                onPress={handleConnectArgent}
-                label="Connect Argent"
-                style={styles.basicButton}
-                textStyle={styles.basicButtonText}
-                // disabled={connecting}
-              />
-            </View>
-
-            {account ? (
-              <Text style={styles.subtitle}>
-                Connected wallet: {account.slice(0, 6)}...{account.slice(-6)}
-              </Text>
-            ) : null}
-
-            <Text style={styles.subtitle}>
-              Paste your Starknet address to receive them.
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 12 }}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <Text style={styles.messageText}>
+              Congratulations for completing POW! and reaching Prestige{" "}
+              {rewardPrestigeThreshold}.
             </Text>
+            {claimed ? (
+              <Text style={styles.messageHighlight}>Reward claimed!</Text>
+            ) : (
+              <>
+                <Text style={styles.messageHighlight}>
+                  You are now eligible for {rewardAmountStr} STRK
+                </Text>
+                <Text style={styles.messageSub}>
+                  To claim this reward you’ll need a dedicated Starknet wallet.
+                </Text>
+              </>
+            )}
+          </View>
+        </View>
 
+        {/* Section 1: Wallet Address */}
+        <SectionTitle title="Wallet Address" width={width} />
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <WalletButtonRow
+              onPressReady={openReadyWallet}
+              onPressBraavos={openBraavosWallet}
+            />
+            <Text style={styles.hintInline}>
+              Open a wallet above and paste an address to receive your STRK.
+            </Text>
             <TextInput
               style={styles.input}
               placeholder="copy/paste your account address"
-              placeholderTextColor="#10111980"
+              placeholderTextColor="#bfbfc6"
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="off"
@@ -264,128 +245,84 @@ export const ClaimRewardSection: React.FC = () => {
               onChangeText={setAccountInput}
             />
 
-            {(() => {
-              const addr = (debouncedInput || "").trim();
-              return (
-                <View style={styles.linkSlot}>
-                  {addr ? (
-                    <TouchableOpacity
-                      style={styles.linkWrap}
-                      onPress={() => {
-                        const baseUrl =
-                          network === "SN_SEPOLIA"
-                            ? "https://sepolia.starkscan.co"
-                            : "https://starkscan.co";
-                        Linking.openURL(`${baseUrl}/contract/${addr}`);
-                      }}
-                    >
-                      <Text style={styles.linkText}>
-                        View address on StarkScan ({addr.slice(0, 6)}...
-                        {addr.slice(-6)})
-                      </Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-              );
-            })()}
+            <AddressExplorerLink
+              address={debouncedInput}
+              network={network}
+              styles={{
+                linkSlot: styles.linkSlot,
+                linkWrap: styles.linkWrap,
+                linkText: styles.linkText,
+                linkDisabled: styles.linkDisabled,
+                validationSlot: styles.validationSlot,
+                errorInline: styles.errorInline,
+              }}
+            />
+          </View>
+        </View>
 
-            {!claimed && (
-              <View style={styles.buttonWrap}>
-                <BasicButton
-                  label="Claim STRK"
-                  onPress={claimReward}
-                  style={styles.basicButton}
-                  textStyle={styles.basicButtonText}
-                  disabled={claiming || !debouncedInput.trim()}
-                />
-              </View>
-            )}
+        {(() => {
+          const isValidAddress = /^0x[a-fA-F0-9]{64}$/.test(
+            (debouncedInput || "").trim(),
+          );
+          const claimState = claimed
+            ? "claimed"
+            : claiming
+              ? "claiming"
+              : "idle";
+          const claimLabel =
+            claimState === "claimed"
+              ? "CLAIMED"
+              : claimState === "claiming"
+                ? `CLAIMING ${rewardAmountStr} STRK`
+                : `CLAIM ${rewardAmountStr} STRK`;
+          const claimDisabled = claimed || claiming || !isValidAddress;
+          const containerWidth = claimState === "claiming" ? 260 : 220;
 
-            <View style={styles.linksContainer}>
-              {localTxHash && (
-                <TouchableOpacity
-                  style={styles.linkWrap}
-                  onPress={() => {
-                    const hash = localTxHash as string;
-                    const baseUrl =
-                      network === "SN_SEPOLIA"
-                        ? "https://sepolia.starkscan.co"
-                        : "https://starkscan.co";
-                    Linking.openURL(`${baseUrl}/tx/${hash}`);
-                  }}
-                >
-                  <Text style={styles.linkText}>
-                    View transaction on StarkScan({localTxHash?.slice(0, 6)}...
-                    {localTxHash?.slice(-6)})
-                  </Text>
-                </TouchableOpacity>
-              )}
+          return (
+            <View
+              style={[
+                styles.bottomAction,
+                { marginBottom: insets.bottom + 64, width: containerWidth },
+              ]}
+            >
+              <ClaimRewardAction
+                action={claimReward}
+                label={claimLabel}
+                disabled={claimDisabled}
+              />
             </View>
+          );
+        })()}
+      </ScrollView>
 
-            {localTxHash && (
-              <Text style={styles.successText}>Reward claimed! 🎊</Text>
-            )}
-            {claimed && (
-              <Text style={styles.successText}>Reward claimed! 🎊</Text>
-            )}
-            {txErrorMessage && (
-              <Text style={styles.errorText}>{txErrorMessage}</Text>
-            )}
-            {walletError && (
-              <Text style={styles.errorText}>Error: {walletError}</Text>
-            )}
-            {hideHint ? null : (
-              <Text style={styles.hintText}>
-                If you use Braavos, open the app, copy your address, and paste
-                it above.
-              </Text>
-            )}
-          </>
-        )}
+      <View
+        style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
+      >
+        <ClaimRewardAction
+          action={() => {
+            if (onBack) onBack();
+          }}
+          label="BACK"
+          disabled={false}
+        />
       </View>
-    </View>
+
+      {txErrorMessage && (
+        <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
+          <Text style={styles.errorText}>{txErrorMessage}</Text>
+        </View>
+      )}
+
+      <LoadingModal visible={claiming} text="Claiming…" />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
+  safe: {
     flex: 1,
-  },
-  content: {
-    alignItems: "center",
-    paddingHorizontal: 24,
-    marginBottom: 80,
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "700",
-    color: "#101119",
-    marginBottom: 8,
-    fontFamily: "Xerxes",
-  },
-  titleAlt: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#101119",
-    marginBottom: 8,
-    fontFamily: "Xerxes",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#e7e7e7",
-    textAlign: "center",
-    marginBottom: 12,
-    fontFamily: "Xerxes",
-  },
-  buttonWrap: {
-    marginVertical: 10,
-  },
-  basicButton: {
-    alignSelf: "center",
-  },
-  basicButtonText: {
-    fontSize: 20,
-    fontFamily: "Xerxes",
+    position: "relative",
+    backgroundColor: "#000000",
   },
   input: {
     width: 300,
@@ -397,38 +334,66 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 18,
-    color: "#101119",
+    color: "#fff7ff",
     borderWidth: 2,
-    borderColor: "#101119",
-    backgroundColor: "#10111910",
-    fontFamily: "Xerxes",
+    borderColor: "#39274E",
+    backgroundColor: "#0f0f14",
+    fontFamily: "Pixels",
+  },
+  section: { marginBottom: 10 },
+  card: {
+    backgroundColor: "rgba(16,17,25,0.75)",
+    borderWidth: 1,
+    borderColor: "#39274E",
+    borderRadius: 6,
+    padding: 12,
+  },
+  messageText: {
+    fontFamily: "Pixels",
+    fontSize: 18,
+    color: "#e7e7e7",
+    textAlign: "center",
+  },
+  messageHighlight: {
+    fontFamily: "Pixels",
+    fontSize: 18,
+    textAlign: "center",
+    color: "#22c55e",
+  },
+  messageSub: {
+    fontFamily: "Pixels",
+    fontSize: 16,
+    color: "#e7e7e7",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  hintInline: {
+    fontFamily: "Pixels",
+    fontSize: 16,
+    color: "#e7e7e7",
+    textAlign: "center",
+    marginTop: 8,
   },
   linkWrap: { paddingVertical: 6 },
   linkText: {
-    color: "#101119", // black, readable on green background
+    color: "#fff7ff",
     textDecorationLine: "underline",
     textAlign: "center",
     marginVertical: 4,
-    fontFamily: "Xerxes",
+    fontFamily: "Pixels",
   },
-  linkDisabled: { color: "#9ca3af" },
-  linksContainer: {
-    marginTop: 8,
-    marginBottom: 16,
-    width: "100%",
-    alignItems: "center",
-  },
+  linkDisabled: { color: "#9ca3af", textDecorationLine: "none" },
   linkSlot: {
     height: 56,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
-  successText: {
-    color: "#22c55e",
-    marginTop: 8,
-    textAlign: "center",
-    fontFamily: "Xerxes",
+  validationSlot: {
+    height: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   errorText: {
     color: "#f87171",
@@ -436,51 +401,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Xerxes",
   },
-  loadingOverlay: {
-    flex: 1,
-    backgroundColor: "#00000080",
-    justifyContent: "center",
-    alignItems: "center",
+  errorInline: {
+    color: "#f87171",
+    textAlign: "center",
+    fontFamily: "Xerxes",
   },
-  loadingBox: {
-    backgroundColor: "#101119",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    maxWidth: 280,
-    position: "relative",
+  bottomAction: {
+    marginBottom: 16,
+    alignSelf: "center",
+    width: 220,
   },
-  closeButton: {
+  backAction: {
     position: "absolute",
-    top: 8,
+    bottom: 0,
+    alignSelf: "center",
+    width: 220,
+    // marginBottom: 8,
+  },
+  bannerOverlay: {
+    position: "absolute",
+    left: 12,
     right: 12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#ffffff20",
     alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
-  },
-  closeButtonText: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "bold",
-    lineHeight: 20,
-  },
-  loadingText: {
-    color: "#ffffff",
-    marginTop: 10,
-    fontSize: 16,
-    textAlign: "center",
-    fontFamily: "Xerxes",
-  },
-  hintText: {
-    fontSize: 14,
-    color: "#e7e7e7",
-    textAlign: "center",
-    marginTop: 12,
-    fontFamily: "Xerxes",
+    pointerEvents: "none",
   },
 });
