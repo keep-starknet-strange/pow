@@ -2,7 +2,7 @@ const { withNativeWind } = require("nativewind/metro");
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const {
   wrapWithReanimatedMetroConfig,
-} = require('react-native-reanimated/metro-config');
+} = require("react-native-reanimated/metro-config");
 
 let config = getSentryExpoConfig(__dirname);
 config.resolver.unstable_conditionNames = [
