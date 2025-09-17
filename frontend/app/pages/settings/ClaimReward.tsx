@@ -10,7 +10,7 @@ import {
   Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { uint256 } from "starknet";
+import { uint256, toBigInt } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,41 +24,14 @@ import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
 import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 
-// Decode various shapes of a Starknet u256 into a bigint
+// Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
   if (raw == null) return null;
   try {
-    // Shape: { low, high }
     if (typeof raw === "object" && ("low" in raw || "high" in raw)) {
-      const lowRaw = (raw as any).low ?? 0;
-      const highRaw = (raw as any).high ?? 0;
-      const bn = uint256.uint256ToBN({
-        low:
-          typeof lowRaw === "string" ? lowRaw : (lowRaw?.toString?.() ?? "0"),
-        high:
-          typeof highRaw === "string"
-            ? highRaw
-            : (highRaw?.toString?.() ?? "0"),
-      } as any);
-      return BigInt(bn.toString());
+      return uint256.uint256ToBN(raw as any);
     }
-
-    // BN-like or BigNumberish with toString()
-    if (typeof raw === "object" && typeof raw.toString === "function") {
-      return BigInt(raw.toString());
-    }
-
-    // Hex or decimal string
-    if (typeof raw === "string") {
-      return BigInt(raw);
-    }
-
-    // Number or bigint
-    if (typeof raw === "number" || typeof raw === "bigint") {
-      return BigInt(raw);
-    }
-
-    return null;
+    return toBigInt(raw as any);
   } catch (_e) {
     return null;
   }
