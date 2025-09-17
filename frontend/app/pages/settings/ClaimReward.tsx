@@ -1,19 +1,6 @@
 import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Linking,
-  StyleSheet,
-  Alert,
-  Modal,
-  ActivityIndicator,
-  SafeAreaView,
-  ScrollView,
-  Platform,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, SafeAreaView, ScrollView, Platform, Linking } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
@@ -22,7 +9,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SectionTitle } from "../../components/claim-reward/SectionTitle";
 import { ClaimRewardAction } from "../../components/claim-reward/ClaimRewardAction";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { AddressExplorerLink } from "../../components/claim-reward/AddressExplorerLink";
 import { PageHeader } from "../../components/claim-reward/PageHeader";
+import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
+import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 
 // Decode various shapes of a Starknet u256 into a bigint
@@ -74,7 +65,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
-  const [debouncedInput, setDebouncedInput] = useState(accountInput);
+  const debouncedInput = useDebouncedValue(accountInput, 500);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
@@ -147,14 +138,6 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       Alert.alert("Wallet Error", walletError);
     }
   }, [walletError]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedInput(accountInput);
-    }, 500); // 500ms delay
-
-    return () => clearTimeout(timer);
-  }, [accountInput]);
 
   useEffect(() => {
     (async () => {
@@ -270,18 +253,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         <SectionTitle title="Wallet Address" width={width} />
         <View style={styles.section}>
           <View style={styles.card}>
-            <View style={styles.buttonRow}>
-              <ClaimRewardAction
-                action={openReadyWallet}
-                label="READY"
-                style={styles.equalButton}
-              />
-              <ClaimRewardAction
-                action={openBraavosWallet}
-                label="BRAAVOS"
-                style={styles.equalButton}
-              />
-            </View>
+            <WalletButtonRow onPressReady={openReadyWallet} onPressBraavos={openBraavosWallet} />
             <Text style={styles.hintInline}>
               Open a wallet above and paste an address to receive your STRK.
             </Text>
@@ -296,39 +268,18 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
               onChangeText={setAccountInput}
             />
 
-            {(() => {
-              const addr = (debouncedInput || "").trim();
-              const enabled = /^0x[a-fA-F0-9]{64}$/.test(addr);
-              const explorerBase =
-                network === "SN_SEPOLIA"
-                  ? "https://sepolia.voyager.online"
-                  : "https://voyager.online";
-              return (
-                <>
-                  <View style={styles.linkSlot}>
-                    <TouchableOpacity
-                      style={styles.linkWrap}
-                      disabled={!enabled}
-                      onPress={() => {
-                        if (!enabled) return;
-                        Linking.openURL(`${explorerBase}/contract/${addr}`);
-                      }}
-                    >
-                      <Text
-                        style={[styles.linkText, !enabled && styles.linkDisabled]}
-                      >
-                        View address on Voyager
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.validationSlot}>
-                    {addr.length > 0 && !enabled ? (
-                      <Text style={styles.errorInline}>Invalid address</Text>
-                    ) : null}
-                  </View>
-                </>
-              );
-            })()}
+            <AddressExplorerLink
+              address={debouncedInput}
+              network={network}
+              styles={{
+                linkSlot: styles.linkSlot,
+                linkWrap: styles.linkWrap,
+                linkText: styles.linkText,
+                linkDisabled: styles.linkDisabled,
+                validationSlot: styles.validationSlot,
+                errorInline: styles.errorInline,
+              }}
+            />
           </View>
         </View>
 
@@ -390,16 +341,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         </View>
       )}
 
-      {claiming && (
-        <Modal transparent visible animationType="fade">
-          <View style={styles.loadingOverlay}>
-            <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color="#ffffff" />
-              <Text style={styles.loadingText}>{busyText || "Claiming…"}</Text>
-            </View>
-          </View>
-        </Modal>
-      )}
+      <LoadingModal visible={claiming} text={busyText || "Claiming…"} />
     </SafeAreaView>
   );
 };
