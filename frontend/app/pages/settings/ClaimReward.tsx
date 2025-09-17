@@ -304,22 +304,29 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
                   ? "https://sepolia.voyager.online"
                   : "https://voyager.online";
               return (
-                <View style={styles.linkSlot}>
-                  <TouchableOpacity
-                    style={styles.linkWrap}
-                    disabled={!enabled}
-                    onPress={() => {
-                      if (!enabled) return;
-                      Linking.openURL(`${explorerBase}/contract/${addr}`);
-                    }}
-                  >
-                    <Text
-                      style={[styles.linkText, !enabled && styles.linkDisabled]}
+                <>
+                  <View style={styles.linkSlot}>
+                    <TouchableOpacity
+                      style={styles.linkWrap}
+                      disabled={!enabled}
+                      onPress={() => {
+                        if (!enabled) return;
+                        Linking.openURL(`${explorerBase}/contract/${addr}`);
+                      }}
                     >
-                      View address on Voyager
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                      <Text
+                        style={[styles.linkText, !enabled && styles.linkDisabled]}
+                      >
+                        View address on Voyager
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.validationSlot}>
+                    {addr.length > 0 && !enabled ? (
+                      <Text style={styles.errorInline}>Invalid address</Text>
+                    ) : null}
+                  </View>
+                </>
               );
             })()}
           </View>
@@ -521,6 +528,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
+  validationSlot: {
+    height: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
   successText: {
     color: "#22c55e",
     marginTop: 8,
@@ -530,6 +543,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#f87171",
     marginTop: 8,
+    textAlign: "center",
+    fontFamily: "Xerxes",
+  },
+  errorInline: {
+    color: "#f87171",
     textAlign: "center",
     fontFamily: "Xerxes",
   },
