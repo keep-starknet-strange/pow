@@ -10,7 +10,7 @@ import {
   Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { uint256, toBigInt } from "starknet";
+import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -31,7 +31,12 @@ function decodeU256ToBigInt(raw: any): bigint | null {
     if (typeof raw === "object" && ("low" in raw || "high" in raw)) {
       return uint256.uint256ToBN(raw as any);
     }
-    return toBigInt(raw as any);
+    // Fallback for non-object: use uint256.uint256ToBN if possible, else try BigInt
+    try {
+      return BigInt(raw);
+    } catch {
+      return null;
+    }
   } catch (_e) {
     return null;
   }
