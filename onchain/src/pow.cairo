@@ -311,7 +311,6 @@ mod PowGame {
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
             let recipient_received = self.received_reward.read(recipient);
-            assert!(!recipient_received, "Recipient already received reward");
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
             assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");

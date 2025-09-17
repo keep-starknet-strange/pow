@@ -1,6 +1,4 @@
-import "react-native-gesture-handler";
 import { Stack } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Sentry from "@sentry/react-native";
 
 // Only initialize Sentry in production builds
