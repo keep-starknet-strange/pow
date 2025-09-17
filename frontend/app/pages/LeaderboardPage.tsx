@@ -47,7 +47,8 @@ export const LeaderboardPage: React.FC = () => {
   const { getImage } = useImages();
   const { getAccounts } = useFocEngine();
   const { width, height } = useCachedWindowDimensions();
-  const { powGameContractAddress, getUserPrestiges } = usePowContractConnector();
+  const { powGameContractAddress, getUserPrestiges } =
+    usePowContractConnector();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const leaderboardMock = [
@@ -197,7 +198,10 @@ export const LeaderboardPage: React.FC = () => {
           return {
             address: item.user,
             balance: item.balance,
-            prestige: prestiges && prestiges[index] !== undefined ? prestiges[index] : 0,
+            prestige:
+              prestiges && prestiges[index] !== undefined
+                ? prestiges[index]
+                : 0,
             nouns:
               account?.account.metadata && account.account.metadata.length === 4
                 ? createNounsAttributes(
@@ -224,7 +228,13 @@ export const LeaderboardPage: React.FC = () => {
     };
 
     getLeaderboard();
-  }, [STARKNET_ENABLED, powGameContractAddress, getAccounts, getUserPrestiges, isFocused]);
+  }, [
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    getAccounts,
+    getUserPrestiges,
+    isFocused,
+  ]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused

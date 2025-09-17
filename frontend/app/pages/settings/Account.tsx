@@ -1,5 +1,13 @@
 import React, { memo, useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Share, TextInput, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Share,
+  TextInput,
+  Pressable,
+} from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import BasicButton from "../../components/buttons/Basic";
@@ -38,8 +46,13 @@ const isValidPrivateKey = (key: string): boolean => {
 };
 
 export const AccountSection: React.FC = memo(() => {
-  const { account, getPrivateKey, getAvailableKeys, generateAccountAddress, storeKeyAndConnect } =
-    useStarknetConnector();
+  const {
+    account,
+    getPrivateKey,
+    getAvailableKeys,
+    generateAccountAddress,
+    storeKeyAndConnect,
+  } = useStarknetConnector();
   const { user, getAccount } = useFocEngine();
   const { currentPrestige } = useUpgrades();
   const { getImage } = useImages();
@@ -129,8 +142,10 @@ export const AccountSection: React.FC = memo(() => {
       return;
     }
 
-    const cleanKey = restorePrivateKey.startsWith("0x") ? restorePrivateKey : `0x${restorePrivateKey}`;
-    
+    const cleanKey = restorePrivateKey.startsWith("0x")
+      ? restorePrivateKey
+      : `0x${restorePrivateKey}`;
+
     if (!isValidPrivateKey(cleanKey)) {
       setRestoreError("Invalid private key format. Must be 64 hex characters.");
       return;
@@ -145,7 +160,9 @@ export const AccountSection: React.FC = memo(() => {
       await loadAccountData();
     } catch (error) {
       console.error("Error restoring account:", error);
-      setRestoreError("Failed to restore account. Please check your private key.");
+      setRestoreError(
+        "Failed to restore account. Please check your private key.",
+      );
     }
   };
 
@@ -323,12 +340,14 @@ export const AccountSection: React.FC = memo(() => {
                         }}
                       />
                     </Canvas>
-                    <Text className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
-                          style={{ lineHeight: 40 }}>
+                    <Text
+                      className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
+                      style={{ lineHeight: 40 }}
+                    >
                       Restore
                     </Text>
                   </Pressable>
-                  
+
                   {/* Cancel Button */}
                   <Pressable
                     onPress={() => {
@@ -352,14 +371,17 @@ export const AccountSection: React.FC = memo(() => {
                         }}
                       />
                     </Canvas>
-                    <Text className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
-                          style={{ lineHeight: 40 }}>
+                    <Text
+                      className="absolute inset-0 text-white font-Teatime text-[24px] text-center"
+                      style={{ lineHeight: 40 }}
+                    >
                       Cancel
                     </Text>
                   </Pressable>
                 </View>
                 <Text className="text-[#fff7f7] text-[12px] font-Pixels mt-4 text-center">
-                  Using the power of Starknet, you can securely restore your accounts state. Your account is truly yours. Forever.
+                  Using the power of Starknet, you can securely restore your
+                  accounts state. Your account is truly yours. Forever.
                 </Text>
               </View>
             ) : (
@@ -372,7 +394,8 @@ export const AccountSection: React.FC = memo(() => {
                   </Text>
                   <TouchableOpacity
                     onPress={() => {
-                      const addressToShare = account?.address || availableAccount;
+                      const addressToShare =
+                        account?.address || availableAccount;
                       if (addressToShare) {
                         shareOrCopy(addressToShare, "Account address");
                       }
@@ -414,10 +437,16 @@ export const AccountSection: React.FC = memo(() => {
                         className="flex-row items-center justify-between"
                       >
                         <Text className="text-white text-[14px] font-Pixels flex-1">
-                          {privateKey ? formatAddress(privateKey) : "Not available"}
+                          {privateKey
+                            ? formatAddress(privateKey)
+                            : "Not available"}
                         </Text>
                         {privateKey && (
-                          <Ionicons name="share-outline" size={20} color="white" />
+                          <Ionicons
+                            name="share-outline"
+                            size={20}
+                            color="white"
+                          />
                         )}
                       </TouchableOpacity>
                     ) : (
@@ -431,7 +460,9 @@ export const AccountSection: React.FC = memo(() => {
                       className="flex-row items-center justify-center p-2 rounded"
                     >
                       <Ionicons
-                        name={showPrivateKey ? "eye-off-outline" : "eye-outline"}
+                        name={
+                          showPrivateKey ? "eye-off-outline" : "eye-outline"
+                        }
                         size={20}
                         color="white"
                       />
@@ -452,10 +483,7 @@ export const AccountSection: React.FC = memo(() => {
         {/* Restore Button - only show when no account is found and not currently restoring */}
         {!account?.address && !availableAccount && !isRestoring && (
           <View className="mt-6 items-center">
-            <BasicButton
-              label="Restore"
-              onPress={() => setIsRestoring(true)}
-            />
+            <BasicButton label="Restore" onPress={() => setIsRestoring(true)} />
           </View>
         )}
       </ScrollView>
