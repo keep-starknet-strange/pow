@@ -1,7 +1,12 @@
 const { withNativeWind } = require("nativewind/metro");
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
+const {
+  wrapWithReanimatedMetroConfig,
+} = require("react-native-reanimated/metro-config");
 
-const config = getSentryExpoConfig(__dirname);
+let config = getSentryExpoConfig(__dirname, {
+  annotateReactComponents: true,
+});
 config.resolver.unstable_conditionNames = [
   "browser",
   "require",
@@ -12,4 +17,5 @@ config.resolver.extraNodeModules = {
   stream: require.resolve("readable-stream"),
 };
 
-module.exports = withNativeWind(config, { input: "./app/global.css" });
+config = withNativeWind(config, { input: "./app/global.css" });
+module.exports = wrapWithReanimatedMetroConfig(config);

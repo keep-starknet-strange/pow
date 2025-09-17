@@ -202,7 +202,7 @@ interface SoundState {
   soundPool: SoundPool | null;
   isInitialized: boolean;
   currentTrackName: string | null;
-  lastPlayedTracks: string[];
+  lastPlayedTracks: (string | null)[];
   musicPlayerListener: any;
 
   toggleSound: () => void;
@@ -456,7 +456,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
         newMusicPlayer.play();
       } else {
-        musicPlayer.play();
+        get().playNextTrack();
       }
     } catch (error) {
       if (__DEV__) console.error("Failed to play music:", error);

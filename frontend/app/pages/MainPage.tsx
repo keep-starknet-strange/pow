@@ -5,6 +5,7 @@ import { L1Phase } from "./main/L1Phase";
 import { L2Phase } from "./main/L2Phase";
 import { MainBackground } from "../components/MainBackground";
 import { L1L2Switch } from "../components/L1L2Switch";
+import { ClaimRewardModal } from "../components/ClaimRewardModal";
 
 const MainPageComponent: React.FC = () => {
   const isL2Unlocked = useL2Store((state) => state.isL2Unlocked);
@@ -31,6 +32,7 @@ const MainPageComponent: React.FC = () => {
         />
       )}
       {currentView === "L2" ? <L2Phase /> : <L1Phase />}
+      <ClaimRewardModal />
     </View>
   );
 };
