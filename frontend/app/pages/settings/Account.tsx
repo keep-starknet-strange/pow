@@ -25,6 +25,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useEventManager } from "../../stores/useEventManager";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
+import { useTutorialStore } from "../../stores/useTutorialStore";
 
 const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -156,6 +157,9 @@ export const AccountSection: React.FC = memo(() => {
       await storeKeyAndConnect(cleanKey, "pow_game");
       setIsRestoring(false);
       setRestorePrivateKey("");
+      // Mark tutorial as complete since restoring old account
+      const { completeTutorial } = useTutorialStore.getState();
+      completeTutorial();
       // Reload account data to show the restored account
       await loadAccountData();
     } catch (error) {

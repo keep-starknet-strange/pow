@@ -34,6 +34,7 @@ interface TutorialState {
   resetTutorial: () => void;
   initializeTutorial: () => Promise<void>;
   saveTutorialProgress: () => Promise<void>;
+  completeTutorial: () => void;
 }
 
 export const useTutorialStore = create<TutorialState>((set, get) => ({
@@ -174,6 +175,22 @@ export const useTutorialStore = create<TutorialState>((set, get) => ({
     ]).catch((error) => {
       if (__DEV__) console.error("Failed to clear tutorial progress:", error);
     });
+  },
+
+  completeTutorial: () => {
+    const keys = Object.keys(tutorialConfig) as TutorialStep[];
+    const lastIndex = keys.length - 1;
+    const lastStep = keys[lastIndex];
+
+    set({
+      isTutorialActive: false,
+      step: lastStep,
+      stepIndex: lastIndex,
+      visible: false,
+    });
+
+    // Save the completed state
+    get().saveTutorialProgress();
   },
 }));
 

@@ -109,9 +109,7 @@ const imagePaths = {
   txIconGalaxia: require(
     `${assetsPath}/transactions/icons/icon_galaxia_lg.webp`,
   ),
-  txIconStark: require(
-    `${assetsPath}/transactions/icons/icon_stark_lg.webp`,
-  ),
+  txIconStark: require(`${assetsPath}/transactions/icons/icon_stark_lg.webp`),
 
   // Transaction Images - Nameplates
   txNameplateBlue: require(
