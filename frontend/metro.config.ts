@@ -4,7 +4,9 @@ const {
   wrapWithReanimatedMetroConfig,
 } = require("react-native-reanimated/metro-config");
 
-let config = getSentryExpoConfig(__dirname);
+let config = getSentryExpoConfig(__dirname, {
+  annotateReactComponents: true,
+});
 config.resolver.unstable_conditionNames = [
   "browser",
   "require",
