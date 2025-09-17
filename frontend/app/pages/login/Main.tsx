@@ -68,9 +68,10 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       </Animated.View>
       <View
         style={{
-          paddingBottom: insets.bottom,
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 16,
         }}
-        className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]"
+        className="absolute bottom-0 w-full px-8 bg-[#10111A]"
       >
         <Animated.View
           entering={FadeInDown}

@@ -16,6 +16,7 @@ import { useSoundStore } from "../stores/useSoundStore";
 import { useStarknetConnector } from "../context/StarknetConnector";
 import { useFocEngine } from "../context/FocEngineConnector";
 import Constants from "expo-constants";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TipTextDisplayProps {
   tipText: string;
@@ -39,6 +40,7 @@ const TipTextDisplay: React.FC<TipTextDisplayProps> = memo(({ tipText }) => {
 });
 
 export const LoadingScreenView: React.FC = memo(() => {
+  const insets = useSafeAreaInsets();
   const version = Constants.expoConfig?.version || "0.0.1";
   const allTextsRef = useRef([
     ...loadingConfig.tips,
@@ -91,7 +93,13 @@ export const LoadingScreenView: React.FC = memo(() => {
           {dots}
         </Text>
       </View>
-      <View className="absolute bottom-0 w-full px-8 py-4 pb-6 bg-[#10111A]">
+      <View 
+        style={{
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 16,
+        }}
+        className="absolute bottom-0 w-full px-8 bg-[#10111A]"
+      >
         <Animated.View
           entering={FadeInDown}
           className="flex flex-row items-center justify-between w-full"
