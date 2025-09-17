@@ -109,8 +109,8 @@ const imagePaths = {
   txIconGalaxia: require(
     `${assetsPath}/transactions/icons/icon_galaxia_lg.webp`,
   ),
-  txIconJourney: require(
-    `${assetsPath}/transactions/icons/icon_journey_lg.webp`,
+  txIconStark: require(
+    `${assetsPath}/transactions/icons/icon_stark_lg.webp`,
   ),
 
   // Transaction Images - Nameplates
@@ -169,7 +169,7 @@ const imagePaths = {
   blockTxIcon42inch: require(`${assetsPath}/block/icons/icon_42inch_sm.webp`),
   blockTxIconLendme: require(`${assetsPath}/block/icons/icon_lendme_sm.webp`),
   blockTxIconGalaxia: require(`${assetsPath}/block/icons/icon_galaxia_sm.webp`),
-  blockTxIconJourney: require(`${assetsPath}/block/icons/icon_journey_sm.webp`),
+  blockTxIconStark: require(`${assetsPath}/block/icons/icon_stark_sm.webp`),
   blockGrid: require(`${assetsPath}/block/blockchain_grid.webp`),
   blockGridMin: require(`${assetsPath}/block/blockchain_grid_inactive.webp`),
   blockConnector: require(
@@ -517,7 +517,7 @@ export const useImagePreloader = () => {
     txIcon42inch: useImage(imagePaths.txIcon42inch),
     txIconLendme: useImage(imagePaths.txIconLendme),
     txIconGalaxia: useImage(imagePaths.txIconGalaxia),
-    txIconJourney: useImage(imagePaths.txIconJourney),
+    txIconStark: useImage(imagePaths.txIconStark),
     txNameplateBlue: useImage(imagePaths.txNameplateBlue),
     txNameplateGreen: useImage(imagePaths.txNameplateGreen),
     txNameplatePink: useImage(imagePaths.txNameplatePink),
@@ -549,7 +549,7 @@ export const useImagePreloader = () => {
     blockTxIcon42inch: useImage(imagePaths.blockTxIcon42inch),
     blockTxIconLendme: useImage(imagePaths.blockTxIconLendme),
     blockTxIconGalaxia: useImage(imagePaths.blockTxIconGalaxia),
-    blockTxIconJourney: useImage(imagePaths.blockTxIconJourney),
+    blockTxIconStark: useImage(imagePaths.blockTxIconStark),
     blockGrid: useImage(imagePaths.blockGrid),
     blockGridMin: useImage(imagePaths.blockGridMin),
     blockConnector: useImage(imagePaths.blockConnector),
@@ -750,7 +750,7 @@ export const useImagePreloader = () => {
         "tx.icon.42inch": images.txIcon42inch,
         "tx.icon.lendme": images.txIconLendme,
         "tx.icon.galaxia": images.txIconGalaxia,
-        "tx.icon.journey": images.txIconJourney,
+        "tx.icon.stark": images.txIconStark,
         "tx.nameplate.blue": images.txNameplateBlue,
         "tx.nameplate.green": images.txNameplateGreen,
         "tx.nameplate.pink": images.txNameplatePink,
@@ -782,7 +782,7 @@ export const useImagePreloader = () => {
         "block.icon.42inch": images.blockTxIcon42inch,
         "block.icon.lendme": images.blockTxIconLendme,
         "block.icon.galaxia": images.blockTxIconGalaxia,
-        "block.icon.journey": images.blockTxIconJourney,
+        "block.icon.stark": images.blockTxIconStark,
         "block.grid": images.blockGrid,
         "block.grid.min": images.blockGridMin,
         "block.connector": images.blockConnector,
