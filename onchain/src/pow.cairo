@@ -136,6 +136,13 @@ mod PowGame {
         recipient: ContractAddress,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct DoubleClaim {
+        #[key]
+        user: ContractAddress,
+        recipient: ContractAddress,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
@@ -161,6 +168,7 @@ mod PowGame {
         #[flat]
         PausableEvent: PausableComponent::Event,
         CheatCodeUsed: CheatCodeUsed,
+        DoubleClaim: DoubleClaim,
     }
 
     #[constructor]
@@ -310,14 +318,17 @@ mod PowGame {
 
             self.reward_claimed.write(caller, true);
             self.received_reward.write(recipient, true);
+            if !recipient_received {
+                let success: bool = IERC20Dispatcher {
+                    contract_address: self.reward_token_address.read(),
+                }
+                    .transfer(recipient, self.reward_amount.read());
 
-            let success: bool = IERC20Dispatcher {
-                contract_address: self.reward_token_address.read(),
+                assert!(success, "Reward transfer failed");
+                self.emit(RewardClaimed { user: caller, recipient });
+            } else {
+                self.emit(DoubleClaim { user: caller, recipient });
             }
-                .transfer(recipient, self.reward_amount.read());
-
-            assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed { user: caller, recipient });
         }
 
         fn host_give_reward(
