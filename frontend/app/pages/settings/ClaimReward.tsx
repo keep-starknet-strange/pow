@@ -1,11 +1,9 @@
-import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
-  Alert,
   SafeAreaView,
   ScrollView,
   Platform,
@@ -76,14 +74,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 500);
-  const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
   const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
     useState<number>(0);
-  const [walletError, setWalletError] = useState<string | null>(null);
-  const [busyText, setBusyText] = useState<string | null>(null);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
   const notify = useEventManager((state) => state.notify);
@@ -104,13 +99,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       calldata: [recipient] as string[],
     };
     setClaiming(true);
-    setBusyText("Claiming…");
     setTxErrorMessage(null);
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) {
-        setLocalTxHash(hash);
         setClaimed(true);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
@@ -139,15 +132,8 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       setClaimed(false);
     } finally {
       setClaiming(false);
-      setBusyText(null);
     }
   };
-
-  useEffect(() => {
-    if (walletError) {
-      Alert.alert("Wallet Error", walletError);
-    }
-  }, [walletError]);
 
   useEffect(() => {
     (async () => {
@@ -348,13 +334,8 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           <Text style={styles.errorText}>{txErrorMessage}</Text>
         </View>
       )}
-      {walletError && (
-        <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
-          <Text style={styles.errorText}>Error: {walletError}</Text>
-        </View>
-      )}
-
-      <LoadingModal visible={claiming} text={busyText || "Claiming…"} />
+ 
+      <LoadingModal visible={claiming} text="Claiming…" />
     </SafeAreaView>
   );
 };
@@ -364,45 +345,6 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
     backgroundColor: "#000000",
-  },
-  screen: {
-    flex: 1,
-  },
-  content: {
-    alignItems: "center",
-    paddingHorizontal: 24,
-    marginBottom: 80,
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "700",
-    color: "#101119",
-    marginBottom: 8,
-    fontFamily: "Xerxes",
-  },
-  titleAlt: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#101119",
-    marginBottom: 8,
-    fontFamily: "Xerxes",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#e7e7e7",
-    textAlign: "center",
-    marginBottom: 12,
-    fontFamily: "Xerxes",
-  },
-  buttonWrap: {
-    marginVertical: 10,
-  },
-  basicButton: {
-    alignSelf: "center",
-  },
-  basicButtonText: {
-    fontSize: 20,
-    fontFamily: "Xerxes",
   },
   input: {
     width: 300,
@@ -447,14 +389,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 4,
   },
-  buttonRow: {
-    flexDirection: "row",
-    columnGap: 16,
-    marginBottom: 12,
-  },
-  equalButton: {
-    flex: 1,
-  },
   hintInline: {
     fontFamily: "Pixels",
     fontSize: 16,
@@ -471,12 +405,6 @@ const styles = StyleSheet.create({
     fontFamily: "Pixels",
   },
   linkDisabled: { color: "#9ca3af", textDecorationLine: "none" },
-  linksContainer: {
-    marginTop: 8,
-    marginBottom: 16,
-    width: "100%",
-    alignItems: "center",
-  },
   linkSlot: {
     height: 56,
     justifyContent: "center",
@@ -489,12 +417,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  successText: {
-    color: "#22c55e",
-    marginTop: 8,
-    textAlign: "center",
-    fontFamily: "Xerxes",
-  },
   errorText: {
     color: "#f87171",
     marginTop: 8,
@@ -503,27 +425,6 @@ const styles = StyleSheet.create({
   },
   errorInline: {
     color: "#f87171",
-    textAlign: "center",
-    fontFamily: "Xerxes",
-  },
-  loadingOverlay: {
-    flex: 1,
-    backgroundColor: "#00000080",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingBox: {
-    backgroundColor: "#101119",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    maxWidth: 280,
-  },
-  loadingText: {
-    color: "#ffffff",
-    marginTop: 10,
-    fontSize: 16,
     textAlign: "center",
     fontFamily: "Xerxes",
   },
