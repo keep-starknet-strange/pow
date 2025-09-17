@@ -40,7 +40,13 @@ if [ -z "$NEW_CLASS_HASH" ]; then
   exit 1
 fi
 
-RPC_URL=https://starknet-mainnet.infura.io/v3/0d98c49747574cda8eeebee9c7353ca8
+# RPC_URL is loaded from .env file
+if [ -z "$RPC_URL" ]; then
+  echo "Error: RPC_URL is not set."
+  echo "Please set RPC_URL in your .env.main file or environment variables."
+  echo "Example: RPC_URL=https://starknet-mainnet.infura.io/v3/YOUR_API_KEY"
+  exit 1
+fi
 
 echo "Upgrading POW! contract on Mainnet..."
 echo "Contract address: $CONTRACT_ADDRESS"

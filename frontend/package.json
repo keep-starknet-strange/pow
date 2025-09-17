@@ -62,7 +62,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
-    "react-native-animated-rolling-numbers": "^2.0.0",
+    "react-native-animated-rolling-numbers": "git+https://github.com/b-j-roberts/react-native-animated-rolling-numbers.git#large-numbers-support",
     "react-native-crypto": "^2.2.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-get-random-values": "^1.11.0",

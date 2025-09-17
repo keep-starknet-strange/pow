@@ -43,6 +43,8 @@ export type EventManager = {
   registerObserver(key: string, observer: Observer): void;
   unregisterObserver(key: string): void;
   notify(eventType: EventType, data?: any): void;
+  cleanup(): void;
+  getObserverCount(): number;
 };
 
 export const useEventManager = create<EventManager>((set, get) => ({
@@ -63,11 +65,37 @@ export const useEventManager = create<EventManager>((set, get) => ({
   },
 
   notify(eventType: EventType, data?: any): void {
-    // Defer all observer calls to next tick to avoid render-time state updates
-    setTimeout(() => {
-      get().observers.forEach((observer, _) => {
-        observer.onNotify(eventType, data);
-      });
-    }, 0);
+    // Use queueMicrotask for better performance than setTimeout
+    // This avoids creating timer objects and provides immediate execution
+    queueMicrotask(() => {
+      const currentObservers = get().observers;
+      if (currentObservers.size > 0) {
+        currentObservers.forEach(async (observer, key) => {
+          try {
+            await observer.onNotify(eventType, data);
+          } catch (error) {
+            if (__DEV__) {
+              console.warn(
+                `Observer ${key} failed to handle event ${eventType}:`,
+                error,
+              );
+            }
+          }
+        });
+      }
+    });
+  },
+
+  cleanup(): void {
+    const observers = get().observers;
+    if (__DEV__ && observers.size > 0) {
+      console.log(`Cleaning up ${observers.size} event observers`);
+    }
+    observers.clear();
+    set({ observers: new Map<string, Observer>() });
+  },
+
+  getObserverCount(): number {
+    return get().observers.size;
   },
 }));

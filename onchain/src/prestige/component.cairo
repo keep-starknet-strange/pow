@@ -49,6 +49,15 @@ pub mod PrestigeComponent {
             self.user_prestige.read(user)
         }
 
+        fn get_user_prestiges(self: @ComponentState<TContractState>, users: Span<ContractAddress>) -> Span<u32> {
+            let mut prestiges = array![];
+            for user in users {
+                let prestige = self.user_prestige.read(*user);
+                prestiges.append(prestige);
+            }
+            return prestiges.into();
+        }
+
         fn get_next_prestige_cost(self: @ComponentState<TContractState>) -> u128 {
             let caller = get_caller_address();
             let next_prestige = self.user_prestige.read(caller) + 1;

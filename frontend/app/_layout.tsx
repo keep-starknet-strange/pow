@@ -63,6 +63,16 @@ if (!__DEV__) {
 
       return event;
     },
+
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [
+      Sentry.mobileReplayIntegration({
+        maskAllText: false,
+        maskAllImages: false,
+        maskAllVectors: false,
+      }),
+    ],
   });
 }
 

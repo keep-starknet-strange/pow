@@ -1,5 +1,5 @@
 import { memo, useState, useEffect, useMemo } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, ActivityIndicator } from "react-native";
 import {
   Canvas,
   Image,
@@ -10,6 +10,7 @@ import Animated, {
   FadeInLeft,
   FadeInRight,
   FadeInDown,
+  FadeIn,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { PFPView } from "../components/PFPView";
@@ -27,6 +28,7 @@ import {
 import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { FOC_ENGINE_API } from "../context/FocEngineConnector";
+import { useMock } from "../api/requests";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -45,7 +47,10 @@ export const LeaderboardPage: React.FC = () => {
   const { getImage } = useImages();
   const { getAccounts } = useFocEngine();
   const { width, height } = useCachedWindowDimensions();
-  const { powGameContractAddress } = usePowContractConnector();
+  const { powGameContractAddress, getUserPrestiges } =
+    usePowContractConnector();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const leaderboardMock = [
     {
       id: 1,
@@ -126,24 +131,42 @@ export const LeaderboardPage: React.FC = () => {
       balance: 5_000,
     },
   ];
-  const [leaderboard, setLeaderboard] = useState(leaderboardMock);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (!isFocused) {
       return; // Don't run if the page is not focused
     }
-    if (!STARKNET_ENABLED || !powGameContractAddress) {
-      // If Starknet is not enabled, use mock data
+
+    // Use mock data if USE_MOCK is true
+    if (useMock) {
       setLeaderboard(leaderboardMock);
+      setIsLoading(false);
+      setError(null);
       return;
     }
+
+    if (!STARKNET_ENABLED || !powGameContractAddress) {
+      // If Starknet is not enabled and not using mock, show error
+      setError("Unable to connect to blockchain");
+      setIsLoading(false);
+      return;
+    }
+
     const getLeaderboard = async () => {
-      // Load the leaderboard data from the new API endpoint
+      setIsLoading(true);
+      setError(null);
+
       try {
         const response = await fetch(
           `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=20`,
         );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         const events = data.events || [];
 
@@ -155,6 +178,9 @@ export const LeaderboardPage: React.FC = () => {
 
         const addresses = eventData.map((item: any) => item.user);
         const accounts = await getAccounts(addresses, undefined, true);
+
+        // Fetch prestiges for all users
+        const prestiges = await getUserPrestiges(addresses);
 
         const users = eventData.map((item: any, index: number) => {
           const shortAddress =
@@ -172,7 +198,10 @@ export const LeaderboardPage: React.FC = () => {
           return {
             address: item.user,
             balance: item.balance,
-            prestige: 0, // TODO
+            prestige:
+              prestiges && prestiges[index] !== undefined
+                ? prestiges[index]
+                : 0,
             nouns:
               account?.account.metadata && account.account.metadata.length === 4
                 ? createNounsAttributes(
@@ -188,14 +217,24 @@ export const LeaderboardPage: React.FC = () => {
         });
         users.sort((a: any, b: any) => b.balance - a.balance);
         setLeaderboard(users);
+        setIsLoading(false);
+        setError(null);
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
-        // Fallback to mock data on error
-        setLeaderboard(leaderboardMock);
+        setError("Failed to load leaderboard. Please try again later.");
+        setLeaderboard([]);
+        setIsLoading(false);
       }
     };
+
     getLeaderboard();
-  }, [STARKNET_ENABLED, powGameContractAddress, getAccounts, isFocused]);
+  }, [
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    getAccounts,
+    getUserPrestiges,
+    isFocused,
+  ]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -262,16 +301,37 @@ export const LeaderboardPage: React.FC = () => {
           Prestige
         </Animated.Text>
       </View>
-      <FlatList
-        data={leaderboard}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <LeaderboardItem index={index} user={item} />
-        )}
-        contentContainerStyle={{ paddingBottom: 200 }}
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-      />
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#fff7ff" />
+          <Animated.Text
+            className="text-white text-lg font-Pixels mt-4"
+            entering={FadeIn}
+          >
+            Loading leaderboard...
+          </Animated.Text>
+        </View>
+      ) : error ? (
+        <View className="flex-1 items-center justify-center px-8">
+          <Animated.Text
+            className="text-[#8B0000] text-lg font-Pixels text-center"
+            entering={FadeIn}
+          >
+            {error}
+          </Animated.Text>
+        </View>
+      ) : (
+        <FlatList
+          data={leaderboard}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => (
+            <LeaderboardItem index={index} user={item} />
+          )}
+          contentContainerStyle={{ paddingBottom: 200 }}
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
       <LinearGradient
         style={{
           position: "absolute",
