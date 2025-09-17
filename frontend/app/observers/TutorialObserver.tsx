@@ -16,8 +16,8 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set(`TutorialDismissed-mineBlock`, () => {
-      const { advanceStep } = useTutorialStore.getState();
-      advanceStep();
+      const { setVisible } = useTutorialStore.getState();
+      setVisible(false);
     });
 
     // balanceExplanation step
@@ -47,8 +47,9 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set(`TutorialDismissed-addTransactionsToBlock`, () => {
-      const { advanceStep } = useTutorialStore.getState();
-      advanceStep();
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
     });
 
     // finishMiningBlock step
@@ -126,8 +127,9 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set(`TutorialDismissed-checkAchievements`, () => {
-      const { advanceStep } = useTutorialStore.getState();
-      advanceStep();
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
     });
 
     // dapps step
@@ -142,8 +144,9 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
     this.handlers.set(`TutorialDismissed-dapps`, () => {
-      const { advanceStep } = useTutorialStore.getState();
-      advanceStep();
+      const { setVisible } = useTutorialStore.getState();
+      // break in tutorial
+      setVisible(false);
     });
 
     // leaderboard step
