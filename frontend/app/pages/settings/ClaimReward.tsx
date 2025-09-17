@@ -312,7 +312,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           <Text style={styles.errorText}>{txErrorMessage}</Text>
         </View>
       )}
- 
+
       <LoadingModal visible={claiming} text="Claiming…" />
     </SafeAreaView>
   );
