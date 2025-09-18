@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { View, TouchableOpacity, Text, Linking } from "react-native";
 
 type AddressExplorerLinkStyles = {
@@ -17,18 +17,26 @@ type Props = {
   label?: string;
 };
 
-export const AddressExplorerLink: React.FC<Props> = ({
+const AddressExplorerLinkComponent: React.FC<Props> = ({
   address,
   network,
   styles,
   label = "View address on Voyager",
 }) => {
-  const addr = (address || "").trim();
-  const isValid = /^0x[a-fA-F0-9]{64}$/.test(addr);
-  const explorerBase =
-    network === "SN_SEPOLIA"
-      ? "https://sepolia.voyager.online"
-      : "https://voyager.online";
+  const addr = useMemo(() => (address || "").trim(), [address]);
+  const isValid = useMemo(() => /^0x[a-fA-F0-9]{63,64}$/.test(addr), [addr]);
+  const explorerBase = useMemo(
+    () =>
+      network === "SN_SEPOLIA"
+        ? "https://sepolia.voyager.online"
+        : "https://voyager.online",
+    [network]
+  );
+
+  const handlePress = useCallback(() => {
+    if (!isValid) return;
+    Linking.openURL(`${explorerBase}/contract/${addr}`);
+  }, [isValid, explorerBase, addr]);
 
   return (
     <>
@@ -36,10 +44,7 @@ export const AddressExplorerLink: React.FC<Props> = ({
         <TouchableOpacity
           style={styles.linkWrap}
           disabled={!isValid}
-          onPress={() => {
-            if (!isValid) return;
-            Linking.openURL(`${explorerBase}/contract/${addr}`);
-          }}
+          onPress={handlePress}
         >
           <Text style={[styles.linkText, !isValid && styles.linkDisabled]}>
             {label}
@@ -54,3 +59,5 @@ export const AddressExplorerLink: React.FC<Props> = ({
     </>
   );
 };
+
+export const AddressExplorerLink = React.memo(AddressExplorerLinkComponent);

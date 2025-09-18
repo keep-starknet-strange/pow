@@ -7,7 +7,7 @@ type Props = {
   onPressBraavos: () => void;
 };
 
-export const WalletButtonRow: React.FC<Props> = ({
+const WalletButtonRowComponent: React.FC<Props> = ({
   onPressReady,
   onPressBraavos,
 }) => {
@@ -26,6 +26,8 @@ export const WalletButtonRow: React.FC<Props> = ({
     </View>
   );
 };
+
+export const WalletButtonRow = React.memo(WalletButtonRowComponent);
 
 const styles = StyleSheet.create({
   buttonRow: {

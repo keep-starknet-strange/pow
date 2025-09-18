@@ -111,7 +111,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
-    ...(currentPrestige >= 1 && !isRewardClaimed
+    ...(isAuthenticated && currentPrestige >= 1 && !isRewardClaimed
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
     {
