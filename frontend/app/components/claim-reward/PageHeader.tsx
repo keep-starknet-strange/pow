@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas,
@@ -11,7 +12,8 @@ interface SectionHeaderProps {
   width: number;
   title: string;
 }
-export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
+
+const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => {
   const { getImage } = useImages();
 
   return (
@@ -34,6 +36,8 @@ export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
     </View>
   );
 };
+
+export const PageHeader = React.memo(PageHeaderComponent);
 
 const styles = StyleSheet.create({
   container: {

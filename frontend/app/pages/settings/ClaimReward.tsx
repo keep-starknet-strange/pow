@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -47,7 +47,7 @@ type ClaimRewardProps = {
   onBack?: () => void;
 };
 
-export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
+const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
@@ -61,9 +61,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
   const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
-  const notify = useEventManager((state) => state.notify);
+  const { notify } = useEventManager();
 
-  const claimReward = async () => {
+  const claimReward = useCallback(async () => {
     const recipient = (debouncedInput || "").trim();
     if (!recipient) {
       if (__DEV__) console.error("No recipient provided");
@@ -114,7 +114,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     } finally {
       setClaiming(false);
     }
-  };
+  }, [debouncedInput, powGameContractAddress, invokeCalls]);
 
   useEffect(() => {
     (async () => {
@@ -148,7 +148,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     })();
   }, []);
 
-  const openReadyWallet = async () => {
+  const openReadyWallet = useCallback(async () => {
     const scheme = "ready://open";
     try {
       await Linking.openURL(scheme);
@@ -174,9 +174,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         console.debug("Failed to open READY install link");
       }
     }
-  };
-  //
-  const openBraavosWallet = async () => {
+  }, []);
+
+  const openBraavosWallet = useCallback(async () => {
     const scheme = "braavos://openr";
     try {
       await Linking.openURL(scheme);
@@ -202,7 +202,37 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         console.debug("Failed to open BRAAVOS install link");
       }
     }
-  };
+  }, []);
+
+  const handleBack = useCallback(() => {
+    if (onBack) onBack();
+  }, [onBack]);
+
+  const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test((debouncedInput || "").trim());
+
+  const claimState = claimed ? "claimed" : claiming ? "claiming" : "idle";
+
+  const claimLabel =
+    claimState === "claimed"
+      ? "CLAIMED"
+      : claimState === "claiming"
+        ? `CLAIMING ${rewardAmountStr} STRK`
+        : `CLAIM ${rewardAmountStr} STRK`;
+
+  const claimDisabled = claimed || claiming || !isValidAddress;
+
+  const containerWidth = claimState === "claiming" ? 260 : 220;
+
+  const explorerBase =
+    network === "SN_SEPOLIA"
+      ? "https://sepolia.voyager.online"
+      : "https://voyager.online";
+
+  const handleViewClaimTransaction = useCallback(() => {
+    if (claimTxHash) {
+      Linking.openURL(`${explorerBase}/tx/${claimTxHash}`);
+    }
+  }, [claimTxHash, explorerBase]);
 
   return (
     <SafeAreaView style={[styles.safe]}>
@@ -270,65 +300,35 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           </View>
         </View>
 
-        {(() => {
-          const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
-            (debouncedInput || "").trim(),
-          );
-          const claimState = claimed
-            ? "claimed"
-            : claiming
-              ? "claiming"
-              : "idle";
-          const claimLabel =
-            claimState === "claimed"
-              ? "CLAIMED"
-              : claimState === "claiming"
-                ? `CLAIMING ${rewardAmountStr} STRK`
-                : `CLAIM ${rewardAmountStr} STRK`;
-          const claimDisabled = claimed || claiming || !isValidAddress;
-          const containerWidth = claimState === "claiming" ? 260 : 220;
-
-          const explorerBase =
-            network === "SN_SEPOLIA"
-              ? "https://sepolia.voyager.online"
-              : "https://voyager.online";
-
-          return (
-            <View
-              style={[
-                styles.bottomAction,
-                { marginBottom: insets.bottom + 64, width: containerWidth },
-              ]}
+        <View
+          style={[
+            styles.bottomAction,
+            { marginBottom: insets.bottom + 64, width: containerWidth },
+          ]}
+        >
+          <ClaimRewardAction
+            action={claimReward}
+            label={claimLabel}
+            disabled={claimDisabled}
+          />
+          {claimed && claimTxHash && (
+            <TouchableOpacity
+              style={styles.voyagerLink}
+              onPress={handleViewClaimTransaction}
             >
-              <ClaimRewardAction
-                action={claimReward}
-                label={claimLabel}
-                disabled={claimDisabled}
-              />
-              {claimed && claimTxHash && (
-                <TouchableOpacity
-                  style={styles.voyagerLink}
-                  onPress={() => {
-                    Linking.openURL(`${explorerBase}/tx/${claimTxHash}`);
-                  }}
-                >
-                  <Text style={styles.voyagerLinkText}>
-                    View claim on Voyager
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          );
-        })()}
+              <Text style={styles.voyagerLinkText}>
+                View claim on Voyager
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
 
       <View
         style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
       >
         <ClaimRewardAction
-          action={() => {
-            if (onBack) onBack();
-          }}
+          action={handleBack}
           label="BACK"
           disabled={false}
         />
@@ -344,6 +344,8 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     </SafeAreaView>
   );
 };
+
+export const ClaimRewardSection = React.memo(ClaimRewardSectionComponent);
 
 const styles = StyleSheet.create({
   safe: {

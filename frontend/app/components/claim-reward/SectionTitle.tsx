@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas, Image,
@@ -10,7 +11,8 @@ interface SectionTitleProps {
   width: number;
   title: string;
 }
-export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
+
+const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) => {
   const { getImage } = useImages();
 
   return (
@@ -33,6 +35,8 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
     </View>
   );
 };
+
+export const SectionTitle = React.memo(SectionTitleComponent);
 
 const styles = StyleSheet.create({
   container: {
