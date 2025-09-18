@@ -172,29 +172,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     powContract.connect(account);
   }, [account, powContract, STARKNET_ENABLED]);
 
-  const toU256BigInt = useCallback((maybe: any): bigint | null => {
-    try {
-      if (maybe == null) return null;
-      // Already decoded to bigint
-      if (typeof maybe === "bigint") return maybe;
-      // Hex/decimal string
-      if (typeof maybe === "string") return BigInt(maybe);
-      // Object with low/high or tuple-like
-      const low = (maybe as any).low ?? (maybe as any)[0];
-      const high = (maybe as any).high ?? (maybe as any)[1];
-      if (low != null && high != null) {
-        return (BigInt(high) << BigInt(128)) + BigInt(low);
-      }
-      // Raw array [low, high]
-      if (Array.isArray(maybe) && maybe.length >= 2) {
-        return (BigInt(maybe[1]) << BigInt(128)) + BigInt(maybe[0]);
-      }
-      return null;
-    } catch (_e) {
-      return null;
-    }
-  }, []);
-
   const getTokenBalanceOf = useCallback(
     async (
       tokenAddress: string,
@@ -221,10 +198,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
             ],
           },
         ] as any;
-        const c1 = new Contract(abiC1, tokenAddress, provider);
-        const resC1: any = await c1.balance_of(ownerAddress);
-        const parsedC1 = toU256BigInt(resC1?.balance ?? resC1);
-        if (parsedC1 != null) return parsedC1;
+        const contract = new Contract(abiC1, tokenAddress, provider);
+        const response: any = await contract.balance_of(ownerAddress);
+        if (response != null) return response;
       } catch (error) {
         if (__DEV__) {
           console.error(
@@ -237,7 +213,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return null;
     },
-    [STARKNET_ENABLED, provider, toU256BigInt],
+    [STARKNET_ENABLED, provider],
   );
 
   const getRewardPoolBalance = useCallback(async (): Promise<bigint | null> => {

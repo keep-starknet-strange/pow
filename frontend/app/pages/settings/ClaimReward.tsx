@@ -166,8 +166,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         if (bal != null && bal < rewardAmountRaw) {
           setShowInsufficientFunds(true);
         }
-      } catch (_e) {
-        // ignore
+      } catch (error) {
+        if (__DEV__) {
+          console.error("Failed to fetch reward pool balance:", error);
+        }
       }
     })();
     return () => {
