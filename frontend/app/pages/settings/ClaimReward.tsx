@@ -47,7 +47,9 @@ type ClaimRewardProps = {
   onBack?: () => void;
 };
 
-const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => {
+const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
+  onBack,
+}) => {
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
@@ -127,7 +129,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => 
       const divisor = BigInt(10) ** BigInt(strkDecimals);
       const adjusted = decoded != null ? decoded / divisor : null;
       const amountStr =
-        adjusted != null ? adjusted.toString() : (raw || "unknown");
+        adjusted != null ? adjusted.toString() : raw || "unknown";
       setRewardAmountStr(amountStr);
       if ((params as any).rewardPrestigeThreshold != null) {
         setRewardPrestigeThreshold(
@@ -208,7 +210,9 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => 
     if (onBack) onBack();
   }, [onBack]);
 
-  const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test((debouncedInput || "").trim());
+  const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
+    (debouncedInput || "").trim(),
+  );
 
   const claimState = claimed ? "claimed" : claiming ? "claiming" : "idle";
 
@@ -316,9 +320,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => 
               style={styles.voyagerLink}
               onPress={handleViewClaimTransaction}
             >
-              <Text style={styles.voyagerLinkText}>
-                View claim on Voyager
-              </Text>
+              <Text style={styles.voyagerLinkText}>View claim on Voyager</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -327,11 +329,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({ onBack }) => 
       <View
         style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
       >
-        <ClaimRewardAction
-          action={handleBack}
-          label="BACK"
-          disabled={false}
-        />
+        <ClaimRewardAction action={handleBack} label="BACK" disabled={false} />
       </View>
 
       {txErrorMessage && (

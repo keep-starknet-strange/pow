@@ -13,7 +13,10 @@ interface SectionHeaderProps {
   title: string;
 }
 
-const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => {
+const PageHeaderComponent: React.FC<SectionHeaderProps> = ({
+  width,
+  title,
+}) => {
   const { getImage } = useImages();
 
   return (
@@ -24,7 +27,7 @@ const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => 
           fit="fill"
           x={0}
           y={0}
-          width={width-8}
+          width={width - 8}
           height={28}
           sampling={{
             filter: FilterMode.Nearest,

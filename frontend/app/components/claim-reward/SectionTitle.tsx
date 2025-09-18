@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import {
-  Canvas, Image,
+  Canvas,
+  Image,
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
@@ -12,7 +13,10 @@ interface SectionTitleProps {
   title: string;
 }
 
-const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) => {
+const SectionTitleComponent: React.FC<SectionTitleProps> = ({
+  width,
+  title,
+}) => {
   const { getImage } = useImages();
 
   return (
@@ -23,7 +27,7 @@ const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) =>
           fit="fill"
           x={0}
           y={0}
-          width={width-8}
+          width={width - 8}
           height={28}
           sampling={{
             filter: FilterMode.Nearest,

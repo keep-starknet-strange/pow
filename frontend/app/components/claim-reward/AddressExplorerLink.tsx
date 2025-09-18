@@ -30,7 +30,7 @@ const AddressExplorerLinkComponent: React.FC<Props> = ({
       network === "SN_SEPOLIA"
         ? "https://sepolia.voyager.online"
         : "https://voyager.online",
-    [network]
+    [network],
   );
 
   const handlePress = useCallback(() => {
