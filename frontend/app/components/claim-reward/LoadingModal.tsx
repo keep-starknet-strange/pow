@@ -6,7 +6,7 @@ type Props = {
   text?: string | null;
 };
 
-export const LoadingModal: React.FC<Props> = ({ visible, text }) => {
+const LoadingModalComponent: React.FC<Props> = ({ visible, text }) => {
   if (!visible) return null;
   return (
     <Modal transparent visible animationType="fade">
@@ -19,6 +19,8 @@ export const LoadingModal: React.FC<Props> = ({ visible, text }) => {
     </Modal>
   );
 };
+
+export const LoadingModal = React.memo(LoadingModalComponent);
 
 const styles = StyleSheet.create({
   loadingOverlay: {

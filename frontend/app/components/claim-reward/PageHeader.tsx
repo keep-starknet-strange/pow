@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas,
@@ -11,19 +12,23 @@ interface SectionHeaderProps {
   width: number;
   title: string;
 }
-export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
+
+const PageHeaderComponent: React.FC<SectionHeaderProps> = ({
+  width,
+  title,
+}) => {
   const { getImage } = useImages();
 
   return (
     <View style={[styles.container, { marginBottom: 14 }]}>
-      <Canvas style={{ width: width, height: 24 }}>
+      <Canvas style={{ width: width - 8, height: 28, marginLeft: 4 }}>
         <Image
           image={getImage("shop.title")}
           fit="fill"
           x={0}
           y={0}
-          width={width}
-          height={24}
+          width={width - 8}
+          height={28}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -34,6 +39,8 @@ export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
     </View>
   );
 };
+
+export const PageHeader = React.memo(PageHeaderComponent);
 
 const styles = StyleSheet.create({
   container: {
@@ -47,6 +54,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 8,
     fontFamily: "Pixels",
-    top: 2,
+    top: 4,
   },
 });

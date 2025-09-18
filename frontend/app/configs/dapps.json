@@ -128,9 +128,9 @@
       },
       {
         "id": 4,
-        "name": "Journey",
-        "slug": "journey",
-        "description": "Fractal scale with app-chains! Cause your journey only just begun.",
+        "name": "STARK",
+        "slug": "stark",
+        "description": "Fractal scale with STARK verification! L3s, app-chains, and privacy at your fingertips!",
         "color": "purple",
         "feeCosts": [
           2019600000000000, 5849280000000000, 8317440000000000, 11174400000000000, 14497920000000000

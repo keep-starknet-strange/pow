@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   Linking,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
@@ -46,22 +47,25 @@ type ClaimRewardProps = {
   onBack?: () => void;
 };
 
-export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
+const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
+  onBack,
+}) => {
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
-  const debouncedInput = useDebouncedValue(accountInput, 500);
+  const debouncedInput = useDebouncedValue(accountInput, 200);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
   const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
     useState<number>(0);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
+  const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
-  const notify = useEventManager((state) => state.notify);
+  const { notify } = useEventManager();
 
-  const claimReward = async () => {
+  const claimReward = useCallback(async () => {
     const recipient = (debouncedInput || "").trim();
     if (!recipient) {
       if (__DEV__) console.error("No recipient provided");
@@ -83,6 +87,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) {
         setClaimed(true);
+        setClaimTxHash(hash);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
         // Notify achievement system that STRK reward was claimed
@@ -111,7 +116,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     } finally {
       setClaiming(false);
     }
-  };
+  }, [debouncedInput, powGameContractAddress, invokeCalls]);
 
   useEffect(() => {
     (async () => {
@@ -120,15 +125,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       // Robustly decode u256 amount from various shapes
       const raw = (params as any).rewardAmount;
       const decoded = decodeU256ToBigInt(raw);
-      if (__DEV__) {
-        console.log(
-          "getRewardParams raw:",
-          params,
-          "decoded:",
-          decoded?.toString(),
-        );
-      }
-      const amountStr = decoded != null ? decoded.toString() : "10";
+      const strkDecimals = 18;
+      const divisor = BigInt(10) ** BigInt(strkDecimals);
+      const adjusted = decoded != null ? decoded / divisor : null;
+      const amountStr =
+        adjusted != null ? adjusted.toString() : raw || "unknown";
       setRewardAmountStr(amountStr);
       if ((params as any).rewardPrestigeThreshold != null) {
         setRewardPrestigeThreshold(
@@ -138,7 +139,18 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
     })();
   }, [getRewardParams]);
 
-  const openReadyWallet = async () => {
+  // Load saved transaction hash on mount
+  useEffect(() => {
+    (async () => {
+      const savedHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+      if (savedHash) {
+        setClaimed(true);
+        setClaimTxHash(savedHash);
+      }
+    })();
+  }, []);
+
+  const openReadyWallet = useCallback(async () => {
     const scheme = "ready://open";
     try {
       await Linking.openURL(scheme);
@@ -164,9 +176,9 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         console.debug("Failed to open READY install link");
       }
     }
-  };
-  //
-  const openBraavosWallet = async () => {
+  }, []);
+
+  const openBraavosWallet = useCallback(async () => {
     const scheme = "braavos://openr";
     try {
       await Linking.openURL(scheme);
@@ -192,14 +204,46 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         console.debug("Failed to open BRAAVOS install link");
       }
     }
-  };
+  }, []);
+
+  const handleBack = useCallback(() => {
+    if (onBack) onBack();
+  }, [onBack]);
+
+  const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
+    (debouncedInput || "").trim(),
+  );
+
+  const claimState = claimed ? "claimed" : claiming ? "claiming" : "idle";
+
+  const claimLabel =
+    claimState === "claimed"
+      ? "CLAIMED"
+      : claimState === "claiming"
+        ? `CLAIMING ${rewardAmountStr} STRK`
+        : `CLAIM ${rewardAmountStr} STRK`;
+
+  const claimDisabled = claimed || claiming || !isValidAddress;
+
+  const containerWidth = claimState === "claiming" ? 260 : 220;
+
+  const explorerBase =
+    network === "SN_SEPOLIA"
+      ? "https://sepolia.voyager.online"
+      : "https://voyager.online";
+
+  const handleViewClaimTransaction = useCallback(() => {
+    if (claimTxHash) {
+      Linking.openURL(`${explorerBase}/tx/${claimTxHash}`);
+    }
+  }, [claimTxHash, explorerBase]);
 
   return (
     <SafeAreaView style={[styles.safe]}>
       <PageHeader title="CLAIM REWARD" width={width} />
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 12 }}
+        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 4 }}
         style={{ flex: 1 }}
       >
         <View style={styles.section}>
@@ -260,51 +304,32 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           </View>
         </View>
 
-        {(() => {
-          const isValidAddress = /^0x[a-fA-F0-9]{64}$/.test(
-            (debouncedInput || "").trim(),
-          );
-          const claimState = claimed
-            ? "claimed"
-            : claiming
-              ? "claiming"
-              : "idle";
-          const claimLabel =
-            claimState === "claimed"
-              ? "CLAIMED"
-              : claimState === "claiming"
-                ? `CLAIMING ${rewardAmountStr} STRK`
-                : `CLAIM ${rewardAmountStr} STRK`;
-          const claimDisabled = claimed || claiming || !isValidAddress;
-          const containerWidth = claimState === "claiming" ? 260 : 220;
-
-          return (
-            <View
-              style={[
-                styles.bottomAction,
-                { marginBottom: insets.bottom + 64, width: containerWidth },
-              ]}
+        <View
+          style={[
+            styles.bottomAction,
+            { marginBottom: insets.bottom + 64, width: containerWidth },
+          ]}
+        >
+          <ClaimRewardAction
+            action={claimReward}
+            label={claimLabel}
+            disabled={claimDisabled}
+          />
+          {claimed && claimTxHash && (
+            <TouchableOpacity
+              style={styles.voyagerLink}
+              onPress={handleViewClaimTransaction}
             >
-              <ClaimRewardAction
-                action={claimReward}
-                label={claimLabel}
-                disabled={claimDisabled}
-              />
-            </View>
-          );
-        })()}
+              <Text style={styles.voyagerLinkText}>View claim on Voyager</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
 
       <View
         style={[styles.backAction, { bottom: Math.max(insets.bottom - 25, 0) }]}
       >
-        <ClaimRewardAction
-          action={() => {
-            if (onBack) onBack();
-          }}
-          label="BACK"
-          disabled={false}
-        />
+        <ClaimRewardAction action={handleBack} label="BACK" disabled={false} />
       </View>
 
       {txErrorMessage && (
@@ -318,11 +343,13 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   );
 };
 
+export const ClaimRewardSection = React.memo(ClaimRewardSectionComponent);
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
     position: "relative",
-    backgroundColor: "#000000",
+    backgroundColor: "#101119",
   },
   input: {
     width: 300,
@@ -340,7 +367,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f0f14",
     fontFamily: "Pixels",
   },
-  section: { marginBottom: 10 },
+  section: { marginBottom: 10, paddingHorizontal: 8 },
   card: {
     backgroundColor: "rgba(16,17,25,0.75)",
     borderWidth: 1,
@@ -362,10 +389,10 @@ const styles = StyleSheet.create({
   },
   messageSub: {
     fontFamily: "Pixels",
-    fontSize: 16,
+    fontSize: 18,
     color: "#e7e7e7",
     textAlign: "center",
-    marginTop: 4,
+    marginTop: 8,
   },
   hintInline: {
     fontFamily: "Pixels",
@@ -384,7 +411,6 @@ const styles = StyleSheet.create({
   },
   linkDisabled: { color: "#9ca3af", textDecorationLine: "none" },
   linkSlot: {
-    height: 56,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
@@ -424,5 +450,17 @@ const styles = StyleSheet.create({
     right: 12,
     alignItems: "center",
     pointerEvents: "none",
+  },
+  voyagerLink: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  voyagerLinkText: {
+    color: "#fff7ff",
+    textDecorationLine: "underline",
+    textAlign: "center",
+    fontSize: 16,
+    fontFamily: "Pixels",
   },
 });
