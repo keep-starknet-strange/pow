@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   Linking,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
@@ -58,6 +59,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
     useState<number>(0);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
+  const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
   const notify = useEventManager((state) => state.notify);
 
@@ -83,6 +85,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) {
         setClaimed(true);
+        setClaimTxHash(hash);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
         // Notify achievement system that STRK reward was claimed
@@ -133,6 +136,17 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       }
     })();
   }, [getRewardParams]);
+
+  // Load saved transaction hash on mount
+  useEffect(() => {
+    (async () => {
+      const savedHash = await AsyncStorage.getItem("rewardClaimedTxHash");
+      if (savedHash) {
+        setClaimed(true);
+        setClaimTxHash(savedHash);
+      }
+    })();
+  }, []);
 
   const openReadyWallet = async () => {
     const scheme = "ready://open";
@@ -274,6 +288,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
           const claimDisabled = claimed || claiming || !isValidAddress;
           const containerWidth = claimState === "claiming" ? 260 : 220;
 
+          const explorerBase =
+            network === "SN_SEPOLIA"
+              ? "https://sepolia.voyager.online"
+              : "https://voyager.online";
+
           return (
             <View
               style={[
@@ -286,6 +305,18 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
                 label={claimLabel}
                 disabled={claimDisabled}
               />
+              {claimed && claimTxHash && (
+                <TouchableOpacity
+                  style={styles.voyagerLink}
+                  onPress={() => {
+                    Linking.openURL(`${explorerBase}/tx/${claimTxHash}`);
+                  }}
+                >
+                  <Text style={styles.voyagerLinkText}>
+                    View claim on Voyager
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           );
         })()}
@@ -419,5 +450,17 @@ const styles = StyleSheet.create({
     right: 12,
     alignItems: "center",
     pointerEvents: "none",
+  },
+  voyagerLink: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  voyagerLinkText: {
+    color: "#fff7ff",
+    textDecorationLine: "underline",
+    textAlign: "center",
+    fontSize: 16,
+    fontFamily: "Pixels",
   },
 });
