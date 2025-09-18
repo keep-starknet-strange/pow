@@ -51,7 +51,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
   const { powGameContractAddress, getRewardParams } = usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
-  const debouncedInput = useDebouncedValue(accountInput, 500);
+  const debouncedInput = useDebouncedValue(accountInput, 200);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
@@ -120,15 +120,11 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       // Robustly decode u256 amount from various shapes
       const raw = (params as any).rewardAmount;
       const decoded = decodeU256ToBigInt(raw);
-      if (__DEV__) {
-        console.log(
-          "getRewardParams raw:",
-          params,
-          "decoded:",
-          decoded?.toString(),
-        );
-      }
-      const amountStr = decoded != null ? decoded.toString() : "10";
+      const strkDecimals = 18;
+      const divisor = BigInt(10) ** BigInt(strkDecimals);
+      const adjusted = decoded != null ? decoded / divisor : null;
+      const amountStr =
+        adjusted != null ? adjusted.toString() : (raw || "unknown");
       setRewardAmountStr(amountStr);
       if ((params as any).rewardPrestigeThreshold != null) {
         setRewardPrestigeThreshold(
@@ -199,7 +195,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
       <PageHeader title="CLAIM REWARD" width={width} />
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 12 }}
+        contentContainerStyle={{ paddingBottom: 24, paddingHorizontal: 4 }}
         style={{ flex: 1 }}
       >
         <View style={styles.section}>
@@ -261,7 +257,7 @@ export const ClaimRewardSection: React.FC<ClaimRewardProps> = ({ onBack }) => {
         </View>
 
         {(() => {
-          const isValidAddress = /^0x[a-fA-F0-9]{64}$/.test(
+          const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
             (debouncedInput || "").trim(),
           );
           const claimState = claimed
@@ -322,7 +318,7 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     position: "relative",
-    backgroundColor: "#000000",
+    backgroundColor: "#101119",
   },
   input: {
     width: 300,
@@ -340,7 +336,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f0f14",
     fontFamily: "Pixels",
   },
-  section: { marginBottom: 10 },
+  section: { marginBottom: 10, paddingHorizontal: 8 },
   card: {
     backgroundColor: "rgba(16,17,25,0.75)",
     borderWidth: 1,
@@ -362,10 +358,10 @@ const styles = StyleSheet.create({
   },
   messageSub: {
     fontFamily: "Pixels",
-    fontSize: 16,
+    fontSize: 18,
     color: "#e7e7e7",
     textAlign: "center",
-    marginTop: 4,
+    marginTop: 8,
   },
   hintInline: {
     fontFamily: "Pixels",
@@ -384,7 +380,6 @@ const styles = StyleSheet.create({
   },
   linkDisabled: { color: "#9ca3af", textDecorationLine: "none" },
   linkSlot: {
-    height: 56,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",

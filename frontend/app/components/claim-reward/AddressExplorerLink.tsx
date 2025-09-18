@@ -24,7 +24,7 @@ export const AddressExplorerLink: React.FC<Props> = ({
   label = "View address on Voyager",
 }) => {
   const addr = (address || "").trim();
-  const isValid = /^0x[a-fA-F0-9]{64}$/.test(addr);
+  const isValid = /^0x[a-fA-F0-9]{63,64}$/.test(addr);
   const explorerBase =
     network === "SN_SEPOLIA"
       ? "https://sepolia.voyager.online"

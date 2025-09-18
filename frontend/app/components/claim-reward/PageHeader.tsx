@@ -16,14 +16,14 @@ export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
 
   return (
     <View style={[styles.container, { marginBottom: 14 }]}>
-      <Canvas style={{ width: width, height: 24 }}>
+      <Canvas style={{ width: width - 8, height: 28, marginLeft: 4 }}>
         <Image
           image={getImage("shop.title")}
           fit="fill"
           x={0}
           y={0}
-          width={width}
-          height={24}
+          width={width-8}
+          height={28}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 8,
     fontFamily: "Pixels",
-    top: 2,
+    top: 4,
   },
 });

@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import {
-  Canvas,
-  Image,
+  Canvas, Image,
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
@@ -16,14 +15,14 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
 
   return (
     <View style={styles.container}>
-      <Canvas style={{ width: width, height: 24 }}>
+      <Canvas style={{ width: width - 8, height: 28 }}>
         <Image
-          image={getImage("shop.name.plaque")}
+          image={getImage("shop.title")}
           fit="fill"
           x={0}
           y={0}
-          width={width}
-          height={24}
+          width={width-8}
+          height={28}
           sampling={{
             filter: FilterMode.Nearest,
             mipmap: MipmapMode.Nearest,
@@ -39,6 +38,7 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     position: "relative",
+    marginBottom: 14,
   },
   title: {
     color: "#fff7ff",
