@@ -196,7 +196,10 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const getTokenBalanceOf = useCallback(
-    async (tokenAddress: string, ownerAddress: string): Promise<bigint | null> => {
+    async (
+      tokenAddress: string,
+      ownerAddress: string,
+    ): Promise<bigint | null> => {
       if (!STARKNET_ENABLED || !provider) return null;
       // Try minimal Cairo 1 ABI first
       try {
@@ -220,48 +223,18 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         ] as any;
         const c1 = new Contract(abiC1, tokenAddress, provider);
         const resC1: any = await c1.balance_of(ownerAddress);
-        console.log("resC1", resC1);
         const parsedC1 = toU256BigInt(resC1?.balance ?? resC1);
         if (parsedC1 != null) return parsedC1;
-      } catch (_e) {}
-
-      // Try minimal Cairo 0 ABI
-      try {
-        const abiC0 = [
-          {
-            type: "function",
-            name: "balanceOf",
-            state_mutability: "view",
-            inputs: [{ name: "account", type: "felt" }],
-            outputs: [
-              {
-                type: "Uint256",
-              },
-            ],
-          },
-        ] as any;
-        const c0 = new Contract(abiC0, tokenAddress, provider);
-        const resC0: any = await c0.balanceOf(ownerAddress);
-        const parsedC0 = toU256BigInt(resC0);
-        if (parsedC0 != null) return parsedC0;
-      } catch (_e) {}
-
-      // Fallback to raw callContract with common entrypoints
-      try {
-        const entries = ["balance_of", "balanceOf", "get_balance"];
-        for (const entry of entries) {
-          try {
-            const res: any = await provider.callContract({
-              contractAddress: tokenAddress,
-              entrypoint: entry,
-              calldata: [ownerAddress],
-            });
-            const arr: string[] = res?.result || res?.calldata || [];
-            const parsed = toU256BigInt(arr);
-            if (parsed != null) return parsed;
-          } catch (_inner) {}
+      } catch (error) {
+        if (__DEV__) {
+          console.error(
+            "Failed to fetch token balance of",
+            tokenAddress,
+            ownerAddress,
+            error,
+          );
         }
-      } catch (_e) {}
+      }
       return null;
     },
     [STARKNET_ENABLED, provider, toU256BigInt],
@@ -290,7 +263,13 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (_e) {
       return null;
     }
-  }, [STARKNET_ENABLED, provider, powGameContractAddress, powContract, getTokenBalanceOf]);
+  }, [
+    STARKNET_ENABLED,
+    provider,
+    powGameContractAddress,
+    powContract,
+    getTokenBalanceOf,
+  ]);
 
   const createGameAccount = useCallback(async () => {
     if (!STARKNET_ENABLED) {
@@ -699,7 +678,6 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!STARKNET_ENABLED || !powContract) return;
     try {
       const params = await powContract.get_reward_params();
-      console.log("params", params);
       return {
         rewardTokenAddress: params.reward_token_address as string,
         rewardPrestigeThreshold: Number(

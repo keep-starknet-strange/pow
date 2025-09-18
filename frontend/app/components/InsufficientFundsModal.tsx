@@ -1,7 +1,12 @@
 import React, { memo } from "react";
 import { View, Image, StyleSheet } from "react-native";
 import { StatusModal } from "./StatusModal";
-import { getNounsHead, getNounsAccessories, getNounsBody, getNounsGlasses } from "../configs/nouns";
+import {
+  getNounsHead,
+  getNounsAccessories,
+  getNounsBody,
+  getNounsGlasses,
+} from "../configs/nouns";
 
 type Props = {
   visible: boolean;
@@ -24,15 +29,34 @@ const BankAvatar = memo(({ useAltBody = false }: { useAltBody?: boolean }) => {
   const bodyIdx = useAltBody ? BODY_GRAYSCALE_9_INDEX : BODY_GRAYSCALE_1_INDEX;
   return (
     <View style={styles.avatarWrap}>
-      <Image source={getNounsBody(bodyIdx)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsHead(BANK_HEAD_INDEX)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsGlasses(GLASSES_SQUARE_BLACK_INDEX)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsAccessories(TIE_RED_INDEX)} style={styles.avatarLayer} resizeMode="contain" />
+      <Image
+        source={getNounsBody(bodyIdx)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsHead(BANK_HEAD_INDEX)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsGlasses(GLASSES_SQUARE_BLACK_INDEX)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsAccessories(TIE_RED_INDEX)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
     </View>
   );
 });
 
-export const InsufficientFundsModal: React.FC<Props> = ({ visible, onBack }) => {
+export const InsufficientFundsModal: React.FC<Props> = ({
+  visible,
+  onBack,
+}) => {
   return (
     <StatusModal
       visible={true}
@@ -65,5 +89,3 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 });
-
-

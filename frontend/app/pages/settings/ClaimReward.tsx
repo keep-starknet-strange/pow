@@ -162,7 +162,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     (async () => {
       try {
         const bal = await getRewardPoolBalance();
-        console.log("bal2", bal);
         if (cancelled) return;
         if (bal != null && bal < rewardAmountRaw) {
           setShowInsufficientFunds(true);

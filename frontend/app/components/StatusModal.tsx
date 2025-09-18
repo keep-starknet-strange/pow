@@ -39,7 +39,11 @@ const LoadingDots = memo(() => {
 
   React.useEffect(() => {
     const animateDot = (sharedValue: any) => {
-      sharedValue.value = withRepeat(withTiming(1, { duration: 600 }), -1, true);
+      sharedValue.value = withRepeat(
+        withTiming(1, { duration: 600 }),
+        -1,
+        true,
+      );
     };
     animateDot(dot1);
     setTimeout(() => animateDot(dot2), 200);
@@ -70,10 +74,26 @@ const NounAvatar = memo(({ seed }: { seed?: string }) => {
   const [attrs] = useState(() => getRandomNounsAttributes(seed));
   return (
     <View style={styles.avatarWrap}>
-      <Image source={getNounsBody(attrs.body)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsHead(attrs.head)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsGlasses(attrs.glasses)} style={styles.avatarLayer} resizeMode="contain" />
-      <Image source={getNounsAccessories(attrs.accessories)} style={styles.avatarLayer} resizeMode="contain" />
+      <Image
+        source={getNounsBody(attrs.body)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsHead(attrs.head)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsGlasses(attrs.glasses)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
+      <Image
+        source={getNounsAccessories(attrs.accessories)}
+        style={styles.avatarLayer}
+        resizeMode="contain"
+      />
     </View>
   );
 });
@@ -98,18 +118,26 @@ export const StatusModal: React.FC<StatusModalProps> = memo(
     const showSecondary = Boolean(secondaryLabel && onSecondaryPress);
 
     return (
-      <Modal visible={visible} transparent animationType="none" onRequestClose={onRequestClose}>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="none"
+        onRequestClose={onRequestClose}
+      >
         <Animated.View style={styles.overlay}>
-          <Animated.View entering={FadeInDown.duration(300)} exiting={FadeOutDown.duration(300)}>
+          <Animated.View
+            entering={FadeInDown.duration(300)}
+            exiting={FadeOutDown.duration(300)}
+          >
             <Window style={styles.windowSize}>
               <View style={styles.contentCenter}>
                 <Text style={styles.titleText}>{title}</Text>
 
-                {renderAvatar !== undefined
-                  ? renderAvatar
-                  : avatarSeed !== undefined
-                    ? <NounAvatar seed={avatarSeed} />
-                    : null}
+                {renderAvatar !== undefined ? (
+                  renderAvatar
+                ) : avatarSeed !== undefined ? (
+                  <NounAvatar seed={avatarSeed} />
+                ) : null}
 
                 <Text style={styles.messageText}>{message}</Text>
 
@@ -118,12 +146,18 @@ export const StatusModal: React.FC<StatusModalProps> = memo(
                 ) : (
                   <View style={styles.buttonRow}>
                     {showSecondary && (
-                      <Pressable onPress={onSecondaryPress} style={styles.secondaryBtn}>
+                      <Pressable
+                        onPress={onSecondaryPress}
+                        style={styles.secondaryBtn}
+                      >
                         <Text style={styles.btnText}>{secondaryLabel}</Text>
                       </Pressable>
                     )}
                     {showPrimary && (
-                      <Pressable onPress={onPrimaryPress} style={styles.primaryBtn}>
+                      <Pressable
+                        onPress={onPrimaryPress}
+                        style={styles.primaryBtn}
+                      >
                         <Text style={styles.btnText}>{primaryLabel}</Text>
                       </Pressable>
                     )}
@@ -223,5 +257,3 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
 });
-
-
