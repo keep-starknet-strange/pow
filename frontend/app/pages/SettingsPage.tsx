@@ -39,6 +39,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
   const ActiveComponent = tabs[activeTab];
 
   const isInLoginMode = setLoginPage !== null;
+  const isClaimReward = activeTab === "ClaimReward";
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -47,23 +48,30 @@ export const SettingsPage: React.FC<SettingsProps> = ({
 
   return (
     <View className="flex-1 relative w-full h-full">
-      <MainBackground />
+      {!isClaimReward && <MainBackground />}
       <View
         className="w-full h-full flex-1 items-center justify-center"
         style={{
           paddingTop: isInLoginMode ? insets.top : 0,
           paddingBottom: isInLoginMode ? insets.bottom : 0,
-          paddingHorizontal: 32,
+          paddingHorizontal: isClaimReward ? 0 : 32,
           gap: 8,
         }}
       >
-        <ActiveComponent
-          setSettingTab={setActiveTab}
-          goBackToLogin={() => {
-            setLoginPage?.("login");
-          }}
-        />
-        {activeTab !== "Main" && (
+        {activeTab === "ClaimReward" ? (
+          <ClaimRewardSection
+            setSettingTab={setActiveTab as any}
+            onBack={() => setActiveTab("Main")}
+          />
+        ) : (
+          <ActiveComponent
+            setSettingTab={setActiveTab as any}
+            goBackToLogin={() => {
+              setLoginPage?.("login");
+            }}
+          />
+        )}
+        {activeTab !== "Main" && activeTab !== "ClaimReward" && (
           <Animated.View entering={FadeInDown}>
             <BasicButton
               label="Back"

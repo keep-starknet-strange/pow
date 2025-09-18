@@ -93,6 +93,8 @@ mod PowGame {
         user_balances: Map<ContractAddress, u128>,
         // Maps: user address -> reward claimed
         reward_claimed: Map<ContractAddress, bool>,
+        // Maps: recipient address -> reward received
+        received_reward: Map<ContractAddress, bool>,
         // Cheat codes enabled flag
         cheat_codes_enabled: bool,
         #[substorage(v0)]
@@ -134,6 +136,13 @@ mod PowGame {
         recipient: ContractAddress,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct DoubleClaim {
+        #[key]
+        user: ContractAddress,
+        recipient: ContractAddress,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
@@ -159,6 +168,7 @@ mod PowGame {
         #[flat]
         PausableEvent: PausableComponent::Event,
         CheatCodeUsed: CheatCodeUsed,
+        DoubleClaim: DoubleClaim,
     }
 
     #[constructor]
@@ -300,19 +310,24 @@ mod PowGame {
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
+            let recipient_received = self.received_reward.read(recipient);
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
             assert!(prestige >= reward_prestige_threshold, "Not enough prestige to claim reward");
 
             self.reward_claimed.write(caller, true);
+            self.received_reward.write(recipient, true);
+            if !recipient_received {
+                let success: bool = IERC20Dispatcher {
+                    contract_address: self.reward_token_address.read(),
+                }
+                    .transfer(recipient, self.reward_amount.read());
 
-            let success: bool = IERC20Dispatcher {
-                contract_address: self.reward_token_address.read(),
+                assert!(success, "Reward transfer failed");
+                self.emit(RewardClaimed { user: caller, recipient });
+            } else {
+                self.emit(DoubleClaim { user: caller, recipient });
             }
-                .transfer(recipient, self.reward_amount.read());
-
-            assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed { user: caller, recipient });
         }
 
         fn host_give_reward(
@@ -321,8 +336,11 @@ mod PowGame {
             self.check_valid_host(get_caller_address());
             let claimed = self.reward_claimed.read(user);
             assert!(!claimed, "Reward already claimed");
+            let recipient_received = self.received_reward.read(recipient);
+            assert!(!recipient_received, "Recipient already received reward");
 
             self.reward_claimed.write(user, true);
+            self.received_reward.write(recipient, true);
 
             let success: bool = IERC20Dispatcher {
                 contract_address: self.reward_token_address.read(),
