@@ -59,7 +59,7 @@ export const InsufficientFundsModal: React.FC<Props> = ({
 }) => {
   return (
     <StatusModal
-      visible={true}
+      visible={visible}
       title="Capital Controls"
       message={
         "Capital controls in effect: the bank is out of funds for now—check back later to claim your rewards. Rewards will resume when the pool is replenished."

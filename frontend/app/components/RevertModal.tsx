@@ -30,8 +30,6 @@ const RevertModalComponent: React.FC = () => {
     }
   }, [isReverting]);
 
-  if (!shouldShow) return null;
-
   const title = useMemo(() => {
     return isConnected ? "Reversion Attack!" : "Connection Lost!";
   }, [isConnected]);
