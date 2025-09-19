@@ -5,6 +5,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import * as Crypto from "expo-crypto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { toBeHex } from "ethers";
@@ -250,7 +251,7 @@ export const StarknetConnectorProvider: React.FC<{
 
   const randomHex = (length: number): string => {
     const randomBytes = new Uint8Array(length / 2);
-    window.crypto.getRandomValues(randomBytes);
+    Crypto.getRandomValues(randomBytes);
     return Array.from(randomBytes, (byte) =>
       byte.toString(16).padStart(2, "0"),
     ).join("");
