@@ -79,6 +79,11 @@ type PowContractContextType = {
     | undefined
   >;
   getHasClaimedReward: () => Promise<boolean | undefined>;
+  getTokenBalanceOf: (
+    tokenAddress: string,
+    ownerAddress: string,
+  ) => Promise<bigint | null>;
+  getRewardPoolBalance: () => Promise<bigint | null>;
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
@@ -166,6 +171,81 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     powContract.connect(account);
   }, [account, powContract, STARKNET_ENABLED]);
+
+  const getTokenBalanceOf = useCallback(
+    async (
+      tokenAddress: string,
+      ownerAddress: string,
+    ): Promise<bigint | null> => {
+      if (!STARKNET_ENABLED || !provider) return null;
+      // Try minimal Cairo 1 ABI first
+      try {
+        const abiC1 = [
+          {
+            type: "function",
+            name: "balance_of",
+            state_mutability: "view",
+            inputs: [
+              {
+                name: "account",
+                type: "core::starknet::contract_address::ContractAddress",
+              },
+            ],
+            outputs: [
+              {
+                type: "core::integer::u256",
+              },
+            ],
+          },
+        ] as any;
+        const contract = new Contract(abiC1, tokenAddress, provider);
+        const response: any = await contract.balance_of(ownerAddress);
+        if (response != null) return response;
+      } catch (error) {
+        if (__DEV__) {
+          console.error(
+            "Failed to fetch token balance of",
+            tokenAddress,
+            ownerAddress,
+            error,
+          );
+        }
+      }
+      return null;
+    },
+    [STARKNET_ENABLED, provider],
+  );
+
+  const getRewardPoolBalance = useCallback(async (): Promise<bigint | null> => {
+    if (!STARKNET_ENABLED || !provider || !powGameContractAddress) return null;
+    try {
+      const params = await powContract?.get_reward_params?.();
+      const tokenAny = (params as any)?.reward_token_address;
+      if (tokenAny == null) return null;
+
+      // Normalize address to 0x-hex string (params may return BigInt/decimal string)
+      let tokenHex: string;
+      try {
+        const tokenBig = BigInt(
+          (tokenAny as any)?.toString?.() ?? (tokenAny as string),
+        );
+        tokenHex = `0x${tokenBig.toString(16)}`;
+      } catch (_e) {
+        const raw = String(tokenAny);
+        tokenHex = raw.startsWith("0x") ? raw : `0x${BigInt(raw).toString(16)}`;
+      }
+
+      return await getTokenBalanceOf(tokenHex, powGameContractAddress);
+    } catch (_e) {
+      return null;
+    }
+  }, [
+    STARKNET_ENABLED,
+    provider,
+    powGameContractAddress,
+    powContract,
+    getTokenBalanceOf,
+  ]);
 
   const createGameAccount = useCallback(async () => {
     if (!STARKNET_ENABLED) {
@@ -645,6 +725,8 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserPrestiges,
         getRewardParams,
         getHasClaimedReward,
+        getTokenBalanceOf,
+        getRewardPoolBalance,
         doubleBalanceCheat,
       }}
     >

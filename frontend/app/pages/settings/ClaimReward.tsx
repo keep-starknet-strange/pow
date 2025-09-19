@@ -24,6 +24,7 @@ import { PageHeader } from "../../components/claim-reward/PageHeader";
 import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
 import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
+import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -51,19 +52,27 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   onBack,
 }) => {
   const { invokeCalls, network } = useStarknetConnector();
-  const { powGameContractAddress, getRewardParams } = usePowContractConnector();
+  const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
+    usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
+  const [rewardAmountRaw, setRewardAmountRaw] = useState<bigint | null>(null);
+  // no local token address state needed; the connector reads it internally
   const [rewardPrestigeThreshold, setRewardPrestigeThreshold] =
     useState<number>(0);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
   const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
   const { notify } = useEventManager();
+  const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
+
+  const handleBack = useCallback(() => {
+    if (onBack) onBack();
+  }, [onBack]);
 
   const claimReward = useCallback(async () => {
     const recipient = (debouncedInput || "").trim();
@@ -136,8 +145,37 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
           (params as any).rewardPrestigeThreshold as number,
         );
       }
+      // Keep bigint raw form for comparisons
+      try {
+        const big = decoded != null ? BigInt(decoded as any) : null;
+        setRewardAmountRaw(big);
+      } catch (_e) {
+        setRewardAmountRaw(null);
+      }
     })();
   }, [getRewardParams]);
+
+  // Check POW contract reward-token balance via connector
+  useEffect(() => {
+    if (!rewardAmountRaw) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const bal = await getRewardPoolBalance();
+        if (cancelled) return;
+        if (bal != null && bal < rewardAmountRaw) {
+          setShowInsufficientFunds(true);
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.error("Failed to fetch reward pool balance:", error);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [getRewardPoolBalance, rewardAmountRaw]);
 
   // Load saved transaction hash on mount
   useEffect(() => {
@@ -206,10 +244,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     }
   }, []);
 
-  const handleBack = useCallback(() => {
-    if (onBack) onBack();
-  }, [onBack]);
-
   const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
     (debouncedInput || "").trim(),
   );
@@ -240,6 +274,13 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
 
   return (
     <SafeAreaView style={[styles.safe]}>
+      <InsufficientFundsModal
+        visible={showInsufficientFunds}
+        onBack={() => {
+          setShowInsufficientFunds(false);
+          handleBack();
+        }}
+      />
       <PageHeader title="CLAIM REWARD" width={width} />
 
       <ScrollView
