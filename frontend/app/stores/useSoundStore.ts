@@ -519,10 +519,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayer.removeListener(
-            "playbackStatusUpdate",
-            musicPlayerListener,
-          );
+          try {
+            if (typeof musicPlayerListener === "function") {
+              // Old API style - listener is a function
+              musicPlayer.removeListener(
+                "playbackStatusUpdate",
+                musicPlayerListener,
+              );
+            } else if (
+              musicPlayerListener &&
+              typeof musicPlayerListener.remove === "function"
+            ) {
+              // New API style - listener is a subscription object with remove method
+              musicPlayerListener.remove();
+            }
+          } catch (listenerError) {
+            if (__DEV__)
+              console.warn(
+                "Failed to remove music player listener:",
+                listenerError,
+              );
+          }
         }
         musicPlayer.pause();
         musicPlayer.release();
@@ -556,10 +573,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayer.removeListener(
-            "playbackStatusUpdate",
-            musicPlayerListener,
-          );
+          try {
+            if (typeof musicPlayerListener === "function") {
+              // Old API style - listener is a function
+              musicPlayer.removeListener(
+                "playbackStatusUpdate",
+                musicPlayerListener,
+              );
+            } else if (
+              musicPlayerListener &&
+              typeof musicPlayerListener.remove === "function"
+            ) {
+              // New API style - listener is a subscription object with remove method
+              musicPlayerListener.remove();
+            }
+          } catch (listenerError) {
+            if (__DEV__)
+              console.warn(
+                "Failed to remove music player listener:",
+                listenerError,
+              );
+          }
         }
         musicPlayer.pause();
         musicPlayer.release();

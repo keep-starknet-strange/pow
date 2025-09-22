@@ -1,5 +1,11 @@
-import { memo, useState, useEffect, useMemo } from "react";
-import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { memo, useState, useEffect, useMemo, useCallback } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import {
   Canvas,
   Image,
@@ -132,35 +138,24 @@ export const LeaderboardPage: React.FC = () => {
     },
   ];
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const pageSize = 20;
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    if (!isFocused) {
-      return; // Don't run if the page is not focused
-    }
-
-    // Use mock data if USE_MOCK is true
-    if (useMock) {
-      setLeaderboard(leaderboardMock);
-      setIsLoading(false);
-      setError(null);
-      return;
-    }
-
-    if (!STARKNET_ENABLED || !powGameContractAddress) {
-      // If Starknet is not enabled and not using mock, show error
-      setError("Unable to connect to blockchain");
-      setIsLoading(false);
-      return;
-    }
-
-    const getLeaderboard = async () => {
-      setIsLoading(true);
+  const loadLeaderboardPage = useCallback(
+    async (page: number, isInitialLoad: boolean = false) => {
+      if (isInitialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       setError(null);
 
       try {
         const response = await fetch(
-          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=20`,
+          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=${pageSize}&page=${page}`,
         );
 
         if (!response.ok) {
@@ -169,6 +164,10 @@ export const LeaderboardPage: React.FC = () => {
 
         const data = await response.json();
         const events = data.events || [];
+
+        if (events.length < pageSize) {
+          setHasMorePages(false);
+        }
 
         // Extract user addresses and balances from events
         const eventData = events.map((event: any) => ({
@@ -195,6 +194,8 @@ export const LeaderboardPage: React.FC = () => {
           const name = hasValidUsername
             ? account.account.username
             : shortAddress;
+
+          const baseId = page * pageSize + index + 1;
           return {
             address: item.user,
             balance: item.balance,
@@ -212,28 +213,74 @@ export const LeaderboardPage: React.FC = () => {
                   )
                 : getRandomNounsAttributes(item.user),
             name,
-            id: index + 1,
+            id: baseId,
           };
         });
+
         users.sort((a: any, b: any) => b.balance - a.balance);
-        setLeaderboard(users);
+
+        if (isInitialLoad) {
+          setLeaderboard(users);
+        } else {
+          setLeaderboard((prev) => [...prev, ...users]);
+        }
+
         setIsLoading(false);
+        setIsLoadingMore(false);
         setError(null);
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
         setError("Failed to load leaderboard. Please try again later.");
-        setLeaderboard([]);
+        if (isInitialLoad) {
+          setLeaderboard([]);
+        }
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
-    };
+    },
+    [getAccounts, getUserPrestiges, pageSize],
+  );
 
-    getLeaderboard();
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasMorePages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      loadLeaderboardPage(nextPage, false);
+    }
+  }, [currentPage, isLoadingMore, hasMorePages, loadLeaderboardPage]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      return; // Don't run if the page is not focused
+    }
+
+    // Reset state when page comes into focus
+    setCurrentPage(0);
+    setHasMorePages(true);
+    setLeaderboard([]);
+
+    // Use mock data if USE_MOCK is true
+    if (useMock) {
+      setLeaderboard(leaderboardMock);
+      setIsLoading(false);
+      setError(null);
+      setHasMorePages(false);
+      return;
+    }
+
+    if (!STARKNET_ENABLED || !powGameContractAddress) {
+      // If Starknet is not enabled and not using mock, show error
+      setError("Unable to connect to blockchain");
+      setIsLoading(false);
+      return;
+    }
+
+    loadLeaderboardPage(0, true);
   }, [
     STARKNET_ENABLED,
     powGameContractAddress,
-    getAccounts,
-    getUserPrestiges,
     isFocused,
+    loadLeaderboardPage,
   ]);
 
   if (!isFocused) {
@@ -327,6 +374,26 @@ export const LeaderboardPage: React.FC = () => {
           renderItem={({ item, index }) => (
             <LeaderboardItem index={index} user={item} />
           )}
+          ListFooterComponent={() =>
+            hasMorePages ? (
+              <View className="items-center mb-4 mt-2">
+                <TouchableOpacity
+                  onPress={handleLoadMore}
+                  disabled={isLoadingMore}
+                >
+                  <View className="bg-[#1b1c26] border-2 border-[#2a2b3a] rounded-lg py-3 items-center">
+                    {isLoadingMore ? (
+                      <ActivityIndicator size="small" color="#fff7ff" />
+                    ) : (
+                      <Text className="text-white text-[16px] font-Pixels px-8">
+                        more...
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ) : null
+          }
           contentContainerStyle={{ paddingBottom: 200 }}
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
