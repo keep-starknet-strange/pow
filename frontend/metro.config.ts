@@ -13,7 +13,7 @@ config.resolver.unstable_conditionNames = [
   "react-native",
 ];
 config.resolver.extraNodeModules = {
-  crypto: require.resolve("react-native-crypto"),
+  crypto: require.resolve("expo-crypto"),
   stream: require.resolve("readable-stream"),
 };
 
