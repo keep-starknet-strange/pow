@@ -26,6 +26,7 @@ import { View, StyleProp, ViewStyle } from "react-native";
 import { BlockView } from "./BlockView";
 import { useImages } from "../hooks/useImages";
 import { useGameStore } from "../stores/useGameStore";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 import { Block } from "../types/Chains";
 import { WorkingBlockDetails } from "./WorkingBlockDetails";
 import { EmptyBlockView } from "./EmptyBlockView";
@@ -47,6 +48,7 @@ export type BlockchainViewProps = {
 
 export const BlockchainView: React.FC<BlockchainViewProps> = memo(
   (props) => {
+    const { shouldAnimate } = useAnimationConfig();
     const parentRef = useRef<View>(null);
     const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
 
@@ -82,13 +84,15 @@ export const BlockchainView: React.FC<BlockchainViewProps> = memo(
     const blockShakeAnim = useSharedValue(0);
 
     const triggerBlockShake = useCallback(() => {
+      if (!shouldAnimate) return; // Don't animate if animations are disabled
+
       blockShakeAnim.value = withSequence(
         withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
         withSpring(2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
         withSpring(-2, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
         withSpring(0, { duration: 100, dampingRatio: 0.5, stiffness: 100 }),
       );
-    }, []);
+    }, [shouldAnimate]);
 
     const createNewBlockchainBlockView = useCallback(() => {
       const workingBlockId =
@@ -172,6 +176,7 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (
   props,
 ) => {
   const { getImage } = useImages();
+  const { shouldAnimate } = useAnimationConfig();
   const { workingBlocks } = useGameStore();
   const blockHeight = useGameStore(
     (state) => state.blockHeights[props.chainId],
@@ -243,8 +248,8 @@ export const BlockchainBlockView: React.FC<BlockchainBlockViewProps> = (
   const blockTransformStyle = useAnimatedStyle(() => {
     const transforms: any[] = [{ scale: blockScaleAnim.value }];
 
-    // Only apply shake animation if this is the current working block
-    if (isCurrentWorkingBlock) {
+    // Only apply shake animation if this is the current working block and animations are enabled
+    if (isCurrentWorkingBlock && shouldAnimate) {
       transforms.push({ rotate: `${props.blockShakeAnim.value}deg` });
     }
 

@@ -38,9 +38,11 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     isSoundOn,
     isMusicOn,
     isHapticsOn,
+    animationLevel,
     toggleSound,
     toggleMusic,
     toggleHaptics,
+    setAnimationLevel,
   } = useSound();
   const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
@@ -139,6 +141,18 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
           <BasicButton
             label={isHapticsOn ? "Haptics On" : "Haptics Off"}
             onPress={toggleHaptics}
+          />
+          <BasicButton
+            label={`Anims ${animationLevel === "full" ? "Full" : animationLevel === "reduced" ? "Less" : "Off"}`}
+            onPress={() => {
+              const nextLevel =
+                animationLevel === "full"
+                  ? "reduced"
+                  : animationLevel === "reduced"
+                    ? "off"
+                    : "full";
+              setAnimationLevel(nextLevel);
+            }}
           />
 
           {settingsComponents.map(({ label, tab, onPress }) => (

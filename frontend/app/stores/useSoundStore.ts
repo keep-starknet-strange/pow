@@ -10,6 +10,7 @@ const SOUND_VOLUME_KEY = "sound_volume";
 const MUSIC_ENABLED_KEY = "music_enabled";
 const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
+const ANIMATIONS_LEVEL_KEY = "animations_level";
 const FIRST_LAUNCH_KEY = "has_launched_before";
 
 const musicAssets: { [key: string]: any } = {
@@ -193,10 +194,13 @@ class SoundPool {
   }
 }
 
+export type AnimationLevel = "full" | "reduced" | "off";
+
 interface SoundState {
   isSoundOn: boolean;
   isMusicOn: boolean;
   isHapticsOn: boolean;
+  animationLevel: AnimationLevel;
   soundEffectVolume: number;
   musicVolume: number;
   musicPlayer: AudioPlayer | null;
@@ -212,6 +216,7 @@ interface SoundState {
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
   toggleHaptics: () => void;
+  setAnimationLevel: (level: AnimationLevel) => void;
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
   playSoundEffect: (soundType: string, pitchShift?: number) => Promise<void>;
@@ -228,6 +233,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   isSoundOn: false,
   isMusicOn: false,
   isHapticsOn: true,
+  animationLevel: "full",
   soundEffectVolume: 1,
   musicVolume: 0.2,
   musicPlayer: null,
@@ -250,6 +256,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
       const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
       const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
+      const animationLevel = await AsyncStorage.getItem(ANIMATIONS_LEVEL_KEY);
       const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
       const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
       const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
@@ -309,6 +316,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         isSoundOn: soundEnabled === "true" || soundEnabled === null,
         isMusicOn: musicOn,
         isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
+        animationLevel: (animationLevel as AnimationLevel) || "full",
         soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
         musicVolume: volume,
         musicPlayer: musicPlayer,
@@ -326,6 +334,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         isSoundOn: true,
         isMusicOn: false,
         isHapticsOn: true,
+        animationLevel: "full",
         soundEffectVolume: 1,
         musicVolume: 0.5,
         soundPool: new SoundPool(),
@@ -404,6 +413,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       AsyncStorage.setItem(HAPTICS_ENABLED_KEY, newValue.toString());
       return { isHapticsOn: newValue };
     });
+  },
+
+  setAnimationLevel: (level: AnimationLevel) => {
+    set({ animationLevel: level });
+    AsyncStorage.setItem(ANIMATIONS_LEVEL_KEY, level);
   },
 
   setSoundEffectVolume: (volume) => {
@@ -677,8 +691,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   playRevertMusic: async () => {
-    const { isMusicOn, musicVolume, musicPlayer, currentTrackName, revertMusicPlayer } = get();
-
+    const {
+      isMusicOn,
+      musicVolume,
+      musicPlayer,
+      currentTrackName,
+      revertMusicPlayer,
+    } = get();
 
     // Don't start if already playing
     if (revertMusicPlayer) {
@@ -704,12 +723,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const revertMusicAsset = require("../../assets/music/revert-theme.m4a");
 
       const revertPlayer = createAudioPlayer(revertMusicAsset);
-      // Use the music volume setting if available, otherwise default to 0.3  
+      // Use the music volume setting if available, otherwise default to 0.3
       const volume = musicVolume > 0 ? musicVolume * 0.8 : 0.3;
       revertPlayer.volume = volume;
       revertPlayer.shouldCorrectPitch = true; // Enable pitch correction like sound effects
       // Don't set loop immediately, set it after play starts
-      
 
       // Store player reference before playing
       set({
@@ -720,12 +738,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       // Play the revert music - handle both Promise and non-Promise return
       try {
         const playResult = revertPlayer.play();
-        if (playResult && typeof playResult.then === 'function') {
+        if (playResult && typeof playResult.then === "function") {
           // It's a Promise
-          playResult.then(() => {
-          }).catch((error) => {
-            console.error("Failed to start revert music:", error);
-          });
+          playResult
+            .then(() => {})
+            .catch((error) => {
+              console.error("Failed to start revert music:", error);
+            });
         } else {
           // Not a Promise, play() completed synchronously
           // Set loop after playing starts
@@ -743,20 +762,21 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       setTimeout(() => {
         const currentPlayer = get().revertMusicPlayer;
         if (currentPlayer) {
+          // Player is available, potentially add status checks here if needed
         }
       }, 500);
-      
+
       // Also check after a longer delay
       setTimeout(() => {
         const currentPlayer = get().revertMusicPlayer;
         if (currentPlayer) {
+          // Player is available, potentially add status checks here if needed
         }
       }, 2000);
 
       // Also play the revert sound effect
       const { playSoundEffect } = get();
       playSoundEffect("RevertStarted");
-
     } catch (error) {
       console.error("Failed to play revert music - full error:", error);
     }
@@ -771,21 +791,19 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       musicVolume,
     } = get();
 
-
     // Stop and cleanup revert music
     if (revertMusicPlayer) {
       try {
-        
         // First set state to indicate we're stopping
         set({
           isPlayingRevertMusic: false,
         });
-        
+
         // Then stop and cleanup the player
         if (revertMusicPlayer.playing) {
           await revertMusicPlayer.pause();
         }
-        
+
         // Small delay before release to ensure pause completes
         setTimeout(() => {
           try {
@@ -794,13 +812,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             console.error("Error releasing revert player:", releaseError);
           }
         }, 100);
-        
+
         // Clear the reference
         set({
           revertMusicPlayer: null,
           previousTrackBeforeRevert: null,
         });
-        
       } catch (error) {
         console.error("Failed to stop revert music:", error);
         // Force clear the reference even if cleanup failed
@@ -873,11 +890,13 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
+    animationLevel,
     soundEffectVolume,
     musicVolume,
     toggleSound,
     toggleMusic,
     toggleHaptics,
+    setAnimationLevel,
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,
@@ -890,11 +909,13 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
+    animationLevel,
     soundEffectVolume,
     musicVolume,
     toggleSound,
     toggleMusic,
     toggleHaptics,
+    setAnimationLevel,
     setSoundEffectVolume,
     setMusicVolume,
     playSoundEffect,

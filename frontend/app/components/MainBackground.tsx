@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { useInterval } from "usehooks-ts";
 import { useImages } from "../hooks/useImages";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 import {
   withTiming,
   Easing,
@@ -20,6 +21,7 @@ import {
 export const MainBackground: React.FC = memo(() => {
   const { getImage } = useImages();
   const { width, height } = useCachedWindowDimensions();
+  const { shouldAnimate } = useAnimationConfig();
 
   const bgOffsetX = useSharedValue(0);
   const bgOffsetY = useSharedValue(0);
@@ -43,6 +45,8 @@ export const MainBackground: React.FC = memo(() => {
   };
 
   const updateBackgroundOffsets = (travelDuration: number) => {
+    if (!shouldAnimate) return; // Don't animate if animations are disabled
+
     const { x: travelDirectionX, y: travelDirectionY } =
       getRandomTravelDirection(travelDuration);
     bgOffsetX.value = withTiming(bgOffsetX.value + travelDirectionX, {

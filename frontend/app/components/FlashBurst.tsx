@@ -10,6 +10,7 @@ import Animated, {
   withDelay,
   runOnJS,
 } from "react-native-reanimated";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 
 interface FlashBurstProps {
   x: number; // Click position X
@@ -307,6 +308,7 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
   renderedBy,
   onComplete,
 }) => {
+  const { shouldAnimate, animationIntensity } = useAnimationConfig();
   const containerOpacity = useSharedValue(0);
 
   // Get text and color based on confirmer type
@@ -388,9 +390,19 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
     };
   });
 
-  // Generate random streaks
+  // Generate random streaks with intensity based on animation settings
   const streaks = React.useMemo(() => {
-    const streakCount = 8 + Math.floor(Math.random() * 4); // 8-12 streaks
+    if (!shouldAnimate) return [];
+
+    let streakCount: number;
+    if (animationIntensity === "full") {
+      streakCount = 8 + Math.floor(Math.random() * 4); // 8-12 streaks
+    } else if (animationIntensity === "reduced") {
+      streakCount = 4 + Math.floor(Math.random() * 2); // 4-5 streaks
+    } else {
+      return [];
+    }
+
     return Array.from({ length: streakCount }, (_, index) => {
       // Distribute evenly around the circle with some random variation
       const baseAngle = (360 / streakCount) * index;
@@ -401,11 +413,21 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
         delay: Math.random() * 50, // Random delay 0-50ms
       };
     });
-  }, [trigger]);
+  }, [trigger, shouldAnimate, animationIntensity]);
 
-  // Generate random text particles
+  // Generate random text particles with intensity based on animation settings
   const textParticles = React.useMemo(() => {
-    const particleCount = 4 + Math.floor(Math.random() * 3); // 4-6 particles as requested
+    if (!shouldAnimate) return [];
+
+    let particleCount: number;
+    if (animationIntensity === "full") {
+      particleCount = 4 + Math.floor(Math.random() * 3); // 4-6 particles
+    } else if (animationIntensity === "reduced") {
+      particleCount = 2 + Math.floor(Math.random() * 2); // 2-3 particles
+    } else {
+      return [];
+    }
+
     return Array.from({ length: particleCount }, (_, index) => {
       const angle = Math.random() * 360; // Completely random angles
       return {
@@ -414,9 +436,19 @@ export const FlashBurst: React.FC<FlashBurstProps> = ({
         delay: Math.random() * 100, // Random delay 0-100ms
       };
     });
-  }, [trigger]);
+  }, [trigger, shouldAnimate, animationIntensity]);
 
   if (trigger === 0) return null;
+
+  // If animations are disabled, trigger completion callback immediately and return null
+  if (!shouldAnimate) {
+    React.useEffect(() => {
+      if (trigger > 0 && onComplete) {
+        onComplete();
+      }
+    }, [trigger, onComplete]);
+    return null;
+  }
 
   return (
     <Animated.View
