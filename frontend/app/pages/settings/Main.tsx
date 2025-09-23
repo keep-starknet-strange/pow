@@ -9,6 +9,7 @@ import BasicButton from "../../components/buttons/Basic";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 
 import { useSound } from "../../stores/useSoundStore";
+import { useAnimations } from "../../stores/useAnimationsStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
@@ -38,12 +39,11 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     isSoundOn,
     isMusicOn,
     isHapticsOn,
-    animationLevel,
     toggleSound,
     toggleMusic,
     toggleHaptics,
-    setAnimationLevel,
   } = useSound();
+  const { animationLevel, setAnimationLevel } = useAnimations();
   const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const [isRewardClaimed, setIsRewardClaimed] = useState(false);

@@ -1,4 +1,4 @@
-import { useSoundStore } from "../stores/useSoundStore";
+import { useAnimationsStore } from "../stores/useAnimationsStore";
 
 export type AnimationIntensity = "full" | "reduced" | "none";
 
@@ -13,7 +13,7 @@ export interface AnimationConfig {
  * Components should use this to determine if and how they should animate.
  */
 export const useAnimationConfig = (): AnimationConfig => {
-  const { animationLevel } = useSoundStore();
+  const { animationLevel } = useAnimationsStore();
 
   // TODO: In the future, we could also check system preferences for reduced motion
   // const reduceMotion = useReducedMotion(); // From react-native-reanimated or system settings
