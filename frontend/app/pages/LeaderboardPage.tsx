@@ -380,16 +380,55 @@ export const LeaderboardPage: React.FC = () => {
                 <TouchableOpacity
                   onPress={handleLoadMore}
                   disabled={isLoadingMore}
+                  style={{
+                    width: 120,
+                    height: 48,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
                 >
-                  <View className="bg-[#1b1c26] border-2 border-[#2a2b3a] rounded-lg py-3 items-center">
-                    {isLoadingMore ? (
-                      <ActivityIndicator size="small" color="#fff7ff" />
-                    ) : (
-                      <Text className="text-white text-[16px] font-Pixels px-8">
-                        more...
-                      </Text>
-                    )}
-                  </View>
+                  {!isLoadingMore && (
+                    <Canvas
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        width: 120,
+                        height: 48,
+                      }}
+                    >
+                      <Image
+                        image={getImage("staking.button")}
+                        x={0}
+                        y={0}
+                        width={120}
+                        height={48}
+                        fit="fill"
+                        sampling={{
+                          filter: FilterMode.Nearest,
+                          mipmap: MipmapMode.Nearest,
+                        }}
+                      />
+                    </Canvas>
+                  )}
+                  {isLoadingMore ? (
+                    <ActivityIndicator size="small" color="#fff7ff" />
+                  ) : (
+                    <Text
+                      style={{
+                        fontFamily: "Pixels",
+                        fontSize: 16,
+                        color: "#fff7ff",
+                        textAlign: "center",
+                        paddingVertical: 12,
+                        paddingHorizontal: 8,
+                      }}
+                    >
+                      more...
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </View>
             ) : null
