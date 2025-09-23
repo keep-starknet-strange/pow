@@ -527,6 +527,22 @@ export const LeaderboardItem: React.FC<{
   ({ index, user }: { index: number; user: any }) => {
     const { getImage } = useImages();
 
+    const getRankBadge = (index: number) => {
+      switch (index) {
+        case 0:
+          return { badge: "leaderboard.number.gold", color: "#C61C01" };
+        case 1:
+          return { badge: "leaderboard.number.silver", color: "#252529" };
+        case 2:
+          return { badge: "leaderboard.number.bronze", color: "#672703" };
+        default:
+          return null;
+      }
+    };
+
+    const rankInfo = getRankBadge(index);
+    const rankNumber = index < 3 ? `0${index + 1}` : null;
+
     return (
       <View
         key={user.id}
@@ -538,6 +554,37 @@ export const LeaderboardItem: React.FC<{
           className="flex flex-row items-center flex-1"
           entering={FadeInLeft}
         >
+          {rankInfo && (
+            <View className="w-[36px] h-[36px] mr-1 relative">
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <Image
+                  image={getImage(rankInfo.badge)}
+                  fit="contain"
+                  x={0}
+                  y={0}
+                  width={36}
+                  height={36}
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                />
+              </Canvas>
+              <View className="absolute inset-0 items-center justify-center">
+                <Text
+                  className="text-[16px] font-Xerxes"
+                  style={{
+                    color: rankInfo.color,
+                    includeFontPadding: false,
+                    textAlign: "center",
+                    lineHeight: 16,
+                  }}
+                >
+                  {rankNumber}
+                </Text>
+              </View>
+            </View>
+          )}
           <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
             <PFPView user={user.address} attributes={user.nouns} />
           </View>

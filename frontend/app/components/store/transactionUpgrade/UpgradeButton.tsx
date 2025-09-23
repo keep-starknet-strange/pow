@@ -155,7 +155,7 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
                   <Canvas style={{ width: 24, height: 24 }}>
                     {paused ? (
                       /* Play button - triangle */
-                      <Path path="M 9 7 L 9 17 L 17 12 Z" color="#e7e7e7" />
+                      <Path path="M 9 7 L 9 15 L 17 11 Z" color="#e7e7e7" />
                     ) : (
                       /* Pause button - two bars */
                       <>
@@ -163,14 +163,14 @@ export const UpgradeButton = memo<UpgradeButtonProps>(
                           x={8}
                           y={7}
                           width={3}
-                          height={10}
+                          height={8}
                           color="#e7e7e7"
                         />
                         <Rect
                           x={13}
                           y={7}
                           width={3}
-                          height={10}
+                          height={8}
                           color="#e7e7e7"
                         />
                       </>
