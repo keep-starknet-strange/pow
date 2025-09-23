@@ -89,7 +89,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         </View>
       </ScrollView>
       <View className="items-center">
-        <BasicButton label="Terms of Use" onPress={() => setSettingTab("TermsOfUse")} />
+        <BasicButton
+          label="Terms of Use"
+          onPress={() => setSettingTab("TermsOfUse")}
+        />
       </View>
       <View className="mt-2 items-center">
         <BasicButton label="Credits" onPress={() => setSettingTab("Credits")} />
