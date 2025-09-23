@@ -35,7 +35,10 @@ import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { FOC_ENGINE_API } from "../context/FocEngineConnector";
 import { useMock } from "../api/requests";
-import { useLeaderboardInfiniteQuery, LeaderboardUser } from "../hooks/useLeaderboardQueries";
+import {
+  useLeaderboardInfiniteQuery,
+  LeaderboardUser,
+} from "../hooks/useLeaderboardQueries";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -55,7 +58,7 @@ export const LeaderboardPage: React.FC = () => {
   const { width, height } = useCachedWindowDimensions();
   const { powGameContractAddress } = usePowContractConnector();
   const isFocused = useIsFocused();
-  
+
   // Use TanStack Query for leaderboard data
   const {
     data,
@@ -70,7 +73,7 @@ export const LeaderboardPage: React.FC = () => {
   // Flatten all pages into a single array
   const leaderboard = useMemo(() => {
     if (!data?.pages) return [];
-    return data.pages.flatMap(page => page.users);
+    return data.pages.flatMap((page) => page.users);
   }, [data]);
 
   const handleLoadMore = useCallback(() => {
@@ -82,7 +85,10 @@ export const LeaderboardPage: React.FC = () => {
   // Error message for display
   const errorMessage = useMemo(() => {
     if (isError) {
-      return (error as Error)?.message || "Failed to load leaderboard. Please try again later.";
+      return (
+        (error as Error)?.message ||
+        "Failed to load leaderboard. Please try again later."
+      );
     }
     if (!STARKNET_ENABLED && !useMock) {
       return "Unable to connect to blockchain";

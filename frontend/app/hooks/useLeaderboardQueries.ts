@@ -1,8 +1,20 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useFocEngine, FocAccount, FOC_ENGINE_API } from '../context/FocEngineConnector';
-import { usePowContractConnector } from '../context/PowContractConnector';
-import { createNounsAttributes, getRandomNounsAttributes } from '../configs/nouns';
-import { useMock } from '../api/requests';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  useFocEngine,
+  FocAccount,
+  FOC_ENGINE_API,
+} from "../context/FocEngineConnector";
+import { usePowContractConnector } from "../context/PowContractConnector";
+import {
+  createNounsAttributes,
+  getRandomNounsAttributes,
+} from "../configs/nouns";
+import { useMock } from "../api/requests";
 
 export interface LeaderboardUser {
   id: number;
@@ -84,13 +96,15 @@ export const useLeaderboardInfiniteQuery = () => {
   const { getUserPrestiges } = usePowContractConnector();
   const pageSize = 20;
 
-  const fetchLeaderboardPage = async ({ pageParam = 0 }): Promise<LeaderboardPageData> => {
+  const fetchLeaderboardPage = async ({
+    pageParam = 0,
+  }): Promise<LeaderboardPageData> => {
     // Use mock data if enabled
     if (useMock) {
       const startIndex = pageParam * pageSize;
       const endIndex = startIndex + pageSize;
       const pageUsers = leaderboardMock.slice(startIndex, endIndex);
-      
+
       return {
         users: pageUsers.map((user, index) => ({
           ...user,
@@ -121,42 +135,46 @@ export const useLeaderboardInfiniteQuery = () => {
     }));
 
     const addresses = eventData.map((item: any) => item.user);
-    
+
     // Fetch account data and prestiges in parallel
     const [accounts, prestiges] = await Promise.all([
       getAccounts(addresses, undefined, true),
       getUserPrestiges(addresses),
     ]);
 
-    const users: LeaderboardUser[] = eventData.map((item: any, index: number) => {
-      const shortAddress = item.user.slice(0, 4) + "..." + item.user.slice(-4);
-      const account = accounts?.find(
-        (account) => account.account_address === item.user,
-      );
-      const hasValidUsername =
-        account?.account.username &&
-        typeof account.account.username === "string" &&
-        account.account.username.trim().length > 1;
-      const name = hasValidUsername ? account.account.username : shortAddress;
+    const users: LeaderboardUser[] = eventData.map(
+      (item: any, index: number) => {
+        const shortAddress =
+          item.user.slice(0, 4) + "..." + item.user.slice(-4);
+        const account = accounts?.find(
+          (account) => account.account_address === item.user,
+        );
+        const hasValidUsername =
+          account?.account.username &&
+          typeof account.account.username === "string" &&
+          account.account.username.trim().length > 1;
+        const name = hasValidUsername ? account.account.username : shortAddress;
 
-      const baseId = pageParam * pageSize + index + 1;
-      return {
-        address: item.user,
-        balance: item.balance,
-        prestige: prestiges && prestiges[index] !== undefined ? prestiges[index] : 0,
-        nouns:
-          account?.account.metadata && account.account.metadata.length === 4
-            ? createNounsAttributes(
-                parseInt(account.account.metadata[0], 16),
-                parseInt(account.account.metadata[1], 16),
-                parseInt(account.account.metadata[2], 16),
-                parseInt(account.account.metadata[3], 16),
-              )
-            : getRandomNounsAttributes(item.user),
-        name,
-        id: baseId,
-      };
-    });
+        const baseId = pageParam * pageSize + index + 1;
+        return {
+          address: item.user,
+          balance: item.balance,
+          prestige:
+            prestiges && prestiges[index] !== undefined ? prestiges[index] : 0,
+          nouns:
+            account?.account.metadata && account.account.metadata.length === 4
+              ? createNounsAttributes(
+                  parseInt(account.account.metadata[0], 16),
+                  parseInt(account.account.metadata[1], 16),
+                  parseInt(account.account.metadata[2], 16),
+                  parseInt(account.account.metadata[3], 16),
+                )
+              : getRandomNounsAttributes(item.user),
+          name,
+          id: baseId,
+        };
+      },
+    );
 
     // Sort by balance (highest first)
     users.sort((a, b) => b.balance - a.balance);
@@ -169,9 +187,10 @@ export const useLeaderboardInfiniteQuery = () => {
   };
 
   return useInfiniteQuery({
-    queryKey: ['leaderboard'],
+    queryKey: ["leaderboard"],
     queryFn: fetchLeaderboardPage,
-    getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.page + 1 : undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.page + 1 : undefined,
     initialPageParam: 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
@@ -187,7 +206,7 @@ export const useAccountQuery = (address: string, enabled: boolean = true) => {
   const { getAccount } = useFocEngine();
 
   return useQuery({
-    queryKey: ['account', address],
+    queryKey: ["account", address],
     queryFn: () => getAccount(address, undefined, true),
     enabled: enabled && !!address,
     staleTime: 15 * 60 * 1000, // 15 minutes - account data changes less frequently
@@ -199,11 +218,14 @@ export const useAccountQuery = (address: string, enabled: boolean = true) => {
 /**
  * Hook to fetch multiple accounts with caching
  */
-export const useAccountsQuery = (addresses: string[], enabled: boolean = true) => {
+export const useAccountsQuery = (
+  addresses: string[],
+  enabled: boolean = true,
+) => {
   const { getAccounts } = useFocEngine();
 
   return useQuery({
-    queryKey: ['accounts', addresses.sort()], // Sort for consistent cache keys
+    queryKey: ["accounts", addresses.sort()], // Sort for consistent cache keys
     queryFn: () => getAccounts(addresses, undefined, true),
     enabled: enabled && addresses.length > 0,
     staleTime: 15 * 60 * 1000, // 15 minutes
@@ -215,11 +237,14 @@ export const useAccountsQuery = (addresses: string[], enabled: boolean = true) =
 /**
  * Hook to fetch user prestiges with caching
  */
-export const usePrestigesQuery = (addresses: string[], enabled: boolean = true) => {
+export const usePrestigesQuery = (
+  addresses: string[],
+  enabled: boolean = true,
+) => {
   const { getUserPrestiges } = usePowContractConnector();
 
   return useQuery({
-    queryKey: ['prestiges', addresses.sort()],
+    queryKey: ["prestiges", addresses.sort()],
     queryFn: () => getUserPrestiges(addresses),
     enabled: enabled && addresses.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes - prestige changes moderately
@@ -241,7 +266,7 @@ export const useInvalidateLeaderboard = () => {
     },
     onSuccess: () => {
       // Invalidate leaderboard data to trigger refetch
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
     },
   });
 };
@@ -253,20 +278,29 @@ export const useUpdateAccountMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ address, data }: { address: string; data: Partial<FocAccount> }) => {
+    mutationFn: async ({
+      address,
+      data,
+    }: {
+      address: string;
+      data: Partial<FocAccount>;
+    }) => {
       // This would normally call an API to update the account
       // For now, we'll just update the cache optimistically
       return data;
     },
     onSuccess: (data, variables) => {
       // Update account cache
-      queryClient.setQueryData(['account', variables.address], (old: FocAccount | undefined) => {
-        if (!old) return old;
-        return { ...old, ...data };
-      });
+      queryClient.setQueryData(
+        ["account", variables.address],
+        (old: FocAccount | undefined) => {
+          if (!old) return old;
+          return { ...old, ...data };
+        },
+      );
 
       // Invalidate leaderboard to show updated data
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
     },
   });
 };

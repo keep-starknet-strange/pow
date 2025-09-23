@@ -2,6 +2,7 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { StatusModal } from "./StatusModal";
 import { useOnchainActions } from "../stores/useOnchainActions";
+import { useSoundStore } from "../stores/useSoundStore";
 
 const RevertModalComponent: React.FC = () => {
   const { isReverting, revertCounter } = useOnchainActions();
@@ -13,6 +14,7 @@ const RevertModalComponent: React.FC = () => {
     if (isReverting) {
       setShouldShow(true);
       setCanDismiss(false);
+
       // Check network connectivity when reverting starts
       NetInfo.fetch().then((state) => {
         setIsConnected(state.isConnected ?? true);
@@ -29,6 +31,19 @@ const RevertModalComponent: React.FC = () => {
       setTimeout(() => setCanDismiss(true), 5000);
     }
   }, [isReverting]);
+
+  // Separate effect for music tied to modal visibility
+  useEffect(() => {
+    if (shouldShow) {
+      // Start playing revert music when modal becomes visible
+      const { playRevertMusic } = useSoundStore.getState();
+      playRevertMusic();
+    } else {
+      // Stop revert music immediately when modal is hidden
+      const { stopRevertMusic } = useSoundStore.getState();
+      stopRevertMusic();
+    }
+  }, [shouldShow]);
 
   const title = useMemo(() => {
     return isConnected ? "Reversion Attack!" : "Connection Lost!";

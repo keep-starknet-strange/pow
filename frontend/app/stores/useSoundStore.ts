@@ -19,6 +19,7 @@ const musicAssets: { [key: string]: any } = {
   "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
   "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
+  "Revert Theme": require("../../assets/music/revert-theme.m4a"),
 };
 
 // Sound file assets - one entry per unique sound file
@@ -31,6 +32,7 @@ const soundFileAssets: { [key: string]: any } = {
   "achieve.m4a": require("../../assets/sounds/achieve.m4a"),
   "basic-click.m4a": require("../../assets/sounds/basic-click.m4a"),
   "dice.m4a": require("../../assets/sounds/dice.m4a"),
+  "revert.m4a": require("../../assets/sounds/revert.m4a"),
 };
 
 // Helper function to get sound file for event type from config
@@ -204,6 +206,9 @@ interface SoundState {
   currentTrackName: string | null;
   lastPlayedTracks: (string | null)[];
   musicPlayerListener: any;
+  revertMusicPlayer: AudioPlayer | null;
+  previousTrackBeforeRevert: string | null;
+  isPlayingRevertMusic: boolean;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -216,6 +221,8 @@ interface SoundState {
   stopMusic: () => Promise<void>;
   cleanupSound: () => void;
   playNextTrack: () => Promise<void>;
+  playRevertMusic: () => Promise<void>;
+  stopRevertMusic: () => Promise<void>;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -230,6 +237,9 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   currentTrackName: null,
   lastPlayedTracks: [],
   musicPlayerListener: null,
+  revertMusicPlayer: null,
+  previousTrackBeforeRevert: null,
+  isPlayingRevertMusic: false,
 
   initializeSound: async () => {
     try {
@@ -564,9 +574,10 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       lastPlayedTracks,
       musicPlayer,
       musicPlayerListener,
+      isPlayingRevertMusic,
     } = get();
 
-    if (!isMusicOn) return;
+    if (!isMusicOn || isPlayingRevertMusic) return;
 
     // Clean up current player
     if (musicPlayer) {
@@ -663,6 +674,163 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       if (__DEV__) console.log(`Now playing: ${nextTrack}`);
     } catch (error) {
       if (__DEV__) console.error("Failed to play next track:", error);
+    }
+  },
+
+  playRevertMusic: async () => {
+    const { isMusicOn, musicVolume, musicPlayer, currentTrackName, revertMusicPlayer } = get();
+
+
+    // Don't start if already playing
+    if (revertMusicPlayer) {
+      return;
+    }
+
+    // Store the current track name before switching (if music was playing)
+    if (isMusicOn && currentTrackName) {
+      set({ previousTrackBeforeRevert: currentTrackName });
+    }
+
+    // Pause current music if playing
+    if (musicPlayer && isMusicOn) {
+      try {
+        musicPlayer.pause();
+      } catch (error) {
+        console.error("Failed to pause music:", error);
+      }
+    }
+
+    try {
+      // Create and play revert theme - plays regardless of music setting for dramatic effect
+      const revertMusicAsset = require("../../assets/music/revert-theme.m4a");
+
+      const revertPlayer = createAudioPlayer(revertMusicAsset);
+      // Use the music volume setting if available, otherwise default to 0.3  
+      const volume = musicVolume > 0 ? musicVolume * 0.8 : 0.3;
+      revertPlayer.volume = volume;
+      revertPlayer.shouldCorrectPitch = true; // Enable pitch correction like sound effects
+      // Don't set loop immediately, set it after play starts
+      
+
+      // Store player reference before playing
+      set({
+        revertMusicPlayer: revertPlayer,
+        isPlayingRevertMusic: true,
+      });
+
+      // Play the revert music - handle both Promise and non-Promise return
+      try {
+        const playResult = revertPlayer.play();
+        if (playResult && typeof playResult.then === 'function') {
+          // It's a Promise
+          playResult.then(() => {
+          }).catch((error) => {
+            console.error("Failed to start revert music:", error);
+          });
+        } else {
+          // Not a Promise, play() completed synchronously
+          // Set loop after playing starts
+          setTimeout(() => {
+            if (revertPlayer && revertPlayer.playing) {
+              revertPlayer.loop = true;
+            }
+          }, 100);
+        }
+      } catch (playError) {
+        console.error("Error calling play():", playError);
+      }
+
+      // Check if playing after a short delay
+      setTimeout(() => {
+        const currentPlayer = get().revertMusicPlayer;
+        if (currentPlayer) {
+        }
+      }, 500);
+      
+      // Also check after a longer delay
+      setTimeout(() => {
+        const currentPlayer = get().revertMusicPlayer;
+        if (currentPlayer) {
+        }
+      }, 2000);
+
+      // Also play the revert sound effect
+      const { playSoundEffect } = get();
+      playSoundEffect("RevertStarted");
+
+    } catch (error) {
+      console.error("Failed to play revert music - full error:", error);
+    }
+  },
+
+  stopRevertMusic: async () => {
+    const {
+      revertMusicPlayer,
+      musicPlayer,
+      isMusicOn,
+      previousTrackBeforeRevert,
+      musicVolume,
+    } = get();
+
+
+    // Stop and cleanup revert music
+    if (revertMusicPlayer) {
+      try {
+        
+        // First set state to indicate we're stopping
+        set({
+          isPlayingRevertMusic: false,
+        });
+        
+        // Then stop and cleanup the player
+        if (revertMusicPlayer.playing) {
+          await revertMusicPlayer.pause();
+        }
+        
+        // Small delay before release to ensure pause completes
+        setTimeout(() => {
+          try {
+            revertMusicPlayer.release();
+          } catch (releaseError) {
+            console.error("Error releasing revert player:", releaseError);
+          }
+        }, 100);
+        
+        // Clear the reference
+        set({
+          revertMusicPlayer: null,
+          previousTrackBeforeRevert: null,
+        });
+        
+      } catch (error) {
+        console.error("Failed to stop revert music:", error);
+        // Force clear the reference even if cleanup failed
+        set({
+          revertMusicPlayer: null,
+          isPlayingRevertMusic: false,
+          previousTrackBeforeRevert: null,
+        });
+      }
+    }
+
+    // Resume normal music after a short delay (only if music was on and we had a track)
+    if (isMusicOn && previousTrackBeforeRevert) {
+      setTimeout(() => {
+        const state = get();
+        if (!state.isPlayingRevertMusic && state.isMusicOn) {
+          // If we had a track before, resume it, otherwise play next
+          if (musicPlayer) {
+            try {
+              musicPlayer.play();
+            } catch (error) {
+              // If resume fails, play next track
+              get().playNextTrack();
+            }
+          } else {
+            get().playNextTrack();
+          }
+        }
+      }, 2000); // 2 second delay before resuming normal music
     }
   },
 }));

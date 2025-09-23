@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { QueryCacheInitializer } from '../components/initializers/QueryCacheInitializer';
+import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCacheInitializer } from "../components/initializers/QueryCacheInitializer";
 
 // Create a client with optimized defaults for mobile
 const queryClient = new QueryClient({
@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
       // Refetch on reconnect is useful for mobile
       refetchOnReconnect: true,
       // Refetch on mount if data is stale
-      refetchOnMount: 'always',
+      refetchOnMount: "always",
     },
     mutations: {
       // Retry mutations once
