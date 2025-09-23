@@ -406,6 +406,10 @@ export const StorePage: React.FC = () => {
           />
         </Animated.View>
       </View>
+      <View
+        className="border-t-[5px] border-[#1b1c26] mx-[4px] bg-[#101119]"
+        style={{ height: 24 }}
+      />
     </View>
   );
 };
