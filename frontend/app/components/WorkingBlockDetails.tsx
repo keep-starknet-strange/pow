@@ -18,6 +18,8 @@ import {
   FilterMode,
   MipmapMode,
 } from "@shopify/react-native-skia";
+import { opacity } from "react-native-reanimated/lib/typescript/Colors";
+import { shortMoneyString } from "../utils/helpers";
 
 export type WorkingBlockDetailsProps = {
   chainId: number;
@@ -84,17 +86,6 @@ const BlockIdLabel = memo(
     blockId: number;
     blockSizeType: BlockSizeType;
   }) => {
-    const textStyle = useMemo(
-      () => ({
-        color: "#c3c3c3",
-        fontFamily: "Pixels" as const,
-        fontSize: BlockSizeUtil.selector(blockSizeType, 16, 14, 10),
-        includeFontPadding: false,
-        textAlignVertical: "center" as const,
-      }),
-      [blockSizeType],
-    );
-
     const animConfig = useMemo(
       () => ({
         duration: 400,
@@ -103,42 +94,28 @@ const BlockIdLabel = memo(
       [],
     );
 
-    if (blockId >= 100) {
-      return (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-          }}
-        >
-          <Text style={textStyle}>#</Text>
-          <AnimatedRollingNumber
-            value={blockId}
-            textStyle={textStyle}
-            spinningAnimationConfig={animConfig}
-          />
-        </View>
-      );
-    }
-
     return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}
-      >
-        <Text style={textStyle}>Block&nbsp;</Text>
-        <AnimatedRollingNumber
+      <AnimatedRollingNumber
           value={blockId}
-          textStyle={textStyle}
+          containerStyle={{
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            padding: 4
+          }}
+          textStyle={{
+            color: "#c3c3c3",
+            fontFamily: "Pixels",
+            fontSize: BlockSizeUtil.selector(blockSizeType, 14, 10, 8)            
+          }}
           spinningAnimationConfig={animConfig}
+          formattedText={blockId >= 100 ? `#${blockId}` : "Block " + blockId}
+          textProps={{
+            numberOfLines: 1,
+            adjustsFontSizeToFit: true,
+            allowFontScaling: false
+          }}
         />
-      </View>
     );
   },
 );
@@ -339,14 +316,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
 
     const blockIdLabelStyle = useMemo(
       () => ({
-        width: props.placement.width * 0.35,
+        width: props.placement.width * 0.30,
         height: props.placement.height * BLOCK_IMAGE_LABEL_PERCENT,
         top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
-        paddingTop: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
-        paddingBottom: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
-        paddingLeft: BlockSizeUtil.selector(blockSizeType, 4, 3, 2),
-        paddingRight: BlockSizeUtil.selector(blockSizeType, 2, 2, 1),
-        overflow: "hidden" as const,
       }),
       [blockSizeType, props.placement.width, props.placement.height],
     );
@@ -416,12 +388,10 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
         <BlockCanvas placement={props.placement} />
 
         <View className="absolute" style={blockIdLabelStyle}>
-          <View className="flex-1 flex-row">
-            <BlockIdLabel
+          <BlockIdLabel
               blockId={workingBlock?.blockId || 0}
               blockSizeType={blockSizeType}
             />
-          </View>
         </View>
 
         <View style={transactionCountStyle}>
