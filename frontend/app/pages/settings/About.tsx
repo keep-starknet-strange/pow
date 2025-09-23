@@ -53,8 +53,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             <TouchableOpacity
               onPress={() => {
                 const url =
-                  process.env.NEXT_PUBLIC_DISCORD_URL ||
-                  "https://x.com/StarkWareLtd";
+                  process.env.NEXT_PUBLIC_TWITTER_URL ||
+                  "https://x.com/POW_sn";
                 Linking.openURL(url);
               }}
             >
