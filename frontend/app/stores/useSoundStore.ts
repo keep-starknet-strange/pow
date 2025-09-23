@@ -19,7 +19,6 @@ const musicAssets: { [key: string]: any } = {
   "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
   "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
-  "Revert Theme": require("../../assets/music/revert-theme.m4a"),
 };
 
 // Sound file assets - one entry per unique sound file
