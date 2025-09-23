@@ -83,7 +83,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({
                   setActiveTab("Main");
                 }
               }}
-              style={{ marginVertical: 16 }}
+              style={{ marginBottom: 16 }}
             />
           </Animated.View>
         )}

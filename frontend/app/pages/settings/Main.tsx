@@ -110,7 +110,6 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
       onPress: () => setShowResetConfirmation(true),
     },
     { label: "Review", onPress: () => StoreReview.requestReview() },
-    { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
     ...(isAuthenticated && currentPrestige >= 1 && !isRewardClaimed
