@@ -18,6 +18,7 @@ import BasicButton from "../../components/buttons/Basic";
 import AvatarCreator from "./AvatarCreator";
 import Constants from "expo-constants";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
+import { generateRandomUsername } from "../../utils/usernameGenerator";
 import {
   Canvas,
   FilterMode,
@@ -25,7 +26,7 @@ import {
   MipmapMode,
 } from "@shopify/react-native-skia";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Marquee } from "@animatereactnative/marquee";
 
 type AccountCreationProps = {
@@ -43,14 +44,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     usernameValidationError,
     initializeAccount,
     accountsContractAddress,
-    user,
     mintFunds,
   } = useFocEngine();
   const {
     generatePrivateKey,
     generateAccountAddress,
     deployAccount,
-    invokeWithPaymaster,
     network,
     getAvailableKeys,
     storeKeyAndConnect,
@@ -86,57 +85,16 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     notify("BasicClick");
   };
 
-  // Generate random username using Random Word API
-  const generateRandomUsername = async () => {
+  const handleGenerateRandomUsername = async () => {
     setIsGeneratingUsername(true);
     try {
-      // Fetch 2 random words from the API
-      const response = await fetch(
-        "https://random-word-api.herokuapp.com/word?number=2",
-      );
-      const words = await response.json();
-
-      if (words && Array.isArray(words) && words.length >= 2) {
-        // Clean words: remove non-alphanumeric characters and capitalize first letter
-        const cleanWord1 = words[0].replace(/[^a-zA-Z0-9]/g, "");
-        const cleanWord2 = words[1].replace(/[^a-zA-Z0-9]/g, "");
-
-        // Capitalize first letter of each word
-        const word1 =
-          cleanWord1.charAt(0).toUpperCase() +
-          cleanWord1.slice(1).toLowerCase();
-        const word2 =
-          cleanWord2.charAt(0).toUpperCase() +
-          cleanWord2.slice(1).toLowerCase();
-
-        let combinedUsername = word1 + word2;
-
-        // Ensure max 31 characters
-        if (combinedUsername.length > 31) {
-          // Try to trim the second word first
-          const maxSecondWordLength = 31 - word1.length;
-          if (maxSecondWordLength > 3) {
-            combinedUsername = word1 + word2.substring(0, maxSecondWordLength);
-          } else {
-            // If still too long, trim both words proportionally
-            const halfLength = Math.floor(31 / 2);
-            combinedUsername =
-              word1.substring(0, halfLength) +
-              word2.substring(0, 31 - halfLength);
-          }
-        }
-
-        setUsername(combinedUsername);
-        setUsernameError(""); // Clear any previous errors
-        notify("DiceRoll");
-      } else {
-        // Fallback if API fails
-        setUsername("RandomUser" + Math.floor(Math.random() * 1000));
-        notify("BasicError");
-      }
+      const combinedUsername = generateRandomUsername();
+      setUsername(combinedUsername);
+      setUsernameError(""); // Clear any previous errors
+      notify("DiceRoll");
     } catch (error) {
       console.error("Error generating random username:", error);
-      // Fallback username if API fails
+      // Fallback username if generation fails
       setUsername("RandomUser" + Math.floor(Math.random() * 1000));
       notify("BasicError");
     } finally {
@@ -261,7 +219,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 onChangeText={setUsername}
               />
               <Pressable
-                onPress={generateRandomUsername}
+                onPress={handleGenerateRandomUsername}
                 disabled={isGeneratingUsername || isSavingAccount}
                 className="shadow-lg shadow-black/50"
               >
