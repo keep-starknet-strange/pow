@@ -520,7 +520,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayerListener.remove()
+          musicPlayerListener.remove();
         }
         musicPlayer.pause();
         musicPlayer.release();
@@ -554,8 +554,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayerListener.remove()
-          
+          musicPlayerListener.remove();
         }
         musicPlayer.pause();
         musicPlayer.release();

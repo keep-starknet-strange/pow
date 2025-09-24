@@ -206,16 +206,16 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
               className="absolute top-[6px]"
               style={[
                 expandingItemsAnimatedStyle,
-                { 
-                  left: parentWidth * 0.13,                  
+                {
+                  left: parentWidth * 0.13,
                   flex: 1,
                   width: "86%",
                   height: "28%",
-                  justifyContent: "center"
+                  justifyContent: "center",
                 },
               ]}
             >
-              <Text 
+              <Text
                 className="text-[18px] font-Pixels text-[#fff7ff]"
                 adjustsFontSizeToFit={true}
                 numberOfLines={1}
@@ -227,15 +227,15 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
               className="absolute bottom-[10px]"
               style={[
                 expandingItemsAnimatedStyle,
-                { 
-                  left: parentWidth * 0.13, 
+                {
+                  left: parentWidth * 0.13,
                   width: "48%",
                   height: "38%",
-                  justifyContent: "flex-end"
+                  justifyContent: "flex-end",
                 },
               ]}
             >
-              <Text 
+              <Text
                 className="text-[18px] font-Pixels text-[#fff7ff]"
                 adjustsFontSizeToFit={true}
                 numberOfLines={1}
@@ -246,17 +246,17 @@ export const FeatureUnlockView: React.FC<FeatureUnlockView> = memo(
             <Animated.View
               className="absolute bottom-[10px] flex-row"
               style={[
-                expandingItemsAnimatedStyle, 
-                { 
+                expandingItemsAnimatedStyle,
+                {
                   flex: 1,
                   right: 6,
                   width: "36%",
                   height: "38%",
-                  alignItems: "flex-end"
-                }
+                  alignItems: "flex-end",
+                },
               ]}
             >
-              <Text 
+              <Text
                 className="text-[18px] font-Pixels text-[#fff7ff] flex-1 text-right"
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}

@@ -96,26 +96,26 @@ const BlockIdLabel = memo(
 
     return (
       <AnimatedRollingNumber
-          value={blockId}
-          containerStyle={{
-            height: "100%",
-            width: "100%",
-            alignItems: "center",
-            padding: 4
-          }}
-          textStyle={{
-            color: "#c3c3c3",
-            fontFamily: "Pixels",
-            fontSize: BlockSizeUtil.selector(blockSizeType, 14, 10, 8)            
-          }}
-          spinningAnimationConfig={animConfig}
-          formattedText={blockId >= 100 ? `#${blockId}` : "Block " + blockId}
-          textProps={{
-            numberOfLines: 1,
-            adjustsFontSizeToFit: true,
-            allowFontScaling: false
-          }}
-        />
+        value={blockId}
+        containerStyle={{
+          height: "100%",
+          width: "100%",
+          alignItems: "center",
+          padding: 4,
+        }}
+        textStyle={{
+          color: "#c3c3c3",
+          fontFamily: "Pixels",
+          fontSize: BlockSizeUtil.selector(blockSizeType, 14, 10, 8),
+        }}
+        spinningAnimationConfig={animConfig}
+        formattedText={blockId >= 100 ? `#${blockId}` : "Block " + blockId}
+        textProps={{
+          numberOfLines: 1,
+          adjustsFontSizeToFit: true,
+          allowFontScaling: false,
+        }}
+      />
     );
   },
 );
@@ -316,7 +316,7 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
 
     const blockIdLabelStyle = useMemo(
       () => ({
-        width: props.placement.width * 0.30,
+        width: props.placement.width * 0.3,
         height: props.placement.height * BLOCK_IMAGE_LABEL_PERCENT,
         top: -(props.placement.height * BLOCK_IMAGE_LABEL_PERCENT),
       }),
@@ -389,9 +389,9 @@ export const WorkingBlockDetails: React.FC<WorkingBlockDetailsProps> = memo(
 
         <View className="absolute" style={blockIdLabelStyle}>
           <BlockIdLabel
-              blockId={workingBlock?.blockId || 0}
-              blockSizeType={blockSizeType}
-            />
+            blockId={workingBlock?.blockId || 0}
+            blockSizeType={blockSizeType}
+          />
         </View>
 
         <View style={transactionCountStyle}>

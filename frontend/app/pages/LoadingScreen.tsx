@@ -82,7 +82,7 @@ export const LoadingScreenView: React.FC = memo(() => {
         <Logo doEnterAnim={false} doWaveAnim={true} />
         <TipTextDisplay key={tipText} tipText={tipText} />
       </View>
-      <View className="flex-1"/>
+      <View className="flex-1" />
       <View className="flex-row p-4 justify-end">
         <Text className="text-black font-Pixels" style={{ fontSize: 18 }}>
           Loading
