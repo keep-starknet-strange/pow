@@ -305,6 +305,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   setMusicVolume: (volume) => {
     set({ musicVolume: volume });
     AsyncStorage.setItem(MUSIC_VOLUME_KEY, volume.toString());
+
+    // const { musicPlayer } = get();
+    // if (!musicPlayer) {
+    //   if (__DEV__) console.warn("Music player is not initialized.");
+    //   return;
+    // }
+    // musicPlayer.volume = volume;
   },
 
   playSoundEffect: async (
