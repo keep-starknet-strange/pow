@@ -700,7 +700,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         musicPlayer.pause();
       } catch (error) {
-        console.error("Failed to pause music:", error);
+        if (__DEV__) console.error("Failed to pause music:", error);
       }
     }
 
@@ -721,50 +721,15 @@ export const useSoundStore = create<SoundState>((set, get) => ({
         isPlayingRevertMusic: true,
       });
 
-      // Play the revert music - handle both Promise and non-Promise return
-      try {
-        const playResult = revertPlayer.play();
-        if (playResult && typeof playResult.then === "function") {
-          // It's a Promise
-          playResult
-            .then(() => {})
-            .catch((error) => {
-              console.error("Failed to start revert music:", error);
-            });
-        } else {
-          // Not a Promise, play() completed synchronously
-          // Set loop after playing starts
-          setTimeout(() => {
-            if (revertPlayer && revertPlayer.playing) {
-              revertPlayer.loop = true;
-            }
-          }, 100);
-        }
-      } catch (playError) {
-        console.error("Error calling play():", playError);
-      }
-
-      // Check if playing after a short delay
-      setTimeout(() => {
-        const currentPlayer = get().revertMusicPlayer;
-        if (currentPlayer) {
-          // Player is available, potentially add status checks here if needed
-        }
-      }, 500);
-
-      // Also check after a longer delay
-      setTimeout(() => {
-        const currentPlayer = get().revertMusicPlayer;
-        if (currentPlayer) {
-          // Player is available, potentially add status checks here if needed
-        }
-      }, 2000);
+      // Play the revert music
+      revertPlayer.play();
+      revertPlayer.loop = true;
 
       // Also play the revert sound effect
       const { playSoundEffect } = get();
       playSoundEffect("RevertStarted");
     } catch (error) {
-      console.error("Failed to play revert music - full error:", error);
+      if (__DEV__) console.error("Failed to play revert music:", error);
     }
   },
 
@@ -774,7 +739,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       musicPlayer,
       isMusicOn,
       previousTrackBeforeRevert,
-      musicVolume,
     } = get();
 
     // Stop and cleanup revert music
@@ -795,7 +759,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
           try {
             revertMusicPlayer.release();
           } catch (releaseError) {
-            console.error("Error releasing revert player:", releaseError);
+            if (__DEV__)
+              console.error("Error releasing revert player:", releaseError);
           }
         }, 100);
 
@@ -805,7 +770,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
           previousTrackBeforeRevert: null,
         });
       } catch (error) {
-        console.error("Failed to stop revert music:", error);
+        if (__DEV__) console.error("Failed to stop revert music:", error);
         // Force clear the reference even if cleanup failed
         set({
           revertMusicPlayer: null,
