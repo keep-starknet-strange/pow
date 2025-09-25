@@ -4,6 +4,7 @@ import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import soundPoolsJson from "../configs/soundpools.json";
+import { EventSubscription } from "expo-modules-core/src/ts-declarations/EventEmitter";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -203,7 +204,7 @@ interface SoundState {
   isInitialized: boolean;
   currentTrackName: string | null;
   lastPlayedTracks: (string | null)[];
-  musicPlayerListener: any;
+  musicPlayerListener: EventSubscription | null;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -519,10 +520,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayer.removeListener(
-            "playbackStatusUpdate",
-            musicPlayerListener,
-          );
+          musicPlayerListener.remove();
         }
         musicPlayer.pause();
         musicPlayer.release();
@@ -556,10 +554,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       try {
         // Remove listener before cleanup
         if (musicPlayerListener) {
-          musicPlayer.removeListener(
-            "playbackStatusUpdate",
-            musicPlayerListener,
-          );
+          musicPlayerListener.remove();
         }
         musicPlayer.pause();
         musicPlayer.release();

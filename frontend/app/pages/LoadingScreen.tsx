@@ -76,13 +76,14 @@ export const LoadingScreenView: React.FC = memo(() => {
   }, 500);
 
   return (
-    <View className="flex-1 items-center w-full h-full">
+    <View className="flex-1 w-full h-full">
       <MainBackground />
-      <View className="relative flex-col items-center justify-center flex-1">
+      <View className="absolute w-full h-full flex-col items-center justify-center">
         <Logo doEnterAnim={false} doWaveAnim={true} />
         <TipTextDisplay key={tipText} tipText={tipText} />
       </View>
-      <View className="absolute bottom-[60px] right-[20px] flex-row">
+      <View className="flex-1" />
+      <View className="flex-row p-4 justify-end">
         <Text className="text-black font-Pixels" style={{ fontSize: 18 }}>
           Loading
         </Text>
@@ -98,7 +99,7 @@ export const LoadingScreenView: React.FC = memo(() => {
           paddingTop: 16,
           paddingBottom: insets.bottom + 16,
         }}
-        className="absolute bottom-0 w-full px-8 bg-[#10111A]"
+        className="w-full px-8 bg-[#10111A]"
       >
         <Animated.View
           entering={FadeInDown}
