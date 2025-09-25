@@ -31,7 +31,6 @@
     "@reown/walletkit": "^1.0.0",
     "@sentry/react-native": "~6.14.0",
     "@shopify/react-native-skia": "^2.2.9",
-    "@tanstack/react-query": "^5.90.1",
     "@walletconnect/core": "^2.20.3",
     "@walletconnect/react-native-compat": "^2.20.3",
     "@walletconnect/types": "^2.20.3",

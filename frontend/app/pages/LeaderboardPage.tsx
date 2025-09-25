@@ -35,10 +35,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { FOC_ENGINE_API } from "../context/FocEngineConnector";
 import { useMock } from "../api/requests";
-import {
-  useLeaderboardInfiniteQuery,
-  LeaderboardUser,
-} from "../hooks/useLeaderboardQueries";
 
 export const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -55,46 +51,237 @@ export const getPrestigeIcon = (prestige: number) => {
 export const LeaderboardPage: React.FC = () => {
   const { STARKNET_ENABLED } = useStarknetConnector();
   const { getImage } = useImages();
+  const { getAccounts } = useFocEngine();
   const { width, height } = useCachedWindowDimensions();
-  const { powGameContractAddress } = usePowContractConnector();
+  const { powGameContractAddress, getUserPrestiges } =
+    usePowContractConnector();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const leaderboardMock = [
+    {
+      id: 1,
+      name: "Satoshi",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 4,
+        body: 2,
+        glasses: 1,
+        accessories: 3,
+      },
+      prestige: 10,
+      balance: 1_245_000_000,
+    },
+    {
+      id: 2,
+      name: "Mr Moneybags",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 5,
+        body: 3,
+        glasses: 2,
+        accessories: 4,
+      },
+      prestige: 6,
+      balance: 4_290_000,
+    },
+    {
+      id: 3,
+      name: "Builder",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 3,
+        body: 1,
+        glasses: 0,
+        accessories: 2,
+      },
+      prestige: 3,
+      balance: 62_000,
+    },
+    {
+      id: 4,
+      name: "Hello World",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 2,
+        body: 0,
+        glasses: 1,
+        accessories: 1,
+      },
+      prestige: 1,
+      balance: 1_000,
+    },
+    {
+      id: 5,
+      name: "Test User",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 0,
+        body: 0,
+        glasses: 0,
+        accessories: 0,
+      },
+      prestige: 0,
+      balance: 200,
+    },
+    {
+      id: 6,
+      name: "Another User With Long Name",
+      address: "0x1234567890abcdef1234567890abcdef12345678",
+      nouns: {
+        head: 1,
+        body: 1,
+        glasses: 1,
+        accessories: 1,
+      },
+      prestige: 2,
+      balance: 5_000,
+    },
+  ];
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const pageSize = 20;
   const isFocused = useIsFocused();
 
-  // Use TanStack Query for leaderboard data
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useLeaderboardInfiniteQuery();
+  const loadLeaderboardPage = useCallback(
+    async (page: number, isInitialLoad: boolean = false) => {
+      if (isInitialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
+      setError(null);
 
-  // Flatten all pages into a single array
-  const leaderboard = useMemo(() => {
-    if (!data?.pages) return [];
-    return data.pages.flatMap((page) => page.users);
-  }, [data]);
+      try {
+        const response = await fetch(
+          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=${pageSize}&page=${page}`,
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const events = data.events || [];
+
+        if (events.length < pageSize) {
+          setHasMorePages(false);
+        }
+
+        // Extract user addresses and balances from events
+        const eventData = events.map((event: any) => ({
+          user: event.keys[1], // User address from keys[1]
+          balance: parseInt(event.data[1], 16), // Parse hex balance from data[1] as uint128
+        }));
+
+        const addresses = eventData.map((item: any) => item.user);
+        const accounts = await getAccounts(addresses, undefined, true);
+
+        // Fetch prestiges for all users
+        const prestiges = await getUserPrestiges(addresses);
+
+        const users = eventData.map((item: any, index: number) => {
+          const shortAddress =
+            item.user.slice(0, 4) + "..." + item.user.slice(-4);
+          const account = accounts?.find(
+            (account) => account.account_address === item.user,
+          );
+          const hasValidUsername =
+            account?.account.username &&
+            typeof account.account.username === "string" &&
+            account.account.username.trim().length > 1;
+          const name = hasValidUsername
+            ? account.account.username
+            : shortAddress;
+
+          const baseId = page * pageSize + index + 1;
+          return {
+            address: item.user,
+            balance: item.balance,
+            prestige:
+              prestiges && prestiges[index] !== undefined
+                ? prestiges[index]
+                : 0,
+            nouns:
+              account?.account.metadata && account.account.metadata.length === 4
+                ? createNounsAttributes(
+                    parseInt(account.account.metadata[0], 16),
+                    parseInt(account.account.metadata[1], 16),
+                    parseInt(account.account.metadata[2], 16),
+                    parseInt(account.account.metadata[3], 16),
+                  )
+                : getRandomNounsAttributes(item.user),
+            name,
+            id: baseId,
+          };
+        });
+
+        users.sort((a: any, b: any) => b.balance - a.balance);
+
+        if (isInitialLoad) {
+          setLeaderboard(users);
+        } else {
+          setLeaderboard((prev) => [...prev, ...users]);
+        }
+
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+        setError("Failed to load leaderboard. Please try again later.");
+        if (isInitialLoad) {
+          setLeaderboard([]);
+        }
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [getAccounts, getUserPrestiges, pageSize],
+  );
 
   const handleLoadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    if (!isLoadingMore && hasMorePages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      loadLeaderboardPage(nextPage, false);
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [currentPage, isLoadingMore, hasMorePages, loadLeaderboardPage]);
 
-  // Error message for display
-  const errorMessage = useMemo(() => {
-    if (isError) {
-      return (
-        (error as Error)?.message ||
-        "Failed to load leaderboard. Please try again later."
-      );
+  useEffect(() => {
+    if (!isFocused) {
+      return; // Don't run if the page is not focused
     }
-    if (!STARKNET_ENABLED && !useMock) {
-      return "Unable to connect to blockchain";
+
+    // Reset state when page comes into focus
+    setCurrentPage(0);
+    setHasMorePages(true);
+    setLeaderboard([]);
+
+    // Use mock data if USE_MOCK is true
+    if (useMock) {
+      setLeaderboard(leaderboardMock);
+      setIsLoading(false);
+      setError(null);
+      setHasMorePages(false);
+      return;
     }
-    return null;
-  }, [isError, error, STARKNET_ENABLED]);
+
+    if (!STARKNET_ENABLED || !powGameContractAddress) {
+      // If Starknet is not enabled and not using mock, show error
+      setError("Unable to connect to blockchain");
+      setIsLoading(false);
+      return;
+    }
+
+    loadLeaderboardPage(0, true);
+  }, [
+    STARKNET_ENABLED,
+    powGameContractAddress,
+    isFocused,
+    loadLeaderboardPage,
+  ]);
 
   if (!isFocused) {
     return <View className="flex-1 bg-[#101119]"></View>; // Return empty view if not focused
@@ -161,7 +348,7 @@ export const LeaderboardPage: React.FC = () => {
           Prestige
         </Animated.Text>
       </View>
-      {isLoading && leaderboard.length === 0 ? (
+      {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#fff7ff" />
           <Animated.Text
@@ -171,13 +358,13 @@ export const LeaderboardPage: React.FC = () => {
             Loading leaderboard...
           </Animated.Text>
         </View>
-      ) : errorMessage ? (
+      ) : error ? (
         <View className="flex-1 items-center justify-center px-8">
           <Animated.Text
             className="text-[#8B0000] text-lg font-Pixels text-center"
             entering={FadeIn}
           >
-            {errorMessage}
+            {error}
           </Animated.Text>
         </View>
       ) : (
@@ -188,11 +375,11 @@ export const LeaderboardPage: React.FC = () => {
             <LeaderboardItem index={index} user={item} />
           )}
           ListFooterComponent={() =>
-            hasNextPage ? (
+            hasMorePages ? (
               <View className="items-center mb-4 mt-2">
                 <TouchableOpacity
                   onPress={handleLoadMore}
-                  disabled={isFetchingNextPage}
+                  disabled={isLoadingMore}
                   style={{
                     width: 120,
                     height: 48,
@@ -200,7 +387,7 @@ export const LeaderboardPage: React.FC = () => {
                     alignItems: "center",
                   }}
                 >
-                  {!isFetchingNextPage && (
+                  {!isLoadingMore && (
                     <Canvas
                       style={{
                         position: "absolute",
@@ -226,7 +413,7 @@ export const LeaderboardPage: React.FC = () => {
                       />
                     </Canvas>
                   )}
-                  {isFetchingNextPage ? (
+                  {isLoadingMore ? (
                     <ActivityIndicator size="small" color="#fff7ff" />
                   ) : (
                     <Text
@@ -362,9 +549,21 @@ const UserAccountSection: React.FC = memo(() => {
 
 export const LeaderboardItem: React.FC<{
   index: number;
-  user: LeaderboardUser;
+  user: {
+    id: number;
+    name: string;
+    address: string;
+    nouns: {
+      head: number;
+      body: number;
+      glasses: number;
+      accessories: number;
+    };
+    prestige: number;
+    balance: number;
+  };
 }> = memo(
-  ({ index, user }: { index: number; user: LeaderboardUser }) => {
+  ({ index, user }: { index: number; user: any }) => {
     const { getImage } = useImages();
 
     const getRankBadge = (index: number) => {

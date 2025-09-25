@@ -4,7 +4,6 @@ import * as Font from "expo-font";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
-import { QueryProvider } from "./providers/QueryProvider";
 import { useImagePreloader } from "./hooks/useImagePreloader";
 import Game from "./game";
 
@@ -30,14 +29,12 @@ export default function App() {
   }
 
   return (
-    <QueryProvider>
-      <StarknetConnectorProvider>
-        <FocEngineProvider>
-          <PowContractProvider>
-            <Game />
-          </PowContractProvider>
-        </FocEngineProvider>
-      </StarknetConnectorProvider>
-    </QueryProvider>
+    <StarknetConnectorProvider>
+      <FocEngineProvider>
+        <PowContractProvider>
+          <Game />
+        </PowContractProvider>
+      </FocEngineProvider>
+    </StarknetConnectorProvider>
   );
 }
