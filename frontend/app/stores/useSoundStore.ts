@@ -758,7 +758,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
             get().playNextTrack();
           }
         }
-      }, 2000); // 2 second delay before resuming normal music
+      }, 1000); // 1 second delay before resuming normal music
     }
   },
 }));
