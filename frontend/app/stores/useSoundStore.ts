@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AudioPlayer, createAudioPlayer, setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import {
+  AudioPlayer,
+  createAudioPlayer,
+  setAudioModeAsync,
+  useAudioPlayer,
+  useAudioPlayerStatus,
+} from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import soundPoolsJson from "../configs/soundpools.json";
@@ -20,7 +26,7 @@ const MUSIC_ASSETS = {
   "Left Right": require("../../assets/music/LeftRightExcluded.m4a"),
   "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
   "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
-  "Happy": require("../../assets/music/happy.m4a"),
+  Happy: require("../../assets/music/happy.m4a"),
 };
 
 type SongName = keyof typeof MUSIC_ASSETS;
@@ -239,14 +245,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
-        // First launch - play "The Return"
-        selectedTrack = "The Return";
-        // Mark that the app has been launched before
-        await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
+      // First launch - play "The Return"
+      selectedTrack = "The Return";
+      // Mark that the app has been launched before
+      await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
     } else {
-        // Returning user - select random track
-        const trackNames = Object.keys(MUSIC_ASSETS) as SongName[];
-        selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
+      // Returning user - select random track
+      const trackNames = Object.keys(MUSIC_ASSETS) as SongName[];
+      selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
     }
 
     set({
@@ -341,10 +347,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   selectNextTrack: () => {
-    const {
-      currentTrack,
-      lastPlayedTracks,
-    } = get();
+    const { currentTrack, lastPlayedTracks } = get();
 
     // // Get all track names
     const allTracks = Object.keys(MUSIC_ASSETS) as SongName[];
@@ -352,13 +355,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (currentTrack) {
       lastPlayedTracks.push(currentTrack);
     }
-  
+
     // Keep track of last 2 played tracks to avoid immediate repeats
-    let recentTracks = lastPlayedTracks.slice(-2);
+    const recentTracks = lastPlayedTracks.slice(-2);
 
     // Filter out recently played tracks
     let availableTracks = allTracks.filter(
-        (track) => !recentTracks.includes(track)
+      (track) => !recentTracks.includes(track),
     );
 
     if (availableTracks.length == 0) {
@@ -371,8 +374,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     set({
       currentTrack: nextTrack,
-      lastPlayedTracks: recentTracks
-    })
+      lastPlayedTracks: recentTracks,
+    });
   },
 }));
 
@@ -443,13 +446,19 @@ export const useSound = () => {
 };
 
 export const MusicComponent = memo(() => {
-  const { isMusicOn, currentTrack, musicVolume, initializeSound, selectNextTrack: selectNextTrack } = useSoundStore();
+  const {
+    isMusicOn,
+    currentTrack,
+    musicVolume,
+    initializeSound,
+    selectNextTrack: selectNextTrack,
+  } = useSoundStore();
 
   useEffect(() => {
     // Configure global audio mode to play sounds even in iOS silent mode
     setAudioModeAsync({ playsInSilentMode: true });
-    
-    initializeSound()
+
+    initializeSound();
   }, []);
 
   const player = useAudioPlayer(null);
@@ -458,20 +467,23 @@ export const MusicComponent = memo(() => {
   // Toggle Music
   useEffect(() => {
     if (status.isLoaded && isMusicOn) {
-      player.play()
+      player.play();
     } else if (!isMusicOn && status.playing) {
-      player.pause()
+      player.pause();
     }
-  }, [status.isLoaded, isMusicOn, player])
+  }, [status.isLoaded, isMusicOn, player]);
 
   // Select next track, when previous one finished
   useEffect(() => {
     if (status.didJustFinish) {
-      setTimeout(() => {
-        selectNextTrack()
-      }, 2000 + Math.random() * 1000);
+      setTimeout(
+        () => {
+          selectNextTrack();
+        },
+        2000 + Math.random() * 1000,
+      );
     }
-  }, [status.didJustFinish, selectNextTrack])
+  }, [status.didJustFinish, selectNextTrack]);
 
   // Observe current track
   useEffect(() => {

@@ -8,7 +8,11 @@ import { useOnchainActions } from "@/app/stores/useOnchainActions";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useAchievementsStore } from "@/app/stores/useAchievementsStore";
-import { useSoundStore, useSound, MusicComponent } from "@/app/stores/useSoundStore";
+import {
+  useSoundStore,
+  useSound,
+  MusicComponent,
+} from "@/app/stores/useSoundStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 import { useTransactionPauseStore } from "@/app/stores/useTransactionPauseStore";
