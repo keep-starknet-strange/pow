@@ -204,7 +204,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
           "https://apps.apple.com/us/app/ready-earn-on-bitcoin-usdc/id1358741926",
         );
       } else {
-        const pkg = "im.argent.contractwalletclien";
+        const pkg = "im.argent.contractwalletclient";
         const market = `market://details?id=${pkg}`;
         const web = `https://play.google.com/store/apps/details?id=${pkg}`;
         await Linking.openURL(market).catch(() => Linking.openURL(web));
@@ -217,7 +217,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   }, []);
 
   const openBraavosWallet = useCallback(async () => {
-    const scheme = "braavos://openr";
+    const scheme = "braavos://open";
     try {
       await Linking.openURL(scheme);
       return;
