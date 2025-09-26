@@ -13,6 +13,7 @@ import {
   useSound,
   MusicComponent,
 } from "@/app/stores/useSoundStore";
+import { useAnimationsStore } from "@/app/stores/useAnimationsStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 import { useTransactionPauseStore } from "@/app/stores/useTransactionPauseStore";
@@ -265,12 +266,23 @@ const TransactionPauseInitializer = memo(() => {
   return null;
 });
 
+const AnimationsInitializer = memo(() => {
+  const { initializeAnimations } = useAnimationsStore();
+
+  useEffect(() => {
+    initializeAnimations();
+  }, [initializeAnimations]);
+
+  return null;
+});
+
 export const StoreInitializer = memo(() => {
   return (
     <>
       <OnchainActionsInitializer />
       <OnchainActionsRevertInitializer />
       <MusicComponent />
+      <AnimationsInitializer />
       <TutorialInitializer />
       <AchievementsInitializer />
       <BalanceInitializer />

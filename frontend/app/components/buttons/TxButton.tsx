@@ -10,6 +10,7 @@ import { useGameStore } from "@/app/stores/useGameStore";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useImages } from "../../hooks/useImages";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
+import { useAnimationConfig } from "../../hooks/useAnimationConfig";
 import { newTransaction } from "../../types/Chains";
 import { TutorialRefView } from "../tutorial/TutorialRefView";
 import transactionsJson from "../../configs/transactions.json";
@@ -47,6 +48,7 @@ export type TxButtonProps = {
 export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
+  const { shouldAnimate } = useAnimationConfig();
   const { addTransaction } = useGameStore();
   const {
     getFeeLevel,
@@ -72,16 +74,18 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
   const shakeAnimStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: withSequence(
-          withTiming(Math.abs(shakeAnim.value), {
-            duration: 50,
-            easing: Easing.linear,
-          }),
-          withTiming(0, {
-            duration: 50,
-            easing: Easing.linear,
-          }),
-        ),
+        translateY: shouldAnimate
+          ? withSequence(
+              withTiming(Math.abs(shakeAnim.value), {
+                duration: 50,
+                easing: Easing.linear,
+              }),
+              withTiming(0, {
+                duration: 50,
+                easing: Easing.linear,
+              }),
+            )
+          : 0,
       },
     ],
   }));
@@ -104,9 +108,11 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     popupRef.current?.showPopup(popupValue, popupColor);
 
     // Use requestAnimationFrame to batch animation updates
-    requestAnimationFrame(() => {
-      shakeAnim.value *= -1; // Toggle the shake animation value
-    });
+    if (shouldAnimate) {
+      requestAnimationFrame(() => {
+        shakeAnim.value *= -1; // Toggle the shake animation value
+      });
+    }
   }, [addTransaction, props.chainId, props.txId, fee, props.isDapp]);
 
   const triggerTxShake = useCallback(() => {
@@ -119,7 +125,9 @@ export const TxButton: React.FC<TxButtonProps> = memo((props) => {
     const popupColor = feeLevel === -1 ? "#CA1F4B" : "#F0E130";
     popupRef.current?.showPopup(popupValue, popupColor);
 
-    shakeAnim.value *= -1; // Toggle the shake animation value
+    if (shouldAnimate) {
+      shakeAnim.value *= -1; // Toggle the shake animation value
+    }
   }, [feeLevel, feeCost, fee]);
 
   const handleFlashRequested = useCallback(

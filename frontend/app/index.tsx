@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import React, { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";

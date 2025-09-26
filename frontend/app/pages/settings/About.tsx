@@ -9,7 +9,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import BasicButton from "../../components/buttons/Basic";
 
 export type AboutSectionProps = {
-  setSettingTab: (tab: "Credits") => void;
+  setSettingTab: (tab: "Credits" | "TermsOfUse") => void;
 };
 
 export const AboutSection: React.FC<AboutSectionProps> = ({
@@ -18,10 +18,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   return (
     <Animated.View className="flex-1" entering={FadeInUp}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text className="text-[#101119] text-[40px] font-Xerxes text-right">
+        <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
           About
         </Text>
-        <Text className="text-[#101119] mt-4 text-[18px] font-Pixels">
+        <Text className="text-[#101119] mt-2 text-[18px] font-Pixels">
           POW! is THE idle clicker game on Starknet, where players can
           experience the thrill of building their own blockchain empire through
           simple yet addictive click-to-earn mechanics.
@@ -30,7 +30,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
             Features
           </Text>
-          <View className="flex flex-col gap-2 mt-4">
+          <View className="flex flex-col gap-2 mt-2">
             <Text className="text-[#101119] font-Pixels text-[18px]">
               ● Fully Onchain Experience
             </Text>
@@ -38,7 +38,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               ● Enticing Click-to-Earn Gameplay
             </Text>
             <Text className="text-[#101119] font-Pixels text-[18px]">
-              ● Session Keys & Paymaster
+              ● AVNU Paymaster - Gas Free!
             </Text>
             <Text className="text-[#101119] font-Pixels text-[18px]">
               ● Open Source Goldmine
@@ -49,12 +49,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           <Text className="text-[#101119] text-[32px] font-Xerxes text-right">
             Contact
           </Text>
-          <View className="flex flex-row gap-4 mt-6 justify-around">
+          <View className="flex flex-row gap-4 mt-4 justify-around">
             <TouchableOpacity
               onPress={() => {
                 const url =
-                  process.env.NEXT_PUBLIC_DISCORD_URL ||
-                  "https://x.com/StarkWareLtd";
+                  process.env.NEXT_PUBLIC_TWITTER_URL || "https://x.com/POW_sn";
                 Linking.openURL(url);
               }}
             >
@@ -89,7 +88,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           </View>
         </View>
       </ScrollView>
-      <View className="mt-4 items-center">
+      <View className="items-center">
+        <BasicButton
+          label="Terms of Use"
+          onPress={() => setSettingTab("TermsOfUse")}
+        />
+      </View>
+      <View className="mt-2 items-center">
         <BasicButton label="Credits" onPress={() => setSettingTab("Credits")} />
       </View>
     </Animated.View>

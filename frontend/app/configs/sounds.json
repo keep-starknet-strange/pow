@@ -138,5 +138,12 @@
     "rate": 1,
     "haptic": "Light",
     "duration": 300
+  },
+  "RevertStarted": {
+    "soundFile": "revert.m4a",
+    "volume": 0.8,
+    "rate": 1,
+    "haptic": "Error",
+    "duration": 2970
   }
 }

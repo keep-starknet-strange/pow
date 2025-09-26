@@ -427,6 +427,15 @@ const imagePaths = {
   tutorialArrow: require(`${assetsPath}/tutorial/arrow.webp`),
   tutorialWindow: require(`${assetsPath}/tutorial/window.webp`),
 
+  // Leaderboard Badges
+  leaderboardNumberGold: require(`${assetsPath}/leaderboard_number_gold.webp`),
+  leaderboardNumberSilver: require(
+    `${assetsPath}/leaderboard_number_silver.webp`,
+  ),
+  leaderboardNumberBronze: require(
+    `${assetsPath}/leaderboard_number_bronze.webp`,
+  ),
+
   // Prestige Icons
   prestige1: require(`${assetsPath}/prestige/icon_prestige1.webp`),
   prestige2: require(`${assetsPath}/prestige/icon_prestige2.webp`),
@@ -673,6 +682,9 @@ export const useImagePreloader = () => {
     prestige8: useImage(imagePaths.prestige8),
     prestige9: useImage(imagePaths.prestige9),
     prestige10: useImage(imagePaths.prestige10),
+    leaderboardNumberGold: useImage(imagePaths.leaderboardNumberGold),
+    leaderboardNumberSilver: useImage(imagePaths.leaderboardNumberSilver),
+    leaderboardNumberBronze: useImage(imagePaths.leaderboardNumberBronze),
   };
 
   // Check if all images are loaded
@@ -890,6 +902,9 @@ export const useImagePreloader = () => {
         "shop.automation.da.2": images.shopAutomationDa2,
         "shop.automation.da.3": images.shopAutomationDa3,
         "shop.automation.da.4": images.shopAutomationDa4,
+        "leaderboard.number.gold": images.leaderboardNumberGold,
+        "leaderboard.number.silver": images.leaderboardNumberSilver,
+        "leaderboard.number.bronze": images.leaderboardNumberBronze,
         "tutorial.arrow": images.tutorialArrow,
         "tutorial.window": images.tutorialWindow,
       };

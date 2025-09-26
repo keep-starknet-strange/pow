@@ -10,7 +10,6 @@ import {
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import soundPoolsJson from "../configs/soundpools.json";
-import { EventSubscription } from "expo-modules-core/src/ts-declarations/EventEmitter";
 import { memo, useEffect } from "react";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
@@ -29,6 +28,8 @@ const MUSIC_ASSETS = {
   Happy: require("../../assets/music/happy.m4a"),
 };
 
+const REVERT_MUSIC = require("../../assets/music/revert-theme.m4a");
+
 type SongName = keyof typeof MUSIC_ASSETS;
 
 // Sound file assets - one entry per unique sound file
@@ -41,6 +42,7 @@ const soundFileAssets: { [key: string]: any } = {
   "achieve.m4a": require("../../assets/sounds/achieve.m4a"),
   "basic-click.m4a": require("../../assets/sounds/basic-click.m4a"),
   "dice.m4a": require("../../assets/sounds/dice.m4a"),
+  "revert.m4a": require("../../assets/sounds/revert.m4a"),
 };
 
 // Helper function to get sound file for event type from config
@@ -211,6 +213,7 @@ interface SoundState {
   musicVolume: number;
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
+  isPlayingRevertMusic: boolean;
   isInitialized: boolean;
 
   toggleSound: () => void;
@@ -222,6 +225,8 @@ interface SoundState {
   initializeSound: () => Promise<void>;
   cleanupSound: () => void;
   selectNextTrack: () => void;
+  startRevertMusic: () => void;
+  stopRevertMusic: () => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -233,6 +238,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   soundPool: null,
   isInitialized: false,
   currentTrack: null,
+  isPlayingRevertMusic: false,
   lastPlayedTracks: [],
 
   initializeSound: async () => {
@@ -378,6 +384,20 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       lastPlayedTracks: recentTracks,
     });
   },
+
+  startRevertMusic: () => {
+    const { isMusicOn } = get();
+    if (!isMusicOn) return;
+
+    set({ isPlayingRevertMusic: true });
+  },
+
+  stopRevertMusic: () => {
+    const { isMusicOn } = get();
+    if (!isMusicOn) return;
+
+    set({ isPlayingRevertMusic: false });
+  },
 }));
 
 const playHaptic = async (type: string) => {
@@ -419,6 +439,7 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
+    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -428,12 +449,15 @@ export const useSound = () => {
     setMusicVolume,
     playSoundEffect,
     cleanupSound,
+    startRevertMusic,
+    stopRevertMusic,
   } = useSoundStore();
 
   return {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
+    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -443,6 +467,8 @@ export const useSound = () => {
     setMusicVolume,
     playSoundEffect,
     cleanupSound,
+    startRevertMusic,
+    stopRevertMusic,
   };
 };
 
@@ -453,6 +479,7 @@ export const MusicComponent = memo(() => {
     musicVolume,
     initializeSound,
     selectNextTrack: selectNextTrack,
+    isPlayingRevertMusic,
   } = useSoundStore();
 
   useEffect(() => {
@@ -465,6 +492,9 @@ export const MusicComponent = memo(() => {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
+  const revertPlayer = useAudioPlayer(REVERT_MUSIC);
+  const revertStatus = useAudioPlayerStatus(revertPlayer);
+
   // Toggle Music
   useEffect(() => {
     if (status.isLoaded && isMusicOn) {
@@ -473,6 +503,26 @@ export const MusicComponent = memo(() => {
       player.pause();
     }
   }, [status.isLoaded, isMusicOn, player]);
+
+  // Toggle Revert Music
+  useEffect(() => {
+    if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
+      player.pause();
+      revertPlayer.seekTo(0);
+      revertPlayer.play();
+    } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
+      revertPlayer.pause();
+      if (isMusicOn) {
+        player.play();
+      }
+    }
+  }, [
+    revertStatus.isLoaded,
+    isMusicOn,
+    isPlayingRevertMusic,
+    revertPlayer,
+    player,
+  ]);
 
   // Select next track, when previous one finished
   useEffect(() => {
@@ -498,7 +548,8 @@ export const MusicComponent = memo(() => {
   // Observe volume
   useEffect(() => {
     player.volume = musicVolume;
-  }, [musicVolume, player]);
+    revertPlayer.volume = musicVolume;
+  }, [musicVolume, player, revertPlayer]);
 
   return null;
 });

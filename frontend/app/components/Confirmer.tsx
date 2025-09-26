@@ -16,6 +16,7 @@ import {
 import { FlashBurstManager } from "./FlashBurstManager";
 import { TutorialRefView } from "./tutorial/TutorialRefView";
 import { useImages } from "../hooks/useImages";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 
 export type ConfirmerProps = {
   image?: string;
@@ -26,6 +27,7 @@ export type ConfirmerProps = {
 
 export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const { getImage } = useImages();
+  const { shouldAnimate } = useAnimationConfig();
   const pressableRef = useRef<View>(null);
   const [triggerFlash, setTriggerFlash] = useState<
     ((x: number, y: number) => void) | null
@@ -40,6 +42,8 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
   const confirmAnimation = useAnimatedValue(0);
 
   useEffect(() => {
+    if (!shouldAnimate) return; // Don't animate if animations are disabled
+
     confirmAnimation.setValue(0);
     Animated.timing(confirmAnimation, {
       toValue: 100,
@@ -50,7 +54,7 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
     return () => {
       confirmAnimation.removeAllListeners();
     };
-  }, [confirmTime]);
+  }, [confirmTime, shouldAnimate]);
 
   const handlePress = useCallback(
     (event: GestureResponderEvent) => {
@@ -88,10 +92,12 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
             height: 112,
             transform: [
               {
-                translateY: confirmAnimation.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [0, -20],
-                }),
+                translateY: shouldAnimate
+                  ? confirmAnimation.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [0, -20],
+                    })
+                  : 0,
               },
             ],
           }}
@@ -121,10 +127,12 @@ export const Confirmer: React.FC<ConfirmerProps> = (props) => {
           style={{
             transform: [
               {
-                translateY: confirmAnimation.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [0, -20],
-                }),
+                translateY: shouldAnimate
+                  ? confirmAnimation.interpolate({
+                      inputRange: [0, 100],
+                      outputRange: [0, -20],
+                    })
+                  : 0,
               },
             ],
           }}

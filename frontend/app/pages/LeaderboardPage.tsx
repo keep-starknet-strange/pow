@@ -1,5 +1,11 @@
-import { memo, useState, useEffect, useMemo } from "react";
-import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { memo, useState, useEffect, useMemo, useCallback } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import {
   Canvas,
   Image,
@@ -132,35 +138,24 @@ export const LeaderboardPage: React.FC = () => {
     },
   ];
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const pageSize = 20;
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    if (!isFocused) {
-      return; // Don't run if the page is not focused
-    }
-
-    // Use mock data if USE_MOCK is true
-    if (useMock) {
-      setLeaderboard(leaderboardMock);
-      setIsLoading(false);
-      setError(null);
-      return;
-    }
-
-    if (!STARKNET_ENABLED || !powGameContractAddress) {
-      // If Starknet is not enabled and not using mock, show error
-      setError("Unable to connect to blockchain");
-      setIsLoading(false);
-      return;
-    }
-
-    const getLeaderboard = async () => {
-      setIsLoading(true);
+  const loadLeaderboardPage = useCallback(
+    async (page: number, isInitialLoad: boolean = false) => {
+      if (isInitialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       setError(null);
 
       try {
         const response = await fetch(
-          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=20`,
+          `${FOC_ENGINE_API}/indexer/events-latest-ordered?order=desc&pageLength=${pageSize}&page=${page}`,
         );
 
         if (!response.ok) {
@@ -169,6 +164,10 @@ export const LeaderboardPage: React.FC = () => {
 
         const data = await response.json();
         const events = data.events || [];
+
+        if (events.length < pageSize) {
+          setHasMorePages(false);
+        }
 
         // Extract user addresses and balances from events
         const eventData = events.map((event: any) => ({
@@ -195,6 +194,8 @@ export const LeaderboardPage: React.FC = () => {
           const name = hasValidUsername
             ? account.account.username
             : shortAddress;
+
+          const baseId = page * pageSize + index + 1;
           return {
             address: item.user,
             balance: item.balance,
@@ -212,28 +213,74 @@ export const LeaderboardPage: React.FC = () => {
                   )
                 : getRandomNounsAttributes(item.user),
             name,
-            id: index + 1,
+            id: baseId,
           };
         });
+
         users.sort((a: any, b: any) => b.balance - a.balance);
-        setLeaderboard(users);
+
+        if (isInitialLoad) {
+          setLeaderboard(users);
+        } else {
+          setLeaderboard((prev) => [...prev, ...users]);
+        }
+
         setIsLoading(false);
+        setIsLoadingMore(false);
         setError(null);
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
         setError("Failed to load leaderboard. Please try again later.");
-        setLeaderboard([]);
+        if (isInitialLoad) {
+          setLeaderboard([]);
+        }
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
-    };
+    },
+    [getAccounts, getUserPrestiges, pageSize],
+  );
 
-    getLeaderboard();
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasMorePages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      loadLeaderboardPage(nextPage, false);
+    }
+  }, [currentPage, isLoadingMore, hasMorePages, loadLeaderboardPage]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      return; // Don't run if the page is not focused
+    }
+
+    // Reset state when page comes into focus
+    setCurrentPage(0);
+    setHasMorePages(true);
+    setLeaderboard([]);
+
+    // Use mock data if USE_MOCK is true
+    if (useMock) {
+      setLeaderboard(leaderboardMock);
+      setIsLoading(false);
+      setError(null);
+      setHasMorePages(false);
+      return;
+    }
+
+    if (!STARKNET_ENABLED || !powGameContractAddress) {
+      // If Starknet is not enabled and not using mock, show error
+      setError("Unable to connect to blockchain");
+      setIsLoading(false);
+      return;
+    }
+
+    loadLeaderboardPage(0, true);
   }, [
     STARKNET_ENABLED,
     powGameContractAddress,
-    getAccounts,
-    getUserPrestiges,
     isFocused,
+    loadLeaderboardPage,
   ]);
 
   if (!isFocused) {
@@ -327,6 +374,65 @@ export const LeaderboardPage: React.FC = () => {
           renderItem={({ item, index }) => (
             <LeaderboardItem index={index} user={item} />
           )}
+          ListFooterComponent={() =>
+            hasMorePages ? (
+              <View className="items-center mb-4 mt-2">
+                <TouchableOpacity
+                  onPress={handleLoadMore}
+                  disabled={isLoadingMore}
+                  style={{
+                    width: 120,
+                    height: 48,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {!isLoadingMore && (
+                    <Canvas
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        width: 120,
+                        height: 48,
+                      }}
+                    >
+                      <Image
+                        image={getImage("staking.button")}
+                        x={0}
+                        y={0}
+                        width={120}
+                        height={48}
+                        fit="fill"
+                        sampling={{
+                          filter: FilterMode.Nearest,
+                          mipmap: MipmapMode.Nearest,
+                        }}
+                      />
+                    </Canvas>
+                  )}
+                  {isLoadingMore ? (
+                    <ActivityIndicator size="small" color="#fff7ff" />
+                  ) : (
+                    <Text
+                      style={{
+                        fontFamily: "Pixels",
+                        fontSize: 16,
+                        color: "#fff7ff",
+                        textAlign: "center",
+                        paddingVertical: 12,
+                        paddingHorizontal: 8,
+                      }}
+                    >
+                      more...
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : null
+          }
           contentContainerStyle={{ paddingBottom: 200 }}
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
@@ -460,6 +566,22 @@ export const LeaderboardItem: React.FC<{
   ({ index, user }: { index: number; user: any }) => {
     const { getImage } = useImages();
 
+    const getRankBadge = (index: number) => {
+      switch (index) {
+        case 0:
+          return { badge: "leaderboard.number.gold", color: "#C61C01" };
+        case 1:
+          return { badge: "leaderboard.number.silver", color: "#252529" };
+        case 2:
+          return { badge: "leaderboard.number.bronze", color: "#672703" };
+        default:
+          return null;
+      }
+    };
+
+    const rankInfo = getRankBadge(index);
+    const rankNumber = index < 3 ? `0${index + 1}` : null;
+
     return (
       <View
         key={user.id}
@@ -471,6 +593,37 @@ export const LeaderboardItem: React.FC<{
           className="flex flex-row items-center flex-1"
           entering={FadeInLeft}
         >
+          {rankInfo && (
+            <View className="w-[36px] h-[36px] mr-1 relative">
+              <Canvas style={{ flex: 1 }} className="w-full h-full">
+                <Image
+                  image={getImage(rankInfo.badge)}
+                  fit="contain"
+                  x={0}
+                  y={0}
+                  width={36}
+                  height={36}
+                  sampling={{
+                    filter: FilterMode.Nearest,
+                    mipmap: MipmapMode.Nearest,
+                  }}
+                />
+              </Canvas>
+              <View className="absolute inset-0 items-center justify-center">
+                <Text
+                  className="text-[16px] font-Xerxes"
+                  style={{
+                    color: rankInfo.color,
+                    includeFontPadding: false,
+                    textAlign: "center",
+                    lineHeight: 16,
+                  }}
+                >
+                  {rankNumber}
+                </Text>
+              </View>
+            </View>
+          )}
           <View className="w-[60px] aspect-square mr-2 relative p-[2px]">
             <PFPView user={user.address} attributes={user.nouns} />
           </View>

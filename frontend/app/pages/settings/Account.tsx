@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from "react";
+import React, { memo, useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -26,6 +26,10 @@ import {
 import { useEventManager } from "../../stores/useEventManager";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { useTutorialStore } from "../../stores/useTutorialStore";
+import {
+  getRandomNounsAttributes,
+  createNounsAttributes,
+} from "../../configs/nouns";
 
 const getPrestigeIcon = (prestige: number) => {
   if (prestige === 0) {
@@ -54,19 +58,56 @@ export const AccountSection: React.FC = memo(() => {
     generateAccountAddress,
     storeKeyAndConnect,
   } = useStarknetConnector();
-  const { user, getAccount } = useFocEngine();
+  const { user, getAccount, getAccounts } = useFocEngine();
   const { currentPrestige } = useUpgrades();
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
   const { notify } = useEventManager();
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
-  const [nounsAttributes, setNounsAttributes] = useState<any>(null);
   const [availableAccount, setAvailableAccount] = useState<string | null>(null);
   const [availableUser, setAvailableUser] = useState<any>(null);
   const [isRestoring, setIsRestoring] = useState(false);
   const [restorePrivateKey, setRestorePrivateKey] = useState("");
   const [restoreError, setRestoreError] = useState("");
+
+  const nounsAttributes = useMemo(() => {
+    // First try to get from connected user
+    if (user?.account?.metadata && user.account.metadata.length === 4) {
+      return createNounsAttributes(
+        parseInt(user.account.metadata[0], 16),
+        parseInt(user.account.metadata[1], 16),
+        parseInt(user.account.metadata[2], 16),
+        parseInt(user.account.metadata[3], 16),
+      );
+    }
+    // Then try available user if not connected (check both possible data structures)
+    if (
+      availableUser?.account?.metadata &&
+      availableUser.account.metadata.length === 4
+    ) {
+      return createNounsAttributes(
+        parseInt(availableUser.account.metadata[0], 16),
+        parseInt(availableUser.account.metadata[1], 16),
+        parseInt(availableUser.account.metadata[2], 16),
+        parseInt(availableUser.account.metadata[3], 16),
+      );
+    }
+    // Fall back to random attributes based on account address
+    const addressToUse =
+      user?.account_address ||
+      availableUser?.account_address ||
+      account?.address ||
+      availableAccount;
+    return getRandomNounsAttributes(addressToUse);
+  }, [
+    user?.account?.metadata,
+    availableUser?.account?.metadata,
+    user?.account_address,
+    availableUser?.account_address,
+    account?.address,
+    availableAccount,
+  ]);
 
   const loadAccountData = async () => {
     // Check for available accounts first
@@ -93,11 +134,17 @@ export const AccountSection: React.FC = memo(() => {
         const address = generateAccountAddress(pk);
         setAvailableAccount(address);
 
-        // Try to fetch user data for this address
+        // Try to fetch user data for this address using getAccounts (like in Leaderboard)
         try {
-          const userData = await getAccount(address);
-          if (userData) {
-            setAvailableUser(userData);
+          const accounts = await getAccounts([address], undefined, true);
+          if (accounts && accounts.length > 0) {
+            setAvailableUser(accounts[0]);
+          } else {
+            // Fallback to getAccount if getAccounts doesn't return data
+            const userData = await getAccount(address);
+            if (userData) {
+              setAvailableUser(userData);
+            }
           }
         } catch (error) {
           console.log("Could not fetch user data for available account");
