@@ -111,21 +111,23 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     }
 
     const didUnlockNow = prevProgress < 100 && clampedProgress >= 100;
+    const isAlreadyUnlocked = get().achievementsUnlockedAt[achievementId] > 0;
 
     set((state) => ({
       achievementsProgress: {
         ...state.achievementsProgress,
         [achievementId]: clampedProgress,
       },
-      achievementsUnlockedAt: didUnlockNow
-        ? {
-            ...state.achievementsUnlockedAt,
-            [achievementId]: Date.now(),
-          }
-        : state.achievementsUnlockedAt,
+      achievementsUnlockedAt:
+        didUnlockNow || (clampedProgress >= 100 && !isAlreadyUnlocked)
+          ? {
+              ...state.achievementsUnlockedAt,
+              [achievementId]: Date.now(),
+            }
+          : state.achievementsUnlockedAt,
     }));
 
-    if (clampedProgress >= 100 && didUnlockNow) {
+    if (clampedProgress >= 100 && (!isAlreadyUnlocked || didUnlockNow)) {
       if (playSoundEffect) {
         playSoundEffect("AchievementCompleted");
       }
@@ -151,7 +153,7 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
       console.error("Error saving achievement progress:", error),
     );
 
-    if (didUnlockNow) {
+    if (didUnlockNow || (clampedProgress >= 100 && !isAlreadyUnlocked)) {
       AsyncStorage.setItem(
         `${account}.achievement_${achievementId}_unlockedAt`,
         String(Date.now()),
