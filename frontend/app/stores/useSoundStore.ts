@@ -484,8 +484,10 @@ export const MusicComponent = memo(() => {
 
   useEffect(() => {
     // Configure global audio mode to play sounds even in iOS silent mode
+    console.log("Starting Audio setup");
     setAudioModeAsync({ playsInSilentMode: true });
-
+    console.log("Audio setup is complete");
+    
     initializeSound();
   }, []);
 
