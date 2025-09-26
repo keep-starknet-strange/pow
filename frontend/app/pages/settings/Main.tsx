@@ -9,6 +9,7 @@ import BasicButton from "../../components/buttons/Basic";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 
 import { useSound } from "../../stores/useSoundStore";
+import { useAnimations } from "../../stores/useAnimationsStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 import { useUpgrades } from "../../stores/useUpgradesStore";
@@ -42,6 +43,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     toggleMusic,
     toggleHaptics,
   } = useSound();
+  const { animationLevel, setAnimationLevel } = useAnimations();
   const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const [isRewardClaimed, setIsRewardClaimed] = useState(false);
@@ -108,7 +110,6 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
       onPress: () => setShowResetConfirmation(true),
     },
     { label: "Review", onPress: () => StoreReview.requestReview() },
-    { label: "Terms of Use", tab: "TermsOfUse" },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
     ...(isAuthenticated && currentPrestige >= 1 && !isRewardClaimed
@@ -139,6 +140,18 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
           <BasicButton
             label={isHapticsOn ? "Haptics On" : "Haptics Off"}
             onPress={toggleHaptics}
+          />
+          <BasicButton
+            label={`Anims ${animationLevel === "full" ? "Full" : animationLevel === "reduced" ? "Less" : "Off"}`}
+            onPress={() => {
+              const nextLevel =
+                animationLevel === "full"
+                  ? "reduced"
+                  : animationLevel === "reduced"
+                    ? "off"
+                    : "full";
+              setAnimationLevel(nextLevel);
+            }}
           />
 
           {settingsComponents.map(({ label, tab, onPress }) => (

@@ -11,6 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 import transactionsJson from "../configs/transactions.json";
 import dappsJson from "../configs/dapps.json";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 
 interface TxFlashBurstProps {
   x: number; // Click position X
@@ -218,6 +219,7 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
   isDapp,
   onComplete,
 }) => {
+  const { shouldAnimate, animationIntensity } = useAnimationConfig();
   const containerOpacity = useSharedValue(0);
 
   // Get transaction color from config
@@ -270,9 +272,19 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
     };
   });
 
-  // Generate random streaks - fewer than blocks
+  // Generate random streaks with intensity based on animation settings
   const streaks = React.useMemo(() => {
-    const streakCount = 6 + Math.floor(Math.random() * 3); // 6-8 streaks (fewer than blocks)
+    if (!shouldAnimate) return [];
+
+    let streakCount: number;
+    if (animationIntensity === "full") {
+      streakCount = 6 + Math.floor(Math.random() * 3); // 6-8 streaks (fewer than blocks)
+    } else if (animationIntensity === "reduced") {
+      streakCount = 3 + Math.floor(Math.random() * 2); // 3-4 streaks
+    } else {
+      return [];
+    }
+
     return Array.from({ length: streakCount }, (_, index) => {
       const baseAngle = (360 / streakCount) * index;
       const randomVariation = (Math.random() - 0.5) * 25; // ±12.5 degrees
@@ -282,9 +294,19 @@ export const TxFlashBurst: React.FC<TxFlashBurstProps> = ({
         delay: Math.random() * 30, // Random delay 0-30ms
       };
     });
-  }, [trigger]);
+  }, [trigger, shouldAnimate, animationIntensity]);
 
   if (trigger === 0) return null;
+
+  // If animations are disabled, trigger completion callback immediately and return null
+  if (!shouldAnimate) {
+    React.useEffect(() => {
+      if (trigger > 0 && onComplete) {
+        onComplete();
+      }
+    }, [trigger, onComplete]);
+    return null;
+  }
 
   return (
     <Animated.View

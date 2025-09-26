@@ -9,6 +9,7 @@ import {
   ColorMatrix,
 } from "@shopify/react-native-skia";
 import { useImages } from "../hooks/useImages";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 import Animated, {
   useSharedValue,
   withSpring,
@@ -31,6 +32,7 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const { getImage } = useImages();
   const { width: screenWidth } = Dimensions.get("window");
+  const { shouldAnimate } = useAnimationConfig();
 
   // Scale factor based on screen width (iPhone SE width is 375)
   const scaleFactor = Math.min(screenWidth / 400, 1);
@@ -41,17 +43,30 @@ export const Logo: React.FC<LogoProps> = ({
   const sublogoFinalX = 100 * scaleFactor;
 
   // Animated values for character Y positions (falling from top if animated, otherwise at final position)
-  const pShadowY = useSharedValue(doEnterAnim ? -200 : finalY);
-  const oShadowY = useSharedValue(doEnterAnim ? -250 : finalY);
-  const wShadowY = useSharedValue(doEnterAnim ? -300 : finalY);
-  const exclamationShadowY = useSharedValue(doEnterAnim ? -350 : finalY);
+  // Only animate if shouldAnimate is true
+  const pShadowY = useSharedValue(doEnterAnim && shouldAnimate ? -200 : finalY);
+  const oShadowY = useSharedValue(doEnterAnim && shouldAnimate ? -250 : finalY);
+  const wShadowY = useSharedValue(doEnterAnim && shouldAnimate ? -300 : finalY);
+  const exclamationShadowY = useSharedValue(
+    doEnterAnim && shouldAnimate ? -350 : finalY,
+  );
 
-  const pMainY = useSharedValue(doEnterAnim ? -200 : mainFinalY);
-  const oMainY = useSharedValue(doEnterAnim ? -250 : mainFinalY);
-  const wMainY = useSharedValue(doEnterAnim ? -300 : mainFinalY);
-  const exclamationMainY = useSharedValue(doEnterAnim ? -350 : mainFinalY);
+  const pMainY = useSharedValue(
+    doEnterAnim && shouldAnimate ? -200 : mainFinalY,
+  );
+  const oMainY = useSharedValue(
+    doEnterAnim && shouldAnimate ? -250 : mainFinalY,
+  );
+  const wMainY = useSharedValue(
+    doEnterAnim && shouldAnimate ? -300 : mainFinalY,
+  );
+  const exclamationMainY = useSharedValue(
+    doEnterAnim && shouldAnimate ? -350 : mainFinalY,
+  );
 
-  const sublogoX = useSharedValue(doEnterAnim ? 400 : sublogoFinalX);
+  const sublogoX = useSharedValue(
+    doEnterAnim && shouldAnimate ? 400 : sublogoFinalX,
+  );
 
   // Fixed X positions for each character (scaled)
   const pX = 30 * scaleFactor;
@@ -103,8 +118,8 @@ export const Logo: React.FC<LogoProps> = ({
   );
 
   useEffect(() => {
-    // Only animate if doEnterAnim is true
-    if (!doEnterAnim) return;
+    // Only animate if doEnterAnim is true and animations are enabled
+    if (!doEnterAnim || !shouldAnimate) return;
 
     pShadowY.value = withDelay(
       100,
@@ -209,10 +224,10 @@ export const Logo: React.FC<LogoProps> = ({
         restSpeedThreshold: 0.01,
       }),
     );
-  }, [doEnterAnim]);
+  }, [doEnterAnim, shouldAnimate]);
 
   useEffect(() => {
-    if (!doWaveAnim) return;
+    if (!doWaveAnim || !shouldAnimate) return;
 
     // Create the bounce animation sequence with rest period
     pMainY.value = withRepeat(
@@ -430,7 +445,7 @@ export const Logo: React.FC<LogoProps> = ({
       ),
       -1, // Repeat indefinitely
     );
-  }, [doWaveAnim]);
+  }, [doWaveAnim, shouldAnimate]);
 
   return (
     <Animated.View

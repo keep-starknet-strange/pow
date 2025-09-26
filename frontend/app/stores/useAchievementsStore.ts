@@ -104,6 +104,12 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     const clampedProgress = Math.min(progress, 100);
 
     const prevProgress = get().achievementsProgress[achievementId] || 0;
+
+    // Don't allow progress to decrease if achievement is already completed
+    if (prevProgress >= 100 && clampedProgress < 100) {
+      return;
+    }
+
     const didUnlockNow = prevProgress < 100 && clampedProgress >= 100;
 
     set((state) => ({

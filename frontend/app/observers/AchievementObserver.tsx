@@ -14,29 +14,9 @@ type Achievement = (typeof achievements)[number];
 
 export class AchievementObserver implements Observer {
   achievementsByEvent: Map<string, Achievement[]>;
-  completedAchievements: Set<number>;
 
   constructor() {
     this.achievementsByEvent = this.groupAchievementsByEvent();
-    this.completedAchievements = new Set<number>();
-    // Load completed achievements from local storage
-    achievements.forEach((achievement) => {
-      AsyncStorage.getItem(`achievement_${achievement.id}`)
-        .then((value) => {
-          if (value !== null) {
-            const parsedProgress = parseInt(value, 10);
-            if (parsedProgress >= 100) {
-              this.completedAchievements.add(achievement.id);
-            }
-          }
-        })
-        .catch((error) => {
-          console.error(
-            "Error loading achievements from local storage:",
-            error,
-          );
-        });
-    });
   }
 
   private groupAchievementsByEvent(): Map<string, Achievement[]> {
@@ -62,7 +42,11 @@ export class AchievementObserver implements Observer {
     if (!relevantAchievements) return;
 
     relevantAchievements.forEach((achievement) => {
-      if (this.completedAchievements.has(achievement.id)) return; // Skip completed achievements
+      // Check current completion status from store instead of cached set
+      const currentProgress =
+        useAchievementsStore.getState().achievementsProgress[achievement.id] ||
+        0;
+      if (currentProgress >= 100) return; // Skip completed achievements
 
       switch (eventName) {
         case "TxAdded":
@@ -108,10 +92,6 @@ export class AchievementObserver implements Observer {
     // Get fresh updateAchievement function from store
     const { updateAchievement } = useAchievementsStore.getState();
     updateAchievement(achievementId, progress);
-
-    if (progress >= 100) {
-      this.completedAchievements.add(achievementId);
-    }
   }
 
   private handleTxAdded(achievement: Achievement, tx: Transaction) {

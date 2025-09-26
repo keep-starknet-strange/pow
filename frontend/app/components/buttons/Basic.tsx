@@ -2,6 +2,7 @@ import React from "react";
 import { View, TouchableWithoutFeedback, Text, Platform } from "react-native";
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
+import { useAnimationConfig } from "../../hooks/useAnimationConfig";
 import {
   Canvas,
   Image,
@@ -37,21 +38,24 @@ const BasicButton: React.FC<BasicButtonProps> = ({
 }) => {
   const { getImage } = useImages();
   const { notify } = useEventManager();
+  const { shouldAnimate } = useAnimationConfig();
 
   const shakeAnim = useSharedValue(8);
   const shakeAnimStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: withSequence(
-          withTiming(Math.abs(shakeAnim.value), {
-            duration: 100,
-            easing: Easing.linear,
-          }),
-          withTiming(0, {
-            duration: 50,
-            easing: Easing.linear,
-          }),
-        ),
+        translateY: shouldAnimate
+          ? withSequence(
+              withTiming(Math.abs(shakeAnim.value), {
+                duration: 100,
+                easing: Easing.linear,
+              }),
+              withTiming(0, {
+                duration: 50,
+                easing: Easing.linear,
+              }),
+            )
+          : 0,
       },
     ],
   }));
@@ -61,7 +65,9 @@ const BasicButton: React.FC<BasicButtonProps> = ({
       <TouchableWithoutFeedback
         onPress={() => {
           notify("BasicClick");
-          shakeAnim.value *= -1; // Toggle the shake direction
+          if (shouldAnimate) {
+            shakeAnim.value *= -1; // Toggle the shake direction
+          }
           onPress?.();
         }}
         disabled={disabled}

@@ -1,5 +1,6 @@
 import React, { useImperativeHandle, forwardRef } from "react";
 import { Text, View, Easing, Animated, useAnimatedValue } from "react-native";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
 
 export type PopupAnimationRef = {
   showPopup: (value: string, color?: string) => void;
@@ -13,14 +14,21 @@ export const PopupAnimation = forwardRef<
   PopupAnimationRef,
   PopupAnimationProps
 >(({ animRange }, ref) => {
+  const { shouldAnimate } = useAnimationConfig();
   const popupAnimation = useAnimatedValue(0);
   const [popupValue, setPopupValue] = React.useState("");
   const [color, setColor] = React.useState<string | undefined>();
 
   useImperativeHandle(ref, () => ({
     showPopup: (value: string, color?: string) => {
+      if (!shouldAnimate) {
+        // If animations are disabled, don't render popup at all
+        return;
+      }
+
       setPopupValue(value);
       setColor(color);
+
       // Reset the animation value
       popupAnimation.setValue(0);
       Animated.timing(popupAnimation, {

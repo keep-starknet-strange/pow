@@ -8,6 +8,7 @@ import Animated, {
   runOnJS,
   Easing,
 } from "react-native-reanimated";
+import { useAnimationConfig } from "./useAnimationConfig";
 
 /**
  * Custom hook for handling completion animations on confirmer components
@@ -15,6 +16,8 @@ import Animated, {
  * @returns Object containing localIsBuilt state and animated style
  */
 export const useCompletionAnimation = (isBuilt: boolean | undefined) => {
+  const { shouldAnimate, animationIntensity } = useAnimationConfig();
+
   // Local state to control when confirmer disappears (delayed from actual isBuilt)
   const [localIsBuilt, setLocalIsBuilt] = useState(false);
   const [isCompletingAnimation, setIsCompletingAnimation] = useState(false);
@@ -43,14 +46,25 @@ export const useCompletionAnimation = (isBuilt: boolean | undefined) => {
       // Component was completed (isBuilt changed from true to false) - start completion animation
       setIsCompletingAnimation(true);
 
+      if (!shouldAnimate) {
+        // If animations are disabled, immediately hide without animation
+        handleAnimationComplete();
+        return;
+      }
+
+      // Adjust animation intensity based on settings
+      const springIntensity = animationIntensity === "full" ? 1.3 : 1.15;
+      const rotateIntensity = animationIntensity === "full" ? 5 : 3;
+      const duration = animationIntensity === "full" ? 200 : 150;
+
       // Completion animation sequence (~600ms total)
       scaleAnim.value = withSequence(
-        withSpring(1.3, { duration: 200, dampingRatio: 0.6 }),
-        withSpring(1.1, { duration: 200, dampingRatio: 0.8 }),
+        withSpring(springIntensity, { duration, dampingRatio: 0.6 }),
+        withSpring(1.1, { duration, dampingRatio: 0.8 }),
         withTiming(
           0.8,
           {
-            duration: 200,
+            duration,
             easing: Easing.out(Easing.quad),
           },
           () => {
@@ -61,19 +75,32 @@ export const useCompletionAnimation = (isBuilt: boolean | undefined) => {
       );
 
       opacityAnim.value = withSequence(
-        withTiming(1, { duration: 300 }),
-        withTiming(0.7, { duration: 150 }),
-        withTiming(0, { duration: 150 }),
+        withTiming(1, { duration: duration + 100 }),
+        withTiming(0.7, { duration: duration - 50 }),
+        withTiming(0, { duration: duration - 50 }),
       );
 
       rotateAnim.value = withSequence(
-        withSpring(5, { duration: 150, dampingRatio: 0.7 }),
-        withSpring(-3, { duration: 150, dampingRatio: 0.7 }),
-        withSpring(0, { duration: 150, dampingRatio: 0.8 }),
-        withTiming(0, { duration: 150 }),
+        withSpring(rotateIntensity, {
+          duration: duration - 50,
+          dampingRatio: 0.7,
+        }),
+        withSpring(-rotateIntensity * 0.6, {
+          duration: duration - 50,
+          dampingRatio: 0.7,
+        }),
+        withSpring(0, { duration: duration - 50, dampingRatio: 0.8 }),
+        withTiming(0, { duration: duration - 50 }),
       );
     }
-  }, [isBuilt, localIsBuilt, isCompletingAnimation, handleAnimationComplete]);
+  }, [
+    isBuilt,
+    localIsBuilt,
+    isCompletingAnimation,
+    handleAnimationComplete,
+    shouldAnimate,
+    animationIntensity,
+  ]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

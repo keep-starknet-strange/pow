@@ -14,6 +14,7 @@ import { useImages } from "../../hooks/useImages";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { useTransactionsStore } from "../../stores/useTransactionsStore";
 import { useTransactionPause } from "../../stores/useTransactionPauseStore";
+import { useGameStore } from "../../stores/useGameStore";
 import {
   getTxBg,
   getTxIcon,
@@ -44,6 +45,7 @@ export const TxButtonInner = memo(
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
     const { isPaused } = useTransactionPause();
+    const { getWorkingBlock } = useGameStore();
     const transactionUnlocked = props.feeLevel !== -1;
 
     // Get the images and check if they're loaded
@@ -107,7 +109,9 @@ export const TxButtonInner = memo(
 
     const speed = getSpeed(props.chainId, props.txId, props.isDapp);
     const paused = isPaused(props.chainId, props.txId, props.isDapp);
-    const shouldAutomate = speed > 0 && !paused;
+    const workingBlock = getWorkingBlock(props.chainId);
+    const blockIsFull = workingBlock?.isBuilt ?? false;
+    const shouldAutomate = speed > 0 && !paused && !blockIsFull;
 
     useEffect(() => {
       if (shouldAutomate) {
