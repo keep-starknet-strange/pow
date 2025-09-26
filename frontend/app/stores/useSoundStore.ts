@@ -27,7 +27,6 @@ const MUSIC_ASSETS = {
   "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
   "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
-  "Revert Theme": require("../../assets/music/revert-theme.m4a"),
 };
 
 type SongName = keyof typeof MUSIC_ASSETS;
@@ -214,9 +213,6 @@ interface SoundState {
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
   isInitialized: boolean;
-  previousTrackBeforeRevert: SongName | null;
-  shouldPlayRevertMusic: boolean;
-  isPlayingRevertMusic: boolean;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -227,9 +223,6 @@ interface SoundState {
   initializeSound: () => Promise<void>;
   cleanupSound: () => void;
   selectNextTrack: () => void;
-  startRevertMusic: () => void;
-  stopRevertMusic: () => void;
-  setIsPlayingRevertMusic: (isPlaying: boolean) => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -242,9 +235,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   isInitialized: false,
   currentTrack: null,
   lastPlayedTracks: [],
-  previousTrackBeforeRevert: null,
-  shouldPlayRevertMusic: false,
-  isPlayingRevertMusic: false,
 
   initializeSound: async () => {
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
@@ -361,12 +351,10 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   selectNextTrack: () => {
     const { currentTrack, lastPlayedTracks } = get();
 
-    // Get all track names except Revert Theme
-    const allTracks = (Object.keys(MUSIC_ASSETS) as SongName[]).filter(
-      (track) => track !== "Revert Theme",
-    );
+    // // Get all track names
+    const allTracks = Object.keys(MUSIC_ASSETS) as SongName[];
 
-    if (currentTrack && currentTrack !== "Revert Theme") {
+    if (currentTrack) {
       lastPlayedTracks.push(currentTrack);
     }
 
@@ -390,64 +378,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       currentTrack: nextTrack,
       lastPlayedTracks: recentTracks,
     });
-  },
-
-  startRevertMusic: () => {
-    const { currentTrack, isMusicOn, shouldPlayRevertMusic } = get();
-
-    // Don't start if already playing
-    if (shouldPlayRevertMusic) {
-      return;
-    }
-
-    // Store the current track before switching (if music was playing)
-    if (isMusicOn && currentTrack && currentTrack !== "Revert Theme") {
-      set({ previousTrackBeforeRevert: currentTrack });
-    }
-
-    // Switch to revert music track
-    set({
-      shouldPlayRevertMusic: true,
-      currentTrack: "Revert Theme" as SongName,
-    });
-
-    // Play the revert sound effect
-    const { playSoundEffect } = get();
-    playSoundEffect("RevertStarted");
-  },
-
-  stopRevertMusic: () => {
-    const { isMusicOn, previousTrackBeforeRevert, selectNextTrack } = get();
-
-    // Clear revert music flag
-    set({
-      shouldPlayRevertMusic: false,
-      isPlayingRevertMusic: false,
-    });
-
-    // Resume normal music after a short delay
-    setTimeout(() => {
-      if (isMusicOn && previousTrackBeforeRevert) {
-        // Restore the previous track
-        set({
-          currentTrack: previousTrackBeforeRevert,
-          previousTrackBeforeRevert: null,
-        });
-      } else if (isMusicOn) {
-        // If no previous track, select a new one
-        selectNextTrack();
-      } else {
-        // Clear the revert theme if music is off
-        set({
-          currentTrack: null,
-          previousTrackBeforeRevert: null,
-        });
-      }
-    }, 1000); // 1 second delay before resuming normal music
-  },
-
-  setIsPlayingRevertMusic: (isPlaying: boolean) => {
-    set({ isPlayingRevertMusic: isPlaying });
   },
 }));
 
@@ -523,9 +453,7 @@ export const MusicComponent = memo(() => {
     currentTrack,
     musicVolume,
     initializeSound,
-    selectNextTrack,
-    shouldPlayRevertMusic,
-    setIsPlayingRevertMusic,
+    selectNextTrack: selectNextTrack,
   } = useSoundStore();
 
   useEffect(() => {
@@ -538,53 +466,18 @@ export const MusicComponent = memo(() => {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
-  // Handle track loading
+  // Toggle Music
   useEffect(() => {
-    if (currentTrack) {
-      const audioSource = MUSIC_ASSETS[currentTrack];
-      player.replace(audioSource);
-      console.log("Current track:", currentTrack);
-
-      // Set loop based on whether it's revert music
-      if (currentTrack === "Revert Theme") {
-        player.loop = true;
-      } else {
-        player.loop = false;
-      }
-    }
-  }, [currentTrack, player]);
-
-  // Handle playback based on music state and revert state
-  useEffect(() => {
-    if (!status.isLoaded) return;
-
-    if (shouldPlayRevertMusic) {
-      // Always play revert music regardless of isMusicOn setting
+    if (status.isLoaded && isMusicOn) {
       player.play();
-      setIsPlayingRevertMusic(true);
-    } else if (currentTrack === "Revert Theme") {
-      // Stop revert music when shouldPlayRevertMusic becomes false
-      player.pause();
-      setIsPlayingRevertMusic(false);
-    } else if (isMusicOn) {
-      // Play normal music
-      player.play();
-    } else {
-      // Pause if music is turned off
+    } else if (!isMusicOn && status.playing) {
       player.pause();
     }
-  }, [
-    status.isLoaded,
-    isMusicOn,
-    shouldPlayRevertMusic,
-    currentTrack,
-    player,
-    setIsPlayingRevertMusic,
-  ]);
+  }, [status.isLoaded, isMusicOn, player]);
 
-  // Select next track when current one finishes (only for non-revert tracks)
+  // Select next track, when previous one finished
   useEffect(() => {
-    if (status.didJustFinish && currentTrack !== "Revert Theme") {
+    if (status.didJustFinish) {
       setTimeout(
         () => {
           selectNextTrack();
@@ -592,17 +485,21 @@ export const MusicComponent = memo(() => {
         2000 + Math.random() * 1000,
       );
     }
-  }, [status.didJustFinish, selectNextTrack, currentTrack]);
+  }, [status.didJustFinish, selectNextTrack]);
 
-  // Set volume - slightly reduced for revert music
+  // Observe current track
   useEffect(() => {
-    if (currentTrack === "Revert Theme") {
-      const volume = musicVolume > 0 ? musicVolume * 0.8 : 0.3;
-      player.volume = volume;
-    } else {
-      player.volume = musicVolume;
+    if (currentTrack) {
+      const audioSource = MUSIC_ASSETS[currentTrack];
+      player.replace(audioSource);
+      console.log("Current track:", currentTrack);
     }
-  }, [musicVolume, currentTrack, player]);
+  }, [currentTrack, player]);
+
+  // Observe volume
+  useEffect(() => {
+    player.volume = musicVolume;
+  }, [musicVolume, player]);
 
   return null;
 });
