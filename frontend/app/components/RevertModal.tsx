@@ -36,8 +36,8 @@ const RevertModalComponent: React.FC = () => {
   useEffect(() => {
     if (shouldShow) {
       // Start playing revert music when modal becomes visible
-      const { playRevertMusic } = useSoundStore.getState();
-      playRevertMusic();
+      const { startRevertMusic } = useSoundStore.getState();
+      startRevertMusic();
     } else {
       // Stop revert music immediately when modal is hidden
       const { stopRevertMusic } = useSoundStore.getState();

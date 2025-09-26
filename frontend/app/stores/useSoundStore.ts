@@ -27,6 +27,7 @@ const MUSIC_ASSETS = {
   "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
   "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
+  "Revert Theme": require("../../assets/music/revert-theme.m4a"),
 };
 
 type SongName = keyof typeof MUSIC_ASSETS;
@@ -213,8 +214,8 @@ interface SoundState {
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
   isInitialized: boolean;
-  revertMusicPlayer: AudioPlayer | null;
   previousTrackBeforeRevert: SongName | null;
+  shouldPlayRevertMusic: boolean;
   isPlayingRevertMusic: boolean;
 
   toggleSound: () => void;
@@ -226,8 +227,9 @@ interface SoundState {
   initializeSound: () => Promise<void>;
   cleanupSound: () => void;
   selectNextTrack: () => void;
-  playRevertMusic: () => Promise<void>;
-  stopRevertMusic: () => Promise<void>;
+  startRevertMusic: () => void;
+  stopRevertMusic: () => void;
+  setIsPlayingRevertMusic: (isPlaying: boolean) => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -240,8 +242,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   isInitialized: false,
   currentTrack: null,
   lastPlayedTracks: [],
-  revertMusicPlayer: null,
   previousTrackBeforeRevert: null,
+  shouldPlayRevertMusic: false,
   isPlayingRevertMusic: false,
 
   initializeSound: async () => {
@@ -359,10 +361,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   selectNextTrack: () => {
     const { currentTrack, lastPlayedTracks } = get();
 
-    // Get all track names
-    const allTracks = Object.keys(MUSIC_ASSETS) as SongName[];
+    // Get all track names except Revert Theme
+    const allTracks = (Object.keys(MUSIC_ASSETS) as SongName[]).filter(
+      (track) => track !== "Revert Theme",
+    );
 
-    if (currentTrack) {
+    if (currentTrack && currentTrack !== "Revert Theme") {
       lastPlayedTracks.push(currentTrack);
     }
 
@@ -388,100 +392,62 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     });
   },
 
-  playRevertMusic: async () => {
-    const { isMusicOn, musicVolume, currentTrack, revertMusicPlayer } = get();
+  startRevertMusic: () => {
+    const { currentTrack, isMusicOn, shouldPlayRevertMusic } = get();
 
     // Don't start if already playing
-    if (revertMusicPlayer) {
+    if (shouldPlayRevertMusic) {
       return;
     }
 
     // Store the current track before switching (if music was playing)
-    if (isMusicOn && currentTrack) {
+    if (isMusicOn && currentTrack && currentTrack !== "Revert Theme") {
       set({ previousTrackBeforeRevert: currentTrack });
     }
 
-    try {
-      // Create and play revert theme - plays regardless of music setting for dramatic effect
-      const revertMusicAsset = require("../../assets/music/revert-theme.m4a");
+    // Switch to revert music track
+    set({
+      shouldPlayRevertMusic: true,
+      currentTrack: "Revert Theme" as SongName,
+    });
 
-      const revertPlayer = createAudioPlayer(revertMusicAsset);
-      // Use the music volume setting if available, otherwise default to 0.3
-      const volume = musicVolume > 0 ? musicVolume * 0.8 : 0.3;
-      revertPlayer.volume = volume;
-      revertPlayer.shouldCorrectPitch = true; // Enable pitch correction like sound effects
-      // Don't set loop immediately, set it after play starts
-
-      // Store player reference before playing
-      set({
-        revertMusicPlayer: revertPlayer,
-        isPlayingRevertMusic: true,
-      });
-
-      // Play the revert music
-      revertPlayer.play();
-      revertPlayer.loop = true;
-
-      // Also play the revert sound effect
-      const { playSoundEffect } = get();
-      playSoundEffect("RevertStarted");
-    } catch (error) {
-      if (__DEV__) console.error("Failed to play revert music:", error);
-    }
+    // Play the revert sound effect
+    const { playSoundEffect } = get();
+    playSoundEffect("RevertStarted");
   },
 
-  stopRevertMusic: async () => {
-    const { revertMusicPlayer, isMusicOn, previousTrackBeforeRevert } = get();
+  stopRevertMusic: () => {
+    const { isMusicOn, previousTrackBeforeRevert, selectNextTrack } = get();
 
-    // Stop and cleanup revert music
-    if (revertMusicPlayer) {
-      try {
-        // First set state to indicate we're stopping
+    // Clear revert music flag
+    set({
+      shouldPlayRevertMusic: false,
+      isPlayingRevertMusic: false,
+    });
+
+    // Resume normal music after a short delay
+    setTimeout(() => {
+      if (isMusicOn && previousTrackBeforeRevert) {
+        // Restore the previous track
         set({
-          isPlayingRevertMusic: false,
-        });
-
-        // Then stop and cleanup the player
-        if (revertMusicPlayer.playing) {
-          await revertMusicPlayer.pause();
-        }
-
-        // Small delay before release to ensure pause completes
-        setTimeout(() => {
-          try {
-            revertMusicPlayer.release();
-          } catch (releaseError) {
-            if (__DEV__)
-              console.error("Error releasing revert player:", releaseError);
-          }
-        }, 100);
-
-        // Clear the reference
-        set({
-          revertMusicPlayer: null,
+          currentTrack: previousTrackBeforeRevert,
           previousTrackBeforeRevert: null,
         });
-      } catch (error) {
-        if (__DEV__) console.error("Failed to stop revert music:", error);
-        // Force clear the reference even if cleanup failed
+      } else if (isMusicOn) {
+        // If no previous track, select a new one
+        selectNextTrack();
+      } else {
+        // Clear the revert theme if music is off
         set({
-          revertMusicPlayer: null,
-          isPlayingRevertMusic: false,
+          currentTrack: null,
           previousTrackBeforeRevert: null,
         });
       }
-    }
+    }, 1000); // 1 second delay before resuming normal music
+  },
 
-    // Resume normal music after a short delay (only if music was on and we had a track)
-    if (isMusicOn && previousTrackBeforeRevert) {
-      setTimeout(() => {
-        const state = get();
-        if (!state.isPlayingRevertMusic && state.isMusicOn) {
-          // Restore the previous track
-          set({ currentTrack: previousTrackBeforeRevert });
-        }
-      }, 1000); // 1 second delay before resuming normal music
-    }
+  setIsPlayingRevertMusic: (isPlaying: boolean) => {
+    set({ isPlayingRevertMusic: isPlaying });
   },
 }));
 
@@ -558,7 +524,8 @@ export const MusicComponent = memo(() => {
     musicVolume,
     initializeSound,
     selectNextTrack,
-    isPlayingRevertMusic,
+    shouldPlayRevertMusic,
+    setIsPlayingRevertMusic,
   } = useSoundStore();
 
   useEffect(() => {
@@ -571,29 +538,53 @@ export const MusicComponent = memo(() => {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
-  // Toggle Music - but respect revert music state
+  // Handle track loading
   useEffect(() => {
-    if (isPlayingRevertMusic) {
-      // Pause normal music when revert music is playing
-      if (status.playing) {
-        player.pause();
+    if (currentTrack) {
+      const audioSource = MUSIC_ASSETS[currentTrack];
+      player.replace(audioSource);
+      console.log("Current track:", currentTrack);
+
+      // Set loop based on whether it's revert music
+      if (currentTrack === "Revert Theme") {
+        player.loop = true;
+      } else {
+        player.loop = false;
       }
-    } else if (status.isLoaded && isMusicOn) {
+    }
+  }, [currentTrack, player]);
+
+  // Handle playback based on music state and revert state
+  useEffect(() => {
+    if (!status.isLoaded) return;
+
+    if (shouldPlayRevertMusic) {
+      // Always play revert music regardless of isMusicOn setting
       player.play();
-    } else if (!isMusicOn && status.playing) {
+      setIsPlayingRevertMusic(true);
+    } else if (currentTrack === "Revert Theme") {
+      // Stop revert music when shouldPlayRevertMusic becomes false
+      player.pause();
+      setIsPlayingRevertMusic(false);
+    } else if (isMusicOn) {
+      // Play normal music
+      player.play();
+    } else {
+      // Pause if music is turned off
       player.pause();
     }
   }, [
     status.isLoaded,
     isMusicOn,
-    isPlayingRevertMusic,
-    status.playing,
+    shouldPlayRevertMusic,
+    currentTrack,
     player,
+    setIsPlayingRevertMusic,
   ]);
 
-  // Select next track, when previous one finished
+  // Select next track when current one finishes (only for non-revert tracks)
   useEffect(() => {
-    if (status.didJustFinish && !isPlayingRevertMusic) {
+    if (status.didJustFinish && currentTrack !== "Revert Theme") {
       setTimeout(
         () => {
           selectNextTrack();
@@ -601,21 +592,17 @@ export const MusicComponent = memo(() => {
         2000 + Math.random() * 1000,
       );
     }
-  }, [status.didJustFinish, selectNextTrack, isPlayingRevertMusic]);
+  }, [status.didJustFinish, selectNextTrack, currentTrack]);
 
-  // Observe current track
+  // Set volume - slightly reduced for revert music
   useEffect(() => {
-    if (currentTrack && !isPlayingRevertMusic) {
-      const audioSource = MUSIC_ASSETS[currentTrack];
-      player.replace(audioSource);
-      console.log("Current track:", currentTrack);
+    if (currentTrack === "Revert Theme") {
+      const volume = musicVolume > 0 ? musicVolume * 0.8 : 0.3;
+      player.volume = volume;
+    } else {
+      player.volume = musicVolume;
     }
-  }, [currentTrack, player, isPlayingRevertMusic]);
-
-  // Observe volume
-  useEffect(() => {
-    player.volume = musicVolume;
-  }, [musicVolume, player]);
+  }, [musicVolume, currentTrack, player]);
 
   return null;
 });
