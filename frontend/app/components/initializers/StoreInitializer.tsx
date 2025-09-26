@@ -8,7 +8,11 @@ import { useOnchainActions } from "@/app/stores/useOnchainActions";
 import { useL2Store } from "@/app/stores/useL2Store";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
 import { useAchievementsStore } from "@/app/stores/useAchievementsStore";
-import { useSoundStore, useSound } from "@/app/stores/useSoundStore";
+import {
+  useSoundStore,
+  useSound,
+  MusicComponent,
+} from "@/app/stores/useSoundStore";
 import { useAnimationsStore } from "@/app/stores/useAnimationsStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
@@ -277,7 +281,7 @@ export const StoreInitializer = memo(() => {
     <>
       <OnchainActionsInitializer />
       <OnchainActionsRevertInitializer />
-      <SoundInitializer />
+      <MusicComponent />
       <AnimationsInitializer />
       <TutorialInitializer />
       <AchievementsInitializer />
