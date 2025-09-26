@@ -20,11 +20,11 @@ const HAPTICS_ENABLED_KEY = "haptics_enabled";
 const FIRST_LAUNCH_KEY = "has_launched_before";
 
 const MUSIC_ASSETS = {
-  "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
-  "Busy Market": require("../../assets/music/Busy Day At The Market-LOOP.m4a"),
-  "Left Right": require("../../assets/music/LeftRightExcluded.m4a"),
-  "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
-  "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
+  "The Return": require("../../assets/music/the-return.m4a"),
+  "Busy Market": require("../../assets/music/busy-date.m4a"),
+  "Left Right": require("../../assets/music/left-right.m4a"),
+  "Super Ninja": require("../../assets/music/super-ninja.m4a"),
+  "Mega Wall": require("../../assets/music/mega-wall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
 };
 
@@ -483,54 +483,61 @@ export const MusicComponent = memo(() => {
   } = useSoundStore();
 
   useEffect(() => {
+    console.error("Set up audio mode")
     // Configure global audio mode to play sounds even in iOS silent mode
-    console.log("Starting Audio setup");
     setAudioModeAsync({ playsInSilentMode: true });
-    console.log("Audio setup is complete");
     
+    console.error("Init sound")
     initializeSound();
   }, []);
 
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
-  const revertPlayer = useAudioPlayer(REVERT_MUSIC);
-  const revertStatus = useAudioPlayerStatus(revertPlayer);
+  useEffect(() => {
+    console.error(JSON.stringify(status))
+  }, [status])
+
+  // const revertPlayer = useAudioPlayer(REVERT_MUSIC);
+  // const revertStatus = useAudioPlayerStatus(revertPlayer);
 
   // Toggle Music
   useEffect(() => {
     if (status.isLoaded && isMusicOn) {
+      console.error("Music play")
       player.play();
     } else if (!isMusicOn && status.playing) {
+      console.error("Music pause")
       player.pause();
     }
   }, [status.isLoaded, isMusicOn, player]);
 
-  // Toggle Revert Music
-  useEffect(() => {
-    if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
-      player.pause();
-      revertPlayer.seekTo(0);
-      revertPlayer.play();
-    } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
-      revertPlayer.pause();
-      if (isMusicOn) {
-        player.play();
-      }
-    }
-  }, [
-    revertStatus.isLoaded,
-    isMusicOn,
-    isPlayingRevertMusic,
-    revertPlayer,
-    player,
-  ]);
+  // // Toggle Revert Music
+  // useEffect(() => {
+  //   if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
+  //     player.pause();
+  //     revertPlayer.seekTo(0);
+  //     revertPlayer.play();
+  //   } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
+  //     revertPlayer.pause();
+  //     if (isMusicOn) {
+  //       player.play();
+  //     }
+  //   }
+  // }, [
+  //   revertStatus.isLoaded,
+  //   isMusicOn,
+  //   isPlayingRevertMusic,
+  //   revertPlayer,
+  //   player,
+  // ]);
 
   // Select next track, when previous one finished
   useEffect(() => {
     if (status.didJustFinish) {
       setTimeout(
         () => {
+          console.error("Select next track")
           selectNextTrack();
         },
         2000 + Math.random() * 1000,
@@ -542,16 +549,18 @@ export const MusicComponent = memo(() => {
   useEffect(() => {
     if (currentTrack) {
       const audioSource = MUSIC_ASSETS[currentTrack];
+      console.error("Current track:", currentTrack);
       player.replace(audioSource);
-      console.log("Current track:", currentTrack);
+      console.error("Current track replaced.")
     }
   }, [currentTrack, player]);
 
   // Observe volume
   useEffect(() => {
+    console.error("Player volume", musicVolume)
     player.volume = musicVolume;
-    revertPlayer.volume = musicVolume;
-  }, [musicVolume, player, revertPlayer]);
+    // revertPlayer.volume = musicVolume;
+  }, [musicVolume, player]);
 
   return null;
 });
