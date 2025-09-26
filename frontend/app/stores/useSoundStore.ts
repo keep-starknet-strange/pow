@@ -256,6 +256,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
 
     set({
+      isInitialized: true,
       isSoundOn: soundEnabled === "true" || soundEnabled === null,
       isMusicOn: musicEnabled === "true" || musicEnabled === null,
       isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
