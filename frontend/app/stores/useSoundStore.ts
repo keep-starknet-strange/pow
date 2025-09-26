@@ -510,16 +510,19 @@ export const MusicComponent = memo(() => {
       player.pause();
       revertPlayer.seekTo(0);
       revertPlayer.play();
-    } else if (
-      (!isMusicOn || !isPlayingRevertMusic) &&
-      revertStatus.playing
-    ) {
+    } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
       revertPlayer.pause();
       if (isMusicOn) {
         player.play();
       }
     }
-  }, [revertStatus.isLoaded, isMusicOn, isPlayingRevertMusic, revertPlayer, player]);
+  }, [
+    revertStatus.isLoaded,
+    isMusicOn,
+    isPlayingRevertMusic,
+    revertPlayer,
+    player,
+  ]);
 
   // Select next track, when previous one finished
   useEffect(() => {
