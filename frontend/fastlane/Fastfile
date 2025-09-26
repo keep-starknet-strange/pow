@@ -147,8 +147,6 @@ end
 platform :ios do
   before_all do
     setup_ci if ENV['CI']
-
-    setup_appstore_connect_api_key()
   end
 
   lane :prebuild do
@@ -171,7 +169,11 @@ platform :ios do
 
   # Used to build the app and sign it with the 
   # correct certificates and provisioning profiles
-  private_lane :build_and_sign_release do
+  private_lane :build_and_sign_release do |options|
+    is_appstore = options[:adhoc] == false || options[:adhoc] == nil
+
+    provisioning_profile = is_appstore ? "match AppStore com.starknet.pow" : "match AdHoc com.starknet.pow"
+
     # Since the ios project is dynamically generated, we need to update the 
     # code signing settings. This is similar to opening the project in Xcode and
     # 1. Click POW on the project navigator
@@ -179,7 +181,7 @@ platform :ios do
     # 3. Then click Signing & Capabilities tab
     # 4. Then click on Release tab
     # 5. The uncheck the "Automatically manage signing" checkbox
-    # 6. Select the profile "match AppStore com.starknet.pow"
+    # 6. Select the profile provisioning_profile
     # Since this script is run in CI those settings can be changed with the follwing lane.
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -188,12 +190,13 @@ platform :ios do
       bundle_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
       code_sign_identity: "iPhone Distribution",
       sdk: "iphoneos*",
-      profile_name: "match AppStore com.starknet.pow"
+      profile_name: provisioning_profile
     )
 
     # Setup certificates and provisioning profiles (Check the Matchfile)
+    type = is_appstore ? "appstore" : "adhoc"
     match(
-      type: 'appstore',
+      type: type,
       readonly: true
     )
 
@@ -237,16 +240,17 @@ platform :ios do
       prebuild
     end
 
+    setup_appstore_connect_api_key
     update_build_number
     build_and_sign_release
 
-    upload_to_testflight(
-      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
-      submit_beta_review: false,
-      skip_waiting_for_build_processing: true,
-      # changelog: "", Only add this when publishing to external testers. The log should not be too short
-      groups: ["Internal Testers"]
-    )
+    # upload_to_testflight(
+    #   ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+    #   submit_beta_review: false,
+    #   skip_waiting_for_build_processing: true,
+    #   # changelog: "", Only add this when publishing to external testers. The log should not be too short
+    #   groups: ["Internal Testers"]
+    # )
   end
 
   lane :deploy_app_store do |options|
@@ -254,6 +258,7 @@ platform :ios do
       prebuild
     end
     
+    setup_appstore_connect_api_key
     update_build_number
     build_and_sign_release
 
@@ -272,8 +277,8 @@ platform :ios do
   # args: clean: true/false (default: false) - whether to clean the build folder before building
   #       skip_prebuild: true/false (default: false) - whether to skip the expo prebuild step. This is useful
   #                                                    only if you have already prebuild the ios project manually.
-  # Example: fastlane ios local_build clean:true
-  lane :local_build do |options|    
+  # Example: fastlane ios simulator_build clean:true
+  lane :simulator_build do |options|    
     selected_device = select_simulator
     UI.message("📱 Selected device: #{selected_device.name}")
         
@@ -298,5 +303,13 @@ platform :ios do
 
     UI.message("🚀 Launching app")
     sh(command: "xcrun simctl launch #{selected_device.udid} #{CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)}")
+  end
+
+  lane :adhoc_build do |options| 
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+
+    build_and_sign_release(adhoc: true)
   end
 end

@@ -68,10 +68,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 
 
-### ios local_build
+### ios simulator_build
 
 ```sh
-[bundle exec] fastlane ios local_build
+[bundle exec] fastlane ios simulator_build
+```
+
+
+
+### ios adhoc_build
+
+```sh
+[bundle exec] fastlane ios adhoc_build
 ```
 
 
