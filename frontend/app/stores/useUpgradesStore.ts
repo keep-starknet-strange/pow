@@ -4,12 +4,13 @@ import { useBalanceStore } from "./useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";
-import { Contract, Call } from "starknet";
+import { Contract } from "starknet";
 import { FocAccount } from "../context/FocEngineConnector";
 import { useL2Store } from "./useL2Store";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useGameStore } from "./useGameStore";
 import { useTransactionPauseStore } from "./useTransactionPauseStore";
+import { useAchievementsStore } from "./useAchievementsStore";
 
 interface UpgradesState {
   // Map: chainId -> upgradeId -> Upgrade Level
@@ -138,7 +139,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     getUserUpgradeLevels,
     getUserAutomationLevels,
     getUserPrestige,
-    getUniqueEventsWith,
   ) => {
     const { resetUpgrades } = get();
     resetUpgrades();
@@ -259,6 +259,87 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
 
     // Mark as initialized
     set({ isInitialized: true });
+
+    setTimeout(() => {
+      try {
+        const { updateAchievement } = useAchievementsStore.getState();
+        const currentState = get();
+
+        // Fix automation achievements
+        const l1Automations = currentState.automations[0] || {};
+        const l2Automations = currentState.automations[1] || {};
+
+        // Fix L1 Miner (Quantum Mining)
+        const minerLevel = l1Automations[0] ?? -1;
+        if (minerLevel >= 0) {
+          const progress =
+            minerLevel >= 5 ? 100 : Math.min(((minerLevel + 1) / 6) * 100, 100);
+          updateAchievement(18, progress);
+        }
+
+        // Fix L2 Sequencer (Decentralize the Sequencer)
+        const sequencerLevel = l2Automations[0] ?? -1;
+        if (sequencerLevel >= 0) {
+          const progress =
+            sequencerLevel >= 5
+              ? 100
+              : Math.min(((sequencerLevel + 1) / 6) * 100, 100);
+          updateAchievement(19, progress);
+        }
+
+        // Fix L2 Prover
+        const proverLevel = l2Automations[1] ?? -1;
+        if (proverLevel >= 0) {
+          const progress =
+            proverLevel >= 5
+              ? 100
+              : Math.min(((proverLevel + 1) / 6) * 100, 100);
+          updateAchievement(20, progress);
+        }
+
+        // Fix L2 DA
+        const daLevel = l2Automations[2] ?? -1;
+        if (daLevel >= 0) {
+          const progress =
+            daLevel >= 4 ? 100 : Math.min(((daLevel + 1) / 5) * 100, 100);
+          updateAchievement(21, progress);
+        }
+
+        // Fix L1 Upgrades
+        const l1Upgrades = currentState.upgrades[0] || {};
+        const l1UpgradeKeys = Object.keys(l1Upgrades);
+        if (l1UpgradeKeys.length > 0) {
+          const maxL1Levels = upgradesJson.L1.reduce(
+            (acc, upgrade) => acc + upgrade.values.length,
+            0,
+          );
+          const currentL1Levels = Object.values(l1Upgrades).reduce(
+            (acc, level: number) => acc + level + 1,
+            0,
+          );
+          const progress = Math.min((currentL1Levels / maxL1Levels) * 100, 100);
+          updateAchievement(16, progress);
+        }
+
+        // Fix L2 Upgrades
+        const l2Upgrades = currentState.upgrades[1] || {};
+        const l2UpgradeKeys = Object.keys(l2Upgrades);
+        if (l2UpgradeKeys.length > 0) {
+          const maxL2Levels = upgradesJson.L2.reduce(
+            (acc, upgrade) => acc + upgrade.values.length,
+            0,
+          );
+          const currentL2Levels = Object.values(l2Upgrades).reduce(
+            (acc, level: number) => acc + level + 1,
+            0,
+          );
+          const progress = Math.min((currentL2Levels / maxL2Levels) * 100, 100);
+          updateAchievement(17, progress);
+        }
+      } catch (error) {
+        console.warn("Error during achievement recalculation:", error);
+      }
+    }, 200);
   },
 
   upgrade: (chainId: number, upgradeId: number) => {
