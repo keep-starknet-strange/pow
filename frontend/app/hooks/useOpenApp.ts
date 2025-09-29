@@ -91,7 +91,7 @@ export const WalletPresets = {
       "https://play.google.com/store/apps/details?id=app.braavos.wallet",
   } satisfies AppTarget,
 
-  readyLegacy: {
+  ready: {
     iosSchemes: ["ready://", "argent://"],
     androidSchemes: ["ready://", "argent://"],
     universalLinks: ["https://www.ready.co/", "https://ready.co/"],
