@@ -15,6 +15,7 @@ interface AchievementState {
   playSoundEffect?: (sound: string) => void;
   setSoundDependency: (playSoundEffect: (sound: string) => void) => void;
   setAchievementsLastViewedNow: () => void;
+  resetAchievementsOnPrestige: () => Promise<void>;
   resetAchievementsState: (account?: string) => Promise<void>;
 }
 
@@ -171,6 +172,41 @@ export const useAchievementsStore = create<AchievementState>((set, get) => ({
     ).catch((error) =>
       console.error("Error saving achievements lastViewedAt:", error),
     );
+  },
+
+  resetAchievementsOnPrestige: async () => {
+    const targetAccount = get().achievementsAccount;
+    const currentProgress = get().achievementsProgress;
+    const currentUnlocked = get().achievementsUnlockedAt;
+
+    const preservedAchievements = [24, 25, 29]; // Prestige!, Reach Max Prestige, STRK Reward Claimed
+
+    const keysToRemove: string[] = [];
+    const newProgress: { [key: number]: number } = {};
+    const newUnlocked: { [key: number]: number } = {};
+
+    for (const achievement of achievementsJson) {
+      if (preservedAchievements.includes(achievement.id)) {
+        newProgress[achievement.id] = currentProgress[achievement.id] || 0;
+        newUnlocked[achievement.id] = currentUnlocked[achievement.id] || 0;
+      } else {
+        newProgress[achievement.id] = 0;
+        newUnlocked[achievement.id] = 0;
+        keysToRemove.push(
+          `${targetAccount}.achievement_${achievement.id}`,
+          `${targetAccount}.achievement_${achievement.id}_unlockedAt`,
+        );
+      }
+    }
+
+    try {
+      await AsyncStorage.multiRemove(keysToRemove);
+    } catch (error) {
+      console.error("Error resetting achievements on prestige:", error);
+    }
+
+    set({ achievementsProgress: newProgress });
+    set({ achievementsUnlockedAt: newUnlocked });
   },
 
   resetAchievementsState: async (account?: string) => {
