@@ -25,6 +25,7 @@ import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
 import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
+import { useOpenApp, WalletPresets } from "../../hooks/useOpenApp";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -69,6 +70,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { width } = useCachedWindowDimensions();
   const { notify } = useEventManager();
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
+  const { openApp } = useOpenApp();
 
   const handleBack = useCallback(() => {
     if (onBack) onBack();
@@ -188,62 +190,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     })();
   }, []);
 
-  const openReadyWallet = useCallback(async () => {
-    const scheme = "ready://open";
-    try {
-      await Linking.openURL(scheme);
-      return;
-    } catch (_e) {
-      if (__DEV__) {
-        console.debug("Failed to open READY wallet scheme");
-      }
-    }
-    try {
-      if (Platform.OS === "ios") {
-        await Linking.openURL(
-          "https://apps.apple.com/us/app/ready-earn-on-bitcoin-usdc/id1358741926",
-        );
-      } else {
-        const pkg = "im.argent.contractwalletclient";
-        const market = `market://details?id=${pkg}`;
-        const web = `https://play.google.com/store/apps/details?id=${pkg}`;
-        await Linking.openURL(market).catch(() => Linking.openURL(web));
-      }
-    } catch (_e) {
-      if (__DEV__) {
-        console.debug("Failed to open READY install link");
-      }
-    }
-  }, []);
-
-  const openBraavosWallet = useCallback(async () => {
-    const scheme = "braavos://open";
-    try {
-      await Linking.openURL(scheme);
-      return;
-    } catch (_e) {
-      if (__DEV__) {
-        console.debug("Failed to open BRAAVOS wallet scheme");
-      }
-    }
-    try {
-      if (Platform.OS === "ios") {
-        await Linking.openURL(
-          "https://apps.apple.com/us/app/braavos-wallet/id1636013523",
-        );
-      } else {
-        const pkg = "app.braavos.wallet";
-        const market = `market://details?id=${pkg}`;
-        const web = `https://play.google.com/store/apps/details?id=${pkg}`;
-        await Linking.openURL(market).catch(() => Linking.openURL(web));
-      }
-    } catch (_e) {
-      if (__DEV__) {
-        console.debug("Failed to open BRAAVOS install link");
-      }
-    }
-  }, []);
-
   const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
     (debouncedInput || "").trim(),
   );
@@ -313,8 +259,8 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         <View style={styles.section}>
           <View style={styles.card}>
             <WalletButtonRow
-              onPressReady={openReadyWallet}
-              onPressBraavos={openBraavosWallet}
+              onPressReady={() => openApp(WalletPresets.readyWallet)}
+              onPressBraavos={() => openApp(WalletPresets.braavos)}
             />
             <Text style={styles.hintInline}>
               Open a wallet above and paste an address to receive your STRK.
