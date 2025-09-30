@@ -19,12 +19,12 @@ const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
 const FIRST_LAUNCH_KEY = "has_launched_before";
 
-const MUSIC_ASSETS = {
-  "The Return": require("../../assets/music/the-return-of-the-8-bit-era-301292.m4a"),
-  "Busy Market": require("../../assets/music/Busy Day At The Market-LOOP.m4a"),
-  "Left Right": require("../../assets/music/LeftRightExcluded.m4a"),
-  "Super Ninja": require("../../assets/music/Ove Melaa - Super Ninja Assasin.m4a"),
-  "Mega Wall": require("../../assets/music/awake10_megaWall.m4a"),
+const MUSIC_ASSETS: { [key: string]: number } = {
+  "The Return": require("../../assets/music/the-return.m4a"),
+  "Busy Market": require("../../assets/music/busy-market.m4a"),
+  "Left Right": require("../../assets/music/left-right.m4a"),
+  "Super Ninja": require("../../assets/music/super-ninja.m4a"),
+  "Mega Wall": require("../../assets/music/mega-wall.m4a"),
   Happy: require("../../assets/music/happy.m4a"),
 };
 
@@ -33,7 +33,7 @@ const REVERT_MUSIC = require("../../assets/music/revert-theme.m4a");
 type SongName = keyof typeof MUSIC_ASSETS;
 
 // Sound file assets - one entry per unique sound file
-const soundFileAssets: { [key: string]: any } = {
+const soundFileAssets: { [key: string]: number } = {
   "confirm.m4a": require("../../assets/sounds/confirm.m4a"),
   "complete.m4a": require("../../assets/sounds/complete.m4a"),
   "purchase.mp3": require("../../assets/sounds/purchase.mp3"),
@@ -123,8 +123,9 @@ class SoundPool {
 
       player.volume = finalVolume;
       player.setPlaybackRate(finalRate);
-      player.seekTo(0);
-      player.play();
+      player.seekTo(0).then(() => {
+        player.play();
+      });
 
       // Cleanup after sound duration with proper timeout tracking
       const duration = soundConfig.duration || 1000;
@@ -474,23 +475,35 @@ export const useSound = () => {
 
 export const MusicComponent = memo(() => {
   const {
+    isInitialized,
     isMusicOn,
     currentTrack,
     musicVolume,
     initializeSound,
-    selectNextTrack: selectNextTrack,
+    selectNextTrack,
     isPlayingRevertMusic,
   } = useSoundStore();
 
   useEffect(() => {
-    // Configure global audio mode to play sounds even in iOS silent mode
-    setAudioModeAsync({ playsInSilentMode: true });
-
-    initializeSound();
-  }, []);
+    if (!isInitialized) {
+      console.log("Set up audio mode");
+      // Configure global audio mode to play sounds even in iOS silent mode
+      setAudioModeAsync({ playsInSilentMode: true })
+        .then(() => {
+          console.log("Init sound");
+        })
+        .then(initializeSound);
+    }
+  }, [isInitialized]);
 
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
+
+  useEffect(() => {
+    if (isInitialized) {
+      console.log(JSON.stringify(status, Object.keys(status).sort()));
+    }
+  }, [status, isInitialized]);
 
   const revertPlayer = useAudioPlayer(REVERT_MUSIC);
   const revertStatus = useAudioPlayerStatus(revertPlayer);
@@ -498,8 +511,10 @@ export const MusicComponent = memo(() => {
   // Toggle Music
   useEffect(() => {
     if (status.isLoaded && isMusicOn) {
+      console.log("Music play");
       player.play();
     } else if (!isMusicOn && status.playing) {
+      console.log("Music pause");
       player.pause();
     }
   }, [status.isLoaded, isMusicOn, player]);
@@ -508,8 +523,9 @@ export const MusicComponent = memo(() => {
   useEffect(() => {
     if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
       player.pause();
-      revertPlayer.seekTo(0);
-      revertPlayer.play();
+      revertPlayer.seekTo(0).then(() => {
+        revertPlayer.play();
+      });
     } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
       revertPlayer.pause();
       if (isMusicOn) {
@@ -529,6 +545,7 @@ export const MusicComponent = memo(() => {
     if (status.didJustFinish) {
       setTimeout(
         () => {
+          console.log("Select next track");
           selectNextTrack();
         },
         2000 + Math.random() * 1000,
@@ -541,15 +558,18 @@ export const MusicComponent = memo(() => {
     if (currentTrack) {
       const audioSource = MUSIC_ASSETS[currentTrack];
       player.replace(audioSource);
-      console.log("Current track:", currentTrack);
+      console.log(`Current track ${currentTrack}`);
     }
   }, [currentTrack, player]);
 
   // Observe volume
   useEffect(() => {
-    player.volume = musicVolume;
-    revertPlayer.volume = musicVolume;
-  }, [musicVolume, player, revertPlayer]);
+    if (isInitialized) {
+      console.log(`Player volume ${musicVolume}`);
+      player.volume = musicVolume;
+      revertPlayer.volume = musicVolume;
+    }
+  }, [musicVolume, player, isInitialized]);
 
   return null;
 });
