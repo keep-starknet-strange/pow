@@ -1,5 +1,6 @@
+import React, { memo } from "react";
 import { useImages } from "../../hooks/useImages";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import {
   Canvas,
   Image,
@@ -12,12 +13,12 @@ interface BackGroundProps {
   height: number;
 }
 
-export const BackGround: React.FC<BackGroundProps> = ({ width, height }) => {
+const BackGroundComponent: React.FC<BackGroundProps> = ({ width, height }) => {
   const { getImage } = useImages();
 
   return (
-    <View className="absolute w-full h-full">
-      <Canvas style={{ flex: 1 }} className="w-full h-full">
+    <View style={styles.root}>
+      <Canvas style={styles.fill}>
         <Image
           image={getImage("background.staking")}
           fit="fill"
@@ -34,3 +35,18 @@ export const BackGround: React.FC<BackGroundProps> = ({ width, height }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  fill: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+});
+
+export const BackGround = memo(BackGroundComponent);

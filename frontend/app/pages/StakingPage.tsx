@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import { View, Text, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
 import { Dimensions } from "react-native";
@@ -49,61 +49,65 @@ export const StakingPage: React.FC = () => {
   }, []);
 
   // countdown until next validation
-  const next = lastValidation + config.slashing_config.due_time;
-  const rem = Math.max(next - now, 0);
-  const days = Math.floor(rem / 86400);
-  const hours = Math.floor((rem % 86400) / 3600);
-  const minutes = Math.floor((rem % 3600) / 60);
-  const seconds = rem % 60;
+  const { days, hours, minutes, seconds } = useMemo(() => {
+    const next = lastValidation + config.slashing_config.due_time;
+    const rem = Math.max(next - now, 0);
+    return {
+      days: Math.floor(rem / 86400),
+      hours: Math.floor((rem % 86400) / 3600),
+      minutes: Math.floor((rem % 3600) / 60),
+      seconds: rem % 60,
+    };
+  }, [lastValidation, config.slashing_config.due_time, now]);
 
   // APR % = seconds-per-year / reward_rate * 100
-  const apr = (31 / config.reward_rate).toFixed(1);
+  const apr = useMemo(() => (31 / config.reward_rate).toFixed(1), [config.reward_rate]);
 
-  const onPressClaim = () => {
-    const rewards = claimStakingRewards();
-    if (rewards > 0) {
-      updateBalance(rewards);
+  const onPressClaim = useCallback(() => {
+    const r = claimStakingRewards();
+    if (r > 0) {
+      updateBalance(r);
     }
-  };
+  }, [claimStakingRewards, updateBalance]);
 
-  const onPressStake = () => {
+  const onPressStake = useCallback(() => {
     if (tryBuy(stakeAmount)) {
       stakeTokens(stakeAmount);
     }
-  };
+  }, [stakeAmount, tryBuy, stakeTokens]);
 
-  const onPressFillStake = (percent: number) => () => {
-    setStakeAmount(getPercentOf({ percent, amount: balance }));
-  };
+  const onPressFillStake = useCallback(
+    (percent: number) => () => {
+      setStakeAmount(getPercentOf({ percent, amount: balance }));
+    },
+    [balance]
+  );
 
-  const onPressWithdraw = () => {
+  const onPressWithdraw = useCallback(() => {
     const withdrawn = withdrawStakedTokens();
     if (withdrawn > 0) {
       updateBalance(withdrawn);
     }
-  };
+  }, [withdrawStakedTokens, updateBalance]);
 
   return (
-    <SafeAreaView className="flex-1 relative">
+    <SafeAreaView style={styles.screen}>
       <BackGround width={width} height={height} />
 
       <PageHeader title="STAKING" width={width} />
 
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 24 }}
-        className="flex-1"
-      >
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} style={styles.flex1}>
         {/** === Claim your Bitcoin === */}
         <SectionTitle title="Claim your Bitcoin" width={width} />
 
-        <View className="mb-5">
-          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
-            <View className="flex-row space-x-2 mb-3 ">
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <View style={styles.rowStats}>
               <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
               <StatsDisplay label="APR" value={`${apr} %`} />
             </View>
 
-            <View className="flex-row space-x-4 mb-3 space-x-2">
+            <View style={styles.rowActions}>
               <StakingAction
                 action={onPressWithdraw}
                 label="WITHDRAW"
@@ -116,7 +120,7 @@ export const StakingPage: React.FC = () => {
               />
             </View>
 
-            <View className="flex-row items-center">
+            <View style={styles.rowCenter}>
               <AmountField amount={rewards.toString()} />
               <StakingAction
                 action={onPressClaim}
@@ -130,10 +134,10 @@ export const StakingPage: React.FC = () => {
         {/** === Stake your Bitcoin === */}
         <SectionTitle title="Stake your Bitcoin" width={width} />
 
-        <View className="mb-5">
-          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3">
+        <View style={styles.section}>
+          <View style={styles.card}>
             {/* input + STAKE */}
-            <View className="flex-row items-center">
+            <View style={styles.rowCenter}>
               <AmountField amount={stakeAmount.toString()} />
               <StakingAction
                 action={onPressStake}
@@ -144,7 +148,7 @@ export const StakingPage: React.FC = () => {
           </View>
 
           {/* quick select row */}
-          <View className="relative px-2">
+          <View style={styles.relativePad}>
             {/* TODO: staking.amounts.bg */}
             {/* Canvas underlay */}
             {/* <Canvas
@@ -170,7 +174,7 @@ export const StakingPage: React.FC = () => {
             />
           </Canvas> */}
 
-            <View className="flex-row space-x-2 px-2">
+            <View style={styles.percRow}>
               {balancePercentages.map((percent, i) => (
                 <StakingAction
                   key={i}
@@ -184,11 +188,11 @@ export const StakingPage: React.FC = () => {
 
         {/** === Validate your claim === */}
 
-        <View className="">
+        <View style={styles.section}>
           <SectionTitle title="Validate your claim" width={width} />
 
-          <View className="bg-[#16161d] border border-[#39274E] rounded-b-md p-3 items-center">
-            <Text className="font-Pixels text-5xl text-[#fff7ff]">
+          <View style={[styles.card, styles.center]}>
+            <Text style={styles.countdownText}>
               {days.toString().padStart(2, "0")}:
               {hours.toString().padStart(2, "0")}:
               {minutes.toString().padStart(2, "0")}:
@@ -202,3 +206,55 @@ export const StakingPage: React.FC = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    position: "relative",
+  },
+  flex1: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: 20, // mb-5
+  },
+  card: {
+    backgroundColor: "#16161d",
+    borderWidth: 1,
+    borderColor: "#39274E",
+    padding: 12, // p-3
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
+  },
+  rowStats: {
+    flexDirection: "row",
+    columnGap: 8, // space-x-2
+    marginBottom: 12, // mb-3
+  },
+  rowActions: {
+    flexDirection: "row",
+    columnGap: 8,
+    marginBottom: 12,
+  },
+  rowCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  relativePad: {
+    position: "relative",
+    paddingHorizontal: 8, // px-2
+  },
+  percRow: {
+    flexDirection: "row",
+    columnGap: 8, // space-x-2
+    paddingHorizontal: 8, // px-2
+  },
+  center: {
+    alignItems: "center",
+  },
+  countdownText: {
+    fontFamily: "Pixels",
+    fontSize: 48, // text-5xl
+    color: "#fff7ff",
+  },
+});

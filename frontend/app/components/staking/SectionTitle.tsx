@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import React, { memo } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas,
   Image,
@@ -11,11 +12,11 @@ interface SectionTitleProps {
   width: number;
   title: string;
 }
-export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
+const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) => {
   const { getImage } = useImages();
 
   return (
-    <View className="w-full relative">
+    <View style={styles.container}>
       <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
         <Image
           image={getImage("shop.name.plaque")}
@@ -30,9 +31,26 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({ width, title }) => {
           }}
         />
       </Canvas>
-      <Text className="text-[#fff7ff] text-2xl font-bold absolute left-2 font-Pixels">
+      <Text style={styles.title}>
         {title}
       </Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    position: "relative",
+  },
+  title: {
+    color: "#fff7ff",
+    fontSize: 24,
+    fontWeight: "700",
+    position: "absolute",
+    left: 8, // left-2
+    fontFamily: "Pixels",
+  },
+});
+
+export const SectionTitle = memo(SectionTitleComponent);

@@ -1,21 +1,36 @@
-import { View, Text } from "react-native";
+import React, { memo } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 interface StatsDisplayProps {
   label: string;
   value: string;
 }
 
-export const StatsDisplay: React.FC<StatsDisplayProps> = ({ label, value }) => {
+const StatsDisplayComponent: React.FC<StatsDisplayProps> = ({ label, value }) => {
   return (
-    <View className="flex-1">
-      <Text
-        className="font-Pixels px-2 py-6 text-3xl text-center text-[#fff7ff] rounded border"
-        style={{ borderColor: "#717171" }}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-      >
+    <View style={styles.container}>
+      <Text style={styles.text} numberOfLines={1} adjustsFontSizeToFit>
         {label} {value}
       </Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  text: {
+    fontFamily: "Pixels",
+    paddingHorizontal: 8, // px-2
+    paddingVertical: 24, // py-6
+    fontSize: 30, // text-3xl
+    textAlign: "center",
+    color: "#fff7ff",
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#717171",
+  },
+});
+
+export const StatsDisplay = memo(StatsDisplayComponent);

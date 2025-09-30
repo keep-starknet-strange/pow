@@ -16,6 +16,7 @@ interface StakingState {
   amountStaked: number;
   rewards: number;
   lastValidation: number;
+  lastRewardAccrual: number;
 
   // actions
   stakeTokens: (amount: number) => void;
@@ -38,23 +39,47 @@ export const useStakingStore = create<StakingState>((set, get) => {
     amountStaked: 0,
     rewards: 0,
     lastValidation: Math.floor(Date.now() / 1000),
+    lastRewardAccrual: Math.floor(Date.now() / 1000),
 
     validateStake: () => {
       const now = Math.floor(Date.now() / 1000);
-      const { amountStaked, rewards, lastValidation, config } = get();
+      const { amountStaked } = get();
       if (amountStaked === 0) {
-        set({ lastValidation: now });
+        set({ lastValidation: now, lastRewardAccrual: now });
         return;
       }
 
       set((state) => {
-        if (now - state.lastValidation > 60) {
-          return {
-            lastValidation: now,
-            rewards: state.rewards + state.amountStaked * 0.01,
-          };
+        // --- Hourly rewards accrual ---
+        const SECONDS_PER_HOUR = 3600;
+        const hoursSinceAccrual = Math.floor(
+          (now - state.lastRewardAccrual) / SECONDS_PER_HOUR
+        );
+        const hourlyRewardRate = state.config.reward_rate; // fraction per hour
+        const rewardsDelta =
+          hoursSinceAccrual > 0
+            ? state.amountStaked * hourlyRewardRate * hoursSinceAccrual
+            : 0;
+
+        // --- Daily slashing (every due_time seconds) ---
+        const dueTime = state.config.slashing_config.due_time; // expect 24h
+        const slashFraction = state.config.slashing_config.slash_fraction; // fraction per period
+        const periodsOverdue = Math.floor((now - state.lastValidation) / dueTime);
+        let newAmountStaked = state.amountStaked;
+        if (periodsOverdue > 0 && newAmountStaked > 0) {
+          const remainingMultiplier = Math.pow(1 - slashFraction, periodsOverdue);
+          newAmountStaked = newAmountStaked * remainingMultiplier;
         }
-        return {};
+
+        return {
+          amountStaked: newAmountStaked,
+          rewards: state.rewards + rewardsDelta,
+          lastRewardAccrual:
+            hoursSinceAccrual > 0
+              ? state.lastRewardAccrual + hoursSinceAccrual * SECONDS_PER_HOUR
+              : state.lastRewardAccrual,
+          lastValidation: now,
+        };
       });
     },
 

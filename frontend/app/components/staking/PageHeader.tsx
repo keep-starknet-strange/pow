@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import React, { memo } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import {
   Canvas,
   Image,
@@ -11,11 +12,11 @@ interface SectionHeaderProps {
   width: number;
   title: string;
 }
-export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
+const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => {
   const { getImage } = useImages();
 
   return (
-    <View className="w-full relative mb-14">
+    <View style={styles.container}>
       <Canvas style={{ width: width - 8, height: 24, marginLeft: 4 }}>
         <Image
           image={getImage("shop.title")}
@@ -30,9 +31,27 @@ export const PageHeader: React.FC<SectionHeaderProps> = ({ width, title }) => {
           }}
         />
       </Canvas>
-      <Text className="text-[#fff7ff] text-2xl font-bold absolute right-2 font-Pixels">
+      <Text style={styles.title}>
         {title}
       </Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    position: "relative",
+    marginBottom: 56, // mb-14
+  },
+  title: {
+    color: "#fff7ff",
+    fontSize: 24, // text-2xl
+    fontWeight: "700",
+    position: "absolute",
+    right: 8, // right-2
+    fontFamily: "Pixels",
+  },
+});
+
+export const PageHeader = memo(PageHeaderComponent);
