@@ -492,6 +492,9 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useTransactionPauseStore.getState().resetPauseStore();
     get().resetUpgrades();
 
+    // Reset achievements except for Prestige!, Reach Max Prestige, and STRK Reward Claimed
+    await useAchievementsStore.getState().resetAchievementsOnPrestige();
+
     set({
       currentPrestige: nextPrestige,
       canPrestige: false,
