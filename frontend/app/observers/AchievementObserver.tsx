@@ -73,6 +73,9 @@ export class AchievementObserver implements Observer {
         case "AutomationPurchased":
           this.handleAutomationPurchased(achievement, data);
           break;
+        case "StakingPurchased":
+          this.handleStakingPurchased(achievement);
+          break;
         case "L2Purchased":
           this.handleL2Purchased(achievement);
           break;
@@ -260,6 +263,10 @@ export class AchievementObserver implements Observer {
     if (!maxLevel) return;
     const progress = Math.min(((level + 1) / maxLevel) * 100, 100);
     this.updateAchievement(achievement.id, progress);
+  }
+
+  private handleStakingPurchased(achievement: Achievement) {
+    this.updateAchievement(achievement.id, 100);
   }
 
   private handleL2Purchased(achievement: Achievement) {
