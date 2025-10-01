@@ -486,24 +486,13 @@ export const MusicComponent = memo(() => {
 
   useEffect(() => {
     if (!isInitialized) {
-      console.log("Set up audio mode");
       // Configure global audio mode to play sounds even in iOS silent mode
-      setAudioModeAsync({ playsInSilentMode: true })
-        .then(() => {
-          console.log("Init sound");
-        })
-        .then(initializeSound);
+      setAudioModeAsync({ playsInSilentMode: true }).then(initializeSound);
     }
   }, [isInitialized]);
 
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
-
-  useEffect(() => {
-    if (isInitialized) {
-      console.log(JSON.stringify(status, Object.keys(status).sort()));
-    }
-  }, [status, isInitialized]);
 
   const revertPlayer = useAudioPlayer(REVERT_MUSIC);
   const revertStatus = useAudioPlayerStatus(revertPlayer);
@@ -511,10 +500,8 @@ export const MusicComponent = memo(() => {
   // Toggle Music
   useEffect(() => {
     if (status.isLoaded && isMusicOn) {
-      console.log("Music play");
       player.play();
     } else if (!isMusicOn && status.playing) {
-      console.log("Music pause");
       player.pause();
     }
   }, [status.isLoaded, isMusicOn, player]);
@@ -545,7 +532,6 @@ export const MusicComponent = memo(() => {
     if (status.didJustFinish) {
       setTimeout(
         () => {
-          console.log("Select next track");
           selectNextTrack();
         },
         2000 + Math.random() * 1000,
@@ -558,14 +544,12 @@ export const MusicComponent = memo(() => {
     if (currentTrack) {
       const audioSource = MUSIC_ASSETS[currentTrack];
       player.replace(audioSource);
-      console.log(`Current track ${currentTrack}`);
     }
   }, [currentTrack, player]);
 
   // Observe volume
   useEffect(() => {
     if (isInitialized) {
-      console.log(`Player volume ${musicVolume}`);
       player.volume = musicVolume;
       revertPlayer.volume = musicVolume;
     }
