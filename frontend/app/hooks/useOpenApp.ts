@@ -61,19 +61,37 @@ export function useOpenApp() {
       androidPlayUrl,
     } = target;
 
-    const candidates: string[] = [];
+    // 1) Try app schemes/intent first
+    const schemeCandidates: string[] = [];
     if (Platform.OS === "ios") {
-      candidates.push(...iosSchemes, ...universalLinks);
+      schemeCandidates.push(...iosSchemes);
     } else {
-      candidates.push(...androidSchemes, ...universalLinks);
+      schemeCandidates.push(...androidSchemes);
       const intentUrl = buildIntentUrl(androidSchemes[0], androidPackage);
-      if (intentUrl) candidates.push(intentUrl);
+      if (intentUrl) schemeCandidates.push(intentUrl);
     }
 
-    const opened = await tryOpen(candidates);
-    if (opened) return true;
+    const openedApp = await tryOpen(schemeCandidates);
+    if (openedApp) return true;
 
-    await openStore(iosAppStoreId, androidPackage, androidPlayUrl);
+    // 2) If not installed, try opening the app store first
+    try {
+      const storeRes = await openStore(
+        iosAppStoreId,
+        androidPackage,
+        androidPlayUrl,
+      );
+      if (storeRes !== false) return true;
+    } catch {
+      // If store open fails, continue to universal links
+    }
+
+    // 3) As a final fallback, try universal links (web)
+    if (universalLinks.length > 0) {
+      const openedWeb = await tryOpen(universalLinks);
+      if (openedWeb) return true;
+    }
+
     return false;
   };
 
@@ -106,6 +124,6 @@ export const WalletPresets = {
     iosAppStoreId: "6744935604",
     androidPackage: "com.ready.wallet",
     androidPlayUrl:
-      "https://play.google.com/store/apps/details?id=co.ready.wallet",
+      "https://play.google.com/store/apps/details?id=com.ready.wallet",
   } satisfies AppTarget,
 };
