@@ -1,16 +1,20 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  AudioPlayer,
-  createAudioPlayer,
-  setAudioModeAsync,
-  useAudioPlayer,
-  useAudioPlayerStatus,
-} from "expo-audio";
+import { AudioPlayer, createAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import soundPoolsJson from "../configs/soundpools.json";
 import { memo, useEffect } from "react";
+import { FlatList, Text } from "react-native";
+import { Asset } from "expo-asset";
+import {
+  AudioContext,
+  AudioManager,
+  AudioBuffer,
+  AudioBufferSourceNode,
+} from "react-native-audio-api";
+import { v4 as uuidv4 } from "uuid";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -19,18 +23,18 @@ const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
 const FIRST_LAUNCH_KEY = "has_launched_before";
 
-const MUSIC_ASSETS: { [key: string]: number } = {
-  "The Return": require("../../assets/music/the-return.m4a"),
-  "Busy Market": require("../../assets/music/busy-market.m4a"),
-  "Left Right": require("../../assets/music/left-right.m4a"),
-  "Super Ninja": require("../../assets/music/super-ninja.m4a"),
-  "Mega Wall": require("../../assets/music/mega-wall.m4a"),
-  Happy: require("../../assets/music/happy.m4a"),
+const MUSIC_FILES = {
+  "the-return": require("../../assets/music/the-return.m4a"),
+  "busy-market": require("../../assets/music/busy-market.m4a"),
+  "left-right": require("../../assets/music/left-right.m4a"),
+  "super-ninja": require("../../assets/music/super-ninja.m4a"),
+  "mega-wall": require("../../assets/music/mega-wall.m4a"),
+  happy: require("../../assets/music/happy.m4a"),
 };
 
 const REVERT_MUSIC = require("../../assets/music/revert-theme.m4a");
 
-type SongName = keyof typeof MUSIC_ASSETS;
+type SongName = keyof typeof MUSIC_FILES;
 
 // Sound file assets - one entry per unique sound file
 const soundFileAssets: { [key: string]: number } = {
@@ -205,7 +209,70 @@ class SoundPool {
   }
 }
 
+class MusicController {
+  private audioContext: AudioContext = new AudioContext();
+  private onSongEndedCallback: (() => void) | null = null;
+
+  private currentAudioBuffer: AudioBuffer | null = null;
+  private currentAudioProgress: number = 0;
+  private playingAudioNode: AudioBufferSourceNode | null = null;
+
+  public play() {
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.currentAudioBuffer;
+    source.connect(this.audioContext.destination);
+    source.onPositionChanged = (event) => {
+      console.log("Progress", event.value);
+      this.currentAudioProgress = event.value;
+    };
+    source.onEnded = () => {
+      if (this.onSongEndedCallback) {
+        this.onSongEndedCallback();
+      }
+    };
+    source.onPositionChangedInterval = 100; // ~10Hz
+    source.start(0, this.currentAudioProgress);
+    this.playingAudioNode = source;
+  }
+
+  public pause() {
+    if (this.playingAudioNode) {
+      this.playingAudioNode.onEnded = null;
+      this.playingAudioNode.stop();
+    }
+  }
+
+  public setOnSongEndedCallback(onSongEndedCallback: (() => void) | null) {
+    this.onSongEndedCallback = onSongEndedCallback;
+  }
+
+  public async changeSong(songName: SongName) {
+    this.currentAudioProgress = 0;
+    this.currentAudioBuffer = await Asset.fromModule(MUSIC_FILES[songName])
+      .downloadAsync()
+      .then((asset) => {
+        if (!asset.localUri) {
+          console.error("Failed to load asset for", songName);
+          return null;
+        }
+
+        return this.audioContext.decodeAudioDataSource(asset.localUri);
+      });
+  }
+
+  public cleanup() {
+    this.currentAudioProgress = 0;
+    this.currentAudioBuffer = null;
+    this.onSongEndedCallback = null;
+    this.playingAudioNode?.disconnect();
+    this.audioContext.close();
+  }
+}
+
 interface SoundState {
+  audioLogs: { id: string; log: string }[];
+  musicController: MusicController;
+
   isSoundOn: boolean;
   isMusicOn: boolean;
   isHapticsOn: boolean;
@@ -228,9 +295,13 @@ interface SoundState {
   selectNextTrack: () => void;
   startRevertMusic: () => void;
   stopRevertMusic: () => void;
+
+  log: (log: string) => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
+  musicController: new MusicController(),
+  audioLogs: [],
   isSoundOn: false,
   isMusicOn: false,
   isHapticsOn: true,
@@ -243,6 +314,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   lastPlayedTracks: [],
 
   initializeSound: async () => {
+    AudioManager.setAudioSessionOptions({
+      iosCategory: "soloAmbient",
+      iosMode: "default",
+      iosOptions: ["mixWithOthers"],
+    });
+    const { musicController, log, selectNextTrack } = get();
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
     const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
     const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
@@ -253,19 +330,29 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
       // First launch - play "The Return"
-      selectedTrack = "The Return";
+      selectedTrack = "the-return";
       // Mark that the app has been launched before
       await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
     } else {
       // Returning user - select random track
-      const trackNames = Object.keys(MUSIC_ASSETS) as SongName[];
+      const trackNames = Object.keys(MUSIC_FILES) as SongName[];
       selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
+    }
+    log("Initialize sound");
+
+    musicController.setOnSongEndedCallback(() => {
+      selectNextTrack();
+    });
+    await musicController.changeSong(selectedTrack);
+    const musicOn = musicEnabled === "true" || musicEnabled === null;
+    if (musicOn) {
+      musicController.play();
     }
 
     set({
       isInitialized: true,
-      isSoundOn: soundEnabled === "true" || soundEnabled === null,
-      isMusicOn: musicEnabled === "true" || musicEnabled === null,
+      isSoundOn: false, // isSoundOn: soundEnabled === "true" || soundEnabled === null,
+      isMusicOn: musicOn,
       isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
       soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
       musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
@@ -286,6 +373,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     set((state) => {
       const newValue = !state.isMusicOn;
       AsyncStorage.setItem(MUSIC_ENABLED_KEY, newValue.toString());
+      if (newValue) {
+        state.musicController.play();
+      } else {
+        state.musicController.pause();
+      }
+
       return { isMusicOn: newValue };
     });
   },
@@ -345,20 +438,25 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   cleanupSound: () => {
-    const { soundPool } = get();
+    const { log, musicController, soundPool } = get();
 
     // Clean up sound pool
     if (soundPool) {
       soundPool.cleanup();
       set({ soundPool: null });
     }
+
+    // musicController.pause();
+    log("Closing audio context");
+    musicController.cleanup();
   },
 
-  selectNextTrack: () => {
-    const { currentTrack, lastPlayedTracks } = get();
+  selectNextTrack: async () => {
+    const { musicController, isMusicOn, currentTrack, lastPlayedTracks } =
+      get();
 
     // // Get all track names
-    const allTracks = Object.keys(MUSIC_ASSETS) as SongName[];
+    const allTracks = Object.keys(MUSIC_FILES) as SongName[];
 
     if (currentTrack) {
       lastPlayedTracks.push(currentTrack);
@@ -380,6 +478,11 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const nextTrack =
       availableTracks[Math.floor(Math.random() * availableTracks.length)];
 
+    await musicController.changeSong(nextTrack);
+    if (isMusicOn) {
+      musicController.play();
+    }
+
     set({
       currentTrack: nextTrack,
       lastPlayedTracks: recentTracks,
@@ -398,6 +501,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (!isMusicOn) return;
 
     set({ isPlayingRevertMusic: false });
+  },
+
+  log: (log: string) => {
+    set((soundState) => {
+      return {
+        audioLogs: [...soundState.audioLogs, { id: uuidv4(), log: log }],
+      };
+    });
   },
 }));
 
@@ -474,86 +585,83 @@ export const useSound = () => {
 };
 
 export const MusicComponent = memo(() => {
-  const {
-    isInitialized,
-    isMusicOn,
-    currentTrack,
-    musicVolume,
-    initializeSound,
-    selectNextTrack,
-    isPlayingRevertMusic,
-  } = useSoundStore();
+  const { initializeSound, cleanupSound, audioLogs } = useSoundStore();
 
   useEffect(() => {
-    if (!isInitialized) {
-      // Configure global audio mode to play sounds even in iOS silent mode
-      setAudioModeAsync({ playsInSilentMode: true }).then(initializeSound);
-    }
-  }, [isInitialized]);
+    initializeSound();
 
-  const player = useAudioPlayer(null);
-  const status = useAudioPlayerStatus(player);
+    return () => {
+      cleanupSound();
+    };
+  }, []);
 
-  const revertPlayer = useAudioPlayer(REVERT_MUSIC);
-  const revertStatus = useAudioPlayerStatus(revertPlayer);
-
-  // Toggle Music
-  useEffect(() => {
-    if (status.isLoaded && isMusicOn) {
-      player.play();
-    } else if (!isMusicOn && status.playing) {
-      player.pause();
-    }
-  }, [status.isLoaded, isMusicOn, player]);
-
-  // Toggle Revert Music
-  useEffect(() => {
-    if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
-      player.pause();
-      revertPlayer.seekTo(0).then(() => {
-        revertPlayer.play();
-      });
-    } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
-      revertPlayer.pause();
-      if (isMusicOn) {
-        player.play();
-      }
-    }
-  }, [
-    revertStatus.isLoaded,
-    isMusicOn,
-    isPlayingRevertMusic,
-    revertPlayer,
-    player,
-  ]);
-
-  // Select next track, when previous one finished
-  useEffect(() => {
-    if (status.didJustFinish) {
-      setTimeout(
-        () => {
-          selectNextTrack();
-        },
-        2000 + Math.random() * 1000,
-      );
-    }
-  }, [status.didJustFinish, selectNextTrack]);
-
-  // Observe current track
-  useEffect(() => {
-    if (currentTrack) {
-      const audioSource = MUSIC_ASSETS[currentTrack];
-      player.replace(audioSource);
-    }
-  }, [currentTrack, player]);
-
-  // Observe volume
-  useEffect(() => {
-    if (isInitialized) {
-      player.volume = musicVolume;
-      revertPlayer.volume = musicVolume;
-    }
-  }, [musicVolume, player, isInitialized]);
-
-  return null;
+  //
+  // const [logs, setLogs] = useState<{ id: string; log: string }[]>([]);
+  //
+  // const audioContextRef = useRef<AudioContext | null>(null);
+  //
+  // const log = useCallback(
+  //   (log: string) => {
+  //     setLogs((logs) => [...logs, { id: uuidv4(), log: log }]);
+  //   },
+  //   [setLogs],
+  // );
+  //
+  // useEffect(() => {
+  //   if (!audioContextRef.current) {
+  //     audioContextRef.current = new AudioContext();
+  //   }
+  //
+  //   return () => {
+  //     audioContextRef.current?.close();
+  //   };
+  // }, []);
+  //
+  // useEffect(() => {
+  //   if (!isInitialized) {
+  //     log("Init sound");
+  //     initializeSound();
+  //   }
+  // }, [isInitialized, initializeSound]);
+  //
+  // useEffect(() => {
+  //   const handlePlay = async (song: SongName) => {
+  //     if (!audioContextRef.current) {
+  //       log("No audio context");
+  //       return;
+  //     }
+  //
+  //     const audioContext = audioContextRef.current;
+  //
+  //
+  //     const playerNode = audioContext.createBufferSource();
+  //     playerNode.buffer = buffer;
+  //
+  //     log("Play");
+  //     playerNode.connect(audioContext.destination);
+  //     playerNode.start(audioContext.currentTime);
+  //   };
+  //
+  //   if (currentTrack) {
+  //     handlePlay(currentTrack);
+  //   }
+  // }, [currentTrack]);
+  //
+  const insets = useSafeAreaInsets();
+  return (
+    <FlatList
+      style={{
+        flex: 1,
+        height: "100%",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        zIndex: 100,
+        pointerEvents: "none",
+        position: "absolute",
+      }}
+      data={audioLogs}
+      renderItem={({ item }) => <Text>{item.log}</Text>}
+      keyExtractor={(item) => item.id}
+    />
+  );
 });
