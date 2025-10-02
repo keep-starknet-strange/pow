@@ -52,6 +52,14 @@ export const TxButtonInner = memo(
     const transactionUnlocked = props.feeLevel !== -1;
     const isMountedRef = useRef(true);
 
+    // Track mount/unmount lifecycle
+    useEffect(() => {
+      isMountedRef.current = true;
+      return () => {
+        isMountedRef.current = false;
+      };
+    }, []);
+
     // Get the images and check if they're loaded
     const iconImage = getTxIcon(
       props.chainId,
