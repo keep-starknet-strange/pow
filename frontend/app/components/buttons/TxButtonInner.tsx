@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback, useState } from "react";
+import React, { memo, useEffect, useCallback, useState, useRef } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import { useInterval } from "usehooks-ts";
 import {
@@ -27,6 +27,7 @@ import {
   runOnJS,
   withSequence,
   withTiming,
+  cancelAnimation,
 } from "react-native-reanimated";
 
 export interface TxButtonInnerProps {
@@ -45,8 +46,19 @@ export const TxButtonInner = memo(
     const { width } = useCachedWindowDimensions();
     const { getFee, getSpeed } = useTransactionsStore();
     const { isPaused } = useTransactionPause();
-    const { getWorkingBlock } = useGameStore();
+    const blockIsFull = useGameStore(
+      (state) => state.workingBlocks[props.chainId]?.isBuilt ?? false,
+    );
     const transactionUnlocked = props.feeLevel !== -1;
+    const isMountedRef = useRef(true);
+
+    // Track mount/unmount lifecycle
+    useEffect(() => {
+      isMountedRef.current = true;
+      return () => {
+        isMountedRef.current = false;
+      };
+    }, []);
 
     // Get the images and check if they're loaded
     const iconImage = getTxIcon(
@@ -87,7 +99,7 @@ export const TxButtonInner = memo(
     const fee = getFee(props.chainId, props.txId, props.isDapp);
     const addNewTransaction = useCallback(
       async (finished: boolean | undefined) => {
-        if (finished === false) return;
+        if (finished === false || !isMountedRef.current) return;
 
         // Trigger animation if provided
         if (props.triggerTxAnimation) {
@@ -109,8 +121,6 @@ export const TxButtonInner = memo(
 
     const speed = getSpeed(props.chainId, props.txId, props.isDapp);
     const paused = isPaused(props.chainId, props.txId, props.isDapp);
-    const workingBlock = getWorkingBlock(props.chainId);
-    const blockIsFull = workingBlock?.isBuilt ?? false;
     const shouldAutomate = speed > 0 && !paused && !blockIsFull;
 
     useEffect(() => {
@@ -136,6 +146,7 @@ export const TxButtonInner = memo(
       }
 
       return () => {
+        cancelAnimation(automationAnimHeight);
         automationAnimHeight.value = 94; // Reset to default height when unmounted
       };
     }, [shouldAutomate, speed]);
