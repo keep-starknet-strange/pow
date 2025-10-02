@@ -213,7 +213,7 @@ const AchievementItem: React.FC<{
           </Canvas>
         </View>
       )}
-      {progress === 100 && isUnseen  && (
+      {progress === 100 && isUnseen && (
         <View
           style={{
             position: "absolute",
