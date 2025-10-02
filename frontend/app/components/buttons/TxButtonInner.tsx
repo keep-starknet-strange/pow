@@ -52,6 +52,14 @@ export const TxButtonInner = memo(
     const transactionUnlocked = props.feeLevel !== -1;
     const isMountedRef = useRef(true);
 
+    // Track mount/unmount lifecycle correctly
+    useEffect(() => {
+      isMountedRef.current = true;
+      return () => {
+        isMountedRef.current = false;
+      };
+    }, []);
+
     // Get the images and check if they're loaded
     const iconImage = getTxIcon(
       props.chainId,
@@ -140,7 +148,6 @@ export const TxButtonInner = memo(
       return () => {
         cancelAnimation(automationAnimHeight);
         automationAnimHeight.value = 94; // Reset to default height when unmounted
-        isMountedRef.current = false;
       };
     }, [shouldAutomate, speed]);
     useInterval(
