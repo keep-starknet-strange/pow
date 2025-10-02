@@ -25,7 +25,8 @@ import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
 import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
-import { useOpenApp, WalletPresets } from "../../hooks/useOpenApp";
+import { useOpenApp } from "../../hooks/useOpenApp";
+import { WalletPresets } from "@/constants/WalletPresets";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {

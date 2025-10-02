@@ -1,5 +1,6 @@
 import "ts-node/register";
 import { ExpoConfig } from "expo/config";
+import { WalletPresets } from "./constants/WalletPresets";
 
 const config: ExpoConfig = {
   name: "POW!",
@@ -66,6 +67,12 @@ const config: ExpoConfig = {
     "expo-web-browser",
     "expo-audio",
     "./plugins/sentry.ts",
+    [
+      "./plugins/android-queries.ts",
+      {
+        packageNames: Object.values(WalletPresets).map((p) => p.androidPackage),
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
