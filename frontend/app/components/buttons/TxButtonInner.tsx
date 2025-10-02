@@ -52,7 +52,7 @@ export const TxButtonInner = memo(
     const transactionUnlocked = props.feeLevel !== -1;
     const isMountedRef = useRef(true);
 
-    // Track mount/unmount lifecycle correctly
+    // Track mount/unmount lifecycle
     useEffect(() => {
       isMountedRef.current = true;
       return () => {
