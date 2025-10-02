@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import Animated, { FadeInRight, FadeInLeft } from "react-native-reanimated";
 import { useIsFocused, useFocusEffect } from "@react-navigation/native";
@@ -6,6 +6,7 @@ import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import {
   useAchievement,
   useAchievementsLastViewed,
+  useIsAchievementUnseen,
 } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -35,7 +36,6 @@ const ICON_CONTAINER_BOTTOM = 38;
 const ICON_CONTAINER_LEFT = 33;
 const ICON_SIZE = 50;
 const TILE_HORIZONTAL_MARGIN = 4;
-const HEADER_TO_ROW_SPACING = 8;
 const GRADIENT_FRACTION = 0.14; // of screen width, clamped below
 
 const styles = StyleSheet.create({
@@ -144,6 +144,133 @@ const styles = StyleSheet.create({
   },
 });
 
+const AchievementItem: React.FC<{
+  achievement: any;
+  categoryId: string;
+  achievementIndex: number;
+  progress: number;
+  getImage: (imageName: string) => any;
+  renderAchievementName: (name: string) => React.ReactNode;
+}> = ({
+  achievement,
+  categoryId,
+  achievementIndex,
+  progress,
+  getImage,
+  renderAchievementName,
+}) => {
+  const isUnseen = useIsAchievementUnseen(achievement.id);
+
+  return (
+    <Animated.View
+      style={styles.achievementItem}
+      key={achievementIndex}
+      entering={FadeInRight}
+    >
+      <Canvas
+        key={`achievement-bg-${categoryId}-${achievement.id}`}
+        style={styles.fillCanvas}
+      >
+        <Image
+          image={getImage("achievements.tile.locked")}
+          fit="fill"
+          x={0}
+          y={0}
+          width={ACHIEVEMENT_TILE_WIDTH}
+          height={ACHIEVEMENT_TILE_HEIGHT}
+        />
+      </Canvas>
+      {progress > 0 && (
+        <View
+          style={[
+            styles.progressOverlayBase,
+            {
+              backgroundColor: "#6dcd64",
+              width: `${progress}%`,
+            },
+          ]}
+        />
+      )}
+      {progress > 0 && (
+        <View style={styles.progressOverlayImageWrapper}>
+          <Canvas
+            key={`achievement-overlay-${categoryId}-${achievement.id}-${progress}`}
+            style={styles.fillCanvas}
+          >
+            <Image
+              image={getImage(
+                progress === 100
+                  ? "achievements.tile.achieved"
+                  : "achievements.tile.overlay",
+              )}
+              fit="fill"
+              x={0}
+              y={0}
+              width={ACHIEVEMENT_TILE_WIDTH}
+              height={ACHIEVEMENT_TILE_HEIGHT}
+            />
+          </Canvas>
+        </View>
+      )}
+      {progress === 100 && isUnseen && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 8,
+            left: 0,
+            right: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 10,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#7c3aed",
+              paddingHorizontal: 12,
+              paddingVertical: 3,
+              borderRadius: 6,
+            }}
+          >
+            <Text
+              style={{
+                color: "#fff7ff",
+                fontSize: 15,
+                fontFamily: PIXEL_FONT,
+                fontWeight: "bold",
+              }}
+            >
+              NEW!
+            </Text>
+          </View>
+        </View>
+      )}
+      <View style={styles.achievementNameContainer}>
+        {renderAchievementName(achievement.name)}
+      </View>
+      <View style={styles.achievementIconContainer}>
+        <Canvas
+          key={`achievement-icon-${categoryId}-${achievement.id}`}
+          style={styles.fillCanvas}
+        >
+          <Image
+            image={getImage(achievement.image)}
+            fit="contain"
+            x={0}
+            y={0}
+            width={ICON_SIZE}
+            height={ICON_SIZE}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+        </Canvas>
+      </View>
+    </Animated.View>
+  );
+};
+
 export const AchievementsPage: React.FC = () => {
   const isFocused = useIsFocused();
   const { achievementsProgress } = useAchievement();
@@ -153,7 +280,10 @@ export const AchievementsPage: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setAchievementsLastViewedNow();
+      // Mark achievements as viewed when the user leaves the page
+      return () => {
+        setAchievementsLastViewedNow();
+      };
     }, [setAchievementsLastViewedNow]),
   );
 
@@ -276,79 +406,14 @@ export const AchievementsPage: React.FC = () => {
           maxToRenderPerBatch={6}
           windowSize={10}
           renderItem={({ item: achievement, index: achievementIndex }) => (
-            <Animated.View
-              style={styles.achievementItem}
-              key={achievementIndex}
-              entering={FadeInRight}
-            >
-              <Canvas
-                key={`achievement-bg-${item.id}-${achievement.id}`}
-                style={styles.fillCanvas}
-              >
-                <Image
-                  image={getImage("achievements.tile.locked")}
-                  fit="fill"
-                  x={0}
-                  y={0}
-                  width={ACHIEVEMENT_TILE_WIDTH}
-                  height={ACHIEVEMENT_TILE_HEIGHT}
-                />
-              </Canvas>
-              {achievementsProgress[achievement.id] > 0 && (
-                <View
-                  style={[
-                    styles.progressOverlayBase,
-                    {
-                      backgroundColor: "#6dcd64",
-                      width: `${achievementsProgress[achievement.id]}%`,
-                    },
-                  ]}
-                />
-              )}
-              {achievementsProgress[achievement.id] > 0 && (
-                <View style={styles.progressOverlayImageWrapper}>
-                  <Canvas
-                    key={`achievement-overlay-${item.id}-${achievement.id}-${achievementsProgress[achievement.id]}`}
-                    style={styles.fillCanvas}
-                  >
-                    <Image
-                      image={getImage(
-                        achievementsProgress[achievement.id] === 100
-                          ? "achievements.tile.achieved"
-                          : "achievements.tile.overlay",
-                      )}
-                      fit="fill"
-                      x={0}
-                      y={0}
-                      width={ACHIEVEMENT_TILE_WIDTH}
-                      height={ACHIEVEMENT_TILE_HEIGHT}
-                    />
-                  </Canvas>
-                </View>
-              )}
-              <View style={styles.achievementNameContainer}>
-                {renderAchievementName(achievement.name)}
-              </View>
-              <View style={styles.achievementIconContainer}>
-                <Canvas
-                  key={`achievement-icon-${item.id}-${achievement.id}`}
-                  style={styles.fillCanvas}
-                >
-                  <Image
-                    image={getImage(achievement.image)}
-                    fit="contain"
-                    x={0}
-                    y={0}
-                    width={ICON_SIZE}
-                    height={ICON_SIZE}
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-              </View>
-            </Animated.View>
+            <AchievementItem
+              achievement={achievement}
+              categoryId={item.id}
+              achievementIndex={achievementIndex}
+              progress={achievementsProgress[achievement.id] || 0}
+              getImage={getImage}
+              renderAchievementName={renderAchievementName}
+            />
           )}
         />
       </View>
