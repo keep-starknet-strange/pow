@@ -171,7 +171,11 @@ platform :ios do
 
   # Used to build the app and sign it with the 
   # correct certificates and provisioning profiles
-  private_lane :build_and_sign_release do
+  private_lane :build_and_sign_release do |options|
+    is_appstore = options[:adhoc] == false || options[:adhoc] == nil
+    is_clean = options[:clean] == true
+
+    provisioning_profile_name = is_appstore ? "match AppStore com.starknet.pow" : "match AdHoc com.starknet.pow"
     # Since the ios project is dynamically generated, we need to update the 
     # code signing settings. This is similar to opening the project in Xcode and
     # 1. Click POW on the project navigator
@@ -179,7 +183,7 @@ platform :ios do
     # 3. Then click Signing & Capabilities tab
     # 4. Then click on Release tab
     # 5. The uncheck the "Automatically manage signing" checkbox
-    # 6. Select the profile "match AppStore com.starknet.pow"
+    # 6. Select the profile `provisioning_profile_name`
     # Since this script is run in CI those settings can be changed with the follwing lane.
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -188,18 +192,19 @@ platform :ios do
       bundle_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
       code_sign_identity: "iPhone Distribution",
       sdk: "iphoneos*",
-      profile_name: "match AppStore com.starknet.pow"
+      profile_name: provisioning_profile_name
     )
 
     # Setup certificates and provisioning profiles (Check the Matchfile)
+    type = is_appstore ? 'appstore' : 'adhoc'
     match(
-      type: 'appstore',
+      type: type,
       readonly: true
     )
 
     # Build the app (Check the Gymfile)
     gym(
-      clean: true,
+      clean: is_clean,
       configuration: "Release"
     )
   end
@@ -238,7 +243,7 @@ platform :ios do
     end
 
     update_build_number
-    build_and_sign_release
+    build_and_sign_release(clean: true)
 
     upload_to_testflight(
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
@@ -255,7 +260,7 @@ platform :ios do
     end
     
     update_build_number
-    build_and_sign_release
+    build_and_sign_release(clean: true)
 
     upload_to_app_store(
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
@@ -272,8 +277,8 @@ platform :ios do
   # args: clean: true/false (default: false) - whether to clean the build folder before building
   #       skip_prebuild: true/false (default: false) - whether to skip the expo prebuild step. This is useful
   #                                                    only if you have already prebuild the ios project manually.
-  # Example: fastlane ios local_build clean:true
-  lane :local_build do |options|    
+  # Example: fastlane ios sim_release_build clean:true
+  lane :sim_release_build do |options|
     selected_device = select_simulator
     UI.message("📱 Selected device: #{selected_device.name}")
         
@@ -298,5 +303,25 @@ platform :ios do
 
     UI.message("🚀 Launching app")
     sh(command: "xcrun simctl launch #{selected_device.udid} #{CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)}")
+  end
+
+  # This lane is used to build (Release configuration) the app in a device. It does not currently install the app
+  # automatically.
+  # This script does not requires AdHoc signing.
+  # args: clean: true/false (default: false) - whether to clean the build folder before building
+  #       skip_prebuild: true/false (default: false) - whether to skip the expo prebuild step. This is useful
+  #                                                    only if you have already prebuild the ios project manually.
+  # Example: fastlane ios device_release_build clean:true
+  lane :device_release_build do |options|
+    if options[:skip_prebuild] == false || options[:skip_prebuild] == nil
+      prebuild
+    end
+
+    clean = options[:clean] == true
+
+    build_and_sign_release(adhoc: true, clean: clean)
+    UI.message("IPA created at: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
+
+    # TODO Add logic to install automatically to device
   end
 end
