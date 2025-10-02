@@ -118,7 +118,7 @@ export const WalletPresets = {
   } satisfies AppTarget,
 
   readyWallet: {
-    iosSchemes: ["readywallet://"],
+    iosSchemes: ["ready-wallet://"],
     androidSchemes: ["readywallet://"],
     universalLinks: ["https://www.ready.co/download-ready-wallet"],
     iosAppStoreId: "6744935604",
