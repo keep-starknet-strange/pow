@@ -151,11 +151,6 @@ export const TxButtonInner = memo(
       };
     }, [shouldAutomate, speed]);
 
-    useEffect(() => {
-      return () => {
-        isMountedRef.current = false;
-      };
-    }, []);
     useInterval(
       () => {
         automationAnimHeight.value = withSequence(
