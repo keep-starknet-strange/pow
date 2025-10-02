@@ -272,13 +272,3 @@ export const useAchievementsHasUnseen = (): boolean => {
     return false;
   }) as boolean;
 };
-
-export const useIsAchievementUnseen = (achievementId: number): boolean => {
-  return useAchievementsStore((state) => {
-    const lastViewed = state.lastViewedAt;
-    const unlockedAt = state.achievementsUnlockedAt[achievementId] || 0;
-    const progress = state.achievementsProgress[achievementId] || 0;
-
-    return progress >= 100 && unlockedAt > 0 && unlockedAt > lastViewed;
-  }) as boolean;
-};

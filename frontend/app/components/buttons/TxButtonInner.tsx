@@ -140,9 +140,14 @@ export const TxButtonInner = memo(
       return () => {
         cancelAnimation(automationAnimHeight);
         automationAnimHeight.value = 94; // Reset to default height when unmounted
-        isMountedRef.current = false;
       };
     }, [shouldAutomate, speed]);
+
+    useEffect(() => {
+      return () => {
+        isMountedRef.current = false;
+      };
+    }, []);
     useInterval(
       () => {
         automationAnimHeight.value = withSequence(
