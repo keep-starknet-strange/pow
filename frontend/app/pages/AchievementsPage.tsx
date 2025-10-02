@@ -36,7 +36,6 @@ const ICON_CONTAINER_BOTTOM = 38;
 const ICON_CONTAINER_LEFT = 33;
 const ICON_SIZE = 50;
 const TILE_HORIZONTAL_MARGIN = 4;
-const HEADER_TO_ROW_SPACING = 8;
 const GRADIENT_FRACTION = 0.14; // of screen width, clamped below
 
 const styles = StyleSheet.create({
@@ -217,28 +216,33 @@ const AchievementItem: React.FC<{
         <View
           style={{
             position: "absolute",
-            bottom: 0,
+            bottom: 8,
             left: 0,
             right: 0,
-            height: 30,
             justifyContent: "center",
             alignItems: "center",
             zIndex: 10,
           }}
         >
-          <Text
+          <View
             style={{
-              color: "#ff4444",
-              fontSize: 12,
-              fontFamily: PIXEL_FONT,
-              fontWeight: "bold",
-              textShadowColor: "#000",
-              textShadowOffset: { width: 1, height: 1 },
-              textShadowRadius: 2,
+              backgroundColor: "#7c3aed",
+              paddingHorizontal: 12,
+              paddingVertical: 3,
+              borderRadius: 6,
             }}
           >
-            NEW!
-          </Text>
+            <Text
+              style={{
+                color: "#fff7ff",
+                fontSize: 15,
+                fontFamily: PIXEL_FONT,
+                fontWeight: "bold",
+              }}
+            >
+              NEW!
+            </Text>
+          </View>
         </View>
       )}
       <View style={styles.achievementNameContainer}>
