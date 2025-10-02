@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff7ff",
     fontSize: 24,
-    fontWeight: "700",
     position: "absolute",
     left: 8,
     fontFamily: "Pixels",
