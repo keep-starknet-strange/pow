@@ -150,6 +150,7 @@ export const TxButtonInner = memo(
         automationAnimHeight.value = 94; // Reset to default height when unmounted
       };
     }, [shouldAutomate, speed]);
+
     useInterval(
       () => {
         automationAnimHeight.value = withSequence(

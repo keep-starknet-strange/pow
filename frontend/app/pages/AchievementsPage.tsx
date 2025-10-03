@@ -6,7 +6,7 @@ import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import {
   useAchievement,
   useAchievementsLastViewed,
-  useIsAchievementUnseen,
+  useAchievementsStore,
 } from "../stores/useAchievementsStore";
 import { useImages } from "../hooks/useImages";
 import achievementJson from "../configs/achievements.json";
@@ -152,6 +152,7 @@ const AchievementItem: React.FC<{
   progress: number;
   getImage: (imageName: string) => any;
   renderAchievementName: (name: string) => React.ReactNode;
+  isUnseen: boolean;
 }> = ({
   achievement,
   categoryId,
@@ -159,9 +160,8 @@ const AchievementItem: React.FC<{
   progress,
   getImage,
   renderAchievementName,
+  isUnseen,
 }) => {
-  const isUnseen = useIsAchievementUnseen(achievement.id);
-
   return (
     <Animated.View
       style={styles.achievementItem}
@@ -300,6 +300,7 @@ export const AchievementsPage: React.FC = () => {
   const { setAchievementsLastViewedNow } = useAchievementsLastViewed();
   const { width } = useCachedWindowDimensions();
   const { getImage } = useImages();
+  const achievementsStore = useAchievementsStore();
 
   useFocusEffect(
     useCallback(() => {
@@ -428,20 +429,40 @@ export const AchievementsPage: React.FC = () => {
           initialNumToRender={6}
           maxToRenderPerBatch={6}
           windowSize={10}
-          renderItem={({ item: achievement, index: achievementIndex }) => (
-            <AchievementItem
-              achievement={achievement}
-              categoryId={item.id}
-              achievementIndex={achievementIndex}
-              progress={achievementsProgress[achievement.id] || 0}
-              getImage={getImage}
-              renderAchievementName={renderAchievementName}
-            />
-          )}
+          renderItem={({ item: achievement }) => {
+            if (!achievement || !achievement.id) return null;
+
+            const progress = achievementsProgress[achievement.id] || 0;
+            const unlockedAt =
+              achievementsStore.achievementsUnlockedAt[achievement.id] || 0;
+            const isUnseen =
+              progress >= 100 &&
+              unlockedAt > 0 &&
+              unlockedAt > achievementsStore.lastViewedAt;
+
+            return (
+              <AchievementItem
+                achievement={achievement}
+                categoryId={item.id}
+                achievementIndex={achievement.id}
+                progress={progress}
+                getImage={getImage}
+                renderAchievementName={renderAchievementName}
+                isUnseen={isUnseen}
+              />
+            );
+          }}
         />
       </View>
     ),
-    [width, getImage, achievementsProgress, renderAchievementName],
+    [
+      width,
+      getImage,
+      achievementsProgress,
+      renderAchievementName,
+      achievementsStore.achievementsUnlockedAt,
+      achievementsStore.lastViewedAt,
+    ],
   );
 
   if (!isFocused) {
@@ -487,6 +508,7 @@ export const AchievementsPage: React.FC = () => {
       </View>
       <View style={{ flex: 1, height: 558 }}>
         <FlatList
+          key={`categories-${isFocused ? "focused" : "unfocused"}`}
           data={categoriesData}
           style={styles.listArea}
           showsVerticalScrollIndicator={false}
