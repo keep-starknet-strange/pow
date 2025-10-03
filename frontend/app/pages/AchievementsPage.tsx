@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: TITLE_RIGHT_MARGIN,
     fontFamily: PIXEL_FONT,
+    transform: [{ translateY: 3 }],
   },
   categoryContainer: {
     width: "100%",
@@ -224,24 +225,46 @@ const AchievementItem: React.FC<{
             zIndex: 10,
           }}
         >
-          <View
-            style={{
-              backgroundColor: "#7c3aed",
-              paddingHorizontal: 12,
-              paddingVertical: 3,
-              borderRadius: 6,
-            }}
-          >
-            <Text
+          <View style={{ width: 62, height: 20 }}>
+            <Canvas style={{ width: 62, height: 20 }}>
+              <Image
+                image={getImage("achievements.new.badge")}
+                fit="contain"
+                x={0}
+                y={0}
+                width={70}
+                height={20}
+                sampling={{
+                  filter: FilterMode.Nearest,
+                  mipmap: MipmapMode.Nearest,
+                }}
+              />
+            </Canvas>
+            <View
               style={{
-                color: "#fff7ff",
-                fontSize: 15,
-                fontFamily: PIXEL_FONT,
-                fontWeight: "bold",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              NEW!
-            </Text>
+              <View>
+                <Text
+                  style={{
+                    color: "#fff7ff",
+                    fontSize: 15,
+                    fontFamily: PIXEL_FONT,
+                    fontWeight: "bold",
+                    transform: [{ translateX: 5 }, { translateY: 1 }],
+                  }}
+                >
+                  NEW!
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       )}
