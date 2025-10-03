@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# Check if cwebp binary exists
-if [ ! -f "./cwebp" ]; then
-    echo "Error: cwebp binary not found in current directory"
-    exit 1
+# Resolve script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Locate cwebp: prefer PATH, fallback to bundled binary next to the script
+if command -v cwebp >/dev/null 2>&1; then
+  CWEBP_BIN="cwebp"
+elif [ -x "$SCRIPT_DIR/cwebp" ]; then
+  CWEBP_BIN="$SCRIPT_DIR/cwebp"
+else
+  echo "Error: cwebp not found. Install with 'brew install webp' or place a 'cwebp' binary next to this script: $SCRIPT_DIR"
+  exit 1
 fi
 
 convert_directory() {
@@ -21,7 +28,7 @@ convert_directory() {
         continue
       fi
 
-      if ./cwebp -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
+      if "$CWEBP_BIN" -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
         echo "  ✓ Successfully converted ${f##*/}"
 
         if rm "$f"; then
@@ -42,6 +49,8 @@ convert_directory() {
   done
 }
 
-convert_directory "$(pwd)"
+TARGET_DIR="${1:-$SCRIPT_DIR}"
+
+convert_directory "$TARGET_DIR"
 
 echo "Conversion complete!"
