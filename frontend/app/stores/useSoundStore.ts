@@ -123,20 +123,36 @@ class MusicController {
   private gainNode: GainNode = this.audioContext.createGain();
   private onSongEndedCallback: (() => void) | null = null;
 
-  private currentAudioBuffer: AudioBuffer | null = null;
-  private currentAudioProgress: number = 0;
-  private playingAudioNode: AudioBufferSourceNode | null = null;
+  private currentMusicBuffer: AudioBuffer | null = null;
+  private currentMusicProgress: number = 0;
+  private playingMusicNode: AudioBufferSourceNode | null = null;
+
+  private revertAudioBuffer: AudioBuffer | null = null;
+  private revertAudioNode: AudioBufferSourceNode | null = null;
 
   constructor() {
     this.gainNode.connect(this.audioContext.destination);
     this.gainNode.gain.value = 1;
   }
 
-  public play() {
+  async setupMusic() {
+    this.revertAudioBuffer = await Asset.fromModule(REVERT_MUSIC)
+      .downloadAsync()
+      .then((asset) => {
+        if (!asset.localUri) {
+          console.error("Failed to load asset for Revert Music");
+          return null;
+        }
+
+        return this.audioContext.decodeAudioDataSource(asset.localUri);
+      });
+  }
+
+  play(delayMs?: number) {
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.currentAudioBuffer;
+    source.buffer = this.currentMusicBuffer;
     source.onPositionChanged = (event) => {
-      this.currentAudioProgress = event.value;
+      this.currentMusicProgress = event.value;
     };
     source.onEnded = () => {
       if (this.onSongEndedCallback) {
@@ -145,24 +161,29 @@ class MusicController {
     };
     source.onPositionChangedInterval = 100; // ~10Hz
     source.connect(this.gainNode);
-    source.start(0, this.currentAudioProgress);
-    this.playingAudioNode = source;
+
+    const delaySeconds = (delayMs ?? 0) / 1000;
+    source.start(
+      this.audioContext.currentTime + delaySeconds,
+      this.currentMusicProgress,
+    );
+    this.playingMusicNode = source;
   }
 
-  public pause() {
-    if (this.playingAudioNode) {
-      this.playingAudioNode.onEnded = null;
-      this.playingAudioNode.stop();
+  pause() {
+    if (this.playingMusicNode) {
+      this.playingMusicNode.onEnded = null;
+      this.playingMusicNode.stop();
     }
   }
 
-  public setOnSongEndedCallback(onSongEndedCallback: (() => void) | null) {
+  setOnSongEndedCallback(onSongEndedCallback: (() => void) | null) {
     this.onSongEndedCallback = onSongEndedCallback;
   }
 
-  public async changeSong(songName: SongName) {
-    this.currentAudioProgress = 0;
-    this.currentAudioBuffer = await Asset.fromModule(MUSIC_FILES[songName])
+  async changeSong(songName: SongName) {
+    this.currentMusicProgress = 0;
+    this.currentMusicBuffer = await Asset.fromModule(MUSIC_FILES[songName])
       .downloadAsync()
       .then((asset) => {
         if (!asset.localUri) {
@@ -174,16 +195,37 @@ class MusicController {
       });
   }
 
-  public cleanup() {
-    this.currentAudioProgress = 0;
-    this.currentAudioBuffer = null;
+  cleanup() {
+    this.currentMusicProgress = 0;
+    this.currentMusicBuffer = null;
+    this.revertAudioBuffer = null;
     this.onSongEndedCallback = null;
-    this.playingAudioNode?.disconnect();
+    this.playingMusicNode?.disconnect();
+    this.revertAudioNode?.disconnect();
     this.audioContext.close();
   }
 
-  public set volume(volume: number) {
+  set volume(volume: number) {
     this.gainNode.gain.value = volume;
+  }
+
+  async playRevertMusic() {
+    this.pause();
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.revertAudioBuffer;
+    source.loop = true;
+    source.connect(this.gainNode);
+    source.start();
+    this.revertAudioNode = source;
+  }
+
+  stopRevertMusic() {
+    if (this.revertAudioNode) {
+      this.revertAudioNode.stop();
+    }
+
+    this.play();
   }
 }
 
@@ -198,7 +240,6 @@ interface SoundState {
   musicVolume: number;
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
-  isPlayingRevertMusic: boolean;
   isInitialized: boolean;
 
   toggleSound: () => void;
@@ -224,7 +265,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   musicVolume: 0.2,
   isInitialized: false,
   currentTrack: null,
-  isPlayingRevertMusic: false,
   lastPlayedTracks: [],
 
   initializeSound: async () => {
@@ -240,6 +280,9 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
     const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
     const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
+
+    await musicController.setupMusic();
+    await soundController.setupSounds();
 
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
@@ -263,8 +306,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (musicOn) {
       musicController.play();
     }
-
-    await soundController.setupSounds();
 
     set({
       isInitialized: true,
@@ -393,7 +434,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     await musicController.changeSong(nextTrack);
     if (isMusicOn) {
-      musicController.play();
+      const delay = 2000 + 1000 * Math.random();
+      musicController.play(delay);
     }
 
     set({
@@ -403,17 +445,17 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   startRevertMusic: () => {
-    const { isMusicOn } = get();
+    const { isMusicOn, musicController } = get();
     if (!isMusicOn) return;
 
-    set({ isPlayingRevertMusic: true });
+    musicController.playRevertMusic();
   },
 
   stopRevertMusic: () => {
-    const { isMusicOn } = get();
+    const { isMusicOn, musicController } = get();
     if (!isMusicOn) return;
 
-    set({ isPlayingRevertMusic: false });
+    musicController.stopRevertMusic();
   },
 }));
 
@@ -456,7 +498,6 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
-    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -474,7 +515,6 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
-    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
