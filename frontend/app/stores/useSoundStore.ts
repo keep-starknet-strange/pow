@@ -3,7 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
 import { memo, useEffect } from "react";
-import { FlatList, Text } from "react-native";
 import { Asset } from "expo-asset";
 import {
   AudioBuffer,
@@ -12,8 +11,6 @@ import {
   AudioManager,
   GainNode,
 } from "react-native-audio-api";
-import { v4 as uuidv4 } from "uuid";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -191,7 +188,6 @@ class MusicController {
 }
 
 interface SoundState {
-  audioLogs: { id: string; log: string }[];
   musicController: MusicController;
   soundController: SoundController;
 
@@ -216,14 +212,11 @@ interface SoundState {
   selectNextTrack: () => void;
   startRevertMusic: () => void;
   stopRevertMusic: () => void;
-
-  log: (log: string) => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
   musicController: new MusicController(),
   soundController: new SoundController(),
-  audioLogs: [],
   isSoundOn: false,
   isMusicOn: false,
   isHapticsOn: true,
@@ -240,14 +233,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       iosMode: "default",
       iosOptions: ["duckOthers"],
     });
-    const { musicController, soundController, log, selectNextTrack } = get();
+    const { musicController, soundController, selectNextTrack } = get();
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
     const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
     const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
     const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
     const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
     const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
-    log("Initialize sound");
 
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
@@ -366,21 +358,15 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   cleanupSound: () => {
-    const { log, musicController, soundController } = get();
+    const { musicController, soundController } = get();
 
-    log("Cleaning up sound");
     soundController.cleanup();
     musicController.cleanup();
   },
 
   selectNextTrack: async () => {
-    const {
-      musicController,
-      isMusicOn,
-      currentTrack,
-      lastPlayedTracks,
-      musicVolume,
-    } = get();
+    const { musicController, isMusicOn, currentTrack, lastPlayedTracks } =
+      get();
 
     // // Get all track names
     const allTracks = Object.keys(MUSIC_FILES) as SongName[];
@@ -428,14 +414,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (!isMusicOn) return;
 
     set({ isPlayingRevertMusic: false });
-  },
-
-  log: (log: string) => {
-    set((soundState) => {
-      return {
-        audioLogs: [...soundState.audioLogs, { id: uuidv4(), log: log }],
-      };
-    });
   },
 }));
 
@@ -512,7 +490,7 @@ export const useSound = () => {
 };
 
 export const MusicComponent = memo(() => {
-  const { initializeSound, cleanupSound, audioLogs } = useSoundStore();
+  const { initializeSound, cleanupSound } = useSoundStore();
 
   useEffect(() => {
     initializeSound();
@@ -522,21 +500,5 @@ export const MusicComponent = memo(() => {
     };
   }, []);
 
-  const insets = useSafeAreaInsets();
-  return (
-    <FlatList
-      style={{
-        flex: 1,
-        height: "100%",
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-        zIndex: 100,
-        pointerEvents: "none",
-        position: "absolute",
-      }}
-      data={audioLogs}
-      renderItem={({ item }) => <Text>{item.log}</Text>}
-      keyExtractor={(item) => item.id}
-    />
-  );
+  return null;
 });
