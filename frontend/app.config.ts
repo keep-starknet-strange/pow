@@ -65,7 +65,15 @@ const config: ExpoConfig = {
       },
     ],
     "expo-web-browser",
-    "expo-audio",
+    [
+      "react-native-audio-api",
+      {
+        iosBackgroundMode: false,
+        androidPermissions: [],
+        androidForegroundService: false,
+      },
+    ],
+    "expo-asset",
     "./plugins/sentry.ts",
     [
       "./plugins/android-queries.ts",
