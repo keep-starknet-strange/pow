@@ -337,18 +337,21 @@ mod PowGame {
             let claimed = self.reward_claimed.read(user);
             assert!(!claimed, "Reward already claimed");
             let recipient_received = self.received_reward.read(recipient);
-            assert!(!recipient_received, "Recipient already received reward");
 
             self.reward_claimed.write(user, true);
             self.received_reward.write(recipient, true);
 
-            let success: bool = IERC20Dispatcher {
-                contract_address: self.reward_token_address.read(),
-            }
-                .transfer(recipient, self.reward_amount.read());
+            if !recipient_received {
+                let success: bool = IERC20Dispatcher {
+                    contract_address: self.reward_token_address.read(),
+                }
+                    .transfer(recipient, self.reward_amount.read());
 
-            assert!(success, "Reward transfer failed");
-            self.emit(RewardClaimed { user: user, recipient });
+                assert!(success, "Reward transfer failed");
+                self.emit(RewardClaimed { user: user, recipient });
+            } else {
+                self.emit(DoubleClaim { user: user, recipient });
+            }
         }
 
         fn get_reward_params(self: @ContractState) -> RewardParams {
