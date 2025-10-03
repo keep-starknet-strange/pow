@@ -1,17 +1,16 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AudioPlayer, createAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
-import soundPoolsJson from "../configs/soundpools.json";
 import { memo, useEffect } from "react";
 import { FlatList, Text } from "react-native";
 import { Asset } from "expo-asset";
 import {
-  AudioContext,
-  AudioManager,
   AudioBuffer,
   AudioBufferSourceNode,
+  AudioContext,
+  AudioManager,
+  GainNode,
 } from "react-native-audio-api";
 import { v4 as uuidv4 } from "uuid";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -37,7 +36,7 @@ const REVERT_MUSIC = require("../../assets/music/revert-theme.m4a");
 type SongName = keyof typeof MUSIC_FILES;
 
 // Sound file assets - one entry per unique sound file
-const soundFileAssets: { [key: string]: number } = {
+const soundFileAssets = {
   "confirm.m4a": require("../../assets/sounds/confirm.m4a"),
   "complete.m4a": require("../../assets/sounds/complete.m4a"),
   "purchase.mp3": require("../../assets/sounds/purchase.mp3"),
@@ -49,180 +48,97 @@ const soundFileAssets: { [key: string]: number } = {
   "revert.m4a": require("../../assets/sounds/revert.m4a"),
 };
 
+type SoundName = keyof typeof soundFileAssets;
+
 // Helper function to get sound file for event type from config
-const getSoundFileForEvent = (eventType: string): string | null => {
+const getSoundNameForEvent = (eventType: string): SoundName | null => {
   const eventConfig = soundsJson[eventType as keyof typeof soundsJson];
-  return eventConfig?.soundFile || null;
+  if (eventConfig) {
+    return eventConfig.soundFile as SoundName;
+  } else {
+    return null;
+  }
 };
 
-// Simple sound pool optimized for high-frequency game sounds
-class SoundPool {
-  private soundPlayers: Map<string, AudioPlayer[]> = new Map();
-  private currentIndex: Map<string, number> = new Map();
-  private activeTimeouts: Set<ReturnType<typeof setTimeout>> = new Set();
-  private isDestroyed: boolean = false;
+class SoundController {
+  private audioContext: AudioContext = new AudioContext();
+  private gainNode: GainNode = this.audioContext.createGain();
+  private soundBuffers: Map<SoundName, AudioBuffer> = new Map();
 
   constructor() {
-    // Create sound pools per sound file using configured pool sizes from soundpools.json
-    Object.keys(soundFileAssets).forEach((soundFile) => {
-      const poolSize =
-        soundPoolsJson[soundFile as keyof typeof soundPoolsJson] || 3; // Default to 3 if not specified
+    this.gainNode.connect(this.audioContext.destination);
+  }
 
-      const players: AudioPlayer[] = [];
-      for (let i = 0; i < poolSize; i++) {
-        const player = createAudioPlayer(soundFileAssets[soundFile]);
-        player.shouldCorrectPitch = true; // Enable pitch correction
-        players.push(player);
+  async setupSounds() {
+    const soundNames = Object.keys(soundFileAssets).map((s) => s as SoundName);
+
+    for (const soundName of soundNames) {
+      const assetModule = soundFileAssets[soundName];
+      const asset = await Asset.fromModule(assetModule).downloadAsync();
+
+      if (asset?.localUri) {
+        const audioBuffer = await this.audioContext.decodeAudioDataSource(
+          asset.localUri,
+        );
+        this.soundBuffers.set(soundName, audioBuffer);
       }
-      this.soundPlayers.set(soundFile, players);
-      this.currentIndex.set(soundFile, 0);
-    });
+    }
   }
 
   playSound(
-    eventType: string,
+    soundName: SoundName,
     pitchShift: number,
     soundConfig: any,
     volume: number,
-  ): void {
-    // Early return if pool is destroyed
-    if (this.isDestroyed) return;
+  ) {
+    const audioBuffer = this.soundBuffers.get(soundName);
+    if (!audioBuffer) return;
 
-    // Get the sound file for this event type
-    const soundFile = getSoundFileForEvent(eventType);
-    if (!soundFile) return;
+    const finalVolume = Math.max(
+      0,
+      Math.min(1, volume * (soundConfig?.volume || 1.0)),
+    );
+    const finalRate = Math.max(
+      0.5,
+      Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
+    );
 
-    const players = this.soundPlayers.get(soundFile);
-    if (!players || players.length === 0) return;
+    const duration = soundConfig.duration || 1000;
+    const estimatedDuration = Math.min(duration / finalRate, 3000);
 
-    // Get the next player in round-robin fashion
-    const currentIdx = this.currentIndex.get(soundFile) || 0;
-    const player = players[currentIdx];
-
-    // Validate player exists and is not null
-    if (!player) {
-      if (__DEV__)
-        console.warn(
-          `Audio player is null for ${soundFile} at index ${currentIdx}`,
-        );
-      return;
-    }
-
-    // Update index for next time (round-robin within the pool for this sound file)
-    this.currentIndex.set(soundFile, (currentIdx + 1) % players.length);
-
-    try {
-      // Validate player state before operations
-      if (this.isDestroyed || !player) return;
-
-      // Simple, fast configuration with null checks
-      const finalVolume = Math.max(
-        0,
-        Math.min(1, volume * (soundConfig?.volume || 1.0)),
-      );
-      const finalRate = Math.max(
-        0.5,
-        Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
-      );
-
-      player.volume = finalVolume;
-      player.setPlaybackRate(finalRate);
-      player.seekTo(0).then(() => {
-        player.play();
-      });
-
-      // Cleanup after sound duration with proper timeout tracking
-      const duration = soundConfig.duration || 1000;
-      const playbackRate = (soundConfig.rate || 1.0) * pitchShift;
-      const estimatedDuration = Math.min(duration / playbackRate, 3000);
-
-      const timeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
-        this.activeTimeouts.delete(timeoutId);
-        if (!this.isDestroyed) {
-          try {
-            player.pause();
-          } catch (e) {
-            // Ignore errors during cleanup
-          }
-        }
-      }, estimatedDuration + 100);
-
-      this.activeTimeouts.add(timeoutId);
-    } catch (error) {
-      // Log errors in development but don't crash
-      if (__DEV__) {
-        console.warn(
-          `Failed to play sound ${eventType} (${soundFile}):`,
-          error,
-        );
-      }
-    }
+    const source = this.audioContext.createBufferSource();
+    source.playbackRate.value = finalRate;
+    this.gainNode.gain.value = finalVolume;
+    source.buffer = audioBuffer;
+    source.connect(this.gainNode);
+    source.start();
+    source.stop(estimatedDuration);
   }
 
   cleanup() {
-    // Create a copy of the map to avoid iterator issues during cleanup
-    const playersToCleanup = Array.from(this.soundPlayers.entries());
-
-    playersToCleanup.forEach(([soundFile, players]) => {
-      players.forEach((player, index) => {
-        try {
-          // Ensure player is stopped before release
-          if (player.playing) {
-            player.pause();
-          }
-          // Small delay to ensure pause completes before release
-          setTimeout(() => {
-            try {
-              player.release();
-            } catch (releaseError) {
-              if (__DEV__)
-                console.warn(
-                  `Failed to release audio player ${index} for ${soundFile}:`,
-                  releaseError,
-                );
-            }
-          }, 50);
-        } catch (error) {
-          if (__DEV__)
-            console.warn(
-              `Failed to cleanup audio player ${index} for ${soundFile}:`,
-              error,
-            );
-        }
-      });
-    });
-
-    // Cancel all active timeouts to prevent operations on destroyed pool
-    this.activeTimeouts.forEach((timeoutId: ReturnType<typeof setTimeout>) => {
-      clearTimeout(timeoutId);
-    });
-    this.activeTimeouts.clear();
-
-    // Mark as destroyed to prevent further operations
-    this.isDestroyed = true;
-
-    // Clear maps after a delay to ensure all releases complete
-    setTimeout(() => {
-      this.soundPlayers.clear();
-      this.currentIndex.clear();
-    }, 100);
+    this.soundBuffers.clear();
+    this.audioContext.close();
   }
 }
 
 class MusicController {
   private audioContext: AudioContext = new AudioContext();
+  private gainNode: GainNode = this.audioContext.createGain();
   private onSongEndedCallback: (() => void) | null = null;
 
   private currentAudioBuffer: AudioBuffer | null = null;
   private currentAudioProgress: number = 0;
   private playingAudioNode: AudioBufferSourceNode | null = null;
 
+  constructor() {
+    this.gainNode.connect(this.audioContext.destination);
+    this.gainNode.gain.value = 1;
+  }
+
   public play() {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.currentAudioBuffer;
-    source.connect(this.audioContext.destination);
     source.onPositionChanged = (event) => {
-      console.log("Progress", event.value);
       this.currentAudioProgress = event.value;
     };
     source.onEnded = () => {
@@ -231,6 +147,7 @@ class MusicController {
       }
     };
     source.onPositionChangedInterval = 100; // ~10Hz
+    source.connect(this.gainNode);
     source.start(0, this.currentAudioProgress);
     this.playingAudioNode = source;
   }
@@ -267,17 +184,21 @@ class MusicController {
     this.playingAudioNode?.disconnect();
     this.audioContext.close();
   }
+
+  public set volume(volume: number) {
+    this.gainNode.gain.value = volume;
+  }
 }
 
 interface SoundState {
   audioLogs: { id: string; log: string }[];
   musicController: MusicController;
+  soundController: SoundController;
 
   isSoundOn: boolean;
   isMusicOn: boolean;
   isHapticsOn: boolean;
   soundEffectVolume: number;
-  soundPool: SoundPool | null;
   musicVolume: number;
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
@@ -301,13 +222,13 @@ interface SoundState {
 
 export const useSoundStore = create<SoundState>((set, get) => ({
   musicController: new MusicController(),
+  soundController: new SoundController(),
   audioLogs: [],
   isSoundOn: false,
   isMusicOn: false,
   isHapticsOn: true,
   soundEffectVolume: 1,
   musicVolume: 0.2,
-  soundPool: null,
   isInitialized: false,
   currentTrack: null,
   isPlayingRevertMusic: false,
@@ -315,17 +236,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
   initializeSound: async () => {
     AudioManager.setAudioSessionOptions({
-      iosCategory: "soloAmbient",
+      iosCategory: "playback",
       iosMode: "default",
-      iosOptions: ["mixWithOthers"],
+      iosOptions: ["duckOthers"],
     });
-    const { musicController, log, selectNextTrack } = get();
+    const { musicController, soundController, log, selectNextTrack } = get();
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
     const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
     const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
     const soundVolume = await AsyncStorage.getItem(SOUND_VOLUME_KEY);
     const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
     const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
+    log("Initialize sound");
 
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
@@ -338,25 +260,27 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       const trackNames = Object.keys(MUSIC_FILES) as SongName[];
       selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
     }
-    log("Initialize sound");
 
     musicController.setOnSongEndedCallback(() => {
       selectNextTrack();
     });
     await musicController.changeSong(selectedTrack);
     const musicOn = musicEnabled === "true" || musicEnabled === null;
+    const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
+    musicController.volume = volume;
     if (musicOn) {
       musicController.play();
     }
 
+    await soundController.setupSounds();
+
     set({
       isInitialized: true,
-      isSoundOn: false, // isSoundOn: soundEnabled === "true" || soundEnabled === null,
+      isSoundOn: soundEnabled === "true" || soundEnabled === null,
       isMusicOn: musicOn,
       isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
       soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
-      musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
-      soundPool: new SoundPool(),
+      musicVolume: volume,
       currentTrack: selectedTrack,
     });
   },
@@ -397,7 +321,9 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   setMusicVolume: (volume) => {
+    const { musicController } = get();
     set({ musicVolume: volume });
+    musicController.volume = volume;
     AsyncStorage.setItem(MUSIC_VOLUME_KEY, volume.toString());
   },
 
@@ -405,7 +331,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     soundType: string,
     pitchShift: number = 1.0,
   ): Promise<void> => {
-    const { isSoundOn, isHapticsOn, soundEffectVolume, soundPool } = get();
+    const { isSoundOn, isHapticsOn, soundEffectVolume, soundController } =
+      get();
 
     // Get sound config once for both sound and haptics
     const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
@@ -417,17 +344,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
 
     // Fast early returns for sound performance
-    if (!isSoundOn || !soundPool || !getSoundFileForEvent(soundType)) {
-      return;
-    }
+    if (!isSoundOn) return;
+
+    const soundName = getSoundNameForEvent(soundType);
+    if (!soundName) return;
 
     // Clamp pitch shift with minimal overhead
     pitchShift = Math.max(0.5, Math.min(2.0, pitchShift));
 
     try {
       // Play sound with minimal overhead
-      soundPool.playSound(
-        soundType,
+      soundController.playSound(
+        soundName,
         pitchShift,
         soundConfig,
         soundEffectVolume,
@@ -438,22 +366,21 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   cleanupSound: () => {
-    const { log, musicController, soundPool } = get();
+    const { log, musicController, soundController } = get();
 
-    // Clean up sound pool
-    if (soundPool) {
-      soundPool.cleanup();
-      set({ soundPool: null });
-    }
-
-    // musicController.pause();
-    log("Closing audio context");
+    log("Cleaning up sound");
+    soundController.cleanup();
     musicController.cleanup();
   },
 
   selectNextTrack: async () => {
-    const { musicController, isMusicOn, currentTrack, lastPlayedTracks } =
-      get();
+    const {
+      musicController,
+      isMusicOn,
+      currentTrack,
+      lastPlayedTracks,
+      musicVolume,
+    } = get();
 
     // // Get all track names
     const allTracks = Object.keys(MUSIC_FILES) as SongName[];
@@ -595,58 +522,6 @@ export const MusicComponent = memo(() => {
     };
   }, []);
 
-  //
-  // const [logs, setLogs] = useState<{ id: string; log: string }[]>([]);
-  //
-  // const audioContextRef = useRef<AudioContext | null>(null);
-  //
-  // const log = useCallback(
-  //   (log: string) => {
-  //     setLogs((logs) => [...logs, { id: uuidv4(), log: log }]);
-  //   },
-  //   [setLogs],
-  // );
-  //
-  // useEffect(() => {
-  //   if (!audioContextRef.current) {
-  //     audioContextRef.current = new AudioContext();
-  //   }
-  //
-  //   return () => {
-  //     audioContextRef.current?.close();
-  //   };
-  // }, []);
-  //
-  // useEffect(() => {
-  //   if (!isInitialized) {
-  //     log("Init sound");
-  //     initializeSound();
-  //   }
-  // }, [isInitialized, initializeSound]);
-  //
-  // useEffect(() => {
-  //   const handlePlay = async (song: SongName) => {
-  //     if (!audioContextRef.current) {
-  //       log("No audio context");
-  //       return;
-  //     }
-  //
-  //     const audioContext = audioContextRef.current;
-  //
-  //
-  //     const playerNode = audioContext.createBufferSource();
-  //     playerNode.buffer = buffer;
-  //
-  //     log("Play");
-  //     playerNode.connect(audioContext.destination);
-  //     playerNode.start(audioContext.currentTime);
-  //   };
-  //
-  //   if (currentTrack) {
-  //     handlePlay(currentTrack);
-  //   }
-  // }, [currentTrack]);
-  //
   const insets = useSafeAreaInsets();
   return (
     <FlatList
