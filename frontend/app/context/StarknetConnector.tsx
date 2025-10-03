@@ -250,13 +250,20 @@ export const StarknetConnectorProvider: React.FC<{
     }
   };
 
-  const randomHex = (length: number): string => {
-    const randomBytes = new Uint8Array(length / 2);
-    Crypto.getRandomValues(randomBytes);
-    return Array.from(randomBytes, (byte) =>
-      byte.toString(16).padStart(2, "0"),
-    ).join("");
-  };
+  const randomHex = useCallback((length: number): string => {
+    try {
+      const randomBytes = new Uint8Array(length / 2);
+      Crypto.getRandomValues(randomBytes);
+      return Array.from(randomBytes, (byte) =>
+        byte.toString(16).padStart(2, "0"),
+      ).join("");
+    } catch (error) {
+      console.error("Crypto session error:", error);
+      throw new Error(
+        "Failed to generate random bytes - crypto session not available",
+      );
+    }
+  }, []);
 
   const storePrivateKey = async (
     privateKey: string,
@@ -360,7 +367,7 @@ export const StarknetConnectorProvider: React.FC<{
 
     const privateKey = `0x0${randomHex(63)}`;
     return privateKey;
-  }, [STARKNET_ENABLED]);
+  }, [STARKNET_ENABLED, randomHex]);
 
   const getDeployCalldata = (privateKey: string, accountClassName?: string) => {
     // Default to Argent X account class calldata
