@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useMemo,
 } from "react";
 import * as Crypto from "expo-crypto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -352,14 +353,14 @@ export const StarknetConnectorProvider: React.FC<{
     }
   };
 
-  const generatePrivateKey = () => {
+  const generatePrivateKey = useCallback(() => {
     if (!STARKNET_ENABLED) {
       return "";
     }
 
     const privateKey = `0x0${randomHex(63)}`;
     return privateKey;
-  };
+  }, [STARKNET_ENABLED]);
 
   const getDeployCalldata = (privateKey: string, accountClassName?: string) => {
     // Default to Argent X account class calldata
@@ -920,31 +921,58 @@ export const StarknetConnectorProvider: React.FC<{
     [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
   );
 
-  const value = {
-    STARKNET_ENABLED,
-    network,
-    account,
-    provider,
-    storePrivateKey,
-    clearPrivateKey,
-    clearPrivateKeys,
-    getAvailableKeys,
-    getPrivateKey,
-    generatePrivateKey,
-    generateAccountAddress,
-    getDeploymentData,
-    deployAccount,
-    connectStorageAccount,
-    connectAccount,
-    storeKeyAndConnect,
-    disconnectAccount,
-    disconnectAndDeleteAccount,
-    invokeContract,
-    invokeContractCalls,
-    invokeWithPaymaster,
-    invokeCalls,
-    waitForTransaction,
-  };
+  const value = useMemo(
+    () => ({
+      STARKNET_ENABLED,
+      network,
+      account,
+      provider,
+      storePrivateKey,
+      clearPrivateKey,
+      clearPrivateKeys,
+      getAvailableKeys,
+      getPrivateKey,
+      generatePrivateKey,
+      generateAccountAddress,
+      getDeploymentData,
+      deployAccount,
+      connectStorageAccount,
+      connectAccount,
+      storeKeyAndConnect,
+      disconnectAccount,
+      disconnectAndDeleteAccount,
+      invokeContract,
+      invokeContractCalls,
+      invokeWithPaymaster,
+      invokeCalls,
+      waitForTransaction,
+    }),
+    [
+      STARKNET_ENABLED,
+      network,
+      account,
+      provider,
+      storePrivateKey,
+      clearPrivateKey,
+      clearPrivateKeys,
+      getAvailableKeys,
+      getPrivateKey,
+      generatePrivateKey,
+      generateAccountAddress,
+      getDeploymentData,
+      deployAccount,
+      connectStorageAccount,
+      connectAccount,
+      storeKeyAndConnect,
+      disconnectAccount,
+      disconnectAndDeleteAccount,
+      invokeContract,
+      invokeContractCalls,
+      invokeWithPaymaster,
+      invokeCalls,
+      waitForTransaction,
+    ],
+  );
   return (
     <StarknetConnector.Provider value={value}>
       {children}
