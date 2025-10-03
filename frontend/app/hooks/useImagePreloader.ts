@@ -293,6 +293,9 @@ const imagePaths = {
   achievementsTileOverlay: require(
     `${assetsPath}/achievements/achievements_tile.webp`,
   ),
+  achievementsNewBadge: require(
+    `${assetsPath}/achievements/achievement_new_badge.webp`,
+  ),
   achievements100: require(`${assetsPath}/achievements/icons/icon_100.webp`),
   achievements1000: require(`${assetsPath}/achievements/icons/icon_1000.webp`),
   achievementsStake: require(
@@ -621,6 +624,7 @@ export const useImagePreloader = () => {
     achievementsTileAchieved: useImage(imagePaths.achievementsTileAchieved),
     achievementsTitle: useImage(imagePaths.achievementsTitle),
     achievementsTileOverlay: useImage(imagePaths.achievementsTileOverlay),
+    achievementsNewBadge: useImage(imagePaths.achievementsNewBadge),
     achievements100: useImage(imagePaths.achievements100),
     achievements1000: useImage(imagePaths.achievements1000),
     achievementsStake: useImage(imagePaths.achievementsStake),
@@ -840,6 +844,7 @@ export const useImagePreloader = () => {
         "achievements.tile.progress": images.achievementsTileProgress,
         "achievements.tile.achieved": images.achievementsTileAchieved,
         "achievements.tile.overlay": images.achievementsTileOverlay,
+        "achievements.new.badge": images.achievementsNewBadge,
         "achievements.title": images.achievementsTitle,
         "achievements.mission.btc.1": images.achievements100,
         "achievements.mission.btc.2": images.achievements1000,
