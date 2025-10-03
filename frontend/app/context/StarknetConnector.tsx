@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useMemo,
 } from "react";
 import * as Crypto from "expo-crypto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -249,13 +250,20 @@ export const StarknetConnectorProvider: React.FC<{
     }
   };
 
-  const randomHex = (length: number): string => {
-    const randomBytes = new Uint8Array(length / 2);
-    Crypto.getRandomValues(randomBytes);
-    return Array.from(randomBytes, (byte) =>
-      byte.toString(16).padStart(2, "0"),
-    ).join("");
-  };
+  const randomHex = useCallback((length: number): string => {
+    try {
+      const randomBytes = new Uint8Array(length / 2);
+      Crypto.getRandomValues(randomBytes);
+      return Array.from(randomBytes, (byte) =>
+        byte.toString(16).padStart(2, "0"),
+      ).join("");
+    } catch (error) {
+      console.error("Crypto session error:", error);
+      throw new Error(
+        "Failed to generate random bytes - crypto session not available",
+      );
+    }
+  }, []);
 
   const storePrivateKey = async (
     privateKey: string,
@@ -352,14 +360,14 @@ export const StarknetConnectorProvider: React.FC<{
     }
   };
 
-  const generatePrivateKey = () => {
+  const generatePrivateKey = useCallback(() => {
     if (!STARKNET_ENABLED) {
       return "";
     }
 
     const privateKey = `0x0${randomHex(63)}`;
     return privateKey;
-  };
+  }, [STARKNET_ENABLED, randomHex]);
 
   const getDeployCalldata = (privateKey: string, accountClassName?: string) => {
     // Default to Argent X account class calldata
@@ -920,31 +928,58 @@ export const StarknetConnectorProvider: React.FC<{
     [invokeWithPaymaster, invokeContractCalls, network, STARKNET_ENABLED],
   );
 
-  const value = {
-    STARKNET_ENABLED,
-    network,
-    account,
-    provider,
-    storePrivateKey,
-    clearPrivateKey,
-    clearPrivateKeys,
-    getAvailableKeys,
-    getPrivateKey,
-    generatePrivateKey,
-    generateAccountAddress,
-    getDeploymentData,
-    deployAccount,
-    connectStorageAccount,
-    connectAccount,
-    storeKeyAndConnect,
-    disconnectAccount,
-    disconnectAndDeleteAccount,
-    invokeContract,
-    invokeContractCalls,
-    invokeWithPaymaster,
-    invokeCalls,
-    waitForTransaction,
-  };
+  const value = useMemo(
+    () => ({
+      STARKNET_ENABLED,
+      network,
+      account,
+      provider,
+      storePrivateKey,
+      clearPrivateKey,
+      clearPrivateKeys,
+      getAvailableKeys,
+      getPrivateKey,
+      generatePrivateKey,
+      generateAccountAddress,
+      getDeploymentData,
+      deployAccount,
+      connectStorageAccount,
+      connectAccount,
+      storeKeyAndConnect,
+      disconnectAccount,
+      disconnectAndDeleteAccount,
+      invokeContract,
+      invokeContractCalls,
+      invokeWithPaymaster,
+      invokeCalls,
+      waitForTransaction,
+    }),
+    [
+      STARKNET_ENABLED,
+      network,
+      account,
+      provider,
+      storePrivateKey,
+      clearPrivateKey,
+      clearPrivateKeys,
+      getAvailableKeys,
+      getPrivateKey,
+      generatePrivateKey,
+      generateAccountAddress,
+      getDeploymentData,
+      deployAccount,
+      connectStorageAccount,
+      connectAccount,
+      storeKeyAndConnect,
+      disconnectAccount,
+      disconnectAndDeleteAccount,
+      invokeContract,
+      invokeContractCalls,
+      invokeWithPaymaster,
+      invokeCalls,
+      waitForTransaction,
+    ],
+  );
   return (
     <StarknetConnector.Provider value={value}>
       {children}
