@@ -65,7 +65,6 @@ const config: ExpoConfig = {
       },
     ],
     "expo-web-browser",
-    "expo-audio",
     [
       "react-native-audio-api",
       {
