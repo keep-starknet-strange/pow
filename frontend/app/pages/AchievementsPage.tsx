@@ -232,7 +232,7 @@ const AchievementItem: React.FC<{
                 fit="contain"
                 x={0}
                 y={0}
-                width={70}
+                width={62}
                 height={20}
                 sampling={{
                   filter: FilterMode.Nearest,
@@ -258,7 +258,7 @@ const AchievementItem: React.FC<{
                     fontSize: 15,
                     fontFamily: PIXEL_FONT,
                     fontWeight: "bold",
-                    transform: [{ translateX: 5 }, { translateY: 1 }],
+                    transform: [{ translateY: 1 }],
                   }}
                 >
                   NEW!
