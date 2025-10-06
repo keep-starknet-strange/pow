@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
@@ -9,16 +9,17 @@ import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
 import { AmountField } from "../components/staking/AmountField";
+import { StakingUnlock } from "../components/staking/StakingUnlock";
+import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
 
-// You may need to define width, height, and getImage if not already imported:
-const { width, height } = Dimensions.get("window");
 
 const SECOND = 1000;
 const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
 
 export const StakingPage: React.FC = () => {
+  const { width, height } = useCachedWindowDimensions();
   const {
     amountStaked,
     rewards,
@@ -29,6 +30,7 @@ export const StakingPage: React.FC = () => {
     claimStakingRewards,
     withdrawStakedTokens,
   } = useStakingStore();
+  const isUnlocked = useStakingStore((s) => s.isUnlocked);
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   // const { getImage } = useImages();
@@ -44,9 +46,10 @@ export const StakingPage: React.FC = () => {
 
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
+    if (!isUnlocked || amountStaked === 0) return; // pause timer when locked or nothing staked
     const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
     return () => clearInterval(id);
-  }, []);
+  }, [isUnlocked, amountStaked]);
 
   // countdown until next validation
   const { days, hours, minutes, seconds } = useMemo(() => {
@@ -59,6 +62,17 @@ export const StakingPage: React.FC = () => {
       seconds: rem % 60,
     };
   }, [lastValidation, config.slashing_config.due_time, now]);
+
+  // Build a countdown string without leading zero segments (e.g., 00:00:23:59 -> 23:59)
+  const countdownDisplay = useMemo(() => {
+    const parts = [days, hours, minutes, seconds]
+      .map((n) => n.toString().padStart(2, "0"));
+    // Remove leading 00 segments but keep at least minutes:seconds
+    while (parts.length > 2 && parts[0] === "00") {
+      parts.shift();
+    }
+    return parts.join(":");
+  }, [days, hours, minutes, seconds]);
 
   // APR % = seconds-per-year / reward_rate * 100
   const apr = useMemo(() => (31 / config.reward_rate).toFixed(1), [config.reward_rate]);
@@ -96,7 +110,13 @@ export const StakingPage: React.FC = () => {
 
       <PageHeader title="STAKING" width={width} />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} style={styles.flex1}>
+      <View
+        style={[
+          styles.flex1,
+          styles.contentContainer,
+          { opacity: isUnlocked ? 1 : 0.35 },
+        ]}
+      >
         {/** === Claim your Bitcoin === */}
         <SectionTitle title="Claim your Bitcoin" width={width} />
 
@@ -104,7 +124,7 @@ export const StakingPage: React.FC = () => {
           <View style={styles.card}>
             <View style={styles.rowStats}>
               <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
-              <StatsDisplay label="APR" value={`${apr} %`} />
+              {/* <StatsDisplay label="APR" value={`${apr} %`} /> */}
             </View>
 
             <View style={styles.rowActions}>
@@ -112,11 +132,8 @@ export const StakingPage: React.FC = () => {
                 action={onPressWithdraw}
                 label="WITHDRAW"
                 disabled={amountStaked === 0}
-              />
-              <StakingAction
-                action={() => {}}
-                label="BOOST APR"
-                disabled={true}
+                expand={false}
+                style={{ paddingHorizontal: 24 }}
               />
             </View>
 
@@ -193,16 +210,22 @@ export const StakingPage: React.FC = () => {
 
           <View style={[styles.card, styles.center]}>
             <Text style={styles.countdownText}>
-              {days.toString().padStart(2, "0")}:
-              {hours.toString().padStart(2, "0")}:
-              {minutes.toString().padStart(2, "0")}:
-              {seconds.toString().padStart(2, "0")}
+              {countdownDisplay}
             </Text>
           </View>
+            <StakingAction action={validateStake} label="VALIDATE" expand={false} style={{ marginTop: 8, alignSelf: "center", paddingHorizontal: 24 }} />
 
-          <StakingAction action={validateStake} label="VALIDATE" />
         </View>
-      </ScrollView>
+      </View>
+
+      {!isUnlocked && (
+        <View style={styles.overlay} pointerEvents="box-none">
+          <View style={styles.overlayBackdrop} />
+          <View style={styles.overlayContent}>
+            <StakingUnlock alwaysShow hidden={false} />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -212,11 +235,36 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlayBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#000000",
+    opacity: 0.5,
+  },
+  overlayContent: {
+    width: "100%",
+  },
   flex1: {
     flex: 1,
   },
+  contentContainer: {
+    justifyContent: "flex-start",
+    paddingBottom: 8,
+  },
   section: {
-    marginBottom: 20, // mb-5
+    marginBottom: 8,
   },
   card: {
     backgroundColor: "#16161d",
@@ -235,6 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     columnGap: 8,
     marginBottom: 12,
+    justifyContent: "center",
   },
   rowCenter: {
     flexDirection: "row",
@@ -254,7 +303,7 @@ const styles = StyleSheet.create({
   },
   countdownText: {
     fontFamily: "Pixels",
-    fontSize: 48, // text-5xl
+    fontSize: 36,
     color: "#fff7ff",
   },
 });

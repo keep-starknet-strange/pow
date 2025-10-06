@@ -8,6 +8,9 @@ import unlocksConfig from "@/app/configs/unlocks.json";
 import { useBalanceStore } from "./useBalanceStore";
 import { useUpgradesStore } from "./useUpgradesStore";
 
+// Paave dApp is ID 2 on L1
+const STAKING_DAPP_ID = 2;
+
 interface TransactionsState {
   // Map: chainId -> txId -> Tx Fee Level
   transactionFeeLevels: { [chainId: number]: { [txId: number]: number } };
@@ -62,6 +65,9 @@ interface TransactionsState {
   getNextTxSpeedCost: (chainId: number, txId: number) => number;
   getNextDappFeeCost: (chainId: number, dappId: number) => number;
   getNextDappSpeedCost: (chainId: number, dappId: number) => number;
+
+  // staking unlock gating
+  canUnlockStaking: (chainId: number) => boolean;
 }
 
 export const useTransactionsStore = create<TransactionsState>((set, get) => ({
@@ -628,5 +634,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     }
     const level = dappLevels[dappId];
     return dappData.speedCosts[level + 1] || 0;
+  },
+
+  canUnlockStaking: (chainId) => {
+    const dappLevels = get().dappFeeLevels[chainId];
+    if (!dappLevels) return false;
+    const level = dappLevels[STAKING_DAPP_ID];
+    return (level ?? -1) >= 0;
   },
 }));

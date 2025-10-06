@@ -8,6 +8,7 @@ import { StorePage } from "../pages/StorePage";
 import { LeaderboardPage } from "../pages/LeaderboardPage";
 import { AchievementsPage } from "../pages/AchievementsPage";
 import { SettingsPage } from "../pages/SettingsPage";
+import { StakingPage } from "../pages/StakingPage";
 
 import { useEventManager } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
@@ -104,6 +105,10 @@ const TabBarButton = memo(
           return isActive
             ? getImage("nav.icon.game.active")
             : getImage("nav.icon.game");
+        case "Staking":
+          return isActive
+            ? getImage("nav.icon.staking.active")
+            : getImage("nav.icon.staking");
         case "Store":
           return isActive
             ? getImage("nav.icon.shop.active")
@@ -270,6 +275,20 @@ export const TabNavigator = memo(() => {
         }}
         listeners={{
           tabPress: () => handleTabPress("Main"),
+        }}
+      />
+
+      <Tab.Screen
+        name="Staking"
+        component={StakingPage}
+        options={{
+          tabBarButton: (props) => (
+            <TabBarButton
+              tabName="Staking"
+              isActive={props["aria-selected"] || false}
+              onPress={props.onPress}
+            />
+          ),
         }}
       />
 

@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Window } from "../tutorial/Window";
 
 interface StatsDisplayProps {
   label: string;
@@ -9,9 +10,11 @@ interface StatsDisplayProps {
 const StatsDisplayComponent: React.FC<StatsDisplayProps> = ({ label, value }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text} numberOfLines={1} adjustsFontSizeToFit>
-        {label} {value}
-      </Text>
+      <Window style={styles.window}>
+        <Text style={styles.text} numberOfLines={1} adjustsFontSizeToFit>
+          {label} {value}
+        </Text>
+      </Window>
     </View>
   );
 };
@@ -20,16 +23,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  window: {
+    width: "100%",
+  },
   text: {
     fontFamily: "Pixels",
-    paddingHorizontal: 8, // px-2
-    paddingVertical: 24, // py-6
-    fontSize: 30, // text-3xl
+    fontSize: 26, // slightly smaller
     textAlign: "center",
     color: "#fff7ff",
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#717171",
   },
 });
 

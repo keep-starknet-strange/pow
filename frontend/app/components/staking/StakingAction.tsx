@@ -19,12 +19,16 @@ interface StakingActionsProps {
   action: (e: GestureResponderEvent) => void;
   label: string;
   disabled?: boolean;
+  expand?: boolean; // if false, button will size to content
+  style?: object;
 }
 
 export const StakingAction: React.FC<StakingActionsProps> = ({
   action,
   label,
   disabled = false,
+  expand = true,
+  style,
 }) => {
   const { getImage } = useImages();
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -38,7 +42,7 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
     <TouchableOpacity
       onPress={action}
       disabled={disabled}
-      style={styles.button}
+      style={[styles.button, !expand && styles.buttonCompact, style]}
       onLayout={onLayout}
       activeOpacity={0.8}
     >
@@ -77,11 +81,13 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginHorizontal: 4,
-    borderRadius: BORDER_RADIUS,
     overflow: "hidden",
-    backgroundColor: "#2c2c2e",
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonCompact: {
+    flex: 0,
+    alignSelf: "flex-start",
   },
   label: {
     fontFamily: "Pixels",

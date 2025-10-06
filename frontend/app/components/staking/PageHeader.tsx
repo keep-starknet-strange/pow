@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     position: "relative",
-    marginBottom: 56, // mb-14
+    marginBottom: 24, // reduced to bring content up
   },
   title: {
     color: "#fff7ff",

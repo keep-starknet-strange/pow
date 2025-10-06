@@ -11,7 +11,7 @@ const AmountFieldComponent: React.FC<AmountFieldProps> = ({ amount }) => {
       <Text style={[styles.field, styles.amount]} numberOfLines={1} adjustsFontSizeToFit>
         {amount}
       </Text>
-      <Text style={styles.field} numberOfLines={1} adjustsFontSizeToFit>
+      <Text style={[styles.field, styles.unit]} numberOfLines={1} adjustsFontSizeToFit>
         BTC
       </Text>
     </View>
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     flex: 1,
-    columnGap: 8, // space-x-2
+    // columnGap: 8, // space-x-2
   },
   field: {
     paddingHorizontal: 12, // px-3
@@ -37,6 +37,12 @@ const styles = StyleSheet.create({
   amount: {
     flex: 1,
     textAlign: "right",
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  unit: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
   },
 });
 

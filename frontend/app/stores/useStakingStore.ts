@@ -1,5 +1,9 @@
 import { create } from "zustand";
 import stakingConfig from "../configs/staking.json";
+import { useTransactionsStore } from "./useTransactionsStore";
+import { useBalanceStore } from "./useBalanceStore";
+import { useEventManager } from "./useEventManager";
+// Staking unlock gating is controlled by a specific dApp level in TransactionsStore
 
 interface SlashingConfig {
   slash_fraction: number; // e.g. 10 means “1/10th slashed per period”
@@ -23,9 +27,20 @@ interface StakingState {
   validateStake: () => void;
   claimStakingRewards: () => number;
   withdrawStakedTokens: () => number;
+
+  // unlock state/actions
+  isUnlocked: boolean;
+  canUnlockStaking: () => boolean;
+  getUnlockCost: () => number;
+  unlockStaking: () => void;
 }
 
 export const useStakingStore = create<StakingState>((set, get) => {
+  const computePaaveUnlocked = (): boolean => {
+    // Delegate to TransactionsStore so logic stays centralized
+    return useTransactionsStore.getState().canUnlockStaking(0);
+  };
+
   const cfg: StakingConfig = {
     reward_rate: stakingConfig.baseRewardRate,
     slashing_config: {
@@ -40,6 +55,8 @@ export const useStakingStore = create<StakingState>((set, get) => {
     rewards: 0,
     lastValidation: Math.floor(Date.now() / 1000),
     lastRewardAccrual: Math.floor(Date.now() / 1000),
+    isUnlocked: false,
+    canUnlockStaking: () => computePaaveUnlocked(),
 
     validateStake: () => {
       const now = Math.floor(Date.now() / 1000);
@@ -113,6 +130,23 @@ export const useStakingStore = create<StakingState>((set, get) => {
         amountStaked: 0,
       }));
       return amountStaked;
+    },
+
+    getUnlockCost: () => 42,
+
+    unlockStaking: () => {
+      if (get().isUnlocked) return;
+      if (!get().canUnlockStaking()) {
+        useEventManager.getState().notify("InvalidPurchase");
+        return;
+      }
+      const cost = get().getUnlockCost();
+      if (!useBalanceStore.getState().tryBuy(cost)) {
+        useEventManager.getState().notify("BuyFailed");
+        return;
+      }
+      set({ isUnlocked: true });
+      useEventManager.getState().notify("StakingPurchased");
     },
   };
 });
