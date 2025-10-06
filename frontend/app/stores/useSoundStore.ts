@@ -11,6 +11,7 @@ import {
   AudioManager,
   GainNode,
 } from "react-native-audio-api";
+import { AppState, NativeEventSubscription } from "react-native";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -122,6 +123,8 @@ class MusicController {
   private audioContext: AudioContext = new AudioContext();
   private gainNode: GainNode = this.audioContext.createGain();
   private onSongEndedCallback: (() => void) | null = null;
+  private appStateSubscription: NativeEventSubscription | null = null;
+  private requestedStatus: "play" | "pause" = "pause";
 
   private currentMusicBuffer: AudioBuffer | null = null;
   private currentMusicProgress: number = 0;
@@ -146,9 +149,39 @@ class MusicController {
 
         return this.audioContext.decodeAudioDataSource(asset.localUri);
       });
+
+    this.appStateSubscription = AppState.addEventListener(
+      "change",
+      (nextAppState) => {
+        if (this.requestedStatus != "play") return;
+
+        if (nextAppState === "active") {
+          this.runPlay();
+        } else if (
+          nextAppState === "inactive" ||
+          nextAppState === "background"
+        ) {
+          this.runPause();
+        }
+      },
+    );
   }
 
   play(delayMs?: number) {
+    this.requestedStatus = "play";
+    if (AppState.currentState == "active") {
+      this.runPlay(delayMs);
+    } else {
+      console.log("Play requested but app not active");
+    }
+  }
+
+  pause() {
+    this.requestedStatus = "pause";
+    this.runPause();
+  }
+
+  private runPlay(delayMs?: number) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.currentMusicBuffer;
     source.onPositionChanged = (event) => {
@@ -170,7 +203,7 @@ class MusicController {
     this.playingMusicNode = source;
   }
 
-  pause() {
+  private runPause() {
     if (this.playingMusicNode) {
       this.playingMusicNode.onEnded = null;
       this.playingMusicNode.stop();
@@ -196,6 +229,7 @@ class MusicController {
   }
 
   cleanup() {
+    this.appStateSubscription?.remove();
     this.currentMusicProgress = 0;
     this.currentMusicBuffer = null;
     this.revertAudioBuffer = null;
