@@ -481,6 +481,18 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     }
 
     const nextPrestige = currentPrestige + 1;
+    const { updateAchievement } = useAchievementsStore.getState();
+    updateAchievement(24, 100); //Prestige
+
+    const maxPrestige = prestigeJson.length - 1;
+    const maxPrestigeProgress = Math.min(
+      (nextPrestige / maxPrestige) * 100,
+      100,
+    );
+    updateAchievement(25, maxPrestigeProgress); //Reach Max Prestige
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await useAchievementsStore.getState().resetAchievementsOnPrestige();
+
     useEventManager
       .getState()
       .notify("PrestigePurchased", { prestigeLevel: nextPrestige });
@@ -491,9 +503,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     useTransactionsStore.getState().resetTransactions();
     useTransactionPauseStore.getState().resetPauseStore();
     get().resetUpgrades();
-
-    // Reset achievements except for Prestige!, Reach Max Prestige, and STRK Reward Claimed
-    await useAchievementsStore.getState().resetAchievementsOnPrestige();
 
     set({
       currentPrestige: nextPrestige,
