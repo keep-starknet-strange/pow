@@ -174,37 +174,14 @@ export const StakingPage: React.FC = () => {
 
           {/* quick select row */}
           <View style={styles.relativePad}>
-            {/* TODO: staking.amounts.bg */}
-            {/* Canvas underlay */}
-            {/* <Canvas
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: width - 16,   // matches px-2 (8px on each side)
-              height: 48,          // adjust to your button height + vertical padding
-            }}
-          >
-            <Image
-              image={getImage("staking.amounts.bg")}
-              fit="fill"
-              x={0}
-              y={0}
-              width={width - 16}
-              height={48}
-              sampling={{
-                filter: FilterMode.Nearest,
-                mipmap: MipmapMode.Nearest,
-              }}
-            />
-          </Canvas> */}
-
             <View style={styles.percRow}>
               {balancePercentages.map((percent, i) => (
                 <StakingAction
                   key={i}
                   action={onPressFillStake(percent)}
                   label={`${percent}%`}
+                  labelSize={28}
+                  style={styles.pctButton}
                 />
               ))}
             </View>
@@ -280,6 +257,7 @@ const styles = StyleSheet.create({
   rowStats: {
     flexDirection: "row",
     marginBottom: 12, // mb-3
+    marginHorizontal: 8,
   },
   rowActions: {
     flexDirection: "row",
@@ -296,8 +274,12 @@ const styles = StyleSheet.create({
   },
   percRow: {
     flexDirection: "row",
-    columnGap: 8, // space-x-2
     paddingHorizontal: 8, // px-2
+  },
+  pctButton: {
+    height: 56,
+    flexBasis: 0,
+    minWidth: 0,
   },
   center: {
     alignItems: "center",

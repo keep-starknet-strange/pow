@@ -21,6 +21,7 @@ interface StakingActionsProps {
   disabled?: boolean;
   expand?: boolean; // if false, button will size to content
   style?: object;
+  labelSize?: number;
 }
 
 export const StakingAction: React.FC<StakingActionsProps> = ({
@@ -29,6 +30,7 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
   disabled = false,
   expand = true,
   style,
+  labelSize,
 }) => {
   const { getImage } = useImages();
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -68,14 +70,17 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
         </Canvas>
       )}
 
-      <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit>
+      <Text
+        style={[styles.label, labelSize !== undefined ? { fontSize: labelSize } : null]}
+        numberOfLines={1}
+        adjustsFontSizeToFit={false}
+        allowFontScaling={false}
+      >
         {label}
       </Text>
     </TouchableOpacity>
   );
 };
-
-const BORDER_RADIUS = 8;
 
 const styles = StyleSheet.create({
   button: {

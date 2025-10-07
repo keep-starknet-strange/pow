@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: "Pixels",
-    fontSize: 22, // slightly smaller
+    fontSize: 20, // slightly smaller
     lineHeight: 46,
     textAlign: "center",
     color: "#fff7ff",
