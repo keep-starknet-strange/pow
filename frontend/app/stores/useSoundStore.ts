@@ -101,16 +101,12 @@ class SoundController {
       Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
     );
 
-    const duration = soundConfig.duration || 1000;
-    const estimatedDuration = Math.min(duration / finalRate, 3000);
-
     const source = this.audioContext.createBufferSource();
     source.playbackRate.value = finalRate;
     this.gainNode.gain.value = finalVolume;
     source.buffer = audioBuffer;
     source.connect(this.gainNode);
     source.start();
-    source.stop(estimatedDuration);
   }
 
   cleanup() {
