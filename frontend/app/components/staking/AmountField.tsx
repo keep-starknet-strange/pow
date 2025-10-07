@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     flex: 1,
-
+marginLeft: 8,
   },
   field: {
     paddingHorizontal: 12, // px-3

@@ -240,7 +240,7 @@ export const TabNavigator = memo(() => {
   const tabBarStyle = useMemo(
     () => ({
       backgroundColor: "#101119ff",
-      height: 96 + insets.bottom,
+      height: 75 + insets.bottom,
       paddingTop: 6,
       borderTopWidth: 0,
       zIndex: 20,
