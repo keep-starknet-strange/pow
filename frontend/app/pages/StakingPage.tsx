@@ -11,6 +11,7 @@ import { StakingAction } from "../components/staking/StakingAction";
 import { AmountField } from "../components/staking/AmountField";
 import { StakingUnlock } from "../components/staking/StakingUnlock";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
+import { shortMoneyString } from "../utils/helpers";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
 
@@ -123,7 +124,7 @@ export const StakingPage: React.FC = () => {
         <View style={styles.section}>
           <View style={styles.card}>
             <View style={styles.rowStats}>
-              <StatsDisplay label="Staked" value={`${amountStaked} BTC`} />
+              <StatsDisplay label="Staked" value={`${shortMoneyString(amountStaked)} BTC`} />
               {/* <StatsDisplay label="APR" value={`${apr} %`} /> */}
             </View>
 
@@ -138,7 +139,7 @@ export const StakingPage: React.FC = () => {
             </View>
 
             <View style={styles.rowCenter}>
-              <AmountField amount={rewards.toString()} />
+              <AmountField amount={shortMoneyString(rewards)} />
               <StakingAction
                 action={onPressClaim}
                 label="CLAIM"
@@ -155,7 +156,7 @@ export const StakingPage: React.FC = () => {
           <View style={styles.card}>
             {/* input + STAKE */}
             <View style={styles.rowCenter}>
-              <AmountField amount={stakeAmount.toString()} />
+              <AmountField amount={shortMoneyString(stakeAmount)} />
               <StakingAction
                 action={onPressStake}
                 label="STAKE"
