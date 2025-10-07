@@ -26,12 +26,12 @@ const styles = StyleSheet.create({
   },
   field: {
     paddingHorizontal: 12, // px-3
-    paddingVertical: 8, // py-2
+    paddingVertical: 10, // py-2
     borderRadius: 4,
     borderWidth: 1,
     borderColor: "#717171",
-    fontFamily: "Pixels",
-    fontSize: 20, // text-xl
+    fontFamily: "Teatime",
+    fontSize: 33, // text-xl
     color: "#fff7ff",
   },
   amount: {

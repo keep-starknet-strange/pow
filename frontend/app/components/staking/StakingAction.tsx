@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   label: {
-    fontFamily: "Pixels",
-    fontSize: 24,
+    fontFamily: "Teatime",
+    fontSize: 33,
     color: "#fff7ff",
     textAlign: "center",
     paddingVertical: 12,

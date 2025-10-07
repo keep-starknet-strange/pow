@@ -11,7 +11,7 @@ const StatsDisplayComponent: React.FC<StatsDisplayProps> = ({ label, value }) =>
   return (
     <View style={styles.container}>
       <Window style={styles.window}>
-        <Text style={styles.text} numberOfLines={1} adjustsFontSizeToFit>
+        <Text style={styles.text} numberOfLines={1}>
           {label} {value}
         </Text>
       </Window>
@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: "Pixels",
-    fontSize: 26, // slightly smaller
+    fontSize: 22, // slightly smaller
+    lineHeight: 46,
     textAlign: "center",
     color: "#fff7ff",
   },

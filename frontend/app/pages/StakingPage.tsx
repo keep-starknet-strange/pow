@@ -125,7 +125,7 @@ export const StakingPage: React.FC = () => {
           <View style={styles.card}>
             <View style={styles.rowStats}>
               <StatsDisplay label="Staked" value={`${shortMoneyString(amountStaked)} BTC`} />
-              {/* <StatsDisplay label="APR" value={`${apr} %`} /> */}
+              <StatsDisplay label="APR" value={`${apr} %`} />
             </View>
 
             <View style={styles.rowActions}>
@@ -133,6 +133,13 @@ export const StakingPage: React.FC = () => {
                 action={onPressWithdraw}
                 label="WITHDRAW"
                 disabled={amountStaked === 0}
+                expand={false}
+                style={{ paddingHorizontal: 24 }}
+              />
+              <StakingAction
+                action={onPressClaim}
+                label="BOOST APR"
+                disabled={rewards === 0}
                 expand={false}
                 style={{ paddingHorizontal: 24 }}
               />
@@ -268,21 +275,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   card: {
-    backgroundColor: "#16161d",
-    borderWidth: 1,
-    borderColor: "#39274E",
-    padding: 12, // p-3
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 6,
+    padding: 3, // p-3
   },
   rowStats: {
     flexDirection: "row",
-    columnGap: 8, // space-x-2
     marginBottom: 12, // mb-3
   },
   rowActions: {
     flexDirection: "row",
-    columnGap: 8,
     marginBottom: 12,
     justifyContent: "center",
   },

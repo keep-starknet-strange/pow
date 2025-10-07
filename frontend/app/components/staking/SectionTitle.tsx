@@ -23,7 +23,7 @@ const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) =>
           fit="fill"
           x={0}
           y={0}
-          width={width - 8}
+          width={width - 24}
           height={24}
           sampling={{
             filter: FilterMode.Nearest,
@@ -42,14 +42,17 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     position: "relative",
+    marginLeft: 8,
+    marginBottom: 4
   },
   title: {
     color: "#fff7ff",
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
     position: "absolute",
     left: 8, // left-2
-    fontFamily: "Pixels",
+    fontFamily: "Teatime",
+    top: 1,
   },
 });
 

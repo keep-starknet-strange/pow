@@ -42,15 +42,16 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     position: "relative",
-    marginBottom: 24, // reduced to bring content up
+    marginBottom: 40, // reduced to bring content up
   },
   title: {
     color: "#fff7ff",
-    fontSize: 24, // text-2xl
+    fontSize: 33, // text-2xl
     fontWeight: "700",
     position: "absolute",
     right: 8, // right-2
-    fontFamily: "Pixels",
+    fontFamily: "Teatime",
+    top: -1,
   },
 });
 
