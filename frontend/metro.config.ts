@@ -3,6 +3,9 @@ const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const {
   wrapWithReanimatedMetroConfig,
 } = require("react-native-reanimated/metro-config");
+const {
+  wrapWithAudioAPIMetroConfig,
+} = require("react-native-audio-api/metro-config");
 
 let config = getSentryExpoConfig(__dirname, {
   annotateReactComponents: true,
@@ -18,4 +21,5 @@ config.resolver.extraNodeModules = {
 };
 
 config = withNativeWind(config, { input: "./app/global.css" });
-module.exports = wrapWithReanimatedMetroConfig(config);
+config = wrapWithAudioAPIMetroConfig(config);
+config = module.exports = wrapWithReanimatedMetroConfig(config);

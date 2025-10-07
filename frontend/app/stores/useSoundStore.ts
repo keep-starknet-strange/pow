@@ -1,16 +1,17 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  AudioPlayer,
-  createAudioPlayer,
-  setAudioModeAsync,
-  useAudioPlayer,
-  useAudioPlayerStatus,
-} from "expo-audio";
 import * as Haptics from "expo-haptics";
 import soundsJson from "../configs/sounds.json";
-import soundPoolsJson from "../configs/soundpools.json";
 import { memo, useEffect } from "react";
+import { Asset } from "expo-asset";
+import {
+  AudioBuffer,
+  AudioBufferSourceNode,
+  AudioContext,
+  AudioManager,
+  GainNode,
+} from "react-native-audio-api";
+import { AppState, NativeEventSubscription } from "react-native";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -19,21 +20,21 @@ const MUSIC_VOLUME_KEY = "music_volume";
 const HAPTICS_ENABLED_KEY = "haptics_enabled";
 const FIRST_LAUNCH_KEY = "has_launched_before";
 
-const MUSIC_ASSETS: { [key: string]: number } = {
-  "The Return": require("../../assets/music/the-return.m4a"),
-  "Busy Market": require("../../assets/music/busy-market.m4a"),
-  "Left Right": require("../../assets/music/left-right.m4a"),
-  "Super Ninja": require("../../assets/music/super-ninja.m4a"),
-  "Mega Wall": require("../../assets/music/mega-wall.m4a"),
-  Happy: require("../../assets/music/happy.m4a"),
+const MUSIC_FILES = {
+  "the-return": require("../../assets/music/the-return.m4a"),
+  "busy-market": require("../../assets/music/busy-market.m4a"),
+  "left-right": require("../../assets/music/left-right.m4a"),
+  "super-ninja": require("../../assets/music/super-ninja.m4a"),
+  "mega-wall": require("../../assets/music/mega-wall.m4a"),
+  happy: require("../../assets/music/happy.m4a"),
 };
 
 const REVERT_MUSIC = require("../../assets/music/revert-theme.m4a");
 
-type SongName = keyof typeof MUSIC_ASSETS;
+type SongName = keyof typeof MUSIC_FILES;
 
 // Sound file assets - one entry per unique sound file
-const soundFileAssets: { [key: string]: number } = {
+const soundFileAssets = {
   "confirm.m4a": require("../../assets/sounds/confirm.m4a"),
   "complete.m4a": require("../../assets/sounds/complete.m4a"),
   "purchase.mp3": require("../../assets/sounds/purchase.mp3"),
@@ -45,176 +46,230 @@ const soundFileAssets: { [key: string]: number } = {
   "revert.m4a": require("../../assets/sounds/revert.m4a"),
 };
 
+type SoundName = keyof typeof soundFileAssets;
+
 // Helper function to get sound file for event type from config
-const getSoundFileForEvent = (eventType: string): string | null => {
+const getSoundNameForEvent = (eventType: string): SoundName | null => {
   const eventConfig = soundsJson[eventType as keyof typeof soundsJson];
-  return eventConfig?.soundFile || null;
+  if (eventConfig) {
+    return eventConfig.soundFile as SoundName;
+  } else {
+    return null;
+  }
 };
 
-// Simple sound pool optimized for high-frequency game sounds
-class SoundPool {
-  private soundPlayers: Map<string, AudioPlayer[]> = new Map();
-  private currentIndex: Map<string, number> = new Map();
-  private activeTimeouts: Set<ReturnType<typeof setTimeout>> = new Set();
-  private isDestroyed: boolean = false;
+class SoundController {
+  private audioContext: AudioContext = new AudioContext();
+  private gainNode: GainNode = this.audioContext.createGain();
+  private soundBuffers: Map<SoundName, AudioBuffer> = new Map();
 
   constructor() {
-    // Create sound pools per sound file using configured pool sizes from soundpools.json
-    Object.keys(soundFileAssets).forEach((soundFile) => {
-      const poolSize =
-        soundPoolsJson[soundFile as keyof typeof soundPoolsJson] || 3; // Default to 3 if not specified
+    this.gainNode.connect(this.audioContext.destination);
+  }
 
-      const players: AudioPlayer[] = [];
-      for (let i = 0; i < poolSize; i++) {
-        const player = createAudioPlayer(soundFileAssets[soundFile]);
-        player.shouldCorrectPitch = true; // Enable pitch correction
-        players.push(player);
+  async setupSounds() {
+    const soundNames = Object.keys(soundFileAssets).map((s) => s as SoundName);
+
+    for (const soundName of soundNames) {
+      const assetModule = soundFileAssets[soundName];
+      const asset = await Asset.fromModule(assetModule).downloadAsync();
+
+      if (asset?.localUri) {
+        const audioBuffer = await this.audioContext.decodeAudioDataSource(
+          asset.localUri,
+        );
+        this.soundBuffers.set(soundName, audioBuffer);
       }
-      this.soundPlayers.set(soundFile, players);
-      this.currentIndex.set(soundFile, 0);
-    });
+    }
   }
 
   playSound(
-    eventType: string,
+    soundName: SoundName,
     pitchShift: number,
     soundConfig: any,
     volume: number,
-  ): void {
-    // Early return if pool is destroyed
-    if (this.isDestroyed) return;
+  ) {
+    const audioBuffer = this.soundBuffers.get(soundName);
+    if (!audioBuffer) return;
 
-    // Get the sound file for this event type
-    const soundFile = getSoundFileForEvent(eventType);
-    if (!soundFile) return;
+    const finalVolume = Math.max(
+      0,
+      Math.min(1, volume * (soundConfig?.volume || 1.0)),
+    );
+    const finalRate = Math.max(
+      0.5,
+      Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
+    );
 
-    const players = this.soundPlayers.get(soundFile);
-    if (!players || players.length === 0) return;
-
-    // Get the next player in round-robin fashion
-    const currentIdx = this.currentIndex.get(soundFile) || 0;
-    const player = players[currentIdx];
-
-    // Validate player exists and is not null
-    if (!player) {
-      if (__DEV__)
-        console.warn(
-          `Audio player is null for ${soundFile} at index ${currentIdx}`,
-        );
-      return;
-    }
-
-    // Update index for next time (round-robin within the pool for this sound file)
-    this.currentIndex.set(soundFile, (currentIdx + 1) % players.length);
-
-    try {
-      // Validate player state before operations
-      if (this.isDestroyed || !player) return;
-
-      // Simple, fast configuration with null checks
-      const finalVolume = Math.max(
-        0,
-        Math.min(1, volume * (soundConfig?.volume || 1.0)),
-      );
-      const finalRate = Math.max(
-        0.5,
-        Math.min(2.0, (soundConfig?.rate || 1.0) * pitchShift),
-      );
-
-      player.volume = finalVolume;
-      player.setPlaybackRate(finalRate);
-      player.seekTo(0).then(() => {
-        player.play();
-      });
-
-      // Cleanup after sound duration with proper timeout tracking
-      const duration = soundConfig.duration || 1000;
-      const playbackRate = (soundConfig.rate || 1.0) * pitchShift;
-      const estimatedDuration = Math.min(duration / playbackRate, 3000);
-
-      const timeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
-        this.activeTimeouts.delete(timeoutId);
-        if (!this.isDestroyed) {
-          try {
-            player.pause();
-          } catch (e) {
-            // Ignore errors during cleanup
-          }
-        }
-      }, estimatedDuration + 100);
-
-      this.activeTimeouts.add(timeoutId);
-    } catch (error) {
-      // Log errors in development but don't crash
-      if (__DEV__) {
-        console.warn(
-          `Failed to play sound ${eventType} (${soundFile}):`,
-          error,
-        );
-      }
-    }
+    const source = this.audioContext.createBufferSource();
+    source.playbackRate.value = finalRate;
+    this.gainNode.gain.value = finalVolume;
+    source.buffer = audioBuffer;
+    source.connect(this.gainNode);
+    source.start();
   }
 
   cleanup() {
-    // Create a copy of the map to avoid iterator issues during cleanup
-    const playersToCleanup = Array.from(this.soundPlayers.entries());
+    this.soundBuffers.clear();
+    this.audioContext.close();
+  }
+}
 
-    playersToCleanup.forEach(([soundFile, players]) => {
-      players.forEach((player, index) => {
-        try {
-          // Ensure player is stopped before release
-          if (player.playing) {
-            player.pause();
-          }
-          // Small delay to ensure pause completes before release
-          setTimeout(() => {
-            try {
-              player.release();
-            } catch (releaseError) {
-              if (__DEV__)
-                console.warn(
-                  `Failed to release audio player ${index} for ${soundFile}:`,
-                  releaseError,
-                );
-            }
-          }, 50);
-        } catch (error) {
-          if (__DEV__)
-            console.warn(
-              `Failed to cleanup audio player ${index} for ${soundFile}:`,
-              error,
-            );
+class MusicController {
+  private audioContext: AudioContext = new AudioContext();
+  private gainNode: GainNode = this.audioContext.createGain();
+  private onSongEndedCallback: (() => void) | null = null;
+  private appStateSubscription: NativeEventSubscription | null = null;
+  private requestedStatus: "play" | "pause" = "pause";
+
+  private currentMusicBuffer: AudioBuffer | null = null;
+  private currentMusicProgress: number = 0;
+  private playingMusicNode: AudioBufferSourceNode | null = null;
+
+  private revertAudioBuffer: AudioBuffer | null = null;
+  private revertAudioNode: AudioBufferSourceNode | null = null;
+
+  constructor() {
+    this.gainNode.connect(this.audioContext.destination);
+    this.gainNode.gain.value = 1;
+  }
+
+  async setupMusic() {
+    this.revertAudioBuffer = await Asset.fromModule(REVERT_MUSIC)
+      .downloadAsync()
+      .then((asset) => {
+        if (!asset.localUri) {
+          console.error("Failed to load asset for Revert Music");
+          return null;
         }
+
+        return this.audioContext.decodeAudioDataSource(asset.localUri);
       });
-    });
 
-    // Cancel all active timeouts to prevent operations on destroyed pool
-    this.activeTimeouts.forEach((timeoutId: ReturnType<typeof setTimeout>) => {
-      clearTimeout(timeoutId);
-    });
-    this.activeTimeouts.clear();
+    this.appStateSubscription = AppState.addEventListener(
+      "change",
+      (nextAppState) => {
+        if (this.requestedStatus != "play") return;
 
-    // Mark as destroyed to prevent further operations
-    this.isDestroyed = true;
+        if (nextAppState === "active") {
+          this.runPlay();
+        } else if (
+          nextAppState === "inactive" ||
+          nextAppState === "background"
+        ) {
+          this.runPause();
+        }
+      },
+    );
+  }
 
-    // Clear maps after a delay to ensure all releases complete
-    setTimeout(() => {
-      this.soundPlayers.clear();
-      this.currentIndex.clear();
-    }, 100);
+  play(delayMs?: number) {
+    this.requestedStatus = "play";
+    if (AppState.currentState == "active") {
+      this.runPlay(delayMs);
+    } else {
+      console.log("Play requested but app not active");
+    }
+  }
+
+  pause() {
+    this.requestedStatus = "pause";
+    this.runPause();
+  }
+
+  private runPlay(delayMs?: number) {
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.currentMusicBuffer;
+    source.onPositionChanged = (event) => {
+      this.currentMusicProgress = event.value;
+    };
+    source.onEnded = () => {
+      if (this.onSongEndedCallback) {
+        this.onSongEndedCallback();
+      }
+    };
+    source.onPositionChangedInterval = 100; // ~10Hz
+    source.connect(this.gainNode);
+
+    const delaySeconds = (delayMs ?? 0) / 1000;
+    source.start(
+      this.audioContext.currentTime + delaySeconds,
+      this.currentMusicProgress,
+    );
+    this.playingMusicNode = source;
+  }
+
+  private runPause() {
+    if (this.playingMusicNode) {
+      this.playingMusicNode.onEnded = null;
+      this.playingMusicNode.stop();
+    }
+  }
+
+  setOnSongEndedCallback(onSongEndedCallback: (() => void) | null) {
+    this.onSongEndedCallback = onSongEndedCallback;
+  }
+
+  async changeSong(songName: SongName) {
+    this.currentMusicProgress = 0;
+    this.currentMusicBuffer = await Asset.fromModule(MUSIC_FILES[songName])
+      .downloadAsync()
+      .then((asset) => {
+        if (!asset.localUri) {
+          console.error("Failed to load asset for", songName);
+          return null;
+        }
+
+        return this.audioContext.decodeAudioDataSource(asset.localUri);
+      });
+  }
+
+  cleanup() {
+    this.appStateSubscription?.remove();
+    this.currentMusicProgress = 0;
+    this.currentMusicBuffer = null;
+    this.revertAudioBuffer = null;
+    this.onSongEndedCallback = null;
+    this.playingMusicNode?.disconnect();
+    this.revertAudioNode?.disconnect();
+    this.audioContext.close();
+  }
+
+  set volume(volume: number) {
+    this.gainNode.gain.value = volume;
+  }
+
+  async playRevertMusic() {
+    this.pause();
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.revertAudioBuffer;
+    source.loop = true;
+    source.connect(this.gainNode);
+    source.start();
+    this.revertAudioNode = source;
+  }
+
+  stopRevertMusic() {
+    if (this.revertAudioNode) {
+      this.revertAudioNode.stop();
+    }
+
+    this.play();
   }
 }
 
 interface SoundState {
+  musicController: MusicController;
+  soundController: SoundController;
+
   isSoundOn: boolean;
   isMusicOn: boolean;
   isHapticsOn: boolean;
   soundEffectVolume: number;
-  soundPool: SoundPool | null;
   musicVolume: number;
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
-  isPlayingRevertMusic: boolean;
   isInitialized: boolean;
 
   toggleSound: () => void;
@@ -231,18 +286,24 @@ interface SoundState {
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
+  musicController: new MusicController(),
+  soundController: new SoundController(),
   isSoundOn: false,
   isMusicOn: false,
   isHapticsOn: true,
   soundEffectVolume: 1,
   musicVolume: 0.2,
-  soundPool: null,
   isInitialized: false,
   currentTrack: null,
-  isPlayingRevertMusic: false,
   lastPlayedTracks: [],
 
   initializeSound: async () => {
+    AudioManager.setAudioSessionOptions({
+      iosCategory: "playback",
+      iosMode: "default",
+      iosOptions: ["duckOthers"],
+    });
+    const { musicController, soundController, selectNextTrack } = get();
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
     const musicEnabled = await AsyncStorage.getItem(MUSIC_ENABLED_KEY);
     const hapticsEnabled = await AsyncStorage.getItem(HAPTICS_ENABLED_KEY);
@@ -250,26 +311,39 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const musicVolume = await AsyncStorage.getItem(MUSIC_VOLUME_KEY);
     const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
 
+    await musicController.setupMusic();
+    await soundController.setupSounds();
+
     let selectedTrack: SongName;
     if (!hasLaunchedBefore) {
       // First launch - play "The Return"
-      selectedTrack = "The Return";
+      selectedTrack = "the-return";
       // Mark that the app has been launched before
       await AsyncStorage.setItem(FIRST_LAUNCH_KEY, "true");
     } else {
       // Returning user - select random track
-      const trackNames = Object.keys(MUSIC_ASSETS) as SongName[];
+      const trackNames = Object.keys(MUSIC_FILES) as SongName[];
       selectedTrack = trackNames[Math.floor(Math.random() * trackNames.length)];
+    }
+
+    musicController.setOnSongEndedCallback(() => {
+      selectNextTrack();
+    });
+    await musicController.changeSong(selectedTrack);
+    const musicOn = musicEnabled === "true" || musicEnabled === null;
+    const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
+    musicController.volume = volume;
+    if (musicOn) {
+      musicController.play();
     }
 
     set({
       isInitialized: true,
       isSoundOn: soundEnabled === "true" || soundEnabled === null,
-      isMusicOn: musicEnabled === "true" || musicEnabled === null,
+      isMusicOn: musicOn,
       isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
       soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
-      musicVolume: musicVolume ? parseFloat(musicVolume) : 0.5,
-      soundPool: new SoundPool(),
+      musicVolume: volume,
       currentTrack: selectedTrack,
     });
   },
@@ -286,6 +360,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     set((state) => {
       const newValue = !state.isMusicOn;
       AsyncStorage.setItem(MUSIC_ENABLED_KEY, newValue.toString());
+      if (newValue) {
+        state.musicController.play();
+      } else {
+        state.musicController.pause();
+      }
+
       return { isMusicOn: newValue };
     });
   },
@@ -304,7 +384,9 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   setMusicVolume: (volume) => {
+    const { musicController } = get();
     set({ musicVolume: volume });
+    musicController.volume = volume;
     AsyncStorage.setItem(MUSIC_VOLUME_KEY, volume.toString());
   },
 
@@ -312,7 +394,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     soundType: string,
     pitchShift: number = 1.0,
   ): Promise<void> => {
-    const { isSoundOn, isHapticsOn, soundEffectVolume, soundPool } = get();
+    const { isSoundOn, isHapticsOn, soundEffectVolume, soundController } =
+      get();
 
     // Get sound config once for both sound and haptics
     const soundConfig = soundsJson[soundType as keyof typeof soundsJson];
@@ -324,17 +407,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     }
 
     // Fast early returns for sound performance
-    if (!isSoundOn || !soundPool || !getSoundFileForEvent(soundType)) {
-      return;
-    }
+    if (!isSoundOn) return;
+
+    const soundName = getSoundNameForEvent(soundType);
+    if (!soundName) return;
 
     // Clamp pitch shift with minimal overhead
     pitchShift = Math.max(0.5, Math.min(2.0, pitchShift));
 
     try {
       // Play sound with minimal overhead
-      soundPool.playSound(
-        soundType,
+      soundController.playSound(
+        soundName,
         pitchShift,
         soundConfig,
         soundEffectVolume,
@@ -345,20 +429,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   cleanupSound: () => {
-    const { soundPool } = get();
+    const { musicController, soundController } = get();
 
-    // Clean up sound pool
-    if (soundPool) {
-      soundPool.cleanup();
-      set({ soundPool: null });
-    }
+    soundController.cleanup();
+    musicController.cleanup();
   },
 
-  selectNextTrack: () => {
-    const { currentTrack, lastPlayedTracks } = get();
+  selectNextTrack: async () => {
+    const { musicController, isMusicOn, currentTrack, lastPlayedTracks } =
+      get();
 
     // // Get all track names
-    const allTracks = Object.keys(MUSIC_ASSETS) as SongName[];
+    const allTracks = Object.keys(MUSIC_FILES) as SongName[];
 
     if (currentTrack) {
       lastPlayedTracks.push(currentTrack);
@@ -380,6 +462,12 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const nextTrack =
       availableTracks[Math.floor(Math.random() * availableTracks.length)];
 
+    await musicController.changeSong(nextTrack);
+    if (isMusicOn) {
+      const delay = 2000 + 1000 * Math.random();
+      musicController.play(delay);
+    }
+
     set({
       currentTrack: nextTrack,
       lastPlayedTracks: recentTracks,
@@ -387,17 +475,17 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   },
 
   startRevertMusic: () => {
-    const { isMusicOn } = get();
+    const { isMusicOn, musicController } = get();
     if (!isMusicOn) return;
 
-    set({ isPlayingRevertMusic: true });
+    musicController.playRevertMusic();
   },
 
   stopRevertMusic: () => {
-    const { isMusicOn } = get();
+    const { isMusicOn, musicController } = get();
     if (!isMusicOn) return;
 
-    set({ isPlayingRevertMusic: false });
+    musicController.stopRevertMusic();
   },
 }));
 
@@ -440,7 +528,6 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
-    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -458,7 +545,6 @@ export const useSound = () => {
     isSoundOn,
     isMusicOn,
     isHapticsOn,
-    isPlayingRevertMusic,
     soundEffectVolume,
     musicVolume,
     toggleSound,
@@ -474,86 +560,15 @@ export const useSound = () => {
 };
 
 export const MusicComponent = memo(() => {
-  const {
-    isInitialized,
-    isMusicOn,
-    currentTrack,
-    musicVolume,
-    initializeSound,
-    selectNextTrack,
-    isPlayingRevertMusic,
-  } = useSoundStore();
+  const { initializeSound, cleanupSound } = useSoundStore();
 
   useEffect(() => {
-    if (!isInitialized) {
-      // Configure global audio mode to play sounds even in iOS silent mode
-      setAudioModeAsync({ playsInSilentMode: true }).then(initializeSound);
-    }
-  }, [isInitialized]);
+    initializeSound();
 
-  const player = useAudioPlayer(null);
-  const status = useAudioPlayerStatus(player);
-
-  const revertPlayer = useAudioPlayer(REVERT_MUSIC);
-  const revertStatus = useAudioPlayerStatus(revertPlayer);
-
-  // Toggle Music
-  useEffect(() => {
-    if (status.isLoaded && isMusicOn) {
-      player.play();
-    } else if (!isMusicOn && status.playing) {
-      player.pause();
-    }
-  }, [status.isLoaded, isMusicOn, player]);
-
-  // Toggle Revert Music
-  useEffect(() => {
-    if (revertStatus.isLoaded && isMusicOn && isPlayingRevertMusic) {
-      player.pause();
-      revertPlayer.seekTo(0).then(() => {
-        revertPlayer.play();
-      });
-    } else if ((!isMusicOn || !isPlayingRevertMusic) && revertStatus.playing) {
-      revertPlayer.pause();
-      if (isMusicOn) {
-        player.play();
-      }
-    }
-  }, [
-    revertStatus.isLoaded,
-    isMusicOn,
-    isPlayingRevertMusic,
-    revertPlayer,
-    player,
-  ]);
-
-  // Select next track, when previous one finished
-  useEffect(() => {
-    if (status.didJustFinish) {
-      setTimeout(
-        () => {
-          selectNextTrack();
-        },
-        2000 + Math.random() * 1000,
-      );
-    }
-  }, [status.didJustFinish, selectNextTrack]);
-
-  // Observe current track
-  useEffect(() => {
-    if (currentTrack) {
-      const audioSource = MUSIC_ASSETS[currentTrack];
-      player.replace(audioSource);
-    }
-  }, [currentTrack, player]);
-
-  // Observe volume
-  useEffect(() => {
-    if (isInitialized) {
-      player.volume = musicVolume;
-      revertPlayer.volume = musicVolume;
-    }
-  }, [musicVolume, player, isInitialized]);
+    return () => {
+      cleanupSound();
+    };
+  }, []);
 
   return null;
 });
