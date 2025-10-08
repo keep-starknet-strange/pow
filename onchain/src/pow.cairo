@@ -54,14 +54,13 @@ mod PowGame {
     impl BuilderComponentImpl = BuilderComponent::BuilderImpl<ContractState>;
     impl BuilderInternalImpl = BuilderComponent::InternalImpl<ContractState>;
 
-    // TODO: Re-enable
     // Staking
-    // use pow_game::staking::StakingConfig;
-    // use pow_game::staking::component::StakingComponent;
-    // component!(path: StakingComponent, storage: staking, event: StakingEvent);
-    // #[abi(embed_v0)]
-    // impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
-    // impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
+    use pow_game::staking::StakingConfig;
+    use pow_game::staking::component::StakingComponent;
+    component!(path: StakingComponent, storage: staking, event: StakingEvent);
+    #[abi(embed_v0)]
+    impl StakingComponentImpl = StakingComponent::StakingImpl<ContractState>;
+    impl StakingInternalImpl = StakingComponent::InternalImpl<ContractState>;
 
     // -- Admin Components --
 
@@ -105,8 +104,8 @@ mod PowGame {
         prestige: PrestigeComponent::Storage,
         #[substorage(v0)]
         builder: BuilderComponent::Storage,
-        // #[substorage(v0)]
-        // staking: StakingComponent::Storage,
+        #[substorage(v0)]
+        staking: StakingComponent::Storage,
         #[substorage(v0)]
         upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
@@ -161,8 +160,8 @@ mod PowGame {
         PrestigeEvent: PrestigeComponent::Event,
         #[flat]
         BuilderEvent: BuilderComponent::Event,
-        // #[flat]
-        // StakingEvent: StakingComponent::Event,
+        #[flat]
+        StakingEvent: StakingComponent::Event,
         #[flat]
         UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
@@ -285,10 +284,10 @@ mod PowGame {
             self.check_valid_game_master();
             self.prestige.setup_prestige(config);
         }
-        // fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
-    //     self.check_valid_game_master();
-    //     self.staking.setup_staking(config);
-    // }
+        fn setup_staking_config(ref self: ContractState, config: StakingConfig) {
+            self.check_valid_game_master();
+            self.staking.setup_staking(config);
+        }
     }
 
     #[abi(embed_v0)]
@@ -524,31 +523,31 @@ mod PowGame {
         }
     }
 
-    // #[abi(embed_v0)]
-    // impl PowGameStakingActionsImpl of IPowGameStakingActions<ContractState> {
-    //     fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
-    //         let caller = get_caller_address();
-    //         debit_user(ref self, caller, amount);
-    //         self.staking.stake(caller, amount, now);
-    //     }
+    #[abi(embed_v0)]
+    impl PowGameStakingActionsImpl of IPowGameStakingActions<ContractState> {
+        fn stake_tokens(ref self: ContractState, amount: u128, now: u64) {
+            let caller = get_caller_address();
+            debit_user(ref self, caller, amount);
+            self.staking.stake(caller, amount, now);
+        }
 
-    //     fn claim_staking_rewards(ref self: ContractState) {
-    //         let caller = get_caller_address();
-    //         let reward = self.staking.claim_rewards(caller);
-    //         pay_user(ref self, caller, reward);
-    //     }
+        fn claim_staking_rewards(ref self: ContractState) {
+            let caller = get_caller_address();
+            let reward = self.staking.claim_rewards(caller);
+            pay_user(ref self, caller, reward);
+        }
 
-    //     fn validate_stake(ref self: ContractState, now: u64) {
-    //         let caller = get_caller_address();
-    //         self.staking.validate(caller, now);
-    //     }
+        fn validate_stake(ref self: ContractState, now: u64) {
+            let caller = get_caller_address();
+            self.staking.validate(caller, now);
+        }
 
-    //     fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
-    //         let caller = get_caller_address();
-    //         let withdrawal = self.staking.withdraw_stake(caller, now);
-    //         pay_user(ref self, caller, withdrawal);
-    //     }
-    // }
+        fn withdraw_staked_tokens(ref self: ContractState, now: u64) {
+            let caller = get_caller_address();
+            let withdrawal = self.staking.withdraw_stake(caller, now);
+            pay_user(ref self, caller, withdrawal);
+        }
+    }
 
     #[abi(embed_v0)]
     impl PowCheatCodesImpl of IPowCheatCodes<ContractState> {
