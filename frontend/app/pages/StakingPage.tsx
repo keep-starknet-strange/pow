@@ -129,7 +129,6 @@ export const StakingPage: React.FC = () => {
           { opacity: isUnlocked ? 1 : 0.35 },
         ]}
       >
-
         {/** === Stake your Bitcoin === */}
         <SectionTitle title="Stake your Bitcoin" width={width} />
 
@@ -312,4 +311,3 @@ const styles = StyleSheet.create({
     color: "#fff7ff",
   },
 });
-  
