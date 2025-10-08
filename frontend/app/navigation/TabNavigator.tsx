@@ -232,10 +232,18 @@ const StakingTabButton = memo(
       );
 
       const t = setTimeout(() => {
-        onBounced && onBounced();
+        if (onBounced) {
+          onBounced();
+        }
       }, 800);
       return () => clearTimeout(t);
-    }, [bounceOnMount, onBounced, scale, shouldAnimate, shouldUseReducedMotion]);
+    }, [
+      bounceOnMount,
+      onBounced,
+      scale,
+      shouldAnimate,
+      shouldUseReducedMotion,
+    ]);
 
     const animatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
