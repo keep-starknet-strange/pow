@@ -12,7 +12,10 @@ interface SectionHeaderProps {
   width: number;
   title: string;
 }
-const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => {
+const PageHeaderComponent: React.FC<SectionHeaderProps> = ({
+  width,
+  title,
+}) => {
   const { getImage } = useImages();
 
   return (
@@ -31,9 +34,7 @@ const PageHeaderComponent: React.FC<SectionHeaderProps> = ({ width, title }) => 
           }}
         />
       </Canvas>
-      <Text style={styles.title}>
-        {title}
-      </Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 };

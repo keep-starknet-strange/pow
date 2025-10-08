@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { Contract } from "starknet";
+import { FocAccount } from "../context/FocEngineConnector";
 import stakingConfig from "../configs/staking.json";
 import { useTransactionsStore } from "./useTransactionsStore";
 import { useBalanceStore } from "./useBalanceStore";
@@ -27,6 +29,23 @@ interface StakingState {
   validateStake: () => void;
   claimStakingRewards: () => number;
   withdrawStakedTokens: () => number;
+  boostApr: () => void;
+
+  // initialization
+  initializeStaking: (
+    powContract: Contract | null,
+    user: FocAccount | null,
+    getStakingConfig: () => Promise<
+      | {
+          reward_rate: number;
+          slashing_config: { slash_fraction: number; due_time: number };
+        }
+      | undefined
+    >,
+    getUserStakedAmount: () => Promise<number | undefined>,
+    getUserRewardAmount: () => Promise<number | undefined>,
+    getUserStakingUnlocked: () => Promise<boolean | undefined>,
+  ) => Promise<void>;
 
   // unlock state/actions
   isUnlocked: boolean;
@@ -67,34 +86,45 @@ export const useStakingStore = create<StakingState>((set, get) => {
       }
 
       set((state) => {
-        // --- Hourly rewards accrual ---
+        // --- Validation gating ---
+        const dueTime = state.config.slashing_config.due_time;
+        const slashFraction = state.config.slashing_config.slash_fraction;
+        const secondsSinceValidation = now - state.lastValidation;
+
+        // Not yet due: do nothing
+        if (secondsSinceValidation < dueTime) {
+          return {} as any;
+        }
+
+        let newAmountStaked = state.amountStaked;
+        let rewardsDelta = 0;
+
+        // Rewards accrue proportionally to time since last validation
+        // Using existing reward_rate semantics (fraction per hour)
         const SECONDS_PER_HOUR = 3600;
         const hoursSinceAccrual = Math.floor(
-          (now - state.lastRewardAccrual) / SECONDS_PER_HOUR
+          (now - state.lastRewardAccrual) / SECONDS_PER_HOUR,
         );
         const hourlyRewardRate = state.config.reward_rate; // fraction per hour
-        const rewardsDelta =
+        rewardsDelta =
           hoursSinceAccrual > 0
             ? state.amountStaked * hourlyRewardRate * hoursSinceAccrual
             : 0;
 
-        // --- Daily slashing (every due_time seconds) ---
-        const dueTime = state.config.slashing_config.due_time; // expect 24h
-        const slashFraction = state.config.slashing_config.slash_fraction; // fraction per period
-        const periodsOverdue = Math.floor((now - state.lastValidation) / dueTime);
-        let newAmountStaked = state.amountStaked;
+        // Apply slashing if overdue by periods
+        const periodsOverdue = Math.floor(secondsSinceValidation / dueTime);
         if (periodsOverdue > 0 && newAmountStaked > 0) {
-          const remainingMultiplier = Math.pow(1 - slashFraction, periodsOverdue);
+          const remainingMultiplier = Math.pow(
+            1 - slashFraction,
+            periodsOverdue,
+          );
           newAmountStaked = newAmountStaked * remainingMultiplier;
         }
 
         return {
           amountStaked: newAmountStaked,
           rewards: state.rewards + rewardsDelta,
-          lastRewardAccrual:
-            hoursSinceAccrual > 0
-              ? state.lastRewardAccrual + hoursSinceAccrual * SECONDS_PER_HOUR
-              : state.lastRewardAccrual,
+          lastRewardAccrual: rewardsDelta > 0 ? now : state.lastRewardAccrual,
           lastValidation: now,
         };
       });
@@ -130,6 +160,60 @@ export const useStakingStore = create<StakingState>((set, get) => {
         amountStaked: 0,
       }));
       return amountStaked;
+    },
+
+    boostApr: () => {
+      const { rewards } = get();
+      if (rewards <= 0) return;
+      set((state) => ({
+        rewards: 0,
+        config: {
+          ...state.config,
+          reward_rate: Math.max(0.000001, state.config.reward_rate * 0.9),
+        },
+      }));
+    },
+
+    initializeStaking: async (
+      powContract,
+      user,
+      getStakingConfig,
+      getUserStakedAmount,
+      getUserRewardAmount,
+      getUserStakingUnlocked,
+    ) => {
+      if (!user || !powContract) {
+        // Fallback to defaults when not connected
+        set({ isUnlocked: false });
+        return;
+      }
+      try {
+        const [cfg, staked, reward, unlocked] = await Promise.all([
+          getStakingConfig(),
+          getUserStakedAmount(),
+          getUserRewardAmount(),
+          getUserStakingUnlocked(),
+        ]);
+
+        set((state) => ({
+          config: cfg
+            ? {
+                reward_rate: Number(cfg.reward_rate),
+                slashing_config: {
+                  slash_fraction: Number(cfg.slashing_config.slash_fraction),
+                  due_time: Number(cfg.slashing_config.due_time),
+                },
+              }
+            : state.config,
+          amountStaked: staked ?? state.amountStaked,
+          rewards: reward ?? state.rewards,
+          isUnlocked: unlocked ?? state.isUnlocked,
+          lastValidation: state.lastValidation,
+          lastRewardAccrual: state.lastRewardAccrual,
+        }));
+      } catch (error) {
+        if (__DEV__) console.error("Error initializing staking:", error);
+      }
     },
 
     getUnlockCost: () => 42,

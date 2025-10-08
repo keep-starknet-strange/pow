@@ -9,13 +9,11 @@ import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
 import { Window } from "../components/tutorial/Window";
-import { AmountField } from "../components/staking/AmountField";
 import { StakingUnlock } from "../components/staking/StakingUnlock";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { shortMoneyString, showThreeDigitsMax } from "../utils/helpers";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
 // import { useImages } from "../hooks/useImages";
-
 
 const SECOND = 1000;
 const BALANCE_PERCENTAGE = [5, 10, 25, 50, 100];
@@ -31,6 +29,7 @@ export const StakingPage: React.FC = () => {
     stakeTokens,
     claimStakingRewards,
     withdrawStakedTokens,
+    boostApr,
   } = useStakingStore();
   const isUnlocked = useStakingStore((s) => s.isUnlocked);
   const { tryBuy, updateBalance, balance } = useBalanceStore();
@@ -65,19 +64,24 @@ export const StakingPage: React.FC = () => {
     };
   }, [lastValidation, config.slashing_config.due_time, now]);
 
-  // Build a countdown string without leading zero segments (e.g., 00:00:23:59 -> 23:59)
+  // Build countdown as total hours:minutes:seconds (e.g., 24:00:00)
   const countdownDisplay = useMemo(() => {
-    const parts = [days, hours, minutes, seconds]
-      .map((n) => n.toString().padStart(2, "0"));
-    // Remove leading 00 segments but keep at least minutes:seconds
-    while (parts.length > 2 && parts[0] === "00") {
-      parts.shift();
-    }
-    return parts.join(":");
+    const totalHours = days * 24 + hours;
+    const mm = minutes.toString().padStart(2, "0");
+    const ss = seconds.toString().padStart(2, "0");
+    return `${totalHours}:${mm}:${ss}`;
   }, [days, hours, minutes, seconds]);
 
   // APR % = seconds-per-year / reward_rate * 100
-  const apr = useMemo(() => (31 / config.reward_rate).toFixed(1), [config.reward_rate]);
+  const apr = useMemo(
+    () => (31 / config.reward_rate).toFixed(1),
+    [config.reward_rate],
+  );
+
+  const canValidate = useMemo(() => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    return nowSec - lastValidation >= config.slashing_config.due_time;
+  }, [lastValidation, config.slashing_config.due_time]);
 
   const onPressClaim = useCallback(() => {
     const r = claimStakingRewards();
@@ -89,14 +93,20 @@ export const StakingPage: React.FC = () => {
   const onPressStake = useCallback(() => {
     if (tryBuy(stakeAmount)) {
       stakeTokens(stakeAmount);
+      setStakeAmount(0); // clear input after successful stake
     }
   }, [stakeAmount, tryBuy, stakeTokens]);
+
+  const onPressBoostApr = useCallback(() => {
+    // Spend rewards to boost APR (handled in store)
+    if (rewards > 0) boostApr();
+  }, [rewards, boostApr]);
 
   const onPressFillStake = useCallback(
     (percent: number) => () => {
       setStakeAmount(getPercentOf({ percent, amount: balance }));
     },
-    [balance]
+    [balance],
   );
 
   const onPressWithdraw = useCallback(() => {
@@ -119,52 +129,18 @@ export const StakingPage: React.FC = () => {
           { opacity: isUnlocked ? 1 : 0.35 },
         ]}
       >
-        {/** === Claim your Bitcoin === */}
-        <SectionTitle title="Claim your Bitcoin" width={width} />
-
-        <View style={styles.section}>
-          <View style={styles.card}>
-            <View style={styles.rowStats}>
-              <StatsDisplay label="Staked" value={`${shortMoneyString(amountStaked, false, 1)} BTC`} />
-              <StatsDisplay label="APR" value={`${apr} %`} />
-            </View>
-
-            <View style={styles.rowActions}>
-              <StakingAction
-                action={onPressWithdraw}
-                label="WITHDRAW"
-                disabled={amountStaked === 0}
-                expand={false}
-                style={{ paddingHorizontal: 24, marginHorizontal: 2 }}
-              />
-              <StakingAction
-                action={onPressClaim}
-                label="BOOST APR"
-                disabled={rewards === 0}
-                expand={false}
-                style={{ paddingHorizontal: 24, marginHorizontal: 2 }}
-              />
-            </View>
-
-            <View style={styles.rowCenter}>
-              <AmountField amount={shortMoneyString(rewards)} />
-              <StakingAction
-                action={onPressClaim}
-                label="CLAIM"
-                disabled={rewards === 0}
-              />
-            </View>
-          </View>
-        </View>
 
         {/** === Stake your Bitcoin === */}
         <SectionTitle title="Stake your Bitcoin" width={width} />
 
         <View style={styles.section}>
           <View style={styles.card}>
-            {/* input + STAKE */}
+            {/* amount display + STAKE */}
             <View style={styles.rowCenter}>
-              <AmountField amount={shortMoneyString(stakeAmount)} />
+              <StatsDisplay
+                label="Amount"
+                value={`${shortMoneyString(stakeAmount)} BTC`}
+              />
               <StakingAction
                 action={onPressStake}
                 label="STAKE"
@@ -183,8 +159,46 @@ export const StakingPage: React.FC = () => {
                   label={`${percent}%`}
                   labelSize={28}
                   style={styles.pctButton}
+                  backgroundKey="staking.button.small"
                 />
               ))}
+            </View>
+          </View>
+        </View>
+
+        {/** === Claim your Bitcoin === */}
+        <SectionTitle title="Claim your Bitcoin" width={width} />
+
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <View style={styles.rowStats}>
+              <StatsDisplay
+                label="Staked"
+                value={`${shortMoneyString(amountStaked, false, 1)} BTC`}
+              />
+            </View>
+
+            <View style={styles.middleRow}>
+              <StatsDisplay label="APR" value={`${apr} %`} />
+              <StakingAction
+                action={onPressWithdraw}
+                label="WITHDRAW"
+                disabled={amountStaked === 0}
+                expand={false}
+                style={{ paddingHorizontal: 30, marginHorizontal: 2 }}
+              />
+            </View>
+
+            <View style={styles.rowCenter}>
+              <StatsDisplay
+                label="Rewards"
+                value={`${shortMoneyString(rewards)} BTC`}
+              />
+              <StakingAction
+                action={onPressClaim}
+                label="CLAIM"
+                disabled={rewards === 0}
+              />
             </View>
           </View>
         </View>
@@ -196,13 +210,20 @@ export const StakingPage: React.FC = () => {
 
           <View style={styles.card}>
             <Window style={{ width: "98%", alignSelf: "center" }}>
-              <Text style={styles.countdownText}>
-                {countdownDisplay}
-              </Text>
+              <Text style={styles.countdownText}>{countdownDisplay}</Text>
             </Window>
           </View>
-            <StakingAction action={validateStake} label="VALIDATE" expand={false} style={{ marginTop: 8, alignSelf: "center", paddingHorizontal: 100 }} />
-
+          <StakingAction
+            action={validateStake}
+            label="VALIDATE"
+            disabled={!canValidate}
+            expand={false}
+            style={{
+              marginTop: 8,
+              alignSelf: "center",
+              paddingHorizontal: 100,
+            }}
+          />
         </View>
       </View>
 
@@ -261,11 +282,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 12, // mb-3
     marginHorizontal: 8,
+    justifyContent: "center",
   },
-  rowActions: {
+  middleRow: {
     flexDirection: "row",
     marginBottom: 12,
-    justifyContent: "center",
+    alignItems: "center",
   },
   rowCenter: {
     flexDirection: "row",
@@ -280,8 +302,6 @@ const styles = StyleSheet.create({
   },
   pctButton: {
     height: 56,
-    flexBasis: 0,
-    minWidth: 0,
   },
   center: {
     alignItems: "center",
@@ -292,3 +312,4 @@ const styles = StyleSheet.create({
     color: "#fff7ff",
   },
 });
+  

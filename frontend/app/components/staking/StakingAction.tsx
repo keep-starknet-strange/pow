@@ -22,6 +22,7 @@ interface StakingActionsProps {
   expand?: boolean; // if false, button will size to content
   style?: object;
   labelSize?: number;
+  backgroundKey?: string; // key for background image in preloader
 }
 
 export const StakingAction: React.FC<StakingActionsProps> = ({
@@ -31,6 +32,7 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
   expand = true,
   style,
   labelSize,
+  backgroundKey = "staking.button.bg",
 }) => {
   const { getImage } = useImages();
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -56,7 +58,7 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
           ]}
         >
           <Image
-            image={getImage("staking.button.bg")}
+            image={getImage(backgroundKey)}
             x={0}
             y={0}
             width={size.width}
@@ -71,7 +73,10 @@ export const StakingAction: React.FC<StakingActionsProps> = ({
       )}
 
       <Text
-        style={[styles.label, labelSize !== undefined ? { fontSize: labelSize } : null]}
+        style={[
+          styles.label,
+          labelSize !== undefined ? { fontSize: labelSize } : null,
+        ]}
         numberOfLines={1}
         adjustsFontSizeToFit={false}
         allowFontScaling={false}
@@ -92,7 +97,6 @@ const styles = StyleSheet.create({
   },
   buttonCompact: {
     flex: 0,
-    alignSelf: "flex-start",
   },
   label: {
     fontFamily: "Teatime",

@@ -20,7 +20,9 @@ export const StakingUnlock: React.FC<StakingUnlockProps> = React.memo(
     );
     const { workingBlocks } = useGameStore();
     const miningBlock = workingBlocks[0];
-    const showUnlock = props.alwaysShow ? true : !isUnlocked && availableToPurchase;
+    const showUnlock = props.alwaysShow
+      ? true
+      : !isUnlocked && availableToPurchase;
     const description = availableToPurchase
       ? "Stake BTC to earn rewards!"
       : "Unlock Paave to unlock staking";

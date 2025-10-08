@@ -12,7 +12,10 @@ interface SectionTitleProps {
   width: number;
   title: string;
 }
-const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) => {
+const SectionTitleComponent: React.FC<SectionTitleProps> = ({
+  width,
+  title,
+}) => {
   const { getImage } = useImages();
 
   return (
@@ -31,9 +34,7 @@ const SectionTitleComponent: React.FC<SectionTitleProps> = ({ width, title }) =>
           }}
         />
       </Canvas>
-      <Text style={styles.title}>
-        {title}
-      </Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 };
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "relative",
     marginLeft: 8,
-    marginBottom: 4
+    marginBottom: 4,
   },
   title: {
     color: "#fff7ff",
