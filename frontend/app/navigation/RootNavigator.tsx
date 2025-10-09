@@ -12,6 +12,7 @@ import { LoadingScreen } from "../pages/LoadingScreen";
 
 import { useFocEngine } from "../context/FocEngineConnector";
 import { useTutorial } from "../stores/useTutorialStore";
+import { ShareActionModal } from "@/app/components/ShareActionModal";
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,7 @@ export const RootNavigator = memo(() => {
           {isTutorialActive && <TutorialOverlay />}
           <Header />
           <InAppNotification />
+          <ShareActionModal />
           <TabNavigator />
         </>
       ) : (

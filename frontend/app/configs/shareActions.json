@@ -1,0 +1,29 @@
+[
+  {
+    "id": 0,
+    "title": "Congrats!",
+    "message": "You just claimed 10 STRK!",
+    "share": {
+      "x": "I just claimed 10 STRK!",
+      "other": "I just claimed 10 STRK on https://www.pow-game.com/"
+    }
+  },
+  {
+    "id": 1,
+    "title": "Congrats!",
+    "message": "You just reached Prestige {}!",
+    "share": {
+      "x": "I just reached Prestige {}!",
+      "other": "I just reached Prestige {} on https://www.pow-game.com/"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Congrats!",
+    "message": "You just reached MAX Prestige!",
+    "share": {
+      "x": "I just reached MAX Prestige!",
+      "other": "I just reached MAX Prestige on https://www.pow-game.com/"
+    }
+  }
+]
