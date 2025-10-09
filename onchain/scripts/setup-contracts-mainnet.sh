@@ -85,6 +85,7 @@ PRESTIGE_CONFIG=$CONFIGS_DIR/prestige.json
 UPGRADES_CONFIG=$CONFIGS_DIR/upgrades.json
 TRANSACTIONS_CONFIG=$CONFIGS_DIR/transactions.json
 UNLOCKS_CONFIG=$CONFIGS_DIR/unlocks.json
+STAKING_CONFIG=$CONFIGS_DIR/staking.json
 
 # RPC_URL is loaded from .env file
 if [ -z "$RPC_URL" ]; then
@@ -414,4 +415,24 @@ starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_K
 echo
 echo "Done setting up costs!"
 echo
+echo "7. Setting up staking from $STAKING_CONFIG"
+echo
+
+STAKING_CONFIG_CONTENT=$(cat $STAKING_CONFIG)
+
+# Extract and normalize staking parameters
+UNLOCK_COST=$(echo $STAKING_CONFIG_CONTENT | jq -r '.unlock_cost // .unlockCost // 0')
+
+# Convert baseRewardRate to divisor per hour (if <= 1 treat as fraction, else assume already divisor)
+REWARD_RATE_DIV=$(echo $STAKING_CONFIG_CONTENT | jq -r '((.baseRewardRate // 0) | tonumber) as $rr | if $rr <= 0 then 1 elif $rr <= 1 then ((1/$rr) | floor) else ($rr | floor) end')
+
+# Convert slashFraction to divisor (if <= 1 treat as fraction, else assume already divisor)
+SLASH_DIV=$(echo $STAKING_CONFIG_CONTENT | jq -r '((.slashingConfig.slashFraction // 0) | tonumber) as $sf | if $sf <= 0 then 1 elif $sf <= 1 then ((1/$sf) | floor) else ($sf | floor) end')
+
+DUE_TIME=$(echo $STAKING_CONFIG_CONTENT | jq -r '.slashingConfig.dueTime // 86400')
+LEANIANCE_MARGIN=$(echo $STAKING_CONFIG_CONTENT | jq -r '.slashingConfig.leanianceMargin // 300')
+
+echo "Setting staking config (unlock_cost=$UNLOCK_COST, reward_rate_divisor=$REWARD_RATE_DIV, slash_divisor=$SLASH_DIV, due_time=$DUE_TIME, leaniance_margin=$LEANIANCE_MARGIN)"
+starkli invoke --rpc $RPC_URL --network mainnet --keystore-password "$STARKNET_KEYSTORE_PASSWORD" --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_CONTRACT_ADDRESS setup_staking_config $UNLOCK_COST $REWARD_RATE_DIV $SLASH_DIV $DUE_TIME $LEANIANCE_MARGIN
+
 echo "Completed setting up POW! contracts!"

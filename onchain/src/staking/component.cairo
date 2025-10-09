@@ -164,12 +164,13 @@ pub mod StakingComponent {
                 self.user_stakes.write(user, user_stake - slashed_amount);
                 self.emit(Slashed { user: user, amount: slashed_amount });
             } else {
-                // Reward logic
-                let reward: u128 = total_stake
-                    * (time_since_last_validation.into())
-                    / config.reward_rate;
-                self.user_rewards.write(user, user_rewards + reward);
-                self.emit(Reward { user: user, amount: reward });
+                // Reward logic: accrue in discrete hourly steps
+                let hours_since: u64 = time_since_last_validation / 3600;
+                if hours_since > 0 {
+                    let reward: u128 = total_stake * (hours_since.into()) / config.reward_rate;
+                    self.user_rewards.write(user, user_rewards + reward);
+                    self.emit(Reward { user: user, amount: reward });
+                }
             }
         }
 

@@ -74,12 +74,20 @@ cd $ONCHAIN_DIR && scarb build
 
 # Declaring the contract
 # Declare if POW_GAME_CLASS_HASH is not set
+# Compute class hash from Sierra file (avoids fragile parsing of declare output)
+POW_GAME_CLASS_HASH_COMPUTED=$(starkli class-hash "$POW_GAME_SIERRA_FILE")
+
 if [ -z "$POW_GAME_CLASS_HASH" ]; then
   echo "Declaring the contract..."
   echo "starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE"
-  POW_GAME_DECLARE_OUTPUT=$(starkli declare --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $POW_GAME_SIERRA_FILE 2>&1)
-  POW_GAME_CONTRACT_CLASSHASH=$(echo $POW_GAME_DECLARE_OUTPUT | tail -n 1 | awk '{print $NF}')
-  echo "Contract class hash: $POW_GAME_CONTRACT_CLASSHASH"
+  starkli declare --network sepolia --keystore "$STARKNET_KEYSTORE" --account "$STARKNET_ACCOUNT" --watch "$POW_GAME_SIERRA_FILE"
+  DECLARE_EXIT=$?
+  if [ $DECLARE_EXIT -ne 0 ]; then
+    echo "Declare failed. Aborting before deploy."
+    exit 1
+  fi
+  POW_GAME_CONTRACT_CLASSHASH=$POW_GAME_CLASS_HASH_COMPUTED
+  echo "Using class hash: $POW_GAME_CONTRACT_CLASSHASH"
 else
   echo "Using existing contract class hash: $POW_GAME_CLASS_HASH"
   POW_GAME_CONTRACT_CLASSHASH=$POW_GAME_CLASS_HASH

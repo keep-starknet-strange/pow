@@ -91,8 +91,9 @@ type PowContractContextType = {
   // Staking (best-effort)
   getStakingConfig: () => Promise<
     | {
+        unlock_cost: number;
         reward_rate: number;
-        slashing_config: { slash_fraction: number; due_time: number };
+        slashing_config: { slash_fraction: number; due_time: number; leaniance_margin?: number };
       }
     | undefined
   >;
@@ -262,8 +263,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
   // ---- Staking (best-effort; guarded if ABI not present) ----
   const getStakingConfig = useCallback(async (): Promise<
     | {
+        unlock_cost: number;
         reward_rate: number;
-        slashing_config: { slash_fraction: number; due_time: number };
+        slashing_config: { slash_fraction: number; due_time: number; leaniance_margin?: number };
       }
     | undefined
   > => {
@@ -272,6 +274,9 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       const cfg: any = await (powContract as any)?.get_staking_config?.();
       if (!cfg) return undefined;
       const rr = Number(cfg.reward_rate?.toString?.() ?? cfg.reward_rate ?? 0);
+      const uc = Number(
+        cfg.unlock_cost?.toString?.() ?? cfg.unlock_cost ?? 0,
+      );
       const sf = Number(
         cfg.slashing_config?.slash_fraction?.toString?.() ??
           cfg.slashing_config?.slash_fraction ??
@@ -282,9 +287,15 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
           cfg.slashing_config?.due_time ??
           0,
       );
+      const lm = Number(
+        cfg.slashing_config?.leaniance_margin?.toString?.() ??
+          cfg.slashing_config?.leaniance_margin ??
+          0,
+      );
       return {
+        unlock_cost: uc,
         reward_rate: rr,
-        slashing_config: { slash_fraction: sf, due_time: dt },
+        slashing_config: { slash_fraction: sf, due_time: dt, leaniance_margin: lm },
       };
     } catch (_e) {
       return undefined;

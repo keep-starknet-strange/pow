@@ -225,15 +225,6 @@ export const StakingPage: React.FC = () => {
           />
         </View>
       </View>
-
-      {!isUnlocked && (
-        <View style={styles.overlay} pointerEvents="box-none">
-          <View style={styles.overlayBackdrop} />
-          <View style={styles.overlayContent}>
-            <StakingUnlock alwaysShow hidden={false} />
-          </View>
-        </View>
-      )}
     </SafeAreaView>
   );
 };

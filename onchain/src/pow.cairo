@@ -625,6 +625,17 @@ mod PowGame {
             debit_user(ref self, caller, cost);
             do_prestige(ref self);
         }
+
+        fn buy_staking(ref self: ContractState) {
+            // Charge unlock_cost from staking config and unlock for caller
+            let cfg = self.staking.get_staking_config();
+            let caller = get_caller_address();
+            let cost = cfg.unlock_cost;
+            if cost > 0 {
+                debit_user(ref self, caller, cost);
+            }
+            self.staking.unlock_staking(caller);
+        }
     }
 
     // Private functions
