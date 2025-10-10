@@ -71,6 +71,7 @@ const RevertModalComponent: React.FC = () => {
       isLoading={!canDismiss}
       primaryLabel={canDismiss ? "Okay" : undefined}
       onPrimaryPress={canDismiss ? () => setShouldShow(false) : undefined}
+      closeButtonVisible={false}
     />
   );
 };

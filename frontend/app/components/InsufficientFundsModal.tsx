@@ -67,6 +67,7 @@ export const InsufficientFundsModal: React.FC<Props> = ({
       renderAvatar={<BankAvatar />}
       isLoading={false}
       primaryLabel="Back"
+      closeButtonVisible={false}
       onPrimaryPress={onBack}
     />
   );

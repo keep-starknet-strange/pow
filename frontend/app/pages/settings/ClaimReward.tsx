@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
+  Linking,
   SafeAreaView,
   ScrollView,
-  Platform,
-  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";

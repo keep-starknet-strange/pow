@@ -1,5 +1,13 @@
 import React, { memo, useMemo, useState } from "react";
-import { Modal, View, Text, Image, Pressable, StyleSheet } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import Animated, {
   FadeInDown,
   FadeOutDown,
@@ -17,6 +25,7 @@ import {
   getNounsHead,
   getNounsAccessories,
 } from "../configs/nouns";
+import { Ionicons } from "@expo/vector-icons";
 
 type StatusModalProps = {
   visible: boolean;
@@ -29,6 +38,7 @@ type StatusModalProps = {
   onPrimaryPress?: () => void;
   secondaryLabel?: string;
   onSecondaryPress?: () => void;
+  closeButtonVisible: boolean;
   onRequestClose?: () => void;
 };
 
@@ -110,6 +120,7 @@ export const StatusModal: React.FC<StatusModalProps> = memo(
     onPrimaryPress,
     secondaryLabel,
     onSecondaryPress,
+    closeButtonVisible,
     onRequestClose,
   }) => {
     if (!visible) return null;
@@ -130,6 +141,15 @@ export const StatusModal: React.FC<StatusModalProps> = memo(
             exiting={FadeOutDown.duration(300)}
           >
             <Window style={styles.windowSize}>
+              {closeButtonVisible && (
+                <TouchableOpacity
+                  style={styles.closeIcon}
+                  onPress={onRequestClose}
+                >
+                  <Ionicons name="close-sharp" size={20} color="white" />
+                </TouchableOpacity>
+              )}
+
               <View style={styles.contentCenter}>
                 <Text style={styles.titleText}>{title}</Text>
 
@@ -186,6 +206,13 @@ const styles = StyleSheet.create({
   },
   contentCenter: {
     alignItems: "center",
+  },
+  closeIcon: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    marginTop: 18,
+    marginLeft: 16,
   },
   titleText: {
     fontFamily: "Teatime",
