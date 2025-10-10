@@ -8,4 +8,5 @@ pub trait IPowStore<TContractState> {
     fn buy_dapps(ref self: TContractState, chain_id: u32);
     fn buy_next_chain(ref self: TContractState);
     fn buy_prestige(ref self: TContractState);
+    fn buy_staking(ref self: TContractState);
 }

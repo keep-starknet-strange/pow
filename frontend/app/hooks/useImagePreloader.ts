@@ -177,6 +177,7 @@ const imagePaths = {
   // Staking
   stakingBg: require(`${assetsPath}/staking/staking_bg.webp`),
   stakingButtonBg: require(`${assetsPath}/staking/button.webp`),
+  stakingButtonSmall: require(`${assetsPath}/staking/button_small.png`),
   stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.webp`),
 
   // Navigation Images
@@ -567,6 +568,7 @@ export const useImagePreloader = () => {
     // Staking
     stakingBg: useImage(imagePaths.stakingBg),
     stakingButtonBg: useImage(imagePaths.stakingButtonBg),
+    stakingButtonSmall: useImage(imagePaths.stakingButtonSmall),
     stakingAmountsBg: useImage(imagePaths.stakingAmountsBg),
 
     txBackground: useImage(imagePaths.txBackground),
@@ -838,6 +840,7 @@ export const useImagePreloader = () => {
         "shop.upgrades.mevBoost": images.shopMevBoost,
         "shop.upgrades.recursiveProving": images.shopRecursiveProof,
         "staking.button.bg": images.stakingButtonBg,
+        "staking.button.small": images.stakingButtonSmall,
         "staking.amounts.bg": images.stakingAmountsBg,
         "achievements.bg": images.achievmentsBg,
         "achievements.tile.locked": images.achievementsTileLocked,
