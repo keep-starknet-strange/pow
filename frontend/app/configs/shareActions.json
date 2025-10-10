@@ -4,7 +4,7 @@
     "title": "Congrats!",
     "message": "You just claimed 10 STRK!",
     "share": {
-      "x": "I just claimed 10 STRK!",
+      "x": "I just claimed 10 STRK after playing POW!",
       "other": "I just claimed 10 STRK on https://www.pow-game.com/"
     }
   },
@@ -13,7 +13,7 @@
     "title": "Congrats!",
     "message": "You just reached Prestige {}!",
     "share": {
-      "x": "I just reached Prestige {}!",
+      "x": "I just reached Prestige {} in POW!",
       "other": "I just reached Prestige {} on https://www.pow-game.com/"
     }
   },
@@ -22,7 +22,7 @@
     "title": "Congrats!",
     "message": "You just reached MAX Prestige!",
     "share": {
-      "x": "I just reached MAX Prestige!",
+      "x": "I just reached MAX Prestige and completed POW!",
       "other": "I just reached MAX Prestige on https://www.pow-game.com/"
     }
   }
