@@ -337,8 +337,6 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
     musicController.volume = volume;
 
-    // If device is in silent mode, don't start playback
-    // Music/sound will only play if user explicitly turns them on
     if (musicOn && !isDeviceSilent) {
       musicController.play();
     }
@@ -584,7 +582,6 @@ export const MusicComponent = memo(() => {
   const silentStatus = useSilentSwitch(1); // Check every 1 second
   const { mode } = useRingerMode();
 
-  // Initialize sound on mount (only once)
   useEffect(() => {
     if (isInitialized) {
       return;
@@ -594,7 +591,6 @@ export const MusicComponent = memo(() => {
       let isDeviceSilent;
 
       if (Platform.OS === "ios") {
-        // Wait for silent status to be available
         if (silentStatus === undefined) {
           return;
         }
@@ -606,20 +602,18 @@ export const MusicComponent = memo(() => {
       await initializeSound(isDeviceSilent);
     };
 
-    // Only initialize once we have the silent status (iOS) or immediately (Android)
     if (Platform.OS === "android" || silentStatus !== undefined) {
       void checkInitialSilentMode();
     }
   }, [silentStatus, isInitialized, initializeSound]);
 
-  // Cleanup only on unmount
   useEffect(() => {
     return () => {
       cleanupSound();
     };
   }, [cleanupSound]);
 
-  // Monitor silent mode changes (only after initialization)
+  // Monitor silent mode changes
   useEffect(() => {
     if (!isInitialized) return;
 
