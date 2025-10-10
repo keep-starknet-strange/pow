@@ -62,6 +62,10 @@ const config: ExpoConfig = {
         url: "https://sentry.io/",
         project: "pow",
         organization: "starkware-industries",
+        experimental_android: {
+          uploadNativeSymbols: true,
+          includeNativeSources: true,
+        },
       },
     ],
     "expo-web-browser",
