@@ -43,10 +43,11 @@ export class AchievementObserver implements Observer {
 
     relevantAchievements.forEach((achievement) => {
       // Check current completion status from store instead of cached set
-      const currentProgress =
-        useAchievementsStore.getState().achievementsProgress[achievement.id] ||
-        0;
-      if (currentProgress >= 100) return; // Skip completed achievements
+      const state = useAchievementsStore.getState();
+      const currentProgress = state.achievementsProgress[achievement.id] || 0;
+      const unlockedAt = state.achievementsUnlockedAt[achievement.id] || 0;
+      // Skip only if both progress is 100 AND unlockedAt is set
+      if (currentProgress >= 100 && unlockedAt > 0) return;
 
       switch (eventName) {
         case "TxAdded":
