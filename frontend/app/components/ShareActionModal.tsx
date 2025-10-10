@@ -9,7 +9,7 @@ import {
 } from "@/app/configs/nouns";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
 
-const GENERIC_SHARE_SHEET_ENABLED = false;
+const GENERIC_SHARE_SHEET_ENABLED = true;
 
 export const ShareActionModal = () => {
   const { user } = useFocEngine();
