@@ -73,6 +73,7 @@ const config: ExpoConfig = {
       "react-native-audio-api",
       {
         iosBackgroundMode: false,
+        iosMicrophonePermission: "We will never request microphone permission.",
         androidPermissions: [],
         androidForegroundService: false,
       },
