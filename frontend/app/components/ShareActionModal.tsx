@@ -31,10 +31,6 @@ export const ShareActionModal = () => {
     }
   }, [visibleShareAction, user]);
 
-  useEffect(() => {
-    console.log("ShareActionModal", visibleShareAction);
-  }, [visibleShareAction]);
-
   return (
     <StatusModal
       visible={visibleShareAction !== null}
