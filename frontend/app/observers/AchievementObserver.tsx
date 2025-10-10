@@ -9,6 +9,7 @@ import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
 import prestigeJson from "../configs/prestige.json";
 import { Transaction, Block } from "../types/Chains";
+import { useShareActionStore } from "@/app/stores/useShareActionStore";
 
 type Achievement = (typeof achievements)[number];
 
@@ -277,12 +278,21 @@ export class AchievementObserver implements Observer {
       const maxPrestigeLevel = prestigeConfigJson.length - 1;
       const progress = Math.min((prestigeLevel / maxPrestigeLevel) * 100, 100);
       this.updateAchievement(achievement.id, progress);
+
+      // Share action should be invoked with a delay due to how the game resets.
+      new Promise((resolve) => setTimeout(resolve, 200)).then(() => {
+        const { setVisibleShareAction } = useShareActionStore.getState();
+        setVisibleShareAction(progress >= 100 ? 2 : 1, data);
+      });
     }
   }
 
   private handleRewardClaimed(achievement: Achievement, data: any) {
     if (achievement.name === "STRK Reward Claimed") {
       this.updateAchievement(achievement.id, 100);
+
+      const { setVisibleShareAction } = useShareActionStore.getState();
+      setVisibleShareAction(0);
     }
   }
 }

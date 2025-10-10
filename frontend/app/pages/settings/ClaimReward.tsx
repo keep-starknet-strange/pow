@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
+  Linking,
   SafeAreaView,
   ScrollView,
-  Platform,
-  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
@@ -27,7 +26,6 @@ import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
 import { WalletPresets } from "@/constants/WalletPresets";
-import { useShareActionStore } from "@/app/stores/useShareActionStore";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -105,9 +103,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
         // Notify achievement system that STRK reward was claimed
         notify("RewardClaimed", { recipient, transactionHash: hash });
-
-        const { setVisibleShareAction } = useShareActionStore.getState();
-        setVisibleShareAction(0);
       } else {
         throw new Error("Transaction completed but no hash returned");
       }

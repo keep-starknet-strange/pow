@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { useEventManager } from "@/app/stores/useEventManager";
-import { useShareActionStore } from "@/app/stores/useShareActionStore";
 import { useBalanceStore } from "./useBalanceStore";
 import upgradesJson from "../configs/upgrades.json";
 import automationsJson from "../configs/automations.json";
@@ -502,12 +501,6 @@ export const useUpgradesStore = create<UpgradesState>((set, get) => ({
     });
 
     console.log(`Prestige complete! New prestige level: ${nextPrestige}`);
-
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    const { setVisibleShareAction } = useShareActionStore.getState();
-    setVisibleShareAction(maxPrestigeProgress >= 100 ? 2 : 1, {
-      prestigeLevel: nextPrestige,
-    });
   },
 
   // Can unlock if the previous upgrade level is at least 0
