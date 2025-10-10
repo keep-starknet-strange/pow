@@ -11,7 +11,8 @@ import {
   AudioManager,
   GainNode,
 } from "react-native-audio-api";
-import { AppState, NativeEventSubscription } from "react-native";
+import { AppState, NativeEventSubscription, Platform } from "react-native";
+import { useSilentSwitch, useRingerMode } from "react-native-volume-manager";
 
 const SOUND_ENABLED_KEY = "sound_enabled";
 const SOUND_VOLUME_KEY = "sound_volume";
@@ -167,8 +168,6 @@ class MusicController {
     this.requestedStatus = "play";
     if (AppState.currentState == "active") {
       this.runPlay(delayMs);
-    } else {
-      console.log("Play requested but app not active");
     }
   }
 
@@ -271,6 +270,7 @@ interface SoundState {
   lastPlayedTracks: SongName[];
   currentTrack: SongName | null;
   isInitialized: boolean;
+  isDeviceSilent: boolean;
 
   toggleSound: () => void;
   toggleMusic: () => Promise<void>;
@@ -278,11 +278,12 @@ interface SoundState {
   setSoundEffectVolume: (volume: number) => void;
   setMusicVolume: (volume: number) => void;
   playSoundEffect: (soundType: string, pitchShift?: number) => Promise<void>;
-  initializeSound: () => Promise<void>;
+  initializeSound: (isDeviceSilent?: boolean) => Promise<void>;
   cleanupSound: () => void;
   selectNextTrack: () => void;
   startRevertMusic: () => void;
   stopRevertMusic: () => void;
+  setDeviceSilent: (isSilent: boolean) => void;
 }
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -296,12 +297,13 @@ export const useSoundStore = create<SoundState>((set, get) => ({
   isInitialized: false,
   currentTrack: null,
   lastPlayedTracks: [],
+  isDeviceSilent: false,
 
-  initializeSound: async () => {
+  initializeSound: async (isDeviceSilent = false) => {
     AudioManager.setAudioSessionOptions({
       iosCategory: "playback",
       iosMode: "default",
-      iosOptions: ["duckOthers"],
+      iosOptions: ["mixWithOthers"],
     });
     const { musicController, soundController, selectNextTrack } = get();
     const soundEnabled = await AsyncStorage.getItem(SOUND_ENABLED_KEY);
@@ -331,20 +333,23 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     });
     await musicController.changeSong(selectedTrack);
     const musicOn = musicEnabled === "true" || musicEnabled === null;
+    const soundOn = soundEnabled === "true" || soundEnabled === null;
     const volume = musicVolume ? parseFloat(musicVolume) : 0.5;
     musicController.volume = volume;
-    if (musicOn) {
+
+    if (musicOn && !isDeviceSilent) {
       musicController.play();
     }
 
     set({
       isInitialized: true,
-      isSoundOn: soundEnabled === "true" || soundEnabled === null,
-      isMusicOn: musicOn,
+      isSoundOn: isDeviceSilent ? false : soundOn,
+      isMusicOn: isDeviceSilent ? false : musicOn,
       isHapticsOn: hapticsEnabled === "true" || hapticsEnabled === null,
       soundEffectVolume: soundVolume ? parseFloat(soundVolume) : 1,
       musicVolume: volume,
       currentTrack: selectedTrack,
+      isDeviceSilent,
     });
   },
 
@@ -487,6 +492,18 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     musicController.stopRevertMusic();
   },
+
+  setDeviceSilent: (isSilent: boolean) => {
+    const { musicController, isMusicOn } = get();
+
+    set({ isDeviceSilent: isSilent });
+
+    // If device enters silent mode, stop music playback
+    if (isSilent && isMusicOn) {
+      musicController.pause();
+      set({ isMusicOn: false, isSoundOn: false });
+    }
+  },
 }));
 
 const playHaptic = async (type: string) => {
@@ -560,15 +577,57 @@ export const useSound = () => {
 };
 
 export const MusicComponent = memo(() => {
-  const { initializeSound, cleanupSound } = useSoundStore();
+  const { initializeSound, cleanupSound, setDeviceSilent, isInitialized } =
+    useSoundStore();
+  const silentStatus = useSilentSwitch(1); // Check every 1 second
+  const { mode } = useRingerMode();
 
   useEffect(() => {
-    initializeSound();
+    if (isInitialized) {
+      return;
+    }
 
+    const checkInitialSilentMode = async () => {
+      let isDeviceSilent;
+
+      if (Platform.OS === "ios") {
+        if (silentStatus === undefined) {
+          return;
+        }
+        isDeviceSilent = silentStatus.isMuted;
+      } else {
+        isDeviceSilent = mode !== 2;
+      }
+
+      await initializeSound(isDeviceSilent);
+    };
+
+    if (Platform.OS === "android" || silentStatus !== undefined) {
+      void checkInitialSilentMode();
+    }
+  }, [silentStatus, isInitialized, initializeSound]);
+
+  useEffect(() => {
     return () => {
       cleanupSound();
     };
-  }, []);
+  }, [cleanupSound]);
+
+  // Monitor silent mode changes
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    let isSilent;
+
+    if (Platform.OS === "ios") {
+      if (silentStatus === undefined) return;
+      isSilent = silentStatus.isMuted;
+    } else {
+      isSilent = mode !== 2;
+    }
+
+    setDeviceSilent(isSilent);
+  }, [silentStatus, mode, setDeviceSilent, isInitialized]);
 
   return null;
 });
