@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
+import * as Sentry from "@sentry/react-native";
 import * as Crypto from "expo-crypto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
@@ -633,13 +634,29 @@ export const StarknetConnectorProvider: React.FC<{
             console.log(`✅ Transaction ${txHash} confirmed on-chain`);
           return true;
         } else {
-          if (__DEV__)
-            console.error(`❌ Transaction ${txHash} failed:`, receipt);
+          Sentry.addBreadcrumb({
+            category: "pow.tx",
+            level: "warning",
+            message: "waitForTransaction non-success status",
+            data: { txHash, executionStatus, status },
+          });
+          Sentry.captureMessage("tx_failed_or_timeout", {
+            level: "warning",
+            tags: {
+              execution_status: String(executionStatus),
+              status: String(status),
+            },
+          });
           return false;
         }
       } catch (error) {
-        if (__DEV__)
-          console.error(`❌ Error waiting for transaction ${txHash}:`, error);
+        Sentry.addBreadcrumb({
+          category: "pow.tx",
+          level: "error",
+          message: "waitForTransaction threw",
+          data: { txHash },
+        });
+        Sentry.captureException(error);
         return false;
       }
     },
@@ -838,26 +855,40 @@ export const StarknetConnectorProvider: React.FC<{
           })
             .then((response) => response.json())
             .catch((error) => {
-              if (__DEV__) console.error("Error sending gasless tx:", error);
+              Sentry.addBreadcrumb({
+                category: "pow.paymaster",
+                level: "error",
+                message: "backend send-gasless-tx fetch failed",
+              });
+              Sentry.captureException(error);
               throw error;
             });
 
           if (sendGaslessTxRes.error) {
-            if (__DEV__)
-              console.error("Error from send-gasless-tx:", sendGaslessTxRes);
+            Sentry.addBreadcrumb({
+              category: "pow.paymaster",
+              level: "error",
+              message: "backend send-gasless-tx error",
+            });
+            Sentry.captureMessage("paymaster_backend_error", {
+              level: "error",
+              tags: { provider: "backend" },
+            });
             throw new Error(sendGaslessTxRes.error);
           }
 
           if (sendGaslessTxRes.data?.revertError) {
-            if (__DEV__)
-              console.log(
-                "⚠️ Revert error from paymaster: ",
-                sendGaslessTxRes.data.revertError,
-              );
-            // Don't throw here, let the retry logic handle validation
-            throw new Error(
-              `Revert error: ${sendGaslessTxRes.data.revertError}`,
-            );
+            Sentry.addBreadcrumb({
+              category: "pow.paymaster",
+              level: "warning",
+              message: "backend revertError",
+              data: { reason: String(sendGaslessTxRes.data.revertError) },
+            });
+            Sentry.captureMessage("paymaster_revert", {
+              level: "warning",
+              tags: { provider: "backend" },
+            });
+            throw new Error(`Revert error: ${sendGaslessTxRes.data.revertError}`);
           }
 
           if (__DEV__)
@@ -875,8 +906,12 @@ export const StarknetConnectorProvider: React.FC<{
             { deploymentData },
             options,
           ).catch((error) => {
-            if (__DEV__)
-              console.error("Error executing calls with paymaster:", error);
+            Sentry.addBreadcrumb({
+              category: "pow.paymaster",
+              level: "error",
+              message: "avnu executeCalls threw",
+            });
+            Sentry.captureException(error);
             throw error;
           });
           if (__DEV__)

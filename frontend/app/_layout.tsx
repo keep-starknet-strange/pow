@@ -54,9 +54,21 @@ if (!__DEV__) {
         event.contexts = filteredContexts;
       }
 
-      // Clear breadcrumbs that might contain user actions
+      // Keep only sanitized breadcrumbs for debugging
       if (event.breadcrumbs) {
-        event.breadcrumbs = [];
+        event.breadcrumbs = event.breadcrumbs
+          .filter((b) => {
+            const category = (b.category || "").toString();
+            return (
+              category.startsWith("pow.") ||
+              category === "error" ||
+              category === "http"
+            );
+          })
+          .map((b) => ({
+            ...b,
+            data: undefined,
+          }));
       }
 
       return event;

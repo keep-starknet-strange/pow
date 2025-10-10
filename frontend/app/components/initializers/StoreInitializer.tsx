@@ -17,10 +17,12 @@ import { useAnimationsStore } from "@/app/stores/useAnimationsStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 import { useTransactionPauseStore } from "@/app/stores/useTransactionPauseStore";
+import * as Sentry from "@sentry/react-native";
 
 const OnchainActionsInitializer = memo(() => {
   const { invokeCalls, waitForTransaction } = useStarknetConnector();
   const { onInvokeActions, onWaitForTransaction } = useOnchainActions();
+  const { network } = useStarknetConnector();
 
   useEffect(() => {
     onInvokeActions(invokeCalls);
@@ -29,6 +31,16 @@ const OnchainActionsInitializer = memo(() => {
   useEffect(() => {
     onWaitForTransaction(waitForTransaction);
   }, [waitForTransaction, onWaitForTransaction]);
+
+  useEffect(() => {
+    if (network) {
+      Sentry.setTag("starknet_network", network);
+      Sentry.setTag(
+        "paymaster_provider",
+        process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY ? "avnu" : "backend",
+      );
+    }
+  }, [network]);
 
   return null;
 });

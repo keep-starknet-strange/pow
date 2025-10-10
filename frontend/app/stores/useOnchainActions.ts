@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import * as Sentry from "@sentry/react-native";
 import { Call } from "starknet";
 import { useEventManager } from "./useEventManager";
 
@@ -225,6 +226,26 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
+      try {
+        const entrypoints = currentItem.actions.map((a) => a.entrypoint);
+        const contractAddresses = currentItem.actions.map(
+          (a) => a.contractAddress,
+        );
+        Sentry.addBreadcrumb({
+          category: "pow.actions",
+          level: "error",
+          message: "invokeActions failed",
+          data: {
+            id: currentItem.id,
+            retry: currentItem.retryCount + 1,
+            actions: currentItem.actions.length,
+            entrypoints,
+            contractAddresses,
+          },
+        });
+        Sentry.captureException(error);
+      } catch {}
+
       if (__DEV__) {
         console.log(
           `❌ ActionsCall ${currentItem.id} failed (attempt ${currentItem.retryCount + 1}/${MAX_RETRIES}):`,
@@ -256,7 +277,15 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
             `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items). Last error: ${errorMessage}`,
           );
         }
-
+        try {
+          Sentry.addBreadcrumb({
+            category: "pow.actions",
+            level: "error",
+            message: "ActionsReverted",
+            data: { id: currentItem.id, lastError: errorMessage },
+          });
+          Sentry.captureMessage("actions_reverted", { level: "error" });
+        } catch {}
         get().revert(currentItem.id, errorMessage);
         return; // Don't continue processing
       }
