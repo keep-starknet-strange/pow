@@ -33,6 +33,7 @@ export const StakingPage: React.FC = () => {
   const isUnlocked = useStakingStore((s) => s.isUnlocked);
   const { tryBuy, updateBalance, balance } = useBalanceStore();
   const [stakeAmount, setStakeAmount] = useState<number>(0);
+  const [tutorialEnabled, setTutorialEnabled] = useState<boolean>(false);
   // const { getImage } = useImages();
   const balancePercentages = BALANCE_PERCENTAGE;
   interface GetPercentOfParams {
@@ -50,6 +51,14 @@ export const StakingPage: React.FC = () => {
     const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), SECOND);
     return () => clearInterval(id);
   }, [isUnlocked, amountStaked]);
+
+  // Enable tutorial after a delay to ensure proper layout measurement
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTutorialEnabled(true);
+    }, 500); // 500ms delay
+    return () => clearTimeout(timer);
+  }, []);
 
   // countdown until next validation
   const { days, hours, minutes, seconds } = useMemo(() => {
@@ -95,11 +104,6 @@ export const StakingPage: React.FC = () => {
       setStakeAmount(0); // clear input after successful stake
     }
   }, [stakeAmount, tryBuy, stakeTokens]);
-
-  const onPressBoostApr = useCallback(() => {
-    // Spend rewards to boost APR (handled in store)
-    if (rewards > 0) boostApr();
-  }, [rewards, boostApr]);
 
   const onPressFillStake = useCallback(
     (percent: number) => () => {
@@ -167,9 +171,9 @@ export const StakingPage: React.FC = () => {
             </View>
           </View>
           
-          <View className="absolute top-0 left-2 right-2 bottom-0">
-            <TutorialRefView targetId="stakeYourBitcoinSection" enabled={true} />
-          </View>
+           <View style={styles.tutorialOverlay}>
+             <TutorialRefView targetId="stakeYourBitcoinSection" enabled={tutorialEnabled} />
+           </View>
         </View>
 
         {/** === Claim your Bitcoin === */}
@@ -234,9 +238,9 @@ export const StakingPage: React.FC = () => {
             />
           </View>
           
-          <View className="absolute top-0 left-2 right-2 bottom-0">
-            <TutorialRefView targetId="validateYourClaimSection" enabled={true} />
-          </View>
+           <View style={styles.tutorialOverlay}>
+             <TutorialRefView targetId="validateYourClaimSection" enabled={tutorialEnabled} />
+           </View>
         </View>
       </View>
     </SafeAreaView>
@@ -314,5 +318,12 @@ const styles = StyleSheet.create({
     fontFamily: "Pixels",
     fontSize: 36,
     color: "#fff7ff",
+  },
+  tutorialOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 8, // left-2 = 8px
+    right: 8, // right-2 = 8px
+    bottom: 0,
   },
 });
