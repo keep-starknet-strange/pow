@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
-import { useImages } from "@/app/hooks/useImages";
 import { getTxIconName, getShopIconBackground } from "../../utils/transactions";
 import { IconWithLock } from "./transactionUpgrade/IconWithLock";
 import { TxDetails } from "./transactionUpgrade/TxDetails";

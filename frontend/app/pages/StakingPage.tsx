@@ -2,14 +2,13 @@ import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useStakingStore } from "../stores/useStakingStore";
 import { useBalanceStore } from "../stores/useBalanceStore";
-import { Dimensions } from "react-native";
 import { BackGround } from "../components/staking/BackGround";
 import { PageHeader } from "../components/staking/PageHeader";
 import { SectionTitle } from "../components/staking/SectionTitle";
 import { StatsDisplay } from "../components/staking/StatsDisplay";
 import { StakingAction } from "../components/staking/StakingAction";
 import { Window } from "../components/tutorial/Window";
-import { StakingUnlock } from "../components/staking/StakingUnlock";
+import { TutorialRefView } from "../components/tutorial/TutorialRefView";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { shortMoneyString, showThreeDigitsMax } from "../utils/helpers";
 // import { Canvas, Image, FilterMode, MipmapMode } from "@shopify/react-native-skia";
@@ -130,38 +129,46 @@ export const StakingPage: React.FC = () => {
         ]}
       >
         {/** === Stake your Bitcoin === */}
-        <SectionTitle title="Stake your Bitcoin" width={width} />
-
-        <View style={styles.section}>
-          <View style={styles.card}>
-            {/* amount display + STAKE */}
-            <View style={styles.rowCenter}>
-              <StatsDisplay
-                label="Amount"
-                value={`${shortMoneyString(stakeAmount)} BTC`}
-              />
-              <StakingAction
-                action={onPressStake}
-                label="STAKE"
-                disabled={stakeAmount <= 0}
-              />
-            </View>
+        <View style={[styles.relativePad, { position: 'relative' }]}>
+          <View>
+            <SectionTitle title="Stake your Bitcoin" width={width} />
           </View>
 
-          {/* quick select row */}
-          <View style={styles.relativePad}>
-            <View style={styles.percRow}>
-              {balancePercentages.map((percent, i) => (
-                <StakingAction
-                  key={i}
-                  action={onPressFillStake(percent)}
-                  label={`${percent}%`}
-                  labelSize={28}
-                  style={styles.pctButton}
-                  backgroundKey="staking.button.small"
+          <View style={styles.section}>
+            <View style={styles.card}>
+              {/* amount display + STAKE */}
+              <View style={styles.rowCenter}>
+                <StatsDisplay
+                  label="Amount"
+                  value={`${shortMoneyString(stakeAmount)} BTC`}
                 />
-              ))}
+                <StakingAction
+                  action={onPressStake}
+                  label="STAKE"
+                  disabled={stakeAmount <= 0}
+                />
+              </View>
             </View>
+
+            {/* quick select row */}
+            <View style={styles.relativePad}>
+              <View style={styles.percRow}>
+                {balancePercentages.map((percent, i) => (
+                  <StakingAction
+                    key={i}
+                    action={onPressFillStake(percent)}
+                    label={`${percent}%`}
+                    labelSize={28}
+                    style={styles.pctButton}
+                    backgroundKey="staking.button.small"
+                  />
+                ))}
+              </View>
+            </View>
+          </View>
+          
+          <View className="absolute top-0 left-2 right-2 bottom-0">
+            <TutorialRefView targetId="stakeYourBitcoinSection" enabled={true} />
           </View>
         </View>
 
@@ -203,26 +210,33 @@ export const StakingPage: React.FC = () => {
         </View>
 
         {/** === Validate your claim === */}
-
-        <View style={styles.section}>
-          <SectionTitle title="Validate your claim" width={width} />
-
-          <View style={styles.card}>
-            <Window style={{ width: "98%", alignSelf: "center" }}>
-              <Text style={styles.countdownText}>{countdownDisplay}</Text>
-            </Window>
+        <View style={[styles.relativePad, { position: 'relative' }]}>
+          <View>
+            <SectionTitle title="Validate your claim" width={width} />
           </View>
-          <StakingAction
-            action={validateStake}
-            label="VALIDATE"
-            disabled={!canValidate}
-            expand={false}
-            style={{
-              marginTop: 8,
-              alignSelf: "center",
-              paddingHorizontal: 100,
-            }}
-          />
+
+          <View style={styles.section}>
+            <View style={styles.card}>
+              <Window style={{ width: "98%", alignSelf: "center" }}>
+                <Text style={styles.countdownText}>{countdownDisplay}</Text>
+              </Window>
+            </View>
+            <StakingAction
+              action={validateStake}
+              label="VALIDATE"
+              disabled={!canValidate}
+              expand={false}
+              style={{
+                marginTop: 8,
+                alignSelf: "center",
+                paddingHorizontal: 100,
+              }}
+            />
+          </View>
+          
+          <View className="absolute top-0 left-2 right-2 bottom-0">
+            <TutorialRefView targetId="validateYourClaimSection" enabled={true} />
+          </View>
         </View>
       </View>
     </SafeAreaView>

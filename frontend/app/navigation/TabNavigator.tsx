@@ -218,6 +218,7 @@ const StakingTabButton = memo(
   }) => {
     const { shouldAnimate, shouldUseReducedMotion } = useAnimationConfig();
     const scale = useSharedValue(1);
+    const isStakingTabActive = useIsTutorialTargetActive("stakingTab" as TargetId);
 
     useEffect(() => {
       if (!shouldAnimate) return;
@@ -250,9 +251,16 @@ const StakingTabButton = memo(
     }));
 
     return (
-      <Animated.View style={animatedStyle}>
-        <TabBarButton tabName="Staking" isActive={isActive} onPress={onPress} />
-      </Animated.View>
+      <View style={styles.relative}>
+        <TutorialRefView targetId="stakingTab" enabled={true} />
+        <Animated.View style={animatedStyle}>
+          <TabBarButton 
+            tabName="Staking" 
+            isActive={isActive || isStakingTabActive} 
+            onPress={onPress} 
+          />
+        </Animated.View>
+      </View>
     );
   },
 );
@@ -371,6 +379,9 @@ export const TabNavigator = memo(() => {
                 onBounced={() => setShouldBounceStaking(false)}
               />
             ),
+          }}
+          listeners={{
+            tabPress: () => handleTabPress("Staking"),
           }}
         />
       )}
