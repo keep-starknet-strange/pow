@@ -1,4 +1,4 @@
-import React, { useCallback, memo, useState, useMemo } from "react";
+import React, { useCallback, memo, useState, useMemo, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Pressable, StyleSheet, Text } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
@@ -8,8 +8,10 @@ import { StorePage } from "../pages/StorePage";
 import { LeaderboardPage } from "../pages/LeaderboardPage";
 import { AchievementsPage } from "../pages/AchievementsPage";
 import { SettingsPage } from "../pages/SettingsPage";
+import { StakingPage } from "../pages/StakingPage";
 
 import { useEventManager } from "@/app/stores/useEventManager";
+import type { EventType } from "@/app/stores/useEventManager";
 import { useImages } from "../hooks/useImages";
 import { TutorialRefView } from "../components/tutorial/TutorialRefView";
 import {
@@ -27,6 +29,14 @@ import {
   useAchievementsHasUnseen,
   useAchievementsUnseenCount,
 } from "../stores/useAchievementsStore";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+} from "react-native-reanimated";
+import { useAnimationConfig } from "../hooks/useAnimationConfig";
+import { useStakingStore } from "../stores/useStakingStore";
 
 const Tab = createBottomTabNavigator();
 
@@ -104,6 +114,10 @@ const TabBarButton = memo(
           return isActive
             ? getImage("nav.icon.game.active")
             : getImage("nav.icon.game");
+        case "Staking":
+          return isActive
+            ? getImage("nav.icon.staking.active")
+            : getImage("nav.icon.staking");
         case "Store":
           return isActive
             ? getImage("nav.icon.shop.active")
@@ -190,6 +204,67 @@ const TabBarButton = memo(
   },
 );
 
+const StakingTabButton = memo(
+  ({
+    isActive,
+    onPress,
+    bounceOnMount,
+    onBounced,
+  }: {
+    isActive: boolean;
+    onPress: any;
+    bounceOnMount?: boolean;
+    onBounced?: () => void;
+  }) => {
+    const { shouldAnimate, shouldUseReducedMotion } = useAnimationConfig();
+    const scale = useSharedValue(1);
+    const isStakingTabActive = useIsTutorialTargetActive("stakingTab" as TargetId);
+
+    useEffect(() => {
+      if (!shouldAnimate) return;
+      if (!bounceOnMount) return;
+
+      // Start from a smaller scale and bounce to draw attention
+      scale.value = shouldUseReducedMotion ? 1 : 0.6;
+      scale.value = withSequence(
+        withSpring(1.15, { damping: 6, stiffness: 200 }),
+        withSpring(0.95, { damping: 10, stiffness: 200 }),
+        withSpring(1, { damping: 12, stiffness: 200 }),
+      );
+
+      const t = setTimeout(() => {
+        if (onBounced) {
+          onBounced();
+        }
+      }, 800);
+      return () => clearTimeout(t);
+    }, [
+      bounceOnMount,
+      onBounced,
+      scale,
+      shouldAnimate,
+      shouldUseReducedMotion,
+    ]);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    return (
+      <View style={styles.relative}>
+        <TutorialRefView targetId="stakingTab" enabled={true} />
+        <Animated.View style={animatedStyle}>
+          <TabBarButton 
+            tabName="Staking" 
+            isActive={isActive || isStakingTabActive} 
+            onPress={onPress} 
+          />
+        </Animated.View>
+      </View>
+    );
+  },
+);
+
 const BadgeOverlay = memo(({ count }: { count: number }) => {
   const { getImage } = useImages();
   const display = count > 99 ? "99+" : String(count);
@@ -222,8 +297,26 @@ const BadgeOverlay = memo(({ count }: { count: number }) => {
 });
 
 export const TabNavigator = memo(() => {
-  const { notify } = useEventManager();
+  const { notify, registerObserver, unregisterObserver } = useEventManager();
   const insets = useSafeAreaInsets();
+  const isStakingUnlocked = useStakingStore((s) => s.isUnlocked);
+  const [shouldBounceStaking, setShouldBounceStaking] = useState(false);
+
+  // Listen for staking purchase to trigger bounce when the tab first appears
+  useEffect(() => {
+    const key = "tabNavigator.staking";
+    const observer = {
+      onNotify: async (eventName: EventType) => {
+        if (eventName === "StakingPurchased") {
+          setShouldBounceStaking(true);
+        }
+      },
+    };
+    // Ensure clean registration
+    unregisterObserver(key);
+    registerObserver(key, observer);
+    return () => unregisterObserver(key);
+  }, [registerObserver, unregisterObserver]);
 
   const handleTabPress = useCallback(
     (routeName: string) => {
@@ -235,7 +328,7 @@ export const TabNavigator = memo(() => {
   const tabBarStyle = useMemo(
     () => ({
       backgroundColor: "#101119ff",
-      height: 96 + insets.bottom,
+      height: 75 + insets.bottom,
       paddingTop: 6,
       borderTopWidth: 0,
       zIndex: 20,
@@ -272,6 +365,26 @@ export const TabNavigator = memo(() => {
           tabPress: () => handleTabPress("Main"),
         }}
       />
+
+      {isStakingUnlocked && (
+        <Tab.Screen
+          name="Staking"
+          component={StakingPage}
+          options={{
+            tabBarButton: (props) => (
+              <StakingTabButton
+                isActive={props["aria-selected"] || false}
+                onPress={props.onPress}
+                bounceOnMount={shouldBounceStaking}
+                onBounced={() => setShouldBounceStaking(false)}
+              />
+            ),
+          }}
+          listeners={{
+            tabPress: () => handleTabPress("Staking"),
+          }}
+        />
+      )}
 
       <Tab.Screen
         name="Store"

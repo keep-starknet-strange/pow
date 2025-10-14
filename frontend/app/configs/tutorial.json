@@ -83,6 +83,27 @@
     "highlightTargetId": "dappsTab",
     "canDismiss": true
   },
+  "stakingUnlocked": {
+    "title": "Staking Unlocked!",
+    "description": "You unlocked staking! Click here to check it out.",
+    "bubbleTargetId": "stakingTab",
+    "highlightTargetId": "stakingTab",
+    "canDismiss": true
+  },
+  "stakeYourBitcoin": {
+    "title": "Stake Your Bitcoin!",
+    "description": "Stake your balance, earn more BTC!\nSelect a portion of your balance, and put it to work to secure your blockchain.",
+    "bubbleTargetId": "stakeYourBitcoinSection",
+    "highlightTargetId": "stakeYourBitcoinSection",
+    "canDismiss": true
+  },
+  "validateYourClaim": {
+    "title": "Validate Your Claim!",
+    "description": "Warning! If you don't validate your chain within the validation period, you will be slashed and lose a portion of your balance.",
+    "bubbleTargetId": "validateYourClaimSection",
+    "highlightTargetId": "validateYourClaimSection",
+    "canDismiss": true
+  },
   "leaderboard": {
     "title": "Leaderboard!",
     "description": "Stack more sats to climb the leaderboard!\nClick here to see where you stand among other miners!",

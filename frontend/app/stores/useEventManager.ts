@@ -32,7 +32,8 @@ export type EventType =
   | "SwitchTxTab"
   | "BlockIsBuilt"
   | "ActionsReverted"
-  | "RewardClaimed";
+  | "RewardClaimed"
+  | "SwitchStakingTab";
 
 export interface Observer {
   onNotify(eventName: EventType, data?: any): Promise<void>;

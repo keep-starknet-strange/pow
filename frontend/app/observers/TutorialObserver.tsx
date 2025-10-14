@@ -149,8 +149,38 @@ export class TutorialObserver implements Observer {
       setVisible(false);
     });
 
+    // stakingUnlocked step - triggered when staking is unlocked
+    this.handlers.set("StakingPurchased-dapps", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-stakingUnlocked`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set("SwitchPage-Staking-stakingUnlocked", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+
+    // stakeYourBitcoin step - triggered when user navigates to staking page
+    this.handlers.set("SwitchPage-Staking-stakeYourBitcoin", () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+    this.handlers.set(`TutorialDismissed-stakeYourBitcoin`, () => {
+      const { advanceStep } = useTutorialStore.getState();
+      advanceStep();
+    });
+
+    // validateYourClaim step - triggered after stakeYourBitcoin is dismissed
+    this.handlers.set(`TutorialDismissed-validateYourClaim`, () => {
+      const { setVisible } = useTutorialStore.getState();
+      setVisible(false);
+    });
+
     // leaderboard step
-    this.handlers.set("TxUpgradePurchased-3-dapps", () => {
+    this.handlers.set("TxUpgradePurchased-3-validateYourClaim", () => {
       const { advanceStep } = useTutorialStore.getState();
       advanceStep();
     });
@@ -246,6 +276,8 @@ export class TutorialObserver implements Observer {
         eventName = eventName + "-" + data.txId;
       }
     }
+
+    console.log("eventName", eventName);
 
     const handler = this.handlers.get(`${eventName}-${step}`);
     if (handler) {

@@ -17,6 +17,7 @@ import { useAnimationsStore } from "@/app/stores/useAnimationsStore";
 import { useTutorialStore } from "@/app/stores/useTutorialStore";
 import { useUpgradesStore } from "@/app/stores/useUpgradesStore";
 import { useTransactionPauseStore } from "@/app/stores/useTransactionPauseStore";
+import { useStakingStore } from "@/app/stores/useStakingStore";
 
 const OnchainActionsInitializer = memo(() => {
   const { invokeCalls, waitForTransaction } = useStarknetConnector();
@@ -125,12 +126,38 @@ const AchievementsInitializer = memo(() => {
 
 const BalanceInitializer = memo(() => {
   const { user } = useFocEngine();
-  const { powContract, getUserBalance } = usePowContractConnector();
+  const {
+    powContract,
+    getUserBalance,
+    getStakingConfig,
+    getUserStakedAmount,
+    getUserRewardAmount,
+    getUserStakingUnlocked,
+  } = usePowContractConnector();
   const { initializeBalance } = useBalanceStore();
+  const { initializeStaking } = useStakingStore();
 
   useEffect(() => {
     initializeBalance(powContract, user, getUserBalance);
-  }, [initializeBalance, getUserBalance, powContract, user]);
+    initializeStaking(
+      powContract,
+      user,
+      getStakingConfig,
+      getUserStakedAmount,
+      getUserRewardAmount,
+      getUserStakingUnlocked,
+    );
+  }, [
+    initializeBalance,
+    getUserBalance,
+    powContract,
+    user,
+    initializeStaking,
+    getStakingConfig,
+    getUserStakedAmount,
+    getUserRewardAmount,
+    getUserStakingUnlocked,
+  ]);
 
   return null;
 });

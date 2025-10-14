@@ -76,7 +76,6 @@ export const StorePage: React.FC = () => {
   const { width } = useCachedWindowDimensions();
   const [listViewportHeight, setListViewportHeight] = useState(0);
   const fadeOpacity = useSharedValue(1);
-  const SCROLL_BOTTOM_THRESHOLD = 16;
   const FADE_TRANSITION_DISTANCE = 100;
   const [chainId, setChainId] = useState(0);
   const [storeType, setStoreType] = useState<"L1" | "L2">(

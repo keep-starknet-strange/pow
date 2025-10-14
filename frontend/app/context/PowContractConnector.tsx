@@ -87,6 +87,19 @@ type PowContractContextType = {
 
   // Cheat Codes
   doubleBalanceCheat: () => void;
+
+  // Staking (best-effort)
+  getStakingConfig: () => Promise<
+    | {
+        unlock_cost: number;
+        reward_rate: number;
+        slashing_config: { slash_fraction: number; due_time: number; leaniance_margin?: number };
+      }
+    | undefined
+  >;
+  getUserStakedAmount: () => Promise<number | undefined>;
+  getUserRewardAmount: () => Promise<number | undefined>;
+  getUserStakingUnlocked: () => Promise<boolean | undefined>;
 };
 
 const PowContractConnector = createContext<PowContractContextType | undefined>(
@@ -246,6 +259,90 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     powContract,
     getTokenBalanceOf,
   ]);
+
+  // ---- Staking (best-effort; guarded if ABI not present) ----
+  const getStakingConfig = useCallback(async (): Promise<
+    | {
+        unlock_cost: number;
+        reward_rate: number;
+        slashing_config: { slash_fraction: number; due_time: number; leaniance_margin?: number };
+      }
+    | undefined
+  > => {
+    if (!STARKNET_ENABLED || !powContract) return undefined;
+    try {
+      const cfg: any = await (powContract as any)?.get_staking_config?.();
+      if (!cfg) return undefined;
+      const rr = Number(cfg.reward_rate?.toString?.() ?? cfg.reward_rate ?? 0);
+      const uc = Number(
+        cfg.unlock_cost?.toString?.() ?? cfg.unlock_cost ?? 0,
+      );
+      const sf = Number(
+        cfg.slashing_config?.slash_fraction?.toString?.() ??
+          cfg.slashing_config?.slash_fraction ??
+          0,
+      );
+      const dt = Number(
+        cfg.slashing_config?.due_time?.toString?.() ??
+          cfg.slashing_config?.due_time ??
+          0,
+      );
+      const lm = Number(
+        cfg.slashing_config?.leaniance_margin?.toString?.() ??
+          cfg.slashing_config?.leaniance_margin ??
+          0,
+      );
+      return {
+        unlock_cost: uc,
+        reward_rate: rr,
+        slashing_config: { slash_fraction: sf, due_time: dt, leaniance_margin: lm },
+      };
+    } catch (_e) {
+      return undefined;
+    }
+  }, [STARKNET_ENABLED, powContract]);
+
+  const getUserStakedAmount = useCallback(async (): Promise<
+    number | undefined
+  > => {
+    if (!STARKNET_ENABLED || !powContract || !account) return undefined;
+    try {
+      const res: any = await (powContract as any)?.get_staked_amount?.(
+        account.address,
+      );
+      return res != null ? Number(res.toString?.() ?? res) : undefined;
+    } catch (_e) {
+      return undefined;
+    }
+  }, [STARKNET_ENABLED, powContract, account]);
+
+  const getUserRewardAmount = useCallback(async (): Promise<
+    number | undefined
+  > => {
+    if (!STARKNET_ENABLED || !powContract || !account) return undefined;
+    try {
+      const res: any = await (powContract as any)?.get_reward_amount?.(
+        account.address,
+      );
+      return res != null ? Number(res.toString?.() ?? res) : undefined;
+    } catch (_e) {
+      return undefined;
+    }
+  }, [STARKNET_ENABLED, powContract, account]);
+
+  const getUserStakingUnlocked = useCallback(async (): Promise<
+    boolean | undefined
+  > => {
+    if (!STARKNET_ENABLED || !powContract || !account) return undefined;
+    try {
+      const res: any = await (powContract as any)?.get_staking_unlocked?.(
+        account.address,
+      );
+      return Boolean(res);
+    } catch (_e) {
+      return undefined;
+    }
+  }, [STARKNET_ENABLED, powContract, account]);
 
   const createGameAccount = useCallback(async () => {
     if (!STARKNET_ENABLED) {
@@ -728,6 +825,10 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getTokenBalanceOf,
         getRewardPoolBalance,
         doubleBalanceCheat,
+        getStakingConfig,
+        getUserStakedAmount,
+        getUserRewardAmount,
+        getUserStakingUnlocked,
       }}
     >
       {children}

@@ -2,6 +2,7 @@ use pow_game::prestige::PrestigeSetupParams;
 use pow_game::transactions::TransactionSetupParams;
 use pow_game::types::RewardParams;
 use pow_game::upgrades::{AutomationSetupParams, UpgradeSetupParams};
+use pow_game::staking::StakingConfig;
 use starknet::ContractAddress;
 
 // Game configuration & state
@@ -26,7 +27,8 @@ pub trait IPowGame<TContractState> {
     fn setup_automation_config(ref self: TContractState, config: AutomationSetupParams);
     fn setup_transaction_config(ref self: TContractState, config: TransactionSetupParams);
     fn setup_prestige_config(ref self: TContractState, config: PrestigeSetupParams);
-    // fn setup_staking_config(ref self: TContractState, config: StakingConfig);
+    fn setup_staking_config(ref self: TContractState, config: StakingConfig);
+
 }
 
 // Game Rewards management

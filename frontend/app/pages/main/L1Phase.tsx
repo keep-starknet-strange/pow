@@ -7,6 +7,7 @@ import { useImages } from "../../hooks/useImages";
 import { TransactionButtonsView } from "../../components/TransactionButtonsView";
 import { DappsUnlock } from "../../components/store/DappsUnlock";
 import { L2Unlock } from "../../components/store/L2Unlock";
+import { StakingUnlock } from "../../components/staking/StakingUnlock";
 import {
   Canvas,
   FilterMode,
@@ -40,6 +41,7 @@ export const L1Phase: React.FC = () => {
     >
       <BlockchainView chainId={0} style={{ flex: 1 }} />
       <DappsUnlock chainId={0} />
+      <StakingUnlock />
       <L2Unlock />
       <Animated.View
         style={{

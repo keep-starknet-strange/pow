@@ -124,6 +124,14 @@ export const createBuyPrestigeCall = (contractAddress: string): Call => {
   };
 };
 
+export const createBuyStakingCall = (contractAddress: string): Call => {
+  return {
+    contractAddress,
+    entrypoint: "buy_staking",
+    calldata: [],
+  };
+};
+
 export const createInitMyGameCall = (contractAddress: string): Call => {
   return {
     contractAddress,
@@ -264,6 +272,9 @@ export class TxBuilderObserver implements Observer {
         break;
       case "PrestigePurchased":
         addActionForceCall(createBuyPrestigeCall(this.contractAddress));
+        break;
+      case "StakingPurchased":
+        addActionForceCall(createBuyStakingCall(this.contractAddress));
         break;
       default:
         break;
