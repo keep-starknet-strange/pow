@@ -257,7 +257,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       }
       const cost = transactionData.feeCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost))
-        return state.transactionFeeLevels;
+        return { transactionFeeLevels: state.transactionFeeLevels };
       // Upgrade the fee level by 1
       newFees[chainId][txId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -298,7 +298,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       }
       const cost = transactionData.speedCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost))
-        return state.transactionSpeedLevels;
+        return { transactionSpeedLevels: state.transactionSpeedLevels };
       // Upgrade the speed level by 1
       newSpeeds[chainId][txId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -340,7 +340,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         return { dappFeeLevels: newFees };
       }
       const cost = dappData.feeCosts[currentLevel + 1];
-      if (!useBalanceStore.getState().tryBuy(cost)) return state.dappFeeLevels;
+      if (!useBalanceStore.getState().tryBuy(cost))
+        return { dappFeeLevels: state.dappFeeLevels };
       // Upgrade the fee level by 1
       newFees[chainId][dappId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -380,7 +381,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       }
       const cost = dappData.speedCosts[currentLevel + 1];
       if (!useBalanceStore.getState().tryBuy(cost))
-        return state.dappSpeedLevels;
+        return { dappSpeedLevels: state.dappSpeedLevels };
       // Upgrade the speed level by 1
       newSpeeds[chainId][dappId] = currentLevel + 1;
       useEventManager.getState().notify("TxUpgradePurchased", {
@@ -401,7 +402,8 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         return { dappsUnlocked: state.dappsUnlocked };
       }
       const cost = get().getDappUnlockCost(chainId);
-      if (!useBalanceStore.getState().tryBuy(cost)) return state.dappsUnlocked;
+      if (!useBalanceStore.getState().tryBuy(cost))
+        return { dappsUnlocked: state.dappsUnlocked };
       const newDappsUnlocked = { ...state.dappsUnlocked };
       newDappsUnlocked[chainId] = true;
       useEventManager.getState().notify("DappsPurchased", { chainId });
