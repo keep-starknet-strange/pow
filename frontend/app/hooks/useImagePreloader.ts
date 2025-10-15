@@ -179,6 +179,7 @@ const imagePaths = {
   stakingButtonBg: require(`${assetsPath}/staking/button.webp`),
   stakingButtonSmall: require(`${assetsPath}/staking/button_small.png`),
   stakingAmountsBg: require(`${assetsPath}/staking/staking_amounts_bg.webp`),
+  stakingStatBg: require(`${assetsPath}/staking/staking_stat_bg.webp`),
 
   // Navigation Images
   navButton: require(`${assetsPath}/navigation/menu_button_normal.webp`),
@@ -567,6 +568,7 @@ export const useImagePreloader = () => {
     stakingButtonBg: useImage(imagePaths.stakingButtonBg),
     stakingButtonSmall: useImage(imagePaths.stakingButtonSmall),
     stakingAmountsBg: useImage(imagePaths.stakingAmountsBg),
+    stakingStatBg: useImage(imagePaths.stakingStatBg),
 
     txBackground: useImage(imagePaths.txBackground),
     l2TxBackground: useImage(imagePaths.l2TxBackground),
@@ -838,6 +840,7 @@ export const useImagePreloader = () => {
         "staking.button.bg": images.stakingButtonBg,
         "staking.button.small": images.stakingButtonSmall,
         "staking.amounts.bg": images.stakingAmountsBg,
+        "staking.stat.bg": images.stakingStatBg,
         "achievements.bg": images.achievmentsBg,
         "achievements.tile.locked": images.achievementsTileLocked,
         "achievements.tile.progress": images.achievementsTileProgress,

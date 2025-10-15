@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check if cwebp binary exists
-if [ ! -f "./cwebp" ]; then
-    echo "Error: cwebp binary not found in current directory"
+if ! command -v cwebp &> /dev/null; then
+    echo "Error: cwebp binary not found in PATH"
     exit 1
 fi
 
@@ -21,7 +21,7 @@ convert_directory() {
         continue
       fi
 
-      if ./cwebp -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
+      if cwebp -q 100 -lossless -m 6 "$f" -o "${ff}.webp"; then
         echo "  ✓ Successfully converted ${f##*/}"
 
         if rm "$f"; then
