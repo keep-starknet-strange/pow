@@ -21,6 +21,7 @@
   "dependencies": {
     "@animatereactnative/marquee": "^0.5.2",
     "@avnu/gasless-sdk": "^0.1.8",
+    "@expo/app-integrity": "^0.1.8",
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-community/netinfo": "^11.4.1",
