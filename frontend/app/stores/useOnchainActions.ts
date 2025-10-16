@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { Call } from "starknet";
 import { useEventManager } from "./useEventManager";
+import { optimizeTransactions } from "../utils/transactionOptimization";
+import { useTransactionOptimizationStore } from "./useTransactionOptimizationStore";
 
 interface ActionsCall {
   id: string;
@@ -191,8 +193,28 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
     set({ isProcessing: true });
 
     try {
+      // Apply transaction optimizations before invoking
+      const { bundlingEnabled, multiExecEnabled } =
+        useTransactionOptimizationStore.getState();
+      const optimizedActions = optimizeTransactions(
+        currentItem.actions,
+        bundlingEnabled,
+        multiExecEnabled,
+      );
+
+      if (__DEV__) {
+        console.log(
+          `Invoking ${currentItem.actions.length} actions (optimized to ${optimizedActions.length})`,
+        );
+        if (bundlingEnabled || multiExecEnabled) {
+          console.log(
+            `Optimizations: bundling=${bundlingEnabled}, multiExec=${multiExecEnabled}`,
+          );
+        }
+      }
+
       // Attempt to invoke the actions
-      const response = await state.invokeActions(currentItem.actions);
+      const response = await state.invokeActions(optimizedActions);
 
       // Check if we got a transaction hash
       if (hasValidTransactionHash(response)) {
