@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, View, Text } from "react-native";
+import { Modal, View, Text, Platform } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Window } from "./tutorial/Window";
 import { ConfirmationButton } from "./buttons/ConfirmationButton";
@@ -73,13 +73,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   label={cancelLabel}
                   onPress={onCancel}
                   variant="cancel"
-                  style={{ width: 100 }}
+                  style={{ width: Platform.OS === "android" ? 115 : 100 }}
                 />
                 <ConfirmationButton
                   label={confirmLabel}
                   onPress={onConfirm}
                   variant={dangerous ? "danger" : "confirm"}
-                  style={{ width: 100 }}
+                  style={{ width: Platform.OS === "android" ? 115 : 100 }}
                 />
               </View>
             </View>

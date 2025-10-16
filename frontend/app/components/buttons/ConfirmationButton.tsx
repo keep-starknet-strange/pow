@@ -6,6 +6,7 @@ import {
   LayoutChangeEvent,
   GestureResponderEvent,
   ViewStyle,
+  Platform,
 } from "react-native";
 import {
   Canvas,
@@ -95,7 +96,11 @@ export const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({
       )}
 
       <Text
-        style={[styles.label, { color: getTextColor() }]}
+        style={[
+          styles.label,
+          { color: getTextColor() },
+          Platform.OS === "android" && styles.labelAndroid,
+        ]}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
@@ -114,7 +119,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "android" ? 4 : 16,
   },
   label: {
     fontFamily: "Pixels",
@@ -122,5 +127,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingVertical: 12,
     paddingHorizontal: 8,
+  },
+  labelAndroid: {
+    paddingHorizontal: 4,
   },
 });
