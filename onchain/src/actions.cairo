@@ -6,7 +6,9 @@ use pow_game::types::PowActions;
 pub trait IPowGameActions<TContractState> {
     fn init_my_game(ref self: TContractState);
     fn add_transaction(ref self: TContractState, chain_id: u32, tx_type_id: u32);
+    fn add_transaction_bundled(ref self: TContractState, chain_id: u32, tx_type_ids: Span<u32>);
     fn mine_block(ref self: TContractState, chain_id: u32);
+    fn mine_block_bundled(ref self: TContractState, chain_id: u32, clicks: u32);
     fn store_da(ref self: TContractState, chain_id: u32);
     fn prove(ref self: TContractState, chain_id: u32);
     fn execute_actions(ref self: TContractState, actions: Span<PowActions>);

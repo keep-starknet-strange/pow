@@ -147,10 +147,34 @@ pub mod BuilderComponent {
             self.emit(BuildingBlockUpdate { user, chain_id, new_block: block });
         }
 
+        fn build_block_bundled(
+            ref self: ComponentState<TContractState>,
+            chain_id: u32,
+            total_fees: u128,
+            tx_count: u32,
+        ) {
+            let user = get_caller_address();
+            let mut block = self.building_blocks.read((user, chain_id));
+            block.fees += total_fees;
+            block.size += tx_count;
+            self.building_blocks.write((user, chain_id), block.clone());
+            self.emit(BuildingBlockUpdate { user, chain_id, new_block: block });
+        }
+
         fn click_block(ref self: ComponentState<TContractState>, chain_id: u32) {
             let user = get_caller_address();
             let mut clicks = self.block_clicks.read((user, chain_id));
             clicks += 1;
+            self.block_clicks.write((user, chain_id), clicks);
+            self.emit(BuildingBlockClicked { user, chain_id, click_count: clicks });
+        }
+
+        fn click_block_bundled(
+            ref self: ComponentState<TContractState>, chain_id: u32, click_count: u32,
+        ) {
+            let user = get_caller_address();
+            let mut clicks = self.block_clicks.read((user, chain_id));
+            clicks += click_count.into();
             self.block_clicks.write((user, chain_id), clicks);
             self.emit(BuildingBlockClicked { user, chain_id, click_count: clicks });
         }
