@@ -8,7 +8,7 @@ mod PowGame {
     use pow_game::cheat_codes::{CheatCodeUsed, IPowCheatCodes};
     use pow_game::interface::{IPowGame, IPowGameRewards, IPowGameValidation};
     use pow_game::store::*;
-    use pow_game::types::RewardParams;
+    use pow_game::types::{RewardParams, PowActions};
 
     // --- Game Components ---
 
@@ -524,6 +524,63 @@ mod PowGame {
             let proof_max_size: u32 = proof_size.try_into().unwrap_or(1);
             let proof_difficulty: u128 = self.get_my_upgrade_level(chain_id, 'Recursive Proving').into() + 1; // Add +1 offset so level 0 returns 1 for difficulty
             self.builder.reset_proof(chain_id, proof_max_size, proof_difficulty);
+        }
+
+        fn execute_actions(ref self: ContractState, actions: Span<PowActions>) {
+            let mut i: u32 = 0;
+            loop {
+                if i >= actions.len() {
+                    break;
+                }
+                let action = actions.at(i);
+                let action_name = *action.action_name;
+                let calldata = *action.action_calldata;
+
+                // Match action name and call appropriate function
+                if action_name == 'init_my_game' {
+                    self.init_my_game();
+                } else if action_name == 'add_transaction' {
+                    let chain_id = *calldata.at(0);
+                    let tx_type_id = *calldata.at(1);
+                    self.add_transaction(chain_id, tx_type_id);
+                } else if action_name == 'mine_block' {
+                    let chain_id = *calldata.at(0);
+                    self.mine_block(chain_id);
+                } else if action_name == 'store_da' {
+                    let chain_id = *calldata.at(0);
+                    self.store_da(chain_id);
+                } else if action_name == 'prove' {
+                    let chain_id = *calldata.at(0);
+                    self.prove(chain_id);
+                } else if action_name == 'buy_tx_fee' {
+                    let chain_id = *calldata.at(0);
+                    let tx_type_id = *calldata.at(1);
+                    self.buy_tx_fee(chain_id, tx_type_id);
+                } else if action_name == 'buy_tx_speed' {
+                    let chain_id = *calldata.at(0);
+                    let tx_type_id = *calldata.at(1);
+                    self.buy_tx_speed(chain_id, tx_type_id);
+                } else if action_name == 'buy_upgrade' {
+                    let chain_id = *calldata.at(0);
+                    let upgrade_id = *calldata.at(1);
+                    self.buy_upgrade(chain_id, upgrade_id);
+                } else if action_name == 'buy_automation' {
+                    let chain_id = *calldata.at(0);
+                    let automation_id = *calldata.at(1);
+                    self.buy_automation(chain_id, automation_id);
+                } else if action_name == 'buy_dapps' {
+                    let chain_id = *calldata.at(0);
+                    self.buy_dapps(chain_id);
+                } else if action_name == 'buy_next_chain' {
+                    self.buy_next_chain();
+                } else if action_name == 'buy_prestige' {
+                    self.buy_prestige();
+                } else {
+                    panic!("Unknown action: {}", action_name);
+                }
+
+                i += 1;
+            };
         }
     }
 
