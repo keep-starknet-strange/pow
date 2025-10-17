@@ -194,8 +194,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
 
     try {
       // Apply transaction optimizations before invoking
-      const { bundlingEnabled } =
-        useTransactionOptimizationStore.getState();
+      const { bundlingEnabled } = useTransactionOptimizationStore.getState();
       const optimizedActions = optimizeTransactions(
         currentItem.actions,
         bundlingEnabled,
@@ -206,9 +205,7 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           `Invoking ${currentItem.actions.length} actions (optimized to ${optimizedActions.length})`,
         );
         if (bundlingEnabled) {
-          console.log(
-            `Optimizations: bundling=${bundlingEnabled}`,
-          );
+          console.log(`Optimizations: bundling=${bundlingEnabled}`);
         }
       }
 
