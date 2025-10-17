@@ -64,13 +64,23 @@ export const BlockView: React.FC<BlockViewProps> = (props) => {
             flex: 1,
           }}
         >
-          <Text
-            adjustsFontSizeToFit={true}
-            numberOfLines={1}
-            className="text-[#101119ff] text-[32px] underline text-center font-Xerxes px-4 pt-2"
+          <View
+            style={{
+              alignSelf: "center",
+              borderBottomWidth: 2,
+              borderBottomColor: "#101119ff",
+              marginHorizontal: 16,
+              marginTop: 8,
+            }}
           >
-            Genesis Block
-          </Text>
+            <Text
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
+              className="text-[#101119ff] text-[32px] text-center font-Xerxes"
+            >
+              Genesis Block
+            </Text>
+          </View>
           <Text
             style={{
               width: props.width,
