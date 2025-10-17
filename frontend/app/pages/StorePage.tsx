@@ -384,7 +384,8 @@ export const StorePage: React.FC = () => {
           removeClippedSubviews={false}
           getItemLayout={undefined}
           onScroll={handleScroll}
-          scrollEventThrottle={32}
+          scrollEventThrottle={16}
+          nestedScrollEnabled={true}
           onContentSizeChange={(_, h) => {
             if (listViewportHeight > 0) {
               // Set initial fade opacity based on content size
