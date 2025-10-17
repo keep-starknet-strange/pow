@@ -26,7 +26,6 @@ import {
 import { useEventManager } from "../../stores/useEventManager";
 import { useCachedWindowDimensions } from "../../hooks/useCachedDimensions";
 import { useTutorialStore } from "../../stores/useTutorialStore";
-import { useTransactionOptimizationStore } from "../../stores/useTransactionOptimizationStore";
 import {
   getRandomNounsAttributes,
   createNounsAttributes,
@@ -64,12 +63,6 @@ export const AccountSection: React.FC = memo(() => {
   const { getImage } = useImages();
   const { width } = useCachedWindowDimensions();
   const { notify } = useEventManager();
-  const {
-    bundlingEnabled,
-    multiExecEnabled,
-    toggleBundling,
-    toggleMultiExec,
-  } = useTransactionOptimizationStore();
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const [availableAccount, setAvailableAccount] = useState<string | null>(null);
@@ -542,79 +535,6 @@ export const AccountSection: React.FC = memo(() => {
         {!account?.address && !availableAccount && !isRestoring && (
           <View className="mt-6 items-center">
             <BasicButton label="Restore" onPress={() => setIsRestoring(true)} />
-          </View>
-        )}
-
-        {/* Transaction Optimization Toggles (Dev Mode Only) */}
-        {__DEV__ && (
-          <View className="mt-8 mb-4">
-            <Text className="text-[#101119] text-[20px] font-Pixels text-center mb-4">
-              Transaction Optimizations
-            </Text>
-
-            {/* Bundling Toggle */}
-            <TouchableOpacity
-              onPress={() => {
-                notify("BasicClick");
-                toggleBundling();
-              }}
-              className="flex-row items-center justify-between p-4 mx-4 mb-3 bg-[#10111910] rounded-lg"
-            >
-              <View className="flex-1">
-                <Text className="text-[#101119] text-[16px] font-Pixels mb-1">
-                  Bundling
-                </Text>
-                <Text className="text-[#101119]/60 text-[12px] font-Pixels">
-                  Bundle consecutive add_transaction and mine_block calls
-                </Text>
-              </View>
-              <View
-                className={`w-12 h-6 rounded-full ${
-                  bundlingEnabled ? "bg-green-500" : "bg-gray-400"
-                }`}
-              >
-                <View
-                  className={`w-5 h-5 rounded-full bg-white mt-0.5 ${
-                    bundlingEnabled ? "ml-6" : "ml-0.5"
-                  }`}
-                />
-              </View>
-            </TouchableOpacity>
-
-            {/* Multi-Exec Toggle */}
-            <TouchableOpacity
-              onPress={() => {
-                notify("BasicClick");
-                toggleMultiExec();
-              }}
-              className="flex-row items-center justify-between p-4 mx-4 mb-3 bg-[#10111910] rounded-lg"
-            >
-              <View className="flex-1">
-                <Text className="text-[#101119] text-[16px] font-Pixels mb-1">
-                  Multi-Exec
-                </Text>
-                <Text className="text-[#101119]/60 text-[12px] font-Pixels">
-                  Combine all actions into single execute_actions call
-                </Text>
-              </View>
-              <View
-                className={`w-12 h-6 rounded-full ${
-                  multiExecEnabled ? "bg-green-500" : "bg-gray-400"
-                }`}
-              >
-                <View
-                  className={`w-5 h-5 rounded-full bg-white mt-0.5 ${
-                    multiExecEnabled ? "ml-6" : "ml-0.5"
-                  }`}
-                />
-              </View>
-            </TouchableOpacity>
-
-            <Text className="text-[#101119]/60 text-[10px] font-Pixels text-center mx-8 mt-2">
-              Dev Mode: These toggles optimize transaction batching for gas
-              efficiency. Bundling applies first, then multi-exec if both
-              enabled.
-            </Text>
           </View>
         )}
       </ScrollView>

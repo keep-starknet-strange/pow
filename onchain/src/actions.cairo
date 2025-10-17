@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use pow_game::types::PowActions;
 
 // Player actions
 #[starknet::interface]
@@ -11,7 +10,6 @@ pub trait IPowGameActions<TContractState> {
     fn mine_block_bundled(ref self: TContractState, chain_id: u32, clicks: u32);
     fn store_da(ref self: TContractState, chain_id: u32);
     fn prove(ref self: TContractState, chain_id: u32);
-    fn execute_actions(ref self: TContractState, actions: Span<PowActions>);
 }
 
 #[starknet::interface]

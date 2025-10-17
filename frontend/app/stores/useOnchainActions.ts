@@ -194,21 +194,20 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
 
     try {
       // Apply transaction optimizations before invoking
-      const { bundlingEnabled, multiExecEnabled } =
+      const { bundlingEnabled } =
         useTransactionOptimizationStore.getState();
       const optimizedActions = optimizeTransactions(
         currentItem.actions,
         bundlingEnabled,
-        multiExecEnabled,
       );
 
       if (__DEV__) {
         console.log(
           `Invoking ${currentItem.actions.length} actions (optimized to ${optimizedActions.length})`,
         );
-        if (bundlingEnabled || multiExecEnabled) {
+        if (bundlingEnabled) {
           console.log(
-            `Optimizations: bundling=${bundlingEnabled}, multiExec=${multiExecEnabled}`,
+            `Optimizations: bundling=${bundlingEnabled}`,
           );
         }
       }

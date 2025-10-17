@@ -1,11 +1,4 @@
-import { Call, shortString } from "starknet";
-
-/**
- * Converts a string to felt252 format for Cairo
- */
-function stringToFelt252(str: string): string {
-  return shortString.encodeShortString(str);
-}
+import { Call } from "starknet";
 
 /**
  * Bundles consecutive add_transaction or mine_block calls with the same chain_id
@@ -89,56 +82,17 @@ export function applyBundling(calls: Call[]): Call[] {
 }
 
 /**
- * Converts all calls into a single execute_actions call
- */
-export function applyMultiExec(calls: Call[]): Call[] {
-  if (calls.length === 0) return calls;
-  if (calls.length === 1) return calls;
-
-  const contractAddress = calls[0].contractAddress;
-  const calldata: string[] = [];
-
-  // Add the number of actions
-  calldata.push(calls.length.toString());
-
-  // For each action, add: action_name, calldata_length, ...calldata
-  for (const call of calls) {
-    const actionName = stringToFelt252(call.entrypoint);
-    const actionCalldata = call.calldata || [];
-
-    calldata.push(actionName);
-    calldata.push(actionCalldata.length.toString());
-    calldata.push(...actionCalldata);
-  }
-
-  // Create a single execute_actions call
-  return [
-    {
-      contractAddress,
-      entrypoint: "execute_actions",
-      calldata,
-    },
-  ];
-}
-
-/**
  * Applies transaction optimizations based on enabled features
  */
 export function optimizeTransactions(
   calls: Call[],
   bundlingEnabled: boolean,
-  multiExecEnabled: boolean,
 ): Call[] {
   let optimizedCalls = calls;
 
-  // Apply bundling first if enabled
+  // Apply bundling if enabled
   if (bundlingEnabled) {
     optimizedCalls = applyBundling(optimizedCalls);
-  }
-
-  // Then apply multi-exec if enabled
-  if (multiExecEnabled) {
-    optimizedCalls = applyMultiExec(optimizedCalls);
   }
 
   return optimizedCalls;
