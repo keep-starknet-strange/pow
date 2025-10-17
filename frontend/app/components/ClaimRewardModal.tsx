@@ -44,7 +44,9 @@ const ClaimRewardModalComponent: React.FC = () => {
       }
     };
 
-    checkAndShowModal();
+    // TODO: Re-enable this once we have the claim feature ready
+    // checkAndShowModal();
+    setShouldShow(false);
   }, [currentPrestige, hasShownClaimModal, setHasShownClaimModal]);
 
   const { navigate } = useNavigation();
