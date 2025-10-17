@@ -112,9 +112,11 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
+    /* TODO: Re-enable when we have claim setup
     ...(isAuthenticated && currentPrestige >= 1 && !isRewardClaimed
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
+    */
     {
       label: "Back",
       onPress: () =>
