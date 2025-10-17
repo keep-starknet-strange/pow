@@ -435,6 +435,69 @@ mod PowGame {
             do_add_transaction(ref self, chain_id, tx_type_id, total_fees);
         }
 
+        fn add_transaction_bundled(ref self: ContractState, chain_id: u32, tx_type_ids: Span<u32>) {
+            // Early return if empty
+            if tx_type_ids.len() == 0 {
+                return;
+            }
+
+            // Common validations done once
+            let caller = get_caller_address();
+            self.check_valid_chain_id(chain_id);
+            self.check_user_valid_chain(chain_id);
+
+            // Check block capacity upfront
+            let working_block = self.get_block_building_state(caller, chain_id);
+            let available_space = working_block.max_size - working_block.size;
+            assert!(tx_type_ids.len() <= available_space, "Not enough space in block for all transactions");
+
+            // Get multipliers once (they don't depend on tx_type_id)
+            let mev_boost = self.get_my_upgrade(chain_id, 'MEV Boost');
+            let prestige_scaler = self.get_my_prestige_scaler();
+
+            // Validate tx_type_ids efficiently
+            // Since tx_types are unlocked sequentially, if user has tx_type N, they have 0..N
+            // So we only need to validate when we see a higher tx_type_id than before
+            let mut max_validated_tx_type: u32 = 0;
+            let mut any_validated = false;
+            let mut i: u32 = 0;
+            loop {
+                if i >= tx_type_ids.len() {
+                    break;
+                }
+                let tx_type_id = *tx_type_ids.at(i);
+
+                // Only validate if this is larger than any tx_type we've validated
+                if !any_validated || tx_type_id > max_validated_tx_type {
+                    self.check_has_tx(chain_id, tx_type_id);
+                    max_validated_tx_type = tx_type_id;
+                    any_validated = true;
+                }
+
+                i += 1;
+            };
+
+            // Accumulate fees and emit events for all transactions
+            let mut total_fees_accumulated: u128 = 0;
+            let mut i: u32 = 0;
+            loop {
+                if i >= tx_type_ids.len() {
+                    break;
+                }
+                let tx_type_id = *tx_type_ids.at(i);
+                let tx_fees = self.transactions.get_my_tx_fee_value(chain_id, tx_type_id);
+                let total_fees = tx_fees * mev_boost * prestige_scaler;
+
+                total_fees_accumulated += total_fees;
+                self.emit(TransactionAdded { user: caller, chain_id, tx_type_id, fees: total_fees });
+
+                i += 1;
+            };
+
+            // Update block storage once with accumulated values
+            self.builder.build_block_bundled(chain_id, total_fees_accumulated, tx_type_ids.len());
+        }
+
         fn mine_block(ref self: ContractState, chain_id: u32) {
             // Validation
             let caller = get_caller_address();
@@ -445,6 +508,49 @@ mod PowGame {
             do_click_block(ref self, chain_id);
             let current_clicks = self.get_block_clicks(caller, chain_id);
             // Use the difficulty stored in the block at creation time
+            let block_hp = working_block.difficulty;
+            if current_clicks < block_hp {
+                return;
+            }
+
+            // Finalize block
+            let fees = working_block.fees;
+            let reward = self.get_my_upgrade(chain_id, 'Block Reward');
+            let prestige_scaler = self.get_my_prestige_scaler();
+            let total_reward = reward * prestige_scaler;
+            if (chain_id != 0) {
+                // Add block to da & proof
+                self.builder.build_proof(chain_id, total_reward);
+                self.builder.build_da(chain_id, total_reward);
+            }
+            pay_user(ref self, caller, fees + total_reward);
+            self.emit(BlockMined { user: caller, chain_id, fees, reward: total_reward });
+
+            // Set max_size and difficulty for the new block based on current upgrade level
+            let block_width = self.get_my_upgrade(chain_id, 'Block Size');
+            let max_size: u32 = (block_width * block_width).try_into().unwrap_or(16);
+            let block_difficulty = self.get_my_upgrade(chain_id, 'Block Difficulty');
+            self.builder.reset_block(chain_id, max_size, block_difficulty);
+        }
+
+        fn mine_block_bundled(ref self: ContractState, chain_id: u32, clicks: u32) {
+            if clicks == 0 {
+                return;
+            }
+
+            // Validation done once
+            let caller = get_caller_address();
+            self.check_valid_chain_id(chain_id);
+            self.check_user_valid_chain(chain_id);
+
+            let working_block = self.get_block_building_state(caller, chain_id);
+            assert!(working_block.size >= working_block.max_size, "Block is not full");
+
+            // Add all clicks at once with single storage write
+            self.builder.click_block_bundled(chain_id, clicks);
+
+            // Check if block is mined
+            let current_clicks = self.get_block_clicks(caller, chain_id);
             let block_hp = working_block.difficulty;
             if current_clicks < block_hp {
                 return;
