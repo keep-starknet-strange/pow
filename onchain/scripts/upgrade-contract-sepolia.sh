@@ -9,7 +9,8 @@ fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR=$SCRIPT_DIR/../..
-
+STARKNET_ACCOUNT=$HOME/.starkli/accounts/sepolia/0x005f5b3A56446089b4f07f5469a9feCA5Cb7A3e217538eBB1297c34Fd8755c83.json
+RPC_URL=https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/pdHWGZFXkHirZbLs2gw25sSmlNHfEawV
 # Load env variable from `.env` only if they're not already set
 if [ -z "$STARKNET_KEYSTORE" ] || [ -z "$STARKNET_ACCOUNT" ]; then
   source $PROJECT_DIR/.env

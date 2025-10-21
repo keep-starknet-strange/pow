@@ -39,6 +39,7 @@ pub trait IPowGameRewards<TContractState> {
     fn host_give_reward(
         ref self: TContractState, user: ContractAddress, recipient: ContractAddress,
     );
+    fn mark_reward_claimed(ref self: TContractState);
     fn remove_funds(
         ref self: TContractState,
         token_address: ContractAddress,

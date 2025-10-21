@@ -330,6 +330,11 @@ mod PowGame {
             }
         }
 
+        fn mark_reward_claimed(ref self: ContractState) {
+            let caller = get_caller_address();
+            self.reward_claimed.write(caller, true);
+        }
+
         fn host_give_reward(
             ref self: ContractState, user: ContractAddress, recipient: ContractAddress,
         ) {
