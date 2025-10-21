@@ -3,6 +3,7 @@ import { Call } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { optimizeTransactions } from "../utils/transactionOptimization";
 import { useTransactionOptimizationStore } from "./useTransactionOptimizationStore";
+import * as Sentry from "@sentry/react-native";
 
 interface ActionsCall {
   id: string;
@@ -243,11 +244,11 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
+      const fullWarnMsg = `❌ ActionsCall ${currentItem.id} failed (attempt ${
+        currentItem.retryCount + 1
+      }/${MAX_RETRIES}): ${errorMessage}`;
       if (__DEV__) {
-        console.log(
-          `❌ ActionsCall ${currentItem.id} failed (attempt ${currentItem.retryCount + 1}/${MAX_RETRIES}):`,
-          errorMessage,
-        );
+        console.log(fullWarnMsg);
       }
 
       // Check if we should retry
@@ -265,17 +266,18 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           ),
         }));
 
+        Sentry.captureMessage(fullWarnMsg, "warning");
         // Wait before retrying
         await delay(RETRY_DELAY_MS);
       } else {
         // Max retries reached - clear entire queue
+        const fullErrorMsg = `🛑 ActionsCall ${currentItem.id} failed after ${MAX_RETRIES} attempts. Initiating revert. Last error: ${errorMessage}`;
         if (__DEV__) {
-          console.error(
-            `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items). Last error: ${errorMessage}`,
-          );
+          console.error(fullErrorMsg);
         }
 
         get().revert(currentItem.id, errorMessage);
+        Sentry.captureMessage(fullErrorMsg, "error");
         return; // Don't continue processing
       }
     } finally {
