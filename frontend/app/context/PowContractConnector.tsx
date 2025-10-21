@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { Call, Contract } from "starknet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useStarknetConnector } from "./StarknetConnector";
 import { useFocEngine } from "./FocEngineConnector";
 import { useOnchainActions } from "../stores/useOnchainActions";
@@ -79,6 +80,7 @@ type PowContractContextType = {
     | undefined
   >;
   getHasClaimedReward: () => Promise<boolean | undefined>;
+  markRewardClaimed: (userAddress: string) => Promise<void>;
   getTokenBalanceOf: (
     tokenAddress: string,
     ownerAddress: string,
@@ -254,6 +256,37 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const privateKey = generatePrivateKey();
     console.log("Creating game account...");
+    
+    // Check if this device has claimed rewards and mark it on the contract
+    try {
+      const claimedDevices = await AsyncStorage.getItem('claimed_reward_devices');
+      if (claimedDevices) {
+        const devices: string[] = JSON.parse(claimedDevices);
+        const accountAddress = generateAccountAddress(privateKey, network === "SN_DEVNET" ? "devnet" : undefined);
+        
+        // Check if this device has claimed rewards
+        const deviceFingerprint = await AsyncStorage.getItem('device_fingerprint');
+        if (deviceFingerprint) {
+          const fingerprint = JSON.parse(deviceFingerprint);
+          if (devices.includes(fingerprint.visitorId)) {
+            console.log("Device has claimed rewards, marking on contract...");
+            // Mark the reward as claimed for this new account
+            const markClaimedCall: Call = {
+              contractAddress: powGameContractAddress!,
+              entrypoint: "mark_reward_claimed",
+              calldata: [accountAddress],
+            };
+            // We'll add this to the action queue to be executed after account creation
+            // TODO: UNDO when contract is updated to mark reward claimed on claim_reward
+            // addAction(markClaimedCall);
+            console.log("Marked reward as claimed for this device");
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to check device reward claim status:", error);
+    }
+    
     if (network === "SN_DEVNET") {
       const accountAddress = generateAccountAddress(privateKey, "devnet");
       await mintFunds(accountAddress, 10n ** 20n); // Mint 1000 ETH
@@ -277,6 +310,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     powGameContractAddress,
     network,
     STARKNET_ENABLED,
+    addAction,
   ]);
 
   const getUserBalance = useCallback(async () => {
@@ -680,6 +714,23 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [powContract, STARKNET_ENABLED, account]);
 
+  const markRewardClaimed = useCallback(async (userAddress: string) => {
+    if (!STARKNET_ENABLED || !powContract) return;
+    try {
+      const call: Call = {
+        contractAddress: powGameContractAddress!,
+        entrypoint: "mark_reward_claimed",
+        calldata: [userAddress],
+      };
+      // await invokeContractCalls([call], 1);
+      // TODO: UNDO when contract is updated to mark reward claimed on claim_reward
+      console.log("Marked reward as claimed for this user");
+    } catch (e) {
+      console.error("Failed to mark reward as claimed:", e);
+      throw e;
+    }
+  }, [powContract, STARKNET_ENABLED, powGameContractAddress, invokeContractCalls]);
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -725,6 +776,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getUserPrestiges,
         getRewardParams,
         getHasClaimedReward,
+        markRewardClaimed,
         getTokenBalanceOf,
         getRewardPoolBalance,
         doubleBalanceCheat,

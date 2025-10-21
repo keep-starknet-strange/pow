@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uint256 } from "starknet";
+import { FingerprintJsProProvider } from "@fingerprintjs/fingerprintjs-pro-react-native";
+import { FINGERPRINT_CONFIG } from "../../configs/fingerprint";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,6 +28,7 @@ import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
 import { WalletPresets } from "@/constants/WalletPresets";
+import { useRewardClaimProtection } from "../../hooks/useDeviceFingerprint";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -53,7 +56,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   onBack,
 }) => {
   const { invokeCalls, network } = useStarknetConnector();
-  const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
+  const { powGameContractAddress, getRewardParams, getRewardPoolBalance, markRewardClaimed } =
     usePowContractConnector();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
@@ -71,6 +74,15 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { notify } = useEventManager();
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
+  const {
+    fingerprint,
+    isLoading: isFingerprintLoading,
+    error: fingerprintError,
+    isFingerprintValid,
+    hasClaimedReward,
+    markRewardAsClaimed,
+    refreshFingerprint,
+  } = useRewardClaimProtection();
 
   const handleBack = useCallback(() => {
     if (onBack) onBack();
@@ -86,6 +98,28 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       if (__DEV__) console.error("pow_game contract address not set");
       return;
     }
+
+    // Check device fingerprint protection
+    if (!isFingerprintValid) {
+      setTxErrorMessage("Device verification required. Please wait...");
+      return;
+    }
+
+    // Check if this device has already claimed a reward
+    if (hasClaimedReward) {
+      // Mark the reward as claimed on the contract for this user
+      try {
+        await markRewardClaimed(recipient);
+        setClaimed(true);
+        setTxErrorMessage("Reward already claimed for this device.");
+        return;
+      } catch (error) {
+        console.error("Failed to mark reward as claimed:", error);
+        setTxErrorMessage("Reward already claimed for this device.");
+        return;
+      }
+    }
+
     const call = {
       contractAddress: powGameContractAddress,
       entrypoint: "claim_reward",
@@ -101,6 +135,8 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         setClaimTxHash(hash);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+        // Mark this device as having claimed a reward
+        await markRewardAsClaimed();
         // Notify achievement system that STRK reward was claimed
         notify("RewardClaimed", { recipient, transactionHash: hash });
       } else {
@@ -127,7 +163,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     } finally {
       setClaiming(false);
     }
-  }, [debouncedInput, powGameContractAddress, invokeCalls]);
+  }, [debouncedInput, powGameContractAddress, invokeCalls, isFingerprintValid, hasClaimedReward, markRewardClaimed]);
 
   useEffect(() => {
     (async () => {
@@ -203,7 +239,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         ? `CLAIMING ${rewardAmountStr} STRK`
         : `CLAIM ${rewardAmountStr} STRK`;
 
-  const claimDisabled = claimed || claiming || !isValidAddress;
+  const claimDisabled = claimed || claiming || !isValidAddress || isFingerprintLoading || !isFingerprintValid;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
@@ -241,6 +277,26 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
             </Text>
             {claimed ? (
               <Text style={styles.messageHighlight}>Reward claimed!</Text>
+            ) : isFingerprintLoading ? (
+              <Text style={styles.messageSub}>
+                Verifying device... Please wait.
+              </Text>
+            ) : !isFingerprintValid ? (
+              <>
+                <Text style={styles.messageSub}>
+                  Device verification failed.
+                </Text>
+                <TouchableOpacity
+                  style={styles.refreshButton}
+                  onPress={refreshFingerprint}
+                >
+                  <Text style={styles.refreshButtonText}>Refresh Device Verification</Text>
+                </TouchableOpacity>
+              </>
+            ) : hasClaimedReward ? (
+              <Text style={styles.messageHighlight}>
+                Reward already claimed on this device.
+              </Text>
             ) : (
               <>
                 <Text style={styles.messageHighlight}>
@@ -330,7 +386,19 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   );
 };
 
-export const ClaimRewardSection = React.memo(ClaimRewardSectionComponent);
+const ClaimRewardSectionWithProvider: React.FC<ClaimRewardProps> = (props) => {
+  return (
+    <FingerprintJsProProvider
+      apiKey={FINGERPRINT_CONFIG.apiKey}
+      region={FINGERPRINT_CONFIG.region}
+      extendedResponseFormat={FINGERPRINT_CONFIG.options.extendedResult}
+    >
+      <ClaimRewardSectionComponent {...props} />
+    </FingerprintJsProProvider>
+  );
+};
+
+export const ClaimRewardSection = React.memo(ClaimRewardSectionWithProvider);
 
 const styles = StyleSheet.create({
   safe: {
@@ -449,5 +517,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontFamily: "Pixels",
+  },
+  refreshButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginTop: 8,
+    alignSelf: "center",
+  },
+  refreshButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Pixels",
+    textAlign: "center",
   },
 });
