@@ -244,16 +244,9 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
-      const fullWarnMsg = `❌ ActionsCall ${currentItem.id} failed (attempt ${
-        currentItem.retryCount + 1
-      }/${MAX_RETRIES}): ${errorMessage}`;
-      if (__DEV__) {
-        console.log(fullWarnMsg);
-      }
-
       // Check if we should retry
       if (currentItem.retryCount < MAX_RETRIES - 1) {
-        // Update retry count for first item
+        // Update retry count for first item (no Sentry logging here)
         set((state) => ({
           invokeQueue: state.invokeQueue.map((item, index) =>
             index === 0
@@ -266,18 +259,40 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           ),
         }));
 
-        Sentry.captureMessage(fullWarnMsg, "warning");
+        if (__DEV__) {
+          console.log(
+            `❌ ActionsCall ${currentItem.id} failed (attempt ${
+              currentItem.retryCount + 1
+            }/${MAX_RETRIES}): ${errorMessage}`,
+          );
+        }
+
         // Wait before retrying
         await delay(RETRY_DELAY_MS);
       } else {
-        // Max retries reached - clear entire queue
-        const fullErrorMsg = `🛑 ActionsCall ${currentItem.id} failed after ${MAX_RETRIES} attempts. Initiating revert. Last error: ${errorMessage}`;
+        // Max retries reached - log to Sentry with full context
         if (__DEV__) {
-          console.error(fullErrorMsg);
+          console.error(
+            `🛑 ActionsCall ${currentItem.id} failed after ${MAX_RETRIES} attempts. Initiating revert. Last error: ${errorMessage}`,
+          );
         }
 
+        Sentry.captureException(error, {
+          level: "error",
+          extra: {
+            actionCallId: currentItem.id,
+            retryCount: currentItem.retryCount,
+            maxRetries: MAX_RETRIES,
+            actionsCount: currentItem.actions.length,
+            queueLength: state.invokeQueue.length,
+            lastError: errorMessage,
+          },
+          tags: {
+            error_type: "transaction_failure",
+          },
+        });
+
         get().revert(currentItem.id, errorMessage);
-        Sentry.captureMessage(fullErrorMsg, "error");
         return; // Don't continue processing
       }
     } finally {
