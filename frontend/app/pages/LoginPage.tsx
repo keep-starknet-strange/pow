@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { FingerprintJsProProvider } from "@fingerprintjs/fingerprintjs-pro-react-native";
 import { LoginMainPage } from "./login/Main";
 import { AccountCreationPage } from "./login/AccountCreation";
 import { SettingsPage } from "./SettingsPage";
 import { MainBackground } from "../components/MainBackground";
-import { FINGERPRINT_CONFIG } from "../configs/fingerprint";
 
 export const LoginPage: React.FC = () => {
   const loginPages = {
@@ -26,25 +24,20 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <FingerprintJsProProvider 
-      apiKey={FINGERPRINT_CONFIG.apiKey} 
-      region={FINGERPRINT_CONFIG.region}
-    >
-      <View className="flex-1 items-center">
-        <MainBackground />
-        <View className="absolute w-full h-full">
-          {currentPage === "login" ? (
-            <LoginMainPage
-              setLoginPage={setLoginPage}
-              setSettingTab={handleSetSettingTab}
-            />
-          ) : currentPage === "settings" ? (
-            <SettingsPage setLoginPage={setLoginPage} initialTab={settingsTab} />
-          ) : (
-            <AccountCreationPage setLoginPage={setLoginPage} />
-          )}
-        </View>
+    <View className="flex-1 items-center">
+      <MainBackground />
+      <View className="absolute w-full h-full">
+        {currentPage === "login" ? (
+          <LoginMainPage
+            setLoginPage={setLoginPage}
+            setSettingTab={handleSetSettingTab}
+          />
+        ) : currentPage === "settings" ? (
+          <SettingsPage setLoginPage={setLoginPage} initialTab={settingsTab} />
+        ) : (
+          <AccountCreationPage setLoginPage={setLoginPage} />
+        )}
       </View>
-    </FingerprintJsProProvider>
+    </View>
   );
 };

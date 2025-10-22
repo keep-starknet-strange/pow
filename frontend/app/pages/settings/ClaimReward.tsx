@@ -57,9 +57,11 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
-  const { data: visitorData, isLoading: fingerprintLoading } = useVisitorData();
+  const { data: visitorData, isLoading: fingerprintLoading, error: fingerprintHookError, getData } = useVisitorData();
   console.log('Claim Reward - Fingerprint loading:', fingerprintLoading);
+  console.log('Claim Reward - Fingerprint error:', fingerprintHookError);
   console.log('Claim Reward - Visitor data:', visitorData);
+  console.log('Claim Reward - Fingerprint getData function:', getData);
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
@@ -78,6 +80,14 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
 
+  // Try to manually trigger fingerprint data if it's not loading
+  React.useEffect(() => {
+    if (!fingerprintLoading && !visitorData && !fingerprintHookError && getData) {
+      console.log('Claim Reward - Manually triggering fingerprint data fetch...');
+      getData();
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+
   const handleBack = useCallback(() => {
     if (onBack) onBack();
   }, [onBack]);
@@ -90,6 +100,13 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     }
     if (!powGameContractAddress) {
       if (__DEV__) console.error("pow_game contract address not set");
+      return;
+    }
+
+    // Check if fingerprint is still loading
+    if (fingerprintLoading) {
+      console.log('Claim Reward - Fingerprint still loading');
+      setFingerprintError("Device verification is loading. Please wait...");
       return;
     }
 
