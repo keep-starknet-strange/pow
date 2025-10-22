@@ -34,3 +34,11 @@ export interface FingerprintError {
   message: string;
   code?: string;
 }
+
+// Validation result types
+export interface FingerprintValidationResult {
+  is_unique: boolean;
+  is_valid: boolean;
+  message?: string;
+  timestamp?: number;
+}

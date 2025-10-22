@@ -75,13 +75,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
   const {
-    fingerprint,
+    canClaimReward,
+    validationResult,
     isLoading: isFingerprintLoading,
-    error: fingerprintError,
-    isFingerprintValid,
-    hasClaimedReward,
-    markRewardAsClaimed,
-    refreshFingerprint,
+    checkRewardEligibility,
   } = useRewardClaimProtection();
 
   const handleBack = useCallback(() => {
@@ -99,26 +96,30 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       return;
     }
 
-    // Check device fingerprint protection
-    if (!isFingerprintValid) {
-      setTxErrorMessage("Device verification required. Please wait...");
+    // 1. Validate fingerprint first
+    try {
+      const isValid = await checkRewardEligibility(recipient);
+      if (!isValid) {
+        setTxErrorMessage('This device has already claimed a reward or fingerprint validation failed');
+        return;
+      }
+    } catch (error: any) {
+      console.error('Fingerprint validation failed:', error);
+      
+      // Enhanced error handling with specific messages
+      if (error.message?.includes('Rate limit exceeded')) {
+        setTxErrorMessage('Too many reward claim verification attempts. Please wait before trying again.');
+      } else if (error.message?.includes('Fingerprint not available')) {
+        setTxErrorMessage('Device verification is not ready. Please wait and try again.');
+      } else if (error.message?.includes('Validation failed')) {
+        setTxErrorMessage('Reward claim verification failed. Please check your connection and try again.');
+      } else {
+        setTxErrorMessage('Reward claim verification failed. Please try again.');
+      }
       return;
     }
 
-    // Check if this device has already claimed a reward
-    if (hasClaimedReward) {
-      // Mark the reward as claimed on the contract for this user
-      try {
-        await markRewardClaimed(recipient);
-        setClaimed(true);
-        setTxErrorMessage("Reward already claimed for this device.");
-        return;
-      } catch (error) {
-        console.error("Failed to mark reward as claimed:", error);
-        setTxErrorMessage("Reward already claimed for this device.");
-        return;
-      }
-    }
+    // 2. Proceed with reward claim
 
     const call = {
       contractAddress: powGameContractAddress,
@@ -131,14 +132,13 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
       if (hash) {
-        setClaimed(true);
+        setClaimed(false);
         setClaimTxHash(hash);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
         // Mark this device as having claimed a reward
-        await markRewardAsClaimed();
         // Notify achievement system that STRK reward was claimed
-        notify("RewardClaimed", { recipient, transactionHash: hash });
+        // notify("RewardClaimed", { recipient, transactionHash: hash });
       } else {
         throw new Error("Transaction completed but no hash returned");
       }
@@ -163,7 +163,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     } finally {
       setClaiming(false);
     }
-  }, [debouncedInput, powGameContractAddress, invokeCalls, isFingerprintValid, hasClaimedReward, markRewardClaimed]);
+  }, [debouncedInput, powGameContractAddress, invokeCalls, checkRewardEligibility]);
 
   useEffect(() => {
     (async () => {
@@ -239,7 +239,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         ? `CLAIMING ${rewardAmountStr} STRK`
         : `CLAIM ${rewardAmountStr} STRK`;
 
-  const claimDisabled = claimed || claiming || !isValidAddress || isFingerprintLoading || !isFingerprintValid;
+  const claimDisabled = claimed || claiming || !isValidAddress || isFingerprintLoading || !canClaimReward;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
@@ -281,29 +281,28 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
               <Text style={styles.messageSub}>
                 Verifying device... Please wait.
               </Text>
-            ) : !isFingerprintValid ? (
+            ) : false ? (
               <>
                 <Text style={styles.messageSub}>
                   Device verification failed.
                 </Text>
                 <TouchableOpacity
                   style={styles.refreshButton}
-                  onPress={refreshFingerprint}
+                  onPress={() => {
+                    // Refresh fingerprint validation
+                    window.location.reload();
+                  }}
                 >
                   <Text style={styles.refreshButtonText}>Refresh Device Verification</Text>
                 </TouchableOpacity>
               </>
-            ) : hasClaimedReward ? (
-              <Text style={styles.messageHighlight}>
-                Reward already claimed on this device.
-              </Text>
             ) : (
               <>
                 <Text style={styles.messageHighlight}>
                   You are now eligible for {rewardAmountStr} STRK
                 </Text>
                 <Text style={styles.messageSub}>
-                  To claim this reward you’ll need a dedicated Starknet wallet.
+                  To claim this reward you'll need a dedicated Starknet wallet.
                 </Text>
               </>
             )}
@@ -356,7 +355,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
           <ClaimRewardAction
             action={claimReward}
             label={claimLabel}
-            disabled={claimDisabled}
+            disabled={false}
           />
           {claimed && claimTxHash && (
             <TouchableOpacity
