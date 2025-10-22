@@ -9,8 +9,11 @@ import {
   View,
   Dimensions,
 } from "react-native";
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocEngine } from "../../context/FocEngineConnector";
 import { useStarknetConnector } from "../../context/StarknetConnector";
+import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import NounsBuilder from "../../components/NounsBuilder";
@@ -19,6 +22,7 @@ import AvatarCreator from "./AvatarCreator";
 import Constants from "expo-constants";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import { generateRandomUsername } from "../../utils/usernameGenerator";
+import { visitorIdToFelt252 } from "../../configs/fingerprint";
 import {
   Canvas,
   FilterMode,
@@ -54,6 +58,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     getAvailableKeys,
     storeKeyAndConnect,
   } = useStarknetConnector();
+  const { setUserToAddress, hasClaimedUserReward } = usePowContractConnector();
+  const { data: visitorData, isLoading: fingerprintLoading } = useVisitorData();
+  console.log('Fingerprint loading state:', fingerprintLoading);
+  console.log('Visitor data:', visitorData);
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
@@ -151,6 +159,28 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           privateKey,
           3,
         );
+      }
+
+      // Handle fingerprint integration after account creation
+      if (visitorData?.visitorId) {
+        try {
+          const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
+          console.log('Converted visitor ID to felt252:', visitorIdFelt);
+          // Set user to address mapping
+          await setUserToAddress(visitorIdFelt);
+          console.log('Successfully set user to address mapping');
+          // Check if this fingerprint has already claimed reward
+          const hasClaimed = await hasClaimedUserReward(visitorIdFelt);
+          console.log('Has claimed user reward:', hasClaimed);
+          if (hasClaimed) {
+            // Store in AsyncStorage that this fingerprint has claimed reward
+            await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
+            console.log('Stored fingerprint reward claimed flag');
+          }
+        } catch (fingerprintError) {
+          console.error("Error handling fingerprint data:", fingerprintError);
+          // Don't fail account creation if fingerprint fails
+        }
       }
     } catch (error) {
       console.error("Error creating account and claiming username:", error);
