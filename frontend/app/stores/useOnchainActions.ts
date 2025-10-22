@@ -61,7 +61,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
   actions: [],
-  maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 100,
+  maxActions: Number(process.env.EXPO_PUBLIC_MAX_ACTIONS) || 150,
   invokeQueue: [],
   isProcessing: false,
   isReverting: false,
