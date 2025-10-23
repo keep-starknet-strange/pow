@@ -251,34 +251,40 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     getTokenBalanceOf,
   ]);
 
-  const setUserToAddress = useCallback(async (user: string) => {
-    if (!STARKNET_ENABLED || !powGameContractAddress) {
-      return;
-    }
-    try {
-      const setUserCall: Call = {
-        contractAddress: powGameContractAddress,
-        entrypoint: "set_user_to_address",
-        calldata: [user],
-      };
-      addAction(setUserCall);
-    } catch (error) {
-      console.error("Failed to set user to address:", error);
-    }
-  }, [powGameContractAddress, addAction, STARKNET_ENABLED]);
+  const setUserToAddress = useCallback(
+    async (user: string) => {
+      if (!STARKNET_ENABLED || !powGameContractAddress) {
+        return;
+      }
+      try {
+        const setUserCall: Call = {
+          contractAddress: powGameContractAddress,
+          entrypoint: "set_user_to_address",
+          calldata: [user],
+        };
+        addAction(setUserCall);
+      } catch (error) {
+        console.error("Failed to set user to address:", error);
+      }
+    },
+    [powGameContractAddress, addAction, STARKNET_ENABLED],
+  );
 
-  const hasClaimedUserReward = useCallback(async (user: string) => {
-    if (!STARKNET_ENABLED || !powContract) {
-      return;
-    }
-    try {
-      const claimed = await powContract.has_claimed_user_reward(user);
-      return Boolean(claimed);
-    } catch (error) {
-      console.error("Failed to check if user has claimed reward:", error);
-      return undefined;
-    }
-  }, [powContract, STARKNET_ENABLED]);
+  const hasClaimedUserReward = useCallback(
+    async (user: string) => {
+      if (!STARKNET_ENABLED || !powContract) {
+        return;
+      }
+      try {
+        const claimed = await powContract.has_claimed_user_reward(user);
+        return Boolean(claimed);
+      } catch (error) {
+        console.error("Failed to check if user has claimed reward:", error);
+        return undefined;
+      }
+    },
+    [powContract, STARKNET_ENABLED],
+  );
 
   const createGameAccount = useCallback(async () => {
     if (!STARKNET_ENABLED) {

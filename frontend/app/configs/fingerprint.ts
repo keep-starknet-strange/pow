@@ -1,9 +1,9 @@
 // Fingerprint Pro configuration
 export const FINGERPRINT_CONFIG = {
   // Use environment variable for API key
-  apiKey: process.env.EXPO_PUBLIC_FINGERPRINT_KEY || 'YHxCwd0avx2lIVi3CQ50',
+  apiKey: process.env.EXPO_PUBLIC_FINGERPRINT_KEY || "YHxCwd0avx2lIVi3CQ50",
   // Choose the appropriate region for your users
-  region: 'ap' as const, // 'us', 'eu', 'ap' for Asia Pacific
+  region: "ap" as const, // 'us', 'eu', 'ap' for Asia Pacific
   // Additional configuration options
   options: {
     // Enable extended result for more detailed device information
@@ -48,9 +48,9 @@ export function visitorIdToFelt252(visitorId: string): string {
   // Convert string to bytes and encode as hex
   const bytes = new TextEncoder().encode(visitorId);
   const hex = Array.from(bytes)
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
-  
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
   // Prepend with 0x and ensure it fits within felt252 range
   return `0x${hex}`;
 }

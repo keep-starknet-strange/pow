@@ -59,7 +59,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     storeKeyAndConnect,
   } = useStarknetConnector();
   const { setUserToAddress, hasClaimedUserReward } = usePowContractConnector();
-  const { data: visitorData, isLoading: fingerprintLoading, error: fingerprintHookError, getData } = useVisitorData();
+  const {
+    data: visitorData,
+    isLoading: fingerprintLoading,
+    error: fingerprintHookError,
+    getData,
+  } = useVisitorData();
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
@@ -81,8 +86,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   // Try to manually trigger fingerprint data if it's not loading
   React.useEffect(() => {
-    if (!fingerprintLoading && !visitorData && !fingerprintHookError && getData) {
-      console.log('Manually triggering fingerprint data fetch...');
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      console.log("Manually triggering fingerprint data fetch...");
       getData();
     }
   }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
@@ -91,17 +101,17 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const handleFingerprintIntegration = async (visitorData: any) => {
     try {
       const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
-      console.log('Converted visitor ID to felt252:', visitorIdFelt);
+      console.log("Converted visitor ID to felt252:", visitorIdFelt);
       // Set user to address mapping
       await setUserToAddress(visitorIdFelt);
-      console.log('Successfully set user to address mapping');
+      console.log("Successfully set user to address mapping");
       // Check if this fingerprint has already claimed reward
       const hasClaimed = await hasClaimedUserReward(visitorIdFelt);
-      console.log('Has claimed user reward:', hasClaimed);
+      console.log("Has claimed user reward:", hasClaimed);
       if (hasClaimed) {
         // Store in AsyncStorage that this fingerprint has claimed reward
         await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
-        console.log('Stored fingerprint reward claimed flag');
+        console.log("Stored fingerprint reward claimed flag");
       }
     } catch (fingerprintError) {
       console.error("Error handling fingerprint data:", fingerprintError);
@@ -197,7 +207,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             await handleFingerprintIntegration(visitorData);
           } else {
             if (__DEV__) {
-              console.log('Fingerprint data still not available after timeout');
+              console.log("Fingerprint data still not available after timeout");
             }
           }
         }, 3000); // Wait 3 seconds and retry
@@ -205,7 +215,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         await handleFingerprintIntegration(visitorData);
       } else {
         if (__DEV__) {
-          console.log('No visitor data available for fingerprint integration');
+          console.log("No visitor data available for fingerprint integration");
         }
       }
     } catch (error) {
@@ -329,10 +339,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       >
         <BasicButton
           label={
-            isSavingAccount 
-              ? "Saving..." 
-              : fingerprintLoading 
-                ? "Loading fingerprint..." 
+            isSavingAccount
+              ? "Saving..."
+              : fingerprintLoading
+                ? "Loading fingerprint..."
                 : "Save"
           }
           disabled={isSavingAccount || fingerprintLoading}

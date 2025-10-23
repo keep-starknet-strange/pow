@@ -57,7 +57,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
-  const { data: visitorData, isLoading: fingerprintLoading, error: fingerprintHookError, getData } = useVisitorData();
+  const {
+    data: visitorData,
+    isLoading: fingerprintLoading,
+    error: fingerprintHookError,
+    getData,
+  } = useVisitorData();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
@@ -78,9 +83,16 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
 
   // Try to manually trigger fingerprint data if it's not loading
   React.useEffect(() => {
-    if (!fingerprintLoading && !visitorData && !fingerprintHookError && getData) {
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
       if (__DEV__) {
-        console.log('Claim Reward - Manually triggering fingerprint data fetch...');
+        console.log(
+          "Claim Reward - Manually triggering fingerprint data fetch...",
+        );
       }
       getData();
     }
@@ -103,7 +115,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
 
     // Check if fingerprint is still loading
     if (fingerprintLoading) {
-      console.log('Claim Reward - Fingerprint still loading');
+      console.log("Claim Reward - Fingerprint still loading");
       setFingerprintError("Device verification is loading. Please wait...");
       return;
     }
@@ -111,13 +123,16 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     // Check fingerprint confidence
     if (!visitorData?.visitorId) {
       if (__DEV__) {
-        console.log('Claim Reward - No visitor ID available');
+        console.log("Claim Reward - No visitor ID available");
       }
       setFingerprintError("Device verification failed. Please try again.");
       return;
     }
     if (__DEV__) {
-      console.log('Claim Reward - Fingerprint confidence:', visitorData.confidence?.score);
+      console.log(
+        "Claim Reward - Fingerprint confidence:",
+        visitorData.confidence?.score,
+      );
     }
     if (visitorData.confidence.score < 0.7) {
       setFingerprintError("Device verification confidence too low.");
@@ -125,7 +140,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     }
 
     const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
-    console.log('Claim Reward - Converted visitor ID to felt252:', visitorIdFelt);
+    console.log(
+      "Claim Reward - Converted visitor ID to felt252:",
+      visitorIdFelt,
+    );
     const call = {
       contractAddress: powGameContractAddress,
       entrypoint: "claim_reward",
@@ -246,7 +264,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         ? `CLAIMING ${rewardAmountStr} STRK`
         : `CLAIM ${rewardAmountStr} STRK`;
 
-  const claimDisabled = claimed || claiming || !isValidAddress || !visitorData?.visitorId || (visitorData?.confidence.score < 0.7);
+  const claimDisabled =
+    claimed ||
+    claiming ||
+    !isValidAddress ||
+    !visitorData?.visitorId ||
+    visitorData?.confidence.score < 0.7;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
@@ -364,7 +387,9 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
 
       {(txErrorMessage || fingerprintError) && (
         <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
-          <Text style={styles.errorText}>{txErrorMessage || fingerprintError}</Text>
+          <Text style={styles.errorText}>
+            {txErrorMessage || fingerprintError}
+          </Text>
         </View>
       )}
 

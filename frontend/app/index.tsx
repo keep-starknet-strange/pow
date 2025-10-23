@@ -31,8 +31,8 @@ export default function App() {
   }
 
   return (
-    <FingerprintJsProProvider 
-      apiKey={FINGERPRINT_CONFIG.apiKey} 
+    <FingerprintJsProProvider
+      apiKey={FINGERPRINT_CONFIG.apiKey}
       region={FINGERPRINT_CONFIG.region}
     >
       <StarknetConnectorProvider>
