@@ -60,10 +60,6 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   } = useStarknetConnector();
   const { setUserToAddress, hasClaimedUserReward } = usePowContractConnector();
   const { data: visitorData, isLoading: fingerprintLoading, error: fingerprintHookError, getData } = useVisitorData();
-  console.log('Fingerprint loading state:', fingerprintLoading);
-  console.log('Fingerprint error:', fingerprintHookError);
-  console.log('Visitor data:', visitorData);
-  console.log('Fingerprint getData function:', getData);
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
@@ -195,22 +191,27 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
       // Handle fingerprint integration after account creation
       if (fingerprintLoading) {
-        console.log('Fingerprint still loading, will retry fingerprint integration later...');
         // Set a timeout to retry fingerprint integration after a delay
         setTimeout(async () => {
           if (visitorData?.visitorId) {
             await handleFingerprintIntegration(visitorData);
           } else {
-            console.log('Fingerprint data still not available after timeout');
+            if (__DEV__) {
+              console.log('Fingerprint data still not available after timeout');
+            }
           }
         }, 3000); // Wait 3 seconds and retry
       } else if (visitorData?.visitorId) {
         await handleFingerprintIntegration(visitorData);
       } else {
-        console.log('No visitor data available for fingerprint integration');
+        if (__DEV__) {
+          console.log('No visitor data available for fingerprint integration');
+        }
       }
     } catch (error) {
-      console.error("Error creating account and claiming username:", error);
+      if (__DEV__) {
+        console.error("Error creating account and claiming username:", error);
+      }
       setUsernameError("Failed to create account. Please try again.");
       notify("BasicError");
     } finally {

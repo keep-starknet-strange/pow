@@ -35,7 +35,7 @@ export interface FingerprintError {
   code?: string;
 }
 
-// Validation result types
+// Validation result types *for BE implementation
 export interface FingerprintValidationResult {
   is_unique: boolean;
   is_valid: boolean;

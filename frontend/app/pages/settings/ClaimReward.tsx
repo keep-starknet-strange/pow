@@ -58,10 +58,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
   const { data: visitorData, isLoading: fingerprintLoading, error: fingerprintHookError, getData } = useVisitorData();
-  console.log('Claim Reward - Fingerprint loading:', fingerprintLoading);
-  console.log('Claim Reward - Fingerprint error:', fingerprintHookError);
-  console.log('Claim Reward - Visitor data:', visitorData);
-  console.log('Claim Reward - Fingerprint getData function:', getData);
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
@@ -83,7 +79,9 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   // Try to manually trigger fingerprint data if it's not loading
   React.useEffect(() => {
     if (!fingerprintLoading && !visitorData && !fingerprintHookError && getData) {
-      console.log('Claim Reward - Manually triggering fingerprint data fetch...');
+      if (__DEV__) {
+        console.log('Claim Reward - Manually triggering fingerprint data fetch...');
+      }
       getData();
     }
   }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
@@ -112,11 +110,15 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
 
     // Check fingerprint confidence
     if (!visitorData?.visitorId) {
-      console.log('Claim Reward - No visitor ID available');
+      if (__DEV__) {
+        console.log('Claim Reward - No visitor ID available');
+      }
       setFingerprintError("Device verification failed. Please try again.");
       return;
     }
-    console.log('Claim Reward - Fingerprint confidence:', visitorData.confidence?.score);
+    if (__DEV__) {
+      console.log('Claim Reward - Fingerprint confidence:', visitorData.confidence?.score);
+    }
     if (visitorData.confidence.score < 0.7) {
       setFingerprintError("Device verification confidence too low.");
       return;
@@ -224,8 +226,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   useEffect(() => {
     (async () => {
       const savedHash = await AsyncStorage.getItem("rewardClaimedTxHash");
-      const fingerprintClaimed = await AsyncStorage.getItem("fingerprintRewardClaimed");
-      if (savedHash || fingerprintClaimed === "true") {
+      if (savedHash) {
         setClaimed(true);
         setClaimTxHash(savedHash);
       }
