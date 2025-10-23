@@ -149,6 +149,7 @@ mod PowGame {
         ChainUnlocked: ChainUnlocked,
         BalanceUpdated: BalanceUpdated,
         TransactionAdded: TransactionAdded,
+        TransactionsAdded: TransactionsAdded,
         BlockMined: BlockMined,
         DAStored: DAStored,
         ProofStored: ProofStored,
@@ -461,10 +462,7 @@ mod PowGame {
             let mut max_validated_tx_type: u32 = 0;
             let mut any_validated = false;
             let mut i: u32 = 0;
-            loop {
-                if i >= tx_type_ids.len() {
-                    break;
-                }
+            while i != tx_type_ids.len() {
                 let tx_type_id = *tx_type_ids.at(i);
 
                 // Only validate if this is larger than any tx_type we've validated
@@ -477,23 +475,19 @@ mod PowGame {
                 i += 1;
             };
 
-            // Accumulate fees and emit events for all transactions
+            // Accumulate fees
             let mut total_fees_accumulated: u128 = 0;
             let mut i: u32 = 0;
-            loop {
-                if i >= tx_type_ids.len() {
-                    break;
-                }
+            while i != tx_type_ids.len() {
                 let tx_type_id = *tx_type_ids.at(i);
                 let tx_fees = self.transactions.get_my_tx_fee_value(chain_id, tx_type_id);
                 let total_fees = tx_fees * mev_boost * prestige_scaler;
 
                 total_fees_accumulated += total_fees;
-                self.emit(TransactionAdded { user: caller, chain_id, tx_type_id, fees: total_fees });
-
                 i += 1;
             };
 
+            self.emit(TransactionsAdded { user: caller, chain_id, tx_type_ids: tx_type_ids.clone(), fees: total_fees_accumulated });
             // Update block storage once with accumulated values
             self.builder.build_block_bundled(chain_id, total_fees_accumulated, tx_type_ids.len());
         }
