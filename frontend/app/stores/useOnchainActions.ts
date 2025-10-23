@@ -3,6 +3,7 @@ import { Call } from "starknet";
 import { useEventManager } from "./useEventManager";
 import { optimizeTransactions } from "../utils/transactionOptimization";
 import { useTransactionOptimizationStore } from "./useTransactionOptimizationStore";
+import * as Sentry from "@sentry/react-native";
 
 interface ActionsCall {
   id: string;
@@ -243,16 +244,9 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
-      if (__DEV__) {
-        console.log(
-          `❌ ActionsCall ${currentItem.id} failed (attempt ${currentItem.retryCount + 1}/${MAX_RETRIES}):`,
-          errorMessage,
-        );
-      }
-
       // Check if we should retry
       if (currentItem.retryCount < MAX_RETRIES - 1) {
-        // Update retry count for first item
+        // Update retry count for first item (no Sentry logging here)
         set((state) => ({
           invokeQueue: state.invokeQueue.map((item, index) =>
             index === 0
@@ -265,15 +259,38 @@ export const useOnchainActions = create<OnchainActionsState>((set, get) => ({
           ),
         }));
 
+        if (__DEV__) {
+          console.log(
+            `❌ ActionsCall ${currentItem.id} failed (attempt ${
+              currentItem.retryCount + 1
+            }/${MAX_RETRIES}): ${errorMessage}`,
+          );
+        }
+
         // Wait before retrying
         await delay(RETRY_DELAY_MS);
       } else {
-        // Max retries reached - clear entire queue
+        // Max retries reached - log to Sentry with full context
         if (__DEV__) {
           console.error(
-            `🛑 ActionsCall ${currentItem.id} permanently failed. Clearing entire queue (${state.invokeQueue.length} items). Last error: ${errorMessage}`,
+            `🛑 ActionsCall ${currentItem.id} failed after ${MAX_RETRIES} attempts. Initiating revert. Last error: ${errorMessage}`,
           );
         }
+
+        Sentry.captureException(error, {
+          level: "error",
+          extra: {
+            actionCallId: currentItem.id,
+            retryCount: currentItem.retryCount,
+            maxRetries: MAX_RETRIES,
+            actionsCount: currentItem.actions.length,
+            queueLength: state.invokeQueue.length,
+            lastError: errorMessage,
+          },
+          tags: {
+            error_type: "transaction_failure",
+          },
+        });
 
         get().revert(currentItem.id, errorMessage);
         return; // Don't continue processing
