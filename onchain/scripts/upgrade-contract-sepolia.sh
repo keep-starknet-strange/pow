@@ -2,6 +2,10 @@
 #
 # This script upgrades the POW! contract on Sepolia
 #
+STARKNET_KEYSTORE=/Users/zackwilliams/.starkli/sepolia/deployer_keystore.json
+STARKNET_ACCOUNT=/Users/zackwilliams/.starkli/sepolia/deployer_account.json
+STARKNET_KEYSTORE_PASSWORD=benice
+RPC_URL=https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/pdHWGZFXkHirZbLs2gw25sSmlNHfEawV
 
 if [ "$FOC_ENV_FILE" ]; then
     source $FOC_ENV_FILE

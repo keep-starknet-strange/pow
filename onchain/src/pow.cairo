@@ -95,6 +95,11 @@ mod PowGame {
         reward_claimed: Map<ContractAddress, bool>,
         // Maps: recipient address -> reward received
         received_reward: Map<ContractAddress, bool>,
+        // Maps: user id ->  bool  -> reward claimed
+        address_to_user: Map<ContractAddress, felt252>,
+        // Maps: user address -> exists flag
+        address_exists: Map<ContractAddress, bool>,
+        user_reward_claimed: Map<felt252, bool>,
         // Cheat codes enabled flag
         cheat_codes_enabled: bool,
         #[substorage(v0)]
@@ -143,6 +148,13 @@ mod PowGame {
         recipient: ContractAddress,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct IneligibleClaim {
+        #[key]
+        user: ContractAddress,
+        recipient: ContractAddress,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
@@ -169,6 +181,7 @@ mod PowGame {
         PausableEvent: PausableComponent::Event,
         CheatCodeUsed: CheatCodeUsed,
         DoubleClaim: DoubleClaim,
+        IneligibleClaim: IneligibleClaim,
     }
 
     #[constructor]
@@ -305,11 +318,18 @@ mod PowGame {
             self.reward_claimed.read(user)
         }
 
-        fn claim_reward(ref self: ContractState, recipient: ContractAddress) {
+        fn has_claimed_user_reward(self: @ContractState, user: felt252) -> bool {
+            self.user_reward_claimed.read(user)
+        }
+        
+        fn claim_reward(ref self: ContractState, recipient: ContractAddress, user: felt252) {
             self.pausable.assert_not_paused();
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
             assert!(!claimed, "Reward already claimed");
+            let user_reward_claimed = self.user_reward_claimed.read(user);
+            assert!(!user_reward_claimed, "User reward already claimed");
+            let address_exists = self.address_exists.read(caller);
             let recipient_received = self.received_reward.read(recipient);
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
@@ -317,7 +337,8 @@ mod PowGame {
 
             self.reward_claimed.write(caller, true);
             self.received_reward.write(recipient, true);
-            if !recipient_received {
+            self.user_reward_claimed.write(user, true);
+            if !recipient_received && !user_reward_claimed && address_exists{
                 let success: bool = IERC20Dispatcher {
                     contract_address: self.reward_token_address.read(),
                 }
@@ -325,9 +346,21 @@ mod PowGame {
 
                 assert!(success, "Reward transfer failed");
                 self.emit(RewardClaimed { user: caller, recipient });
-            } else {
+            } else if recipient_received && !user_reward_claimed {
                 self.emit(DoubleClaim { user: caller, recipient });
+            } else {
+                self.emit(IneligibleClaim { user: caller, recipient });
             }
+        }
+
+        fn set_user_to_address(ref self: ContractState, user: felt252) {
+            let caller = get_caller_address();
+            if !self.address_exists.read(caller) && !self.user_reward_claimed.read(user) {
+                // Key doesn't exist - first time writing this caller and the user hasn't claimed reward yet
+                self.address_exists.write(caller, true);
+                self.address_to_user.write(caller, user);
+            }
+            // If key exists, do nothing
         }
 
         fn host_give_reward(
