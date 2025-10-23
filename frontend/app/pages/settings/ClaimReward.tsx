@@ -27,7 +27,7 @@ import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
 import { WalletPresets } from "@/constants/WalletPresets";
-import { visitorIdToFelt252 } from "../../configs/fingerprint";
+import { visitorIdToFelt252, FINGERPRINT_CONFIG } from "../../configs/fingerprint";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -134,7 +134,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         visitorData.confidence?.score,
       );
     }
-    if (visitorData.confidence.score < 0.7) {
+    if (visitorData.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold) {
       setFingerprintError("Device verification confidence too low.");
       return;
     }
@@ -269,7 +269,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     claiming ||
     !isValidAddress ||
     !visitorData?.visitorId ||
-    visitorData?.confidence.score < 0.7;
+    visitorData?.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
