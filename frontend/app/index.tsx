@@ -1,10 +1,12 @@
 import "react-native-get-random-values";
 import React, { useEffect, useState } from "react";
 import * as Font from "expo-font";
+import { FingerprintJsProProvider } from "@fingerprintjs/fingerprintjs-pro-react-native";
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
 import { useImagePreloader } from "./hooks/useImagePreloader";
+import { FINGERPRINT_CONFIG } from "./configs/fingerprint";
 import Game from "./game";
 
 export default function App() {
@@ -29,12 +31,17 @@ export default function App() {
   }
 
   return (
-    <StarknetConnectorProvider>
-      <FocEngineProvider>
-        <PowContractProvider>
-          <Game />
-        </PowContractProvider>
-      </FocEngineProvider>
-    </StarknetConnectorProvider>
+    <FingerprintJsProProvider
+      apiKey={FINGERPRINT_CONFIG.apiKey}
+      region={FINGERPRINT_CONFIG.region}
+    >
+      <StarknetConnectorProvider>
+        <FocEngineProvider>
+          <PowContractProvider>
+            <Game />
+          </PowContractProvider>
+        </FocEngineProvider>
+      </StarknetConnectorProvider>
+    </FingerprintJsProProvider>
   );
 }
