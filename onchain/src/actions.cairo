@@ -37,7 +37,6 @@ pub struct TransactionsAdded {
     pub user: ContractAddress,
     #[key]
     pub chain_id: u32,
-    #[key]
     pub tx_type_ids: Span<u32>,
     pub fees: u128,
 }
