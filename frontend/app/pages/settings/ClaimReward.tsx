@@ -27,7 +27,10 @@ import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
 import { WalletPresets } from "@/constants/WalletPresets";
-import { visitorIdToFelt252, FINGERPRINT_CONFIG } from "../../configs/fingerprint";
+import {
+  visitorIdToFelt252,
+  FINGERPRINT_CONFIG,
+} from "../../configs/fingerprint";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
