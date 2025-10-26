@@ -9,7 +9,7 @@
     "start:mainnet": "EXPO_PUBLIC_USE_MOCK=false EXPO_PUBLIC_ENABLE_STARKNET=true EXPO_PUBLIC_STARKNET_CHAIN=SN_MAINNET EXPO_PUBLIC_FOC_ENGINE_API=https://api.pow-game.com EXPO_PUBLIC_ENABLE_CHEAT_CODES=false EXPO_PUBLIC_POW_GAME_CONTRACT_ADDRESS=0x05b4ff547559e1b0681e8f62a0d420f83009a6491f4927f3f158b932abff5f7f EXPO_PUBLIC_ACCOUNTS_CONTRACT_ADDRESS=0x05cccff40f83b960791e0d04b8cd494000d9490661657f93d02dc9a0a1617733 EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS=0x06ff983d4d86dc6fd6f2d94264932dd710c700c22c8c7f075821bb4447f4300b EXPO_PUBLIC_WC_PROJECT_ID=921415a9e038c3704d57962004f8222a npx expo start",
     "start:nomock": "EXPO_PUBLIC_USE_MOCK=false expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android --device",
+    "android": "expo run:android --device --variant release",
     "ios": "expo run:ios --device",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix",
