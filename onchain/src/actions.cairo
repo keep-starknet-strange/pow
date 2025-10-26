@@ -32,6 +32,16 @@ pub struct TransactionAdded {
 }
 
 #[derive(Drop, starknet::Event)]
+pub struct TransactionsAdded {
+    #[key]
+    pub user: ContractAddress,
+    #[key]
+    pub chain_id: u32,
+    pub tx_type_ids: Span<u32>,
+    pub fees: u128,
+}
+
+#[derive(Drop, starknet::Event)]
 pub struct BlockMined {
     #[key]
     pub user: ContractAddress,

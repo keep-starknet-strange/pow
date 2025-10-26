@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
 import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
@@ -26,6 +27,10 @@ import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
 import { WalletPresets } from "@/constants/WalletPresets";
+import {
+  visitorIdToFelt252,
+  FINGERPRINT_CONFIG,
+} from "../../configs/fingerprint";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -55,6 +60,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { invokeCalls, network } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
+  const {
+    data: visitorData,
+    isLoading: fingerprintLoading,
+    error: fingerprintHookError,
+    getData,
+  } = useVisitorData();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
@@ -67,10 +78,28 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     useState<number>(0);
   const [txErrorMessage, setTxErrorMessage] = useState<string | null>(null);
   const [claimTxHash, setClaimTxHash] = useState<string | null>(null);
+  const [fingerprintError, setFingerprintError] = useState<string | null>(null);
   const { width } = useCachedWindowDimensions();
   const { notify } = useEventManager();
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
+
+  // Try to manually trigger fingerprint data if it's not loading
+  React.useEffect(() => {
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      if (__DEV__) {
+        console.log(
+          "Claim Reward - Manually triggering fingerprint data fetch...",
+        );
+      }
+      getData();
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
 
   const handleBack = useCallback(() => {
     if (onBack) onBack();
@@ -86,13 +115,46 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       if (__DEV__) console.error("pow_game contract address not set");
       return;
     }
+
+    // Check if fingerprint is still loading
+    if (fingerprintLoading) {
+      console.log("Claim Reward - Fingerprint still loading");
+      setFingerprintError("Device verification is loading. Please wait...");
+      return;
+    }
+
+    // Check fingerprint confidence
+    if (!visitorData?.visitorId) {
+      if (__DEV__) {
+        console.log("Claim Reward - No visitor ID available");
+      }
+      setFingerprintError("Device verification failed. Please try again.");
+      return;
+    }
+    if (__DEV__) {
+      console.log(
+        "Claim Reward - Fingerprint confidence:",
+        visitorData.confidence?.score,
+      );
+    }
+    if (visitorData.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold) {
+      setFingerprintError("Device verification confidence too low.");
+      return;
+    }
+
+    const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
+    console.log(
+      "Claim Reward - Converted visitor ID to felt252:",
+      visitorIdFelt,
+    );
     const call = {
       contractAddress: powGameContractAddress,
       entrypoint: "claim_reward",
-      calldata: [recipient] as string[],
+      calldata: [recipient, visitorIdFelt] as string[],
     };
     setClaiming(true);
     setTxErrorMessage(null);
+    setFingerprintError(null);
     try {
       const res = await invokeCalls([call], 1);
       const hash = res?.data?.transactionHash || res?.transaction_hash || null;
@@ -101,6 +163,8 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         setClaimTxHash(hash);
         // Save transaction hash to AsyncStorage after successful transaction
         await AsyncStorage.setItem("rewardClaimedTxHash", hash);
+        // Save fingerprint reward claimed flag
+        await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
         // Notify achievement system that STRK reward was claimed
         notify("RewardClaimed", { recipient, transactionHash: hash });
       } else {
@@ -127,7 +191,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     } finally {
       setClaiming(false);
     }
-  }, [debouncedInput, powGameContractAddress, invokeCalls]);
+  }, [debouncedInput, powGameContractAddress, invokeCalls, visitorData]);
 
   useEffect(() => {
     (async () => {
@@ -179,7 +243,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     };
   }, [getRewardPoolBalance, rewardAmountRaw]);
 
-  // Load saved transaction hash on mount
+  // Load saved transaction hash and fingerprint reward status on mount
   useEffect(() => {
     (async () => {
       const savedHash = await AsyncStorage.getItem("rewardClaimedTxHash");
@@ -203,7 +267,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         ? `CLAIMING ${rewardAmountStr} STRK`
         : `CLAIM ${rewardAmountStr} STRK`;
 
-  const claimDisabled = claimed || claiming || !isValidAddress;
+  const claimDisabled =
+    claimed ||
+    claiming ||
+    !isValidAddress ||
+    !visitorData?.visitorId ||
+    visitorData?.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
@@ -319,9 +388,11 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         <ClaimRewardAction action={handleBack} label="BACK" disabled={false} />
       </View>
 
-      {txErrorMessage && (
+      {(txErrorMessage || fingerprintError) && (
         <View style={[styles.bannerOverlay, { top: insets.top + 8 }]}>
-          <Text style={styles.errorText}>{txErrorMessage}</Text>
+          <Text style={styles.errorText}>
+            {txErrorMessage || fingerprintError}
+          </Text>
         </View>
       )}
 
