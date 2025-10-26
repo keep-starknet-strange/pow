@@ -33,9 +33,11 @@ pub trait IPowGame<TContractState> {
 #[starknet::interface]
 pub trait IPowGameRewards<TContractState> {
     fn set_reward_params(ref self: TContractState, reward_params: RewardParams);
-    fn claim_reward(ref self: TContractState, recipient: ContractAddress);
+    fn claim_reward(ref self: TContractState, recipient: ContractAddress, user: felt252);
     fn get_reward_params(self: @TContractState) -> RewardParams;
     fn has_claimed_reward(self: @TContractState, user: ContractAddress) -> bool;
+    fn has_claimed_user_reward(self: @TContractState, user: felt252) -> bool;
+    fn set_user_to_address(ref self: TContractState, user: felt252);
     fn host_give_reward(
         ref self: TContractState, user: ContractAddress, recipient: ContractAddress,
     );

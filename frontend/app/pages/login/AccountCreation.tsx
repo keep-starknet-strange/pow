@@ -9,8 +9,11 @@ import {
   View,
   Dimensions,
 } from "react-native";
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocEngine } from "../../context/FocEngineConnector";
 import { useStarknetConnector } from "../../context/StarknetConnector";
+import { usePowContractConnector } from "../../context/PowContractConnector";
 import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import NounsBuilder from "../../components/NounsBuilder";
@@ -19,6 +22,7 @@ import AvatarCreator from "./AvatarCreator";
 import Constants from "expo-constants";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import { generateRandomUsername } from "../../utils/usernameGenerator";
+import { visitorIdToFelt252 } from "../../configs/fingerprint";
 import {
   Canvas,
   FilterMode,
@@ -54,6 +58,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     getAvailableKeys,
     storeKeyAndConnect,
   } = useStarknetConnector();
+  const { setUserToAddress, hasClaimedUserReward } = usePowContractConnector();
+  const {
+    data: visitorData,
+    isLoading: fingerprintLoading,
+    error: fingerprintHookError,
+    getData,
+  } = useVisitorData();
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
   const { width } = Dimensions.get("window");
@@ -72,6 +83,41 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   );
   const [newAvatar, setNewAvatar] = React.useState<NounsAttributes>(avatar);
   const [creatingAvatar, setCreatingAvatar] = React.useState<boolean>(false);
+
+  // Try to manually trigger fingerprint data if it's not loading
+  React.useEffect(() => {
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      console.log("Manually triggering fingerprint data fetch...");
+      getData();
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+
+  // Extract fingerprint integration logic into separate function
+  const handleFingerprintIntegration = async (visitorData: any) => {
+    try {
+      const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
+      console.log("Converted visitor ID to felt252:", visitorIdFelt);
+      // Set user to address mapping
+      await setUserToAddress(visitorIdFelt);
+      console.log("Successfully set user to address mapping");
+      // Check if this fingerprint has already claimed reward
+      const hasClaimed = await hasClaimedUserReward(visitorIdFelt);
+      console.log("Has claimed user reward:", hasClaimed);
+      if (hasClaimed) {
+        // Store in AsyncStorage that this fingerprint has claimed reward
+        await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
+        console.log("Stored fingerprint reward claimed flag");
+      }
+    } catch (fingerprintError) {
+      console.error("Error handling fingerprint data:", fingerprintError);
+      // Don't fail account creation if fingerprint fails
+    }
+  };
 
   const startCreatingAvatar = () => {
     setCreatingAvatar(true);
@@ -152,8 +198,30 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           3,
         );
       }
+
+      // Handle fingerprint integration after account creation
+      if (fingerprintLoading) {
+        // Set a timeout to retry fingerprint integration after a delay
+        setTimeout(async () => {
+          if (visitorData?.visitorId) {
+            await handleFingerprintIntegration(visitorData);
+          } else {
+            if (__DEV__) {
+              console.log("Fingerprint data still not available after timeout");
+            }
+          }
+        }, 3000); // Wait 3 seconds and retry
+      } else if (visitorData?.visitorId) {
+        await handleFingerprintIntegration(visitorData);
+      } else {
+        if (__DEV__) {
+          console.log("No visitor data available for fingerprint integration");
+        }
+      }
     } catch (error) {
-      console.error("Error creating account and claiming username:", error);
+      if (__DEV__) {
+        console.error("Error creating account and claiming username:", error);
+      }
       setUsernameError("Failed to create account. Please try again.");
       notify("BasicError");
     } finally {
@@ -242,6 +310,16 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
               Please notice: your username will be public
             </Text>
+            {fingerprintLoading && (
+              <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
+                Loading device fingerprint...
+              </Text>
+            )}
+            {!fingerprintLoading && !visitorData && !fingerprintHookError && (
+              <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
+                Fingerprint not loaded. Try refreshing the page.
+              </Text>
+            )}
             {usernameError ? (
               <Text className="text-red-500 text-md mt-2 font-Pixels">
                 {usernameError}
@@ -260,8 +338,14 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         entering={FadeInDown}
       >
         <BasicButton
-          label={isSavingAccount ? "Saving..." : "Save"}
-          disabled={isSavingAccount}
+          label={
+            isSavingAccount
+              ? "Saving..."
+              : fingerprintLoading
+                ? "Loading fingerprint..."
+                : "Save"
+          }
+          disabled={isSavingAccount || fingerprintLoading}
           onPress={async () => {
             if (!isUsernameValid(username)) {
               setUsernameError(`Invalid username:\n${usernameValidationError}`);
