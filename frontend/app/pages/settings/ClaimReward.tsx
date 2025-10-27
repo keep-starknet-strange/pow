@@ -81,7 +81,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
 
-
   const handleBack = useCallback(() => {
     if (onBack) onBack();
   }, [onBack]);
@@ -108,7 +107,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     if (__DEV__) {
       console.log("Claim Reward - Using visitor ID:", visitorId);
       if (visitorData?.confidence?.score) {
-        console.log("Claim Reward - Fingerprint confidence:", visitorData.confidence.score);
+        console.log(
+          "Claim Reward - Fingerprint confidence:",
+          visitorData.confidence.score,
+        );
       }
     }
     const call = {
@@ -155,7 +157,13 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     } finally {
       setClaiming(false);
     }
-  }, [debouncedInput, powGameContractAddress, invokeCalls, visitorId, fingerprintLoading]);
+  }, [
+    debouncedInput,
+    powGameContractAddress,
+    invokeCalls,
+    visitorId,
+    fingerprintLoading,
+  ]);
 
   useEffect(() => {
     (async () => {
@@ -236,7 +244,8 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     claiming ||
     !isValidAddress ||
     !visitorData?.visitorId ||
-    (visitorData?.confidence?.score ?? 0) < FINGERPRINT_CONFIG.confidenceThreshold;
+    (visitorData?.confidence?.score ?? 0) <
+      FINGERPRINT_CONFIG.confidenceThreshold;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 

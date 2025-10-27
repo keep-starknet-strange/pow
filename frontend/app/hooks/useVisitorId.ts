@@ -5,7 +5,7 @@ import { visitorIdToFelt252 } from "../configs/fingerprint";
 /**
  * Hook to get the visitor ID from fingerprint and convert it to felt252 format.
  * Falls back to "0x0" if fingerprint fails or trial is over.
- * 
+ *
  * @returns An object containing:
  * - visitorId: The visitor ID in felt252 format (or "0x0" if unavailable)
  * - isLoading: Whether the fingerprint data is still loading
@@ -27,7 +27,9 @@ export function useVisitorId() {
       setVisitorId("0x0");
       setHasVisitorId(false);
       if (__DEV__) {
-        console.log("useVisitorId: No visitor ID available, using fallback 0x0");
+        console.log(
+          "useVisitorId: No visitor ID available, using fallback 0x0",
+        );
       }
       return;
     }
@@ -37,7 +39,10 @@ export function useVisitorId() {
     setVisitorId(visitorIdFelt);
     setHasVisitorId(true);
     if (__DEV__) {
-      console.log("useVisitorId: Successfully loaded visitor ID:", visitorIdFelt);
+      console.log(
+        "useVisitorId: Successfully loaded visitor ID:",
+        visitorIdFelt,
+      );
       console.log("useVisitorId: Confidence:", visitorData.confidence?.score);
     }
   }, [visitorData, isLoading, error]);
@@ -50,4 +55,3 @@ export function useVisitorId() {
     hasVisitorId,
   };
 }
-

@@ -8,7 +8,12 @@ import { useVisitorId } from "./useVisitorId";
 export function useRewardsStatus() {
   const [isRewardAvailable, setIsRewardAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { getAreRewardsPaused, getRewardParams, getHasClaimedReward, hasClaimedUserReward } = usePowContractConnector();
+  const {
+    getAreRewardsPaused,
+    getRewardParams,
+    getHasClaimedReward,
+    hasClaimedUserReward,
+  } = usePowContractConnector();
   const { account } = useStarknetConnector();
   const { currentPrestige } = useUpgradesStore();
   const { visitorId } = useVisitorId();
@@ -55,7 +60,7 @@ export function useRewardsStatus() {
         // Check prestige threshold
         const params = await getRewardParams();
         const threshold = params?.rewardPrestigeThreshold || 1;
-        
+
         setIsRewardAvailable(currentPrestige >= threshold);
       } catch (error) {
         console.error("Error checking reward status:", error);
@@ -66,8 +71,15 @@ export function useRewardsStatus() {
     };
 
     checkRewardStatus();
-  }, [currentPrestige, getAreRewardsPaused, getRewardParams, getHasClaimedReward, hasClaimedUserReward, account, visitorId]);
+  }, [
+    currentPrestige,
+    getAreRewardsPaused,
+    getRewardParams,
+    getHasClaimedReward,
+    hasClaimedUserReward,
+    account,
+    visitorId,
+  ]);
 
   return { isRewardAvailable, isLoading };
 }
-
