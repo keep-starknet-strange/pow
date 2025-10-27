@@ -84,6 +84,7 @@ type PowContractContextType = {
     ownerAddress: string,
   ) => Promise<bigint | null>;
   getRewardPoolBalance: () => Promise<bigint | null>;
+  getAreRewardsPaused: () => Promise<boolean | undefined>;
 
   // Fingerprint functions
   setUserToAddress: (user: string) => Promise<void>;
@@ -719,6 +720,17 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [powContract, STARKNET_ENABLED, account]);
 
+  const getAreRewardsPaused = useCallback(async () => {
+    if (!STARKNET_ENABLED || !powContract) return undefined;
+    try {
+      const paused = await powContract.are_rewards_paused();
+      return Boolean(paused);
+    } catch (e) {
+      console.error("Failed to fetch rewards paused state:", e);
+      return undefined;
+    }
+  }, [powContract, STARKNET_ENABLED]);
+
   // Cheat Codes Functions
   const doubleBalanceCheat = useCallback(() => {
     if (!STARKNET_ENABLED || !powGameContractAddress) {
@@ -766,6 +778,7 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
         getHasClaimedReward,
         getTokenBalanceOf,
         getRewardPoolBalance,
+        getAreRewardsPaused,
         setUserToAddress,
         hasClaimedUserReward,
         doubleBalanceCheat,

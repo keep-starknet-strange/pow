@@ -22,6 +22,7 @@ import { useL2Store } from "../../stores/useL2Store";
 import { useAchievementsStore } from "../../stores/useAchievementsStore";
 import { useUpgradesStore } from "../../stores/useUpgradesStore";
 import { useOnchainActions } from "../../stores/useOnchainActions";
+import { useRewardsStatus } from "../../hooks/useRewardsStatus";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
@@ -46,24 +47,11 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
   const { animationLevel, setAnimationLevel } = useAnimations();
   const { disconnectAccount, clearPrivateKeys } = useStarknetConnector();
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
-  const [isRewardClaimed, setIsRewardClaimed] = useState(false);
   const { user, disconnectUser } = useFocEngine();
   const isAuthenticated = user && user.account.username !== "";
-  const { currentPrestige } = useUpgrades();
   const { resetTutorial } = useTutorialStore();
   const { clearQueue } = useOnchainActions();
-
-  useEffect(() => {
-    const loadClaimedState = async () => {
-      try {
-        const claimedTxHash = await AsyncStorage.getItem("rewardClaimedTxHash");
-        setIsRewardClaimed(!!claimedTxHash);
-      } catch (error) {
-        console.error("Error loading claimed state:", error);
-      }
-    };
-    loadClaimedState();
-  }, []);
+  const { isRewardAvailable } = useRewardsStatus();
 
   const handleResetGame = async () => {
     setShowResetConfirmation(false);
@@ -112,7 +100,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
     { label: "Review", onPress: () => StoreReview.requestReview() },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
-    ...(isAuthenticated && currentPrestige >= 1 && !isRewardClaimed
+    ...(isAuthenticated && isRewardAvailable
       ? [{ label: "Claim Reward", tab: "ClaimReward" as const }]
       : []),
     {

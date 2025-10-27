@@ -419,6 +419,10 @@ mod PowGame {
             self.check_valid_host(get_caller_address());
             self.pausable.unpause();
         }
+
+        fn are_rewards_paused(self: @ContractState) -> bool {
+            self.pausable.is_paused()
+        }
     }
 
     #[abi(embed_v0)]
