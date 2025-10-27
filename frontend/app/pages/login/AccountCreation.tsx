@@ -87,12 +87,8 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   // Extract fingerprint integration logic into separate function
   const handleFingerprintIntegration = async () => {
     try {
-      // visitorId is already in felt252 format from the hook
-      console.log("Using visitor ID:", visitorId);
-
       // Set user to address mapping
       await setUserToAddress(visitorId);
-      console.log("Successfully set user to address mapping");
 
       // Check if this fingerprint has already claimed reward (skip check if visitorId is 0x0)
       if (visitorId !== "0x0") {
