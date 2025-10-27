@@ -347,6 +347,7 @@ mod PowGame {
                 assert!(success, "Reward transfer failed");
                 self.emit(RewardClaimed { user: caller, recipient });
             } else if recipient_received && !user_reward_claimed {
+                self.user_reward_claimed.write(user, true);
                 self.emit(DoubleClaim { user: caller, recipient });
             } else {
                 self.emit(IneligibleClaim { user: caller, recipient });
