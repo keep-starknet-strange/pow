@@ -63,6 +63,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     isLoading: fingerprintLoading,
     error: fingerprintHookError,
     rawVisitorData: visitorData,
+    getData,
   } = useVisitorId();
 
   const { getImage } = useImages();
@@ -84,6 +85,40 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const [newAvatar, setNewAvatar] = React.useState<NounsAttributes>(avatar);
   const [creatingAvatar, setCreatingAvatar] = React.useState<boolean>(false);
 
+  // Try to manually trigger fingerprint data if it's not loading
+  React.useEffect(() => {
+    if (__DEV__) {
+      console.log("AccountCreation: Manual trigger check:", {
+        fingerprintLoading,
+        hasVisitorData: !!visitorData,
+        fingerprintHookError,
+        hasGetData: !!getData,
+      });
+    }
+
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      if (__DEV__) {
+        console.log("Manually triggering fingerprint data fetch...");
+      }
+      getData()
+        .then((result) => {
+          if (__DEV__) {
+            console.log("Manual trigger result:", result);
+          }
+        })
+        .catch((error) => {
+          if (__DEV__) {
+            console.error("Manual trigger error:", error);
+          }
+        });
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+
   // Extract fingerprint integration logic into separate function
   const handleFingerprintIntegration = async () => {
     try {
@@ -93,11 +128,9 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       // Check if this fingerprint has already claimed reward (skip check if visitorId is 0x0)
       if (visitorId !== "0x0") {
         const hasClaimed = await hasClaimedUserReward(visitorId);
-        console.log("Has claimed user reward:", hasClaimed);
         if (hasClaimed) {
           // Store in AsyncStorage that this fingerprint has claimed reward
           await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
-          console.log("Stored fingerprint reward claimed flag");
         }
       }
     } catch (fingerprintError) {
@@ -197,7 +230,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
               console.log("Fingerprint data still not available after timeout");
             }
           }
-        }, 3000); // Wait 3 seconds and retry
+        }, 15000); // Wait 15 seconds and retry
       } else if (visitorId && visitorId !== "0x0") {
         await handleFingerprintIntegration();
       } else {

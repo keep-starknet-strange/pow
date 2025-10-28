@@ -62,6 +62,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     isLoading: fingerprintLoading,
     error: fingerprintHookError,
     rawVisitorData: visitorData,
+    getData,
   } = useVisitorId();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
@@ -225,6 +226,40 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       }
     })();
   }, []);
+
+  // Try to manually trigger fingerprint data if it's not loading
+  useEffect(() => {
+    if (__DEV__) {
+      console.log("ClaimReward: Manual trigger check:", {
+        fingerprintLoading,
+        hasVisitorData: !!visitorData,
+        fingerprintHookError,
+        hasGetData: !!getData,
+      });
+    }
+
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      if (__DEV__) {
+        console.log("Manually triggering fingerprint data fetch...");
+      }
+      getData()
+        .then((result) => {
+          if (__DEV__) {
+            console.log("Manual trigger result:", result);
+          }
+        })
+        .catch((error) => {
+          if (__DEV__) {
+            console.error("Manual trigger error:", error);
+          }
+        });
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
 
   const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
     (debouncedInput || "").trim(),

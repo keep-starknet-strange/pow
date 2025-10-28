@@ -11,14 +11,37 @@ import { visitorIdToFelt252 } from "../configs/fingerprint";
  * - isLoading: Whether the fingerprint data is still loading
  * - rawVisitorData: The raw visitor data object from fingerprintjs
  * - hasVisitorId: Whether a valid visitor ID was retrieved
+ * - getData: Function to manually trigger fingerprint data fetch
  */
 export function useVisitorId() {
-  const { data: visitorData, isLoading, error } = useVisitorData();
+  const { data: visitorData, isLoading, error, getData } = useVisitorData();
   const [visitorId, setVisitorId] = useState<string>("0x0");
   const [hasVisitorId, setHasVisitorId] = useState<boolean>(false);
 
+  // Debug logging
+  useEffect(() => {
+    if (__DEV__) {
+      console.log("useVisitorId: Hook state update:", {
+        isLoading,
+        error,
+        visitorData: visitorData ? "present" : "undefined",
+        visitorId: visitorData?.visitorId,
+        hasGetData: !!getData,
+      });
+    }
+  }, [isLoading, error, visitorData, getData]);
+
   useEffect(() => {
     if (isLoading) {
+      return;
+    }
+
+    if (error) {
+      if (__DEV__) {
+        console.error("useVisitorId: Fingerprint error:", error);
+      }
+      setVisitorId("0x0");
+      setHasVisitorId(false);
       return;
     }
 
@@ -29,6 +52,7 @@ export function useVisitorId() {
       if (__DEV__) {
         console.log(
           "useVisitorId: No visitor ID available, using fallback 0x0",
+          { visitorData, error },
         );
       }
       return;
@@ -53,5 +77,6 @@ export function useVisitorId() {
     error,
     rawVisitorData: visitorData,
     hasVisitorId,
+    getData,
   };
 }
