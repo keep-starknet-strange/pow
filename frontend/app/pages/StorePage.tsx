@@ -269,7 +269,10 @@ export const StorePage: React.FC = () => {
       // Calculate opacity based on distance from bottom over the last 100px
       if (distanceFromBottom <= FADE_TRANSITION_DISTANCE) {
         // Linear transition from 1 to 0 over the last 100px
-        const newOpacity = Math.max(0, distanceFromBottom / FADE_TRANSITION_DISTANCE);
+        const newOpacity = Math.max(
+          0,
+          distanceFromBottom / FADE_TRANSITION_DISTANCE,
+        );
         fadeOpacity.value = withTiming(newOpacity, { duration: 0 });
         lastFadeOpacity.current = newOpacity;
       } else {
