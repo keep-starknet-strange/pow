@@ -131,6 +131,23 @@ export const getStarknetProvider = (network: string): RpcProvider => {
 // Helper functions for retry logic
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const handleNetworkError = (error: any, context: string): never => {
+  if (__DEV__) console.error(context, error);
+  const errorMessage = error?.message || String(error);
+  if (
+    errorMessage.includes("SSL") ||
+    errorMessage.includes("Network") ||
+    errorMessage.includes("Connection") ||
+    errorMessage.includes("ECONNRESET") ||
+    errorMessage.includes("timeout")
+  ) {
+    throw new Error(
+      "Network connection error. Please check your internet connection and try again.",
+    );
+  }
+  throw error;
+};
+
 const hasValidTransactionHash = (response: any): boolean => {
   if (!response) return false;
 
@@ -791,24 +808,9 @@ export const StarknetConnectorProvider: React.FC<{
             body: JSON.stringify(gaslessTxInput),
           })
             .then((response) => response.json())
-            .catch((error) => {
-              if (__DEV__)
-                console.error("Error building gasless tx data:", error);
-              // Check for SSL/network errors
-              const errorMessage = error?.message || String(error);
-              if (
-                errorMessage.includes("SSL") ||
-                errorMessage.includes("Network") ||
-                errorMessage.includes("Connection") ||
-                errorMessage.includes("ECONNRESET") ||
-                errorMessage.includes("timeout")
-              ) {
-                throw new Error(
-                  "Network connection error. Please check your internet connection and try again.",
-                );
-              }
-              throw error;
-            });
+            .catch((error) =>
+              handleNetworkError(error, "Error building gasless tx data:"),
+            );
 
           if (gaslessTxRes.error) {
             if (__DEV__)
@@ -858,23 +860,9 @@ export const StarknetConnectorProvider: React.FC<{
             body: JSON.stringify(sendGaslessTxInput),
           })
             .then((response) => response.json())
-            .catch((error) => {
-              if (__DEV__) console.error("Error sending gasless tx:", error);
-              // Check for SSL/network errors
-              const errorMessage = error?.message || String(error);
-              if (
-                errorMessage.includes("SSL") ||
-                errorMessage.includes("Network") ||
-                errorMessage.includes("Connection") ||
-                errorMessage.includes("ECONNRESET") ||
-                errorMessage.includes("timeout")
-              ) {
-                throw new Error(
-                  "Network connection error. Please check your internet connection and try again.",
-                );
-              }
-              throw error;
-            });
+            .catch((error) =>
+              handleNetworkError(error, "Error sending gasless tx:"),
+            );
 
           if (sendGaslessTxRes.error) {
             if (__DEV__)
