@@ -362,7 +362,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
             isSavingAccount
               ? "Saving..."
               : fingerprintLoading
-                ? "Loading fingerprint..."
+                ? "Loading..."
                 : "Save"
           }
           disabled={isSavingAccount || fingerprintLoading}

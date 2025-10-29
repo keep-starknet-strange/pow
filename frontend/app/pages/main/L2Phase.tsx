@@ -48,6 +48,7 @@ export const L2Phase: React.FC = () => {
           zIndex: 20,
         }}
         entering={FadeInDown}
+        collapsable={false}
       >
         <Canvas
           style={{
@@ -68,14 +69,6 @@ export const L2Phase: React.FC = () => {
               mipmap: MipmapMode.Nearest,
             }}
           />
-        </Canvas>
-        <Canvas
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-          }}
-        >
           <Image
             image={getImage("tx.bg.l2")}
             fit="fill"
@@ -83,6 +76,18 @@ export const L2Phase: React.FC = () => {
             y={dappsUnlocked[1] ? 0 : 20}
             width={window.width}
             height={102}
+            sampling={{
+              filter: FilterMode.Nearest,
+              mipmap: MipmapMode.Nearest,
+            }}
+          />
+          <Image
+            image={getImage("tx.border")}
+            fit="fill"
+            x={3}
+            y={130}
+            width={window.width - 6}
+            height={126}
             sampling={{
               filter: FilterMode.Nearest,
               mipmap: MipmapMode.Nearest,
@@ -98,20 +103,6 @@ export const L2Phase: React.FC = () => {
           <ProverView />
           <DaView />
         </View>
-        <Canvas style={{ position: "absolute", width: "100%", height: "100%" }}>
-          <Image
-            image={getImage("tx.border")}
-            fit="fill"
-            x={3}
-            y={130}
-            width={window.width - 6}
-            height={126}
-            sampling={{
-              filter: FilterMode.Nearest,
-              mipmap: MipmapMode.Nearest,
-            }}
-          />
-        </Canvas>
         <View
           style={{
             width: window.width - 18,

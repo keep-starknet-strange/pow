@@ -69,7 +69,12 @@ export const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[styles.button, { backgroundColor: getBackgroundColor() }, style]}
+      style={[
+        styles.button,
+        Platform.OS === "android" && styles.buttonAndroid,
+        { backgroundColor: getBackgroundColor() },
+        style,
+      ]}
       onLayout={onLayout}
       activeOpacity={disabled ? 1 : 0.8}
     >
@@ -119,7 +124,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: Platform.OS === "android" ? 4 : 16,
+    paddingHorizontal: 16,
+  },
+  buttonAndroid: {
+    paddingHorizontal: 4,
   },
   label: {
     fontFamily: "Pixels",
