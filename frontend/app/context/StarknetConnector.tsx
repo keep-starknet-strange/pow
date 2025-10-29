@@ -131,6 +131,23 @@ export const getStarknetProvider = (network: string): RpcProvider => {
 // Helper functions for retry logic
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const handleNetworkError = (error: any, context: string): never => {
+  if (__DEV__) console.error(context, error);
+  const errorMessage = error?.message || String(error);
+  if (
+    errorMessage.includes("SSL") ||
+    errorMessage.includes("Network") ||
+    errorMessage.includes("Connection") ||
+    errorMessage.includes("ECONNRESET") ||
+    errorMessage.includes("timeout")
+  ) {
+    throw new Error(
+      "Network connection error. Please check your internet connection and try again.",
+    );
+  }
+  throw error;
+};
+
 const hasValidTransactionHash = (response: any): boolean => {
   if (!response) return false;
 
@@ -156,7 +173,7 @@ const executeWithRetries = async (
   waitForTransaction: (txHash: string) => Promise<boolean>,
   retries: number = 0,
 ): Promise<any> => {
-  const RETRY_DELAY_MS = 2000;
+  const BASE_RETRY_DELAY_MS = 2000;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -196,12 +213,20 @@ const executeWithRetries = async (
         error instanceof Error ? error.message : String(error);
 
       if (attempt < retries) {
+        // Use exponential backoff for network errors, linear for others
+        const isNetworkError = errorMessage.includes(
+          "Network connection error",
+        );
+        const retryDelay = isNetworkError
+          ? BASE_RETRY_DELAY_MS * Math.pow(2, attempt) // Exponential backoff for network errors
+          : BASE_RETRY_DELAY_MS; // Linear delay for other errors
+
         if (__DEV__) {
           console.log(
-            `❌ Transaction failed (attempt ${attempt + 1}/${retries + 1}): ${errorMessage}. Retrying in ${RETRY_DELAY_MS}ms...`,
+            `❌ Transaction failed (attempt ${attempt + 1}/${retries + 1}): ${errorMessage}. Retrying in ${retryDelay}ms...`,
           );
         }
-        await delay(RETRY_DELAY_MS);
+        await delay(retryDelay);
       } else {
         if (__DEV__) {
           console.error(
@@ -724,7 +749,7 @@ export const StarknetConnectorProvider: React.FC<{
 
   // privateKey is used if you need to deploy a new account
   const invokeWithPaymaster = useCallback(
-    async (calls: Call[], privateKey?: any, retries: number = 0) => {
+    async (calls: Call[], privateKey?: any, retries: number = 2) => {
       if (!STARKNET_ENABLED) {
         return null;
       }
@@ -783,11 +808,9 @@ export const StarknetConnectorProvider: React.FC<{
             body: JSON.stringify(gaslessTxInput),
           })
             .then((response) => response.json())
-            .catch((error) => {
-              if (__DEV__)
-                console.error("Error building gasless tx data:", error);
-              throw error;
-            });
+            .catch((error) =>
+              handleNetworkError(error, "Error building gasless tx data:"),
+            );
 
           if (gaslessTxRes.error) {
             if (__DEV__)
@@ -837,10 +860,9 @@ export const StarknetConnectorProvider: React.FC<{
             body: JSON.stringify(sendGaslessTxInput),
           })
             .then((response) => response.json())
-            .catch((error) => {
-              if (__DEV__) console.error("Error sending gasless tx:", error);
-              throw error;
-            });
+            .catch((error) =>
+              handleNetworkError(error, "Error sending gasless tx:"),
+            );
 
           if (sendGaslessTxRes.error) {
             if (__DEV__)

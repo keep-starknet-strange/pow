@@ -10,6 +10,8 @@ import { useIsFocused } from "@react-navigation/native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  withTiming,
+  runOnUI,
 } from "react-native-reanimated";
 
 import { useTransactionsStore } from "@/app/stores/useTransactionsStore";
@@ -76,6 +78,7 @@ export const StorePage: React.FC = () => {
   const { width } = useCachedWindowDimensions();
   const [listViewportHeight, setListViewportHeight] = useState(0);
   const fadeOpacity = useSharedValue(1);
+  const lastFadeOpacity = useRef(1);
   const SCROLL_BOTTOM_THRESHOLD = 16;
   const FADE_TRANSITION_DISTANCE = 100;
   const [chainId, setChainId] = useState(0);
@@ -256,19 +259,27 @@ export const StorePage: React.FC = () => {
 
       // Only show fade if content is scrollable
       if (contentSize.height <= layoutMeasurement.height) {
-        fadeOpacity.value = 0;
+        if (lastFadeOpacity.current !== 0) {
+          fadeOpacity.value = withTiming(0, { duration: 0 });
+          lastFadeOpacity.current = 0;
+        }
         return;
       }
 
       // Calculate opacity based on distance from bottom over the last 100px
       if (distanceFromBottom <= FADE_TRANSITION_DISTANCE) {
         // Linear transition from 1 to 0 over the last 100px
-        fadeOpacity.value = Math.max(
+        const newOpacity = Math.max(
           0,
           distanceFromBottom / FADE_TRANSITION_DISTANCE,
         );
+        fadeOpacity.value = withTiming(newOpacity, { duration: 0 });
+        lastFadeOpacity.current = newOpacity;
       } else {
-        fadeOpacity.value = 1;
+        if (lastFadeOpacity.current !== 1) {
+          fadeOpacity.value = withTiming(1, { duration: 0 });
+          lastFadeOpacity.current = 1;
+        }
       }
     },
     [],
@@ -389,10 +400,11 @@ export const StorePage: React.FC = () => {
           onContentSizeChange={(_, h) => {
             if (listViewportHeight > 0) {
               // Set initial fade opacity based on content size
-              if (h <= listViewportHeight) {
-                fadeOpacity.value = 0;
-              } else {
-                fadeOpacity.value = 1;
+              // Use withTiming with 0 duration to prevent infinite update loops on Android
+              const targetOpacity = h <= listViewportHeight ? 0 : 1;
+              if (lastFadeOpacity.current !== targetOpacity) {
+                fadeOpacity.value = withTiming(targetOpacity, { duration: 0 });
+                lastFadeOpacity.current = targetOpacity;
               }
             }
           }}
