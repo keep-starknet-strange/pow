@@ -45,6 +45,7 @@ jobs:
           EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
           EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS: ${{ vars.REGISTRY_CONTRACT_ADDRESS }}
           EXPO_PUBLIC_WC_PROJECT_ID: ${{ vars.WC_PROJECT_ID }}
+          EXPO_PUBLIC_FINGERPRINT_KEY: ${{ vars.FINGERPRINT_KEY }}
           EXPO_APP_VERSION: ${{ inputs.version }}
 
           ## Secrets setup
@@ -128,6 +129,7 @@ jobs:
         EXPO_PUBLIC_ENABLE_CHEAT_CODES: ${{ vars.ENABLE_CHEAT_CODES }}
         EXPO_PUBLIC_REGISTRY_CONTRACT_ADDRESS: ${{ vars.REGISTRY_CONTRACT_ADDRESS }}
         EXPO_PUBLIC_WC_PROJECT_ID: ${{ vars.WC_PROJECT_ID }}
+        EXPO_PUBLIC_FINGERPRINT_KEY: ${{ vars.FINGERPRINT_KEY }}
         EXPO_APP_VERSION: ${{ inputs.version }}
 
         ## Secrets setup
