@@ -86,6 +86,7 @@ const config: ExpoConfig = {
         packageNames: Object.values(WalletPresets).map((p) => p.androidPackage),
       },
     ],
+    "./plugins/fingerprint-maven.ts",
   ],
   experiments: {
     typedRoutes: true,
