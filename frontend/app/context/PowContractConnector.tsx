@@ -726,8 +726,15 @@ export const PowContractProvider: React.FC<{ children: React.ReactNode }> = ({
       const paused = await powContract.are_rewards_paused();
       return Boolean(paused);
     } catch (e) {
-      console.error("Failed to fetch rewards paused state:", e);
-      return undefined;
+      // Function doesn't exist on deployed contract or call failed
+      // Return false (not paused) as safe default to allow rewards to work
+      if (__DEV__) {
+        console.warn(
+          "are_rewards_paused not available on contract (likely older version), defaulting to false:",
+          e,
+        );
+      }
+      return false;
     }
   }, [powContract, STARKNET_ENABLED]);
 
