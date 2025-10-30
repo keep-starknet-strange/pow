@@ -49,6 +49,7 @@ pub trait IPowGameRewards<TContractState> {
     );
     fn pause_rewards(ref self: TContractState);
     fn unpause_rewards(ref self: TContractState);
+    fn are_rewards_paused(self: @TContractState) -> bool;
 }
 
 // Game asserts / check helper functions

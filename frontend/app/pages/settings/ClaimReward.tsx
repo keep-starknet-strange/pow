@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
 import { uint256 } from "starknet";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
@@ -26,11 +25,9 @@ import { LoadingModal } from "../../components/claim-reward/LoadingModal";
 import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
+import { useVisitorId } from "../../hooks/useVisitorId";
 import { WalletPresets } from "@/constants/WalletPresets";
-import {
-  visitorIdToFelt252,
-  FINGERPRINT_CONFIG,
-} from "../../configs/fingerprint";
+import { FINGERPRINT_CONFIG } from "../../configs/fingerprint";
 
 // Decode common Starknet u256/BigNumberish shapes using starknet helpers
 function decodeU256ToBigInt(raw: any): bigint | null {
@@ -61,11 +58,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
   const {
-    data: visitorData,
+    visitorId,
     isLoading: fingerprintLoading,
     error: fingerprintHookError,
+    rawVisitorData: visitorData,
     getData,
-  } = useVisitorData();
+  } = useVisitorId();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
@@ -83,23 +81,6 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const { notify } = useEventManager();
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
   const { openApp } = useOpenApp();
-
-  // Try to manually trigger fingerprint data if it's not loading
-  React.useEffect(() => {
-    if (
-      !fingerprintLoading &&
-      !visitorData &&
-      !fingerprintHookError &&
-      getData
-    ) {
-      if (__DEV__) {
-        console.log(
-          "Claim Reward - Manually triggering fingerprint data fetch...",
-        );
-      }
-      getData();
-    }
-  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
 
   const handleBack = useCallback(() => {
     if (onBack) onBack();
@@ -123,34 +104,20 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       return;
     }
 
-    // Check fingerprint confidence
-    if (!visitorData?.visitorId) {
-      if (__DEV__) {
-        console.log("Claim Reward - No visitor ID available");
-      }
-      setFingerprintError("Device verification failed. Please try again.");
-      return;
-    }
+    // visitorId from hook is already in felt252 format or "0x0"
     if (__DEV__) {
-      console.log(
-        "Claim Reward - Fingerprint confidence:",
-        visitorData.confidence?.score,
-      );
+      console.log("Claim Reward - Using visitor ID:", visitorId);
+      if (visitorData?.confidence?.score) {
+        console.log(
+          "Claim Reward - Fingerprint confidence:",
+          visitorData.confidence.score,
+        );
+      }
     }
-    if (visitorData.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold) {
-      setFingerprintError("Device verification confidence too low.");
-      return;
-    }
-
-    const visitorIdFelt = visitorIdToFelt252(visitorData.visitorId);
-    console.log(
-      "Claim Reward - Converted visitor ID to felt252:",
-      visitorIdFelt,
-    );
     const call = {
       contractAddress: powGameContractAddress,
       entrypoint: "claim_reward",
-      calldata: [recipient, visitorIdFelt] as string[],
+      calldata: [recipient, visitorId] as string[],
     };
     setClaiming(true);
     setTxErrorMessage(null);
@@ -191,7 +158,13 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     } finally {
       setClaiming(false);
     }
-  }, [debouncedInput, powGameContractAddress, invokeCalls, visitorData]);
+  }, [
+    debouncedInput,
+    powGameContractAddress,
+    invokeCalls,
+    visitorId,
+    fingerprintLoading,
+  ]);
 
   useEffect(() => {
     (async () => {
@@ -254,6 +227,40 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     })();
   }, []);
 
+  // Try to manually trigger fingerprint data if it's not loading
+  useEffect(() => {
+    if (__DEV__) {
+      console.log("ClaimReward: Manual trigger check:", {
+        fingerprintLoading,
+        hasVisitorData: !!visitorData,
+        fingerprintHookError,
+        hasGetData: !!getData,
+      });
+    }
+
+    if (
+      !fingerprintLoading &&
+      !visitorData &&
+      !fingerprintHookError &&
+      getData
+    ) {
+      if (__DEV__) {
+        console.log("Manually triggering fingerprint data fetch...");
+      }
+      getData()
+        .then((result) => {
+          if (__DEV__) {
+            console.log("Manual trigger result:", result);
+          }
+        })
+        .catch((error) => {
+          if (__DEV__) {
+            console.error("Manual trigger error:", error);
+          }
+        });
+    }
+  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+
   const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
     (debouncedInput || "").trim(),
   );
@@ -272,7 +279,8 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     claiming ||
     !isValidAddress ||
     !visitorData?.visitorId ||
-    visitorData?.confidence.score < FINGERPRINT_CONFIG.confidenceThreshold;
+    (visitorData?.confidence?.score ?? 0) <
+      FINGERPRINT_CONFIG.confidenceThreshold;
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
