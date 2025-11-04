@@ -331,6 +331,8 @@ mod PowGame {
             let user_reward_claimed = self.user_reward_claimed.read(user);
             assert!(!user_reward_claimed, "User reward already claimed");
             let address_exists = self.address_exists.read(caller);
+            let registered_user = self.address_to_user.read(caller);
+            let user_matches_registered = user == registered_user;
             let recipient_received = self.received_reward.read(recipient);
             let prestige = self.prestige.get_user_prestige(caller);
             let reward_prestige_threshold = self.reward_prestige_threshold.read();
@@ -339,7 +341,7 @@ mod PowGame {
             self.reward_claimed.write(caller, true);
             self.received_reward.write(recipient, true);
             self.user_reward_claimed.write(user, true);
-            if !recipient_received && !user_reward_claimed && address_exists{
+            if !recipient_received && !user_reward_claimed && address_exists && user_matches_registered {
                 let success: bool = IERC20Dispatcher {
                     contract_address: self.reward_token_address.read(),
                 }
