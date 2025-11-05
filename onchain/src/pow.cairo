@@ -358,6 +358,8 @@ mod PowGame {
 
         fn set_user_to_address(ref self: ContractState, user: felt252) {
             let caller = get_caller_address();
+            assert!(self.user_chain_count.read(caller) == 0, "Account already initialized");
+            assert!(self.prestige.get_user_prestige(caller) == 0, "Too much prestige to set user to address");
             if !self.address_exists.read(caller) && !self.user_reward_claimed.read(user) {
                 // Key doesn't exist - first time writing this caller and the user hasn't claimed reward yet
                 self.address_exists.write(caller, true);
