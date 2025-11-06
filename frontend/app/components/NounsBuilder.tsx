@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { View, Text, Pressable, FlatList, Image } from "react-native";
+import { View, Text, Pressable, FlatList, Image, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   SlideInDown,
@@ -245,8 +245,19 @@ const NounsBuilder: React.FC<NounsBuilderProps> = ({
           applyAvatarCreation();
         }}
         className="w-full h-14 my-3"
+        style={{
+          justifyContent: Platform.OS === "android" ? "center" : undefined,
+          alignItems: Platform.OS === "android" ? "center" : undefined,
+        }}
       >
-        <Text className="pt-2 text-[36px] font-Teatime text-[#fff7ff] text-center">
+        <Text
+          className="text-[36px] font-Teatime text-[#fff7ff] text-center"
+          style={{
+            includeFontPadding: false,
+            paddingTop: Platform.OS === "android" ? 0 : 8,
+            marginTop: Platform.OS === "android" ? -4 : 0,
+          }}
+        >
           APPLY
         </Text>
       </Pressable>

@@ -145,6 +145,7 @@ export const StatusModal: React.FC<StatusModalProps> = memo(
                 <TouchableOpacity
                   style={styles.closeIcon}
                   onPress={onRequestClose}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Ionicons name="close-sharp" size={20} color="white" />
                 </TouchableOpacity>

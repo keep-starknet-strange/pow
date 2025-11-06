@@ -25,6 +25,11 @@ export const InAppNotification = () => {
 
   useEffect(() => {
     if (activeNotification != null) {
+      // Achievement notifications (id: 1) display for 3 seconds, others for 800ms
+      const isAchievement = activeNotification.notificationTypeId === 1;
+      const displayDelay = isAchievement ? 3000 : 800;
+      const opacityDelay = isAchievement ? 2800 : 600;
+
       Animated.parallel([
         Animated.sequence([
           Animated.timing(translationAnimation, {
@@ -33,7 +38,7 @@ export const InAppNotification = () => {
             useNativeDriver: true,
           }),
           Animated.timing(translationAnimation, {
-            delay: 800,
+            delay: displayDelay,
             toValue: -HEADER_HEIGHT,
             duration: 150,
             useNativeDriver: true,
@@ -46,7 +51,7 @@ export const InAppNotification = () => {
             useNativeDriver: true,
           }),
           Animated.timing(opacityAnimation, {
-            delay: 600,
+            delay: opacityDelay,
             toValue: 0,
             duration: 150,
             useNativeDriver: true,
