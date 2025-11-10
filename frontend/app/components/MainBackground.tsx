@@ -4,6 +4,7 @@ import { useInterval } from "usehooks-ts";
 import { useImages } from "../hooks/useImages";
 import { useCachedWindowDimensions } from "../hooks/useCachedDimensions";
 import { useAnimationConfig } from "../hooks/useAnimationConfig";
+import { FlyingNoggles } from "./FlyingNoggles";
 import {
   withTiming,
   Easing,
@@ -116,6 +117,7 @@ export const MainBackground: React.FC = memo(() => {
           </Rect>
         </Canvas>
       </View>
+      <FlyingNoggles />
       <View className="absolute w-full h-full">
         <Canvas style={{ flex: 1 }} className="w-full h-full">
           <Rect x={0} y={0} width={width} height={height}>

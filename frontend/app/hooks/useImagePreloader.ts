@@ -39,6 +39,48 @@ const imagePaths = {
   nounsCreatorBg: require(`${assetsPath}/nouns/create_bg.webp`),
   nounsCreatorButton: require(`${assetsPath}/nouns/button.webp`),
 
+  // Noggles (Flying Nouns Glasses)
+  nogglesBlue: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-blue.webp`,
+  ),
+  nogglesGreen: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-frog-green.webp`,
+  ),
+  nogglesPink: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-pink-purple-multi.webp`,
+  ),
+  nogglesPurple: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-pink-purple-multi.webp`,
+  ),
+  nogglesYellow: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-yellow-saturated.webp`,
+  ),
+  nogglesRed: require(`${assetsPath}/nouns/2_Glasses/glasses-square-red.webp`),
+  nogglesMagenta: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-magenta.webp`,
+  ),
+  nogglesOrange: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-orange.webp`,
+  ),
+  nogglesTeal: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-teal.webp`,
+  ),
+  nogglesHoney: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-honey.webp`,
+  ),
+  nogglesWatermelon: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-watermelon.webp`,
+  ),
+  nogglesBlack: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-black.webp`,
+  ),
+  nogglesGreyLight: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-grey-light.webp`,
+  ),
+  nogglesRgb: require(
+    `${assetsPath}/nouns/2_Glasses/glasses-square-black-rgb.webp`,
+  ),
+
   // L2
   l2BarsBg: require(`${assetsPath}/l2/l2_bars_bg.webp`),
   l2BarsBar: require(`${assetsPath}/l2/l2_bars_bar.webp`),
@@ -492,6 +534,20 @@ export const useImagePreloader = () => {
     nounsTabActive: useImage(imagePaths.nounsTabActive),
     nounsCreatorBg: useImage(imagePaths.nounsCreatorBg),
     nounsCreatorButton: useImage(imagePaths.nounsCreatorButton),
+    nogglesBlue: useImage(imagePaths.nogglesBlue),
+    nogglesGreen: useImage(imagePaths.nogglesGreen),
+    nogglesPink: useImage(imagePaths.nogglesPink),
+    nogglesPurple: useImage(imagePaths.nogglesPurple),
+    nogglesYellow: useImage(imagePaths.nogglesYellow),
+    nogglesRed: useImage(imagePaths.nogglesRed),
+    nogglesMagenta: useImage(imagePaths.nogglesMagenta),
+    nogglesOrange: useImage(imagePaths.nogglesOrange),
+    nogglesTeal: useImage(imagePaths.nogglesTeal),
+    nogglesHoney: useImage(imagePaths.nogglesHoney),
+    nogglesWatermelon: useImage(imagePaths.nogglesWatermelon),
+    nogglesBlack: useImage(imagePaths.nogglesBlack),
+    nogglesGreyLight: useImage(imagePaths.nogglesGreyLight),
+    nogglesRgb: useImage(imagePaths.nogglesRgb),
     l2BarsBg: useImage(imagePaths.l2BarsBg),
     l2BarsBar: useImage(imagePaths.l2BarsBar),
     l2BarsPlaque: useImage(imagePaths.l2BarsPlaque),
@@ -729,6 +785,20 @@ export const useImagePreloader = () => {
         "nouns.tab.active": images.nounsTabActive,
         "nouns.creator.bg": images.nounsCreatorBg,
         "nouns.creator.button": images.nounsCreatorButton,
+        "noggles.blue": images.nogglesBlue,
+        "noggles.green": images.nogglesGreen,
+        "noggles.pink": images.nogglesPink,
+        "noggles.purple": images.nogglesPurple,
+        "noggles.yellow": images.nogglesYellow,
+        "noggles.red": images.nogglesRed,
+        "noggles.magenta": images.nogglesMagenta,
+        "noggles.orange": images.nogglesOrange,
+        "noggles.teal": images.nogglesTeal,
+        "noggles.honey": images.nogglesHoney,
+        "noggles.watermelon": images.nogglesWatermelon,
+        "noggles.black": images.nogglesBlack,
+        "noggles.greyLight": images.nogglesGreyLight,
+        "noggles.rgb": images.nogglesRgb,
         "l2.bars.bg": images.l2BarsBg,
         "l2.bars.bar": images.l2BarsBar,
         "l2.bars.plaque": images.l2BarsPlaque,
