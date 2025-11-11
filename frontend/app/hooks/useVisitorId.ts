@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
-import { visitorIdToFelt252 } from "../configs/fingerprint";
+import {
+  visitorIdToFelt252,
+  FINGERPRINT_CONFIG,
+} from "../configs/fingerprint";
 
 /**
  * Hook to get the visitor ID from fingerprint and convert it to felt252 format.
@@ -11,7 +14,7 @@ import { visitorIdToFelt252 } from "../configs/fingerprint";
  * - isLoading: Whether the fingerprint data is still loading
  * - rawVisitorData: The raw visitor data object from fingerprintjs
  * - hasVisitorId: Whether a valid visitor ID was retrieved
- * - getData: Function to manually trigger fingerprint data fetch
+ * - tagEvent: Function to tag a Fingerprint event with custom metadata and linkedId
  */
 export function useVisitorId() {
   const { data: visitorData, isLoading, error, getData } = useVisitorData();
@@ -26,8 +29,21 @@ export function useVisitorId() {
         error,
         visitorData: visitorData ? "present" : "undefined",
         visitorId: visitorData?.visitorId,
+        confidence: visitorData?.confidence?.score,
         hasGetData: !!getData,
+        visitorDataFull: visitorData,
       });
+
+       // Add detailed logging when visitorData is present
+       if (visitorData) {
+        console.log("useVisitorId: Full visitorData structure:", JSON.stringify(visitorData, null, 2));
+        console.log("useVisitorId: visitorData keys:", Object.keys(visitorData));
+        console.log("useVisitorId: confidence object:", visitorData.confidence);
+        console.log("useVisitorId: confidence type:", typeof visitorData.confidence);
+        if (visitorData.confidence) {
+          console.log("useVisitorId: confidence keys:", Object.keys(visitorData.confidence));
+        }
+      }
     }
   }, [isLoading, error, visitorData, getData]);
 
@@ -52,7 +68,14 @@ export function useVisitorId() {
       if (__DEV__) {
         console.log(
           "useVisitorId: No visitor ID available, using fallback 0x0",
-          { visitorData, error },
+          {
+            visitorData,
+            error,
+            hasVisitorData: !!visitorData,
+            visitorIdInData: visitorData?.visitorId,
+            confidence: visitorData?.confidence?.score,
+            confidenceThreshold: FINGERPRINT_CONFIG.confidenceThreshold,
+          },
         );
       }
       return;
@@ -71,12 +94,43 @@ export function useVisitorId() {
     }
   }, [visitorData, isLoading, error]);
 
+  // Function to tag events with custom metadata and linkedId
+  const tagEvent = async (
+    tag: Record<string, any>,
+    linkedId?: string,
+  ): Promise<any> => {
+    if (!getData) {
+      if (__DEV__) {
+        console.warn("useVisitorId: getData is not available for tagging");
+      }
+      return null;
+    }
+
+    try {
+      const result = await getData(tag, linkedId);
+      if (__DEV__) {
+        console.log("useVisitorId: Tagged event:", {
+          tag,
+          linkedId,
+          visitorId: result?.visitorId,
+          requestId: result?.requestId,
+        });
+      }
+      return result;
+    } catch (error) {
+      if (__DEV__) {
+        console.error("useVisitorId: Error tagging event:", error);
+      }
+      throw error;
+    }
+  };
+
   return {
     visitorId,
     isLoading,
     error,
     rawVisitorData: visitorData,
     hasVisitorId,
-    getData,
+    tagEvent,
   };
 }
