@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
-import {
-  visitorIdToFelt252,
-  FINGERPRINT_CONFIG,
-} from "../configs/fingerprint";
+import { visitorIdToFelt252, FINGERPRINT_CONFIG } from "../configs/fingerprint";
 
 /**
  * Hook to get the visitor ID from fingerprint and convert it to felt252 format.
@@ -33,17 +30,6 @@ export function useVisitorId() {
         hasGetData: !!getData,
         visitorDataFull: visitorData,
       });
-
-       // Add detailed logging when visitorData is present
-       if (visitorData) {
-        console.log("useVisitorId: Full visitorData structure:", JSON.stringify(visitorData, null, 2));
-        console.log("useVisitorId: visitorData keys:", Object.keys(visitorData));
-        console.log("useVisitorId: confidence object:", visitorData.confidence);
-        console.log("useVisitorId: confidence type:", typeof visitorData.confidence);
-        if (visitorData.confidence) {
-          console.log("useVisitorId: confidence keys:", Object.keys(visitorData.confidence));
-        }
-      }
     }
   }, [isLoading, error, visitorData, getData]);
 

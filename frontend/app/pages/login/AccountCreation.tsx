@@ -242,7 +242,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
       // Tag Fingerprint event for account creation
       try {
-        const accountAddress = account?.address
+        const accountAddress = account?.address;
         if (accountAddress && tagEvent) {
           await tagEvent({ userAction: "account_creation" }, accountAddress);
         }

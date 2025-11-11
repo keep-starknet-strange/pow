@@ -86,7 +86,7 @@ const config: ExpoConfig = {
         packageNames: Object.values(WalletPresets).map((p) => p.androidPackage),
       },
     ],
-    "@fingerprintjs/fingerprintjs-pro-react-native"
+    "@fingerprintjs/fingerprintjs-pro-react-native",
   ],
   experiments: {
     typedRoutes: true,

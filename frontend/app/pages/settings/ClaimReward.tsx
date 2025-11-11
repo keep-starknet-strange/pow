@@ -54,7 +54,7 @@ type ClaimRewardProps = {
 const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   onBack,
 }) => {
-  const { invokeCalls, network } = useStarknetConnector();
+  const { invokeCalls, network, account } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
   const {
@@ -138,7 +138,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         // Tag Fingerprint event for reward claim
         try {
           if (recipient && tagEvent) {
-            await tagEvent({ userAction: "claim_reward" }, recipient);
+            await tagEvent({ userAction: "claim_reward", recipient: recipient }, account?.address);
           }
         } catch (tagError) {
           // Don't fail reward claim if tagging fails
@@ -259,7 +259,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       if (__DEV__) {
         console.log("Manually triggering fingerprint data fetch...");
       }
-      tagEvent({ userAction: "claim_reward_page_load" }, undefined)
+      tagEvent({ userAction: "claim_reward_page_load" }, account?.address)
         .then((result) => {
           if (__DEV__) {
             console.log("Manual trigger result:", result);
