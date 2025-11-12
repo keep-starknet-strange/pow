@@ -54,7 +54,7 @@ type ClaimRewardProps = {
 const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   onBack,
 }) => {
-  const { invokeCalls, network } = useStarknetConnector();
+  const { invokeCalls, network, account } = useStarknetConnector();
   const { powGameContractAddress, getRewardParams, getRewardPoolBalance } =
     usePowContractConnector();
   const {
@@ -62,7 +62,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     isLoading: fingerprintLoading,
     error: fingerprintHookError,
     rawVisitorData: visitorData,
-    getData,
+    tagEvent,
   } = useVisitorId();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
@@ -134,6 +134,21 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         await AsyncStorage.setItem("fingerprintRewardClaimed", "true");
         // Notify achievement system that STRK reward was claimed
         notify("RewardClaimed", { recipient, transactionHash: hash });
+
+        // Tag Fingerprint event for reward claim
+        try {
+          if (recipient && tagEvent) {
+            await tagEvent(
+              { userAction: "claim_reward", recipient: recipient },
+              account?.address,
+            );
+          }
+        } catch (tagError) {
+          // Don't fail reward claim if tagging fails
+          if (__DEV__) {
+            console.error("Error tagging Fingerprint event:", tagError);
+          }
+        }
       } else {
         throw new Error("Transaction completed but no hash returned");
       }
@@ -234,7 +249,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         fingerprintLoading,
         hasVisitorData: !!visitorData,
         fingerprintHookError,
-        hasGetData: !!getData,
+        hasTagEvent: !!tagEvent,
       });
     }
 
@@ -242,12 +257,12 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       !fingerprintLoading &&
       !visitorData &&
       !fingerprintHookError &&
-      getData
+      tagEvent
     ) {
       if (__DEV__) {
         console.log("Manually triggering fingerprint data fetch...");
       }
-      getData()
+      tagEvent({ userAction: "claim_reward_page_load" }, account?.address)
         .then((result) => {
           if (__DEV__) {
             console.log("Manual trigger result:", result);
@@ -259,7 +274,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
           }
         });
     }
-  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+  }, [fingerprintLoading, visitorData, fingerprintHookError, tagEvent]);
 
   const isValidAddress = /^0x[a-fA-F0-9]{63,64}$/.test(
     (debouncedInput || "").trim(),

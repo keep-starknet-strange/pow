@@ -56,6 +56,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     network,
     getAvailableKeys,
     storeKeyAndConnect,
+    account,
   } = useStarknetConnector();
   const { setUserToAddress, hasClaimedUserReward } = usePowContractConnector();
   const {
@@ -63,7 +64,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     isLoading: fingerprintLoading,
     error: fingerprintHookError,
     rawVisitorData: visitorData,
-    getData,
+    tagEvent,
   } = useVisitorId();
 
   const { getImage } = useImages();
@@ -92,7 +93,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
         fingerprintLoading,
         hasVisitorData: !!visitorData,
         fingerprintHookError,
-        hasGetData: !!getData,
+        hasTagEvent: !!tagEvent,
       });
     }
 
@@ -100,12 +101,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       !fingerprintLoading &&
       !visitorData &&
       !fingerprintHookError &&
-      getData
+      tagEvent
     ) {
       if (__DEV__) {
         console.log("Manually triggering fingerprint data fetch...");
       }
-      getData()
+      tagEvent({ userAction: "account_creation_page_load" }, undefined)
         .then((result) => {
           if (__DEV__) {
             console.log("Manual trigger result:", result);
@@ -117,7 +118,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           }
         });
     }
-  }, [fingerprintLoading, visitorData, fingerprintHookError, getData]);
+  }, [fingerprintLoading, visitorData, fingerprintHookError, tagEvent]);
 
   // Extract fingerprint integration logic into separate function
   const handleFingerprintIntegration = async () => {
@@ -236,6 +237,19 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       } else {
         if (__DEV__) {
           console.log("No visitor ID available for fingerprint integration");
+        }
+      }
+
+      // Tag Fingerprint event for account creation
+      try {
+        const accountAddress = account?.address;
+        if (accountAddress && tagEvent) {
+          await tagEvent({ userAction: "account_creation" }, accountAddress);
+        }
+      } catch (tagError) {
+        // Don't fail account creation if tagging fails
+        if (__DEV__) {
+          console.error("Error tagging Fingerprint event:", tagError);
         }
       }
     } catch (error) {
