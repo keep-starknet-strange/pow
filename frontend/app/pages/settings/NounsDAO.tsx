@@ -6,13 +6,20 @@ import {
   Linking,
   Dimensions,
   Image,
+  Modal,
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import YoutubePlayer from "react-native-youtube-iframe";
+import { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const NounsDAOSection = () => {
   const { width } = Dimensions.get("window");
   const videoWidth = width - 64; // Account for padding
   const videoHeight = (videoWidth * 9) / 16; // 16:9 aspect ratio
+  const [showVideo, setShowVideo] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const insets = useSafeAreaInsets();
 
   return (
     <Animated.View className="flex-1" entering={FadeInUp}>
@@ -21,9 +28,6 @@ export const NounsDAOSection = () => {
           NounsDAO
         </Text>
         <View className="mt-2">
-          <Text className="text-[#101119] text-[20px] font-Teatime mb-4">
-            POW! is funded by NounsDAO ⌐◨-◨
-          </Text>
           <Text className="text-[#101119] text-[16px] font-Pixels mb-4 leading-6">
             NounsDAO is a decentralized autonomous organization building a new
             way of funding public goods. Every day, one Noun NFT is trustlessly
@@ -45,9 +49,10 @@ export const NounsDAOSection = () => {
               Watch: What is Nouns?
             </Text>
             <TouchableOpacity
-              onPress={() =>
-                Linking.openURL("https://www.youtube.com/watch?v=lOzCA7bZG_k")
-              }
+              onPress={() => {
+                setShowVideo(true);
+                setPlaying(true);
+              }}
               style={{
                 width: videoWidth,
                 height: videoHeight,
@@ -127,6 +132,37 @@ export const NounsDAOSection = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showVideo}
+        animationType="slide"
+        onRequestClose={() => setShowVideo(false)}
+      >
+        <View className="flex-1 bg-black">
+          <View
+            className="flex-row justify-end p-4"
+            style={{ paddingTop: insets.top + 16 }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                setShowVideo(false);
+                setPlaying(false);
+              }}
+              className="bg-white/20 px-4 py-2 rounded"
+            >
+              <Text className="text-white font-Pixels text-[16px]">Close</Text>
+            </TouchableOpacity>
+          </View>
+          <View className="flex-1 justify-center">
+            <YoutubePlayer
+              height={300}
+              videoId="lOzCA7bZG_k"
+              play={playing}
+              forceAndroidAutoplay={true}
+            />
+          </View>
+        </View>
+      </Modal>
     </Animated.View>
   );
 };

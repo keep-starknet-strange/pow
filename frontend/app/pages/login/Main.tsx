@@ -74,14 +74,6 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       >
         <Animated.View
           entering={FadeInDown}
-          className="flex items-center justify-center w-full mb-3"
-        >
-          <Text className="text-[#fff7ff] font-Pixels text-[16px] text-center">
-            Funded by NounsDAO ⌐◨-◨
-          </Text>
-        </Animated.View>
-        <Animated.View
-          entering={FadeInDown}
           className="flex flex-row items-center justify-between w-full"
         >
           <Text className="text-[#fff7ff] font-Pixels text-[16px]">
