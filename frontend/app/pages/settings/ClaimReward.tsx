@@ -138,7 +138,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         // Tag Fingerprint event for reward claim
         try {
           if (recipient && tagEvent) {
-            await tagEvent({ userAction: "claim_reward", recipient: recipient }, account?.address);
+            await tagEvent(
+              { userAction: "claim_reward", recipient: recipient },
+              account?.address,
+            );
           }
         } catch (tagError) {
           // Don't fail reward claim if tagging fails
