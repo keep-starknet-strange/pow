@@ -37,7 +37,7 @@ export const NounsDAOSection = () => {
           <Text className="text-[#101119] text-[16px] font-Pixels mb-4 leading-6">
             Each Noun is unique, generated from a collection of heads, bodies,
             accessories, and of course, the iconic pixelated glasses known as
-            "noggles" ⌐◨-◨. 
+            "noggles" ⌐◨-◨.
             POW! avatars are based on NounsDAO art, which is open-source (CC0),
             bringing the Nounish aesthetic to Starknet.
           </Text>
