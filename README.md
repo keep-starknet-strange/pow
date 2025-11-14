@@ -133,4 +133,4 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## License
 
-MIT License © 2025 Click chain Team
+This project is licensed under the [MIT License](LICENSE) — see the LICENSE file for details.
