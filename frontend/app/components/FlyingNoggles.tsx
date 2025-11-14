@@ -74,7 +74,7 @@ const FlyingNoggle: React.FC<{
 
     const animateNoggle = () => {
       const duration = 15000 / noggle.speed;
-      const newAngle = angle.value + (Math.random() - 0.5) * 0.3;
+      let newAngle = angle.value + (Math.random() - 0.5) * 0.3;
 
       // Calculate new position with movement
       const moveDistance = Math.min(width, height) * 0.3;
@@ -87,6 +87,16 @@ const FlyingNoggle: React.FC<{
       const maxX = width + padding - noggle.size;
       const minY = -padding;
       const maxY = height + padding - noggle.size / 2;
+
+      // Check if hitting boundaries and bounce with new random direction
+      if (newX <= minX || newX >= maxX) {
+        newAngle = Math.PI - newAngle + (Math.random() - 0.5) * 0.5;
+        newX = x.value + Math.cos(newAngle) * moveDistance;
+      }
+      if (newY <= minY || newY >= maxY) {
+        newAngle = -newAngle + (Math.random() - 0.5) * 0.5;
+        newY = y.value + Math.sin(newAngle) * moveDistance;
+      }
 
       // Clamp positions within bounds
       newX = Math.max(minX, Math.min(maxX, newX));
