@@ -97,9 +97,23 @@ export const TxButtonInner = memo(
     }, []);
 
     const fee = getFee(props.chainId, props.txId, props.isDapp);
+
+    // Use ref to avoid recreating the callback and causing effect loops
+    const addTransactionRef = useRef(props.addTransaction);
+    useEffect(() => {
+      addTransactionRef.current = props.addTransaction;
+    }, [props.addTransaction]);
+
     const addNewTransaction = useCallback(
       async (finished: boolean | undefined) => {
         if (finished === false || !isMountedRef.current) return;
+
+        // Check if block is full before adding
+        const currentBlockState =
+          useGameStore.getState().workingBlocks[props.chainId];
+        if (currentBlockState?.isBuilt) {
+          return;
+        }
 
         // Trigger animation if provided
         if (props.triggerTxAnimation) {
@@ -107,16 +121,9 @@ export const TxButtonInner = memo(
         }
 
         const newTx = newTransaction(props.txId, fee, props.isDapp);
-        props.addTransaction(props.chainId, newTx);
+        addTransactionRef.current(props.chainId, newTx);
       },
-      [
-        props.chainId,
-        props.txId,
-        props.isDapp,
-        props.triggerTxAnimation,
-        props.addTransaction,
-        fee,
-      ],
+      [props.chainId, props.txId, props.isDapp, props.triggerTxAnimation, fee],
     );
 
     const speed = getSpeed(props.chainId, props.txId, props.isDapp);
@@ -124,6 +131,9 @@ export const TxButtonInner = memo(
     const shouldAutomate = speed > 0 && !paused && !blockIsFull;
 
     useEffect(() => {
+      // Cancel any ongoing animations first
+      cancelAnimation(automationAnimHeight);
+
       if (shouldAutomate) {
         automationAnimHeight.value = 0;
         // Only trigger automation if it's not the initial mount/re-render
@@ -153,6 +163,13 @@ export const TxButtonInner = memo(
 
     useInterval(
       () => {
+        // Double-check block isn't full before starting new animation cycle
+        const currentBlockState =
+          useGameStore.getState().workingBlocks[props.chainId];
+        if (currentBlockState?.isBuilt) {
+          return;
+        }
+
         automationAnimHeight.value = withSequence(
           withTiming(
             94,

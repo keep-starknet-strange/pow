@@ -195,15 +195,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!newWorkingBlocks[chainId]) {
         if (__DEV__)
           console.warn(`No working block found for chainId ${chainId}`);
-        return { workingBlocks: newWorkingBlocks };
+        return {};
       }
       const block = newWorkingBlocks[chainId];
       const maxBlockSize = block.maxSize; // Use the block's static maxSize
 
-      // early return if the block is already full
+      // early return if the block is already full - don't modify state
       if (block.transactions.length >= maxBlockSize) {
-        block.isBuilt = true;
-        return { workingBlocks: newWorkingBlocks };
+        if (!block.isBuilt) {
+          block.isBuilt = true;
+          newWorkingBlocks[chainId] = block;
+          return { workingBlocks: newWorkingBlocks };
+        }
+        return {};
       }
       // Trigger sound immediately before state changes
       useEventManager.getState().notify("TxAdded", {
