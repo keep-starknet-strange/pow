@@ -1,7 +1,6 @@
 import React from "react";
-import { Text, View, BackHandler } from "react-native";
+import { Text, View } from "react-native";
 import { useStarknetConnector } from "../../context/StarknetConnector";
-import { usePowContractConnector } from "../../context/PowContractConnector";
 import Constants from "expo-constants";
 import BasicButton from "../../components/buttons/Basic";
 import { Logo } from "../../components/Logo";
@@ -68,7 +67,7 @@ export const LoginMainPage: React.FC<LoginMainPageProps> = ({
       </Animated.View>
       <View
         style={{
-          paddingTop: 16,
+          paddingTop: 8,
           paddingBottom: insets.bottom + 16,
         }}
         className="absolute bottom-0 w-full px-8 bg-[#10111A]"

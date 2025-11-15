@@ -9,6 +9,7 @@ import SettingsMainSection from "./settings/Main";
 import { ClaimRewardSection } from "./settings/ClaimReward";
 import TermsOfUse from "./settings/TermsOfUse";
 import CreditsSection from "./settings/Credits";
+import NounsDAOSection from "./settings/NounsDAO";
 import MainBackground from "../components/MainBackground";
 import BasicButton from "../components/buttons/Basic";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,6 +21,7 @@ const tabs = {
   ClaimReward: ClaimRewardSection,
   TermsOfUse: TermsOfUse,
   Credits: CreditsSection,
+  NounsDAO: NounsDAOSection,
 };
 
 type SettingsProps = {

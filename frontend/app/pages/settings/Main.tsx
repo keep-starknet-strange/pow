@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import * as StoreReview from "expo-store-review";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import BasicButton from "../../components/buttons/Basic";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
@@ -12,7 +10,6 @@ import { useSound } from "../../stores/useSoundStore";
 import { useAnimations } from "../../stores/useAnimationsStore";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { useFocEngine } from "@/app/context/FocEngineConnector";
-import { useUpgrades } from "../../stores/useUpgradesStore";
 import { useTutorialStore } from "../../stores/useTutorialStore";
 import { useGameStore } from "../../stores/useGameStore";
 import { useBalanceStore } from "../../stores/useBalanceStore";
@@ -26,7 +23,13 @@ import { useRewardsStatus } from "../../hooks/useRewardsStatus";
 
 export type SettingsMainSectionProps = {
   setSettingTab: (
-    tab: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse",
+    tab:
+      | "Account"
+      | "About"
+      | "Credits"
+      | "ClaimReward"
+      | "TermsOfUse"
+      | "NounsDAO",
   ) => void;
   goBackToLogin: () => void;
 };
@@ -89,7 +92,13 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
 
   const settingsComponents: {
     label: string;
-    tab?: "Account" | "About" | "Credits" | "ClaimReward" | "TermsOfUse";
+    tab?:
+      | "Account"
+      | "About"
+      | "Credits"
+      | "ClaimReward"
+      | "TermsOfUse"
+      | "NounsDAO";
     onPress?: () => void;
     icon?: string;
   }[] = [
@@ -97,7 +106,7 @@ const SettingsMainSection: React.FC<SettingsMainSectionProps> = ({
       label: "Reset Game",
       onPress: () => setShowResetConfirmation(true),
     },
-    { label: "Review", onPress: () => StoreReview.requestReview() },
+    { label: "NounsDAO", tab: "NounsDAO" },
     { label: "Account", tab: "Account" },
     { label: "About", tab: "About" },
     ...(isAuthenticated && isRewardAvailable
