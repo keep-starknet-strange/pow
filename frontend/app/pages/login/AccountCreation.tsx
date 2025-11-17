@@ -65,6 +65,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     error: fingerprintHookError,
     rawVisitorData: visitorData,
     tagEvent,
+    isDeviceBlocked,
   } = useVisitorId();
 
   const { getImage } = useImages();
@@ -170,6 +171,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   };
 
   const createAccountAndClaimUsername = async () => {
+    // Prevent account creation if device is blocked
+    if (isDeviceBlocked) {
+      setUsernameError("Device not supported.");
+      notify("BasicError");
+      return;
+    }
+
     setIsSavingAccount(true);
     try {
       // First check if we already have an account connected
@@ -263,6 +271,10 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     }
   };
 
+  // Show blocking UI if device is blocked (only when fingerprint data is available)
+  const shouldShowBlockingUI =
+    !fingerprintLoading && !fingerprintHookError && visitorData && isDeviceBlocked;
+
   return (
     <View
       style={{
@@ -271,7 +283,35 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     >
       <AccountCreationHeader width={width} topInset={insets.top} />
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      {shouldShowBlockingUI ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 32,
+          }}
+        >
+          <Animated.View
+            entering={FadeInDown}
+            className="flex flex-col items-center gap-6"
+          >
+            <Text className="text-[#101119] text-2xl font-Pixels text-center">
+              Device not supported
+            </Text>
+            <Text className="text-[#101119a0] text-lg font-Pixels text-center">
+              This device is not supported for account creation.
+            </Text>
+            <BasicButton
+              label="Go Back"
+              onPress={() => {
+                setLoginPage("login");
+              }}
+            />
+          </Animated.View>
+        </View>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior="padding"
           style={{
@@ -362,7 +402,9 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           </Animated.View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      <Animated.View
+      )}
+      {!shouldShowBlockingUI && (
+        <Animated.View
         style={{
           flex: 0.3,
           alignItems: "center",
@@ -379,7 +421,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 ? "Loading..."
                 : "Save"
           }
-          disabled={isSavingAccount || fingerprintLoading}
+          disabled={isSavingAccount || fingerprintLoading || isDeviceBlocked}
           onPress={async () => {
             if (!isUsernameValid(username)) {
               setUsernameError(`Invalid username:\n${usernameValidationError}`);
@@ -402,6 +444,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           }}
         />
       </Animated.View>
+      )}
 
       <View
         style={{

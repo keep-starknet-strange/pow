@@ -11,6 +11,10 @@ export const FINGERPRINT_CONFIG = {
   confidenceThreshold: parseFloat(
     process.env.EXPO_PUBLIC_FINGERPRINT_CONFIDENCE_THRESHOLD || "0.7",
   ),
+  // Suspect score threshold for blocking suspicious devices
+  suspectScoreThreshold: parseInt(
+    process.env.EXPO_PUBLIC_FINGERPRINT_SUSPECT_SCORE_THRESHOLD || "1",
+  ),
   // Additional configuration options
   options: {
     // Enable extended result for more detailed device information
@@ -72,6 +76,54 @@ export interface FingerprintValidationResult {
   is_valid: boolean;
   message?: string;
   timestamp?: number;
+}
+
+// Suspect Score types
+export interface SuspectScore {
+  data: {
+    result: number;
+  };
+}
+
+// Smart Signals types - all signals follow the pattern: { data: { result: boolean } }
+export interface BooleanSmartSignal {
+  data: {
+    result: boolean;
+  };
+}
+
+// High Activity signal has additional fields
+export interface HighActivitySignal {
+  data: {
+    result: boolean;
+    dailyRequests?: number;
+  };
+}
+
+// Factory Reset signal has timestamp fields
+export interface FactoryResetSignal {
+  data: {
+    time: string; // ISO 8601 format
+    timestamp: number; // Unix epoch time
+  };
+}
+
+// Union type for all signal types
+export type SmartSignal =
+  | BooleanSmartSignal
+  | HighActivitySignal
+  | FactoryResetSignal;
+
+// Smart Signals collection
+export interface SmartSignals {
+  emulator?: BooleanSmartSignal;
+  jailbroken?: BooleanSmartSignal;
+  rootApps?: BooleanSmartSignal;
+  frida?: BooleanSmartSignal;
+  clonedApp?: BooleanSmartSignal;
+  highActivity?: HighActivitySignal;
+  factoryReset?: FactoryResetSignal;
+  [key: string]: SmartSignal | undefined;
 }
 
 // Utility function to convert visitor ID string to felt252 hex format
