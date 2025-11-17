@@ -2,10 +2,6 @@
 #
 # This script sets up the POW! contracts from configs
 # Starknet Mainnet Configuration
-STARKNET_KEYSTORE=~/.starknet-keystores/mainnet-account.json
-STARKNET_ACCOUNT=~/.starknet-accounts/mainnet-account.json
-STARKNET_KEYSTORE_PASSWORD=benice
-RPC_URL=https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/24GEjGFAPv26w3NmSfZHQ
 
 if [ "$FOC_ENV_FILE" ]; then
     source $FOC_ENV_FILE
