@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
-import * as AppIntegrity from "expo-app-integrity";
+import * as AppIntegrity from "@expo/app-integrity";
 import * as SecureStore from "expo-secure-store";
 import * as Crypto from "expo-crypto";
 import { hash } from "starknet";
 import { APP_INTEGRITY_CONFIG } from "../configs/appIntegrity";
+
 import { focFunUrl } from "../api/requests";
 
 // Helper to convert string to felt252

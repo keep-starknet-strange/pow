@@ -785,6 +785,9 @@ export const StarknetConnectorProvider: React.FC<{
 
       // Define the paymaster execution function
       const executePaymasterTransaction = async () => {
+        // Add this at the top of your file where you make the request
+console.log('🔍 EXPO_PUBLIC_FOC_ENGINE_API:', process.env.EXPO_PUBLIC_FOC_ENGINE_API);
+console.log('🔍 Full URL:', `${process.env.EXPO_PUBLIC_FOC_ENGINE_API}/paymaster/build-gasless-tx`);
         const apiKey = process.env.EXPO_PUBLIC_AVNU_PAYMASTER_API_KEY || "";
         if (apiKey === "") {
           // Run using backend paymaster provider
