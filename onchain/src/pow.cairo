@@ -340,8 +340,8 @@ mod PowGame {
 
             self.reward_claimed.write(caller, true);
             self.received_reward.write(recipient, true);
-            self.user_reward_claimed.write(user, true);
             if !recipient_received && !user_reward_claimed && address_exists && user_matches_registered {
+                self.user_reward_claimed.write(user, true);
                 let success: bool = IERC20Dispatcher {
                     contract_address: self.reward_token_address.read(),
                 }
