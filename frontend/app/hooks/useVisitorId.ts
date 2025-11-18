@@ -35,7 +35,10 @@ export function useVisitorId() {
   const suspectScore = useMemo(() => {
     // Type assertion needed as FingerprintJS types may not include suspectScore
     const data = visitorData as any;
-    if (!data?.suspectScore?.data || data.suspectScore.data.result === undefined) {
+    if (
+      !data?.suspectScore?.data ||
+      data.suspectScore.data.result === undefined
+    ) {
       return undefined;
     }
     return data.suspectScore.data.result as number;
@@ -100,9 +103,15 @@ export function useVisitorId() {
     }
 
     // Check suspect score threshold
-    if (suspectScore !== undefined && suspectScore >= FINGERPRINT_CONFIG.suspectScoreThreshold) {
+    if (
+      suspectScore !== undefined &&
+      suspectScore >= FINGERPRINT_CONFIG.suspectScoreThreshold
+    ) {
       if (__DEV__) {
-        console.log("useVisitorId: Device blocked due to suspect score:", suspectScore);
+        console.log(
+          "useVisitorId: Device blocked due to suspect score:",
+          suspectScore,
+        );
       }
       return true;
     }
@@ -124,7 +133,9 @@ export function useVisitorId() {
 
     if (isRooted === true) {
       if (__DEV__) {
-        console.log("useVisitorId: Device blocked due to rooted device detection");
+        console.log(
+          "useVisitorId: Device blocked due to rooted device detection",
+        );
       }
       return true;
     }
@@ -146,7 +157,9 @@ export function useVisitorId() {
     // Check abuse prevention signals
     if (isHighActivity === true) {
       if (__DEV__) {
-        console.log("useVisitorId: Device blocked due to high activity detection");
+        console.log(
+          "useVisitorId: Device blocked due to high activity detection",
+        );
       }
       return true;
     }

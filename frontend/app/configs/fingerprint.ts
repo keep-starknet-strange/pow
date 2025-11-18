@@ -13,7 +13,7 @@ export const FINGERPRINT_CONFIG = {
   ),
   // Suspect score threshold for blocking suspicious devices
   suspectScoreThreshold: parseInt(
-    process.env.EXPO_PUBLIC_FINGERPRINT_SUSPECT_SCORE_THRESHOLD || "1",
+    process.env.EXPO_PUBLIC_FINGERPRINT_SUSPECT_SCORE_THRESHOLD || "5",
   ),
   // Additional configuration options
   options: {
