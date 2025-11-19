@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # This script sets up the POW! contracts from configs
-# Starknet Mainnet Configuration
 
 if [ "$FOC_ENV_FILE" ]; then
     source $FOC_ENV_FILE
