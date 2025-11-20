@@ -78,6 +78,7 @@ mod PowGame {
 
     #[storage]
     struct Storage {
+        app_version: felt252,
         hosts: Map<ContractAddress, bool>,
         game_masters: Map<ContractAddress, bool>,
         reward_token_address: ContractAddress,
@@ -323,7 +324,8 @@ mod PowGame {
             self.user_reward_claimed.read(user)
         }
         
-        fn claim_reward(ref self: ContractState, recipient: ContractAddress, user: felt252) {
+        fn claim_reward(ref self: ContractState, recipient: ContractAddress, user: felt252, app_version: felt252) {
+            assert!(app_version == self.app_version.read(), "App needs to be updated to claim reward");
             self.pausable.assert_not_paused();
             let caller = get_caller_address();
             let claimed = self.reward_claimed.read(caller);
@@ -422,6 +424,11 @@ mod PowGame {
 
         fn are_rewards_paused(self: @ContractState) -> bool {
             self.pausable.is_paused()
+        }
+
+        fn set_app_version(ref self: ContractState, app_version: felt252) {
+            self.check_valid_host(get_caller_address());
+            self.app_version.write(app_version);
         }
     }
 
