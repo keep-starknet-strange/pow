@@ -65,54 +65,49 @@ export const UpdateModal: React.FC<UpdateModalProps> = memo(
         onRequestClose={canDismiss ? onDismiss : undefined}
       >
         <View style={styles.overlay} collapsable={false}>
-          <View style={styles.windowContainer} collapsable={false}>
-            <View style={styles.windowSize}>
-              <View style={styles.contentCenter}>
-                <Text style={styles.titleText}>{title}</Text>
+          <View style={styles.windowSize} collapsable={false}>
+            <View style={styles.contentCenter}>
+              <Text style={styles.titleText}>{title}</Text>
 
-                {needsScroll ? (
-                  <ScrollView
-                    style={[styles.scrollView, { height: scrollHeight }]}
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={true}
-                  >
-                    <Text style={styles.messageText}>{message}</Text>
-                    {optionalLink && mode === "news" && (
-                      <TouchableOpacity
-                        onPress={() => Linking.openURL(optionalLink)}
-                        style={styles.linkContainer}
-                      >
-                        <Text style={styles.linkText}>Learn more</Text>
-                      </TouchableOpacity>
-                    )}
-                  </ScrollView>
-                ) : (
-                  <>
-                    <Text
-                      style={styles.messageText}
-                      onLayout={handleTextLayout}
+              {needsScroll ? (
+                <ScrollView
+                  style={[styles.scrollView, { height: scrollHeight }]}
+                  contentContainerStyle={styles.scrollContent}
+                  showsVerticalScrollIndicator={true}
+                >
+                  <Text style={styles.messageText}>{message}</Text>
+                  {optionalLink && mode === "news" && (
+                    <TouchableOpacity
+                      onPress={() => Linking.openURL(optionalLink)}
+                      style={styles.linkContainer}
                     >
-                      {message}
-                    </Text>
-                    {optionalLink && mode === "news" && (
-                      <TouchableOpacity
-                        onPress={() => Linking.openURL(optionalLink)}
-                        style={styles.linkContainer}
-                      >
-                        <Text style={styles.linkText}>Learn more</Text>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                )}
+                      <Text style={styles.linkText}>Learn more</Text>
+                    </TouchableOpacity>
+                  )}
+                </ScrollView>
+              ) : (
+                <>
+                  <Text style={styles.messageText} onLayout={handleTextLayout}>
+                    {message}
+                  </Text>
+                  {optionalLink && mode === "news" && (
+                    <TouchableOpacity
+                      onPress={() => Linking.openURL(optionalLink)}
+                      style={styles.linkContainer}
+                    >
+                      <Text style={styles.linkText}>Learn more</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
 
-                <View style={styles.buttonRow}>
-                  <Pressable
-                    onPress={handlePrimaryAction}
-                    style={styles.primaryBtn}
-                  >
-                    <Text style={styles.btnText}>{primaryLabel}</Text>
-                  </Pressable>
-                </View>
+              <View style={styles.buttonRow}>
+                <Pressable
+                  onPress={handlePrimaryAction}
+                  style={styles.primaryBtn}
+                >
+                  <Text style={styles.btnText}>{primaryLabel}</Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -129,9 +124,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
-  },
-  windowContainer: {
-    // Empty for now, just a wrapper
   },
   windowSize: {
     width: 300,
