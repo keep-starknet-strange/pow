@@ -190,6 +190,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       useEventManager.getState().notify("BlockFull");
       return;
     }
+
+    let shouldNotifyTxAdded = false;
+    let shouldNotifyBlockIsBuilt = false;
+    let txAddedData: any = null;
+
     set((state) => {
       const newWorkingBlocks = [...state.workingBlocks];
       if (!newWorkingBlocks[chainId]) {
@@ -209,23 +214,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         return {};
       }
-      // Trigger sound immediately before state changes
-      useEventManager.getState().notify("TxAdded", {
+
+      // Set flag to notify after state update
+      shouldNotifyTxAdded = true;
+      txAddedData = {
         chainId,
         tx: transaction,
         progress: (block.transactions.length + 1) / maxBlockSize,
-      });
+      };
 
       block.transactions.push(transaction);
       block.fees += transaction.fee;
       if (block.transactions.length >= maxBlockSize) {
         block.isBuilt = true;
-        // Notify immediately when the block becomes full as a result of this addition
-        useEventManager.getState().notify("BlockIsBuilt");
+        shouldNotifyBlockIsBuilt = true;
       }
       newWorkingBlocks[chainId] = block;
       return { workingBlocks: newWorkingBlocks };
     });
+
+    // Notify after state update is complete
+    if (shouldNotifyTxAdded) {
+      useEventManager.getState().notify("TxAdded", txAddedData);
+    }
+    if (shouldNotifyBlockIsBuilt) {
+      useEventManager.getState().notify("BlockIsBuilt");
+    }
   },
 
   initL2WorkingBlock: () => {
