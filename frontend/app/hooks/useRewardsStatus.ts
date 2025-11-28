@@ -57,6 +57,12 @@ export function useRewardsStatus() {
           }
         }
 
+        if (visitorId && visitorId == "0x0") {
+          setIsRewardAvailable(false);
+          setIsLoading(false);
+          return;
+        }
+
         // Check prestige threshold
         const params = await getRewardParams();
         const threshold = params?.rewardPrestigeThreshold || 1;
