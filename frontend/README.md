@@ -27,6 +27,19 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Remote Configuration
+
+The app uses Google Sheets for remote configuration management:
+
+[**Remote Config Sheet**](https://docs.google.com/spreadsheets/d/1xxhXwW09jAlbbUhGfnoEQu_vT_bcTHi9WfPlpqXPmNM/edit?gid=0#gid=0)
+
+This spreadsheet controls:
+- **Cell B1**: Minimum app version - forces users to update if their version is below this
+- **Cell B2**: What's new message - displays news/announcements to users
+- **Cell B3**: Optional link - adds a "Learn more" link to news messages (leave empty to hide)
+
+Changes to the spreadsheet take effect immediately on the next app launch.
+
 ## Get a fresh project
 
 When you're ready, run:
