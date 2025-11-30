@@ -214,9 +214,9 @@ const executeWithRetries = async (
 
       if (attempt < retries) {
         // Use exponential backoff for network errors, linear for others
-        const isNetworkError = errorMessage.includes(
-          "Network connection error",
-        );
+        const isNetworkError =
+          errorMessage.includes("Network connection error") ||
+          errorMessage.includes("Network error:");
         const retryDelay = isNetworkError
           ? BASE_RETRY_DELAY_MS * Math.pow(2, attempt) // Exponential backoff for network errors
           : BASE_RETRY_DELAY_MS; // Linear delay for other errors
