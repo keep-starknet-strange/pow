@@ -65,6 +65,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     error: fingerprintHookError,
     rawVisitorData: visitorData,
     tagEvent,
+    isDeviceBlocked,
   } = useVisitorId();
 
   const { getImage } = useImages();
@@ -170,6 +171,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   };
 
   const createAccountAndClaimUsername = async () => {
+    // Prevent account creation if device is blocked
+    if (isDeviceBlocked) {
+      setUsernameError("Device not supported.");
+      notify("BasicError");
+      return;
+    }
+
     setIsSavingAccount(true);
     try {
       // First check if we already have an account connected
@@ -263,6 +271,13 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     }
   };
 
+  // Show blocking UI if device is blocked (only when fingerprint data is available)
+  const shouldShowBlockingUI =
+    !fingerprintLoading &&
+    !fingerprintHookError &&
+    visitorData &&
+    isDeviceBlocked;
+
   return (
     <View
       style={{
@@ -271,137 +286,170 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     >
       <AccountCreationHeader width={width} topInset={insets.top} />
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          behavior="padding"
+      {shouldShowBlockingUI ? (
+        <View
           style={{
-            flex: 0.7,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 32,
           }}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-            }}
-            onLayout={(event) => {
-              const { width, height } = event.nativeEvent.layout;
-              setAvatarContainerSize({ width, height });
-            }}
-          >
-            <AvatarCreator
-              containerSize={avatarContainerSize}
-              avatar={avatar}
-              setAvatar={setAvatar}
-              newAvatar={newAvatar}
-              setNewAvatar={setNewAvatar}
-              startCreatingAvatar={startCreatingAvatar}
-              creatingAvatar={creatingAvatar}
-            />
-          </View>
-
           <Animated.View
             entering={FadeInDown}
-            className="flex flex-col items-start w-screen px-8 my-2"
+            className="flex flex-col items-center gap-6"
           >
-            <Text className="text-[#101119] text-lg font-Pixels">
-              Set up a username
+            <Text className="text-[#101119] text-2xl font-Pixels text-center">
+              Device not supported
             </Text>
-            <View className="flex-row items-center w-full mt-1 gap-2">
-              <TextInput
-                className="bg-[#10111910] flex-1 px-2
+            <Text className="text-[#101119a0] text-lg font-Pixels text-center">
+              This device is not supported for account creation.
+            </Text>
+            <BasicButton
+              label="Go Back"
+              onPress={() => {
+                setLoginPage("login");
+              }}
+            />
+          </Animated.View>
+        </View>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
+            behavior="padding"
+            style={{
+              flex: 0.7,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+              }}
+              onLayout={(event) => {
+                const { width, height } = event.nativeEvent.layout;
+                setAvatarContainerSize({ width, height });
+              }}
+            >
+              <AvatarCreator
+                containerSize={avatarContainerSize}
+                avatar={avatar}
+                setAvatar={setAvatar}
+                newAvatar={newAvatar}
+                setNewAvatar={setNewAvatar}
+                startCreatingAvatar={startCreatingAvatar}
+                creatingAvatar={creatingAvatar}
+              />
+            </View>
+
+            <Animated.View
+              entering={FadeInDown}
+              className="flex flex-col items-start w-screen px-8 my-2"
+            >
+              <Text className="text-[#101119] text-lg font-Pixels">
+                Set up a username
+              </Text>
+              <View className="flex-row items-center w-full mt-1 gap-2">
+                <TextInput
+                  className="bg-[#10111910] flex-1 px-2
                             pt-1 text-[32px] text-[#101119] border-2 border-[#101119]
                             shadow-lg shadow-black/50 font-Teatime"
-                selectionColor="#101119"
-                placeholder="Satoshi"
-                placeholderTextColor="#10111980"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoComplete="off"
-                value={username}
-                onChangeText={setUsername}
-              />
-              <Pressable
-                onPress={handleGenerateRandomUsername}
-                disabled={isGeneratingUsername || isSavingAccount}
-                className="shadow-lg shadow-black/50"
-              >
-                <Canvas style={{ width: 40, height: 40 }}>
-                  <SkiaImg
-                    image={getImage("icon.random")}
-                    x={0}
-                    y={0}
-                    width={40}
-                    height={40}
-                    fit="contain"
-                    sampling={{
-                      filter: FilterMode.Nearest,
-                      mipmap: MipmapMode.Nearest,
-                    }}
-                  />
-                </Canvas>
-              </Pressable>
-            </View>
-            <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
-              Please notice: your username will be public
-            </Text>
-            {fingerprintLoading && (
-              <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
-                Loading device fingerprint...
+                  selectionColor="#101119"
+                  placeholder="Satoshi"
+                  placeholderTextColor="#10111980"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="off"
+                  value={username}
+                  onChangeText={setUsername}
+                />
+                <Pressable
+                  onPress={handleGenerateRandomUsername}
+                  disabled={isGeneratingUsername || isSavingAccount}
+                  className="shadow-lg shadow-black/50"
+                >
+                  <Canvas style={{ width: 40, height: 40 }}>
+                    <SkiaImg
+                      image={getImage("icon.random")}
+                      x={0}
+                      y={0}
+                      width={40}
+                      height={40}
+                      fit="contain"
+                      sampling={{
+                        filter: FilterMode.Nearest,
+                        mipmap: MipmapMode.Nearest,
+                      }}
+                    />
+                  </Canvas>
+                </Pressable>
+              </View>
+              <Text className="text-[#101119a0] text-md mt-2 font-Pixels">
+                Please notice: your username will be public
               </Text>
-            )}
-            {!fingerprintLoading && !visitorData && !fingerprintHookError && (
-              <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
-                Fingerprint not loaded. Try refreshing the page.
-              </Text>
-            )}
-            {usernameError ? (
-              <Text className="text-red-500 text-md mt-2 font-Pixels">
-                {usernameError}
-              </Text>
-            ) : null}
-          </Animated.View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-      <Animated.View
-        style={{
-          flex: 0.3,
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-        }}
-        entering={FadeInDown}
-      >
-        <BasicButton
-          label={
-            isSavingAccount
-              ? "Saving..."
-              : fingerprintLoading
-                ? "Loading..."
-                : "Save"
-          }
-          disabled={isSavingAccount || fingerprintLoading}
-          onPress={async () => {
-            if (!isUsernameValid(username)) {
-              setUsernameError(`Invalid username:\n${usernameValidationError}`);
-              notify("BasicError");
-              return;
-            }
-            if (!(await isUsernameUnique(username))) {
-              setUsernameError("This username is unavailable.");
-              notify("BasicError");
-              return;
-            }
-            await createAccountAndClaimUsername();
+              {fingerprintLoading && (
+                <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
+                  Loading device fingerprint...
+                </Text>
+              )}
+              {!fingerprintLoading && !visitorData && !fingerprintHookError && (
+                <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
+                  Fingerprint not loaded. Try refreshing the page.
+                </Text>
+              )}
+              {usernameError ? (
+                <Text className="text-red-500 text-md mt-2 font-Pixels">
+                  {usernameError}
+                </Text>
+              ) : null}
+            </Animated.View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      )}
+      {!shouldShowBlockingUI && (
+        <Animated.View
+          style={{
+            flex: 0.3,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
           }}
-        />
-        <BasicButton
-          label="Cancel"
-          disabled={isSavingAccount}
-          onPress={async () => {
-            setLoginPage("login");
-          }}
-        />
-      </Animated.View>
+          entering={FadeInDown}
+        >
+          <BasicButton
+            label={
+              isSavingAccount
+                ? "Saving..."
+                : fingerprintLoading
+                  ? "Loading..."
+                  : "Save"
+            }
+            disabled={isSavingAccount || fingerprintLoading || isDeviceBlocked}
+            onPress={async () => {
+              if (!isUsernameValid(username)) {
+                setUsernameError(
+                  `Invalid username:\n${usernameValidationError}`,
+                );
+                notify("BasicError");
+                return;
+              }
+              if (!(await isUsernameUnique(username))) {
+                setUsernameError("This username is unavailable.");
+                notify("BasicError");
+                return;
+              }
+              await createAccountAndClaimUsername();
+            }}
+          />
+          <BasicButton
+            label="Cancel"
+            disabled={isSavingAccount}
+            onPress={async () => {
+              setLoginPage("login");
+            }}
+          />
+        </Animated.View>
+      )}
 
       <View
         style={{
