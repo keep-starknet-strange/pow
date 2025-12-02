@@ -185,31 +185,22 @@ export class TxBuilderObserver implements Observer {
       case "MineDone":
         if (data.block?.blockId === 0) {
           addActionForceCall(createInitMyGameCall(this.contractAddress));
+        } else {
+          addAction(createMineBlockCall(this.contractAddress, 0));
         }
-        // Don't add mine_block call here - the new block needs to be filled first
-        // mine_block calls will be added when user clicks (MineClicked events)
         break;
       case "SequenceClicked":
+      case "SequenceDone":
         if (data.ignoreAction) return;
         addAction(createMineBlockCall(this.contractAddress, 1));
         break;
-      case "SequenceDone":
-        // Don't add mine_block call here - the new block needs to be filled first
-        // mine_block calls will be added when user clicks (SequenceClicked events)
-        break;
       case "DaClicked":
+      case "DaDone":
         addAction(createStoreDaCall(this.contractAddress, 1));
         break;
-      case "DaDone":
-        // Don't add store_da call here - the new DA needs to be filled first
-        // store_da calls will be added when user clicks (DaClicked events)
-        break;
       case "ProveClicked":
-        addAction(createProveCall(this.contractAddress, 1));
-        break;
       case "ProveDone":
-        // Don't add prove call here - the new Proof needs to be filled first
-        // prove calls will be added when user clicks (ProveClicked events)
+        addAction(createProveCall(this.contractAddress, 1));
         break;
       case "TxUpgradePurchased":
         if (data.type === "txFee") {
