@@ -214,9 +214,9 @@ const executeWithRetries = async (
 
       if (attempt < retries) {
         // Use exponential backoff for network errors, linear for others
-        const isNetworkError = errorMessage.includes(
-          "Network connection error",
-        );
+        const isNetworkError =
+          errorMessage.includes("Network connection error") ||
+          errorMessage.includes("Network error:");
         const retryDelay = isNetworkError
           ? BASE_RETRY_DELAY_MS * Math.pow(2, attempt) // Exponential backoff for network errors
           : BASE_RETRY_DELAY_MS; // Linear delay for other errors
@@ -871,14 +871,21 @@ export const StarknetConnectorProvider: React.FC<{
           }
 
           if (sendGaslessTxRes.data?.revertError) {
+            const revertError = sendGaslessTxRes.data.revertError;
             if (__DEV__)
-              console.log(
-                "⚠️ Revert error from paymaster: ",
-                sendGaslessTxRes.data.revertError,
-              );
-            // Don't throw here, let the retry logic handle validation
+              console.log("⚠️ Revert error from paymaster: ", revertError);
+
+            // Check if it's a network error (502/503/504) vs actual revert
+            const isNetworkError =
+              revertError.includes("502 Bad Gateway") ||
+              revertError.includes("503 Service Unavailable") ||
+              revertError.includes("504 Gateway Timeout") ||
+              revertError.includes("HTTP status server error");
+
             throw new Error(
-              `Revert error: ${sendGaslessTxRes.data.revertError}`,
+              isNetworkError
+                ? "Network error: Starknet gateway is temporarily unavailable. Please try again."
+                : `Transaction reverted: ${revertError}`,
             );
           }
 
