@@ -97,14 +97,13 @@ jobs:
 
             - uses: ruby/setup-ruby@v1
               with:
-                ruby-version: '2.6'
+                ruby-version: '3.3'
+                bundler-cache: true
+                working-directory: ./frontend
 
-            - name: Update Gems
+            - name: Install Gems
               working-directory: ./frontend
-              run: |
-                gem install bundler -v 2.4.22
-                bundle config path vendor/bundle
-                bundle update
+              run: bundle install
 
             - name: Upload to Firebase
               if: ${{ inputs.internal_testing == true }}
@@ -170,9 +169,15 @@ jobs:
               working-directory: ./frontend
               run: npm ci
 
-            - name: Update Gems
+            - uses: ruby/setup-ruby@v1
+              with:
+                ruby-version: '3.3'
+                bundler-cache: true
+                working-directory: ./frontend
+
+            - name: Install Gems
               working-directory: ./frontend
-              run: bundle update
+              run: bundle install
 
             - name: Decode secrets
               working-directory: ./frontend
