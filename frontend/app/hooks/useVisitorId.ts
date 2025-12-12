@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react-native";
-import { visitorIdToFelt252, FINGERPRINT_CONFIG } from "../configs/fingerprint";
+import {
+  visitorIdToFelt252,
+  FINGERPRINT_CONFIG,
+  SuspectScoreResponse,
+} from "../configs/fingerprint";
+import { validateSealedResult } from "../api/requests";
 
 /**
  * Hook to get the visitor ID from fingerprint and convert it to felt252 format.
@@ -12,11 +17,31 @@ import { visitorIdToFelt252, FINGERPRINT_CONFIG } from "../configs/fingerprint";
  * - rawVisitorData: The raw visitor data object from fingerprintjs
  * - hasVisitorId: Whether a valid visitor ID was retrieved
  * - tagEvent: Function to tag a Fingerprint event with custom metadata and linkedId
+ * - sealedResult: The sealed result from Fingerprint SDK (if available)
+ * - suspectScore: The suspect score from backend validation (0.0-1.0)
+ * - isSuspectScoreLoading: Whether suspect score is being retrieved
+ * - getSuspectScore: Function to retrieve suspect score from backend
  */
 export function useVisitorId() {
   const { data: visitorData, isLoading, error, getData } = useVisitorData();
   const [visitorId, setVisitorId] = useState<string>("0x0");
   const [hasVisitorId, setHasVisitorId] = useState<boolean>(false);
+  const [sealedResult, setSealedResult] = useState<string | null>(null);
+  const [suspectScore, setSuspectScore] = useState<number | null>(null);
+  const [isSuspectScoreLoading, setIsSuspectScoreLoading] =
+    useState<boolean>(false);
+
+  // Extract sealed result from visitor data
+  useEffect(() => {
+    if (visitorData?.sealedResult) {
+      setSealedResult(visitorData.sealedResult);
+      if (__DEV__) {
+        console.log("useVisitorId: Sealed result extracted");
+      }
+    } else {
+      setSealedResult(null);
+    }
+  }, [visitorData]);
 
   // Debug logging
   useEffect(() => {
@@ -28,10 +53,12 @@ export function useVisitorId() {
         visitorId: visitorData?.visitorId,
         confidence: visitorData?.confidence?.score,
         hasGetData: !!getData,
+        hasSealedResult: !!sealedResult,
+        suspectScore,
         visitorDataFull: visitorData,
       });
     }
-  }, [isLoading, error, visitorData, getData]);
+  }, [isLoading, error, visitorData, getData, sealedResult, suspectScore]);
 
   useEffect(() => {
     if (isLoading) {
@@ -94,12 +121,17 @@ export function useVisitorId() {
 
     try {
       const result = await getData(tag, linkedId);
+      // Update sealed result if available in the new result
+      if (result?.sealedResult) {
+        setSealedResult(result.sealedResult);
+      }
       if (__DEV__) {
         console.log("useVisitorId: Tagged event:", {
           tag,
           linkedId,
           visitorId: result?.visitorId,
           requestId: result?.requestId,
+          hasSealedResult: !!result?.sealedResult,
         });
       }
       return result;
@@ -111,6 +143,47 @@ export function useVisitorId() {
     }
   };
 
+  // Function to retrieve suspect score from backend
+  const getSuspectScore = async (): Promise<SuspectScoreResponse | null> => {
+    if (!sealedResult) {
+      if (__DEV__) {
+        console.warn(
+          "useVisitorId: No sealed result available for suspect score validation",
+        );
+      }
+      return null;
+    }
+
+    setIsSuspectScoreLoading(true);
+    try {
+      const response = await validateSealedResult(
+        sealedResult,
+        visitorData?.requestId,
+      );
+      setSuspectScore(response.suspectScore);
+      if (__DEV__) {
+        console.log("useVisitorId: Suspect score retrieved:", {
+          suspectScore: response.suspectScore,
+          isValid: response.isValid,
+        });
+      }
+      return response;
+    } catch (error) {
+      if (__DEV__) {
+        console.error("useVisitorId: Error retrieving suspect score:", error);
+      }
+      // Set suspect score to maximum on error (most suspicious)
+      setSuspectScore(1.0);
+      return {
+        suspectScore: 1.0,
+        isValid: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    } finally {
+      setIsSuspectScoreLoading(false);
+    }
+  };
+
   return {
     visitorId,
     isLoading,
@@ -118,5 +191,9 @@ export function useVisitorId() {
     rawVisitorData: visitorData,
     hasVisitorId,
     tagEvent,
+    sealedResult,
+    suspectScore,
+    isSuspectScoreLoading,
+    getSuspectScore,
   };
 }

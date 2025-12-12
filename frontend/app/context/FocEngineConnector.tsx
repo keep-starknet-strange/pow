@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { Call, Contract } from "starknet";
 import { useStarknetConnector } from "./StarknetConnector";
+import { useAuth } from "./AuthContext";
 import focRegistryAbi from "../abis/foc_registry.json";
 import focAccountsAbi from "../abis/foc_accounts.json";
 
@@ -157,6 +158,7 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
     STARKNET_ENABLED,
     storeKeyAndConnect,
   } = useStarknetConnector();
+  const { getAuthHeaders, refreshAccessToken } = useAuth();
 
   const [registryContractAddress, setRegistryContractAddress] = useState<
     string | null
@@ -679,25 +681,40 @@ export const FocEngineProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    const res = await fetch(`${FOC_ENGINE_API}/accounts/mint-funds`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: address,
-        amount: amount.toString(),
-        unit: unit || "FRI",
-      }),
-    });
-    if (!res.ok) {
-      const errorText = await res.json();
-      console.error("Failed to mint funds:", errorText);
-      return;
-    }
-    const data = await res.json();
-    console.log("Minted funds:", address, amount, unit, data);
-    return data;
+    const makeRequest = async (retry = false): Promise<any> => {
+      const authHeaders = await getAuthHeaders();
+      const res = await fetch(`${FOC_ENGINE_API}/accounts/mint-funds`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders,
+        },
+        body: JSON.stringify({
+          address: address,
+          amount: amount.toString(),
+          unit: unit || "FRI",
+        }),
+      });
+
+      if (res.status === 401 && !retry) {
+        // Try to refresh token and retry once
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          return makeRequest(true);
+        }
+      }
+
+      if (!res.ok) {
+        const errorText = await res.json().catch(() => ({}));
+        console.error("Failed to mint funds:", errorText);
+        return;
+      }
+      const data = await res.json();
+      console.log("Minted funds:", address, amount, unit, data);
+      return data;
+    };
+
+    return makeRequest();
   };
 
   const getRegisteredContract = useCallback(

@@ -5,6 +5,7 @@ import { FingerprintJsProProvider } from "@fingerprintjs/fingerprintjs-pro-react
 import { StarknetConnectorProvider } from "./context/StarknetConnector";
 import { FocEngineProvider } from "./context/FocEngineConnector";
 import { PowContractProvider } from "./context/PowContractConnector";
+import { AuthProvider } from "./context/AuthContext";
 import { useImagePreloader } from "./hooks/useImagePreloader";
 import { FINGERPRINT_CONFIG } from "./configs/fingerprint";
 import Game from "./game";
@@ -35,13 +36,15 @@ export default function App() {
       apiKey={FINGERPRINT_CONFIG.apiKey}
       region={FINGERPRINT_CONFIG.region}
     >
-      <StarknetConnectorProvider>
-        <FocEngineProvider>
-          <PowContractProvider>
-            <Game />
-          </PowContractProvider>
-        </FocEngineProvider>
-      </StarknetConnectorProvider>
+      <AuthProvider>
+        <StarknetConnectorProvider>
+          <FocEngineProvider>
+            <PowContractProvider>
+              <Game />
+            </PowContractProvider>
+          </FocEngineProvider>
+        </StarknetConnectorProvider>
+      </AuthProvider>
     </FingerprintJsProProvider>
   );
 }

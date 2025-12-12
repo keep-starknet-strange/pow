@@ -11,6 +11,10 @@ export const FINGERPRINT_CONFIG = {
   confidenceThreshold: parseFloat(
     process.env.EXPO_PUBLIC_FINGERPRINT_CONFIDENCE_THRESHOLD || "0.7",
   ),
+  // Suspect score threshold for blocking suspicious users (0.0-1.0)
+  suspectScoreThreshold: parseFloat(
+    process.env.EXPO_PUBLIC_FINGERPRINT_SUSPECT_SCORE_THRESHOLD || "0.5",
+  ),
   // Additional configuration options
   options: {
     // Enable extended result for more detailed device information
@@ -72,6 +76,15 @@ export interface FingerprintValidationResult {
   is_valid: boolean;
   message?: string;
   timestamp?: number;
+}
+
+// Suspect score validation response from backend
+export interface SuspectScoreResponse {
+  suspectScore: number; // 0.0-1.0, higher is more suspicious
+  isValid: boolean;
+  visitorId?: string;
+  requestId?: string;
+  error?: string;
 }
 
 // Utility function to convert visitor ID string to felt252 hex format

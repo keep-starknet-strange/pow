@@ -28,6 +28,7 @@ import {
   GaslessOptions,
   SEPOLIA_BASE_URL,
 } from "@avnu/gasless-sdk";
+import { useAuth } from "./AuthContext";
 
 export const LOCALHOST_RPC_URL =
   process.env.EXPO_PUBLIC_LOCALHOST_RPC_URL || "http://localhost:5050/rpc";
@@ -244,6 +245,7 @@ const executeWithRetries = async (
 export const StarknetConnectorProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const { getAuthHeaders, refreshAccessToken } = useAuth();
   const [account, setAccount] = useState<Account | null>(null);
   const [provider, setProvider] = useState<RpcProvider | null>(null);
   const [network, setNetwork] = useState<string>(
@@ -799,18 +801,38 @@ export const StarknetConnectorProvider: React.FC<{
             deploymentData: deploymentData || undefined,
           };
 
-          // Build gasless tx data
-          const gaslessTxRes = await fetch(buildGaslessTxDataUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(gaslessTxInput),
-          })
-            .then((response) => response.json())
-            .catch((error) =>
-              handleNetworkError(error, "Error building gasless tx data:"),
-            );
+          // Build gasless tx data with authentication
+          const makeBuildRequest = async (retry = false): Promise<any> => {
+            const authHeaders = await getAuthHeaders();
+            const response = await fetch(buildGaslessTxDataUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...authHeaders,
+              },
+              body: JSON.stringify(gaslessTxInput),
+            });
+
+            if (response.status === 401 && !retry) {
+              // Try to refresh token and retry once
+              const refreshed = await refreshAccessToken();
+              if (refreshed) {
+                return makeBuildRequest(true);
+              }
+            }
+
+            if (!response.ok) {
+              throw new Error(
+                `Failed to build gasless tx: ${response.status}`,
+              );
+            }
+
+            return response.json();
+          };
+
+          const gaslessTxRes = await makeBuildRequest().catch((error) =>
+            handleNetworkError(error, "Error building gasless tx data:"),
+          );
 
           if (gaslessTxRes.error) {
             if (__DEV__)
@@ -851,18 +873,36 @@ export const StarknetConnectorProvider: React.FC<{
             deploymentData: deploymentData || undefined,
           };
 
-          // Send gasless transaction
-          const sendGaslessTxRes = await fetch(sendGaslessTxUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(sendGaslessTxInput),
-          })
-            .then((response) => response.json())
-            .catch((error) =>
-              handleNetworkError(error, "Error sending gasless tx:"),
-            );
+          // Send gasless transaction with authentication
+          const makeSendRequest = async (retry = false): Promise<any> => {
+            const authHeaders = await getAuthHeaders();
+            const response = await fetch(sendGaslessTxUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...authHeaders,
+              },
+              body: JSON.stringify(sendGaslessTxInput),
+            });
+
+            if (response.status === 401 && !retry) {
+              // Try to refresh token and retry once
+              const refreshed = await refreshAccessToken();
+              if (refreshed) {
+                return makeSendRequest(true);
+              }
+            }
+
+            if (!response.ok) {
+              throw new Error(`Failed to send gasless tx: ${response.status}`);
+            }
+
+            return response.json();
+          };
+
+          const sendGaslessTxRes = await makeSendRequest().catch((error) =>
+            handleNetworkError(error, "Error sending gasless tx:"),
+          );
 
           if (sendGaslessTxRes.error) {
             if (__DEV__)

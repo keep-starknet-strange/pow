@@ -63,6 +63,9 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     error: fingerprintHookError,
     rawVisitorData: visitorData,
     tagEvent,
+    suspectScore,
+    isSuspectScoreLoading,
+    getSuspectScore,
   } = useVisitorId();
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
@@ -102,6 +105,23 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
       console.log("Claim Reward - Fingerprint still loading");
       setFingerprintError("Device verification is loading. Please wait...");
       return;
+    }
+
+    // Check suspect score before allowing reward claim
+    if (getSuspectScore) {
+      const scoreResponse = await getSuspectScore();
+      if (scoreResponse) {
+        const score = scoreResponse.suspectScore;
+        if (score > FINGERPRINT_CONFIG.suspectScoreThreshold) {
+          setFingerprintError(
+            `Reward claim blocked due to suspicious activity (score: ${score.toFixed(2)}). Please contact support if you believe this is an error.`,
+          );
+          return;
+        }
+        if (__DEV__) {
+          console.log("Claim Reward - Suspect score check passed:", score);
+        }
+      }
     }
 
     // visitorId from hook is already in felt252 format or "0x0"
@@ -179,6 +199,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     invokeCalls,
     visitorId,
     fingerprintLoading,
+    getSuspectScore,
+    notify,
+    tagEvent,
+    account?.address,
   ]);
 
   useEffect(() => {
@@ -295,7 +319,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
     !isValidAddress ||
     !visitorData?.visitorId ||
     (visitorData?.confidence?.score ?? 0) <
-      FINGERPRINT_CONFIG.confidenceThreshold;
+      FINGERPRINT_CONFIG.confidenceThreshold ||
+    isSuspectScoreLoading ||
+    (suspectScore !== null &&
+      suspectScore > FINGERPRINT_CONFIG.suspectScoreThreshold);
 
   const containerWidth = claimState === "claiming" ? 260 : 220;
 
@@ -419,7 +446,10 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         </View>
       )}
 
-      <LoadingModal visible={claiming} text="Claiming…" />
+      <LoadingModal
+        visible={claiming || isSuspectScoreLoading}
+        text={isSuspectScoreLoading ? "Validating security…" : "Claiming…"}
+      />
     </SafeAreaView>
   );
 };

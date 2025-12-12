@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocEngine } from "../../context/FocEngineConnector";
 import { useStarknetConnector } from "../../context/StarknetConnector";
 import { usePowContractConnector } from "../../context/PowContractConnector";
+import { useAuth } from "../../context/AuthContext";
 import { useEventManager } from "../../stores/useEventManager";
 import { useImages } from "../../hooks/useImages";
 import NounsBuilder from "../../components/NounsBuilder";
@@ -22,6 +23,7 @@ import Constants from "expo-constants";
 import { getRandomNounsAttributes, NounsAttributes } from "../../configs/nouns";
 import { generateRandomUsername } from "../../utils/usernameGenerator";
 import { useVisitorId } from "../../hooks/useVisitorId";
+import { FINGERPRINT_CONFIG } from "../../configs/fingerprint";
 import {
   Canvas,
   FilterMode,
@@ -65,7 +67,12 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
     error: fingerprintHookError,
     rawVisitorData: visitorData,
     tagEvent,
+    suspectScore,
+    isSuspectScoreLoading,
+    getSuspectScore,
+    sealedResult,
   } = useVisitorId();
+  const { authenticateWithFingerprint, isAuthenticated } = useAuth();
 
   const { getImage } = useImages();
   const insets = useSafeAreaInsets();
@@ -80,6 +87,7 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
   const [isGeneratingUsername, setIsGeneratingUsername] =
     React.useState<boolean>(false);
   const [isSavingAccount, setIsSavingAccount] = React.useState<boolean>(false);
+  const [suspectScoreError, setSuspectScoreError] = React.useState<string>("");
   const [avatar, setAvatar] = React.useState<NounsAttributes>(
     getRandomNounsAttributes(),
   );
@@ -171,7 +179,26 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
 
   const createAccountAndClaimUsername = async () => {
     setIsSavingAccount(true);
+    setSuspectScoreError("");
     try {
+      // Check suspect score before allowing account creation
+      if (getSuspectScore) {
+        const scoreResponse = await getSuspectScore();
+        if (scoreResponse) {
+          const score = scoreResponse.suspectScore;
+          if (score > FINGERPRINT_CONFIG.suspectScoreThreshold) {
+            setSuspectScoreError(
+              `Account creation blocked due to suspicious activity (score: ${score.toFixed(2)}). Please contact support if you believe this is an error.`,
+            );
+            setIsSavingAccount(false);
+            notify("BasicError");
+            return;
+          }
+          if (__DEV__) {
+            console.log("AccountCreation: Suspect score check passed:", score);
+          }
+        }
+      }
       // First check if we already have an account connected
       const keys = await getAvailableKeys("pow_game");
       if (keys.length > 0) {
@@ -237,6 +264,38 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
       } else {
         if (__DEV__) {
           console.log("No visitor ID available for fingerprint integration");
+        }
+      }
+
+      // Ensure authentication after account creation
+      if (!isAuthenticated && sealedResult) {
+        try {
+          const requestId = visitorData?.requestId;
+          const authResult = await authenticateWithFingerprint(
+            sealedResult,
+            requestId,
+          );
+          if (authResult) {
+            if (__DEV__) {
+              console.log(
+                "AccountCreation: Successfully authenticated after account creation",
+              );
+            }
+          } else {
+            if (__DEV__) {
+              console.warn(
+                "AccountCreation: Failed to authenticate after account creation",
+              );
+            }
+          }
+        } catch (authError) {
+          // Don't fail account creation if authentication fails
+          if (__DEV__) {
+            console.error(
+              "AccountCreation: Error authenticating after account creation:",
+              authError,
+            );
+          }
         }
       }
 
@@ -359,6 +418,16 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
                 {usernameError}
               </Text>
             ) : null}
+            {suspectScoreError ? (
+              <Text className="text-red-500 text-md mt-2 font-Pixels">
+                {suspectScoreError}
+              </Text>
+            ) : null}
+            {isSuspectScoreLoading && (
+              <Text className="text-[#10111980] text-sm mt-1 font-Pixels">
+                Validating device security...
+              </Text>
+            )}
           </Animated.View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -375,11 +444,17 @@ export const AccountCreationPage: React.FC<AccountCreationProps> = ({
           label={
             isSavingAccount
               ? "Saving..."
-              : fingerprintLoading
+              : fingerprintLoading || isSuspectScoreLoading
                 ? "Loading..."
                 : "Save"
           }
-          disabled={isSavingAccount || fingerprintLoading}
+          disabled={
+            isSavingAccount ||
+            fingerprintLoading ||
+            isSuspectScoreLoading ||
+            (suspectScore !== null &&
+              suspectScore > FINGERPRINT_CONFIG.suspectScoreThreshold)
+          }
           onPress={async () => {
             if (!isUsernameValid(username)) {
               setUsernameError(`Invalid username:\n${usernameValidationError}`);
