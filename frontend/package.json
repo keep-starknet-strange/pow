@@ -21,6 +21,7 @@
   "dependencies": {
     "@animatereactnative/marquee": "^0.5.2",
     "@avnu/gasless-sdk": "^0.1.8",
+    "@cartridge/controller": "^0.11.3",
     "@expo/vector-icons": "^14.1.0",
     "@fingerprintjs/fingerprintjs-pro-react-native": "^3.9.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
