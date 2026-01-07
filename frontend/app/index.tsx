@@ -57,12 +57,12 @@ export default function App() {
         </StarknetConnectorProvider>
       </FingerprintJsProProvider>
 
-      <UpdateModal
-        visible={needsUpdate}
+      {/* <UpdateModal
+        visible={false}
         mode="force-update"
         title="Update Required"
         message={`Please update to the latest version (${minVersion || "latest"}) to continue. Your current version is ${currentVersion}.`}
-      />
+      /> */}
     </>
   );
 }

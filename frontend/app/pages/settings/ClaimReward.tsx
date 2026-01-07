@@ -22,6 +22,7 @@ import { AddressExplorerLink } from "../../components/claim-reward/AddressExplor
 import { PageHeader } from "../../components/claim-reward/PageHeader";
 import { WalletButtonRow } from "../../components/claim-reward/WalletButtonRow";
 import { LoadingModal } from "../../components/claim-reward/LoadingModal";
+import { CartridgeAuth } from "../../components/claim-reward/CartridgeAuth";
 import { useEventManager } from "../../stores/useEventManager";
 import { InsufficientFundsModal } from "../../components/InsufficientFundsModal";
 import { useOpenApp } from "../../hooks/useOpenApp";
@@ -67,6 +68,7 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const insets = useSafeAreaInsets();
   const [accountInput, setAccountInput] = useState("");
   const debouncedInput = useDebouncedValue(accountInput, 200);
+  const [authMethod, setAuthMethod] = useState<"manual" | "cartridge">("manual");
   const [claimed, setClaimed] = useState<boolean>(false);
   const [claiming, setClaiming] = useState<boolean>(false);
   const [rewardAmountStr, setRewardAmountStr] = useState<string>("10");
@@ -85,6 +87,11 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
   const handleBack = useCallback(() => {
     if (onBack) onBack();
   }, [onBack]);
+
+  const handleCartridgeAuthSuccess = useCallback((address: string) => {
+    setAccountInput(address);
+    setAuthMethod("cartridge");
+  }, []);
 
   const claimReward = useCallback(async () => {
     const recipient = (debouncedInput || "").trim();
@@ -349,38 +356,81 @@ const ClaimRewardSectionComponent: React.FC<ClaimRewardProps> = ({
         {/* Section 1: Wallet Address */}
         <SectionTitle title="Wallet Address" width={width} />
         <View style={styles.section}>
-          <View style={styles.card}>
-            <WalletButtonRow
-              onPressReady={() => openApp(WalletPresets.readyWallet)}
-              onPressBraavos={() => openApp(WalletPresets.braavos)}
-            />
-            <Text style={styles.hintInline}>
-              Open a wallet above and paste an address to receive your STRK.
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="copy/paste your account address"
-              placeholderTextColor="#bfbfc6"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="off"
-              value={accountInput}
-              onChangeText={setAccountInput}
-            />
-
-            <AddressExplorerLink
-              address={debouncedInput}
-              network={network}
-              styles={{
-                linkSlot: styles.linkSlot,
-                linkWrap: styles.linkWrap,
-                linkText: styles.linkText,
-                linkDisabled: styles.linkDisabled,
-                validationSlot: styles.validationSlot,
-                errorInline: styles.errorInline,
-              }}
-            />
+          {/* Cartridge Auth Option */}
+          <View style={styles.authMethodContainer}>
+            <TouchableOpacity
+              style={[
+                styles.authMethodButton,
+                authMethod === "cartridge" && styles.authMethodButtonActive,
+              ]}
+              onPress={() => setAuthMethod("cartridge")}
+            >
+              <Text
+                style={[
+                  styles.authMethodText,
+                  authMethod === "cartridge" && styles.authMethodTextActive,
+                ]}
+              >
+                Use Cartridge Account
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.authMethodButton,
+                authMethod === "manual" && styles.authMethodButtonActive,
+              ]}
+              onPress={() => setAuthMethod("manual")}
+            >
+              <Text
+                style={[
+                  styles.authMethodText,
+                  authMethod === "manual" && styles.authMethodTextActive,
+                ]}
+              >
+                Enter Address Manually
+              </Text>
+            </TouchableOpacity>
           </View>
+
+          {authMethod === "cartridge" ? (
+            <CartridgeAuth onAuthSuccess={handleCartridgeAuthSuccess} />
+          ) : (
+            <View style={styles.card}>
+              <WalletButtonRow
+                onPressReady={() => openApp(WalletPresets.readyWallet)}
+                onPressBraavos={() => openApp(WalletPresets.braavos)}
+              />
+              <Text style={styles.hintInline}>
+                Open a wallet above and paste an address to receive your STRK.
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="copy/paste your account address"
+                placeholderTextColor="#bfbfc6"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                value={accountInput}
+                onChangeText={(text) => {
+                  setAccountInput(text);
+                  setAuthMethod("manual");
+                }}
+              />
+
+              <AddressExplorerLink
+                address={debouncedInput}
+                network={network}
+                styles={{
+                  linkSlot: styles.linkSlot,
+                  linkWrap: styles.linkWrap,
+                  linkText: styles.linkText,
+                  linkDisabled: styles.linkDisabled,
+                  validationSlot: styles.validationSlot,
+                  errorInline: styles.errorInline,
+                }}
+              />
+            </View>
+          )}
         </View>
 
         <View
@@ -543,5 +593,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontFamily: "Pixels",
+  },
+  authMethodContainer: {
+    flexDirection: "row",
+    marginBottom: 12,
+    gap: 8,
+  },
+  authMethodButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#39274E",
+    backgroundColor: "rgba(16,17,25,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  authMethodButtonActive: {
+    borderColor: "#22c55e",
+    backgroundColor: "rgba(34, 197, 94, 0.1)",
+  },
+  authMethodText: {
+    fontFamily: "Pixels",
+    fontSize: 14,
+    color: "#9ca3af",
+    textAlign: "center",
+  },
+  authMethodTextActive: {
+    color: "#22c55e",
   },
 });
